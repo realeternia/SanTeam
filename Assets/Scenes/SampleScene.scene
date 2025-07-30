@@ -154,7 +154,7 @@ Transform:
   m_GameObject: {fileID: 252496193}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 454.494, y: 6.29, z: 171.03}
+  m_LocalPosition: {x: 370.8, y: 6.29, z: 129}
   m_LocalScale: {x: 5, y: 1, z: 5}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -177,8 +177,8 @@ MonoBehaviour:
   side: 2
   chessName: bing
   rend: {fileID: 252496197}
-  moveSpeed: 5
-  attackRange: 15
+  moveSpeed: 100
+  attackRange: 25
   hp: 50
   atk: 30
 --- !u!136 &252496196
@@ -398,6 +398,7 @@ Transform:
   - {fileID: 569130388}
   - {fileID: 2064149874}
   - {fileID: 252496194}
+  - {fileID: 928509266}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &390308835
@@ -453,8 +454,8 @@ MonoBehaviour:
   side: 1
   chessName: bing
   rend: {fileID: 390308839}
-  moveSpeed: 5
-  attackRange: 20
+  moveSpeed: 100
+  attackRange: 25
   hp: 50
   atk: 30
 --- !u!136 &390308838
@@ -775,8 +776,8 @@ MonoBehaviour:
   side: 2
   chessName: bing
   rend: {fileID: 569130390}
-  moveSpeed: 5
-  attackRange: 15
+  moveSpeed: 100
+  attackRange: 25
   hp: 50
   atk: 30
 --- !u!1 &705507993
@@ -1005,8 +1006,8 @@ MonoBehaviour:
   side: 1
   chessName: bing
   rend: {fileID: 838503202}
-  moveSpeed: 5
-  attackRange: 20
+  moveSpeed: 100
+  attackRange: 25
   hp: 50
   atk: 30
 --- !u!1 &926679980
@@ -1062,8 +1063,8 @@ MonoBehaviour:
   side: 1
   chessName: bing
   rend: {fileID: 926679984}
-  moveSpeed: 5
-  attackRange: 20
+  moveSpeed: 100
+  attackRange: 25
   hp: 50
   atk: 30
 --- !u!136 &926679983
@@ -1142,6 +1143,140 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 926679980}
+  m_Mesh: {fileID: 10206, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &928509265
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 7
+  m_Component:
+  - component: {fileID: 928509266}
+  - component: {fileID: 928509270}
+  - component: {fileID: 928509269}
+  - component: {fileID: 928509268}
+  - component: {fileID: 928509267}
+  m_Layer: 0
+  m_HasEditorInfo: 1
+  m_Name: Cylinder (6)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &928509266
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 928509265}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 394.7, y: 6.29, z: 129}
+  m_LocalScale: {x: 5, y: 1, z: 5}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 323741682}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &928509267
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 928509265}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 56e2376d7588b0a42afb0252497515e1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  id: 9
+  maxHp: 100
+  side: 2
+  chessName: bing
+  rend: {fileID: 928509269}
+  moveSpeed: 100
+  attackRange: 25
+  hp: 50
+  atk: 30
+--- !u!136 &928509268
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 928509265}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.5000001
+  m_Height: 2
+  m_Direction: 1
+  m_Center: {x: 0.000000059604645, y: 0, z: -0.00000008940697}
+--- !u!23 &928509269
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 928509265}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_virtualGeometry: 0
+  m_virtualGeometryShadow: 0
+  m_ShadingRate: 0
+  m_ForceDisableGRD: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!33 &928509270
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 928509265}
   m_Mesh: {fileID: 10206, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!1 &963194225
 GameObject:
@@ -1251,6 +1386,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 610ec84bc0ac9db47aea10406a020ad2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Units: {fileID: 323741681}
   gridCellSize: 3
 --- !u!1 &1082794238
 GameObject:
@@ -1399,9 +1535,9 @@ MonoBehaviour:
   side: 2
   chessName: xiahoudun
   rend: {fileID: 1216834638}
-  moveSpeed: 5
-  attackRange: 30
-  hp: 150
+  moveSpeed: 100
+  attackRange: 25
+  hp: 250
   atk: 30
 --- !u!65 &1216834637
 BoxCollider:
@@ -1531,8 +1667,8 @@ MonoBehaviour:
   side: 1
   chessName: zhaoyun
   rend: {fileID: 1327295420}
-  moveSpeed: 5
-  attackRange: 30
+  moveSpeed: 100
+  attackRange: 25
   hp: 300
   atk: 30
 --- !u!65 &1327295419
@@ -1709,7 +1845,7 @@ Transform:
   m_GameObject: {fileID: 2064149873}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 459.7, y: 6.29, z: 171.03}
+  m_LocalPosition: {x: 459.7, y: 6.29, z: 201.9}
   m_LocalScale: {x: 5, y: 1, z: 5}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1732,8 +1868,8 @@ MonoBehaviour:
   side: 2
   chessName: bing
   rend: {fileID: 2064149877}
-  moveSpeed: 5
-  attackRange: 15
+  moveSpeed: 100
+  attackRange: 25
   hp: 50
   atk: 30
 --- !u!136 &2064149876

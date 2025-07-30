@@ -5,9 +5,13 @@ using UnityEngine;
 public class WorldManager : MonoBehaviour
 {
     public static WorldManager Instance;
+    public GameObject Units;
     public int gridCellSize = 3; // 每个格子的实际大小(米)
 
     private Dictionary<int, List<Vector2Int>> occupiedGrids = new Dictionary<int, List<Vector2Int>>(); // 所有被占据的格子，键为chess.id
+
+    private bool showDebugCube = false;
+    private Dictionary<Vector2Int, GameObject> debugGridCubes = new Dictionary<Vector2Int, GameObject>(); // 格子与调试cube的映射
 
     void Start()
     {
@@ -15,10 +19,20 @@ public class WorldManager : MonoBehaviour
     }
 
     // 世界坐标转格子坐标
-    public Vector2Int WorldToGridPosition(Vector3 worldPosition)
+    public Vector2Int WorldToGridPosition(Vector3 worldPosition, bool FloorToInt)
     {
-        int x = Mathf.FloorToInt(worldPosition.x / gridCellSize);
-        int z = Mathf.FloorToInt(worldPosition.z / gridCellSize);
+        int x = 0;
+        int z = 0;
+        if (FloorToInt)
+        {
+            x = Mathf.FloorToInt(worldPosition.x / gridCellSize) * gridCellSize;
+            z = Mathf.FloorToInt(worldPosition.z / gridCellSize) * gridCellSize;
+        }
+        else
+        {
+            x = Mathf.CeilToInt(worldPosition.x / gridCellSize) * gridCellSize;
+            z = Mathf.CeilToInt(worldPosition.z / gridCellSize) * gridCellSize;
+        }
         return new Vector2Int(x, z);
     }
 
@@ -34,7 +48,10 @@ public class WorldManager : MonoBehaviour
         }
 
         // 使用GetOccupiedGrids方法获取需要锁定的格子列表
-        List<Vector2Int> requiredGrids = GetOccupiedGrids(targetPosition, collider);
+         List<Vector2Int> requiredGrids = GetOccupiedGrids(targetPosition, collider);
+        // UnityEngine.Debug.Log($"id:{unit.id} requiredGrids: Target Position = {targetPosition}, Collider Size = {collider.bounds.size}");
+        // string gridPositions = string.Join(", ", requiredGrids);
+        // UnityEngine.Debug.Log($"Grids: {gridPositions}");
 
         // 检查所有格子是否可用
         foreach (var gridPos in requiredGrids)
@@ -55,7 +72,8 @@ public class WorldManager : MonoBehaviour
         foreach (var gridPos in requiredGrids)
         {
             unitGrids.Add(gridPos);
-            UnityEngine.Debug.Log("Lock " + gridPos + " for unit: " + unit.id);
+            CreateDebugCube(unit.id, gridPos);
+         //   UnityEngine.Debug.Log("Lock " + gridPos + " for unit: " + unit.id);
         }
 
         // 存储单位占据的格子
@@ -84,15 +102,15 @@ public class WorldManager : MonoBehaviour
         Vector3 maxWorldPos = position + halfBounds;
 
         // 将世界坐标转换为格子坐标
-        Vector2Int minGridPos = WorldToGridPosition(minWorldPos);
-        Vector2Int maxGridPos = WorldToGridPosition(maxWorldPos);
+        Vector2Int minGridPos = WorldToGridPosition(minWorldPos, true);
+        Vector2Int maxGridPos = WorldToGridPosition(maxWorldPos, false);
 
         // 遍历从最小到最大格子坐标的所有格子
-        for (int x = minGridPos.x; x <= maxGridPos.x; x++)
+        for (int x = minGridPos.x; x <= maxGridPos.x; x+= gridCellSize)
         {
-            for (int z = minGridPos.y; z <= maxGridPos.y; z++)
+            for (int z = minGridPos.y; z <= maxGridPos.y; z+= gridCellSize)
             {
-                Vector2Int currentGrid = new Vector2Int(x*gridCellSize, z*gridCellSize);
+                Vector2Int currentGrid = new Vector2Int(x, z);
                 occupiedGrids.Add(currentGrid);
             }
         }
@@ -113,8 +131,46 @@ public class WorldManager : MonoBehaviour
         // 检查单位是否有占据的格子
         if (occupiedGrids.ContainsKey(unit.id))
         {
+            // 删除该单位占据的所有格子的调试cube
+            foreach (var gridPos in occupiedGrids[unit.id])
+            {
+                DestroyDebugCube(gridPos);
+            }
             occupiedGrids[unit.id].Clear();
-            UnityEngine.Debug.Log("Released all grids for unit: " + unit.id);
+          //  UnityEngine.Debug.Log("Released all grids for unit: " + unit.id);
+        }
+    }
+
+    // 创建调试用的cube
+    private void CreateDebugCube(int oid, Vector2Int gridPos)
+    {
+        if(!showDebugCube)
+            return;
+
+        if (debugGridCubes.ContainsKey(gridPos))
+            return; // 已存在则不再创建
+
+        GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        cube.transform.position = new Vector3(gridPos.x, 0.5f, gridPos.y);
+        cube.transform.localScale = new Vector3(gridCellSize * 0.9f, 1f, gridCellSize * 0.9f);
+        cube.GetComponent<Renderer>().material.color = Color.red;
+        cube.name = "GridCube_" + oid;
+        cube.transform.parent = Units.transform;
+        cube.transform.localPosition += new Vector3(0, 10f, 0);
+
+        debugGridCubes[gridPos] = cube;
+    }
+
+    // 销毁调试用的cube
+    private void DestroyDebugCube(Vector2Int gridPos)
+    {
+        if(!showDebugCube)
+            return;
+
+        if (debugGridCubes.TryGetValue(gridPos, out GameObject cube))
+        {
+            Destroy(cube);
+            debugGridCubes.Remove(gridPos);
         }
     }
 
@@ -122,5 +178,12 @@ public class WorldManager : MonoBehaviour
     private void OnDestroy()
     {
         occupiedGrids.Clear();
+
+        // 销毁所有调试cube
+        foreach (var cube in debugGridCubes.Values)
+        {
+            Destroy(cube);
+        }
+        debugGridCubes.Clear();
     }
 }

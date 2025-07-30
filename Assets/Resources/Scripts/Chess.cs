@@ -14,6 +14,20 @@ public class Chess : MonoBehaviour, IPointerClickHandler
     public int side;
     public string chessName = "0";
     public Renderer rend;
+
+    // 目标单位
+    private Chess targetChess;
+    // 移动速度
+    public float moveSpeed = 5f;
+    public float attackRange = 10f;
+
+    public int hp = 100;
+    public int atk = 30;
+
+    // 攻击冷却时间
+    private float attackCooldown = 2f;
+    private float lastAttackTime = 0f;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -28,8 +42,7 @@ public class Chess : MonoBehaviour, IPointerClickHandler
         // 创建HUD
         CreateHUD();
 
-        // 延迟一点时间后寻找目标，确保所有棋子都已初始化
-        Invoke("FindTarget", 0.5f);
+        StartCoroutine(MoveAndFightCoroutine());
     }
 
     // 创建血条HUD
@@ -79,7 +92,6 @@ public class Chess : MonoBehaviour, IPointerClickHandler
             if (chess.side != this.side)
             {
                 targetChess = chess;
-                isMoving = true;
                 break;
             }
         }
@@ -95,23 +107,19 @@ public class Chess : MonoBehaviour, IPointerClickHandler
         rend.material.mainTexture = Resources.Load<Texture>("Skins/" + chessName);
     }
 
-    // 目标单位
-    private Chess targetChess;
-    // 移动速度
-    public float moveSpeed = 5f;
-    public float attackRange = 10f;
-
-    public int hp = 100;
-    public int atk = 30;
-    // 是否正在移动
-    private bool isMoving = false;
-
-    // 攻击冷却时间
-    private float attackCooldown = 2f;
-    private float lastAttackTime = 0f;
 
     // Update is called once per frame
-    void Update()
+    private IEnumerator MoveAndFightCoroutine()
+    {    
+        yield return new WaitForSeconds(0.5f);
+        while (true)
+        {
+            MoveAndFight();
+            yield return new WaitForSeconds(0.05f);
+        }
+    }
+
+    void MoveAndFight()
     {
         // 检查目标是否存在
         if (targetChess == null)
@@ -120,15 +128,11 @@ public class Chess : MonoBehaviour, IPointerClickHandler
             FindTarget();
             return;
         }
-
         // 检查目标是否在攻击范围内
         float distanceToTarget = Vector3.Distance(transform.position, targetChess.transform.position);
 
         if (distanceToTarget <= attackRange)
         {
-            // 在攻击范围内，停止移动并尝试攻击
-            isMoving = false;
-
             // 检查攻击冷却
             if (Time.time >= lastAttackTime + attackCooldown)
             {
@@ -136,7 +140,7 @@ public class Chess : MonoBehaviour, IPointerClickHandler
                 lastAttackTime = Time.time;
             }
         }
-        else if (isMoving)
+        else if (targetChess != null)
         {
             // 计算下一步位置
             Vector3 nextPosition = Vector3.MoveTowards(transform.position, targetChess.transform.position, moveSpeed * Time.deltaTime);
@@ -150,8 +154,11 @@ public class Chess : MonoBehaviour, IPointerClickHandler
             else
             {
                 // 锁定失败，停止移动
-                isMoving = false;
+               // isMoving = false;
             }
+        }
+        else{
+            Debug.LogError($"id:{id} not moving");
         }
     }
 
