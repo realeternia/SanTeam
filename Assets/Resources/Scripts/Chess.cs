@@ -3,10 +3,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 public class Chess : MonoBehaviour, IPointerClickHandler
 {
     public int id;
+    public int maxHp = 100;  // 最大生命值
+    private Canvas canvas;
+    private ChessHUD hud;
     public int side;
     public string chessName = "0";
     public Renderer rend;
@@ -18,8 +22,49 @@ public class Chess : MonoBehaviour, IPointerClickHandler
         newMaterial.mainTexture = Resources.Load<Texture>("Skins/" + chessName);
         rend.material = newMaterial; // 这会为这个渲染器创建一个独立的材质实例
 
+        // 初始化HP
+        hp = maxHp;
+
+        // 创建HUD
+        CreateHUD();
+
         // 延迟一点时间后寻找目标，确保所有棋子都已初始化
         Invoke("FindTarget", 0.5f);
+    }
+
+    // 创建血条HUD
+    private void CreateHUD()
+    {
+        // 查找或创建Canvas
+        canvas = FindObjectOfType<Canvas>();
+
+        // 加载Hud预制体
+        GameObject hudPrefab = Resources.Load<GameObject>("Prefabs/Hud");
+        if (hudPrefab == null)
+        {
+            Debug.LogError("Hud.prefab not found in Resources/Prefabs");
+            return;
+        }
+
+        // 实例化HUD对象
+        GameObject hudObj = Instantiate(hudPrefab, canvas.transform);
+        hudObj.name = "ChessHUD";
+
+        // 获取ChessHUD组件
+        hud = hudObj.GetComponent<ChessHUD>();
+        if (hud == null)
+        {
+            Debug.LogError("ChessHUD component not found on Hud.prefab");
+            return;
+        }
+
+        // 设置属性
+        hud.chessUnit = this;
+      //  hud.canvas = canvas;
+
+        // 初始化血条显示
+        hud.UpdateHealthDisplay();
+    
     }
 
     // 寻找side不等于自己的单位
@@ -62,7 +107,7 @@ public class Chess : MonoBehaviour, IPointerClickHandler
     private bool isMoving = false;
 
     // 攻击冷却时间
-    private float attackCooldown = 1f;
+    private float attackCooldown = 2f;
     private float lastAttackTime = 0f;
 
     // Update is called once per frame
