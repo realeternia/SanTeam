@@ -57,7 +57,7 @@ public class ChessHUD : MonoBehaviour
         if (healthImg != null)
         {
             healthImg.rectTransform.sizeDelta = new Vector2(chessUnit.hp * 70f / chessUnit.maxHp, healthImg.rectTransform.sizeDelta.y);
-            Debug.Log($"Health updated: {chessUnit.hp}/{chessUnit.maxHp}");
+         //   Debug.Log($"Health updated: {chessUnit.hp}/{chessUnit.maxHp}");
         }
         else
         {

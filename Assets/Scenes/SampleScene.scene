@@ -172,13 +172,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 56e2376d7588b0a42afb0252497515e1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  id: 0
+  id: 8
   maxHp: 100
   side: 2
   chessName: bing
   rend: {fileID: 252496197}
   moveSpeed: 5
-  attackRange: 10
+  attackRange: 15
   hp: 50
   atk: 30
 --- !u!136 &252496196
@@ -448,13 +448,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 56e2376d7588b0a42afb0252497515e1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  id: 0
+  id: 5
   maxHp: 100
   side: 1
   chessName: bing
   rend: {fileID: 390308839}
   moveSpeed: 5
-  attackRange: 10
+  attackRange: 20
   hp: 50
   atk: 30
 --- !u!136 &390308838
@@ -770,13 +770,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 56e2376d7588b0a42afb0252497515e1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  id: 0
+  id: 6
   maxHp: 100
   side: 2
   chessName: bing
   rend: {fileID: 569130390}
   moveSpeed: 5
-  attackRange: 10
+  attackRange: 15
   hp: 50
   atk: 30
 --- !u!1 &705507993
@@ -1000,13 +1000,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 56e2376d7588b0a42afb0252497515e1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  id: 0
+  id: 3
   maxHp: 100
   side: 1
   chessName: bing
   rend: {fileID: 838503202}
   moveSpeed: 5
-  attackRange: 10
+  attackRange: 20
   hp: 50
   atk: 30
 --- !u!1 &926679980
@@ -1057,13 +1057,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 56e2376d7588b0a42afb0252497515e1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  id: 0
+  id: 4
   maxHp: 100
   side: 1
   chessName: bing
   rend: {fileID: 926679984}
   moveSpeed: 5
-  attackRange: 10
+  attackRange: 20
   hp: 50
   atk: 30
 --- !u!136 &926679983
@@ -1154,6 +1154,7 @@ GameObject:
   - component: {fileID: 963194228}
   - component: {fileID: 963194227}
   - component: {fileID: 963194226}
+  - component: {fileID: 963194229}
   m_Layer: 0
   m_HasEditorInfo: 1
   m_Name: Main Camera
@@ -1238,6 +1239,19 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 60.762, y: 13.405, z: 11.403}
+--- !u!114 &963194229
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 963194225}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 610ec84bc0ac9db47aea10406a020ad2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  gridCellSize: 3
 --- !u!1 &1082794238
 GameObject:
   m_ObjectHideFlags: 0
@@ -1380,13 +1394,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 56e2376d7588b0a42afb0252497515e1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  id: 0
+  id: 2
   maxHp: 100
   side: 2
   chessName: xiahoudun
   rend: {fileID: 1216834638}
   moveSpeed: 5
-  attackRange: 10
+  attackRange: 30
   hp: 150
   atk: 30
 --- !u!65 &1216834637
@@ -1494,7 +1508,7 @@ Transform:
   m_GameObject: {fileID: 1327295416}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 1, z: 0, w: 0}
-  m_LocalPosition: {x: 288.7, y: 7.37, z: 217.6}
+  m_LocalPosition: {x: 298.28, y: 7.37, z: 217.6}
   m_LocalScale: {x: 8, y: 5, z: 8}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1512,13 +1526,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 56e2376d7588b0a42afb0252497515e1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  id: 0
+  id: 1
   maxHp: 100
   side: 1
   chessName: zhaoyun
   rend: {fileID: 1327295420}
   moveSpeed: 5
-  attackRange: 25
+  attackRange: 30
   hp: 300
   atk: 30
 --- !u!65 &1327295419
@@ -1713,13 +1727,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 56e2376d7588b0a42afb0252497515e1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  id: 0
+  id: 7
   maxHp: 100
   side: 2
   chessName: bing
   rend: {fileID: 2064149877}
   moveSpeed: 5
-  attackRange: 10
+  attackRange: 15
   hp: 50
   atk: 30
 --- !u!136 &2064149876

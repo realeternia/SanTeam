@@ -138,8 +138,33 @@ public class Chess : MonoBehaviour, IPointerClickHandler
         }
         else if (isMoving)
         {
-            // 不在攻击范围内且正在移动，继续移动
-            transform.position = Vector3.MoveTowards(transform.position, targetChess.transform.position, moveSpeed * Time.deltaTime);
+            // 计算下一步位置
+            Vector3 nextPosition = Vector3.MoveTowards(transform.position, targetChess.transform.position, moveSpeed * Time.deltaTime);
+
+            // 尝试锁定目标格子
+            if (WorldManager.Instance.TryLockGridPositions(this, nextPosition))
+            {
+                // 锁定成功，移动到新位置
+                transform.position = nextPosition;
+            }
+            else
+            {
+                // 锁定失败，停止移动
+                isMoving = false;
+            }
+        }
+    }
+
+    private void OnDestroy()
+    {
+        // 单位销毁时释放格子锁定
+        if (WorldManager.Instance != null)
+        {
+            Collider collider = GetComponent<Collider>();
+            if (collider != null)
+            {
+                WorldManager.Instance.ReleaseGridPositions(this);
+            }
         }
     }
 
