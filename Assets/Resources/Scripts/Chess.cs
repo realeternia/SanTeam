@@ -21,12 +21,19 @@ public class Chess : MonoBehaviour, IPointerClickHandler
     public float moveSpeed = 5f;
     public float attackRange = 10f;
 
+    private Vector3? moveDirection = null;
+    // 移动失败计数器
+    private int moveFailCount = 0;
+    // 最大连续移动尝试次数
+
+    // 是否正在使用偏移路径
     public int hp = 100;
     public int atk = 30;
 
     // 攻击冷却时间
     private float attackCooldown = 2f;
     private float lastAttackTime = 0f;
+    private float lastTargetUpdateTime = 0f; // 上次更新目标的时间
 
     // Start is called before the first frame update
     void Start()
@@ -85,14 +92,20 @@ public class Chess : MonoBehaviour, IPointerClickHandler
     {
         // 获取所有Chess组件
         Chess[] allChess = FindObjectsOfType<Chess>();
+        float minDistance = Mathf.Infinity;
+        targetChess = null;
 
-        // 遍历寻找不同side的单位
+        // 遍历寻找不同side的最近单位
         foreach (Chess chess in allChess)
         {
-            if (chess.side != this.side)
+            if (chess.side != this.side && chess != this)
             {
-                targetChess = chess;
-                break;
+                float distance = Vector3.Distance(transform.position, chess.transform.position);
+                if (distance < minDistance)
+                {
+                    minDistance = distance;
+                    targetChess = chess;
+                }
             }
         }
     }
@@ -121,6 +134,13 @@ public class Chess : MonoBehaviour, IPointerClickHandler
 
     void MoveAndFight()
     {
+        // 每2秒重新寻找目标
+        if (Time.time - lastTargetUpdateTime >= 2f)
+        {
+            FindTarget();
+            lastTargetUpdateTime = Time.time;
+        }
+
         // 检查目标是否存在
         if (targetChess == null)
         {
@@ -139,26 +159,69 @@ public class Chess : MonoBehaviour, IPointerClickHandler
                 Attack();
                 lastAttackTime = Time.time;
             }
+            return;
         }
-        else if (targetChess != null)
+
+        if(moveDirection == null)
+        {
+            moveDirection = targetChess.transform.position;
+        }
+
+        //如果当前位置很接近moveDirection，就直接移动到moveDirection
+        if (Vector3.Distance(transform.position, moveDirection.Value) <= moveSpeed * 0.1f)
+        {
+            moveDirection = targetChess.transform.position;
+        }
+
+        if (moveDirection != null)
         {
             // 计算下一步位置
-            Vector3 nextPosition = Vector3.MoveTowards(transform.position, targetChess.transform.position, moveSpeed * Time.deltaTime);
+            Vector3 nextPosition = Vector3.MoveTowards(transform.position, moveDirection.Value, moveSpeed * 0.1f);
 
             // 尝试锁定目标格子
             if (WorldManager.Instance.TryLockGridPositions(this, nextPosition))
             {
                 // 锁定成功，移动到新位置
                 transform.position = nextPosition;
+                moveFailCount = 0; // 重置失败计数器
             }
             else
             {
-                // 锁定失败，停止移动
-               // isMoving = false;
+                // 锁定失败，不动
+                moveFailCount++;
+
+                // 根据连续失败次数尝试不同角度找路
+                // 如果已经在使用偏移路径或者失败次数达到阈值，则继续使用偏移
+              // 计算原始方向
+                Vector3 direction = (targetChess.transform.position - transform.position).normalized;
+                float angleOffset = 0f;
+
+                // 根据失败次数确定偏移角度
+                if (moveFailCount <= 3)
+                    angleOffset = 45f;
+                else if (moveFailCount <= 5)
+                    angleOffset = 90f;
+                else
+                    angleOffset = 135f;
+
+                // 随机选择向上或向下偏移
+                angleOffset *= UnityEngine.Random.value > 0.5f ? 1 : -1;
+
+                // 计算旋转后的方向
+                Quaternion rotation = Quaternion.Euler(0, angleOffset, 0);
+                Vector3 newDirection = rotation * direction;
+
+                // 计算新的下一步位置
+                nextPosition = transform.position + newDirection * moveSpeed * 0.1f;
+
+                // 尝试移动到新位置
+                if (WorldManager.Instance.TryLockGridPositions(this, nextPosition))
+                {
+                    transform.position = nextPosition;
+                    moveDirection = transform.position + newDirection * moveSpeed * 0.1f * 10;
+                    moveFailCount = 0; // 重置失败计数器
+                }
             }
-        }
-        else{
-            Debug.LogError($"id:{id} not moving");
         }
     }
 
