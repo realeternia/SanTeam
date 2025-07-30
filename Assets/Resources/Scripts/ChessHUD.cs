@@ -14,10 +14,6 @@ public class ChessHUD : MonoBehaviour
     void Start()
     {
         mainCamera = Camera.main;
-        if (mainCamera == null)
-        {
-            Debug.LogError("Main camera not found in ChessHUD");
-        }
 
         if (chessUnit != null)
         {
@@ -40,7 +36,7 @@ public class ChessHUD : MonoBehaviour
         // 更新血条位置，使其跟随单位
         Vector3 worldPosition = new Vector3(chessUnit.transform.position.x, chessUnit.transform.position.y + 3f, chessUnit.transform.position.z);
         Vector3 screenPosition = mainCamera.WorldToScreenPoint(worldPosition);
-        transform.position = screenPosition + new Vector3(0, 10, 0);
+        transform.position = screenPosition + new Vector3(chessUnit.isHero ? -50 : -35, chessUnit.isHero ? 25 : 15, 0);
 
         // 更新血条显示
         UpdateHealthDisplay();
@@ -56,7 +52,8 @@ public class ChessHUD : MonoBehaviour
 
         if (healthImg != null)
         {
-            healthImg.rectTransform.sizeDelta = new Vector2(chessUnit.hp * 70f / chessUnit.maxHp, healthImg.rectTransform.sizeDelta.y);
+            var wid = chessUnit.isHero ? 70f : 50f;
+            healthImg.rectTransform.sizeDelta = new Vector2(chessUnit.hp * wid / chessUnit.maxHp, healthImg.rectTransform.sizeDelta.y);
          //   Debug.Log($"Health updated: {chessUnit.hp}/{chessUnit.maxHp}");
         }
         else

@@ -175,6 +175,7 @@ MonoBehaviour:
   id: 8
   maxHp: 100
   side: 2
+  isHero: 0
   chessName: bing
   rend: {fileID: 252496197}
   moveSpeed: 10
@@ -352,7 +353,9 @@ RectTransform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 0, y: 0, z: 0}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 462617110}
+  - {fileID: 1620492532}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -453,6 +456,7 @@ MonoBehaviour:
   id: 5
   maxHp: 100
   side: 1
+  isHero: 0
   chessName: bing
   rend: {fileID: 390308839}
   moveSpeed: 10
@@ -647,6 +651,108 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1001 &462617109
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 322308958}
+    m_Modifications:
+    - target: {fileID: 5604261553720039206, guid: 7491c2319d841804a86a08b3f2a1e38c, type: 3}
+      propertyPath: m_Name
+      value: Hud
+      objectReference: {fileID: 0}
+    - target: {fileID: 8611914853397195921, guid: 7491c2319d841804a86a08b3f2a1e38c, type: 3}
+      propertyPath: m_Pivot.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8611914853397195921, guid: 7491c2319d841804a86a08b3f2a1e38c, type: 3}
+      propertyPath: m_Pivot.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8611914853397195921, guid: 7491c2319d841804a86a08b3f2a1e38c, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 8611914853397195921, guid: 7491c2319d841804a86a08b3f2a1e38c, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 8611914853397195921, guid: 7491c2319d841804a86a08b3f2a1e38c, type: 3}
+      propertyPath: m_AnchorMin.x
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 8611914853397195921, guid: 7491c2319d841804a86a08b3f2a1e38c, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 8611914853397195921, guid: 7491c2319d841804a86a08b3f2a1e38c, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 70
+      objectReference: {fileID: 0}
+    - target: {fileID: 8611914853397195921, guid: 7491c2319d841804a86a08b3f2a1e38c, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 8611914853397195921, guid: 7491c2319d841804a86a08b3f2a1e38c, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8611914853397195921, guid: 7491c2319d841804a86a08b3f2a1e38c, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8611914853397195921, guid: 7491c2319d841804a86a08b3f2a1e38c, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8611914853397195921, guid: 7491c2319d841804a86a08b3f2a1e38c, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8611914853397195921, guid: 7491c2319d841804a86a08b3f2a1e38c, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8611914853397195921, guid: 7491c2319d841804a86a08b3f2a1e38c, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8611914853397195921, guid: 7491c2319d841804a86a08b3f2a1e38c, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8611914853397195921, guid: 7491c2319d841804a86a08b3f2a1e38c, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8611914853397195921, guid: 7491c2319d841804a86a08b3f2a1e38c, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8611914853397195921, guid: 7491c2319d841804a86a08b3f2a1e38c, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8611914853397195921, guid: 7491c2319d841804a86a08b3f2a1e38c, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8611914853397195921, guid: 7491c2319d841804a86a08b3f2a1e38c, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 7491c2319d841804a86a08b3f2a1e38c, type: 3}
+--- !u!224 &462617110 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 8611914853397195921, guid: 7491c2319d841804a86a08b3f2a1e38c, type: 3}
+  m_PrefabInstance: {fileID: 462617109}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &569130387
 GameObject:
   m_ObjectHideFlags: 0
@@ -775,6 +881,7 @@ MonoBehaviour:
   id: 6
   maxHp: 100
   side: 2
+  isHero: 0
   chessName: bing
   rend: {fileID: 569130390}
   moveSpeed: 10
@@ -1005,6 +1112,7 @@ MonoBehaviour:
   id: 3
   maxHp: 100
   side: 1
+  isHero: 0
   chessName: bing
   rend: {fileID: 838503202}
   moveSpeed: 10
@@ -1062,6 +1170,7 @@ MonoBehaviour:
   id: 4
   maxHp: 100
   side: 1
+  isHero: 0
   chessName: bing
   rend: {fileID: 926679984}
   moveSpeed: 10
@@ -1196,6 +1305,7 @@ MonoBehaviour:
   id: 9
   maxHp: 100
   side: 2
+  isHero: 0
   chessName: bing
   rend: {fileID: 928509269}
   moveSpeed: 10
@@ -1534,6 +1644,7 @@ MonoBehaviour:
   id: 5
   maxHp: 100
   side: 1
+  isHero: 0
   chessName: bing
   rend: {fileID: 1211457681}
   moveSpeed: 10
@@ -1666,8 +1777,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   id: 2
-  maxHp: 100
+  maxHp: 250
   side: 2
+  isHero: 1
   chessName: xiahoudun
   rend: {fileID: 1216834638}
   moveSpeed: 10
@@ -1798,8 +1910,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   id: 1
-  maxHp: 100
+  maxHp: 300
   side: 1
+  isHero: 1
   chessName: zhaoyun
   rend: {fileID: 1327295420}
   moveSpeed: 10
@@ -1950,6 +2063,108 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1001 &1620492531
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 322308958}
+    m_Modifications:
+    - target: {fileID: 5604261553720039206, guid: f7baa1e3c3699fb489bc23fe51de4951, type: 3}
+      propertyPath: m_Name
+      value: HudSmall
+      objectReference: {fileID: 0}
+    - target: {fileID: 8611914853397195921, guid: f7baa1e3c3699fb489bc23fe51de4951, type: 3}
+      propertyPath: m_Pivot.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8611914853397195921, guid: f7baa1e3c3699fb489bc23fe51de4951, type: 3}
+      propertyPath: m_Pivot.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8611914853397195921, guid: f7baa1e3c3699fb489bc23fe51de4951, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 8611914853397195921, guid: f7baa1e3c3699fb489bc23fe51de4951, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 8611914853397195921, guid: f7baa1e3c3699fb489bc23fe51de4951, type: 3}
+      propertyPath: m_AnchorMin.x
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 8611914853397195921, guid: f7baa1e3c3699fb489bc23fe51de4951, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 8611914853397195921, guid: f7baa1e3c3699fb489bc23fe51de4951, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 50
+      objectReference: {fileID: 0}
+    - target: {fileID: 8611914853397195921, guid: f7baa1e3c3699fb489bc23fe51de4951, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 8611914853397195921, guid: f7baa1e3c3699fb489bc23fe51de4951, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8611914853397195921, guid: f7baa1e3c3699fb489bc23fe51de4951, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8611914853397195921, guid: f7baa1e3c3699fb489bc23fe51de4951, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8611914853397195921, guid: f7baa1e3c3699fb489bc23fe51de4951, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8611914853397195921, guid: f7baa1e3c3699fb489bc23fe51de4951, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8611914853397195921, guid: f7baa1e3c3699fb489bc23fe51de4951, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8611914853397195921, guid: f7baa1e3c3699fb489bc23fe51de4951, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8611914853397195921, guid: f7baa1e3c3699fb489bc23fe51de4951, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8611914853397195921, guid: f7baa1e3c3699fb489bc23fe51de4951, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8611914853397195921, guid: f7baa1e3c3699fb489bc23fe51de4951, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8611914853397195921, guid: f7baa1e3c3699fb489bc23fe51de4951, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8611914853397195921, guid: f7baa1e3c3699fb489bc23fe51de4951, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: f7baa1e3c3699fb489bc23fe51de4951, type: 3}
+--- !u!224 &1620492532 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 8611914853397195921, guid: f7baa1e3c3699fb489bc23fe51de4951, type: 3}
+  m_PrefabInstance: {fileID: 1620492531}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &2064149873
 GameObject:
   m_ObjectHideFlags: 0
@@ -2001,6 +2216,7 @@ MonoBehaviour:
   id: 7
   maxHp: 100
   side: 2
+  isHero: 0
   chessName: bing
   rend: {fileID: 2064149877}
   moveSpeed: 10

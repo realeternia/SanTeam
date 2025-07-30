@@ -12,6 +12,7 @@ public class Chess : MonoBehaviour, IPointerClickHandler
     private Canvas canvas;
     private ChessHUD hud;
     public int side;
+    public bool isHero;
     public string chessName = "0";
     public Renderer rend;
 
@@ -59,12 +60,7 @@ public class Chess : MonoBehaviour, IPointerClickHandler
         canvas = FindObjectOfType<Canvas>();
 
         // 加载Hud预制体
-        GameObject hudPrefab = Resources.Load<GameObject>("Prefabs/Hud");
-        if (hudPrefab == null)
-        {
-            Debug.LogError("Hud.prefab not found in Resources/Prefabs");
-            return;
-        }
+        GameObject hudPrefab = Resources.Load<GameObject>( isHero ? "Prefabs/Hud" : "Prefabs/HudSmall");
 
         // 实例化HUD对象
         GameObject hudObj = Instantiate(hudPrefab, canvas.transform);
