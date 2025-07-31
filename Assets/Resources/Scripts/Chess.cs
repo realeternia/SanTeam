@@ -36,12 +36,15 @@ public class Chess : MonoBehaviour, IPointerClickHandler
     private float lastAttackTime = 0f;
     private float lastTargetUpdateTime = 0f; // 上次更新目标的时间
 
+    public HeroInfo heroInfo;
+
     // Start is called before the first frame update
     void Start()
     {
         // 创建材质实例
         Material newMaterial = new Material(rend.sharedMaterial);
         newMaterial.mainTexture = Resources.Load<Texture>("Skins/" + chessName);
+        newMaterial.SetColor("_OutlineColor", side == 1 ? Color.green : Color.blue);
         rend.material = newMaterial; // 这会为这个渲染器创建一个独立的材质实例
 
         // 初始化HP
@@ -237,16 +240,30 @@ public class Chess : MonoBehaviour, IPointerClickHandler
     // 攻击目标
     private void Attack()
     {
-        if (targetChess == null) return;
+        if (targetChess == null) 
+            return;
 
         // 造成伤害
         targetChess.hp -= this.attackDamage;
-        Debug.Log($"{gameObject.name} 攻击了 {targetChess.gameObject.name}，造成 {this.attackDamage} 点伤害，目标剩余生命值：{targetChess.hp}");
+        if(targetChess.heroInfo != null) // 英雄
+            targetChess.heroInfo.SetHpRate((float)targetChess.hp / targetChess.maxHp);
+        //Debug.Log($"{gameObject.name} 攻击了 {targetChess.gameObject.name}，造成 {this.attackDamage} 点伤害，目标剩余生命值：{targetChess.hp}");
+
+        // 播放粒子特效
+        var swordHitBluePrefab = Resources.Load<GameObject>(isHero ? "Prefabs/SwordHitYellowCritical" : "Prefabs/SwordHitBlue");
+        GameObject hitEffect = Instantiate(swordHitBluePrefab, targetChess.transform.position, Quaternion.identity);
+        // 设置特效的父对象为目标单位，使其跟随目标移动
+        hitEffect.transform.parent = targetChess.transform;
+        hitEffect.transform.localScale = new Vector3(1f, 1f, 1f);
+        hitEffect.transform.localPosition += new Vector3(0f, 1f, 0f);
+        // 可以添加代码设置特效的生命周期，例如几秒钟后自动销毁
+        Destroy(hitEffect, 2f);
 
         // 检查目标是否被击败
         if (targetChess.hp <= 0)
         {
             Debug.Log($"{targetChess.gameObject.name} 被击败了！");
+            WorldManager.Instance.OnUnitDie(targetChess);
             Destroy(targetChess.gameObject);
             targetChess = null;
 

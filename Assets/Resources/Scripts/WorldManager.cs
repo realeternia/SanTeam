@@ -1,6 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
+using CommonConfig;
 using UnityEngine;
+using UnityEngine.UI;
+using TMPro;
 
 public class WorldManager : MonoBehaviour
 {
@@ -16,15 +19,44 @@ public class WorldManager : MonoBehaviour
     public GameObject[] RegionSide1; // 阵营1的出生点数组
     public GameObject[] RegionSide2; // 阵营2的出生点数组
 
+    
+    public GameObject[] RegionHeroSide1; // 阵营1的出生点数组
+    public GameObject[] RegionHeroSide2; // 阵营2的出生点数组
+
+    public HeroInfoGroup heroInfoGroup;
+    public Button buttonRestart;
+    public TMP_Text textRestart;
+
 
     void Start()
     {
         Instance = this;
+
+        HeroConfig.Load();
+        buttonRestart.onClick.AddListener(RestartGame);
+
+        buttonRestart.gameObject.SetActive(false);
+        textRestart.gameObject.SetActive(false);
+        SpawnUnitsInRegions();
+    }
+
+    private void RestartGame()
+    {     
+        buttonRestart.gameObject.SetActive(false);
+        textRestart.gameObject.SetActive(false);
         SpawnUnitsInRegions();
     }
 
     private void SpawnUnitsInRegions()
     {
+        // 清空之前的单位
+        foreach (Transform child in Units.transform)
+        {
+            Destroy(child.gameObject);
+        }
+        occupiedGrids.Clear();
+        heroInfoGroup.Reset();
+
         // 加载UnitBing预制体
         GameObject unitPrefab = Resources.Load<GameObject>("Prefabs/UnitBing");
 
@@ -35,6 +67,13 @@ public class WorldManager : MonoBehaviour
 
         // 在RegionSide2生成单位 (阵营2)
         SpawnUnitsForRegion(RegionSide2, unitPrefab, 2, "bottle", ref unitId);
+
+        SpawnHerosForRegion(RegionHeroSide1[0], 100001, 1, ref unitId);
+        SpawnHerosForRegion(RegionHeroSide1[1], 100002, 1, ref unitId);
+        SpawnHerosForRegion(RegionHeroSide1[2], 100003, 1, ref unitId);
+        SpawnHerosForRegion(RegionHeroSide2[0], 100004, 2, ref unitId);
+        SpawnHerosForRegion(RegionHeroSide2[1], 100005, 2, ref unitId);
+        SpawnHerosForRegion(RegionHeroSide2[2], 100006, 2, ref unitId);
     }
 
     private void SpawnUnitsForRegion(GameObject[] region, GameObject prefab, int side, string chessName, ref int idCounter)
@@ -46,6 +85,7 @@ public class WorldManager : MonoBehaviour
                 // 实例化单位
                 GameObject unitInstance = Instantiate(prefab, spawnPoint.transform.position, Quaternion.identity, Units.transform);
                 unitInstance.name = $"UnitBing_{side}_{idCounter}";
+                unitInstance.transform.localRotation = Quaternion.Euler(0f, 180f, 0f);
 
                 // 获取并初始化Chess组件
                 Chess chessComponent = unitInstance.GetComponent<Chess>();
@@ -70,6 +110,42 @@ public class WorldManager : MonoBehaviour
             }
         }
     }
+
+    private void SpawnHerosForRegion(GameObject spawnPoint, int heroId, int side, ref int idCounter)
+    {
+        var heroConfig = HeroConfig.GetConfig((uint)heroId);
+        GameObject heroPrefab = Resources.Load<GameObject>("Prefabs/UnitHero");
+        if (spawnPoint != null)
+        {
+            // 实例化单位
+            GameObject unitInstance = Instantiate(heroPrefab, spawnPoint.transform.position, Quaternion.identity, Units.transform);
+            unitInstance.name = $"Hero_{side}_{idCounter}";
+            unitInstance.transform.localRotation = Quaternion.Euler(0f, 180f, 0f);
+
+            var heroInfo = heroInfoGroup.AddHero(side, heroId, 1);
+            // 获取并初始化Chess组件
+            Chess chessComponent = unitInstance.GetComponent<Chess>();
+            if (chessComponent != null)
+            {
+                chessComponent.id = idCounter;
+                chessComponent.side = side;
+                chessComponent.chessName = heroConfig.Icon;
+                chessComponent.maxHp = heroConfig.Hp;
+                chessComponent.moveSpeed = heroConfig.MoveSpeed;
+                chessComponent.attackRange = heroConfig.Range;
+                chessComponent.attackDamage = heroConfig.Atk;
+                chessComponent.heroInfo = heroInfo;
+
+                // 可以在这里设置其他必要的初始化参数
+            }
+            else
+            {
+                Debug.LogError("Chess component not found on UnitBing prefab");
+            }
+
+            idCounter++;
+        }
+    }    
 
     // 世界坐标转格子坐标
     public Vector2Int WorldToGridPosition(Vector3 worldPosition, bool FloorToInt)
@@ -113,7 +189,7 @@ public class WorldManager : MonoBehaviour
             {
                 if (entry.Key != unit.id && entry.Value.Contains(gridPos))
                 {
-                    UnityEngine.Debug.Log("Grid " + gridPos + " is already occupied by unit: " + entry.Key);
+              //      UnityEngine.Debug.Log("Grid " + gridPos + " is already occupied by unit: " + entry.Key);
                     return false; // 格子不可用
                 }
             }
@@ -224,6 +300,43 @@ public class WorldManager : MonoBehaviour
         {
             Destroy(cube);
             debugGridCubes.Remove(gridPos);
+        }
+    }
+
+    public void OnUnitDie(Chess dieUnit)
+    {
+        // 检查阵营1和阵营2是否还有存活单位
+        bool side1HasUnits = false;
+        bool side2HasUnits = false;
+
+        foreach (Transform child in Units.transform)
+        {
+            Chess chessComponent = child.GetComponent<Chess>();
+            if (chessComponent != null && chessComponent.hp > 0)
+            {
+                if (chessComponent.side == 1)
+                {
+                    side1HasUnits = true;
+                }
+                else if (chessComponent.side == 2)
+                {
+                    side2HasUnits = true;
+                }
+
+                // 如果两个阵营都有存活单位，提前结束检查
+                if (side1HasUnits && side2HasUnits)
+                {
+                    break;
+                }
+            }
+        }
+        UnityEngine.Debug.Log($"id:{dieUnit.id} dieUnit.side:{dieUnit.side} side1HasUnits:{side1HasUnits} side2HasUnits:{side2HasUnits}");
+        // 如果任一阵营没有存活单位，显示重启按钮
+        if (!side1HasUnits || !side2HasUnits)
+        {
+            buttonRestart.gameObject.SetActive(true);
+            textRestart.gameObject.SetActive(true);
+            textRestart.text = side1HasUnits ? "蜀国胜利!!!" : "魏国胜利!!!";
         }
     }
 
