@@ -13,9 +13,62 @@ public class WorldManager : MonoBehaviour
     private bool showDebugCube = false;
     private Dictionary<Vector2Int, GameObject> debugGridCubes = new Dictionary<Vector2Int, GameObject>(); // 格子与调试cube的映射
 
+    public GameObject[] RegionSide1; // 阵营1的出生点数组
+    public GameObject[] RegionSide2; // 阵营2的出生点数组
+
+
     void Start()
     {
         Instance = this;
+        SpawnUnitsInRegions();
+    }
+
+    private void SpawnUnitsInRegions()
+    {
+        // 加载UnitBing预制体
+        GameObject unitPrefab = Resources.Load<GameObject>("Prefabs/UnitBing");
+
+        int unitId = 100;
+
+        // 在RegionSide1生成单位 (阵营1)
+        SpawnUnitsForRegion(RegionSide1, unitPrefab, 1, "tree", ref unitId);
+
+        // 在RegionSide2生成单位 (阵营2)
+        SpawnUnitsForRegion(RegionSide2, unitPrefab, 2, "bottle", ref unitId);
+    }
+
+    private void SpawnUnitsForRegion(GameObject[] region, GameObject prefab, int side, string chessName, ref int idCounter)
+    {
+        foreach (GameObject spawnPoint in region)
+        {
+            if (spawnPoint != null)
+            {
+                // 实例化单位
+                GameObject unitInstance = Instantiate(prefab, spawnPoint.transform.position, Quaternion.identity, Units.transform);
+                unitInstance.name = $"UnitBing_{side}_{idCounter}";
+
+                // 获取并初始化Chess组件
+                Chess chessComponent = unitInstance.GetComponent<Chess>();
+                if (chessComponent != null)
+                {
+                    chessComponent.id = idCounter;
+                    chessComponent.side = side;
+                    chessComponent.chessName = chessName;
+                    chessComponent.maxHp = 100;
+                    chessComponent.moveSpeed = 10;
+                    chessComponent.attackRange = 12;
+                    chessComponent.attackDamage = 20;
+
+                    // 可以在这里设置其他必要的初始化参数
+                }
+                else
+                {
+                    Debug.LogError("Chess component not found on UnitBing prefab");
+                }
+
+                idCounter++;
+            }
+        }
     }
 
     // 世界坐标转格子坐标

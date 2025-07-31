@@ -29,7 +29,7 @@ public class Chess : MonoBehaviour, IPointerClickHandler
 
     // 是否正在使用偏移路径
     public int hp = 100;
-    public int atk = 30;
+    public int attackDamage = 30;
 
     // 攻击冷却时间
     private float attackCooldown = 2f;
@@ -240,8 +240,8 @@ public class Chess : MonoBehaviour, IPointerClickHandler
         if (targetChess == null) return;
 
         // 造成伤害
-        targetChess.hp -= this.atk;
-        Debug.Log($"{gameObject.name} 攻击了 {targetChess.gameObject.name}，造成 {this.atk} 点伤害，目标剩余生命值：{targetChess.hp}");
+        targetChess.hp -= this.attackDamage;
+        Debug.Log($"{gameObject.name} 攻击了 {targetChess.gameObject.name}，造成 {this.attackDamage} 点伤害，目标剩余生命值：{targetChess.hp}");
 
         // 检查目标是否被击败
         if (targetChess.hp <= 0)
