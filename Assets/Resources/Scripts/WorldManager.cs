@@ -95,27 +95,18 @@ public class WorldManager : MonoBehaviour
         SpawnUnitsForRegion(RegionSide3, unitPrefab, 3, "bird", ref unitId);
         SpawnUnitsForRegion(RegionSide4, unitPrefab, 4, "hill", ref unitId);
 
-        // 从HeroConfig随机选择5个不重复的side=1英雄
-        List<int> side1HeroIds = HeroSelectionTool.GetAllHeroIdsBySide(1);
-        List<int> selectedSide1HeroIds = HeroSelectionTool.GetRandomUniqueIds(side1HeroIds, 5);
-        for (int i = 0; i < selectedSide1HeroIds.Count && i < RegionHeroSide1.Length; i++)
-            SpawnHerosForRegion(RegionHeroSide1[i], selectedSide1HeroIds[i], 1, ref unitId);
-
-        // 从HeroConfig随机选择5个不重复的side=2英雄
-        List<int> side2HeroIds = HeroSelectionTool.GetAllHeroIdsBySide(2);
-        List<int> selectedSide2HeroIds = HeroSelectionTool.GetRandomUniqueIds(side2HeroIds, 5);
-        for (int i = 0; i < selectedSide2HeroIds.Count && i < RegionHeroSide2.Length; i++)
-            SpawnHerosForRegion(RegionHeroSide2[i], selectedSide2HeroIds[i], 2, ref unitId);
-
-        List<int> side3HeroIds = HeroSelectionTool.GetAllHeroIdsBySide(1);
-        List<int> selectedSide3HeroIds = HeroSelectionTool.GetRandomUniqueIds(side3HeroIds, 5);
-        for (int i = 0; i < selectedSide3HeroIds.Count && i < RegionHeroSide3.Length; i++)
-            SpawnHerosForRegion(RegionHeroSide3[i], selectedSide3HeroIds[i], 3, ref unitId);
-
-        List<int> side4HeroIds = HeroSelectionTool.GetAllHeroIdsBySide(2);
-        List<int> selectedSide4HeroIds = HeroSelectionTool.GetRandomUniqueIds(side4HeroIds, 5);
-        for (int i = 0; i < selectedSide4HeroIds.Count && i < RegionHeroSide4.Length; i++)
-            SpawnHerosForRegion(RegionHeroSide4[i], selectedSide4HeroIds[i], 4, ref unitId);                        
+        var cards = GameManager.Instance.GetPlayer(0).GetCardList();
+        for (int i = 0; i < cards.Count && i < RegionHeroSide1.Length; i++)
+            SpawnHerosForRegion(RegionHeroSide1[i], cards[i], 1, ref unitId);
+        cards = GameManager.Instance.GetPlayer(1).GetCardList();            
+        for (int i = 0; i < cards.Count && i < RegionHeroSide2.Length; i++)
+            SpawnHerosForRegion(RegionHeroSide2[i], cards[i], 2, ref unitId);
+        cards = GameManager.Instance.GetPlayer(2).GetCardList();
+        for (int i = 0; i < cards.Count && i < RegionHeroSide3.Length; i++)
+                SpawnHerosForRegion(RegionHeroSide3[i], cards[i], 3, ref unitId);
+        cards = GameManager.Instance.GetPlayer(3).GetCardList();
+        for (int i = 0; i < cards.Count && i < RegionHeroSide4.Length; i++)
+                SpawnHerosForRegion(RegionHeroSide4[i], cards[i], 4, ref unitId);                                 
     }
 
     private void SpawnUnitsForRegion(GameObject[] region, GameObject prefab, int side, string chessName, ref int idCounter)

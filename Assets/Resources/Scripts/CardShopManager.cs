@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using CommonConfig;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 public class CardShopManager : MonoBehaviour
 {
@@ -12,7 +13,7 @@ public class CardShopManager : MonoBehaviour
     public GameObject cardViewPrefab; // 拖拽CardView预制体到此处
     private const int TOTAL_CARDS = 10;
     private const int CARDS_PER_ROW = 5;
-    private float cardWidth = 240f;
+    private float cardWidth = 220f;
     private float cardHeight = 360f;
     private float spacing = 10f;
     private int round = 10000;
@@ -20,13 +21,15 @@ public class CardShopManager : MonoBehaviour
     private int passedPlayers = 0; // 记录pass的玩家数量
 
     public Button passBtn;
+    private int era = 0;
+    public TMP_Text eraText;
 
     // Start is called before the first frame update
     void Start()
     {
         Instance = this;
         HeroConfig.Load();
-        RefreshCards();
+        NewEra();
 
         passBtn.onClick.AddListener(() =>
         {
@@ -84,7 +87,7 @@ public class CardShopManager : MonoBehaviour
         
     }
 
-    private void RefreshCards()
+    private void NewEra()
     {
         //移除并销毁旧卡片
         foreach (Transform child in transform)
@@ -128,11 +131,15 @@ public class CardShopManager : MonoBehaviour
                 cardView.str.text = GetColoredText(heroCfg.Str);
 
                 cardView.hp.text = heroCfg.Hp.ToString();
-                cardView.price.text = GetPrice(heroCfg).ToString();
+                cardView.priceI = GetPrice(heroCfg);
+                cardView.price.text = cardView.priceI.ToString();
 
                 cardViews.Add(cardView);
             }
         }
+        era++;
+        passBtn.gameObject.SetActive(true);
+        eraText.text = "第" + era + "轮";
     }
 
     public void OnPlayerBuyCard(CardViewControl ctr, int pid, int cardId, int price)
@@ -148,8 +155,8 @@ public class CardShopManager : MonoBehaviour
 
     public void OnP1Pass()
     {
-         //   passBtn.interactable = false;
-         if(playerPassed[0])
+        passBtn.gameObject.SetActive(false);
+        if(playerPassed[0])
             return;
         playerPassed[0] = true;
         passedPlayers++;
@@ -213,7 +220,12 @@ public class CardShopManager : MonoBehaviour
         {
             // 进入下一轮并刷新卡牌
             round++;
-            RefreshCards();
+            if (era == 3)
+            {
+                ShopEnd();
+                return;
+            }
+            NewEra();
             // 重置所有玩家的pass状态
             for (int i = 0; i < playerPassed.Length; i++)
             {
@@ -222,5 +234,11 @@ public class CardShopManager : MonoBehaviour
             passedPlayers = 0;
         }
         NextTurn();
+    }
+
+    private void ShopEnd()
+    {
+        transform.parent.gameObject.SetActive(false);
+        WorldManager.Instance.RestartGame(); 
     }
 }

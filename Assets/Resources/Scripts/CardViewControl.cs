@@ -8,6 +8,7 @@ public class CardViewControl : MonoBehaviour
 {
     public int cardId;
     public bool isSold = false;
+    public int priceI;
 
     public Image cardImage;
     public Image soldImage;
@@ -24,7 +25,7 @@ public class CardViewControl : MonoBehaviour
     {
         buyButton.onClick.AddListener(() =>
         {
-            CardShopManager.Instance.OnPlayerBuyCard(this, 0, cardId, int.Parse(price.text));
+            CardShopManager.Instance.OnPlayerBuyCard(this, 0, cardId, priceI);
         });
     }
 

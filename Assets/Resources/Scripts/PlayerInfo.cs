@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -93,54 +94,95 @@ public class PlayerInfo : MonoBehaviour
         // 获取所有未售出的卡片
         List<CardViewControl> availableCards = CardShopManager.Instance.cardViews
             .Where(card => !card.isSold)
-            .ToList();
+            .ToList();  
         
         // 如果没有可用卡片，直接返回
-        if (availableCards.Count <= 2) //最后两张卡不选
+        if (availableCards.Count < 5)
+        {
+            // 检查是否有价值高于9的卡
+            if (!availableCards.Any(card => card.priceI >= 9))
+            {
+                // 随机1-4，如果大于可用卡片数量则放弃
+                int randomNum = UnityEngine.Random.Range(1, 5);
+                if (randomNum >= availableCards.Count)
+                    return false;
+            }
+        }
+        if (availableCards.Count <= 2) // 最后两张卡不选
             return false;
-        
-        // 按价格从高到低排序
-        availableCards.Sort((a, b) => 
-            int.Parse(b.price.text).CompareTo(int.Parse(a.price.text)));
-        
+
         // 检查玩家当前拥有的卡片数量
-        if (cards.Count < 4)
+        if (cards.Count <= 4)
         {
             // 少于4张，优先购买价格高的卡片
-            foreach (var card in availableCards)
-            {
-                int price = int.Parse(card.price.text);
-                if (gold >= price)
-                {
-                    BuyCard(card, card.cardId, price);
-                    return true;
-                }
-            }
+            if(TryBuyDearCard(availableCards, 3))
+                return true;
         }
         else
         {
             // 等于或超过4张，优先购买已有的卡片（按价格从高到低）
-            foreach (var card in availableCards)
-            {
-                int price = int.Parse(card.price.text);
-                if (gold >= price && cards.ContainsKey(card.cardId))
-                {
-                    BuyCard(card, card.cardId, price);
-                    return true;
-                }
-            }
+            if(TryUpgradeCard(availableCards))
+               return true;
             
             // 如果没有已有的卡片可买，购买价格最高的可用卡片
-            foreach (var card in availableCards)
+            if(TryBuyDearCard(availableCards, 3))
+                return true;
+        }
+        return false;
+    }
+
+    private bool TryBuyDearCard(List<CardViewControl> availableCards, int n)
+    {
+        // 按价格从高到低排序
+        availableCards.Sort((a, b) => 
+            b.priceI.CompareTo(a.priceI));
+
+        // 获取价值最高的n张牌，注意处理n大于可用卡片数量的情况
+        int count = Math.Min(n, availableCards.Count);
+        var topNCards = availableCards.Take(count).ToList();
+
+        // 筛选出价格不超过玩家金币的卡片
+        var affordableCards = topNCards.Where(card => 
+            gold >= card.priceI).ToList();
+
+        if (affordableCards.Count == 0)
+        {
+            return false;
+        }
+
+        // 随机选择一张可购买的卡片
+        int randomIndex = UnityEngine.Random.Range(0, affordableCards.Count);
+        var selectedCard = affordableCards[randomIndex];
+        int price = selectedCard.priceI;
+        BuyCard(selectedCard, selectedCard.cardId, price);
+        return true;
+    }
+
+    private bool TryUpgradeCard(List<CardViewControl> availableCards)
+    {
+        foreach (var card in availableCards)
+        {
+            int price = card.priceI;
+            if (gold >= price && cards.ContainsKey(card.cardId))
             {
-                int price = int.Parse(card.price.text);
-                if (gold >= price)
-                {
-                    BuyCard(card, card.cardId, price);
-                    return true;
-                }
+                BuyCard(card, card.cardId, price);
+                return true;
             }
         }
         return false;
+    }
+
+    public List<int> GetCardList()
+    {
+        List<int> result = new List<int>();
+        foreach (int cardId in cards.Keys)
+        {
+            result.Add(cardId);
+            if (result.Count >= 5)
+            {
+                break;
+            }
+        }
+        return result;
     }
 }
