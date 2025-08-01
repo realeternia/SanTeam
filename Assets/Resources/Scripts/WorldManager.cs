@@ -27,6 +27,8 @@ public class WorldManager : MonoBehaviour
     public Button buttonRestart;
     public TMP_Text textRestart;
 
+    public GameObject WallNode;
+
 
     void Start()
     {
@@ -56,6 +58,24 @@ public class WorldManager : MonoBehaviour
         }
         occupiedGrids.Clear();
         heroInfoGroup.Reset();
+
+        List<Vector2Int> unitGrids = new List<Vector2Int>();
+        // 生成墙
+        for (int i = 0; i < WallNode.transform.childCount; i++)
+        {
+            var wallNodeCell = WallNode.transform.GetChild(i);
+            // 使用GetOccupiedGrids方法获取需要锁定的格子列表
+            List<Vector2Int> requiredGrids = GetOccupiedGrids(wallNodeCell.transform.position, wallNodeCell.GetComponent<Collider>());
+            // 锁定新格子
+
+            foreach (var gridPos in requiredGrids)
+            {
+                unitGrids.Add(gridPos);
+                CreateDebugCube(300001, gridPos);
+                UnityEngine.Debug.Log("Lock " + gridPos + " for wall");
+            }
+        }
+        occupiedGrids[300001] = unitGrids;
 
         // 加载UnitBing预制体
         GameObject unitPrefab = Resources.Load<GameObject>("Prefabs/UnitBing");
@@ -219,7 +239,7 @@ public class WorldManager : MonoBehaviour
     public bool TryLockGridPositions(Chess unit, Vector3 targetPosition)
     {
         // 获取单位包围盒
-        Collider collider = unit.GetComponent<Collider>();
+        var collider = unit.GetComponent<Collider>();
         if (collider == null)
         {
             UnityEngine.Debug.LogError("Unit missing collider for grid calculation");
@@ -237,10 +257,16 @@ public class WorldManager : MonoBehaviour
         {
             foreach (var entry in occupiedGrids)
             {
-                if (entry.Key != unit.id && entry.Value.Contains(gridPos))
+                if (entry.Key != unit.id)
                 {
-              //      UnityEngine.Debug.Log("Grid " + gridPos + " is already occupied by unit: " + entry.Key);
-                    return false; // 格子不可用
+                    foreach (var occupiedGrid in entry.Value)
+                    {
+                        if (occupiedGrid.x == gridPos.x && occupiedGrid.y == gridPos.y)
+                        {
+                            UnityEngine.Debug.Log("Grid " + gridPos + " is already occupied by unit: " + entry.Key);
+                            return false; // 格子不可用
+                        }
+                    }
                 }
             }
         }

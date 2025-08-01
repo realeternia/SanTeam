@@ -99,7 +99,7 @@ public class Chess : MonoBehaviour, IPointerClickHandler
         // 遍历寻找不同side的最近单位
         foreach (Chess chess in allChess)
         {
-            if (chess.side != this.side && chess != this)
+            if (chess.side != this.side && (chess.side + 1) / 2 == (side + 1) / 2)
             {
                 float distance = Vector3.Distance(transform.position, chess.transform.position);
                 if (distance < minDistance)
@@ -110,17 +110,6 @@ public class Chess : MonoBehaviour, IPointerClickHandler
             }
         }
     }
-
-    public void UpdateVal(int cardId)
-    {
-        id = cardId;
-        // if(cardId > 0)
-        //     chessName = CardBook.GetCard(id).icon.ToString();
-        // else
-        //     chessName = "0";
-        rend.material.mainTexture = Resources.Load<Texture>("Skins/" + chessName);
-    }
-
 
     // Update is called once per frame
     private IEnumerator MoveAndFightCoroutine()
