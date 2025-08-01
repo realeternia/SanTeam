@@ -46,7 +46,7 @@ public class Chess : MonoBehaviour, IPointerClickHandler
         // 创建材质实例
         Material newMaterial = new Material(rend.sharedMaterial);
         newMaterial.mainTexture = Resources.Load<Texture>("Skins/" + chessName);
-        newMaterial.SetColor("_OutlineColor", side == 1 ? Color.green : Color.blue);
+        newMaterial.SetColor("_OutlineColor", side == 1 ? Color.green : side == 3 ? Color.red : side == 4 ? Color.yellow : Color.blue);
         rend.material = newMaterial; // 这会为这个渲染器创建一个独立的材质实例
 
         // 初始化HP

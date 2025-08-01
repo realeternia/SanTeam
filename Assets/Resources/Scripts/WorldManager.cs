@@ -19,9 +19,15 @@ public class WorldManager : MonoBehaviour
     public GameObject[] RegionSide1; // 阵营1的出生点数组
     public GameObject[] RegionSide2; // 阵营2的出生点数组
 
+    public GameObject[] RegionSide3; // 阵营1的出生点数组
+    public GameObject[] RegionSide4; // 阵营2的出生点数组    
+
     
     public GameObject[] RegionHeroSide1; // 阵营1的出生点数组
     public GameObject[] RegionHeroSide2; // 阵营2的出生点数组
+      
+    public GameObject[] RegionHeroSide3; // 阵营1的出生点数组
+    public GameObject[] RegionHeroSide4; // 阵营2的出生点数组
 
     public HeroInfoGroup heroInfoGroup;
     public Button buttonRestart;
@@ -34,15 +40,14 @@ public class WorldManager : MonoBehaviour
     {
         Instance = this;
 
-        HeroConfig.Load();
         buttonRestart.onClick.AddListener(RestartGame);
 
-        buttonRestart.gameObject.SetActive(false);
-        textRestart.gameObject.SetActive(false);
-        SpawnUnitsInRegions();
+        // buttonRestart.gameObject.SetActive(false);
+        // textRestart.gameObject.SetActive(false);
+        // SpawnUnitsInRegions();
     }
 
-    private void RestartGame()
+    public void RestartGame()
     {     
         buttonRestart.gameObject.SetActive(false);
         textRestart.gameObject.SetActive(false);
@@ -87,22 +92,30 @@ public class WorldManager : MonoBehaviour
 
         // 在RegionSide2生成单位 (阵营2)
         SpawnUnitsForRegion(RegionSide2, unitPrefab, 2, "bottle", ref unitId);
+        SpawnUnitsForRegion(RegionSide3, unitPrefab, 3, "bird", ref unitId);
+        SpawnUnitsForRegion(RegionSide4, unitPrefab, 4, "hill", ref unitId);
 
         // 从HeroConfig随机选择5个不重复的side=1英雄
-        List<int> side1HeroIds = GetAllHeroIdsBySide(1);
-        List<int> selectedSide1HeroIds = GetRandomUniqueIds(side1HeroIds, 5);
+        List<int> side1HeroIds = HeroSelectionTool.GetAllHeroIdsBySide(1);
+        List<int> selectedSide1HeroIds = HeroSelectionTool.GetRandomUniqueIds(side1HeroIds, 5);
         for (int i = 0; i < selectedSide1HeroIds.Count && i < RegionHeroSide1.Length; i++)
-        {
             SpawnHerosForRegion(RegionHeroSide1[i], selectedSide1HeroIds[i], 1, ref unitId);
-        }
 
         // 从HeroConfig随机选择5个不重复的side=2英雄
-        List<int> side2HeroIds = GetAllHeroIdsBySide(2);
-        List<int> selectedSide2HeroIds = GetRandomUniqueIds(side2HeroIds, 5);
+        List<int> side2HeroIds = HeroSelectionTool.GetAllHeroIdsBySide(2);
+        List<int> selectedSide2HeroIds = HeroSelectionTool.GetRandomUniqueIds(side2HeroIds, 5);
         for (int i = 0; i < selectedSide2HeroIds.Count && i < RegionHeroSide2.Length; i++)
-        {
             SpawnHerosForRegion(RegionHeroSide2[i], selectedSide2HeroIds[i], 2, ref unitId);
-        }
+
+        List<int> side3HeroIds = HeroSelectionTool.GetAllHeroIdsBySide(1);
+        List<int> selectedSide3HeroIds = HeroSelectionTool.GetRandomUniqueIds(side3HeroIds, 5);
+        for (int i = 0; i < selectedSide3HeroIds.Count && i < RegionHeroSide3.Length; i++)
+            SpawnHerosForRegion(RegionHeroSide3[i], selectedSide3HeroIds[i], 3, ref unitId);
+
+        List<int> side4HeroIds = HeroSelectionTool.GetAllHeroIdsBySide(2);
+        List<int> selectedSide4HeroIds = HeroSelectionTool.GetRandomUniqueIds(side4HeroIds, 5);
+        for (int i = 0; i < selectedSide4HeroIds.Count && i < RegionHeroSide4.Length; i++)
+            SpawnHerosForRegion(RegionHeroSide4[i], selectedSide4HeroIds[i], 4, ref unitId);                        
     }
 
     private void SpawnUnitsForRegion(GameObject[] region, GameObject prefab, int side, string chessName, ref int idCounter)
@@ -152,7 +165,6 @@ public class WorldManager : MonoBehaviour
             unitInstance.name = $"Hero_{side}_{idCounter}";
             unitInstance.transform.localRotation = Quaternion.Euler(0f, 180f, 0f);
 
-            var heroInfo = heroInfoGroup.AddHero(side, heroId, 1);
             // 获取并初始化Chess组件
             Chess chessComponent = unitInstance.GetComponent<Chess>();
             if (chessComponent != null)
@@ -166,8 +178,12 @@ public class WorldManager : MonoBehaviour
                 chessComponent.moveSpeed = heroConfig.MoveSpeed;
                 chessComponent.attackRange = heroConfig.Range;
                 chessComponent.attackDamage = heroConfig.Atk;
-                chessComponent.heroInfo = heroInfo;
 
+                if (side <= 2)
+                {
+                    var heroInfo = heroInfoGroup.AddHero(side, heroId, 1);
+                    chessComponent.heroInfo = heroInfo;
+                }
                 // 可以在这里设置其他必要的初始化参数
             }
             else
@@ -178,44 +194,6 @@ public class WorldManager : MonoBehaviour
             idCounter++;
         }
     }
-
-    // 获取指定阵营的所有英雄ID
-    private List<int> GetAllHeroIdsBySide(int side)
-    {
-        List<int> heroIds = new List<int>();
-        // 假设HeroConfig有一个方法GetAllConfigs()返回所有英雄配置
-        foreach (var config in HeroConfig.ConfigList)
-        {
-            if (config.Side == side)
-            {
-                heroIds.Add((int)config.Id);
-            }
-        }
-        return heroIds;
-    }
-
-    // 从源ID列表中随机选择指定数量的不重复ID
-    private List<int> GetRandomUniqueIds(List<int> sourceIds, int count)
-    {
-        List<int> result = new List<int>();
-        if (sourceIds == null || sourceIds.Count == 0 || count <= 0)
-        {
-            return result;
-        }
-
-        // 创建源列表的副本以避免修改原列表
-        List<int> tempIds = new List<int>(sourceIds);
-        int actualCount = Mathf.Min(count, tempIds.Count);
-
-        for (int i = 0; i < actualCount; i++)
-        {
-            int randomIndex = Random.Range(0, tempIds.Count);
-            result.Add(tempIds[randomIndex]);
-            tempIds.RemoveAt(randomIndex);
-        }
-
-        return result;
-    }    
 
     // 世界坐标转格子坐标
     public Vector2Int WorldToGridPosition(Vector3 worldPosition, bool FloorToInt)
@@ -381,38 +359,62 @@ public class WorldManager : MonoBehaviour
 
     public void OnUnitDie(Chess dieUnit)
     {
-        // 检查阵营1和阵营2是否还有存活单位
+        // 检查所有阵营是否还有存活单位
         bool side1HasUnits = false;
         bool side2HasUnits = false;
+        bool side3HasUnits = false;
+        bool side4HasUnits = false;
+        int aliveSideCount = 0;
 
         foreach (Transform child in Units.transform)
         {
             Chess chessComponent = child.GetComponent<Chess>();
             if (chessComponent != null && chessComponent.hp > 0)
             {
-                if (chessComponent.side == 1)
+                switch (chessComponent.side)
                 {
-                    side1HasUnits = true;
-                }
-                else if (chessComponent.side == 2)
-                {
-                    side2HasUnits = true;
-                }
-
-                // 如果两个阵营都有存活单位，提前结束检查
-                if (side1HasUnits && side2HasUnits)
-                {
-                    break;
+                    case 1:
+                        if (!side1HasUnits)
+                        {
+                            side1HasUnits = true;
+                            aliveSideCount++;
+                        }
+                        break;
+                    case 2:
+                        if (!side2HasUnits)
+                        {
+                            side2HasUnits = true;
+                            aliveSideCount++;
+                        }
+                        break;
+                    case 3:
+                        if (!side3HasUnits)
+                        {
+                            side3HasUnits = true;
+                            aliveSideCount++;
+                        }
+                        break;
+                    case 4:
+                        if (!side4HasUnits)
+                        {
+                            side4HasUnits = true;
+                            aliveSideCount++;
+                        }
+                        break;
                 }
             }
         }
-        UnityEngine.Debug.Log($"id:{dieUnit.id} dieUnit.side:{dieUnit.side} side1HasUnits:{side1HasUnits} side2HasUnits:{side2HasUnits}");
-        // 如果任一阵营没有存活单位，显示重启按钮
-        if (!side1HasUnits || !side2HasUnits)
+
+        UnityEngine.Debug.Log($"id:{dieUnit.id} dieUnit.side:{dieUnit.side} 存活阵营数:{aliveSideCount}");
+        // 如果只剩一个阵营有存活单位，显示重启按钮
+        if (aliveSideCount == 2)
         {
             buttonRestart.gameObject.SetActive(true);
             textRestart.gameObject.SetActive(true);
-            textRestart.text = side1HasUnits ? "蜀国胜利!!!" : "魏国胜利!!!";
+            if (side1HasUnits)
+                textRestart.text = "蜀国胜利!!!";
+            else if (side2HasUnits)
+                textRestart.text = "魏国胜利!!!";
         }
     }
 
