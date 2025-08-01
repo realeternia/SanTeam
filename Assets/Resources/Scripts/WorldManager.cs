@@ -68,12 +68,21 @@ public class WorldManager : MonoBehaviour
         // 在RegionSide2生成单位 (阵营2)
         SpawnUnitsForRegion(RegionSide2, unitPrefab, 2, "bottle", ref unitId);
 
-        SpawnHerosForRegion(RegionHeroSide1[0], 100001, 1, ref unitId);
-        SpawnHerosForRegion(RegionHeroSide1[1], 100002, 1, ref unitId);
-        SpawnHerosForRegion(RegionHeroSide1[2], 100003, 1, ref unitId);
-        SpawnHerosForRegion(RegionHeroSide2[0], 100004, 2, ref unitId);
-        SpawnHerosForRegion(RegionHeroSide2[1], 100005, 2, ref unitId);
-        SpawnHerosForRegion(RegionHeroSide2[2], 100006, 2, ref unitId);
+        // 从HeroConfig随机选择5个不重复的side=1英雄
+        List<int> side1HeroIds = GetAllHeroIdsBySide(1);
+        List<int> selectedSide1HeroIds = GetRandomUniqueIds(side1HeroIds, 5);
+        for (int i = 0; i < selectedSide1HeroIds.Count && i < RegionHeroSide1.Length; i++)
+        {
+            SpawnHerosForRegion(RegionHeroSide1[i], selectedSide1HeroIds[i], 1, ref unitId);
+        }
+
+        // 从HeroConfig随机选择5个不重复的side=2英雄
+        List<int> side2HeroIds = GetAllHeroIdsBySide(2);
+        List<int> selectedSide2HeroIds = GetRandomUniqueIds(side2HeroIds, 5);
+        for (int i = 0; i < selectedSide2HeroIds.Count && i < RegionHeroSide2.Length; i++)
+        {
+            SpawnHerosForRegion(RegionHeroSide2[i], selectedSide2HeroIds[i], 2, ref unitId);
+        }
     }
 
     private void SpawnUnitsForRegion(GameObject[] region, GameObject prefab, int side, string chessName, ref int idCounter)
@@ -92,6 +101,7 @@ public class WorldManager : MonoBehaviour
                 if (chessComponent != null)
                 {
                     chessComponent.id = idCounter;
+                    chessComponent.isHero = false;
                     chessComponent.side = side;
                     chessComponent.chessName = chessName;
                     chessComponent.maxHp = 100;
@@ -128,6 +138,8 @@ public class WorldManager : MonoBehaviour
             if (chessComponent != null)
             {
                 chessComponent.id = idCounter;
+                chessComponent.isHero = true;
+                chessComponent.heroId = heroId;
                 chessComponent.side = side;
                 chessComponent.chessName = heroConfig.Icon;
                 chessComponent.maxHp = heroConfig.Hp;
@@ -145,6 +157,44 @@ public class WorldManager : MonoBehaviour
 
             idCounter++;
         }
+    }
+
+    // 获取指定阵营的所有英雄ID
+    private List<int> GetAllHeroIdsBySide(int side)
+    {
+        List<int> heroIds = new List<int>();
+        // 假设HeroConfig有一个方法GetAllConfigs()返回所有英雄配置
+        foreach (var config in HeroConfig.ConfigList)
+        {
+            if (config.Side == side)
+            {
+                heroIds.Add((int)config.Id);
+            }
+        }
+        return heroIds;
+    }
+
+    // 从源ID列表中随机选择指定数量的不重复ID
+    private List<int> GetRandomUniqueIds(List<int> sourceIds, int count)
+    {
+        List<int> result = new List<int>();
+        if (sourceIds == null || sourceIds.Count == 0 || count <= 0)
+        {
+            return result;
+        }
+
+        // 创建源列表的副本以避免修改原列表
+        List<int> tempIds = new List<int>(sourceIds);
+        int actualCount = Mathf.Min(count, tempIds.Count);
+
+        for (int i = 0; i < actualCount; i++)
+        {
+            int randomIndex = Random.Range(0, tempIds.Count);
+            result.Add(tempIds[randomIndex]);
+            tempIds.RemoveAt(randomIndex);
+        }
+
+        return result;
     }    
 
     // 世界坐标转格子坐标

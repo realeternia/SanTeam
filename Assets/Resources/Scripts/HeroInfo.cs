@@ -11,7 +11,8 @@ public class HeroInfo : MonoBehaviour
     public Image heroImage;
     public Image healthImg;
     public Image errorImg;
-    
+    public Image classImg;
+
     // Start is called before the first frame update
     void Start()
     {

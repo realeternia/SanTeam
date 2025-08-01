@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using CommonConfig;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -13,6 +14,7 @@ public class Chess : MonoBehaviour, IPointerClickHandler
     private ChessHUD hud;
     public int side;
     public bool isHero;
+    public int heroId;
     public string chessName = "0";
     public Renderer rend;
 
@@ -244,7 +246,7 @@ public class Chess : MonoBehaviour, IPointerClickHandler
             return;
 
         // 造成伤害
-        targetChess.hp -= this.attackDamage;
+        targetChess.hp -= calculateDamage(this, targetChess);
         if(targetChess.heroInfo != null) // 英雄
             targetChess.heroInfo.SetHpRate((float)targetChess.hp / targetChess.maxHp);
         //Debug.Log($"{gameObject.name} 攻击了 {targetChess.gameObject.name}，造成 {this.attackDamage} 点伤害，目标剩余生命值：{targetChess.hp}");
@@ -270,6 +272,32 @@ public class Chess : MonoBehaviour, IPointerClickHandler
             // 寻找新目标
             FindTarget();
         }
+    }
+
+    private int calculateDamage(Chess attacker, Chess defender)
+    {
+        if(!attacker.isHero || !defender.isHero)
+            return attacker.attackDamage;
+
+        var attackerHeroCfg = HeroConfig.GetConfig((uint)attacker.heroId);
+        var defenderHeroCfg = HeroConfig.GetConfig((uint)defender.heroId);
+
+        // 计算攻击者三属性与防御者对应属性的差值
+        float inteDiff = attackerHeroCfg.Inte - defenderHeroCfg.Inte;
+        float leadShipDiff = attackerHeroCfg.LeadShip - defenderHeroCfg.LeadShip;
+        float strDiff = attackerHeroCfg.Str - defenderHeroCfg.Str;
+
+        // 找出最大差值
+        float maxDiff = Mathf.Max(inteDiff, leadShipDiff, strDiff);
+
+        // 伤害 = 最大差值 * 2
+        int damage = Mathf.RoundToInt(maxDiff * 2);
+
+        // 记录日志
+        Debug.Log($"{attackerHeroCfg.Name}攻击{defenderHeroCfg.Name}，属性差值：Inte={inteDiff}, LeadShip={leadShipDiff}, Str={strDiff}，最大差值={maxDiff}，伤害：{damage}");
+
+        // 限制伤害在10-60之间
+        return Mathf.Clamp(damage, 10, 60);
     }
 
     public void OnPointerClick(PointerEventData eventData)

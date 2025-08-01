@@ -23,6 +23,22 @@ namespace CommonConfig
         /// </summary>
         public int Atk;
         /// <summary>
+        ///统帅
+        /// </summary>
+        public int LeadShip;
+        /// <summary>
+        ///智力
+        /// </summary>
+        public int Inte;
+        /// <summary>
+        ///武力
+        /// </summary>
+        public int Str;
+        /// <summary>
+        ///总属性
+        /// </summary>
+        public int Total;
+        /// <summary>
         ///生命
         /// </summary>
         public int Hp;
@@ -44,12 +60,16 @@ namespace CommonConfig
         public string Icon;
 
 
-        public HeroConfig(uint Id, string Name, int Lv, int Atk, int Hp, int Side, int MoveSpeed, int Range, string Icon)
+        public HeroConfig(uint Id, string Name, int Lv, int Atk, int LeadShip, int Inte, int Str, int Total, int Hp, int Side, int MoveSpeed, int Range, string Icon)
         {
             this.Id = Id;
             this.Name = Name;
             this.Lv = Lv;
             this.Atk = Atk;
+            this.LeadShip = LeadShip;
+            this.Inte = Inte;
+            this.Str = Str;
+            this.Total = Total;
             this.Hp = Hp;
             this.Side = Side;
             this.MoveSpeed = MoveSpeed;
@@ -78,12 +98,45 @@ namespace CommonConfig
         public static void Load()
         {
             config.Clear();
-            config[100001] = new HeroConfig(100001, "赵云", 1, 30, 400, 1, 10, 15, "zhaoyun");
-            config[100002] = new HeroConfig(100002, "关羽", 1, 30, 300, 1, 10, 15, "guanyu");
-            config[100003] = new HeroConfig(100003, "张飞", 1, 40, 300, 1, 10, 15, "zhangfei");
-            config[100004] = new HeroConfig(100004, "夏侯惇", 1, 35, 250, 2, 10, 15, "xiahoudun");
-            config[100005] = new HeroConfig(100005, "夏侯渊", 1, 30, 250, 2, 10, 25, "xiahouyuan");
-            config[100006] = new HeroConfig(100006, "张辽", 1, 30, 300, 2, 10, 15, "zhangliao");
+            config[100001] = new HeroConfig(100001, "文聘", 1, 24, 72, 65, 78, 215, 300, 2, 10, 15, "wenpin");
+            config[100002] = new HeroConfig(100002, "夏侯惇", 1, 28, 85, 70, 90, 245, 375, 2, 10, 15, "xiahoudun");
+            config[100003] = new HeroConfig(100003, "赵云", 1, 29, 88, 75, 97, 260, 350, 1, 10, 15, "zhaoyun");
+            config[100004] = new HeroConfig(100004, "张飞", 1, 27, 82, 60, 98, 240, 420, 1, 10, 15, "zhangfei");
+            config[100005] = new HeroConfig(100005, "周仓", 1, 22, 68, 50, 76, 194, 350, 1, 10, 15, "zhoucang");
+            config[100006] = new HeroConfig(100006, "张辽", 1, 30, 90, 78, 92, 260, 380, 2, 10, 15, "zhangliao");
+            config[100007] = new HeroConfig(100007, "诸葛亮", 1, 31, 95, 100, 65, 260, 290, 1, 10, 15, "zhugeliang");
+            config[100008] = new HeroConfig(100008, "于禁", 1, 26, 80, 72, 75, 227, 360, 2, 10, 15, "yujin");
+            config[100009] = new HeroConfig(100009, "夏侯渊", 1, 27, 83, 68, 88, 239, 390, 2, 10, 15, "xiahouyuan");
+            config[100010] = new HeroConfig(100010, "张郃", 1, 29, 87, 74, 92, 253, 330, 2, 10, 15, "zhanghe");
+            config[100011] = new HeroConfig(100011, "严颜", 1, 25, 75, 70, 82, 227, 360, 1, 10, 15, "yanyan");
+            config[100012] = new HeroConfig(100012, "徐庶", 1, 26, 78, 94, 65, 237, 310, 1, 10, 15, "xusu");
+            config[100013] = new HeroConfig(100013, "徐晃", 1, 26, 80, 55, 96, 231, 430, 2, 10, 15, "xuhuang");
+            config[100014] = new HeroConfig(100014, "曹仁", 1, 28, 86, 72, 84, 242, 410, 2, 10, 15, "caoren");
+            config[100015] = new HeroConfig(100015, "庞德", 1, 28, 84, 70, 94, 248, 400, 2, 10, 15, "pangde");
+            config[100016] = new HeroConfig(100016, "魏延", 1, 27, 83, 75, 89, 247, 380, 1, 10, 15, "weiyan");
+            config[100017] = new HeroConfig(100017, "刘备", 1, 29, 88, 82, 75, 245, 400, 1, 10, 15, "liubei");
+            config[100018] = new HeroConfig(100018, "黄忠", 1, 28, 85, 75, 95, 255, 330, 1, 10, 15, "huangzhong");
+            config[100019] = new HeroConfig(100019, "马超", 1, 29, 87, 70, 96, 253, 410, 1, 10, 15, "machao");
+            config[100020] = new HeroConfig(100020, "关羽", 1, 30, 92, 75, 97, 264, 400, 1, 10, 15, "guanyu");
+            config[100021] = new HeroConfig(100021, "曹操", 1, 32, 98, 92, 85, 275, 300, 2, 10, 15, "caocao");
+            config[100022] = new HeroConfig(100022, "曹洪", 1, 25, 75, 68, 80, 223, 370, 2, 10, 15, "caohong");
+            config[100023] = new HeroConfig(100023, "许褚", 1, 27, 81, 56, 97, 234, 450, 2, 10, 15, "xuchu");
+            config[100024] = new HeroConfig(100024, "典韦", 1, 26, 78, 50, 98, 226, 460, 2, 10, 15, "dianwei");
+            config[100025] = new HeroConfig(100025, "马岱", 1, 25, 76, 72, 83, 231, 380, 1, 10, 15, "madai");
+            config[100026] = new HeroConfig(100026, "乐进", 1, 26, 79, 70, 85, 234, 360, 2, 10, 15, "lejin");
+            config[100027] = new HeroConfig(100027, "贾诩", 1, 25, 75, 97, 62, 234, 330, 2, 10, 15, "jiaxu");
+            config[100028] = new HeroConfig(100028, "郭嘉", 1, 24, 72, 98, 35, 205, 340, 2, 10, 15, "guojia");
+            config[100029] = new HeroConfig(100029, "曹休", 1, 23, 70, 75, 72, 217, 400, 2, 10, 15, "caoxiu");
+            config[100030] = new HeroConfig(100030, "关兴", 1, 26, 80, 72, 85, 237, 380, 1, 10, 15, "guanxing");
+            config[100031] = new HeroConfig(100031, "关平", 1, 25, 78, 70, 82, 230, 370, 1, 10, 15, "guanping");
+            config[100032] = new HeroConfig(100032, "司马懿", 1, 30, 96, 99, 75, 270, 320, 2, 10, 15, "simayi");
+            config[100033] = new HeroConfig(100033, "邓艾", 1, 28, 89, 88, 80, 257, 360, 2, 10, 15, "dengai");
+            config[100034] = new HeroConfig(100034, "姜维", 1, 29, 90, 92, 87, 269, 340, 1, 10, 15, "jiangwei");
+            config[100035] = new HeroConfig(100035, "廖化", 1, 24, 75, 68, 78, 221, 390, 1, 10, 15, "liaohua");
+            config[100036] = new HeroConfig(100036, "孟获", 1, 27, 82, 60, 90, 232, 450, 1, 10, 15, "menghuo");
+            config[100037] = new HeroConfig(100037, "庞统", 1, 23, 79, 98, 55, 232, 280, 1, 10, 15, "pangtong");
+            config[100038] = new HeroConfig(100038, "李严", 1, 26, 83, 75, 82, 240, 370, 1, 10, 15, "liyan");
+            config[100039] = new HeroConfig(100039, "张苞", 1, 25, 77, 65, 84, 226, 400, 1, 10, 15, "zhangbao");
 
         }
 

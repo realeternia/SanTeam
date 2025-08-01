@@ -44,7 +44,46 @@ public class HeroInfoGroup : MonoBehaviour
         HeroInfo heroInfo = Instantiate(heroPrefab, heroInfoRect.transform).GetComponent<HeroInfo>();
         heroInfo.transform.localPosition = new Vector3(105, 50 - 102 * count, 0);
         var heroCfg = HeroConfig.GetConfig((uint)heroId);
+
+        // 确定英雄的最高属性
+        float inte = heroCfg.Inte;
+        float leadShip = heroCfg.LeadShip;
+        float str = heroCfg.Str;
+
+        string highestAttr = "";
+        if (inte >= leadShip && inte >= str && inte >= 90 )
+        {
+            highestAttr = "attrinte";
+        }
+        else if (leadShip >= inte && leadShip >= str && leadShip >= 90)
+        {
+            highestAttr = "attrlead";
+        }
+        else if (str >= inte && str >= leadShip && str >= 90)
+        {
+            highestAttr = "attrstr";
+        }     
+        else if (heroCfg.Total >= 230)
+        {
+            highestAttr = "attrshield";
+        }
+
+
         heroInfo.heroImage.sprite = Resources.Load<Sprite>("Skins/" + heroCfg.Icon);
+        if(highestAttr != "")
+        {       
+             // 根据最高属性加载对应图片
+            heroInfo.classImg.sprite = Resources.Load<Sprite>(highestAttr);
+            if(heroCfg.Total >= 250)
+            {
+                heroInfo.classImg.color = Color.red;
+            }
+            else if (heroCfg.Total >= 240)
+            {
+                heroInfo.classImg.color = Color.yellow;
+            }
+        }
+
         heroInfo.heroName.text = heroCfg.Name;
         heroInfo.heroLevelTxt.text = "等级 " + level;
         if(side == 1)
