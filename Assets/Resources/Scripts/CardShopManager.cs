@@ -43,6 +43,7 @@ public class CardShopManager : MonoBehaviour
         });
 
         ShopBegin();
+        WorldManager.Instance.isDebug = false;
     }
 
     string GetColoredText(int value)

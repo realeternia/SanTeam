@@ -30,7 +30,7 @@ Transform:
   m_GameObject: {fileID: 4749144538699207148}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 1, z: 0, w: 0}
-  m_LocalPosition: {x: 298.28, y: 7.37, z: 217.6}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 10, y: 5, z: 10}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -128,12 +128,18 @@ MonoBehaviour:
   maxHp: 300
   side: 1
   isHero: 1
+  heroId: 0
   chessName: zhaoyun
   rend: {fileID: 965843959451955951}
   moveSpeed: 10
   attackRange: 15
+  inte: 0
+  str: 0
+  leadShip: 0
+  level: 1
   hp: 300
   attackDamage: 30
+  heroInfo: {fileID: 0}
 --- !u!1001 &8053122518967173290
 PrefabInstance:
   m_ObjectHideFlags: 0
