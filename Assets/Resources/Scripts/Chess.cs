@@ -23,6 +23,10 @@ public class Chess : MonoBehaviour, IPointerClickHandler
     // 移动速度
     public float moveSpeed = 5f;
     public float attackRange = 10f;
+    public int inte;
+    public int str;
+    public int leadShip;
+    public int level = 1;
 
     private Vector3? moveDirection = null;
     // 移动失败计数器
@@ -228,6 +232,57 @@ public class Chess : MonoBehaviour, IPointerClickHandler
         }
     }
 
+    public void UpdateLevel(int lv)
+    {
+        level = lv;
+
+        var heroConfig = HeroConfig.GetConfig((uint)heroId);
+        maxHp = heroConfig.Hp * (8 + lv * 2) / 10;
+        moveSpeed = heroConfig.MoveSpeed;
+        attackRange = heroConfig.Range;
+        attackDamage = heroConfig.Atk * (8 + lv * 2) / 10;
+        inte = heroConfig.Inte + Math.Max(8 * (lv - 1), heroConfig.Inte * (lv - 1) / 10);
+        str = heroConfig.Str + Math.Max(8 * (lv - 1), heroConfig.Str * (lv - 1) / 10);
+        leadShip = heroConfig.LeadShip + Math.Max(8 * (lv - 1), heroConfig.LeadShip * (lv - 1) / 10);
+
+        if(heroInfo != null)
+        {
+            // 确定英雄的最高属性
+            string highestAttr = "";
+            var total = inte + leadShip + str;
+            if (inte >= leadShip && inte >= str && inte >= 90 )
+            {
+                highestAttr = "attrinte";
+            }
+            else if (leadShip >= inte && leadShip >= str && leadShip >= 90)
+            {
+                highestAttr = "attrlead";
+            }
+            else if (str >= inte && str >= leadShip && str >= 90)
+            {
+                highestAttr = "attrstr";
+            }     
+            else if (total >= 230)
+            {
+                highestAttr = "attrshield";
+            }
+
+            if(highestAttr != "")
+            {       
+                // 根据最高属性加载对应图片
+                heroInfo.classImg.sprite = Resources.Load<Sprite>(highestAttr);
+                if(total >= 280)
+                {
+                    heroInfo.classImg.color = Color.red;
+                }
+                else if (total >= 250)
+                {
+                    heroInfo.classImg.color = Color.yellow;
+                }
+            }
+        }
+    }
+
     // 攻击目标
     private void Attack()
     {
@@ -268,13 +323,10 @@ public class Chess : MonoBehaviour, IPointerClickHandler
         if(!attacker.isHero || !defender.isHero)
             return attacker.attackDamage;
 
-        var attackerHeroCfg = HeroConfig.GetConfig((uint)attacker.heroId);
-        var defenderHeroCfg = HeroConfig.GetConfig((uint)defender.heroId);
-
         // 计算攻击者三属性与防御者对应属性的差值
-        float inteDiff = attackerHeroCfg.Inte - defenderHeroCfg.Inte;
-        float leadShipDiff = attackerHeroCfg.LeadShip - defenderHeroCfg.LeadShip;
-        float strDiff = attackerHeroCfg.Str - defenderHeroCfg.Str;
+        float inteDiff = attacker.inte - defender.inte;
+        float leadShipDiff = attacker.leadShip - defender.leadShip;
+        float strDiff = attacker.str - defender.str;
 
         // 找出最大差值
         float maxDiff = Mathf.Max(inteDiff, leadShipDiff, strDiff);
@@ -283,7 +335,7 @@ public class Chess : MonoBehaviour, IPointerClickHandler
         int damage = Mathf.RoundToInt(maxDiff * 2);
 
         // 记录日志
-        Debug.Log($"{attackerHeroCfg.Name}攻击{defenderHeroCfg.Name}，属性差值：Inte={inteDiff}, LeadShip={leadShipDiff}, Str={strDiff}，最大差值={maxDiff}，伤害：{damage}");
+        Debug.Log($"{attacker.heroId}攻击{defender.heroId}，属性差值：Inte={inteDiff}, LeadShip={leadShipDiff}, Str={strDiff}，最大差值={maxDiff}，伤害：{damage}");
 
         // 限制伤害在10-60之间
         return Mathf.Clamp(damage, 10, 60);

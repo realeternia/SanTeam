@@ -26,6 +26,12 @@ public class GameManager : MonoBehaviour
         
     }
 
+    public void ClearTurn()
+    {
+        foreach(var p in players)
+            p.isOnTurn = false;    
+    }
+
     public void OnPlayerTurn(int pid)
     {
         foreach(var p in players)

@@ -11,6 +11,8 @@ public class WorldManager : MonoBehaviour
     public GameObject Units;
     public int gridCellSize = 3; // 每个格子的实际大小(米)
 
+    public int battleIndex = 0; //第几场
+
     private Dictionary<int, List<Vector2Int>> occupiedGrids = new Dictionary<int, List<Vector2Int>>(); // 所有被占据的格子，键为chess.id
 
     private bool showDebugCube = false;
@@ -40,18 +42,39 @@ public class WorldManager : MonoBehaviour
     {
         Instance = this;
 
-        buttonRestart.onClick.AddListener(RestartGame);
+        buttonRestart.onClick.AddListener(BattleEnd);
 
         // buttonRestart.gameObject.SetActive(false);
         // textRestart.gameObject.SetActive(false);
         // SpawnUnitsInRegions();
     }
 
-    public void RestartGame()
-    {     
+    public void BattleEnd()
+    {
+        foreach (Transform child in Units.transform)
+        {
+            Destroy(child.gameObject);
+        }
+        CardShopManager.Instance.ShopBegin();
+    }
+
+    public void BattleBegin()
+    {
+        battleIndex++;
+
         buttonRestart.gameObject.SetActive(false);
         textRestart.gameObject.SetActive(false);
         SpawnUnitsInRegions();
+    }
+
+    private int[] GetMatch()
+    {
+        if(battleIndex % 3 == 1)
+            return new int[] { 0, 1, 2, 3 };
+        else if(battleIndex % 4 == 2)
+            return new int[] { 0, 2, 1, 3 };
+        else
+            return new int[] { 0, 3, 2, 1 };
     }
 
     private void SpawnUnitsInRegions()
@@ -95,16 +118,18 @@ public class WorldManager : MonoBehaviour
         SpawnUnitsForRegion(RegionSide3, unitPrefab, 3, "bird", ref unitId);
         SpawnUnitsForRegion(RegionSide4, unitPrefab, 4, "hill", ref unitId);
 
-        var cards = GameManager.Instance.GetPlayer(0).GetCardList();
+        int[] match = GetMatch();
+        heroInfoGroup.p2NameText.text = GameManager.Instance.GetPlayer(match[1]).playerNameText.text;
+        var cards = GameManager.Instance.GetPlayer(match[0]).GetBattleCardList();
         for (int i = 0; i < cards.Count && i < RegionHeroSide1.Length; i++)
             SpawnHerosForRegion(RegionHeroSide1[i], cards[i], 1, ref unitId);
-        cards = GameManager.Instance.GetPlayer(1).GetCardList();            
+        cards = GameManager.Instance.GetPlayer(match[1]).GetBattleCardList();            
         for (int i = 0; i < cards.Count && i < RegionHeroSide2.Length; i++)
             SpawnHerosForRegion(RegionHeroSide2[i], cards[i], 2, ref unitId);
-        cards = GameManager.Instance.GetPlayer(2).GetCardList();
+        cards = GameManager.Instance.GetPlayer(match[2]).GetBattleCardList();
         for (int i = 0; i < cards.Count && i < RegionHeroSide3.Length; i++)
                 SpawnHerosForRegion(RegionHeroSide3[i], cards[i], 3, ref unitId);
-        cards = GameManager.Instance.GetPlayer(3).GetCardList();
+        cards = GameManager.Instance.GetPlayer(match[3]).GetBattleCardList();
         for (int i = 0; i < cards.Count && i < RegionHeroSide4.Length; i++)
                 SpawnHerosForRegion(RegionHeroSide4[i], cards[i], 4, ref unitId);                                 
     }
@@ -145,9 +170,9 @@ public class WorldManager : MonoBehaviour
         }
     }
 
-    private void SpawnHerosForRegion(GameObject spawnPoint, int heroId, int side, ref int idCounter)
+    private void SpawnHerosForRegion(GameObject spawnPoint, System.Tuple<int, int> heroData, int side, ref int idCounter)
     {
-        var heroConfig = HeroConfig.GetConfig((uint)heroId);
+        var heroConfig = HeroConfig.GetConfig((uint)heroData.Item1);
         GameObject heroPrefab = Resources.Load<GameObject>("Prefabs/UnitHero");
         if (spawnPoint != null)
         {
@@ -162,19 +187,15 @@ public class WorldManager : MonoBehaviour
             {
                 chessComponent.id = idCounter;
                 chessComponent.isHero = true;
-                chessComponent.heroId = heroId;
+                chessComponent.heroId = (int)heroConfig.Id;
                 chessComponent.side = side;
                 chessComponent.chessName = heroConfig.Icon;
-                chessComponent.maxHp = heroConfig.Hp;
-                chessComponent.moveSpeed = heroConfig.MoveSpeed;
-                chessComponent.attackRange = heroConfig.Range;
-                chessComponent.attackDamage = heroConfig.Atk;
-
                 if (side <= 2)
                 {
-                    var heroInfo = heroInfoGroup.AddHero(side, heroId, 1);
+                    var heroInfo = heroInfoGroup.AddHero(side, (int)heroConfig.Id, heroData.Item2);
                     chessComponent.heroInfo = heroInfo;
                 }
+                chessComponent.UpdateLevel(heroData.Item2);
                 // 可以在这里设置其他必要的初始化参数
             }
             else
@@ -232,7 +253,7 @@ public class WorldManager : MonoBehaviour
                     {
                         if (occupiedGrid.x == gridPos.x && occupiedGrid.y == gridPos.y)
                         {
-                            UnityEngine.Debug.Log("Grid " + gridPos + " is already occupied by unit: " + entry.Key);
+                         //   UnityEngine.Debug.Log("Grid " + gridPos + " is already occupied by unit: " + entry.Key);
                             return false; // 格子不可用
                         }
                     }
@@ -403,9 +424,15 @@ public class WorldManager : MonoBehaviour
             buttonRestart.gameObject.SetActive(true);
             textRestart.gameObject.SetActive(true);
             if (side1HasUnits)
-                textRestart.text = "蜀国胜利!!!";
+                textRestart.text = "你获胜了!!!";
             else if (side2HasUnits)
-                textRestart.text = "魏国胜利!!!";
+                textRestart.text = "你输了!!!";
+
+            int[] match = GetMatch();
+            GameManager.Instance.GetPlayer(match[0]).onBattleResult(side1HasUnits);
+            GameManager.Instance.GetPlayer(match[1]).onBattleResult(side2HasUnits);
+            GameManager.Instance.GetPlayer(match[2]).onBattleResult(side3HasUnits);
+            GameManager.Instance.GetPlayer(match[3]).onBattleResult(side4HasUnits);
         }
     }
 

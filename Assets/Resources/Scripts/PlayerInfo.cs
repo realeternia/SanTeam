@@ -41,6 +41,12 @@ public class PlayerInfo : MonoBehaviour
         resultText.text = "准备中";
     }
 
+    public void AddGold(int g)
+    {
+        gold += g;
+        goldText.text = gold.ToString();
+    }
+
     // Update is called once per frame
     void Update()
     {
@@ -172,17 +178,27 @@ public class PlayerInfo : MonoBehaviour
         return false;
     }
 
-    public List<int> GetCardList()
+    public List<Tuple<int, int>> GetBattleCardList()
     {
-        List<int> result = new List<int>();
+        List<Tuple<int, int>> result = new List<Tuple<int, int>>();
         foreach (int cardId in cards.Keys)
         {
-            result.Add(cardId);
-            if (result.Count >= 5)
-            {
-                break;
-            }
+            result.Add(new Tuple<int, int>(cardId, cards[cardId]));
+        }
+        result.Sort((a, b) => b.Item2.CompareTo(a.Item2));
+        if (result.Count >= 5)
+        {
+            result = result.Take(5).ToList();
         }
         return result;
+    }
+
+    public void onBattleResult(bool isWin)
+    {
+        if(isWin)
+            winCount++;
+        else
+            loseCount++;
+        resultText.text = winCount.ToString() + "胜" + loseCount.ToString() + "败";
     }
 }

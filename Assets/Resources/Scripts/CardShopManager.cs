@@ -13,8 +13,8 @@ public class CardShopManager : MonoBehaviour
     public GameObject cardViewPrefab; // 拖拽CardView预制体到此处
     private const int TOTAL_CARDS = 10;
     private const int CARDS_PER_ROW = 5;
-    private float cardWidth = 220f;
-    private float cardHeight = 360f;
+    private float cardWidth = 176f;
+    private float cardHeight = 288f;
     private float spacing = 10f;
     private int round = 10000;
     private bool[] playerPassed = new bool[4]; // 记录每个玩家是否pass过
@@ -23,6 +23,7 @@ public class CardShopManager : MonoBehaviour
     public Button passBtn;
     private int era = 0;
     public TMP_Text eraText;
+    public MySelectControl mySelect;
 
     // Start is called before the first frame update
     void Start()
@@ -96,7 +97,7 @@ public class CardShopManager : MonoBehaviour
 
         // 计算起始位置，使其居中显示
         float startX = -( (CARDS_PER_ROW * cardWidth) + (CARDS_PER_ROW - 1) * spacing ) / 2f + cardWidth / 2f;
-        float startY = 180f;
+        float startY = 145f;
 
         for (int i = 0; i < TOTAL_CARDS; i++)
         {
@@ -137,8 +138,12 @@ public class CardShopManager : MonoBehaviour
                 cardViews.Add(cardView);
             }
         }
+
         era++;
         passBtn.gameObject.SetActive(true);
+        if(mySelect.playerInfo == null)
+            mySelect.playerInfo = GameManager.Instance.GetPlayer(0);        
+        mySelect.UpdateCards();
         eraText.text = "第" + era + "轮";
     }
 
@@ -149,15 +154,22 @@ public class CardShopManager : MonoBehaviour
         var player = GameManager.Instance.GetPlayer(pid);
         if (player.BuyCard(ctr, cardId, price))
         {
+            if(mySelect.playerInfo == null)
+                mySelect.playerInfo = player;
+            mySelect.UpdateCards();
+
             AfterAct();
         }
     }
 
     public void OnP1Pass()
     {
-        passBtn.gameObject.SetActive(false);
+        if((round % 4) != 0)
+            return;        
         if(playerPassed[0])
             return;
+
+        passBtn.gameObject.SetActive(false);
         playerPassed[0] = true;
         passedPlayers++;
 
@@ -236,9 +248,26 @@ public class CardShopManager : MonoBehaviour
         NextTurn();
     }
 
+    public void ShopBegin()
+    {
+        for(int i = 0; i < 4; i++)
+            GameManager.Instance.GetPlayer(i).AddGold(35);
+        era = 0;
+        transform.parent.gameObject.SetActive(true);
+        NewEra();
+        // 重置所有玩家的pass状态
+        for (int i = 0; i < playerPassed.Length; i++)
+        {
+            playerPassed[i] = false;
+        }
+        passedPlayers = 0;        
+        StartCoroutine(DelayedUpdate()); 
+    }
+
     private void ShopEnd()
     {
+        GameManager.Instance.ClearTurn();
         transform.parent.gameObject.SetActive(false);
-        WorldManager.Instance.RestartGame(); 
+        WorldManager.Instance.BattleBegin(); 
     }
 }
