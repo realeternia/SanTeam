@@ -59,4 +59,19 @@ public static class HeroSelectionTool
         int randomIndex = Random.Range(0, configValues.Count);
         return (int)configValues[randomIndex].Id;
     }
+
+    
+ public static    int GetPrice(HeroConfig heroCfg)
+    {
+        var baseP = heroCfg.Total / 30 + 1;
+        int bonus = 0;
+        if (heroCfg.Str > 95) bonus++;
+        if (heroCfg.Str > 90) bonus++;
+        if (heroCfg.Inte > 95) bonus++;
+        if (heroCfg.Inte > 90) bonus++;
+        if (heroCfg.LeadShip > 95) bonus++;
+        if (heroCfg.LeadShip > 90) bonus++;
+        baseP += bonus;
+        return baseP;
+    }
 }

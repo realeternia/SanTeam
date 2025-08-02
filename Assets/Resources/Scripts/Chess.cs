@@ -305,6 +305,9 @@ public class Chess : MonoBehaviour, IPointerClickHandler
         // 可以添加代码设置特效的生命周期，例如几秒钟后自动销毁
         Destroy(hitEffect, 2f);
 
+        if(side == 1 || side == 2)
+            GameManager.Instance.PlaySound("Sounds/sword");
+
         // 检查目标是否被击败
         if (targetChess.hp <= 0)
         {
@@ -312,6 +315,9 @@ public class Chess : MonoBehaviour, IPointerClickHandler
             WorldManager.Instance.OnUnitDie(targetChess);
             Destroy(targetChess.gameObject);
             targetChess = null;
+
+            if(side == 1 || side == 2)
+                GameManager.Instance.PlaySound("Sounds/tnt", 7);
 
             // 寻找新目标
             FindTarget();

@@ -21,6 +21,7 @@ public class CardShopManager : MonoBehaviour
     private int passedPlayers = 0; // 记录pass的玩家数量
 
     public Button passBtn;
+    public Button bagBtn;
     private int era = 0;
     public TMP_Text eraText;
     public MySelectControl mySelect;
@@ -30,14 +31,18 @@ public class CardShopManager : MonoBehaviour
     {
         Instance = this;
         HeroConfig.Load();
-        NewEra();
 
         passBtn.onClick.AddListener(() =>
         {
             OnP1Pass();
         });
 
-        StartCoroutine(DelayedUpdate());         
+        bagBtn.onClick.AddListener(() =>
+        {
+            PanelManager.Instance.ShowBag();
+        });
+
+        ShopBegin();
     }
 
     string GetColoredText(int value)
@@ -53,19 +58,6 @@ public class CardShopManager : MonoBehaviour
         return value.ToString();
     }
 
-    int GetPrice(HeroConfig heroCfg)
-    {
-        var baseP = heroCfg.Total / 30 + 1;
-        int bonus = 0;
-        if (heroCfg.Str > 95) bonus++;
-        if (heroCfg.Str > 90) bonus++;
-        if (heroCfg.Inte > 95) bonus++;
-        if (heroCfg.Inte > 90) bonus++;
-        if (heroCfg.LeadShip > 95) bonus++;
-        if (heroCfg.LeadShip > 90) bonus++;
-        baseP += bonus;
-        return baseP;
-    }
 
     private IEnumerator DelayedUpdate()
     { 
@@ -132,7 +124,7 @@ public class CardShopManager : MonoBehaviour
                 cardView.str.text = GetColoredText(heroCfg.Str);
 
                 cardView.hp.text = heroCfg.Hp.ToString();
-                cardView.priceI = GetPrice(heroCfg);
+                cardView.priceI = HeroSelectionTool.GetPrice(heroCfg);
                 cardView.price.text = cardView.priceI.ToString();
 
                 cardViews.Add(cardView);
@@ -145,6 +137,8 @@ public class CardShopManager : MonoBehaviour
             mySelect.playerInfo = GameManager.Instance.GetPlayer(0);        
         mySelect.UpdateCards();
         eraText.text = "第" + era + "轮";
+
+        GameManager.Instance.PlaySound("Sounds/page");
     }
 
     public void OnPlayerBuyCard(CardViewControl ctr, int pid, int cardId, int price)
@@ -160,6 +154,11 @@ public class CardShopManager : MonoBehaviour
 
             AfterAct();
         }
+    }
+
+    public void OnPlayerSellCard()
+    {
+        mySelect.UpdateCards();
     }
 
     public void OnP1Pass()
@@ -253,7 +252,7 @@ public class CardShopManager : MonoBehaviour
         for(int i = 0; i < 4; i++)
             GameManager.Instance.GetPlayer(i).AddGold(35);
         era = 0;
-        transform.parent.gameObject.SetActive(true);
+        PanelManager.Instance.ShowShop();
         NewEra();
         // 重置所有玩家的pass状态
         for (int i = 0; i < playerPassed.Length; i++)
@@ -267,7 +266,7 @@ public class CardShopManager : MonoBehaviour
     private void ShopEnd()
     {
         GameManager.Instance.ClearTurn();
-        transform.parent.gameObject.SetActive(false);
+        PanelManager.Instance.HideShop();
         WorldManager.Instance.BattleBegin(); 
     }
 }

@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using CommonConfig;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -45,6 +46,13 @@ public class PlayerInfo : MonoBehaviour
     {
         gold += g;
         goldText.text = gold.ToString();
+    }
+
+    public void SellCard(int cardId)
+    {
+        AddGold(HeroSelectionTool.GetPrice(HeroConfig.GetConfig((uint)cardId)) * cards[cardId] / 2);
+        cards.Remove(cardId);
+        GameManager.Instance.PlaySound("Sounds/gold");
     }
 
     // Update is called once per frame
@@ -91,6 +99,7 @@ public class PlayerInfo : MonoBehaviour
         {
             cards[cardId] = 1;
         }
+        GameManager.Instance.PlaySound("Sounds/gold");
         ctr.OnSold();
         return true;
     }
