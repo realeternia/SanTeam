@@ -75,7 +75,7 @@ public class BagControl : MonoBehaviour
 
         var heroConfig = HeroConfig.GetConfig((uint)cell.heroId);
         var lv = cell.level;
-        var maxHp = heroConfig.Hp * (8 + lv * 2) / 10;
+        var maxHp = heroConfig.Hp * (14 + lv) / 15;
        var inte = heroConfig.Inte + System.Math.Max(8 * (lv - 1), heroConfig.Inte * (lv - 1) / 10);
        var str = heroConfig.Str + System.Math.Max(8 * (lv - 1), heroConfig.Str * (lv - 1) / 10);
        var leadShip = heroConfig.LeadShip + System.Math.Max(8 * (lv - 1), heroConfig.LeadShip * (lv - 1) / 10);

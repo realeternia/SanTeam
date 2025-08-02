@@ -201,7 +201,7 @@ public class CardShopManager : MonoBehaviour
         
         if (currentPlayerId != 0)
         {
-            var result = GameManager.Instance.GetPlayer(currentPlayerId).AiCheckBuyCard();
+            var result = GameManager.Instance.GetPlayer(currentPlayerId).AiCheckBuyCard(era);
             
             if (!result)
             {

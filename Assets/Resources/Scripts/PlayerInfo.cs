@@ -27,6 +27,14 @@ public class PlayerInfo : MonoBehaviour
     public TMP_Text goldText;
     public TMP_Text resultText;
 
+    private int ai_price_lower = 0;
+    private int ai_price_upper = 0;
+    private float ai_price_out_rate = 0; //价格区间外卡牌的兴趣度折扣
+    private float ai_same_card_rate = 0; //已经拥有卡牌的兴趣倍率
+    private int ai_card_limit = 8; //卡牌上限
+    private float ai_sell_rate = 0.15f; //到达上限后卖牌概率
+    private float ai_future_rate = 0.5f;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -40,6 +48,34 @@ public class PlayerInfo : MonoBehaviour
         gold = g;
         goldText.text = g.ToString();
         resultText.text = "准备中";
+
+        var roll = UnityEngine.Random.Range(0, 4);
+        if(roll == 0) // 低费流
+        {
+            ai_price_lower = 7;
+            ai_price_upper = 9 + UnityEngine.Random.Range(0, 2);
+            ai_card_limit = 7 + UnityEngine.Random.Range(0, 3);
+            ai_future_rate = UnityEngine.Random.Range(0, 3) * 0.1f + 0.1f;            
+            ai_same_card_rate = (UnityEngine.Random.Range(0, 20) + 20) * 0.1f;
+        }
+        else if(roll == 1) // 中费流
+        {
+            ai_price_lower = 8;
+            ai_price_upper = 10 + UnityEngine.Random.Range(0, 2);
+            ai_card_limit = 7 + UnityEngine.Random.Range(0, 2);
+            ai_future_rate = UnityEngine.Random.Range(0, 4) * 0.1f + 0.15f; 
+            ai_same_card_rate = (UnityEngine.Random.Range(0, 20) + 30) * 0.1f;
+        }
+        else
+        {
+            ai_price_lower = 10;
+            ai_price_upper = 99;
+            ai_card_limit = 6 + UnityEngine.Random.Range(0, 2);
+            ai_future_rate = UnityEngine.Random.Range(0, 5) * 0.1f + 0.2f;
+            ai_same_card_rate = (UnityEngine.Random.Range(0, 20) + 40) * 0.1f;
+        }
+        ai_price_out_rate = 0.1f + UnityEngine.Random.Range(0, 3) * 0.1f;
+        ai_sell_rate = UnityEngine.Random.Range(0, 3) * 0.1f + 0.1f;
     }
 
     public void AddGold(int g)
@@ -104,7 +140,7 @@ public class PlayerInfo : MonoBehaviour
         return true;
     }
 
-    public bool AiCheckBuyCard()
+    public bool AiCheckBuyCard(int era)
     {
         // 获取所有未售出的卡片
         List<CardViewControl> availableCards = CardShopManager.Instance.cardViews
@@ -112,79 +148,83 @@ public class PlayerInfo : MonoBehaviour
             .ToList();  
         
         // 如果没有可用卡片，直接返回
-        if (availableCards.Count < 5)
-        {
-            // 检查是否有价值高于9的卡
-            if (!availableCards.Any(card => card.priceI >= 9))
-            {
-                // 随机1-4，如果大于可用卡片数量则放弃
-                int randomNum = UnityEngine.Random.Range(1, 5);
-                if (randomNum >= availableCards.Count)
-                    return false;
-            }
-        }
-        if (availableCards.Count <= 2) // 最后两张卡不选
+        if (availableCards.Count == 0)
             return false;
 
-        // 检查玩家当前拥有的卡片数量
-        if (cards.Count <= 4)
-        {
-            // 少于4张，优先购买价格高的卡片
-            if(TryBuyDearCard(availableCards, 3))
-                return true;
-        }
-        else
-        {
-            // 等于或超过4张，优先购买已有的卡片（按价格从高到低）
-            if(TryUpgradeCard(availableCards))
-               return true;
-            
-            // 如果没有已有的卡片可买，购买价格最高的可用卡片
-            if(TryBuyDearCard(availableCards, 3))
-                return true;
-        }
-        return false;
-    }
-
-    private bool TryBuyDearCard(List<CardViewControl> availableCards, int n)
-    {
-        // 按价格从高到低排序
-        availableCards.Sort((a, b) => 
-            b.priceI.CompareTo(a.priceI));
-
-        // 获取价值最高的n张牌，注意处理n大于可用卡片数量的情况
-        int count = Math.Min(n, availableCards.Count);
-        var topNCards = availableCards.Take(count).ToList();
-
-        // 筛选出价格不超过玩家金币的卡片
-        var affordableCards = topNCards.Where(card => 
-            gold >= card.priceI).ToList();
-
+        // 过滤掉买不起的卡片
+        var affordableCards = availableCards.Where(card => gold >= card.priceI).ToList();
         if (affordableCards.Count == 0)
-        {
             return false;
+
+        if(era < 2 && gold < 24 || era < 3 && gold < 13)
+        {
+            if(UnityEngine.Random.value < ai_future_rate)
+              return false;
         }
 
-        // 随机选择一张可购买的卡片
-        int randomIndex = UnityEngine.Random.Range(0, affordableCards.Count);
-        var selectedCard = affordableCards[randomIndex];
-        int price = selectedCard.priceI;
-        BuyCard(selectedCard, selectedCard.cardId, price);
-        return true;
-    }
+        bool cardLimit = cards.Count >= ai_card_limit;
 
-    private bool TryUpgradeCard(List<CardViewControl> availableCards)
-    {
-        foreach (var card in availableCards)
+        // 计算每张卡片的加权分
+        List<(CardViewControl card, float score)> scoredCards = new List<(CardViewControl card, float score)>();
+        foreach (var card in affordableCards)
         {
-            int price = card.priceI;
-            if (gold >= price && cards.ContainsKey(card.cardId))
+            float score = 1f;
+
+            // 根据价格区间调整分数
+            if (card.priceI < ai_price_lower || card.priceI > ai_price_upper)
             {
-                BuyCard(card, card.cardId, price);
-                return true;
+                score *= ai_price_out_rate;
+            }
+
+            // 如果已经拥有该卡片，增加分数
+            if (cards.ContainsKey(card.cardId))
+            {
+                score *= ai_same_card_rate;
+            }
+            else if(cardLimit)
+            {
+                score = 0f;
+                continue;
+            }
+
+            score *= HeroSelectionTool.GetTotalPriceRate(card.cardId); //性价比
+
+            // 加入分数列表
+            scoredCards.Add((card, score));
+        }
+
+        // 如果没有有分数的卡片，直接返回
+        if (scoredCards.Count == 0)
+            return false;
+
+        // 根据分数计算总权重
+        float totalWeight = scoredCards.Sum(item => item.score);
+        float randomValue = UnityEngine.Random.Range(0f, totalWeight);
+
+        // 根据随机值和权重选择卡片
+        float cumulativeWeight = 0f;
+        CardViewControl selectedCard = null;
+        foreach (var item in scoredCards)
+        {
+            cumulativeWeight += item.score;
+            if (randomValue <= cumulativeWeight)
+            {
+                selectedCard = item.card;
+                break;
             }
         }
-        return false;
+
+        // 如果没有选到卡片，返回 false
+        if (selectedCard == null)
+            return false;
+
+        // 检查是否达到卡牌上限
+        if (cards.Count >= ai_card_limit && UnityEngine.Random.value > ai_sell_rate)
+            return false;
+
+        // 购买选中的卡片
+        BuyCard(selectedCard, selectedCard.cardId, selectedCard.priceI);
+        return true;
     }
 
     public List<Tuple<int, int>> GetBattleCardList()

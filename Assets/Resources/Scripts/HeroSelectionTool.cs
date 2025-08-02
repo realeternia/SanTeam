@@ -60,8 +60,8 @@ public static class HeroSelectionTool
         return (int)configValues[randomIndex].Id;
     }
 
-    
- public static    int GetPrice(HeroConfig heroCfg)
+
+    public static int GetPrice(HeroConfig heroCfg)
     {
         var baseP = heroCfg.Total / 30 + 1;
         int bonus = 0;
@@ -73,5 +73,48 @@ public static class HeroSelectionTool
         if (heroCfg.LeadShip > 90) bonus++;
         baseP += bonus;
         return baseP;
+    }
+
+
+    private static Dictionary<int, float> priceRateCache = new Dictionary<int, float>();
+    public static float GetTotalPriceRate(int heroId)
+    {
+        // 定义静态字典用于缓存计算结果
+        
+        if (priceRateCache.TryGetValue(heroId, out float cachedRate))
+        {
+            return cachedRate;
+        }
+        
+        var heroCfg = HeroConfig.GetConfig((uint)heroId);
+        if (heroCfg == null)
+        {
+            return 0f;
+        }
+        
+        int heroPrice = GetPrice(heroCfg);
+        int minTotal = int.MaxValue;
+        
+        // 遍历所有英雄配置，找出同价格卡牌的最低Total值
+        foreach (var config in HeroConfig.ConfigList)
+        {
+            int currentPrice = GetPrice(config);
+            if (currentPrice == heroPrice)
+            {
+                if (config.Total < minTotal)
+                {
+                    minTotal = config.Total;
+                }
+            }
+        }
+        
+        if (minTotal == 0)
+        {
+            return 0f;
+        }
+        
+        float rate = (float)heroCfg.Total / minTotal;
+        priceRateCache[heroId] = rate;
+        return rate;
     }
 }
