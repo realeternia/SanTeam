@@ -83,6 +83,10 @@ public class CardShopManager : MonoBehaviour
 
     private void NewEra()
     {
+        var movingCardImages = GameObject.FindGameObjectsWithTag("MovingCard");
+        foreach(var img in movingCardImages)
+            Destroy(img);
+        
         //移除并销毁旧卡片
         foreach (Transform child in transform)
             Destroy(child.gameObject);
@@ -138,6 +142,11 @@ public class CardShopManager : MonoBehaviour
             mySelect.playerInfo = GameManager.Instance.GetPlayer(0);        
         mySelect.UpdateCards();
         eraText.text = "第" + era + "轮";
+
+        // 重置所有玩家的pass状态
+        for (int i = 0; i < playerPassed.Length; i++)
+            playerPassed[i] = false;
+        passedPlayers = 0;        
 
         GameManager.Instance.PlaySound("Sounds/page");
     }
@@ -239,12 +248,7 @@ public class CardShopManager : MonoBehaviour
                 return;
             }
             NewEra();
-            // 重置所有玩家的pass状态
-            for (int i = 0; i < playerPassed.Length; i++)
-            {
-                playerPassed[i] = false;
-            }
-            passedPlayers = 0;
+
         }
         NextTurn();
     }
@@ -255,13 +259,7 @@ public class CardShopManager : MonoBehaviour
             GameManager.Instance.GetPlayer(i).AddGold(35);
         era = 0;
         PanelManager.Instance.ShowShop();
-        NewEra();
-        // 重置所有玩家的pass状态
-        for (int i = 0; i < playerPassed.Length; i++)
-        {
-            playerPassed[i] = false;
-        }
-        passedPlayers = 0;        
+        NewEra();     
         StartCoroutine(DelayedUpdate()); 
     }
 

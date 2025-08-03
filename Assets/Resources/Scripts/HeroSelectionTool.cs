@@ -43,21 +43,53 @@ public static class HeroSelectionTool
         return result;
     }
 
-    public static int GetRandomHeroId()
+    private static List<int> heroPoolCache = new List<int>();
+    private static void UpdateHeroPoolCache()
     {
-        // Get the values from the dictionary and convert to a list
-        List<HeroConfig> configValues = new List<HeroConfig>(HeroConfig.ConfigList);
-        
-        // Check if the list is empty to avoid index errors
-        if (configValues.Count == 0)
+        heroPoolCache.Clear();
+        List<HeroConfig> allHeroes = new List<HeroConfig>(HeroConfig.ConfigList);
+        int targetCount = Mathf.Min(36, allHeroes.Count);
+
+        for (int i = 0; i < targetCount; i++)
         {
-            Debug.LogError("HeroConfig.ConfigList is empty!");
-            return -1; // Return invalid ID if no heroes are available
+            // 计算总权重
+            float totalRate = 0;
+            foreach (var hero in allHeroes)
+            {
+                totalRate += hero.Rate;
+            }
+
+            // 随机选择一个基于权重的位置
+            float randomValue = Random.Range(0, totalRate);
+            float accumulatedRate = 0;
+            HeroConfig selectedHero = null;
+
+            foreach (var hero in allHeroes)
+            {
+                accumulatedRate += hero.Rate;
+                if (accumulatedRate >= randomValue)
+                {
+                    selectedHero = hero;
+                    break;
+                }
+            }
+
+            // 将选中的英雄添加到缓存并从候选列表中移除
+            if (selectedHero != null)
+            {
+                heroPoolCache.Add((int)selectedHero.Id);
+                allHeroes.Remove(selectedHero);
+            }
         }
+    }
+
+    public static int GetRandomHeroId()
+    {       
+        if (heroPoolCache.Count == 0)
+            UpdateHeroPoolCache();
         
-        // Generate a random index within the valid range
-        int randomIndex = Random.Range(0, configValues.Count);
-        return (int)configValues[randomIndex].Id;
+        int randomIndex = Random.Range(0, heroPoolCache.Count);
+        return heroPoolCache[randomIndex];
     }
 
 

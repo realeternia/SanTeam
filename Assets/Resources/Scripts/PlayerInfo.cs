@@ -162,14 +162,8 @@ public class PlayerInfo : MonoBehaviour
         if (affordableCards.Count == 0)
             return false;
 
-        if(era < 2 && gold < 26 || era < 3 && gold < 13)
-        {
-            if(UnityEngine.Random.value < ai_future_rate)
-              return false;
-        }
-
         bool cardLimit = cards.Count >= ai_card_limit && gold < 50;
-
+        bool hasSameCard = false;
         // 计算每张卡片的加权分
         List<(CardViewControl card, float score)> scoredCards = new List<(CardViewControl card, float score)>();
         foreach (var card in affordableCards)
@@ -186,6 +180,7 @@ public class PlayerInfo : MonoBehaviour
             if (cards.ContainsKey(card.cardId))
             {
                 score *= ai_same_card_rate;
+                hasSameCard = true;
             }
             else if(cardLimit)
             {
@@ -202,6 +197,20 @@ public class PlayerInfo : MonoBehaviour
         // 如果没有有分数的卡片，直接返回
         if (scoredCards.Count == 0)
             return false;
+
+        if(!hasSameCard)
+        {
+            if(era < 2 && gold < 26 || era < 3 && gold < 13)
+            {
+                if(UnityEngine.Random.value < ai_future_rate)
+                return false;
+            }
+            else if(availableCards.Count <= 6 && era < 3 && gold < 31) //最后几张牌考虑放弃
+            {
+                if(UnityEngine.Random.value < ai_future_rate  + (30 - gold) * 0.03f + (6 - availableCards.Count) * 0.08f + (2 - era) * 0.15f)
+                return false;
+            }
+        }
 
         // 根据分数计算总权重
         float totalWeight = scoredCards.Sum(item => item.score);
