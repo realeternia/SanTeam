@@ -384,6 +384,9 @@ MonoBehaviour:
   blinkDuration: 2
   startColor: {r: 0.084905684, g: 0.084905684, b: 0.084905684, a: 1}
   endColor: {r: 0.066037714, g: 0.066037714, b: 0.066037714, a: 0.5}
+  gold: 0
+  winCount: 0
+  loseCount: 0
   isOnTurn: 0
   playerNameText: {fileID: 7220488733435201163}
   playerImage: {fileID: 7347440486663307163}
@@ -424,8 +427,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 179, y: -56.3}
-  m_SizeDelta: {x: 100, y: 30}
+  m_AnchoredPosition: {x: 172.6, y: -56.3}
+  m_SizeDelta: {x: 140, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &6085858474645854942
 CanvasRenderer:
@@ -489,7 +492,7 @@ MonoBehaviour:
   m_fontSizeMin: 18
   m_fontSizeMax: 72
   m_fontStyle: 0
-  m_HorizontalAlignment: 1
+  m_HorizontalAlignment: 4
   m_VerticalAlignment: 256
   m_textAlignment: 65535
   m_characterSpacing: 0

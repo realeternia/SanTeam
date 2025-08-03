@@ -47,26 +47,27 @@ public class CardViewControl : MonoBehaviour
 
     private System.Collections.IEnumerator MoveToPlayerInfo(PlayerInfo playerInfo)
     {
-        // 创建一个新的Image对象
-        GameObject imgObj = new GameObject("MovingCardImage");
-        Image img = imgObj.AddComponent<Image>();
+        // 创建一个新的Image对象并缓存
+        var movingCardImage = new GameObject("MovingCardImage");
+        movingCardImage.tag = "MovingCard";
+        Image img = movingCardImage.AddComponent<Image>();
         img.sprite = cardImage.sprite;
         img.rectTransform.sizeDelta = new Vector2(100, 140);
         // 设置初始位置为当前卡片的屏幕位置
         RectTransform cardRect = GetComponent<RectTransform>();
         Vector2 screenPos;
 
-        Canvas canvas = FindObjectOfType<Canvas>();        
+        Canvas canvas = FindObjectOfType<Canvas>();
         RectTransform canvasRect = canvas.transform as RectTransform;
         RectTransformUtility.ScreenPointToLocalPointInRectangle(canvasRect,
             transform.position, canvas.worldCamera, out screenPos);
         img.rectTransform.anchoredPosition = screenPos;
-        imgObj.transform.SetParent(canvas.transform, false);
+        movingCardImage.transform.SetParent(canvas.transform, false);
 
         // 移动动画
         float duration = 0.7f; // 移动持续时间
         float elapsedTime = 0;
-        Vector3 startPos = imgObj.transform.position;
+        Vector3 startPos = movingCardImage.transform.position;
         // 计算目标PlayerInfo在Canvas中的局部位置
         Vector2 targetScreenPos;
         RectTransformUtility.ScreenPointToLocalPointInRectangle(canvas.transform as RectTransform,
@@ -78,14 +79,15 @@ public class CardViewControl : MonoBehaviour
             elapsedTime += Time.deltaTime;
             float t = Mathf.Clamp01(elapsedTime / duration);
             // 使用平滑插值
-            imgObj.transform.position = Vector3.Lerp(startPos, endPos, t);
+            movingCardImage.transform.position = Vector3.Lerp(startPos, endPos, t);
             //逐渐缩小，最终缩小到50%
             img.rectTransform.sizeDelta = new Vector2(100, 140) * (1f - 0.5f * t);
             yield return null;
         }
 
-        // 到达目标后销毁Image
-        Destroy(imgObj);
+        // 到达目标后重置引用，由Hide方法统一销毁
+        Destroy(movingCardImage);
+        movingCardImage = null;
     }
 
 }

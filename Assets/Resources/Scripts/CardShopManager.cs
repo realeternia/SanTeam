@@ -227,7 +227,7 @@ public class CardShopManager : MonoBehaviour
                 break;
             }
         }
-        
+
         // 检查是否4个玩家都放弃或所有卡牌都已售出
         if (passedPlayers >= 4 || allCardsSold)
         {
@@ -235,7 +235,7 @@ public class CardShopManager : MonoBehaviour
             round++;
             if (era == 3)
             {
-                ShopEnd();
+                StartCoroutine(ShopEnd());
                 return;
             }
             NewEra();
@@ -265,9 +265,15 @@ public class CardShopManager : MonoBehaviour
         StartCoroutine(DelayedUpdate()); 
     }
 
-    private void ShopEnd()
+    private IEnumerator ShopEnd()
     {
+        yield return new WaitForSeconds(0.5f);
         GameManager.Instance.ClearTurn();
+
+        var movingCardImages = GameObject.FindGameObjectsWithTag("MovingCard");
+        foreach(var img in movingCardImages)
+            Destroy(img);
+
         PanelManager.Instance.HideShop();
         WorldManager.Instance.BattleBegin(); 
     }
