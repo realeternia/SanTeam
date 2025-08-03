@@ -227,7 +227,8 @@ public class CardShopManager : MonoBehaviour
                 break;
             }
         }
-                // 检查是否4个玩家都放弃或所有卡牌都已售出
+        
+        // 检查是否4个玩家都放弃或所有卡牌都已售出
         if (passedPlayers >= 4 || allCardsSold)
         {
             // 进入下一轮并刷新卡牌

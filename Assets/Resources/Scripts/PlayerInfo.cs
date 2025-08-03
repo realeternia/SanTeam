@@ -55,23 +55,23 @@ public class PlayerInfo : MonoBehaviour
             ai_price_lower = 7;
             ai_price_upper = 9 + UnityEngine.Random.Range(0, 2);
             ai_card_limit = 7 + UnityEngine.Random.Range(0, 3);
-            ai_future_rate = UnityEngine.Random.Range(0, 3) * 0.1f + 0.1f;            
+            ai_future_rate = UnityEngine.Random.Range(0, 3) * 0.1f + 0.2f;            
             ai_same_card_rate = (UnityEngine.Random.Range(0, 20) + 20) * 0.1f;
         }
         else if(roll == 1) // 中费流
         {
             ai_price_lower = 8;
             ai_price_upper = 10 + UnityEngine.Random.Range(0, 2);
-            ai_card_limit = 7 + UnityEngine.Random.Range(0, 2);
-            ai_future_rate = UnityEngine.Random.Range(0, 4) * 0.1f + 0.15f; 
+            ai_card_limit = 8 + UnityEngine.Random.Range(0, 2);
+            ai_future_rate = UnityEngine.Random.Range(0, 4) * 0.1f + 0.3f; 
             ai_same_card_rate = (UnityEngine.Random.Range(0, 20) + 30) * 0.1f;
         }
         else
         {
             ai_price_lower = 10;
             ai_price_upper = 99;
-            ai_card_limit = 6 + UnityEngine.Random.Range(0, 2);
-            ai_future_rate = UnityEngine.Random.Range(0, 5) * 0.1f + 0.2f;
+            ai_card_limit = 7 + UnityEngine.Random.Range(0, 2);
+            ai_future_rate = UnityEngine.Random.Range(0, 5) * 0.1f + 0.4f;
             ai_same_card_rate = (UnityEngine.Random.Range(0, 20) + 40) * 0.1f;
         }
         ai_price_out_rate = 0.1f + UnityEngine.Random.Range(0, 3) * 0.1f;
@@ -136,7 +136,7 @@ public class PlayerInfo : MonoBehaviour
             cards[cardId] = 1;
         }
         GameManager.Instance.PlaySound("Sounds/gold");
-        ctr.OnSold();
+        ctr.OnSold(this);
         return true;
     }
 
@@ -151,18 +151,24 @@ public class PlayerInfo : MonoBehaviour
         if (availableCards.Count == 0)
             return false;
 
+        if (cards.Count >= ai_card_limit)
+        {
+            var cardList = GetBattleCardList();
+            SellCard(cardList[cardList.Count - 1].Item1); //卖掉最弱的卡
+        }
+
         // 过滤掉买不起的卡片
         var affordableCards = availableCards.Where(card => gold >= card.priceI).ToList();
         if (affordableCards.Count == 0)
             return false;
 
-        if(era < 2 && gold < 24 || era < 3 && gold < 13)
+        if(era < 2 && gold < 26 || era < 3 && gold < 13)
         {
             if(UnityEngine.Random.value < ai_future_rate)
               return false;
         }
 
-        bool cardLimit = cards.Count >= ai_card_limit;
+        bool cardLimit = cards.Count >= ai_card_limit && gold < 50;
 
         // 计算每张卡片的加权分
         List<(CardViewControl card, float score)> scoredCards = new List<(CardViewControl card, float score)>();
@@ -229,16 +235,19 @@ public class PlayerInfo : MonoBehaviour
 
     public List<Tuple<int, int>> GetBattleCardList()
     {
-        List<Tuple<int, int>> result = new List<Tuple<int, int>>();
+        List<Tuple<int, int>> sortDataList = new List<Tuple<int, int>>();
         foreach (int cardId in cards.Keys)
         {
-            result.Add(new Tuple<int, int>(cardId, cards[cardId]));
+            var heroConfig = HeroConfig.GetConfig((uint)cardId);
+            sortDataList.Add(new Tuple<int, int>(cardId, heroConfig.Total * (9 + cards[cardId]) / 10 ));
         }
-        result.Sort((a, b) => b.Item2.CompareTo(a.Item2));
+        sortDataList.Sort((a, b) => b.Item2.CompareTo(a.Item2));
+
+        List<Tuple<int, int>> result = new List<Tuple<int, int>>();
+        for(int i = 0; i < sortDataList.Count; i++)
+            result.Add(new Tuple<int, int>(sortDataList[i].Item1, cards[sortDataList[i].Item1]));
         if (result.Count >= 5)
-        {
             result = result.Take(5).ToList();
-        }
         return result;
     }
 

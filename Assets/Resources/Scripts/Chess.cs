@@ -240,7 +240,7 @@ public class Chess : MonoBehaviour, IPointerClickHandler
         maxHp = heroConfig.Hp * (14 + lv) / 15;
         moveSpeed = heroConfig.MoveSpeed;
         attackRange = heroConfig.Range;
-        attackDamage = heroConfig.Atk * (8 + lv * 2) / 10;
+        attackDamage = heroConfig.Atk * (9 + lv) / 10;
         inte = heroConfig.Inte + Math.Max(8 * (lv - 1), heroConfig.Inte * (lv - 1) / 10);
         str = heroConfig.Str + Math.Max(8 * (lv - 1), heroConfig.Str * (lv - 1) / 10);
         leadShip = heroConfig.LeadShip + Math.Max(8 * (lv - 1), heroConfig.LeadShip * (lv - 1) / 10);
