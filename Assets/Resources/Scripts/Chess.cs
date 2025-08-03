@@ -295,18 +295,39 @@ public class Chess : MonoBehaviour, IPointerClickHandler
             targetChess.heroInfo.SetHpRate((float)targetChess.hp / targetChess.maxHp);
         //Debug.Log($"{gameObject.name} 攻击了 {targetChess.gameObject.name}，造成 {this.attackDamage} 点伤害，目标剩余生命值：{targetChess.hp}");
 
-        // 播放粒子特效
-        var swordHitBluePrefab = Resources.Load<GameObject>(isHero ? "Prefabs/SwordHitYellowCritical" : "Prefabs/SwordHitBlue");
-        GameObject hitEffect = Instantiate(swordHitBluePrefab, targetChess.transform.position, Quaternion.identity);
-        // 设置特效的父对象为目标单位，使其跟随目标移动
-        hitEffect.transform.parent = targetChess.transform;
-        hitEffect.transform.localScale = new Vector3(1f, 1f, 1f);
-        hitEffect.transform.localPosition += new Vector3(0f, 1f, 0f);
-        // 可以添加代码设置特效的生命周期，例如几秒钟后自动销毁
-        Destroy(hitEffect, 2f);
+        var effect = "Prefabs/SwordHitBlue";
+        var needMissile = false;
+        if(isHero)
+        {
+            var heroConfig = HeroConfig.GetConfig((uint)heroId);
+            effect = "Prefabs/" + heroConfig.HitEffect;
+            needMissile = heroConfig.Range >= 20;
 
-        if(side == 1 || side == 2)
-            GameManager.Instance.PlaySound("Sounds/sword");
+            if((side == 1 || side == 2) && heroConfig.HitEffect == "SwordHitYellowCritical")
+                GameManager.Instance.PlaySound("Sounds/sword");
+        }
+        // 播放粒子特效
+        var hitPrefab = Resources.Load<GameObject>(effect);
+        if(needMissile)
+        {
+            GameObject missileEffect = Instantiate(hitPrefab, transform.position, Quaternion.identity);
+            missileEffect.transform.parent = transform;
+            missileEffect.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
+
+            // 启动协程让导弹飞向目标位置
+            StartCoroutine(MoveMissileToTarget(missileEffect, targetChess.transform.position + new Vector3(0f, 1f, 0f), effect));
+            Destroy(missileEffect, 2f);
+        }
+        else
+        {
+            GameObject hitEffect = Instantiate(hitPrefab, targetChess.transform.position, Quaternion.identity);
+            // 设置特效的父对象为目标单位，使其跟随目标移动
+            hitEffect.transform.parent = targetChess.transform;
+            hitEffect.transform.localScale = new Vector3(1f, 1f, 1f);
+            hitEffect.transform.localPosition += new Vector3(0f, 1f, 0f);
+            // 可以添加代码设置特效的生命周期，例如几秒钟后自动销毁
+            Destroy(hitEffect, 2f);
+        }
 
         // 检查目标是否被击败
         if (targetChess.hp <= 0)
@@ -323,6 +344,39 @@ public class Chess : MonoBehaviour, IPointerClickHandler
             FindTarget();
         }
     }
+
+    // 定义协程方法，控制导弹移动
+    IEnumerator MoveMissileToTarget(GameObject missile, Vector3 targetPos, string effect)
+    {
+        float journeyLength = Vector3.Distance(missile.transform.position, targetPos);
+        float startTime = Time.time;
+        float speed = 20f; // 导弹移动速度
+
+        while (missile != null && Vector3.Distance(missile.transform.position, targetPos) > 0.1f)
+        {
+            float distCovered = (Time.time - startTime) * speed;
+            float fractionOfJourney = distCovered / journeyLength;
+            missile.transform.position = Vector3.Lerp(missile.transform.position, targetPos, fractionOfJourney);
+            yield return new WaitForSeconds(0.02f);
+        }
+
+        if (missile != null)
+        {
+            if (targetChess != null)
+            {
+                Destroy(missile);
+
+                var hitPrefab = Resources.Load<GameObject>(effect);
+                GameObject hitEffect = Instantiate(hitPrefab, targetChess.transform.position, Quaternion.identity);
+                // 设置特效的父对象为目标单位，使其跟随目标移动
+                hitEffect.transform.parent = targetChess.transform;
+                hitEffect.transform.localScale = new Vector3(1f, 1f, 1f);
+                hitEffect.transform.localPosition += new Vector3(0f, 1f, 0f);
+                // 可以添加代码设置特效的生命周期，例如几秒钟后自动销毁
+                Destroy(hitEffect, 2f);
+            }
+        }
+    }    
 
     private int calculateDamage(Chess attacker, Chess defender)
     {

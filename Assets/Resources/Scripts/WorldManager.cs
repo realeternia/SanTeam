@@ -153,8 +153,8 @@ public class WorldManager : MonoBehaviour
         }
         else
         {
-            SpawnHerosForRegion(RegionHeroSide1[0], new System.Tuple<int, int>(100007, 1), 1, ref unitId);
-            SpawnHerosForRegion(RegionHeroSide2[0], new System.Tuple<int, int>(100038, 1), 2, ref unitId); 
+            SpawnHerosForRegion(RegionHeroSide1[0], new System.Tuple<int, int>(100020, 1), 1, ref unitId);
+            SpawnHerosForRegion(RegionHeroSide2[0], new System.Tuple<int, int>(100018, 1), 2, ref unitId); 
         }
     }
 
