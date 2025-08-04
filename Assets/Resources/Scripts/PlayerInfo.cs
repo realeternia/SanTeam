@@ -34,7 +34,6 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     private float ai_price_out_rate = 0; //价格区间外卡牌的兴趣度折扣
     private float ai_same_card_rate = 0; //已经拥有卡牌的兴趣倍率
     private int ai_card_limit = 8; //卡牌上限
-    private float ai_sell_rate = 0.15f; //到达上限后卖牌概率
     private float ai_future_rate = 0.5f;
 
     // Start is called before the first frame update
@@ -78,7 +77,6 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
             ai_same_card_rate = (UnityEngine.Random.Range(0, 20) + 40) * 0.1f;
         }
         ai_price_out_rate = 0.1f + UnityEngine.Random.Range(0, 3) * 0.1f;
-        ai_sell_rate = UnityEngine.Random.Range(0, 3) * 0.1f + 0.1f;
     }
 
     public void OnPointerUp(PointerEventData eventData)
@@ -166,47 +164,50 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         if (availableCards.Count == 0)
             return false;
 
-        if (cards.Count >= ai_card_limit)
-        {
-            var cardList = GetBattleCardList();
-            SellCard(cardList[cardList.Count - 1].Item1); //卖掉最弱的卡
-        }
-
         // 过滤掉买不起的卡片
         var affordableCards = availableCards.Where(card => gold >= card.priceI).ToList();
         if (affordableCards.Count == 0)
             return false;
 
-        bool cardLimit = cards.Count >= ai_card_limit && gold < 50;
         bool hasSameCard = false;
+        int weakCardId = 0;
+        int weakCardTotal = 0;        
+        if(cards.Count >= ai_card_limit)
+        {
+            var cardList = GetBattleCardList();
+            weakCardId = cardList[cardList.Count - 1].Item1;
+            weakCardTotal = cardList[cardList.Count - 1].Item2 * HeroConfig.GetConfig((uint)weakCardId).Total; 
+        }
+
         // 计算每张卡片的加权分
         List<(CardViewControl card, float score)> scoredCards = new List<(CardViewControl card, float score)>();
-        foreach (var card in affordableCards)
+        foreach (var pickCard in affordableCards)
         {
             float score = 1f;
 
             // 根据价格区间调整分数
-            if (card.priceI < ai_price_lower || card.priceI > ai_price_upper)
+            if (pickCard.priceI < ai_price_lower || pickCard.priceI > ai_price_upper)
             {
                 score *= ai_price_out_rate;
             }
 
             // 如果已经拥有该卡片，增加分数
-            if (cards.ContainsKey(card.cardId))
+            if (cards.ContainsKey(pickCard.cardId))
             {
                 score *= ai_same_card_rate;
+                score *= (1 + Math.Max(0.2f, 0.3f * (4 - cards[pickCard.cardId]))); // 优先拿低等级卡
                 hasSameCard = true;
             }
-            else if(cardLimit)
+            else if(cards.Count >= ai_card_limit)
             {
-                score = 0f;
-                continue;
+                if(HeroConfig.GetConfig((uint)pickCard.cardId).Total < weakCardTotal)
+                    continue; //没必要换更弱的卡
             }
 
-            score *= HeroSelectionTool.GetTotalPriceRate(card.cardId); //性价比
+            score *= HeroSelectionTool.GetTotalPriceRate(pickCard.cardId); //性价比
 
             // 加入分数列表
-            scoredCards.Add((card, score));
+            scoredCards.Add((pickCard, score));
         }
 
         // 如果没有有分数的卡片，直接返回
@@ -248,9 +249,10 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         if (selectedCard == null)
             return false;
 
-        // 检查是否达到卡牌上限
-        if (cards.Count >= ai_card_limit && UnityEngine.Random.value > ai_sell_rate)
-            return false;
+        if (cards.Count >= ai_card_limit && !cards.ContainsKey(selectedCard.cardId))
+        {
+            SellCard(weakCardId); //卖掉最弱的卡
+        }            
 
         // 购买选中的卡片
         BuyCard(selectedCard, selectedCard.cardId, selectedCard.priceI);
