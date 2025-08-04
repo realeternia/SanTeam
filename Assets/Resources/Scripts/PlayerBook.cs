@@ -22,9 +22,14 @@ public class PlayerBook
     {
         playerCfgDic[2] = new PlayerCfg() { id = 2, name = "甲鱼", imgPath = "PlayerPic/jiayu", };
         playerCfgDic[3] = new PlayerCfg() { id = 3, name = "三哥", imgPath = "PlayerPic/sange", };
-        playerCfgDic[4] = new PlayerCfg() { id = 4, name = "吕布", imgPath = "PlayerPic/lvbu", };
+        playerCfgDic[4] = new PlayerCfg() { id = 4, name = "魔童", imgPath = "PlayerPic/nezha", };
         playerCfgDic[5] = new PlayerCfg() { id = 5, name = "八戒", imgPath = "PlayerPic/bajie", };
         playerCfgDic[6] = new PlayerCfg() { id = 6, name = "大虎", imgPath = "PlayerPic/dahu", };
+        playerCfgDic[7] = new PlayerCfg() { id = 7, name = "蓝猫", imgPath = "PlayerPic/mao", };
+        playerCfgDic[8] = new PlayerCfg() { id = 8, name = "巴爸", imgPath = "PlayerPic/baba", };
+        playerCfgDic[9] = new PlayerCfg() { id = 9, name = "蜘蛛", imgPath = "PlayerPic/zhizhu", };
+        playerCfgDic[11] = new PlayerCfg() { id = 11, name = "小红", imgPath = "PlayerPic/xiaohong", };
+        playerCfgDic[12] = new PlayerCfg() { id = 12, name = "电怪", imgPath = "PlayerPic/picaqiu", };
     }
 
     public static PlayerCfg GetPlayerCfg(int id)

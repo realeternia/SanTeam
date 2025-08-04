@@ -85,7 +85,7 @@ public class WorldManager : MonoBehaviour
     {
         if(battleIndex % 3 == 1)
             return new int[] { 0, 1, 2, 3 };
-        else if(battleIndex % 4 == 2)
+        else if(battleIndex % 3 == 2)
             return new int[] { 0, 2, 1, 3 };
         else
             return new int[] { 0, 3, 2, 1 };

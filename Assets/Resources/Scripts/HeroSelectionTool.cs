@@ -101,8 +101,6 @@ public static class HeroSelectionTool
 
     public static int GetRandomHeroId()
     {
-        return 100001;
-
         if (heroPoolCache.Count == 0)
             UpdateHeroPoolCache();
         
