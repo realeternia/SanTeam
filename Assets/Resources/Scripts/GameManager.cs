@@ -15,10 +15,10 @@ public class GameManager : MonoBehaviour
     void Start()
     {
         var p1 = PlayerBook.playerWang;
-        players[0].Init(p1.name, p1.imgPath, 5);
+        players[0].Init(0, p1.name, p1.imgPath, 5);
         var pls = PlayerBook.GetRandomN(3);
         for(int i = 0; i < 3; i++)
-            players[i + 1].Init(pls[i].name, pls[i].imgPath, 5);           
+            players[i + 1].Init(i+1, pls[i].name, pls[i].imgPath, 5);           
     }
   
 

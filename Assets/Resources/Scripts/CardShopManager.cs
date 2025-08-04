@@ -135,16 +135,22 @@ public class CardShopManager : MonoBehaviour
                 cardView.hp.text = heroCfg.Hp.ToString();
                 cardView.priceI = HeroSelectionTool.GetPrice(heroCfg);
                 cardView.price.text = cardView.priceI.ToString();
+                if(heroCfg.Side == 1)
+                    cardView.gameObject.GetComponent<Image>().color = new Color(40/255f, 70/255f, 0/255f, 255/255f);
+                else if(heroCfg.Side == 2)
+                    cardView.gameObject.GetComponent<Image>().color = new Color(0/255f, 35/255f, 100/255f, 255/255f);
+                else if(heroCfg.Side == 3)
+                    cardView.gameObject.GetComponent<Image>().color = new Color(100/255f, 0/255f, 0/255f, 255/255f);
+                else
+                    cardView.gameObject.GetComponent<Image>().color = new Color(50/255f, 50/255f, 50/255f, 255/255f);
 
                 cardViews.Add(cardView);
             }
         }
 
         era++;
-        passBtn.gameObject.SetActive(true);
-        if(mySelect.playerInfo == null)
-            mySelect.playerInfo = GameManager.Instance.GetPlayer(0);        
-        mySelect.UpdateCards();
+        passBtn.gameObject.SetActive(true);    
+        mySelect.UpdateCards(GameManager.Instance.GetPlayer(0));
         eraText.text = "第" + era + "轮";
 
         // 重置所有玩家的pass状态
@@ -162,9 +168,7 @@ public class CardShopManager : MonoBehaviour
         var player = GameManager.Instance.GetPlayer(pid);
         if (player.BuyCard(ctr, cardId, price))
         {
-            if(mySelect.playerInfo == null)
-                mySelect.playerInfo = player;
-            mySelect.UpdateCards();
+            mySelect.UpdateCards(player);
 
             AfterAct();
         }
@@ -172,7 +176,12 @@ public class CardShopManager : MonoBehaviour
 
     public void OnPlayerSellCard()
     {
-        mySelect.UpdateCards();
+        mySelect.UpdateCards(GameManager.Instance.GetPlayer(0));
+    }
+
+    public void UpdateCards(int pid)
+    {
+        mySelect.UpdateCards(GameManager.Instance.GetPlayer(pid));
     }
 
     public void OnP1Pass()

@@ -6,7 +6,6 @@ using CommonConfig;
 
 public class MySelectControl : MonoBehaviour
 {
-    public PlayerInfo playerInfo;
     public GameObject nodePrefab; // 拖拽CardView预制体到此处
     // Start is called before the first frame update
     void Start()
@@ -20,7 +19,7 @@ public class MySelectControl : MonoBehaviour
         
     }
 
-    public void UpdateCards()
+    public void UpdateCards(PlayerInfo playerInfo)
     {
         // 假设 playerInfo 中有 cards 列表
         List<int> cards = new List<int>(playerInfo.cards.Keys);
@@ -62,7 +61,7 @@ public class MySelectControl : MonoBehaviour
 
             // 更新文本内容，这里假设 CardInfo 有一个 GetDisplayText 方法
             var cardCfg = HeroConfig.GetConfig((uint)cards[i]);
-            textComponent.UpdateExp(cardCfg.Name, playerInfo.cards[cards[i]]);
+            textComponent.UpdateExp(cardCfg.Name, playerInfo.cards[cards[i]], cardCfg.Job);
         }
 
         // 移除多余的 TMP_Text

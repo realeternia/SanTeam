@@ -10,6 +10,7 @@ public class SelectCardNodeControl : MonoBehaviour
 {
     public TMP_Text cardName;
     public Image expBar;
+    public Image jobImg;
     // Start is called before the first frame update
     void Start()
     {
@@ -22,9 +23,18 @@ public class SelectCardNodeControl : MonoBehaviour
         
     }
 
-    public void UpdateExp(string name, int exp)
+    public void UpdateExp(string name, int exp, string job)
     {
         expBar.rectTransform.sizeDelta = new Vector2(194 * HeroSelectionTool.GetExpRate(exp), 70);
-        cardName.text = name + " Lv" + HeroSelectionTool.GetCardLevel(exp);
+        cardName.text = HeroSelectionTool.GetCardLevel(exp) + name;
+        if (string.IsNullOrEmpty(job))
+        {
+            jobImg.gameObject.SetActive(false);
+        }
+        else
+        {
+            jobImg.gameObject.SetActive(true);
+            jobImg.sprite = Resources.Load<Sprite>(job);
+        }
     }
 }

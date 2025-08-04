@@ -7,8 +7,9 @@ using CommonConfig;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 
-public class PlayerInfo : MonoBehaviour
+public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 {
     private Image targetImage;
     public float blinkDuration = 1f;
@@ -16,6 +17,7 @@ public class PlayerInfo : MonoBehaviour
     public Color endColor = new Color(0.1f, 0.1f, 0.1f, 0.8f);
     private float timer = 0f;
 
+    public int pid;
     public int gold;
     public int winCount;
     public int loseCount;
@@ -41,8 +43,9 @@ public class PlayerInfo : MonoBehaviour
   		targetImage = GetComponent<Image>();
     }
 
-    public void Init(string name, string imgPath, int g)
+    public void Init(int id, string name, string imgPath, int g)
     {
+        pid = id;
         playerNameText.text = name;
         playerImage.sprite = Resources.Load<Sprite>(imgPath);
         gold = g;
@@ -76,6 +79,18 @@ public class PlayerInfo : MonoBehaviour
         }
         ai_price_out_rate = 0.1f + UnityEngine.Random.Range(0, 3) * 0.1f;
         ai_sell_rate = UnityEngine.Random.Range(0, 3) * 0.1f + 0.1f;
+    }
+
+    public void OnPointerUp(PointerEventData eventData)
+    {
+        Debug.Log($"UI 元素被抬起，位置：{eventData.position}");
+        CardShopManager.Instance.UpdateCards(0);
+    }    
+
+    public void OnPointerDown(PointerEventData eventData)
+    {
+        Debug.Log($"UI 元素被按下，位置：{eventData.position}");
+        CardShopManager.Instance.UpdateCards(pid);
     }
 
     public void AddGold(int g)

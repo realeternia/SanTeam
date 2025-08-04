@@ -72,28 +72,7 @@ public class BagControl : MonoBehaviour
             bagCell.GetComponent<BagCell>().OnSelect(false);
         }
         cell.GetComponent<BagCell>().OnSelect(true);
-
-        var heroConfig = HeroConfig.GetConfig((uint)cell.heroId);
-        var lv = cell.level;
-        var maxHp = heroConfig.Hp * (9 + lv) / 10;
-       var inte = heroConfig.Inte + System.Math.Max(8 * (lv - 1), heroConfig.Inte * (lv - 1) / 10);
-       var str = heroConfig.Str + System.Math.Max(8 * (lv - 1), heroConfig.Str * (lv - 1) / 10);
-       var leadShip = heroConfig.LeadShip + System.Math.Max(8 * (lv - 1), heroConfig.LeadShip * (lv - 1) / 10);
-
-        detail.heroId = cell.heroId;
-        detail.leadText.text = heroConfig.LeadShip.ToString();
-        if(leadShip > heroConfig.LeadShip)
-            detail.leadText.text =  heroConfig.LeadShip.ToString() + "<color=green>+" + (leadShip - heroConfig.LeadShip).ToString() + "</color>";
-        detail.inteText.text = heroConfig.Inte.ToString();
-        if(inte > heroConfig.Inte)
-            detail.inteText.text =  heroConfig.Inte.ToString() + "<color=green>+" + (inte - heroConfig.Inte).ToString() + "</color>";
-        detail.strText.text = heroConfig.Str.ToString();
-        if(str > heroConfig.Str)
-            detail.strText.text =  heroConfig.Str.ToString() + "<color=green>+" + (str - heroConfig.Str).ToString() + "</color>";
-        detail.hpText.text = heroConfig.Hp.ToString();
-        if(maxHp > heroConfig.Hp)
-            detail.hpText.text =  heroConfig.Hp.ToString() + "<color=green>+" + (maxHp - heroConfig.Hp).ToString() + "</color>";
-        detail.goldText.text = (HeroSelectionTool.GetPrice(heroConfig)*lv/2).ToString();
+        detail.UpdateInfo(cell.heroId, cell.level);
     }
 
     // 一次性销毁所有缓存的 cell 对象的函数
