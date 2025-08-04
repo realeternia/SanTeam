@@ -12,6 +12,7 @@ public class CardViewControl : MonoBehaviour
 
     public Image cardImage;
     public Image soldImage;
+    public Image jobImage;
     public TMP_Text cardName;
     public TMP_Text price;
     public TMP_Text lead;
