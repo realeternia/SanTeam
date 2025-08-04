@@ -48,6 +48,20 @@ public static class HeroSelectionTool
     {
         heroPoolCache.Clear();
         List<HeroConfig> allHeroes = new List<HeroConfig>(HeroConfig.ConfigList);
+
+        // 先对allHeroes遍历，1-100随机，如果大于RateAbs，加入返回队列
+        List<HeroConfig> tempHeroes = new List<HeroConfig>(allHeroes);
+        foreach (var hero in tempHeroes)
+        {
+            if(hero.RateAbs <= 0)
+                continue;
+            int randomValue = Random.Range(1, 101);
+            if (randomValue <= hero.RateAbs)
+            {
+                heroPoolCache.Add((int)hero.Id);
+            }
+            allHeroes.Remove(hero);
+        }
         int targetCount = Mathf.Min(36, allHeroes.Count);
 
         for (int i = 0; i < targetCount; i++)
@@ -56,7 +70,7 @@ public static class HeroSelectionTool
             float totalRate = 0;
             foreach (var hero in allHeroes)
             {
-                totalRate += hero.Rate;
+                totalRate += hero.RateWeight;
             }
 
             // 随机选择一个基于权重的位置
@@ -66,7 +80,9 @@ public static class HeroSelectionTool
 
             foreach (var hero in allHeroes)
             {
-                accumulatedRate += hero.Rate;
+                if(hero.RateWeight <= 0)
+                    continue;
+                accumulatedRate += hero.RateWeight;
                 if (accumulatedRate >= randomValue)
                 {
                     selectedHero = hero;
