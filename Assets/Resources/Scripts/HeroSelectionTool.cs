@@ -100,7 +100,9 @@ public static class HeroSelectionTool
     }
 
     public static int GetRandomHeroId()
-    {       
+    {
+        return 100001;
+
         if (heroPoolCache.Count == 0)
             UpdateHeroPoolCache();
         
@@ -164,5 +166,26 @@ public static class HeroSelectionTool
         float rate = (float)heroCfg.Total / minTotal;
         priceRateCache[heroId] = rate;
         return rate;
+    }
+
+    private static int[] cardExp = new int[] { 1, 2, 4, 7, 11, 16, 22, 29, 37, 46, 56, 67, 80, 94, 110, 127, 145, 164, 184, 205, };
+    public static int GetCardLevel(int exp)
+    {
+        for(int i = 0; i < cardExp.Length; i++)
+        {
+            if(exp < cardExp[i])
+                return i;
+        }
+        return cardExp.Length;
+    }
+
+    public static float GetExpRate(int exp)
+    {
+        int level = GetCardLevel(exp);
+        if(level >= cardExp.Length)
+            return 1f;
+        if(level <= 1)
+            return 0;
+        return (float)(exp - cardExp[level - 1]) / (cardExp[level] - cardExp[level - 1]);
     }
 }

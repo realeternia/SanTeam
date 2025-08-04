@@ -237,7 +237,7 @@ public class Chess : MonoBehaviour, IPointerClickHandler
         level = lv;
 
         var heroConfig = HeroConfig.GetConfig((uint)heroId);
-        maxHp = heroConfig.Hp * (14 + lv) / 15;
+        maxHp = heroConfig.Hp * (9 + lv) / 10;
         moveSpeed = heroConfig.MoveSpeed;
         attackRange = heroConfig.Range;
         attackDamage = heroConfig.Atk * (9 + lv) / 10;

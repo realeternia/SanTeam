@@ -254,7 +254,7 @@ public class PlayerInfo : MonoBehaviour
 
         List<Tuple<int, int>> result = new List<Tuple<int, int>>();
         for(int i = 0; i < sortDataList.Count; i++)
-            result.Add(new Tuple<int, int>(sortDataList[i].Item1, cards[sortDataList[i].Item1]));
+            result.Add(new Tuple<int, int>(sortDataList[i].Item1, HeroSelectionTool.GetCardLevel(cards[sortDataList[i].Item1])));
         if (result.Count >= 5)
             result = result.Take(5).ToList();
         return result;

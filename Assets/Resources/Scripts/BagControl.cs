@@ -56,8 +56,8 @@ public class BagControl : MonoBehaviour
             cell.transform.localPosition = new Vector3(80 + 104 * xOff, -80 - 104 * yOff, 0);
             BagCell bagCell = cell.GetComponent<BagCell>();
             bagCell.heroId = item.Key;
-            bagCell.level = item.Value;
-            bagCell.itemNameText.text = item.Value.ToString();
+            bagCell.level = HeroSelectionTool.GetCardLevel(item.Value);
+            bagCell.itemNameText.text = bagCell.level.ToString();
             bagCell.itemImage.sprite = Resources.Load<Sprite>("Skins/" + heroCfg.Icon);
             bagCell.bagControl = this;
 
@@ -75,7 +75,7 @@ public class BagControl : MonoBehaviour
 
         var heroConfig = HeroConfig.GetConfig((uint)cell.heroId);
         var lv = cell.level;
-        var maxHp = heroConfig.Hp * (14 + lv) / 15;
+        var maxHp = heroConfig.Hp * (9 + lv) / 10;
        var inte = heroConfig.Inte + System.Math.Max(8 * (lv - 1), heroConfig.Inte * (lv - 1) / 10);
        var str = heroConfig.Str + System.Math.Max(8 * (lv - 1), heroConfig.Str * (lv - 1) / 10);
        var leadShip = heroConfig.LeadShip + System.Math.Max(8 * (lv - 1), heroConfig.LeadShip * (lv - 1) / 10);
