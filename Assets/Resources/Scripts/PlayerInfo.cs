@@ -174,9 +174,9 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         int weakCardTotal = 0;        
         if(cards.Count >= ai_card_limit)
         {
-            var cardList = GetBattleCardList();
-            weakCardId = cardList[cardList.Count - 1].Item1;
-            weakCardTotal = cardList[cardList.Count - 1].Item2 * HeroConfig.GetConfig((uint)weakCardId).Total; 
+            var weakCard = FindWeakCard();
+            weakCardId = weakCard.Item1;
+            weakCardTotal = weakCard.Item2;
         }
 
         // 计算每张卡片的加权分
@@ -259,6 +259,20 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         return true;
     }
 
+    public Tuple<int, int> FindWeakCard()
+    {
+        List<Tuple<int, int>> sortDataList = new List<Tuple<int, int>>();
+        foreach (int cardId in cards.Keys)
+        {
+            var heroConfig = HeroConfig.GetConfig((uint)cardId);
+            sortDataList.Add(new Tuple<int, int>(cardId, heroConfig.Total * (9 + cards[cardId]) / 10 ));
+        }
+        sortDataList.Sort((a, b) => b.Item2.CompareTo(a.Item2));
+
+        var weakCard = sortDataList[sortDataList.Count - 1];
+        return weakCard;
+    }    
+
     public List<Tuple<int, int>> GetBattleCardList()
     {
         List<Tuple<int, int>> sortDataList = new List<Tuple<int, int>>();
@@ -273,7 +287,45 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         for(int i = 0; i < sortDataList.Count; i++)
             result.Add(new Tuple<int, int>(sortDataList[i].Item1, HeroSelectionTool.GetCardLevel(cards[sortDataList[i].Item1])));
         if (result.Count >= 5)
-            result = result.Take(5).ToList();
+            result = result.Take(5).ToList(); //按战力排出前5
+
+        //result按射程排序，射程远的在后面
+        result.Sort((a, b) => HeroConfig.GetConfig((uint)a.Item1).Range.CompareTo(HeroConfig.GetConfig((uint)b.Item1).Range));
+
+        //results[0]和resuls[3]对比，results[1]和resuls[4]对比，如果射程相等，等级更高的往后放
+        if(result.Count >= 4 && HeroConfig.GetConfig((uint)result[0].Item1).Range == HeroConfig.GetConfig((uint)result[3].Item1).Range)
+        {
+            if(result[0].Item2 > result[3].Item2)
+            {
+                var temp = result[0];
+                result[0] = result[3];
+                result[3] = temp;
+            }
+        }
+        if(result.Count >= 5 && HeroConfig.GetConfig((uint)result[1].Item1).Range == HeroConfig.GetConfig((uint)result[4].Item1).Range)
+        {
+            if(result[1].Item2 > result[4].Item2)
+            {
+                var temp = result[1];
+                result[1] = result[4];
+                result[4] = temp;
+            }
+        }
+        // 如果results[0]或results[1]的job是shuai，而且results[2]不是shuai，互换results[0]和results[2]
+        if(result.Count >= 3 && HeroConfig.GetConfig((uint)result[0].Item1).Job == "shuai" && HeroConfig.GetConfig((uint)result[2].Item1).Job != "shuai")
+        {
+            var temp = result[0];
+            result[0] = result[2];
+            result[2] = temp;
+        }
+        else if(result.Count >= 3 && HeroConfig.GetConfig((uint)result[1].Item1).Job == "shuai" && HeroConfig.GetConfig((uint)result[2].Item1).Job != "shuai")
+        {
+            var temp = result[0];
+            result[0] = result[2];
+            result[2] = temp;
+        }
+
+        
         return result;
     }
 
