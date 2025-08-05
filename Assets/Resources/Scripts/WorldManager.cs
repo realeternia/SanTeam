@@ -198,7 +198,7 @@ public class WorldManager : MonoBehaviour
                     chessComponent.moveSpeed = 10;
                     chessComponent.attackRange = 12;
                     chessComponent.attackDamage = 20;
-                    chessComponent.SetColor(p.lineColor);
+                    chessComponent.Init(p.lineColor);
 
                     // 可以在这里设置其他必要的初始化参数
                 }
@@ -238,7 +238,7 @@ public class WorldManager : MonoBehaviour
                     chessComponent.heroInfo = heroInfo;
                 }
                 chessComponent.UpdateLevel(heroData.Item2);
-                chessComponent.SetColor(p.lineColor);
+                chessComponent.Init(p.lineColor);
                 // 可以在这里设置其他必要的初始化参数
             }
             else
@@ -496,6 +496,33 @@ public class WorldManager : MonoBehaviour
             GameManager.Instance.GetPlayer(match[4]).onBattleResult(side5HasUnits);
             GameManager.Instance.GetPlayer(match[5]).onBattleResult(side6HasUnits);
         }
+    }
+
+    public List<Chess> GetUnitsInRange(Vector2Int center, int range, int mySide, bool findEnemy)
+    {
+        List<Chess> unitsInRange = new List<Chess>();
+        foreach (Transform child in Units.transform)
+        {
+            Chess chessComponent = child.GetComponent<Chess>();
+            if (chessComponent != null && chessComponent.hp > 0)
+            {
+                Vector2Int chessPos = WorldToGridPosition(chessComponent.transform.position, true);
+                if (Vector2Int.Distance(center, chessPos) <= range)
+                {
+                    if(findEnemy)
+                    {
+                        if(chessComponent.side != mySide)
+                            unitsInRange.Add(chessComponent);
+                    }
+                    else
+                    {
+                        if(chessComponent.side == mySide)
+                            unitsInRange.Add(chessComponent);
+                    }
+                }
+            }
+        }
+        return unitsInRange;
     }
 
     // 管理器销毁时释放所有格子

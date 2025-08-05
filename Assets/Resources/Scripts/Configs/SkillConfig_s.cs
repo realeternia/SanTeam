@@ -19,10 +19,6 @@ namespace CommonConfig
         /// </summary>
         public int Lv;
         /// <summary>
-        ///拥有卡牌
-        /// </summary>
-        public int[] OwnHero;
-        /// <summary>
         ///发动概率
         /// </summary>
         public float Rate;
@@ -48,12 +44,11 @@ namespace CommonConfig
         public string Icon;
 
 
-        public SkillConfig(uint Id, string Name, int Lv, int[] OwnHero, float Rate, float CD, string ScriptName, string HitEffect, int Price, string Icon)
+        public SkillConfig(uint Id, string Name, int Lv, float Rate, float CD, string ScriptName, string HitEffect, int Price, string Icon)
         {
             this.Id = Id;
             this.Name = Name;
             this.Lv = Lv;
-            this.OwnHero = OwnHero;
             this.Rate = Rate;
             this.CD = CD;
             this.ScriptName = ScriptName;
@@ -83,7 +78,7 @@ namespace CommonConfig
         public static void Load()
         {
             config.Clear();
-            config[200001] = new SkillConfig(200001, "转转转", 1, new int[]{100020}, 0.15f, 3f, "SpinAttack", "SwordHitYellowCritical", 2, "spinattack");
+            config[200001] = new SkillConfig(200001, "转转转", 1, 0.75f, 3f, "SpinAttack", "SwordWhirlwindWhite", 2, "spinattack");
 
         }
 

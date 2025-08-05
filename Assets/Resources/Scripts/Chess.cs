@@ -44,6 +44,8 @@ public class Chess : MonoBehaviour, IPointerClickHandler
 
     public HeroInfo heroInfo;
 
+    public List<Skill> skills = new List<Skill>();
+
     // Start is called before the first frame update
     void Start()
     {
@@ -56,8 +58,24 @@ public class Chess : MonoBehaviour, IPointerClickHandler
         StartCoroutine(MoveAndFightCoroutine());
     }
 
-    public void SetColor(Color c)
+    public void Init(Color c)
     {
+        if (isHero)
+        {
+            UnityEngine.Debug.Log("Init Hero" + heroId);
+
+
+            var heroCfg = HeroConfig.GetConfig((uint)heroId);
+            // 初始化技能
+            if (heroCfg.Skills != null)
+            {
+                foreach (var skillId in heroCfg.Skills)
+                {
+                    skills.Add(SkillManager.CreateSkill(skillId));
+                }
+            }
+        }
+
         // 创建材质实例
         Material newMaterial = new Material(rend.sharedMaterial);
         newMaterial.mainTexture = Resources.Load<Texture>("Skins/" + chessName);
@@ -294,7 +312,9 @@ public class Chess : MonoBehaviour, IPointerClickHandler
             return;
 
         // 造成伤害
-        targetChess.hp -= calculateDamage(this, targetChess);
+        var damage = calculateDamage(this, targetChess);
+        targetChess.hp -= damage;
+        SkillManager.OnAttack(this, targetChess, damage);
         if(targetChess.heroInfo != null) // 英雄
             targetChess.heroInfo.SetHpRate((float)targetChess.hp / targetChess.maxHp);
         //Debug.Log($"{gameObject.name} 攻击了 {targetChess.gameObject.name}，造成 {this.attackDamage} 点伤害，目标剩余生命值：{targetChess.hp}");
