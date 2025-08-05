@@ -58,7 +58,7 @@ public class WorldManager : MonoBehaviour
     {      
         // 延迟2秒
         yield return new WaitForSeconds(2f);
-        HeroConfig.Load();                
+        ConfigManager.Init();             
         if(isDebug)
         {
             BattleBegin();

@@ -30,7 +30,7 @@ public class CardShopManager : MonoBehaviour
     void Start()
     {
         Instance = this;
-        HeroConfig.Load();
+        ConfigManager.Init();
 
         passBtn.onClick.AddListener(() =>
         {
