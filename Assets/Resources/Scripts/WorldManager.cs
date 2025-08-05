@@ -148,7 +148,6 @@ public class WorldManager : MonoBehaviour
             p = GameManager.Instance.GetPlayer(match[5]);
             SpawnUnitsForRegion(p, RegionSide6, unitPrefab, 6, p.soldierName, ref unitId);
 
-            heroInfoGroup.p2NameText.text = GameManager.Instance.GetPlayer(match[1]).playerNameText.text;
             var cards = GameManager.Instance.GetPlayer(match[0]).GetBattleCardList();
             for (int i = 0; i < cards.Count && i < RegionHeroSide1.Length; i++)
                 SpawnHerosForRegion(GameManager.Instance.GetPlayer(match[0]), RegionHeroSide1[i], cards[i], 1, ref unitId);
