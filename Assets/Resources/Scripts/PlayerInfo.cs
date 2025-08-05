@@ -28,6 +28,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     public Image playerImage;
     public TMP_Text goldText;
     public TMP_Text resultText;
+    public Image playerBgImg;
 
     private int ai_price_lower = 0;
     private int ai_price_upper = 0;
@@ -35,6 +36,9 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     private float ai_same_card_rate = 0; //已经拥有卡牌的兴趣倍率
     private int ai_card_limit = 8; //卡牌上限
     private float ai_future_rate = 0.5f;
+
+    public string soldierName;
+    public Color lineColor;
 
     // Start is called before the first frame update
     void Start()
@@ -47,6 +51,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         pid = id;
         playerNameText.text = name;
         playerImage.sprite = Resources.Load<Sprite>(imgPath);
+
         gold = g;
         goldText.text = g.ToString();
         resultText.text = "准备中";
@@ -77,6 +82,38 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
             ai_same_card_rate = (UnityEngine.Random.Range(0, 13) + 27) * 0.1f;
         }
         ai_price_out_rate = 0.1f + UnityEngine.Random.Range(0, 3) * 0.1f;
+
+        if (pid == 0)
+        {
+            soldierName = "tree";
+            lineColor = Color.green;
+        }
+        else if (pid == 1)
+        {
+            soldierName = "bottle";
+            lineColor = Color.blue;
+        }
+        else if (pid == 2)
+        {
+            soldierName = "bird";
+            lineColor = Color.red;
+        }
+        else if (pid == 3)
+        {
+            soldierName = "hill";
+            lineColor = Color.yellow;
+        }
+        else if (pid == 4)
+        {
+            soldierName = "shield";
+            lineColor = Color.magenta;
+        }
+        else if (pid == 5)
+        {
+            soldierName = "wheel";
+            lineColor = Color.cyan;
+        }
+        playerBgImg.color = lineColor;
     }
 
     public void OnPointerUp(PointerEventData eventData)
@@ -223,10 +260,8 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
                         score *= 1.6f; // 如果智力大于等于90且智力卡数量少于2，分数乘以1.5
                 }
             }
-
-
+            
             score *= HeroSelectionTool.GetTotalPriceRate(pickCard.cardId); //性价比
-
             // 加入分数列表
             scoredCards.Add((pickCard, score));
         }
@@ -242,9 +277,9 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
                 if (UnityEngine.Random.value < ai_future_rate)
                     return false;
             }
-            else if (availableCards.Count <= 6 && era < 3 && gold < 31) //最后几张牌考虑放弃
+            else if (availableCards.Count <= 7 && era < 3 && gold < 31) //最后几张牌考虑放弃
             {
-                if (UnityEngine.Random.value < ai_future_rate + (30 - gold) * 0.03f + (6 - availableCards.Count) * 0.08f + (2 - era) * 0.15f)
+                if (UnityEngine.Random.value < ai_future_rate + (30 - gold) * 0.03f + (7 - availableCards.Count) * 0.08f + (2 - era) * 0.15f)
                     return false;
             }
         }

@@ -22,15 +22,22 @@ public class WorldManager : MonoBehaviour
     public GameObject[] RegionSide1; // 阵营1的出生点数组
     public GameObject[] RegionSide2; // 阵营2的出生点数组
 
-    public GameObject[] RegionSide3; // 阵营1的出生点数组
-    public GameObject[] RegionSide4; // 阵营2的出生点数组    
+    public GameObject[] RegionSide3; // 阵营3的出生点数组
+    public GameObject[] RegionSide4; // 阵营4的出生点数组    
+
+    public GameObject[] RegionSide5; // 阵营3的出生点数组
+    public GameObject[] RegionSide6; // 阵营4的出生点数组   
+
 
     
     public GameObject[] RegionHeroSide1; // 阵营1的出生点数组
     public GameObject[] RegionHeroSide2; // 阵营2的出生点数组
       
-    public GameObject[] RegionHeroSide3; // 阵营1的出生点数组
-    public GameObject[] RegionHeroSide4; // 阵营2的出生点数组
+    public GameObject[] RegionHeroSide3; // 阵营3的出生点数组
+    public GameObject[] RegionHeroSide4; // 阵营4的出生点数组
+
+    public GameObject[] RegionHeroSide5; // 阵营5的出生点数组
+    public GameObject[] RegionHeroSide6; // 阵营6的出生点数组    
 
     public HeroInfoGroup heroInfoGroup;
     public Button buttonRestart;
@@ -44,12 +51,7 @@ public class WorldManager : MonoBehaviour
 
         buttonRestart.onClick.AddListener(BattleEnd);
 
-        // buttonRestart.gameObject.SetActive(false);
-        // textRestart.gameObject.SetActive(false);
-        // SpawnUnitsInRegions();
-
         StartCoroutine(DebugBattleBeginCheck());
-
     }
 
     IEnumerator DebugBattleBeginCheck()
@@ -83,12 +85,17 @@ public class WorldManager : MonoBehaviour
 
     private int[] GetMatch()
     {
-        if(battleIndex % 3 == 1)
-            return new int[] { 0, 1, 2, 3 };
-        else if(battleIndex % 3 == 2)
-            return new int[] { 0, 2, 1, 3 };
+        // 两两组合搭配方案
+        if(battleIndex % 5 == 0)
+            return new int[] { 0, 1, 2, 3, 4, 5 };
+        else if(battleIndex % 5 == 1)
+            return new int[] { 0, 2, 1, 4, 5, 3 };
+        else if(battleIndex % 5 == 2)
+            return new int[] { 0, 3, 1, 5, 4, 2 };
+        else if(battleIndex % 5 == 3)
+            return new int[] { 0, 4, 1, 3, 5, 2 };
         else
-            return new int[] { 0, 3, 2, 1 };
+            return new int[] { 0, 5, 1, 2, 3, 4 };
     }
 
     private void SpawnUnitsInRegions()
@@ -123,42 +130,53 @@ public class WorldManager : MonoBehaviour
         GameObject unitPrefab = Resources.Load<GameObject>("Prefabs/UnitBing");
 
         int unitId = 100;
-
-        if (!isDebug)
-        {
-            // 在RegionSide1生成单位 (阵营1)
-            SpawnUnitsForRegion(RegionSide1, unitPrefab, 1, "tree", ref unitId);
-            // 在RegionSide2生成单位 (阵营2)
-            SpawnUnitsForRegion(RegionSide2, unitPrefab, 2, "bottle", ref unitId);
-            SpawnUnitsForRegion(RegionSide3, unitPrefab, 3, "bird", ref unitId);
-            SpawnUnitsForRegion(RegionSide4, unitPrefab, 4, "hill", ref unitId);
-        }
-
         if (!isDebug)
         {
             int[] match = GetMatch();
+            // 在RegionSide1生成单位 (阵营1)
+            var p = GameManager.Instance.GetPlayer(match[0]);
+            SpawnUnitsForRegion(p, RegionSide1, unitPrefab, 1, p.soldierName, ref unitId);
+            // 在RegionSide2生成单位 (阵营2)
+            p = GameManager.Instance.GetPlayer(match[1]);
+            SpawnUnitsForRegion(p, RegionSide2, unitPrefab, 2, p.soldierName, ref unitId);
+            p = GameManager.Instance.GetPlayer(match[2]);
+            SpawnUnitsForRegion(p, RegionSide3, unitPrefab, 3, p.soldierName, ref unitId);
+            p = GameManager.Instance.GetPlayer(match[3]);
+            SpawnUnitsForRegion(p, RegionSide4, unitPrefab, 4, p.soldierName, ref unitId);
+            p = GameManager.Instance.GetPlayer(match[4]);
+            SpawnUnitsForRegion(p, RegionSide5, unitPrefab, 5, p.soldierName, ref unitId);
+            p = GameManager.Instance.GetPlayer(match[5]);
+            SpawnUnitsForRegion(p, RegionSide6, unitPrefab, 6, p.soldierName, ref unitId);
+
             heroInfoGroup.p2NameText.text = GameManager.Instance.GetPlayer(match[1]).playerNameText.text;
             var cards = GameManager.Instance.GetPlayer(match[0]).GetBattleCardList();
             for (int i = 0; i < cards.Count && i < RegionHeroSide1.Length; i++)
-                SpawnHerosForRegion(RegionHeroSide1[i], cards[i], 1, ref unitId);
+                SpawnHerosForRegion(GameManager.Instance.GetPlayer(match[0]), RegionHeroSide1[i], cards[i], 1, ref unitId);
             cards = GameManager.Instance.GetPlayer(match[1]).GetBattleCardList();            
             for (int i = 0; i < cards.Count && i < RegionHeroSide2.Length; i++)
-                SpawnHerosForRegion(RegionHeroSide2[i], cards[i], 2, ref unitId);
+                SpawnHerosForRegion(GameManager.Instance.GetPlayer(match[1]),RegionHeroSide2[i], cards[i], 2, ref unitId);
             cards = GameManager.Instance.GetPlayer(match[2]).GetBattleCardList();            
             for (int i = 0; i < cards.Count && i < RegionHeroSide3.Length; i++)
-                SpawnHerosForRegion(RegionHeroSide3[i], cards[i], 3, ref unitId);
+                SpawnHerosForRegion(GameManager.Instance.GetPlayer(match[2]), RegionHeroSide3[i], cards[i], 3, ref unitId);
             cards = GameManager.Instance.GetPlayer(match[3]).GetBattleCardList();
             for (int i = 0; i < cards.Count && i < RegionHeroSide4.Length; i++)
-                SpawnHerosForRegion(RegionHeroSide4[i], cards[i], 4, ref unitId);
+                SpawnHerosForRegion(GameManager.Instance.GetPlayer(match[3]), RegionHeroSide4[i], cards[i], 4, ref unitId);
+            cards = GameManager.Instance.GetPlayer(match[4]).GetBattleCardList();
+            for (int i = 0; i < cards.Count && i < RegionHeroSide5.Length; i++)
+                SpawnHerosForRegion(GameManager.Instance.GetPlayer(match[4]),RegionHeroSide5[i], cards[i], 5, ref unitId);
+            cards = GameManager.Instance.GetPlayer(match[5]).GetBattleCardList();
+            for (int i = 0; i < cards.Count && i < RegionHeroSide6.Length; i++)
+                SpawnHerosForRegion(GameManager.Instance.GetPlayer(match[5]), RegionHeroSide6[i], cards[i], 6, ref unitId);
+
         }
         else
         {
-            SpawnHerosForRegion(RegionHeroSide1[0], new System.Tuple<int, int>(100020, 1), 1, ref unitId);
-            SpawnHerosForRegion(RegionHeroSide2[0], new System.Tuple<int, int>(100018, 1), 2, ref unitId); 
+            SpawnHerosForRegion(GameManager.Instance.GetPlayer(0),RegionHeroSide1[0], new System.Tuple<int, int>(100020, 1), 1, ref unitId);
+            SpawnHerosForRegion(GameManager.Instance.GetPlayer(1),RegionHeroSide2[0], new System.Tuple<int, int>(100018, 1), 2, ref unitId); 
         }
     }
 
-    private void SpawnUnitsForRegion(GameObject[] region, GameObject prefab, int side, string chessName, ref int idCounter)
+    private void SpawnUnitsForRegion(PlayerInfo p, GameObject[] region, GameObject prefab, int side, string chessName, ref int idCounter)
     {
         foreach (GameObject spawnPoint in region)
         {
@@ -181,6 +199,7 @@ public class WorldManager : MonoBehaviour
                     chessComponent.moveSpeed = 10;
                     chessComponent.attackRange = 12;
                     chessComponent.attackDamage = 20;
+                    chessComponent.SetColor(p.lineColor);
 
                     // 可以在这里设置其他必要的初始化参数
                 }
@@ -194,7 +213,7 @@ public class WorldManager : MonoBehaviour
         }
     }
 
-    private void SpawnHerosForRegion(GameObject spawnPoint, System.Tuple<int, int> heroData, int side, ref int idCounter)
+    private void SpawnHerosForRegion(PlayerInfo p, GameObject spawnPoint, System.Tuple<int, int> heroData, int side, ref int idCounter)
     {
         var heroConfig = HeroConfig.GetConfig((uint)heroData.Item1);
         GameObject heroPrefab = Resources.Load<GameObject>("Prefabs/UnitHero");
@@ -220,6 +239,7 @@ public class WorldManager : MonoBehaviour
                     chessComponent.heroInfo = heroInfo;
                 }
                 chessComponent.UpdateLevel(heroData.Item2);
+                chessComponent.SetColor(p.lineColor);
                 // 可以在这里设置其他必要的初始化参数
             }
             else
@@ -400,6 +420,9 @@ public class WorldManager : MonoBehaviour
         bool side2HasUnits = false;
         bool side3HasUnits = false;
         bool side4HasUnits = false;
+        bool side5HasUnits = false;
+        bool side6HasUnits = false;
+
         int aliveSideCount = 0;
 
         foreach (Transform child in Units.transform)
@@ -437,13 +460,27 @@ public class WorldManager : MonoBehaviour
                             aliveSideCount++;
                         }
                         break;
+                    case 5:
+                        if (!side5HasUnits)
+                        {
+                            side5HasUnits = true;
+                            aliveSideCount++;
+                        }
+                        break;
+                    case 6:
+                        if (!side6HasUnits)
+                        {
+                            side6HasUnits = true;
+                            aliveSideCount++;
+                        }
+                        break;
                 }
             }
         }
 
         UnityEngine.Debug.Log($"id:{dieUnit.id} dieUnit.side:{dieUnit.side} 存活阵营数:{aliveSideCount}");
         // 如果只剩一个阵营有存活单位，显示重启按钮
-        if (aliveSideCount == 2)
+        if (aliveSideCount == 3)
         {
             buttonRestart.gameObject.SetActive(true);
             textRestart.gameObject.SetActive(true);
@@ -457,6 +494,8 @@ public class WorldManager : MonoBehaviour
             GameManager.Instance.GetPlayer(match[1]).onBattleResult(side2HasUnits);
             GameManager.Instance.GetPlayer(match[2]).onBattleResult(side3HasUnits);
             GameManager.Instance.GetPlayer(match[3]).onBattleResult(side4HasUnits);
+            GameManager.Instance.GetPlayer(match[4]).onBattleResult(side5HasUnits);
+            GameManager.Instance.GetPlayer(match[5]).onBattleResult(side6HasUnits);
         }
     }
 

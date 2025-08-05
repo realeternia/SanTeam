@@ -11,13 +11,13 @@ public class CardShopManager : MonoBehaviour
     public List<CardViewControl> cardViews = new List<CardViewControl>();
 
     public GameObject cardViewPrefab; // 拖拽CardView预制体到此处
-    private const int TOTAL_CARDS = 10;
-    private const int CARDS_PER_ROW = 5;
+    private const int TOTAL_CARDS = 12;
+    private const int CARDS_PER_ROW = 6;
     private float cardWidth = 176f;
     private float cardHeight = 288f;
     private float spacing = 10f;
-    private int round = 10000;
-    private bool[] playerPassed = new bool[4]; // 记录每个玩家是否pass过
+    private int round = 10002;
+    private bool[] playerPassed = new bool[6]; // 记录每个玩家是否pass过
     private int passedPlayers = 0; // 记录pass的玩家数量
 
     public Button passBtn;
@@ -62,16 +62,16 @@ public class CardShopManager : MonoBehaviour
 
     private IEnumerator DelayedUpdate()
     { 
-        yield return new WaitForSeconds(1f);
+        yield return new WaitForSeconds(.7f);
         GameManager.Instance.OnPlayerTurn(0);
         while (true) // 模拟 Update 的循环
         {    
-            yield return new WaitForSeconds(2f);
+            yield return new WaitForSeconds(1.5f);
             // 你的逻辑代码
             doWork();
 
             // 等待 1 秒（不阻塞主线程）
-            yield return new WaitForSeconds(1f);
+            yield return new WaitForSeconds(.7f);
         }
     }      
 
@@ -163,7 +163,7 @@ public class CardShopManager : MonoBehaviour
 
     public void OnPlayerBuyCard(CardViewControl ctr, int pid, int cardId, int price)
     {
-        if((round % 4) != 0)
+        if((round % 6) != 0)
             return;
         var player = GameManager.Instance.GetPlayer(pid);
         if (player.BuyCard(ctr, cardId, price))
@@ -186,7 +186,7 @@ public class CardShopManager : MonoBehaviour
 
     public void OnP1Pass()
     {
-        if((round % 4) != 0)
+        if((round % 6) != 0)
             return;        
         if(playerPassed[0])
             return;
@@ -205,7 +205,7 @@ public class CardShopManager : MonoBehaviour
         do
         {
             round++;
-            nextPlayerId = round % 4;
+            nextPlayerId = round % 6;
         } while (playerPassed[nextPlayerId]);
         
         GameManager.Instance.OnPlayerTurn(nextPlayerId);
@@ -213,7 +213,7 @@ public class CardShopManager : MonoBehaviour
 
     private void doWork()
     {
-        int currentPlayerId = (round % 4);
+        int currentPlayerId = (round % 6);
                
         // 如果当前玩家已经pass，则直接进入下一回合
         if (playerPassed[currentPlayerId])
@@ -268,8 +268,8 @@ public class CardShopManager : MonoBehaviour
 
     public void ShopBegin()
     {
-        for(int i = 0; i < 4; i++)
-            GameManager.Instance.GetPlayer(i).AddGold(35);
+        for(int i = 0; i < 6; i++)
+            GameManager.Instance.GetPlayer(i).AddGold(30);
         era = 0;
         PanelManager.Instance.ShowShop();
         NewEra();     

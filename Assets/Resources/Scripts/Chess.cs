@@ -47,12 +47,6 @@ public class Chess : MonoBehaviour, IPointerClickHandler
     // Start is called before the first frame update
     void Start()
     {
-        // 创建材质实例
-        Material newMaterial = new Material(rend.sharedMaterial);
-        newMaterial.mainTexture = Resources.Load<Texture>("Skins/" + chessName);
-        newMaterial.SetColor("_OutlineColor", side == 1 ? Color.green : side == 3 ? Color.red : side == 4 ? Color.yellow : Color.blue);
-        rend.material = newMaterial; // 这会为这个渲染器创建一个独立的材质实例
-
         // 初始化HP
         hp = maxHp;
 
@@ -60,6 +54,16 @@ public class Chess : MonoBehaviour, IPointerClickHandler
         CreateHUD();
 
         StartCoroutine(MoveAndFightCoroutine());
+    }
+
+    public void SetColor(Color c)
+    {
+        // 创建材质实例
+        Material newMaterial = new Material(rend.sharedMaterial);
+        newMaterial.mainTexture = Resources.Load<Texture>("Skins/" + chessName);
+        newMaterial.SetColor("_OutlineColor", c);                       
+
+        rend.material = newMaterial; // 这会为这个渲染器创建一个独立的材质实例
     }
 
     // 创建血条HUD
