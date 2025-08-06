@@ -12,7 +12,7 @@ public class HeroInfoGroup : MonoBehaviour
     private int countSide2;
     public GameObject heroPrefab;
     // Start is called before the first frame update
-    public TMP_Text p2NameText;
+
     void Start()
     {
         
