@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using CommonConfig;
 
@@ -21,26 +22,48 @@ public static class SkillManager
         throw new System.Exception("Skill not found");
     }
 
-    public static void DuringAttack(Chess attacker, Chess defender, ref int damage, ref string effect)
+    public static void CheckBurst(Chess attacker)
     {
         foreach(var skill in attacker.skills)
         {
-            skill.DuringAttack(attacker, defender, ref damage, ref effect);
-
+            skill.CheckBurst();
         }
+    }
+
+    public static void DuringAttack(Chess attacker, Chess defender, ref int damageBase, ref float damageMulti, ref string effect)
+    {       
+        UnityEngine.Debug.Log("DuringAttack " + attacker.heroId.ToString() + " " + attacker.skills.Where(x => x.isBurst).Count().ToString());
+
+        foreach(var skill in attacker.skills.Where(x => x.isBurst))
+        {
+            skill.DuringAttack(attacker, defender, ref damageBase, ref damageMulti, ref effect);
+        }
+        foreach(var buff in attacker.buffs)
+        {
+            buff.DuringAttack(attacker, defender, ref damageBase, ref damageMulti, ref effect);
+        }   
+        foreach(var buff in defender.buffs)
+        {
+            buff.DuringAttacked(defender, attacker, ref damageBase, ref damageMulti, ref effect);
+        }
+        UnityEngine.Debug.Log("DuringAttackEnd " + attacker.heroId.ToString() + " " + attacker.skills.Count.ToString());
     }
 
 
     public static void OnAttack(Chess attacker, Chess defender, int damage)
     {
-         UnityEngine.Debug.Log("OnAttack " + attacker.heroId.ToString() + " " + attacker.skills.Count.ToString());
-        foreach(var skill in attacker.skills)
+        UnityEngine.Debug.Log("OnAttack " + attacker.heroId.ToString() + " " + attacker.skills.Count.ToString());
+        foreach (var skill in attacker.skills.Where(x => x.isBurst))
         {
-            if(skill.CheckBurst())
-            {
-                skill.OnAttack(attacker, defender, damage);
-                skill.UpdateCD();
-            }
+            skill.OnAttack(attacker, defender, damage);
+        }
+        foreach(var buff in attacker.buffs)
+        {
+            buff.OnAttack(attacker, defender, damage);
+        }   
+        foreach(var buff in defender.buffs)
+        {
+            buff.OnAttacked(defender, attacker, damage);
         }
     }
 }

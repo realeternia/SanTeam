@@ -78,8 +78,8 @@ namespace CommonConfig
         public static void Load()
         {
             config.Clear();
-            config[200001] = new SkillConfig(200001, "转转转", 1, 0.75f, 3f, "SpinAttack", "SwordWhirlwindWhite", 2, "spinattack");
-            config[200002] = new SkillConfig(200002, "愤怒一击", 1, 0.4f, 3f, "CriticalAttack", "SwordHitRedCritical", 2, "crtattack");
+            config[200001] = new SkillConfig(200001, "转转转", 1, 0.15f, 3f, "SpinAttack", "SwordWhirlwindWhite", 2, "spinattack");
+            config[200002] = new SkillConfig(200002, "愤怒一击", 1, 0.7f, 3f, "CriticalAttack", "SwordHitRedCritical", 2, "crtattack");
 
         }
 

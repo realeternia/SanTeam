@@ -9,17 +9,18 @@ public class CriticalAttack : Skill
     {
     }
 
-    public override void DuringAttack(Chess attacker, Chess defender, ref int damage, ref string effect)
+    public override void DuringAttack(Chess attacker, Chess defender, ref int damageBase, ref float damageMulti, ref string effect)
     {
-        Debug.Log("CriticalAttack");
+        Debug.Log("CriticalAttack " + damageBase.ToString() + " " + damageMulti.ToString() + " " + effect);
 
-        damage *= 2;
+        damageMulti += 1f;
         effect = skillCfg.HitEffect;
 
-        WorldManager.Instance.AddBattleText(damage.ToString() + "!", defender.transform.position, new UnityEngine.Vector2(0, 400), Color.red, 2);
-
+        WorldManager.Instance.AddBattleText(damageBase.ToString() + "!", defender.transform.position, new UnityEngine.Vector2(0, 400), Color.red, 2);
 
         EffectManager.PlaySkillEffect(attacker, skillCfg.HitEffect);
+
+        UpdateCD();
 
     }
 }

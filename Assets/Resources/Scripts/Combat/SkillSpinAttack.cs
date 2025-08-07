@@ -22,6 +22,6 @@ public class SkillSpinAttack : Skill
         }
 
         EffectManager.PlaySkillEffect(attacker, skillCfg.HitEffect);
-
+        UpdateCD();
     }
 }

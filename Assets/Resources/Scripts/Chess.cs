@@ -46,6 +46,8 @@ public class Chess : MonoBehaviour
 
     public List<Skill> skills = new List<Skill>();
 
+    public List<Buff> buffs = new List<Buff>();
+
     // Start is called before the first frame update
     void Start()
     {
@@ -241,6 +243,15 @@ public class Chess : MonoBehaviour
         }
     }
 
+    void Update()
+    {
+        foreach(var buff in buffs)
+        {
+            buff.Update();
+        }
+
+    }
+
     private void OnDestroy()
     {
         // 单位销毁时释放格子锁定
@@ -319,7 +330,15 @@ public class Chess : MonoBehaviour
             var heroConfig = HeroConfig.GetConfig((uint)heroId);
             effect = heroConfig.HitEffect;
         }
-        SkillManager.DuringAttack(this, targetChess, ref damage, ref effect);
+        var damageBase = damage;
+        var damageMulti = 1f;
+
+        SkillManager.CheckBurst(this);
+        SkillManager.CheckBurst(targetChess);
+
+        SkillManager.DuringAttack(this, targetChess, ref damageBase, ref damageMulti, ref effect);
+
+        damage = (int)(damageBase * (1 + damageMulti));
         targetChess.hp -= damage;
         SkillManager.OnAttack(this, targetChess, damage);
         if (targetChess.heroInfo != null) // 英雄
