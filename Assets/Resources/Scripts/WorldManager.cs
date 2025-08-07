@@ -44,6 +44,8 @@ public class WorldManager : MonoBehaviour
     public TMP_Text textRestart;
 
     public GameObject WallNode;
+    public GameObject HudNode;
+    public GameObject BattleTextNode;
 
     void Start()
     {
@@ -170,7 +172,7 @@ public class WorldManager : MonoBehaviour
         }
         else
         {
-            SpawnHerosForRegion(GameManager.Instance.GetPlayer(0),RegionHeroSide1[0], new System.Tuple<int, int>(100020, 1), 1, ref unitId);
+            SpawnHerosForRegion(GameManager.Instance.GetPlayer(0),RegionHeroSide1[0], new System.Tuple<int, int>(100004, 1), 1, ref unitId);
             SpawnHerosForRegion(GameManager.Instance.GetPlayer(1),RegionHeroSide2[0], new System.Tuple<int, int>(100112, 1), 2, ref unitId); 
             SpawnHerosForRegion(GameManager.Instance.GetPlayer(1),RegionHeroSide2[1], new System.Tuple<int, int>(100112, 1), 2, ref unitId); 
             SpawnHerosForRegion(GameManager.Instance.GetPlayer(1),RegionHeroSide2[2], new System.Tuple<int, int>(100112, 1), 2, ref unitId); 
@@ -526,6 +528,54 @@ public class WorldManager : MonoBehaviour
         }
         return unitsInRange;
     }
+
+    public void AddBattleText(string text, UnityEngine.Vector3 worldPos, UnityEngine.Vector2 speed, Color color, int duration)
+    {
+        var prefab = Resources.Load<GameObject>("Prefabs/BattleTxt");
+        var battleText = Instantiate(prefab, BattleTextNode.transform);
+        
+        // 将世界坐标转换为屏幕坐标
+        Vector3 screenPos = Camera.main.WorldToScreenPoint(worldPos);
+        
+        battleText.transform.position = screenPos;
+
+        var textCtr = battleText.transform.GetChild(0).GetComponent<TMP_Text>();
+        textCtr.color = color;
+        textCtr.text = text;
+        Destroy(battleText, duration);
+
+        //如果speed不为0，开一个协程移动文本
+        if(speed != UnityEngine.Vector2.zero)
+        {
+            StartCoroutine(MoveText(battleText, speed, duration));
+        }
+    }
+
+    // 战斗文本移动协程
+    private IEnumerator MoveText(GameObject battleText, UnityEngine.Vector2 speed, int duration)
+    {
+        float startTime = Time.time;
+        float endTime = startTime + duration;
+        RectTransform rectTransform = battleText.GetComponent<RectTransform>();
+        Vector3 startPosition = rectTransform.position;
+
+        while (Time.time < endTime)
+        {
+            // 计算移动距离，使用 Time.deltaTime 来保证帧率无关的移动
+            float moveX = speed.x * Time.deltaTime;
+            float moveY = speed.y * Time.deltaTime;
+
+            if(rectTransform == null)
+                yield break;
+
+            // 更新位置
+            rectTransform.Translate(new Vector3(moveX, moveY, 0));
+
+            yield return new WaitForSeconds(0.05f); // 使用 yield return null 在下一帧继续执行，保证流畅移动
+
+        }
+    }
+
 
     // 管理器销毁时释放所有格子
     private void OnDestroy()

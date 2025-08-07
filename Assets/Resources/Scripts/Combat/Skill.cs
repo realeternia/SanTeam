@@ -52,8 +52,11 @@ public class Skill
     }
 
     public virtual void OnAttack(Chess attacker, Chess defender, int damage)
-
     {
-
     }
+
+    public virtual void DuringAttack(Chess attacker, Chess defender, ref int damage, ref string effect)
+    {
+    }
+
 }

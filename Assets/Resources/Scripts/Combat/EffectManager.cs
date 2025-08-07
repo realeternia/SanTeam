@@ -6,22 +6,19 @@ using CommonConfig;
 public static class EffectManager
 {
 
-    public static void PlayHitEffect(Chess targetChess, Chess sourceChess)
-
+    public static void PlayHitEffect(Chess sourceChess, Chess targetChess, string effectName)
     {
-        var effect = "Prefabs/SwordHitBlue";
         var needMissile = false;
         if (sourceChess.isHero)
         {
             var heroConfig = HeroConfig.GetConfig((uint)sourceChess.heroId);
-            effect = "Prefabs/" + heroConfig.HitEffect;
             needMissile = heroConfig.Range >= 20;
 
-            if ((sourceChess.side == 1 || sourceChess.side == 2) && heroConfig.HitEffect == "SwordHitYellowCritical")
+            if ((sourceChess.side == 1 || sourceChess.side == 2) && effectName.StartsWith("Sword"))
                 GameManager.Instance.PlaySound("Sounds/sword");
         }
         // 播放粒子特效
-        var hitPrefab = Resources.Load<GameObject>(effect);
+        var hitPrefab = Resources.Load<GameObject>("Prefabs/" + effectName);
         if (needMissile)
         {
             GameObject missileEffect = UnityEngine.Object.Instantiate(hitPrefab, sourceChess.transform.position, Quaternion.identity);
@@ -29,7 +26,7 @@ public static class EffectManager
             missileEffect.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
 
             // 启动协程让导弹飞向目标位置
-            sourceChess.StartCoroutine(MoveMissileToTarget(missileEffect, targetChess, effect));
+            sourceChess.StartCoroutine(MoveMissileToTarget(missileEffect, targetChess, "Prefabs/" + effectName));
             UnityEngine.Object.Destroy(missileEffect, 2f);
         }
         else
@@ -82,6 +79,7 @@ public static class EffectManager
     public static void PlaySkillEffect(Chess sourceChess, string effect)
     {
         var hitPrefab = Resources.Load<GameObject>("Prefabs/" + effect);
+        UnityEngine.Debug.Log("PlaySkillEffect: " + effect);
 
         GameObject hitEffect = UnityEngine.Object.Instantiate(hitPrefab, sourceChess.transform.position, hitPrefab.transform.rotation);
             // 设置特效的父对象为目标单位，使其跟随目标移动

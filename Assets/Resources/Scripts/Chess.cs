@@ -6,7 +6,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class Chess : MonoBehaviour, IPointerClickHandler
+public class Chess : MonoBehaviour
 {
     public int id;
     public int maxHp = 100;  // 最大生命值
@@ -94,7 +94,7 @@ public class Chess : MonoBehaviour, IPointerClickHandler
         GameObject hudPrefab = Resources.Load<GameObject>( isHero ? "Prefabs/Hud" : "Prefabs/HudSmall");
 
         // 实例化HUD对象
-        GameObject hudObj = Instantiate(hudPrefab, canvas.transform);
+        GameObject hudObj = Instantiate(hudPrefab, WorldManager.Instance.HudNode.transform);
         hudObj.name = "ChessHUD";
 
         // 获取ChessHUD组件
@@ -313,12 +313,19 @@ public class Chess : MonoBehaviour, IPointerClickHandler
 
         // 造成伤害
         var damage = calculateDamage(this, targetChess);
+        var effect = "SwordHitBlue";
+        if(isHero)
+        {
+            var heroConfig = HeroConfig.GetConfig((uint)heroId);
+            effect = heroConfig.HitEffect;
+        }
+        SkillManager.DuringAttack(this, targetChess, ref damage, ref effect);
         targetChess.hp -= damage;
         SkillManager.OnAttack(this, targetChess, damage);
         if (targetChess.heroInfo != null) // 英雄
             targetChess.heroInfo.SetHpRate((float)targetChess.hp / targetChess.maxHp);
         //Debug.Log($"{gameObject.name} 攻击了 {targetChess.gameObject.name}，造成 {this.attackDamage} 点伤害，目标剩余生命值：{targetChess.hp}");
-        EffectManager.PlayHitEffect(targetChess, this);
+        EffectManager.PlayHitEffect(targetChess, this, effect);
 
         // 检查目标是否被击败
         if (targetChess.hp <= 0)
@@ -360,9 +367,4 @@ public class Chess : MonoBehaviour, IPointerClickHandler
         return Mathf.Clamp(damage, 10, 60);
     }
 
-    public void OnPointerClick(PointerEventData eventData)
-    {
-
-        //rend.material.mainTexture = Resources.Load<Texture>("ChessPic/" + UnityEngine.Random.Range(1, 54).ToString());
-    }
 }
