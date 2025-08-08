@@ -15,7 +15,7 @@ public static class SkillManager
             case "SpinAttack":
                 return new SkillSpinAttack(skillId);
             case "CriticalAttack":
-                return new CriticalAttack(skillId);
+                return new SkillCriticalAttack(skillId);
 
         }
 
@@ -32,22 +32,29 @@ public static class SkillManager
 
     public static void DuringAttack(Chess attacker, Chess defender, ref int damageBase, ref float damageMulti, ref string effect)
     {       
-        UnityEngine.Debug.Log("DuringAttack " + attacker.heroId.ToString() + " " + attacker.skills.Where(x => x.isBurst).Count().ToString());
-
         foreach(var skill in attacker.skills.Where(x => x.isBurst))
         {
             skill.DuringAttack(attacker, defender, ref damageBase, ref damageMulti, ref effect);
         }
         foreach(var buff in attacker.buffs)
         {
-            buff.DuringAttack(attacker, defender, ref damageBase, ref damageMulti, ref effect);
+            buff.DuringAttack(defender, ref damageBase, ref damageMulti, ref effect);
         }   
         foreach(var buff in defender.buffs)
         {
-            buff.DuringAttacked(defender, attacker, ref damageBase, ref damageMulti, ref effect);
+            buff.DuringAttacked(attacker, ref damageBase, ref damageMulti, ref effect);
         }
-        UnityEngine.Debug.Log("DuringAttackEnd " + attacker.heroId.ToString() + " " + attacker.skills.Count.ToString());
     }
+
+    // 护盾要再这一层算
+    public static void BeforeAttack(Chess attacker, Chess defender, ref int damage)
+    {
+        foreach(var buff in defender.buffs)
+        {
+            buff.BeforeAttacked(attacker, ref damage);
+        }
+    }
+
 
 
     public static void OnAttack(Chess attacker, Chess defender, int damage)
@@ -59,11 +66,11 @@ public static class SkillManager
         }
         foreach(var buff in attacker.buffs)
         {
-            buff.OnAttack(attacker, defender, damage);
+            buff.OnAttack(defender, damage);
         }   
         foreach(var buff in defender.buffs)
         {
-            buff.OnAttacked(defender, attacker, damage);
+            buff.OnAttacked(attacker, damage);
         }
     }
 }

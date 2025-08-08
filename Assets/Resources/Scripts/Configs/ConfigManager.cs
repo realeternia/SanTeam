@@ -9,5 +9,6 @@ public static class ConfigManager
     {
         HeroConfig.Load();
         SkillConfig.Load();
+        BuffConfig.Load();
     }
 }

@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using CommonConfig;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -245,6 +246,8 @@ public class Chess : MonoBehaviour
 
     void Update()
     {
+        buffs.Where(x => Time.time > x.endTime).ToList().ForEach(x => BuffManager.RemoveBuff(this, x.id));
+
         foreach(var buff in buffs)
         {
             buff.Update();
@@ -336,9 +339,14 @@ public class Chess : MonoBehaviour
         SkillManager.CheckBurst(this);
         SkillManager.CheckBurst(targetChess);
 
+        UnityEngine.Debug.Log(heroId.ToString() + " Attack " + damageBase.ToString() + " " + damageMulti.ToString());
         SkillManager.DuringAttack(this, targetChess, ref damageBase, ref damageMulti, ref effect);
+        UnityEngine.Debug.Log(heroId.ToString() + " Attack2 " + damageBase.ToString() + " " + damageMulti.ToString());
 
-        damage = (int)(damageBase * (1 + damageMulti));
+        damage = (int)(damageBase * damageMulti);
+        SkillManager.BeforeAttack(this, targetChess, ref damage);
+        UnityEngine.Debug.Log(heroId.ToString() + " Attack3 " + damage.ToString());
+
         targetChess.hp -= damage;
         SkillManager.OnAttack(this, targetChess, damage);
         if (targetChess.heroInfo != null) // 英雄
@@ -350,16 +358,23 @@ public class Chess : MonoBehaviour
         if (targetChess.hp <= 0)
         {
             Debug.Log($"{targetChess.gameObject.name} 被击败了！");
-            WorldManager.Instance.OnUnitDie(targetChess);
-            Destroy(targetChess.gameObject);
+            targetChess.Ondying();
             targetChess = null;
 
-            if (side == 1 || side == 2)
-                GameManager.Instance.PlaySound("Sounds/tnt", 7);
 
             // 寻找新目标
             FindTarget();
         }
+    }
+
+    public void Ondying()
+    {
+        buffs.Clear();
+        WorldManager.Instance.OnUnitDying(this);
+        Destroy(gameObject);
+
+        if (side == 1 || side == 2)
+            GameManager.Instance.PlaySound("Sounds/tnt", 7);            
     }
   
 

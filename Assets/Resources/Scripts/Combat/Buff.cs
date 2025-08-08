@@ -1,3 +1,4 @@
+using System;
 using CommonConfig;
 using UnityEngine;
 
@@ -5,39 +6,81 @@ using UnityEngine;
 public class Buff
 {
     public int id;
+
+    public Chess owner;
     
     public BuffConfig buffCfg;
-    private float endTime;
+    public float endTime;
+    public GameObject effect;
 
-    public Buff(int id, float lastTime)
+
+    public Buff(int id, Chess unit, float lastTime)
     {
         this.id = id;
+        owner = unit;
         buffCfg = BuffConfig.GetConfig((uint)id);
         endTime = Time.time + lastTime;
     }
 
-    public void Update()
+    public virtual void OnAdd(Chess chess, Chess caster)
     {
-        if(Time.time > endTime)
+        owner = chess;
+
+        if (!string.IsNullOrEmpty(buffCfg.BuffEffect))
         {
-            
+            effect = EffectManager.PlayBuffEffect(chess, buffCfg.BuffEffect);
         }
     }
 
-    public virtual void DuringAttack(Chess me, Chess defender, ref int damageBase, ref float damageMulti, ref string effect)
+    public virtual void OnRemove(Chess chess)
+    {
+        if (effect != null)
+        {
+            GameObject.Destroy(effect);
+            effect = null;
+        }
+        owner = null;
+    }
+
+    //刷新
+    public virtual void Refresh(Chess caster, float lastTime)
+    {
+        endTime = Math.Max(endTime, Time.time + lastTime);
+
+    }
+
+
+    public void Update()
+    {
+
+    }
+
+    public void WaitForRemove()
+    {
+        endTime = Time.time - 1;
+
+    }
+
+    public virtual void DuringAttack(Chess defender, ref int damageBase, ref float damageMulti, ref string effect)
 
     {
     }
-    public virtual void DuringAttacked(Chess me, Chess attacker, ref int damageBase, ref float damageMulti, ref string effect)
+    public virtual void DuringAttacked(Chess attacker, ref int damageBase, ref float damageMulti, ref string effect)
 
     {
     }
 
-    public virtual void OnAttack(Chess me, Chess defender, int damage)
+    public virtual void BeforeAttacked(Chess defender, ref int damage)
+
     {
     }
 
-    public virtual void OnAttacked(Chess me, Chess attacker, int damage)
+
+    public virtual void OnAttack(Chess defender, int damage)
+    {
+    }
+
+    public virtual void OnAttacked(Chess attacker, int damage)
     {
     }
 

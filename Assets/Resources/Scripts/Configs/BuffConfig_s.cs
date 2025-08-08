@@ -53,7 +53,7 @@ namespace CommonConfig
         public static void Load()
         {
             config.Clear();
-            config[300001] = new BuffConfig(300001, "护盾", "SpinAttack", "SwordWhirlwindWhite");
+            config[300001] = new BuffConfig(300001, "护盾", "BuffShield", "ShieldSoftBlue");
 
         }
 

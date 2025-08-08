@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using CommonConfig;
 using UnityEngine;
 
-public class CriticalAttack : Skill
+public class SkillCriticalAttack : Skill
 {
-    public CriticalAttack(int id) : base(id)
+    public SkillCriticalAttack(int id) : base(id)
     {
     }
 
@@ -16,11 +16,13 @@ public class CriticalAttack : Skill
         damageMulti += 1f;
         effect = skillCfg.HitEffect;
 
-        WorldManager.Instance.AddBattleText(damageBase.ToString() + "!", defender.transform.position, new UnityEngine.Vector2(0, 400), Color.red, 2);
-
-        EffectManager.PlaySkillEffect(attacker, skillCfg.HitEffect);
-
+        BuffManager.AddBuff(attacker, attacker, 300001, 30f);
         UpdateCD();
-
     }
+
+    public override void OnAttack(Chess attacker, Chess defender, int damage)
+    {
+        WorldManager.Instance.AddBattleText(damage.ToString() + "!", defender.transform.position, new UnityEngine.Vector2(0, 400), Color.red, 2);
+    }
+
 }

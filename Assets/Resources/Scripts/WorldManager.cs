@@ -416,7 +416,7 @@ public class WorldManager : MonoBehaviour
         }
     }
 
-    public void OnUnitDie(Chess dieUnit)
+    public void OnUnitDying(Chess dieUnit)
     {
         // 检查所有阵营是否还有存活单位
         bool side1HasUnits = false;
