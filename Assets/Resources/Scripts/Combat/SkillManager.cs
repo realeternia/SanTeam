@@ -6,35 +6,28 @@ using CommonConfig;
 
 public static class SkillManager
 {
-    public static Skill CreateSkill(int skillId)
+    public static Skill CreateSkill(int skillId, Chess owner)
+
     {
         var skillCfg = SkillConfig.GetConfig((uint)skillId);
 
-        switch(skillCfg.ScriptName)
+        switch (skillCfg.ScriptName)
         {
             case "SpinAttack":
-                return new SkillSpinAttack(skillId);
+                return new SkillSpinAttack(skillId, owner);
             case "CriticalAttack":
-                return new SkillCriticalAttack(skillId);
+                return new SkillCriticalAttack(skillId, owner);
 
         }
 
         throw new System.Exception("Skill not found");
     }
 
-    public static void CheckBurst(Chess attacker)
-    {
-        foreach(var skill in attacker.skills)
-        {
-            skill.CheckBurst();
-        }
-    }
-
     public static void DuringAttack(Chess attacker, Chess defender, ref int damageBase, ref float damageMulti, ref string effect)
     {       
-        foreach(var skill in attacker.skills.Where(x => x.isBurst))
+        foreach(var skill in attacker.skills)
         {
-            skill.DuringAttack(attacker, defender, ref damageBase, ref damageMulti, ref effect);
+            skill.DuringAttack(defender, ref damageBase, ref damageMulti, ref effect);
         }
         foreach(var buff in attacker.buffs)
         {
@@ -59,10 +52,9 @@ public static class SkillManager
 
     public static void OnAttack(Chess attacker, Chess defender, int damage)
     {
-        UnityEngine.Debug.Log("OnAttack " + attacker.heroId.ToString() + " " + attacker.skills.Count.ToString());
-        foreach (var skill in attacker.skills.Where(x => x.isBurst))
+        foreach (var skill in attacker.skills)
         {
-            skill.OnAttack(attacker, defender, damage);
+            skill.OnAttack(defender, damage);
         }
         foreach(var buff in attacker.buffs)
         {

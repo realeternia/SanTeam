@@ -74,7 +74,7 @@ public class Chess : MonoBehaviour
             {
                 foreach (var skillId in heroCfg.Skills)
                 {
-                    skills.Add(SkillManager.CreateSkill(skillId));
+                    skills.Add(SkillManager.CreateSkill(skillId, this));
                 }
             }
         }
@@ -335,9 +335,6 @@ public class Chess : MonoBehaviour
         }
         var damageBase = damage;
         var damageMulti = 1f;
-
-        SkillManager.CheckBurst(this);
-        SkillManager.CheckBurst(targetChess);
 
         UnityEngine.Debug.Log(heroId.ToString() + " Attack " + damageBase.ToString() + " " + damageMulti.ToString());
         SkillManager.DuringAttack(this, targetChess, ref damageBase, ref damageMulti, ref effect);

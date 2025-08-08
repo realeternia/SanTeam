@@ -11,13 +11,16 @@ using UnityEngine;
 public class Skill
 {
     public int id;
+    public Chess owner;
     protected SkillConfig skillCfg;
     private float lastUpdateTime; // 上次更新CD的时间
     public bool isBurst;
 
-    public Skill(int id)
+    public Skill(int id, Chess unit)
     {
         this.id = id;
+        this.owner = unit;
+
         skillCfg = SkillConfig.GetConfig((uint)id);
     }
 
@@ -47,17 +50,20 @@ public class Skill
         return Time.time < lastUpdateTime + skillCfg.CD;
     }
 
-    public void CheckBurst()
+    public bool CheckBurst()
     {
         isBurst = !IsInCD() && UnityEngine.Random.value < skillCfg.Rate;
         UnityEngine.Debug.Log("CheckBurst isBurst=" + isBurst.ToString() + " skillId=" + id.ToString());
+        if(isBurst)
+            UpdateCD();
+        return isBurst;
     }
 
-    public virtual void OnAttack(Chess attacker, Chess defender, int damage)
+    public virtual void OnAttack(Chess defender, int damage)
     {
     }
 
-    public virtual void DuringAttack(Chess attacker, Chess defender, ref int damageBase, ref float damageMulti, ref string effect)
+    public virtual void DuringAttack(Chess defender, ref int damageBase, ref float damageMulti, ref string effect)
 
     {
     }
