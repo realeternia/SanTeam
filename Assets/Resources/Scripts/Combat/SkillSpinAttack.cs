@@ -6,7 +6,6 @@ using UnityEngine;
 public class SkillSpinAttack : Skill
 {
     public SkillSpinAttack(int id, Chess unit) : base(id, unit)
-
     {
     }
 
@@ -20,7 +19,7 @@ public class SkillSpinAttack : Skill
             {
                 if(unit == defender)
                     continue;
-                unit.hp -= damage;
+                unit.hp -= (int)(damage * skillCfg.Strength);
             }
 
             EffectManager.PlaySkillEffect(owner, skillCfg.HitEffect);

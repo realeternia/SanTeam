@@ -19,7 +19,10 @@ public static class SkillManager
                 return new SkillCriticalAttack(skillId, owner);
             case "MasterShield":
                 return new SkillMasterShield(skillId, owner);
-
+            case "HardSkin":
+                return new SkillHardSkin(skillId, owner);
+            case "RunCross":
+                return new SkillRunCross(skillId, owner);
 
         }
 
@@ -40,6 +43,10 @@ public static class SkillManager
         foreach(var skill in attacker.skills)
         {
             skill.DuringAttack(defender, ref damageBase, ref damageMulti, ref effect);
+        }    
+        foreach(var skill in defender.skills)
+        {
+            skill.DuringAttacked(attacker, ref damageBase, ref damageMulti, ref effect);
         }
         foreach(var buff in attacker.buffs)
         {

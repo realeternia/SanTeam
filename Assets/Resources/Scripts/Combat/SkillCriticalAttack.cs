@@ -16,7 +16,7 @@ public class SkillCriticalAttack : Skill
         {
             Debug.Log("CriticalAttack " + damageBase.ToString() + " " + damageMulti.ToString() + " " + effect);
 
-            damageMulti += 1f;
+            damageMulti += skillCfg.Strength;
             effect = skillCfg.HitEffect;
         }
     }

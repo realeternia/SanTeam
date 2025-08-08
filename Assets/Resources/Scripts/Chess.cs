@@ -48,6 +48,7 @@ public class Chess : MonoBehaviour
     public List<Skill> skills = new List<Skill>();
 
     public List<Buff> buffs = new List<Buff>();
+    public bool canMove = true;
 
     // Start is called before the first frame update
     void Start()
@@ -167,6 +168,8 @@ public class Chess : MonoBehaviour
             FindTarget();
             return;
         }
+
+
         // 检查目标是否在攻击范围内
         float distanceToTarget = Vector3.Distance(transform.position, targetChess.transform.position);
 
@@ -180,6 +183,12 @@ public class Chess : MonoBehaviour
             }
             return;
         }
+
+        if(!canMove)
+        {
+            return;
+        }
+
 
         if(moveDirection == null)
         {

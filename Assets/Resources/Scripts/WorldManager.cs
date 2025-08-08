@@ -8,7 +8,7 @@ using TMPro;
 public class WorldManager : MonoBehaviour
 {
     public static WorldManager Instance;
-    public bool isDebug = true;
+    public bool isDebug = true; //自动判定的，不要改
     public GameObject Units;
     public int gridCellSize = 3; // 每个格子的实际大小(米)
 
@@ -182,12 +182,11 @@ public class WorldManager : MonoBehaviour
         }
         else
         {
-            SpawnHerosForRegion(GameManager.Instance.GetPlayer(0),RegionHeroSide1[0], new System.Tuple<int, int>(100001, 1), 1, ref unitId);
-            SpawnHerosForRegion(GameManager.Instance.GetPlayer(0),RegionHeroSide1[1], new System.Tuple<int, int>(101002, 1), 1, ref unitId); 
-            SpawnHerosForRegion(GameManager.Instance.GetPlayer(0),RegionHeroSide1[2], new System.Tuple<int, int>(101005, 1), 1, ref unitId); 
+          //  SpawnHerosForRegion(GameManager.Instance.GetPlayer(0),RegionHeroSide1[0], new System.Tuple<int, int>(100001, 1), 1, ref unitId);
+            SpawnHerosForRegion(GameManager.Instance.GetPlayer(0),RegionHeroSide1[1], new System.Tuple<int, int>(101003, 1), 1, ref unitId); 
 
             SpawnHerosForRegion(GameManager.Instance.GetPlayer(1),RegionHeroSide2[1], new System.Tuple<int, int>(102037, 1), 2, ref unitId); 
-            SpawnHerosForRegion(GameManager.Instance.GetPlayer(1),RegionHeroSide2[2], new System.Tuple<int, int>(102037, 1), 2, ref unitId); 
+         //   SpawnHerosForRegion(GameManager.Instance.GetPlayer(1),RegionHeroSide2[2], new System.Tuple<int, int>(102037, 1), 2, ref unitId); 
         }
 
 

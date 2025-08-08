@@ -61,7 +61,7 @@ public class Skill
 
     public virtual void BattleBegin()
     {
-        
+
     }
 
 
@@ -70,8 +70,10 @@ public class Skill
     }
 
     public virtual void DuringAttack(Chess defender, ref int damageBase, ref float damageMulti, ref string effect)
-
     {
     }
 
+    public virtual void DuringAttacked(Chess attacker, ref int damageBase, ref float damageMulti, ref string effect)
+    {
+    }
 }
