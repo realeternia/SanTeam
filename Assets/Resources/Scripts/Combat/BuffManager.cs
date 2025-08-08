@@ -2,7 +2,8 @@ using CommonConfig;
 
 public static class BuffManager
 {
-    public static void AddBuff(Chess chess, Chess caster, int buffId, float time)
+    public static void AddBuff(Chess chess, Chess caster, int buffId, float time, int strength = 0)
+
     {
         var buffCfg = BuffConfig.GetConfig((uint)buffId);
 
@@ -10,7 +11,7 @@ public static class BuffManager
         switch (buffCfg.ScriptName)
         {
             case "BuffShield":
-                buff = new BuffShield(buffId, chess, time);
+                buff = new BuffShield(buffId, chess, time, strength);
                 break;
 
         }
@@ -22,7 +23,7 @@ public static class BuffManager
         {
             if(item.id == buffId)
             {
-                item.Refresh(caster, time);
+                item.Refresh(caster, time, strength);
                 return;
             }
         }

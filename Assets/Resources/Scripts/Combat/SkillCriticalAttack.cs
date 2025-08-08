@@ -18,8 +18,6 @@ public class SkillCriticalAttack : Skill
 
             damageMulti += 1f;
             effect = skillCfg.HitEffect;
-
-            BuffManager.AddBuff(owner, owner, 300001, 30f);
         }
     }
 

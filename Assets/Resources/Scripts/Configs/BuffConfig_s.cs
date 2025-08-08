@@ -22,14 +22,19 @@ namespace CommonConfig
         ///hit
         /// </summary>
         public string BuffEffect;
+        /// <summary>
+        ///图标
+        /// </summary>
+        public string Icon;
 
 
-        public BuffConfig(uint Id, string Name, string ScriptName, string BuffEffect)
+        public BuffConfig(uint Id, string Name, string ScriptName, string BuffEffect, string Icon)
         {
             this.Id = Id;
             this.Name = Name;
             this.ScriptName = ScriptName;
             this.BuffEffect = BuffEffect;
+            this.Icon = Icon;
 
         }
 
@@ -53,7 +58,7 @@ namespace CommonConfig
         public static void Load()
         {
             config.Clear();
-            config[300001] = new BuffConfig(300001, "护盾", "BuffShield", "ShieldSoftBlue");
+            config[300001] = new BuffConfig(300001, "护盾", "BuffShield", "ShieldSoftBlue", "spinattack");
 
         }
 

@@ -59,6 +59,12 @@ public class Skill
         return isBurst;
     }
 
+    public virtual void BattleBegin()
+    {
+        
+    }
+
+
     public virtual void OnAttack(Chess defender, int damage)
     {
     }

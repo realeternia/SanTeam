@@ -19,6 +19,8 @@ public class WorldManager : MonoBehaviour
     private bool showDebugCube = false;
     private Dictionary<Vector2Int, GameObject> debugGridCubes = new Dictionary<Vector2Int, GameObject>(); // 格子与调试cube的映射
 
+    private List<Chess> chessList = new List<Chess>(); // 所有棋子
+
     public GameObject[] RegionSide1; // 阵营1的出生点数组
     public GameObject[] RegionSide2; // 阵营2的出生点数组
 
@@ -73,6 +75,8 @@ public class WorldManager : MonoBehaviour
         {
             Destroy(child.gameObject);
         }
+        chessList.Clear();
+
         CardShopManager.Instance.ShopBegin();
     }
 
@@ -83,6 +87,12 @@ public class WorldManager : MonoBehaviour
         buttonRestart.gameObject.SetActive(false);
         textRestart.gameObject.SetActive(false);
         SpawnUnitsInRegions();
+
+        // 初始化技能
+        foreach (var chess in chessList)
+        {
+            SkillManager.BattleBegin(chess);
+        }
     }
 
     private int[] GetMatch()
@@ -172,11 +182,15 @@ public class WorldManager : MonoBehaviour
         }
         else
         {
-            SpawnHerosForRegion(GameManager.Instance.GetPlayer(0),RegionHeroSide1[0], new System.Tuple<int, int>(100004, 1), 1, ref unitId);
-            SpawnHerosForRegion(GameManager.Instance.GetPlayer(1),RegionHeroSide2[0], new System.Tuple<int, int>(100112, 1), 2, ref unitId); 
-            SpawnHerosForRegion(GameManager.Instance.GetPlayer(1),RegionHeroSide2[1], new System.Tuple<int, int>(100112, 1), 2, ref unitId); 
-            SpawnHerosForRegion(GameManager.Instance.GetPlayer(1),RegionHeroSide2[2], new System.Tuple<int, int>(100112, 1), 2, ref unitId); 
+            SpawnHerosForRegion(GameManager.Instance.GetPlayer(0),RegionHeroSide1[0], new System.Tuple<int, int>(100001, 1), 1, ref unitId);
+            SpawnHerosForRegion(GameManager.Instance.GetPlayer(0),RegionHeroSide1[1], new System.Tuple<int, int>(101002, 1), 1, ref unitId); 
+            SpawnHerosForRegion(GameManager.Instance.GetPlayer(0),RegionHeroSide1[2], new System.Tuple<int, int>(101005, 1), 1, ref unitId); 
+
+            SpawnHerosForRegion(GameManager.Instance.GetPlayer(1),RegionHeroSide2[1], new System.Tuple<int, int>(102037, 1), 2, ref unitId); 
+            SpawnHerosForRegion(GameManager.Instance.GetPlayer(1),RegionHeroSide2[2], new System.Tuple<int, int>(102037, 1), 2, ref unitId); 
         }
+
+
     }
 
     private void SpawnUnitsForRegion(PlayerInfo p, GameObject[] region, GameObject prefab, int side, string chessName, ref int idCounter)
@@ -210,6 +224,7 @@ public class WorldManager : MonoBehaviour
                 {
                     Debug.LogError("Chess component not found on UnitBing prefab");
                 }
+                chessList.Add(chessComponent);
 
                 idCounter++;
             }
@@ -249,7 +264,7 @@ public class WorldManager : MonoBehaviour
             {
                 Debug.LogError("Chess component not found on UnitBing prefab");
             }
-
+            chessList.Add(chessComponent);
             idCounter++;
         }
     }
@@ -418,6 +433,9 @@ public class WorldManager : MonoBehaviour
 
     public void OnUnitDying(Chess dieUnit)
     {
+        // 从chessList中移除死亡单位
+        chessList.Remove(dieUnit);
+        
         // 检查所有阵营是否还有存活单位
         bool side1HasUnits = false;
         bool side2HasUnits = false;
@@ -428,9 +446,8 @@ public class WorldManager : MonoBehaviour
 
         int aliveSideCount = 0;
 
-        foreach (Transform child in Units.transform)
+        foreach (var chessComponent in chessList)
         {
-            Chess chessComponent = child.GetComponent<Chess>();
             if (chessComponent != null && chessComponent.hp > 0)
             {
                 switch (chessComponent.side)
@@ -502,16 +519,16 @@ public class WorldManager : MonoBehaviour
         }
     }
 
-    public List<Chess> GetUnitsInRange(Vector2Int center, int range, int mySide, bool findEnemy)
+    public List<Chess> GetUnitsInRange(Vector3 wPos, int range, int mySide, bool findEnemy)
     {
+        Vector2Int center = WorldManager.Instance.WorldToGridPosition(wPos, true);
         List<Chess> unitsInRange = new List<Chess>();
-        foreach (Transform child in Units.transform)
+        foreach (var chessComponent in chessList)
         {
-            Chess chessComponent = child.GetComponent<Chess>();
             if (chessComponent != null && chessComponent.hp > 0)
             {
                 Vector2Int chessPos = WorldToGridPosition(chessComponent.transform.position, true);
-                if (Vector2Int.Distance(center, chessPos) <= range)
+                if (Vector2Int.Distance(center, chessPos) <= range || range == 0)
                 {
                     if(findEnemy)
                     {

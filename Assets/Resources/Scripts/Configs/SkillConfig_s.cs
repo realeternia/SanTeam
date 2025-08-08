@@ -27,6 +27,18 @@ namespace CommonConfig
         /// </summary>
         public float CD;
         /// <summary>
+        ///技能强度
+        /// </summary>
+        public float Strength;
+        /// <summary>
+        ///BuffId
+        /// </summary>
+        public uint BuffId;
+        /// <summary>
+        ///BuffLast
+        /// </summary>
+        public int BuffTime;
+        /// <summary>
         ///脚本名
         /// </summary>
         public string ScriptName;
@@ -44,13 +56,16 @@ namespace CommonConfig
         public string Icon;
 
 
-        public SkillConfig(uint Id, string Name, int Lv, float Rate, float CD, string ScriptName, string HitEffect, int Price, string Icon)
+        public SkillConfig(uint Id, string Name, int Lv, float Rate, float CD, float Strength, uint BuffId, int BuffTime, string ScriptName, string HitEffect, int Price, string Icon)
         {
             this.Id = Id;
             this.Name = Name;
             this.Lv = Lv;
             this.Rate = Rate;
             this.CD = CD;
+            this.Strength = Strength;
+            this.BuffId = BuffId;
+            this.BuffTime = BuffTime;
             this.ScriptName = ScriptName;
             this.HitEffect = HitEffect;
             this.Price = Price;
@@ -78,8 +93,9 @@ namespace CommonConfig
         public static void Load()
         {
             config.Clear();
-            config[200001] = new SkillConfig(200001, "转转转", 1, 0.15f, 3f, "SpinAttack", "SwordWhirlwindWhite", 2, "spinattack");
-            config[200002] = new SkillConfig(200002, "愤怒一击", 1, 0.6f, 3f, "CriticalAttack", "SwordHitRedCritical", 2, "crtattack");
+            config[200001] = new SkillConfig(200001, "转转转", 1, 0.15f, 3f, 0, 0, 0, "SpinAttack", "SwordWhirlwindWhite", 2, "spinattack");
+            config[200002] = new SkillConfig(200002, "愤怒一击", 1, 0.3f, 3f, 0, 0, 0, "CriticalAttack", "SwordHitRedCritical", 2, "crtattack");
+            config[200003] = new SkillConfig(200003, "主公技", 1, 0, 0, 0.25f, 300001, 999, "MasterShield", "", 3, "");
 
         }
 

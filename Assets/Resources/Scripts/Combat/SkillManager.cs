@@ -17,11 +17,23 @@ public static class SkillManager
                 return new SkillSpinAttack(skillId, owner);
             case "CriticalAttack":
                 return new SkillCriticalAttack(skillId, owner);
+            case "MasterShield":
+                return new SkillMasterShield(skillId, owner);
+
 
         }
 
         throw new System.Exception("Skill not found");
     }
+
+    public static void BattleBegin(Chess chess)
+    {
+        foreach (var skill in chess.skills)
+        {
+            skill.BattleBegin();
+        }
+    }
+
 
     public static void DuringAttack(Chess attacker, Chess defender, ref int damageBase, ref float damageMulti, ref string effect)
     {       
