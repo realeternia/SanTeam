@@ -30,18 +30,8 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     public TMP_Text resultText;
     public Image playerBgImg;
 
-    private int ai_price_lower = 0;
-    private int ai_price_upper = 0;
-    private float ai_price_out_rate = 0; //价格区间外卡牌的兴趣度折扣
-    private float ai_same_card_rate = 0; //已经拥有卡牌的兴趣倍率
-    private int ai_card_limit = 8; //卡牌上限
-    private float ai_future_rate = 0.5f;
-    private float ai_find_master_rate = 1.5f; //寻找主卡的兴趣倍率
-
-    private float ai_pick_range_card_rate = 1.5f;
-    private float ai_pick_inte_card_rate = 1.6f;
-    private float ai_pick_side = 0; //0表示所有阵营
-
+    // 在 PlayerInfo 类中添加 AICardConfig 实例
+    public PlayerBook.AICardConfig aiConfig;
 
     public string soldierName;
     public Color lineColor;
@@ -61,33 +51,6 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         gold = g;
         goldText.text = g.ToString();
         resultText.text = "准备中";
-
-        var roll = UnityEngine.Random.Range(0, 4);
-        if(roll == 0) // 低费流
-        {
-            ai_price_lower = 7;
-            ai_price_upper = 9 + UnityEngine.Random.Range(0, 2);
-            ai_card_limit = 7 + UnityEngine.Random.Range(0, 3);
-            ai_future_rate = UnityEngine.Random.Range(0, 3) * 0.1f + 0.2f;            
-            ai_same_card_rate = (UnityEngine.Random.Range(0, 10) + 18) * 0.1f;
-        }
-        else if(roll == 1) // 中费流
-        {
-            ai_price_lower = 8;
-            ai_price_upper = 10 + UnityEngine.Random.Range(0, 2);
-            ai_card_limit = 8 + UnityEngine.Random.Range(0, 2);
-            ai_future_rate = UnityEngine.Random.Range(0, 4) * 0.1f + 0.3f; 
-            ai_same_card_rate = (UnityEngine.Random.Range(0, 15) + 22) * 0.1f;
-        }
-        else
-        {
-            ai_price_lower = 10;
-            ai_price_upper = 99;
-            ai_card_limit = 7 + UnityEngine.Random.Range(0, 2);
-            ai_future_rate = UnityEngine.Random.Range(0, 5) * 0.1f + 0.4f;
-            ai_same_card_rate = (UnityEngine.Random.Range(0, 13) + 27) * 0.1f;
-        }
-        ai_price_out_rate = 0.1f + UnityEngine.Random.Range(0, 3) * 0.1f;
 
         if (pid == 0)
         {
@@ -215,7 +178,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         bool hasSameCard = false;
         int weakCardId = 0;
         int weakCardPrice = 0;
-        if (cards.Count >= ai_card_limit)
+        if (cards.Count >= aiConfig.cardLimit)
         {
             var weakCard = FindWeakCard();
             weakCardId = weakCard.Item1;
@@ -268,27 +231,33 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
             var pickCardCfg = HeroConfig.GetConfig((uint)pickCard.cardId);
 
             // 根据价格区间调整分数
-            if (pickCard.priceI < ai_price_lower || pickCard.priceI > ai_price_upper)
+            if (pickCard.priceI < aiConfig.priceLower || pickCard.priceI > aiConfig.priceUpper)
             {
-                score *= ai_price_out_rate;
+                score *= aiConfig.priceOutRate;
             }
 
-            if(ai_pick_side != 0 && pickCardCfg.Side != ai_pick_side) //单阵营流
+            if(aiConfig.pickSide != 0 && pickCardCfg.Side != aiConfig.pickSide) //单阵营流
                 continue;
 
             // 如果已经拥有该卡片，增加分数
             if (cards.ContainsKey(pickCard.cardId))
             {
-                score *= ai_same_card_rate;
+                score *= aiConfig.sameCardRate;
                 score *= (1 + Math.Max(0.2f, 0.3f * (4 - cards[pickCard.cardId]))); // 优先拿低等级卡
                 if(strongList.Contains(pickCard.cardId)) //主力卡再增加权重
                     score *= 1.5f;
                 hasSameCard = true;
             }
-            else if (cards.Count >= ai_card_limit)
+            else if (cards.Count >= aiConfig.cardLimit)
             {
                 if (HeroSelectionTool.GetPrice(pickCardCfg) < weakCardPrice)
                     continue; //没必要换更弱的卡
+            }
+
+            if (aiConfig.pickSide > 0)
+            {
+                if(pickCardCfg.Id < 100010) //主公卡一定要拿
+                    score *= aiConfig.findMasterRate;
             }
 
             if(strongList.Count >= 3)
@@ -296,27 +265,27 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
                 if (rangeCount < 2)
                 {
                     if (pickCardCfg.Range > 20)
-                        score *= ai_pick_range_card_rate; // 如果射程大于20且射程卡数量少于3，分数乘以1.3
+                        score *= aiConfig.pickRangeCardRate; // 如果射程大于20且射程卡数量少于3，分数乘以1.3
                 }
                 if (inteCount < 1)
                 {
                     if (pickCardCfg.Inte >= 90)
-                        score *= ai_pick_inte_card_rate; // 如果智力大于等于90且智力卡数量少于2，分数乘以1.5
+                        score *= aiConfig.pickInteCardRate; // 如果智力大于等于90且智力卡数量少于2，分数乘以1.5
                 }
 
                 if(hasLiubei && pickCardCfg.Side == 1)
-                    score *= ai_find_master_rate;
+                    score *= aiConfig.findMasterRate;
                 else if(hasCaocao && pickCardCfg.Side == 2)
-                    score *= ai_find_master_rate;
+                    score *= aiConfig.findMasterRate;
                 else if(hasSunquan && pickCardCfg.Side == 3)
-                    score *= ai_find_master_rate;
+                    score *= aiConfig.findMasterRate;
 
-                if(side1Count > 1 && pickCardCfg.Id == 100001)
-                    score *= ai_find_master_rate;
-                else if(side2Count > 1 && pickCardCfg.Id == 100002)
-                    score *= ai_find_master_rate;
-                else if(side3Count > 1 && pickCardCfg.Id == 100003)
-                    score *= ai_find_master_rate;
+                if(side1Count >= 1 && pickCardCfg.Id == 100001)
+                    score *= aiConfig.findMasterRate;
+                else if(side2Count >= 1 && pickCardCfg.Id == 100002)
+                    score *= aiConfig.findMasterRate;
+                else if(side3Count >= 1 && pickCardCfg.Id == 100003)
+                    score *= aiConfig.findMasterRate;
             }
             
             // 加入分数列表
@@ -331,12 +300,12 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         {
             if (availableCards.Count <= 7 && era < 3 && gold < 31) //最后几张牌考虑放弃
             {
-                if (UnityEngine.Random.value < ai_future_rate + (30 - gold) * 0.03f + (7 - availableCards.Count) * 0.08f + (2 - era) * 0.15f)
+                if (UnityEngine.Random.value < aiConfig.futureRate + (30 - gold) * 0.03f + (7 - availableCards.Count) * 0.08f + (2 - era) * 0.15f)
                     return false;
             }            
             else if (era < 2 && gold < 26 || era < 3 && gold < 13)
             {
-                if (UnityEngine.Random.value < ai_future_rate)
+                if (UnityEngine.Random.value < aiConfig.futureRate)
                     return false;
             }
 
@@ -363,7 +332,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         if (selectedCard == null)
             return false;
 
-        if (cards.Count >= ai_card_limit && !cards.ContainsKey(selectedCard.cardId))
+        if (cards.Count >= aiConfig.cardLimit && !cards.ContainsKey(selectedCard.cardId))
         {
             SellCard(weakCardId); //卖掉最弱的卡
         }
@@ -486,3 +455,4 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         resultText.text = winCount.ToString() + "胜" + loseCount.ToString() + "败";
     }
 }
+
