@@ -123,22 +123,76 @@ public class Chess : MonoBehaviour
     {
         // 获取所有Chess组件
         Chess[] allChess = FindObjectsOfType<Chess>();
-        float minDistance = Mathf.Infinity;
-        targetChess = null;
+        List<(Chess chess, float distance)> validTargets = new List<(Chess, float)>();
 
-        // 遍历寻找不同side的最近单位
+        // 收集所有有效目标及其距离
         foreach (Chess chess in allChess)
         {
-            if (chess.side != this.side && (chess.side + 1) / 2 == (side + 1) / 2)
+            if (chess.side != this.side && (chess.side + 1) / 2 == (side + 1) / 2 && chess != this)
             {
                 float distance = Vector3.Distance(transform.position, chess.transform.position);
-                if (distance < minDistance)
-                {
-                    minDistance = distance;
-                    targetChess = chess;
-                }
+                validTargets.Add((chess, distance));
             }
         }
+
+        // 如果没有有效目标，直接返回
+        if (validTargets.Count == 0)
+        {
+            targetChess = null;
+            return;
+        }
+
+        // 按距离排序
+        validTargets.Sort((a, b) => a.distance.CompareTo(b.distance));
+
+        // 获取最近单位的距离
+        float nearestDistance = validTargets[0].distance;
+
+        // 筛选出距离不超过最近单位10的单位
+        List<(Chess chess, float distance)> filteredTargets = validTargets
+            .Where(t => t.distance <= nearestDistance + 10f)
+            .ToList();
+
+        // 如果筛选后不足3个，则取全部
+        int takeCount = Mathf.Min(3, filteredTargets.Count);
+        List<(Chess chess, float distance)> topTargets = filteredTargets.Take(takeCount).ToList();
+
+        // 对目标进行打分
+        List<(Chess chess, float score)> scoredTargets = new List<(Chess, float)>();
+        foreach (var (chess, distance) in topTargets)
+        {
+            float score = CalculateTargetScore(chess, distance);
+            scoredTargets.Add((chess, score));
+        }
+
+        // 按分数降序排序
+        scoredTargets.Sort((a, b) => b.score.CompareTo(a.score));
+
+        // 选择分数最高的作为目标
+        targetChess = scoredTargets[0].chess;
+    }
+
+    // 计算目标分数
+    private float CalculateTargetScore(Chess target, float distance)
+    {
+        float score = 10;
+
+        if (!target.isHero)
+            score += 30;
+
+        // 距离权重（距离越近分数越高）
+        score += 100f / (distance + 1f);  // 避免除以0
+
+        // 添加最大属性差作为积分项（权重可根据游戏平衡调整）
+        score += calculateDamage(this, target) / 2;
+
+        // 生命值权重（生命值越低分数越高）
+        if (target.hp < (int)(target.maxHp * 0.5))
+            score *= 2;
+        else
+            score -= target.level * 5f;
+
+        return score;
     }
 
     // Update is called once per frame
@@ -154,8 +208,8 @@ public class Chess : MonoBehaviour
 
     void MoveAndFight()
     {
-        // 每2秒重新寻找目标
-        if (Time.time - lastTargetUpdateTime >= 2f)
+        // 每3秒重新寻找目标
+        if (Time.time - lastTargetUpdateTime >= 3f)
         {
             FindTarget();
             lastTargetUpdateTime = Time.time;
@@ -246,7 +300,7 @@ public class Chess : MonoBehaviour
                 if (WorldManager.Instance.TryLockGridPositions(this, nextPosition))
                 {
                     transform.position = nextPosition;
-                    moveDirection = transform.position + newDirection * moveSpeed * 0.1f * 10;
+                    moveDirection = transform.position + newDirection * moveSpeed * 0.1f * 5;
                     moveFailCount = 0; // 重置失败计数器
                 }
             }
