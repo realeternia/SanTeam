@@ -111,64 +111,22 @@ public static class HeroSelectionTool
 
     public static int GetPrice(HeroConfig heroCfg)
     {
-        var baseP = heroCfg.Total / 30 + 1;
-        int bonus = 0;
-        if (heroCfg.Str > 95) bonus++;
-        if (heroCfg.Str > 90) bonus++;
-        if (heroCfg.Inte > 95) bonus++;
-        if (heroCfg.Inte > 90) bonus++;
-        if (heroCfg.LeadShip > 95) bonus++;
-        if (heroCfg.LeadShip > 90) bonus++;
+        var baseP = (float)heroCfg.Total / 30 + 1;
+        float bonus = 0;
+        if (heroCfg.Str > 95) bonus+=0.5f;
+        if (heroCfg.Str > 90) bonus+=0.5f;
+        if (heroCfg.Inte > 95) bonus+=0.5f;
+        if (heroCfg.Inte > 90) bonus+=0.5f;
+        if (heroCfg.LeadShip > 95) bonus+=0.5f;
+        if (heroCfg.LeadShip > 90) bonus+=0.5f;
+
+        bonus += (((float)heroCfg.Hp + (float)heroCfg.Range / 17 * 30) - 300) / 40;
 
         if (heroCfg.Skills != null)
             foreach (var skillId in heroCfg.Skills)
                 bonus += SkillConfig.GetConfig((uint)skillId).Price; //加上技能价格
 
-        baseP += bonus;
-        return baseP;
-    }
-
-
-    private static Dictionary<int, float> priceRateCache = new Dictionary<int, float>();
-    public static float GetTotalPriceRate(int heroId)
-    {
-        // 定义静态字典用于缓存计算结果
-        
-        if (priceRateCache.TryGetValue(heroId, out float cachedRate))
-        {
-            return cachedRate;
-        }
-        
-        var heroCfg = HeroConfig.GetConfig((uint)heroId);
-        if (heroCfg == null)
-        {
-            return 0f;
-        }
-        
-        int heroPrice = GetPrice(heroCfg);
-        int minTotal = int.MaxValue;
-        
-        // 遍历所有英雄配置，找出同价格卡牌的最低Total值
-        foreach (var config in HeroConfig.ConfigList)
-        {
-            int currentPrice = GetPrice(config);
-            if (currentPrice == heroPrice)
-            {
-                if (config.Total < minTotal)
-                {
-                    minTotal = config.Total;
-                }
-            }
-        }
-        
-        if (minTotal == 0)
-        {
-            return 0f;
-        }
-        
-        float rate = (float)heroCfg.Total / minTotal;
-        priceRateCache[heroId] = rate;
-        return rate;
+        return Mathf.RoundToInt(baseP + bonus);
     }
 
     private static int[] cardExp = new int[] { 1, 2, 4, 7, 11, 16, 22, 29, 37, 46, 56, 67, 80, 94, 110, 127, 145, 164, 184, 205, };

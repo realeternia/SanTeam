@@ -36,6 +36,12 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     private float ai_same_card_rate = 0; //已经拥有卡牌的兴趣倍率
     private int ai_card_limit = 8; //卡牌上限
     private float ai_future_rate = 0.5f;
+    private float ai_find_master_rate = 1.5f; //寻找主卡的兴趣倍率
+
+    private float ai_pick_range_card_rate = 1.5f;
+    private float ai_pick_inte_card_rate = 1.6f;
+    private float ai_pick_side = 0; //0表示所有阵营
+
 
     public string soldierName;
     public Color lineColor;
@@ -208,12 +214,12 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 
         bool hasSameCard = false;
         int weakCardId = 0;
-        int weakCardTotal = 0;
+        int weakCardPrice = 0;
         if (cards.Count >= ai_card_limit)
         {
             var weakCard = FindWeakCard();
             weakCardId = weakCard.Item1;
-            weakCardTotal = weakCard.Item2;
+            weakCardPrice = weakCard.Item2;
         }
 
         //把战力前五的卡放到一个队列里
@@ -267,6 +273,9 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
                 score *= ai_price_out_rate;
             }
 
+            if(ai_pick_side != 0 && pickCardCfg.Side != ai_pick_side) //单阵营流
+                continue;
+
             // 如果已经拥有该卡片，增加分数
             if (cards.ContainsKey(pickCard.cardId))
             {
@@ -278,7 +287,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
             }
             else if (cards.Count >= ai_card_limit)
             {
-                if (pickCardCfg.Total < weakCardTotal)
+                if (HeroSelectionTool.GetPrice(pickCardCfg) < weakCardPrice)
                     continue; //没必要换更弱的卡
             }
 
@@ -287,32 +296,29 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
                 if (rangeCount < 2)
                 {
                     if (pickCardCfg.Range > 20)
-                        score *= 1.4f; // 如果射程大于20且射程卡数量少于3，分数乘以1.3
+                        score *= ai_pick_range_card_rate; // 如果射程大于20且射程卡数量少于3，分数乘以1.3
                 }
                 if (inteCount < 1)
                 {
                     if (pickCardCfg.Inte >= 90)
-                        score *= 1.6f; // 如果智力大于等于90且智力卡数量少于2，分数乘以1.5
+                        score *= ai_pick_inte_card_rate; // 如果智力大于等于90且智力卡数量少于2，分数乘以1.5
                 }
 
                 if(hasLiubei && pickCardCfg.Side == 1)
-                    score *= 1.5f;
+                    score *= ai_find_master_rate;
                 else if(hasCaocao && pickCardCfg.Side == 2)
-                    score *= 1.5f;
+                    score *= ai_find_master_rate;
                 else if(hasSunquan && pickCardCfg.Side == 3)
-                    score *= 1.5f;
+                    score *= ai_find_master_rate;
 
                 if(side1Count > 1 && pickCardCfg.Id == 100001)
-                    score *= 1.5f;
+                    score *= ai_find_master_rate;
                 else if(side2Count > 1 && pickCardCfg.Id == 100002)
-                    score *= 1.5f;
+                    score *= ai_find_master_rate;
                 else if(side3Count > 1 && pickCardCfg.Id == 100003)
-                    score *= 1.5f;
-
-
+                    score *= ai_find_master_rate;
             }
             
-            score *= HeroSelectionTool.GetTotalPriceRate(pickCard.cardId); //性价比
             // 加入分数列表
             scoredCards.Add((pickCard, score));
         }
@@ -323,16 +329,17 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 
         if (!hasSameCard)
         {
-            if (era < 2 && gold < 26 || era < 3 && gold < 13)
+            if (availableCards.Count <= 7 && era < 3 && gold < 31) //最后几张牌考虑放弃
+            {
+                if (UnityEngine.Random.value < ai_future_rate + (30 - gold) * 0.03f + (7 - availableCards.Count) * 0.08f + (2 - era) * 0.15f)
+                    return false;
+            }            
+            else if (era < 2 && gold < 26 || era < 3 && gold < 13)
             {
                 if (UnityEngine.Random.value < ai_future_rate)
                     return false;
             }
-            else if (availableCards.Count <= 7 && era < 3 && gold < 31) //最后几张牌考虑放弃
-            {
-                if (UnityEngine.Random.value < ai_future_rate + (30 - gold) * 0.03f + (7 - availableCards.Count) * 0.08f + (2 - era) * 0.15f)
-                    return false;
-            }
+
         }
 
         // 根据分数计算总权重
@@ -371,14 +378,14 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         rangeCount = 0;
         inteCount = 0;        
         // 创建一个列表存储卡牌ID和对应的总战力
-        List<(int cardId, int totalPower)> sortDataList = new List<(int cardId, int totalPower)>();
+        List<(int cardId, int totalPrice)> sortDataList = new List<(int cardId, int totalPrice)>();
         foreach (int cardId in cards.Keys)
         {
-            var heroConfig = HeroConfig.GetConfig((uint)cardId);
-            sortDataList.Add((cardId, heroConfig.Total * (9 + cards[cardId]) / 10));
+            var price = HeroSelectionTool.GetPrice(HeroConfig.GetConfig((uint)cardId));
+            sortDataList.Add((cardId, price * cards[cardId]));
         }
         // 按总战力降序排序
-        sortDataList.Sort((a, b) => b.totalPower.CompareTo(a.totalPower));
+        sortDataList.Sort((a, b) => b.totalPrice.CompareTo(a.totalPrice));
 
         // 将最强的前五张卡的ID加入队列
         List<int> strongCardIds = new List<int>();
@@ -391,15 +398,11 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 
             // 计算射程大于20的卡牌数量
             if (heroConfig.Range > 20)
-            {
                 rangeCount++;
-            }
 
             // 计算智力大于等于90的卡牌数量
             if (heroConfig.Inte >= 90)
-            {
                 inteCount++;
-            }
         }
         return strongCardIds;
     }
@@ -409,8 +412,8 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         List<Tuple<int, int>> sortDataList = new List<Tuple<int, int>>();
         foreach (int cardId in cards.Keys)
         {
-            var heroConfig = HeroConfig.GetConfig((uint)cardId);
-            sortDataList.Add(new Tuple<int, int>(cardId, heroConfig.Total * (9 + cards[cardId]) / 10 ));
+            var price = HeroSelectionTool.GetPrice(HeroConfig.GetConfig((uint)cardId));
+            sortDataList.Add(new Tuple<int, int>(cardId, price * cards[cardId] ));
         }
         sortDataList.Sort((a, b) => b.Item2.CompareTo(a.Item2));
 
