@@ -219,6 +219,41 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         //把战力前五的卡放到一个队列里
         var strongList = GetStrongCards(out int rangeCount, out int inteCount);
 
+        // 初始化 side 卡牌数量
+        int side1Count = 0;
+        int side2Count = 0;
+        int side3Count = 0;
+        // 初始化特殊卡牌标志
+        bool hasLiubei = false;
+        bool hasCaocao = false;
+        bool hasSunquan = false;
+
+        foreach (int cardId in strongList)
+        {
+            // 检查是否为特殊卡牌
+            if (cardId == 100001) hasLiubei = true;
+            if (cardId == 100002) hasCaocao = true;
+            if (cardId == 100003) hasSunquan = true;
+
+            // 排除特殊卡牌后统计 side 数量
+            if (cardId > 100010)
+            {
+                var heroConfig = HeroConfig.GetConfig((uint)cardId);
+                switch (heroConfig.Side)
+                {
+                    case 1:
+                        side1Count++;
+                        break;
+                    case 2:
+                        side2Count++;
+                        break;
+                    case 3:
+                        side3Count++;
+                        break;
+                }
+            }
+        }
+
         // 计算每张卡片的加权分
         List<(CardViewControl card, float score)> scoredCards = new List<(CardViewControl card, float score)>();
         foreach (var pickCard in affordableCards)
@@ -259,6 +294,22 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
                     if (pickCardCfg.Inte >= 90)
                         score *= 1.6f; // 如果智力大于等于90且智力卡数量少于2，分数乘以1.5
                 }
+
+                if(hasLiubei && pickCardCfg.Side == 1)
+                    score *= 1.5f;
+                else if(hasCaocao && pickCardCfg.Side == 2)
+                    score *= 1.5f;
+                else if(hasSunquan && pickCardCfg.Side == 3)
+                    score *= 1.5f;
+
+                if(side1Count > 1 && pickCardCfg.Id == 100001)
+                    score *= 1.5f;
+                else if(side2Count > 1 && pickCardCfg.Id == 100002)
+                    score *= 1.5f;
+                else if(side3Count > 1 && pickCardCfg.Id == 100003)
+                    score *= 1.5f;
+
+
             }
             
             score *= HeroSelectionTool.GetTotalPriceRate(pickCard.cardId); //性价比

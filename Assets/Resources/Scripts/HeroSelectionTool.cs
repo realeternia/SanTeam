@@ -119,6 +119,11 @@ public static class HeroSelectionTool
         if (heroCfg.Inte > 90) bonus++;
         if (heroCfg.LeadShip > 95) bonus++;
         if (heroCfg.LeadShip > 90) bonus++;
+
+        if (heroCfg.Skills != null)
+            foreach (var skillId in heroCfg.Skills)
+                bonus += SkillConfig.GetConfig((uint)skillId).Price; //加上技能价格
+
         baseP += bonus;
         return baseP;
     }
