@@ -122,11 +122,24 @@ public class RankPanelManager : MonoBehaviour
                 }
 
                 cellInfo.heroName.text = heroConfig.Name;
+                cellInfo.heroId = (int)heroConfig.Id;
                 cellInfo.str = heroConfig.Str;
                 cellInfo.inte = heroConfig.Inte;
                 cellInfo.leadShip = heroConfig.LeadShip;
                 cellInfo.hp = heroConfig.Hp;
                 cellInfo.price = HeroSelectionTool.GetPrice(heroConfig);
+                if(heroConfig.Job == "shuai")
+                    cellInfo.loveBtn.gameObject.SetActive(false);
+
+                var bg = cell.GetComponent<Image>();
+                if(heroConfig.Side == 1)
+                    bg.color = new Color(40/255f, 70/255f, 0/255f, 255/255f);
+                else if(heroConfig.Side == 2)
+                    bg.color = new Color(0/255f, 35/255f, 100/255f, 255/255f);
+                else if(heroConfig.Side == 3)
+                    bg.color = new Color(100/255f, 0/255f, 0/255f, 255/255f);
+                else
+                    bg.color = new Color(50/255f, 50/255f, 50/255f, 255/255f);
 
                 cellInfo.heroStr.text = heroConfig.Str.ToString();
                 if(heroConfig.Str >= 95)
@@ -177,6 +190,7 @@ public class RankPanelManager : MonoBehaviour
 
     public void OnShow()
     {
+
     }
 
     public void OnHide()

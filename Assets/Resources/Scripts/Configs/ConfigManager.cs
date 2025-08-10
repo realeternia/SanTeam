@@ -27,7 +27,8 @@ public static class ConfigManager
                 AddSkill(heroCfg, 200002);
             else if (heroCfg.Job == "ma")
                 AddSkill(heroCfg, 200005);
-
+            if (Profile.Instance.cardLoves.Contains((int)heroCfg.Id))
+                heroCfg.RateAbs += 50;
         }
 
     }

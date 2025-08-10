@@ -62,17 +62,17 @@ public static class HeroSelectionTool
             }
             allHeroes.Remove(hero);
         }
-        int targetCount = Mathf.Min(36, allHeroes.Count);
+        int targetCount = Mathf.Min(40, allHeroes.Count);
+
+        // 计算总权重
+        float totalRate = 0;
+        foreach (var hero in allHeroes)
+        {
+            totalRate += hero.RateWeight;
+        }        
 
         for (int i = 0; i < targetCount; i++)
         {
-            // 计算总权重
-            float totalRate = 0;
-            foreach (var hero in allHeroes)
-            {
-                totalRate += hero.RateWeight;
-            }
-
             // 随机选择一个基于权重的位置
             float randomValue = Random.Range(0, totalRate);
             float accumulatedRate = 0;

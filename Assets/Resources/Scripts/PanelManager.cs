@@ -61,6 +61,7 @@ public class PanelManager : MonoBehaviour
 
     public void ShowRank()
     {
+        GameManager.Instance.PlaySound("Sounds/deck");
         rankPanel.SetActive(true);
         rankPanel.GetComponent<RankPanelManager>().OnShow();
 
@@ -69,6 +70,7 @@ public class PanelManager : MonoBehaviour
 
     public void HideRank()
     {
+        GameManager.Instance.PlaySound("Sounds/deck");
         rankPanel.SetActive(false);
         rankPanel.GetComponent<RankPanelManager>().OnHide();
 
