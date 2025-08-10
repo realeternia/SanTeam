@@ -12,6 +12,8 @@ public class PanelManager : MonoBehaviour
 
     public GameObject cardShopPanel;
     public GameObject cardShopTxt;
+    public GameObject rankPanel;
+
 
     public GameObject bagPanel;
 
@@ -52,8 +54,25 @@ public class PanelManager : MonoBehaviour
     {
         GameManager.Instance.PlaySound("Sounds/deck");
         bagPanel.SetActive(false);
+        bagPanel.GetComponent<BagControl>().OnHide();
 
         ChangePanelCount(-1);
+    }
+
+    public void ShowRank()
+    {
+        rankPanel.SetActive(true);
+        rankPanel.GetComponent<RankPanelManager>().OnShow();
+
+        ChangePanelCount(1);        
+    }
+
+    public void HideRank()
+    {
+        rankPanel.SetActive(false);
+        rankPanel.GetComponent<RankPanelManager>().OnHide();
+
+        ChangePanelCount(-1);        
     }
 
     private void ChangePanelCount(int change)

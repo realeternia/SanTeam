@@ -65,6 +65,12 @@ public class BagControl : MonoBehaviour
         }
     }
 
+    public void OnHide()
+    {
+        
+    }
+
+
     public void OnCellClick(BagCell cell)
     {
         foreach (var bagCell in cellCache)

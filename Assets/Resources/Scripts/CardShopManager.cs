@@ -22,6 +22,8 @@ public class CardShopManager : MonoBehaviour
 
     public Button passBtn;
     public Button bagBtn;
+    public Button rankBtn;
+
     private int era = 0;
     public TMP_Text eraText;
     public MySelectControl mySelect;
@@ -41,6 +43,11 @@ public class CardShopManager : MonoBehaviour
         {
             PanelManager.Instance.ShowBag();
         });
+        rankBtn.onClick.AddListener(() =>
+        {
+            PanelManager.Instance.ShowRank();
+        });
+
 
         ShopBegin();
         WorldManager.Instance.isDebug = false;
