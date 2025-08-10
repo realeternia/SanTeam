@@ -12,6 +12,7 @@ public class BagControl : MonoBehaviour
     // 声明一个列表用于缓存 cell 对象
     private List<GameObject> cellCache = new List<GameObject>();
     public ItemDetail detail;
+    public GameObject bagItemRegion;
 
     void Start()
     {
@@ -49,7 +50,7 @@ public class BagControl : MonoBehaviour
             var heroCfg = HeroConfig.GetConfig((uint)item.Key);
 
             // 修改原代码，将新创建的 cell 加入缓存
-            GameObject cell = Instantiate(Resources.Load<GameObject>("Prefabs/BagCellItem"), transform);
+            GameObject cell = Instantiate(Resources.Load<GameObject>("Prefabs/BagCellItem"), bagItemRegion.transform);
             cellCache.Add(cell);
             int xOff = index % 8;
             int yOff = index / 8;
