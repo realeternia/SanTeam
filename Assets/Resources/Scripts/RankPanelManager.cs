@@ -161,9 +161,9 @@ public class RankPanelManager : MonoBehaviour
 
                 var price =  cellInfo.price;
                 cellInfo.heroPrice.text = price.ToString();
-                if(price >= 12)
+                if(price >= 22)
                     cellInfo.heroPrice.text = "<color=red>" + price.ToString() + "</color>";
-                else if(price >= 10)
+                else if(price >= 19)
                     cellInfo.heroPrice.text = "<color=yellow>" + price.ToString() + "</color>";
 
                 cellInfo.heroHp.text = heroConfig.Hp.ToString();

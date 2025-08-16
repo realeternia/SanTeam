@@ -300,7 +300,7 @@ public class Chess : MonoBehaviour
                 if (WorldManager.Instance.TryLockGridPositions(this, nextPosition))
                 {
                     transform.position = nextPosition;
-                    moveDirection = transform.position + newDirection * moveSpeed * 0.05f * 5;
+                    moveDirection = transform.position + newDirection * moveSpeed * 0.05f * 10;
                     moveFailCount = 0; // 重置失败计数器
                 }
             }

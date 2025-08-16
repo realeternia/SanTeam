@@ -111,22 +111,30 @@ public static class HeroSelectionTool
 
     public static int GetPrice(HeroConfig heroCfg)
     {
-        var baseP = (float)heroCfg.Total / 30 + 1;
+        var baseP = Mathf.Pow((float)heroCfg.Total, 1.4f) / 125;
         float bonus = 0;
-        if (heroCfg.Str > 95) bonus+=0.5f;
-        if (heroCfg.Str > 90) bonus+=0.5f;
-        if (heroCfg.Inte > 95) bonus+=0.5f;
-        if (heroCfg.Inte > 90) bonus+=0.5f;
-        if (heroCfg.LeadShip > 95) bonus+=0.5f;
-        if (heroCfg.LeadShip > 90) bonus+=0.5f;
+        if (heroCfg.Str >= 90) bonus += (heroCfg.Str - 89) * 0.01f;
+        if (heroCfg.Inte >= 90) bonus += (heroCfg.Inte - 89) * 0.01f;
+        if (heroCfg.LeadShip >= 90) bonus += (heroCfg.LeadShip - 89) * 0.01f;
+        bonus += ((float)heroCfg.Hp + (float)heroCfg.Range / 17 * 30 - 330) / 330;
 
-        bonus += (((float)heroCfg.Hp + (float)heroCfg.Range / 17 * 30) - 300) / 40;
+        if (heroCfg.Total >= 220)
+        { //救一下偏科的人
+            if (heroCfg.Str < 70)
+                bonus -= (70 - heroCfg.Str) * 0.005f;
+            if (heroCfg.Inte < 70)
+                bonus -= (70 - heroCfg.Inte) * 0.005f;
+            if (heroCfg.LeadShip < 70)
+                bonus -= (70 - heroCfg.LeadShip) * 0.005f;
+        }
 
+        var skillP = 0;
         if (heroCfg.Skills != null)
             foreach (var skillId in heroCfg.Skills)
-                bonus += SkillConfig.GetConfig((uint)skillId).Price; //加上技能价格
+                skillP += SkillConfig.GetConfig((uint)skillId).Price; //加上技能价格
 
-        return Mathf.RoundToInt(baseP + bonus);
+        var finalP = baseP * (1 + bonus) + skillP;
+        return Mathf.RoundToInt(finalP);
     }
 
     private static int[] cardExp = new int[] { 1, 2, 4, 7, 11, 16, 22, 29, 37, 46, 56, 67, 80, 94, 110, 127, 145, 164, 184, 205, };

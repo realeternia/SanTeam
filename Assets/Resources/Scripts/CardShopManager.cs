@@ -276,7 +276,7 @@ public class CardShopManager : MonoBehaviour
     public void ShopBegin()
     {
         for(int i = 0; i < 6; i++)
-            GameManager.Instance.GetPlayer(i).AddGold(30);
+            GameManager.Instance.GetPlayer(i).AddGold(60);
         era = 0;
         PanelManager.Instance.ShowShop();
         NewEra();     

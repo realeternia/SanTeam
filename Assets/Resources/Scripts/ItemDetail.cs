@@ -47,6 +47,7 @@ public class ItemDetail : MonoBehaviour
         hpText.text = heroConfig.Hp.ToString();
         if (maxHp > heroConfig.Hp)
             hpText.text = heroConfig.Hp.ToString() + "<color=green>+" + (maxHp - heroConfig.Hp).ToString() + "</color>";
-        goldText.text = (HeroSelectionTool.GetPrice(heroConfig) * lv / 2).ToString();
+        goldText.text = (HeroSelectionTool.GetPrice(heroConfig) * GameManager.Instance.GetPlayer(0).cards[heroId] / 2).ToString();
+
     }
 }

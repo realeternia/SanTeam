@@ -298,12 +298,12 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 
         if (!hasSameCard)
         {
-            if (availableCards.Count <= 7 && era < 3 && gold < 31) //最后几张牌考虑放弃
+            if (availableCards.Count <= 7 && era < 3 && gold < 50) //最后几张牌考虑放弃
             {
-                if (UnityEngine.Random.value < aiConfig.futureRate + (30 - gold) * 0.03f + (7 - availableCards.Count) * 0.08f + (2 - era) * 0.15f)
+                if (UnityEngine.Random.value < aiConfig.futureRate + (49 - gold) * 0.015f + (7 - availableCards.Count) * 0.08f + (2 - era) * 0.15f)
                     return false;
             }            
-            else if (era < 2 && gold < 26 || era < 3 && gold < 13)
+            else if (era < 2 && gold < 50 || era < 3 && gold < 25)
             {
                 if (UnityEngine.Random.value < aiConfig.futureRate)
                     return false;
