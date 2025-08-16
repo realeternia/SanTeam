@@ -23,18 +23,19 @@ public class SelectCardNodeControl : MonoBehaviour
         
     }
 
-    public void UpdateExp(string name, int exp, string job)
+    public void UpdateExp(string name, int exp, string icon)
     {
         expBar.rectTransform.sizeDelta = new Vector2(194 * HeroSelectionTool.GetExpRate(exp), 70);
         cardName.text = HeroSelectionTool.GetCardLevel(exp) + name;
-        if (string.IsNullOrEmpty(job))
+        if (string.IsNullOrEmpty(icon))
         {
             jobImg.gameObject.SetActive(false);
         }
         else
         {
             jobImg.gameObject.SetActive(true);
-            jobImg.sprite = Resources.Load<Sprite>(job);
+            jobImg.sprite = Resources.Load<Sprite>("SkillPic/" + icon);
+
         }
     }
 }

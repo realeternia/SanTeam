@@ -116,9 +116,15 @@ public class RankPanelManager : MonoBehaviour
             {
                 // 设置英雄信息
                 cellInfo.heroPic.sprite = Resources.Load<Sprite>("Skins/" + heroConfig.Icon);
+
+                var skillIcon = "";
+                if(heroConfig.Skills != null && heroConfig.Skills.Length > 0)
+                {
+                    skillIcon = SkillConfig.GetConfig(heroConfig.Skills[0]).Icon;
+                }                
                 if(!string.IsNullOrEmpty(heroConfig.Job))
                 {
-                    cellInfo.heroSkill.sprite = Resources.Load<Sprite>(heroConfig.Job);
+                    cellInfo.heroSkill.sprite = Resources.Load<Sprite>("SkillPic/" + skillIcon);
                 }
 
                 cellInfo.heroName.text = heroConfig.Name;

@@ -131,8 +131,8 @@ public class CardShopManager : MonoBehaviour
                 cardView.cardId = heroId;
                 cardView.cardImage.sprite = Resources.Load<Sprite>("SkinsBig/" + heroCfg.Icon);
                 cardView.cardName.text = heroCfg.Name;
-                if(!string.IsNullOrEmpty(heroCfg.Job))
-                    cardView.jobImage.sprite = Resources.Load<Sprite>(heroCfg.Job);
+                if(!string.IsNullOrEmpty(heroCfg.Skills) && heroCfg.Skills.Length > 0)
+                    cardView.jobImage.sprite = Resources.Load<Sprite>("SkillPic/" + SkillConfig.GetConfig(heroCfg.Skills[0]).Icon);
                 else
                     cardView.jobImage.gameObject.SetActive(false);
                 cardView.lead.text = GetColoredText(heroCfg.LeadShip);

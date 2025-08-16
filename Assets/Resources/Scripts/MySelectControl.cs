@@ -30,19 +30,19 @@ public class MySelectControl : MonoBehaviour
         // 遍历 cards 列表
         for (int i = 0; i < cards.Count; i++)
         {
-            SelectCardNodeControl textComponent;
+            SelectCardNodeControl selectNode;
             if (i < existingTexts.Count)
             {
                 // 增量更新，复用已有的 TMP_Text
-                textComponent = existingTexts[i];
+                selectNode = existingTexts[i];
             }
             else
             {
                 // 如果找不到对应的 TMP_Text，则创建 nodePrefab 实例
                 GameObject textObject = Instantiate(nodePrefab, transform);
                 textObject.name = $"CardText_{i}";
-                textComponent = textObject.GetComponent<SelectCardNodeControl>();
-                if (textComponent == null)
+                selectNode = textObject.GetComponent<SelectCardNodeControl>();
+                if (selectNode == null)
                 {
                     Debug.LogError("Failed to get SelectCardNodeControl component from the instantiated prefab.");
                 }
@@ -61,7 +61,12 @@ public class MySelectControl : MonoBehaviour
 
             // 更新文本内容，这里假设 CardInfo 有一个 GetDisplayText 方法
             var cardCfg = HeroConfig.GetConfig((uint)cards[i]);
-            textComponent.UpdateExp(cardCfg.Name, playerInfo.cards[cards[i]], cardCfg.Job);
+            var skillIcon = "";
+            if(cardCfg.Skills != null && cardCfg.Skills.Length > 0)
+            {
+                skillIcon = SkillConfig.GetConfig(cardCfg.Skills[0]).Icon;
+            }
+            selectNode.UpdateExp(cardCfg.Name, playerInfo.cards[cards[i]], skillIcon);
         }
 
         // 移除多余的 TMP_Text
