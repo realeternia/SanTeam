@@ -27,6 +27,10 @@ namespace CommonConfig
         /// </summary>
         public float CD;
         /// <summary>
+        ///范围
+        /// </summary>
+        public float Range;
+        /// <summary>
         ///技能强度
         /// </summary>
         public float Strength;
@@ -51,18 +55,19 @@ namespace CommonConfig
         /// </summary>
         public int Price;
         /// <summary>
-        ///背景图
+        ///图标
         /// </summary>
         public string Icon;
 
 
-        public SkillConfig(uint Id, string Name, int Lv, float Rate, float CD, float Strength, uint BuffId, int BuffTime, string ScriptName, string HitEffect, int Price, string Icon)
+        public SkillConfig(uint Id, string Name, int Lv, float Rate, float CD, float Range, float Strength, uint BuffId, int BuffTime, string ScriptName, string HitEffect, int Price, string Icon)
         {
             this.Id = Id;
             this.Name = Name;
             this.Lv = Lv;
             this.Rate = Rate;
             this.CD = CD;
+            this.Range = Range;
             this.Strength = Strength;
             this.BuffId = BuffId;
             this.BuffTime = BuffTime;
@@ -93,11 +98,12 @@ namespace CommonConfig
         public static void Load()
         {
             config.Clear();
-            config[200001] = new SkillConfig(200001, "转转转", 1, 0.2f, 5f, 0.6f, 0, 0, "SpinAttack", "SwordWhirlwindWhite", 5, "spinattack");
-            config[200002] = new SkillConfig(200002, "车愤怒一击", 1, 0.2f, 5f, 0.5f, 0, 0, "CriticalAttack", "SwordHitRedCritical", 2, "crtattack");
-            config[200003] = new SkillConfig(200003, "主公技", 1, 0, 0, 0.2f, 300001, 999, "MasterShield", "", 4, "");
-            config[200004] = new SkillConfig(200004, "士技", 1, 0, 0, 0.3f, 0, 0, "HardSkin", "", 2, "");
-            config[200005] = new SkillConfig(200005, "马技-突破", 1, 1f, 7f, 0.3f, 0, 0, "RunCross", "LightningMissileBlue", 2, "");
+            config[200001] = new SkillConfig(200001, "转转转", 1, 0.2f, 5f, 0, 0.6f, 0, 0, "SpinAttack", "SwordWhirlwindWhite", 5, "spinattack");
+            config[200002] = new SkillConfig(200002, "车愤怒一击", 1, 0.2f, 5f, 0, 0.5f, 0, 0, "CriticalAttack", "SwordHitRedCritical", 2, "");
+            config[200003] = new SkillConfig(200003, "主公技", 1, 0, 0, 0, 0.2f, 300001, 999, "MasterShield", "", 4, "");
+            config[200004] = new SkillConfig(200004, "士技", 1, 0, 0, 0, 0.3f, 0, 0, "HardSkin", "", 2, "");
+            config[200005] = new SkillConfig(200005, "马技-突破", 1, 1f, 7f, 0, 0.3f, 0, 0, "RunCross", "LightningMissileBlue", 2, "");
+            config[201001] = new SkillConfig(201001, "治疗", 1, 1f, 3f, 0, 0.3f, 0, 0, "Heal", "MagicBuffGreen", 3, "heal");
 
         }
 

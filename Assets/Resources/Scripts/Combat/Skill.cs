@@ -47,12 +47,15 @@ public class Skill
     /// <returns>如果在CD中返回true，否则返回false</returns>
     public bool IsInCD()
     {
+        if(skillCfg.CD <= 0)
+            return false;
+
         return Time.time < lastUpdateTime + skillCfg.CD;
     }
 
     public bool CheckBurst()
     {
-        isBurst = !IsInCD() && UnityEngine.Random.value < skillCfg.Rate;
+        isBurst = !IsInCD() && (skillCfg.Rate <= 0 || UnityEngine.Random.value < skillCfg.Rate);
         UnityEngine.Debug.Log("CheckBurst isBurst=" + isBurst.ToString() + " skillId=" + id.ToString());
         if(isBurst)
             UpdateCD();
@@ -76,4 +79,10 @@ public class Skill
     public virtual void DuringAttacked(Chess attacker, ref int damageBase, ref float damageMulti, ref string effect)
     {
     }
+
+    public virtual bool CheckAidSkill()
+    {
+        return false;
+    }
+
 }

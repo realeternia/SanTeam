@@ -250,10 +250,10 @@ namespace CommonConfig
             config[104006] = new HeroConfig(104006, "公孙瓒", 1, 27, 83, 75, 82, 240, 320, 4, 12, 17, 67, 0, "ma", null, "SwordHitYellowCritical", "gongsunzan");
             config[104007] = new HeroConfig(104007, "貂蝉", 1, 21, 65, 80, 65, 210, 280, 4, 10, 17, 39, 0, "", null, "SwordHitYellowCritical", "diaochan");
             config[104008] = new HeroConfig(104008, "张任", 1, 29, 88, 75, 84, 247, 310, 4, 10, 17, 75, 0, "", null, "SwordHitYellowCritical", "zhangren");
-            config[104009] = new HeroConfig(104009, "华佗", 1, 20, 60, 77, 34, 171, 250, 4, 10, 17, 25, 0, "", null, "SwordHitYellowCritical", "huatuo");
+            config[104009] = new HeroConfig(104009, "华佗", 1, 20, 60, 77, 34, 171, 250, 4, 10, 17, 0, 30, "", new int[]{201001}, "SwordHitYellowCritical", "huatuo");
             config[104010] = new HeroConfig(104010, "臧霸", 1, 26, 78, 53, 75, 206, 250, 4, 10, 17, 36, 0, "", null, "SwordHitYellowCritical", "zangba");
             config[104011] = new HeroConfig(104011, "高顺", 1, 28, 85, 63, 86, 234, 330, 4, 10, 17, 60, 0, "ma", null, "SwordHitYellowCritical", "gaoshun");
-            config[104012] = new HeroConfig(104012, "于吉", 1, 15, 47, 73, 27, 147, 250, 4, 10, 17, 25, 0, "", null, "SwordHitYellowCritical", "yuji");
+            config[104012] = new HeroConfig(104012, "于吉", 1, 15, 47, 73, 27, 147, 250, 4, 10, 17, 0, 30, "", new int[]{201001}, "SwordHitYellowCritical", "yuji");
 
         }
 

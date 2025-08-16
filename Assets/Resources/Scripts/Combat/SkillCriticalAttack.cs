@@ -24,7 +24,7 @@ public class SkillCriticalAttack : Skill
     public override void OnAttack(Chess defender, int damage)
     {
         if(isBurst)
-            WorldManager.Instance.AddBattleText(damage.ToString() + "!", defender.transform.position, new UnityEngine.Vector2(0, 400), Color.red, 2);
+            WorldManager.Instance.AddBattleText(damage.ToString() + "!", defender.transform.position, new UnityEngine.Vector2(0, 200), Color.red, 2);
     }
 
 }

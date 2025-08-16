@@ -23,7 +23,8 @@ public static class SkillManager
                 return new SkillHardSkin(skillId, owner);
             case "RunCross":
                 return new SkillRunCross(skillId, owner);
-
+            case "Heal":
+                return new SkillHeal(skillId, owner);
         }
 
         throw new System.Exception("Skill not found");
@@ -67,8 +68,6 @@ public static class SkillManager
         }
     }
 
-
-
     public static void OnAttack(Chess attacker, Chess defender, int damage)
     {
         foreach (var skill in attacker.skills)
@@ -84,4 +83,15 @@ public static class SkillManager
             buff.OnAttacked(attacker, damage);
         }
     }
+
+    public static bool CheckAidSkill(Chess attacker)
+    {
+        foreach (var skill in attacker.skills)
+        {
+            if(skill.CheckAidSkill())
+                return true;
+        }
+        return false;
+    }
+
 }

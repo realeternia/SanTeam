@@ -40,7 +40,7 @@ public class Chess : MonoBehaviour
 
     // 攻击冷却时间
     private float attackCooldown = 2f;
-    private float lastAttackTime = 0f;
+    private float lastActionTime = 0f;
     private float lastTargetUpdateTime = 0f; // 上次更新目标的时间
 
     public HeroInfo heroInfo;
@@ -223,18 +223,27 @@ public class Chess : MonoBehaviour
             return;
         }
 
-
-        // 检查目标是否在攻击范围内
-        float distanceToTarget = Vector3.Distance(transform.position, targetChess.transform.position);
-
-        if (distanceToTarget <= attackRange)
+        // 检查是否有辅助技能
+        var ckResult = SkillManager.CheckAidSkill(this);
+        if(!ckResult)
         {
-            // 检查攻击冷却
-            if (Time.time >= lastAttackTime + attackCooldown)
+            // 检查目标是否在攻击范围内
+            float distanceToTarget = Vector3.Distance(transform.position, targetChess.transform.position);
+
+            if (distanceToTarget <= attackRange)
             {
-                Attack();
-                lastAttackTime = Time.time;
+                // 检查攻击冷却
+                if (Time.time >= lastActionTime + attackCooldown)
+                {
+                    Attack();
+                    lastActionTime = Time.time;
+                }
+                return;
             }
+        }
+        else
+        {
+            lastActionTime = Time.time;
             return;
         }
 
@@ -409,21 +418,28 @@ public class Chess : MonoBehaviour
 
         targetChess.hp -= damage;
         SkillManager.OnAttack(this, targetChess, damage);
-        if (targetChess.heroInfo != null) // 英雄
-            targetChess.heroInfo.SetHpRate((float)targetChess.hp / targetChess.maxHp);
+
         //Debug.Log($"{gameObject.name} 攻击了 {targetChess.gameObject.name}，造成 {this.attackDamage} 点伤害，目标剩余生命值：{targetChess.hp}");
         EffectManager.PlayHitEffect(this, targetChess, effect);
+        targetChess.OnHpChanged();
 
         // 检查目标是否被击败
         if (targetChess.hp <= 0)
         {
-            Debug.Log($"{targetChess.gameObject.name} 被击败了！");
-            targetChess.Ondying();
             targetChess = null;
-
 
             // 寻找新目标
             FindTarget();
+        }
+    }
+
+    public void OnHpChanged()
+    {
+        if (heroInfo != null) // 英雄
+            heroInfo.SetHpRate((float)targetChess.hp / targetChess.maxHp);
+        if (hp <= 0)
+        {
+            Ondying();
         }
     }
 
@@ -460,5 +476,12 @@ public class Chess : MonoBehaviour
         // 限制伤害在10-60之间
         return Mathf.Clamp(damage, 10, 60);
     }
+
+    public void AddHp(int addon)
+    {
+        hp = Mathf.Clamp(hp + addon, 0, maxHp);
+        OnHpChanged();
+    }
+
 
 }
