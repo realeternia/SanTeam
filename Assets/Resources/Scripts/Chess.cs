@@ -412,7 +412,7 @@ public class Chess : MonoBehaviour
         if (targetChess.heroInfo != null) // 英雄
             targetChess.heroInfo.SetHpRate((float)targetChess.hp / targetChess.maxHp);
         //Debug.Log($"{gameObject.name} 攻击了 {targetChess.gameObject.name}，造成 {this.attackDamage} 点伤害，目标剩余生命值：{targetChess.hp}");
-        EffectManager.PlayHitEffect(targetChess, this, effect);
+        EffectManager.PlayHitEffect(this, targetChess, effect);
 
         // 检查目标是否被击败
         if (targetChess.hp <= 0)
