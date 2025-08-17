@@ -162,21 +162,27 @@ public class WorldManager : MonoBehaviour
 
             var cards = GameManager.Instance.GetPlayer(match[0]).GetBattleCardList();
             for (int i = 0; i < cards.Count && i < RegionHeroSide1.Length; i++)
-                SpawnHerosForRegion(GameManager.Instance.GetPlayer(match[0]), RegionHeroSide1[i], cards[i], 1, ref unitId);
+            if(cards[i] != null)
+                    SpawnHerosForRegion(GameManager.Instance.GetPlayer(match[0]), RegionHeroSide1[i], cards[i], 1, ref unitId);
             cards = GameManager.Instance.GetPlayer(match[1]).GetBattleCardList();            
             for (int i = 0; i < cards.Count && i < RegionHeroSide2.Length; i++)
+            if(cards[i] != null)
                 SpawnHerosForRegion(GameManager.Instance.GetPlayer(match[1]),RegionHeroSide2[i], cards[i], 2, ref unitId);
             cards = GameManager.Instance.GetPlayer(match[2]).GetBattleCardList();            
             for (int i = 0; i < cards.Count && i < RegionHeroSide3.Length; i++)
+            if(cards[i] != null)
                 SpawnHerosForRegion(GameManager.Instance.GetPlayer(match[2]), RegionHeroSide3[i], cards[i], 3, ref unitId);
             cards = GameManager.Instance.GetPlayer(match[3]).GetBattleCardList();
             for (int i = 0; i < cards.Count && i < RegionHeroSide4.Length; i++)
+            if(cards[i] != null)
                 SpawnHerosForRegion(GameManager.Instance.GetPlayer(match[3]), RegionHeroSide4[i], cards[i], 4, ref unitId);
             cards = GameManager.Instance.GetPlayer(match[4]).GetBattleCardList();
             for (int i = 0; i < cards.Count && i < RegionHeroSide5.Length; i++)
+            if(cards[i] != null)
                 SpawnHerosForRegion(GameManager.Instance.GetPlayer(match[4]),RegionHeroSide5[i], cards[i], 5, ref unitId);
             cards = GameManager.Instance.GetPlayer(match[5]).GetBattleCardList();
             for (int i = 0; i < cards.Count && i < RegionHeroSide6.Length; i++)
+            if(cards[i] != null)
                 SpawnHerosForRegion(GameManager.Instance.GetPlayer(match[5]), RegionHeroSide6[i], cards[i], 6, ref unitId);
 
         }

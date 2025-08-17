@@ -406,44 +406,66 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         if (result.Count >= 5)
             result = result.Take(5).ToList(); //按战力排出前5
 
-        //result按射程排序，射程远的在后面
-        result.Sort((a, b) => HeroConfig.GetConfig(a.Item1).Range.CompareTo(HeroConfig.GetConfig(b.Item1).Range));
+        // 根据 Pos 属性重新调整卡牌位置
+        List<Tuple<int, int>> newResult = new List<Tuple<int, int>>() { null, null, null, null, null };
+        List<Tuple<int, int>> pos12 = new List<Tuple<int, int>>();
+        List<Tuple<int, int>> pos3 = new List<Tuple<int, int>>();
+        List<Tuple<int, int>> pos45 = new List<Tuple<int, int>>();
 
-        //results[0]和resuls[3]对比，results[1]和resuls[4]对比，如果射程相等，等级更高的往后放
-        if(result.Count >= 4 && HeroConfig.GetConfig(result[0].Item1).Range == HeroConfig.GetConfig(result[3].Item1).Range)
+        // 根据 Pos 分类卡牌
+        foreach (var item in result)
         {
-            if(result[0].Item2 > result[3].Item2)
-            {
-                var temp = result[0];
-                result[0] = result[3];
-                result[3] = temp;
-            }
-        }
-        if(result.Count >= 5 && HeroConfig.GetConfig(result[1].Item1).Range == HeroConfig.GetConfig(result[4].Item1).Range)
-        {
-            if(result[1].Item2 > result[4].Item2)
-            {
-                var temp = result[1];
-                result[1] = result[4];
-                result[4] = temp;
-            }
-        }
-        // 如果results[0]或results[1]的job是shuai，而且results[2]不是shuai，互换results[0]和results[2]
-        if(result.Count >= 3 && HeroConfig.GetConfig(result[0].Item1).Job == "shuai" && HeroConfig.GetConfig(result[2].Item1).Job != "shuai")
-        {
-            var temp = result[0];
-            result[0] = result[2];
-            result[2] = temp;
-        }
-        else if(result.Count >= 3 && HeroConfig.GetConfig(result[1].Item1).Job == "shuai" && HeroConfig.GetConfig(result[2].Item1).Job != "shuai")
-        {
-            var temp = result[0];
-            result[0] = result[2];
-            result[2] = temp;
+            int pos = HeroConfig.GetConfig(item.Item1).Pos;
+            if (pos == 3)
+                pos45.Add(item);
+            else if (pos == 2)
+                pos3.Add(item);
+            else
+                pos12.Add(item);
         }
 
+        // 填充 1-2 位置
+        int index = 0;
+        while (index < 2 && pos12.Count > 0)
+        {
+            newResult[index] = pos12[0];
+            pos12.RemoveAt(0);
+            index++;
+        }
+
+        // 填充 3 位置
+        index = 2;
+        if (pos3.Count > 0)
+        {
+            newResult[index] = pos3[0];
+            pos3.RemoveAt(0);
+        }
+
+        // 填充 4-5 位置
+        index = 3;
+        while (index < 5 && pos45.Count > 0)
+        {
+            newResult[index] = pos45[0];
+            pos45.RemoveAt(0);
+            index++;
+        }
+
+        // 处理剩余卡牌，放到相邻位置
+        List<Tuple<int, int>> remainingCards = new List<Tuple<int, int>>();
+        remainingCards.AddRange(pos12);
+        remainingCards.AddRange(pos3);
+        remainingCards.AddRange(pos45);
+
+        for(int i = 0; i < newResult.Count; i++)
+        {
+            if(newResult[i] == null && remainingCards.Count > 0)
+            {
+                newResult[i] = remainingCards[0];
+                remainingCards.RemoveAt(0);
+            }
+        }
         
-        return result;
+        return newResult;
     }
 
     public void onBattleResult(bool isWin)
