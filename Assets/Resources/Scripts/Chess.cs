@@ -50,6 +50,9 @@ public class Chess : MonoBehaviour
     public List<Buff> buffs = new List<Buff>();
     public bool canMove = true;
 
+    Material material;
+    private Coroutine colorEffectCoroutine; // 协程引用，用于追踪颜色效果协程
+
     // Start is called before the first frame update
     void Start()
     {
@@ -65,9 +68,9 @@ public class Chess : MonoBehaviour
     public void Init(Color c)
     {
         // 创建材质实例
-        Material newMaterial = new Material(rend.sharedMaterial);
-        newMaterial.mainTexture = Resources.Load<Texture>("Skins/" + chessName);
-        newMaterial.SetColor("_OutlineColor", c);
+        material = new Material(rend.sharedMaterial);
+        material.mainTexture = Resources.Load<Texture>("Skins/" + chessName);
+        material.SetColor("_OutlineColor", c);
 
         var hasSKill = false;
 
@@ -86,7 +89,7 @@ public class Chess : MonoBehaviour
                     var skillCfg = SkillConfig.GetConfig(skillId);
                     if(!string.IsNullOrEmpty(skillCfg.Icon))
                     {
-                        newMaterial.SetTexture("_SecondTex", Resources.Load<Texture>("SkillPic/" + skillCfg.Icon));
+                        material.SetTexture("_SecondTex", Resources.Load<Texture>("SkillPic/" + skillCfg.Icon));
                         hasSKill = true;
                     }
                 }
@@ -95,10 +98,10 @@ public class Chess : MonoBehaviour
 
         if(!hasSKill)
         {
-            newMaterial.SetFloat("_SecondTexSize", 0.1f);
+            material.SetFloat("_SecondTexSize", 0.1f);
         }
 
-        rend.material = newMaterial; // 这会为这个渲染器创建一个独立的材质实例
+        rend.material = material; // 这会为这个渲染器创建一个独立的材质实例
     }
 
     // 创建血条HUD
@@ -421,13 +424,15 @@ public class Chess : MonoBehaviour
         var damageBase = damage;
         var damageMulti = 1f;
 
-        UnityEngine.Debug.Log(heroId.ToString() + " Attack " + damageBase.ToString() + " " + damageMulti.ToString());
+        // UnityEngine.Debug.Log(heroId.ToString() + " Attack " + damageBase.ToString() + " " + damageMulti.ToString());
         SkillManager.DuringAttack(this, targetChess, ref damageBase, ref damageMulti, ref effect);
-        UnityEngine.Debug.Log(heroId.ToString() + " Attack2 " + damageBase.ToString() + " " + damageMulti.ToString());
+        // UnityEngine.Debug.Log(heroId.ToString() + " Attack2 " + damageBase.ToString() + " " + damageMulti.ToString());
 
         damage = (int)(damageBase * damageMulti);
+        damage = Mathf.Clamp(damage, 10, 60);
+        //这里不改数值，只能伤害吸收
         SkillManager.BeforeAttack(this, targetChess, ref damage);
-        UnityEngine.Debug.Log(heroId.ToString() + " Attack3 " + damage.ToString());
+        // UnityEngine.Debug.Log(heroId.ToString() + " Attack3 " + damage.ToString());
 
         targetChess.hp -= damage;
         SkillManager.OnAttack(this, targetChess, damage);
@@ -486,8 +491,7 @@ public class Chess : MonoBehaviour
         // 记录日志
         Debug.Log($"{attacker.heroId}攻击{defender.heroId}，属性差值：Inte={inteDiff}, LeadShip={leadShipDiff}, Str={strDiff}，最大差值={maxDiff}，伤害：{damage}");
 
-        // 限制伤害在10-60之间
-        return Mathf.Clamp(damage, 10, 60);
+        return damage;
     }
 
     public void AddHp(int addon)
@@ -496,5 +500,43 @@ public class Chess : MonoBehaviour
         OnHpChanged();
     }
 
+    public void AddColorEffect(Color start, Color end)
+    {
+        // 如果协程已经在运行，则直接返回
+        if (colorEffectCoroutine != null)
+            return;
+        
+        colorEffectCoroutine = StartCoroutine(ColorLerpCoroutine(start, end));
+    }
+
+    public void RemoveColorEffect()
+    {
+        // 停止颜色效果协程
+        if (colorEffectCoroutine != null)
+        {
+            StopCoroutine(colorEffectCoroutine);
+            colorEffectCoroutine = null;
+        }
+        
+        // 恢复默认颜色
+        material.SetColor("_Color", Color.white);
+    }
+
+    IEnumerator ColorLerpCoroutine(Color start, Color end)
+    {
+        float time = 0f;
+        while (true)
+        {
+            // 使用正弦函数实现颜色平滑过渡
+            float t = Mathf.Sin(time*50) * 0.5f + 0.5f;
+            var color = Color.Lerp(start, end, t);
+            UnityEngine.Debug.Log("ColorLerpCoroutine " + color);
+
+            material.SetColor("_Color", color);
+            time += Time.deltaTime;
+            yield return new WaitForSeconds(0.1f);
+
+        }
+    }
 
 }

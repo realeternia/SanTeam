@@ -33,6 +33,14 @@ public class Buff
         {
             effect = EffectManager.PlayBuffEffect(chess, buffCfg.BuffEffect);
         }
+
+        if(!string.IsNullOrEmpty(buffCfg.ColorStart))
+        {
+            Color start = ColorUtility.TryParseHtmlString(buffCfg.ColorStart, out start) ? start : Color.white;
+            Color end = ColorUtility.TryParseHtmlString(buffCfg.ColorEnd, out end) ? end : Color.white;
+            chess.AddColorEffect(start, end);
+        }
+
     }
 
     public virtual void OnRemove(Chess chess)
@@ -42,6 +50,11 @@ public class Buff
             GameObject.Destroy(effect);
             effect = null;
         }
+        if (!string.IsNullOrEmpty(buffCfg.ColorStart))
+        { 
+            chess.RemoveColorEffect();
+        }
+
         owner = null;
     }
 

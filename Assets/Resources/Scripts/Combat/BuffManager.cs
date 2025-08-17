@@ -13,6 +13,9 @@ public static class BuffManager
             case "BuffShield":
                 buff = new BuffShield(buffId, chess, time, strength);
                 break;
+            case "BuffShieldRate":
+                buff = new BuffShieldRate(buffId, chess, time, strength);                
+                break;
 
         }
 

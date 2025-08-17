@@ -19,6 +19,14 @@ namespace CommonConfig
         /// </summary>
         public string ScriptName;
         /// <summary>
+        ///启动色
+        /// </summary>
+        public string ColorStart;
+        /// <summary>
+        ///结束色
+        /// </summary>
+        public string ColorEnd;
+        /// <summary>
         ///hit
         /// </summary>
         public string BuffEffect;
@@ -28,11 +36,13 @@ namespace CommonConfig
         public string Icon;
 
 
-        public BuffConfig(int Id, string Name, string ScriptName, string BuffEffect, string Icon)
+        public BuffConfig(int Id, string Name, string ScriptName, string ColorStart, string ColorEnd, string BuffEffect, string Icon)
         {
             this.Id = Id;
             this.Name = Name;
             this.ScriptName = ScriptName;
+            this.ColorStart = ColorStart;
+            this.ColorEnd = ColorEnd;
             this.BuffEffect = BuffEffect;
             this.Icon = Icon;
 
@@ -58,7 +68,8 @@ namespace CommonConfig
         public static void Load()
         {
             config.Clear();
-            config[300001] = new BuffConfig(300001, "护盾", "BuffShield", "ShieldSoftBlue", "spinattack");
+            config[300001] = new BuffConfig(300001, "护盾", "BuffShield", "", "", "ShieldSoftBlue", "");
+            config[300002] = new BuffConfig(300002, "减伤盾", "BuffShieldRate", "#B25900", "#FFD24D", "", "");
 
         }
 

@@ -12,12 +12,16 @@ public class SkillHardSkin : Skill
 
     public override void DuringAttack(Chess defender, ref int damageBase, ref float damageMulti, ref string effect)
     {
-       damageMulti -= skillCfg.Strength;
     }
 
     public override void DuringAttacked(Chess attacker, ref int damageBase, ref float damageMulti, ref string effect)
     {
-        damageMulti -= skillCfg.Strength;
+        if(damageBase >= 10 && CheckBurst())
+        {
+            damageMulti -= skillCfg.Strength;
+            BuffManager.AddBuff(owner, owner, skillCfg.BuffId, skillCfg.BuffTime);
+
+        }
     }
 
 }
