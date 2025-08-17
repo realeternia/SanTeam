@@ -45,7 +45,7 @@ public class HeroInfoGroup : MonoBehaviour
         GameObject heroInfoRect = side == 1 ? heroInfoRectSide1 : heroInfoRectSide2;
         HeroInfo heroInfo = Instantiate(heroPrefab, heroInfoRect.transform).GetComponent<HeroInfo>();
         heroInfo.transform.localPosition = new Vector3(105, 50 - 102 * count, 0);
-        var heroCfg = HeroConfig.GetConfig((uint)heroId);
+        var heroCfg = HeroConfig.GetConfig(heroId);
 
         heroInfo.heroImage.sprite = Resources.Load<Sprite>("Skins/" + heroCfg.Icon);
 

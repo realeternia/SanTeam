@@ -139,3 +139,4 @@ MonoBehaviour:
   hp: 300
   attackDamage: 30
   heroInfo: {fileID: 0}
+  canMove: 1

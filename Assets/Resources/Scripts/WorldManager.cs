@@ -232,7 +232,7 @@ public class WorldManager : MonoBehaviour
 
     private void SpawnHerosForRegion(PlayerInfo p, GameObject spawnPoint, System.Tuple<int, int> heroData, int side, ref int idCounter)
     {
-        var heroConfig = HeroConfig.GetConfig((uint)heroData.Item1);
+        var heroConfig = HeroConfig.GetConfig(heroData.Item1);
         GameObject heroPrefab = Resources.Load<GameObject>("Prefabs/UnitHero");
         if (spawnPoint != null)
         {

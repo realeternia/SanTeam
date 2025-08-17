@@ -122,7 +122,7 @@ public class RankPanelManager : MonoBehaviour
                 {
                     skillIcon = SkillConfig.GetConfig(heroConfig.Skills[0]).Icon;
                 }                
-                if(!string.IsNullOrEmpty(heroConfig.Job))
+                if(!string.IsNullOrEmpty(skillIcon))
                 {
                     cellInfo.heroSkill.sprite = Resources.Load<Sprite>("SkillPic/" + skillIcon);
                 }

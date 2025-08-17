@@ -9,7 +9,7 @@ public static class SkillManager
     public static Skill CreateSkill(int skillId, Chess owner)
 
     {
-        var skillCfg = SkillConfig.GetConfig((uint)skillId);
+        var skillCfg = SkillConfig.GetConfig(skillId);
 
         switch (skillCfg.ScriptName)
         {
@@ -25,6 +25,8 @@ public static class SkillManager
                 return new SkillRunCross(skillId, owner);
             case "Heal":
                 return new SkillHeal(skillId, owner);
+            case "Dumb":
+                return new SkillDumb(skillId, owner);               
         }
 
         throw new System.Exception("Skill not found");

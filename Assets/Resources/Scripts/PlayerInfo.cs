@@ -105,7 +105,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 
     public void SellCard(int cardId)
     {
-        AddGold(HeroSelectionTool.GetPrice(HeroConfig.GetConfig((uint)cardId)) * cards[cardId] / 2);
+        AddGold(HeroSelectionTool.GetPrice(HeroConfig.GetConfig(cardId)) * cards[cardId] / 2);
         cards.Remove(cardId);
         GameManager.Instance.PlaySound("Sounds/gold");
     }
@@ -207,7 +207,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
             // 排除特殊卡牌后统计 side 数量
             if (cardId > 100010)
             {
-                var heroConfig = HeroConfig.GetConfig((uint)cardId);
+                var heroConfig = HeroConfig.GetConfig(cardId);
                 switch (heroConfig.Side)
                 {
                     case 1:
@@ -228,7 +228,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         foreach (var pickCard in affordableCards)
         {
             float score = 1f;
-            var pickCardCfg = HeroConfig.GetConfig((uint)pickCard.cardId);
+            var pickCardCfg = HeroConfig.GetConfig(pickCard.cardId);
 
             // 根据价格区间调整分数
             if (pickCard.priceI < aiConfig.priceLower || pickCard.priceI > aiConfig.priceUpper)
@@ -350,7 +350,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         List<(int cardId, int totalPrice)> sortDataList = new List<(int cardId, int totalPrice)>();
         foreach (int cardId in cards.Keys)
         {
-            var price = HeroSelectionTool.GetPrice(HeroConfig.GetConfig((uint)cardId));
+            var price = HeroSelectionTool.GetPrice(HeroConfig.GetConfig(cardId));
             sortDataList.Add((cardId, price * cards[cardId]));
         }
         // 按总战力降序排序
@@ -363,7 +363,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
             strongCardIds.Add(sortDataList[i].cardId);
 
             // 获取当前卡牌的配置
-            var heroConfig = HeroConfig.GetConfig((uint)sortDataList[i].cardId);
+            var heroConfig = HeroConfig.GetConfig(sortDataList[i].cardId);
 
             // 计算射程大于20的卡牌数量
             if (heroConfig.Range > 20)
@@ -381,7 +381,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         List<Tuple<int, int>> sortDataList = new List<Tuple<int, int>>();
         foreach (int cardId in cards.Keys)
         {
-            var price = HeroSelectionTool.GetPrice(HeroConfig.GetConfig((uint)cardId));
+            var price = HeroSelectionTool.GetPrice(HeroConfig.GetConfig(cardId));
             sortDataList.Add(new Tuple<int, int>(cardId, price * cards[cardId] ));
         }
         sortDataList.Sort((a, b) => b.Item2.CompareTo(a.Item2));
@@ -395,7 +395,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         List<Tuple<int, int>> sortDataList = new List<Tuple<int, int>>();
         foreach (int cardId in cards.Keys)
         {
-            var heroConfig = HeroConfig.GetConfig((uint)cardId);
+            var heroConfig = HeroConfig.GetConfig(cardId);
             sortDataList.Add(new Tuple<int, int>(cardId, heroConfig.Total * (9 + cards[cardId]) / 10 ));
         }
         sortDataList.Sort((a, b) => b.Item2.CompareTo(a.Item2));
@@ -407,10 +407,10 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
             result = result.Take(5).ToList(); //按战力排出前5
 
         //result按射程排序，射程远的在后面
-        result.Sort((a, b) => HeroConfig.GetConfig((uint)a.Item1).Range.CompareTo(HeroConfig.GetConfig((uint)b.Item1).Range));
+        result.Sort((a, b) => HeroConfig.GetConfig(a.Item1).Range.CompareTo(HeroConfig.GetConfig(b.Item1).Range));
 
         //results[0]和resuls[3]对比，results[1]和resuls[4]对比，如果射程相等，等级更高的往后放
-        if(result.Count >= 4 && HeroConfig.GetConfig((uint)result[0].Item1).Range == HeroConfig.GetConfig((uint)result[3].Item1).Range)
+        if(result.Count >= 4 && HeroConfig.GetConfig(result[0].Item1).Range == HeroConfig.GetConfig(result[3].Item1).Range)
         {
             if(result[0].Item2 > result[3].Item2)
             {
@@ -419,7 +419,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
                 result[3] = temp;
             }
         }
-        if(result.Count >= 5 && HeroConfig.GetConfig((uint)result[1].Item1).Range == HeroConfig.GetConfig((uint)result[4].Item1).Range)
+        if(result.Count >= 5 && HeroConfig.GetConfig(result[1].Item1).Range == HeroConfig.GetConfig(result[4].Item1).Range)
         {
             if(result[1].Item2 > result[4].Item2)
             {
@@ -429,13 +429,13 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
             }
         }
         // 如果results[0]或results[1]的job是shuai，而且results[2]不是shuai，互换results[0]和results[2]
-        if(result.Count >= 3 && HeroConfig.GetConfig((uint)result[0].Item1).Job == "shuai" && HeroConfig.GetConfig((uint)result[2].Item1).Job != "shuai")
+        if(result.Count >= 3 && HeroConfig.GetConfig(result[0].Item1).Job == "shuai" && HeroConfig.GetConfig(result[2].Item1).Job != "shuai")
         {
             var temp = result[0];
             result[0] = result[2];
             result[2] = temp;
         }
-        else if(result.Count >= 3 && HeroConfig.GetConfig((uint)result[1].Item1).Job == "shuai" && HeroConfig.GetConfig((uint)result[2].Item1).Job != "shuai")
+        else if(result.Count >= 3 && HeroConfig.GetConfig(result[1].Item1).Job == "shuai" && HeroConfig.GetConfig(result[2].Item1).Job != "shuai")
         {
             var temp = result[0];
             result[0] = result[2];

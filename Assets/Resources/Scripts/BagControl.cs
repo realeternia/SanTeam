@@ -47,7 +47,7 @@ public class BagControl : MonoBehaviour
         int index = 0;
         foreach (var item in p1.cards)
         {
-            var heroCfg = HeroConfig.GetConfig((uint)item.Key);
+            var heroCfg = HeroConfig.GetConfig(item.Key);
 
             // 修改原代码，将新创建的 cell 加入缓存
             GameObject cell = Instantiate(Resources.Load<GameObject>("Prefabs/BagCellItem"), bagItemRegion.transform);

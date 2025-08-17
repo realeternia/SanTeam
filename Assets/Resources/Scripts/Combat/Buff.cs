@@ -19,7 +19,7 @@ public class Buff
     {
         this.id = id;
         owner = unit;
-        buffCfg = BuffConfig.GetConfig((uint)id);
+        buffCfg = BuffConfig.GetConfig(id);
         endTime = Time.time + lastTime;
         this.strength = strength;
 

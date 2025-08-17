@@ -9,7 +9,7 @@ namespace CommonConfig
         /// <summary>
         ///序列
         /// </summary>
-        public uint Id;
+        public int Id;
         /// <summary>
         ///名字
         /// </summary>
@@ -28,7 +28,7 @@ namespace CommonConfig
         public string Icon;
 
 
-        public BuffConfig(uint Id, string Name, string ScriptName, string BuffEffect, string Icon)
+        public BuffConfig(int Id, string Name, string ScriptName, string BuffEffect, string Icon)
         {
             this.Id = Id;
             this.Name = Name;
@@ -40,8 +40,8 @@ namespace CommonConfig
 
         public BuffConfig() { }
 
-        private static Dictionary<uint, BuffConfig> config = new Dictionary<uint, BuffConfig>();
-        public static Dictionary<uint, BuffConfig>.ValueCollection ConfigList
+        private static Dictionary<int, BuffConfig> config = new Dictionary<int, BuffConfig>();
+        public static Dictionary<int, BuffConfig>.ValueCollection ConfigList
         {
             get
             {
@@ -49,7 +49,7 @@ namespace CommonConfig
             }
         }
 
-        public static void Refresh(Dictionary<uint, BuffConfig> dict)
+        public static void Refresh(Dictionary<int, BuffConfig> dict)
         {
             config.Clear();
             config = dict;
@@ -62,7 +62,7 @@ namespace CommonConfig
 
         }
 
-        public static BuffConfig GetConfig(uint id)
+        public static BuffConfig GetConfig(int id)
         {
             BuffConfig data;
             if (config.TryGetValue(id, out data))
@@ -72,7 +72,7 @@ namespace CommonConfig
             throw new NullReferenceException(string.Format("配置表BuffConfig不存在id={0}", id));
         }
 
-        public static bool HasConfig(uint id)
+        public static bool HasConfig(int id)
         {
             if (config.ContainsKey(id))
             {
@@ -81,12 +81,12 @@ namespace CommonConfig
             return false;
         }
 
-        public static void Assign(uint id, BuffConfig configData)
+        public static void Assign(int id, BuffConfig configData)
         {
             config[id] = configData; 
         }
 
-        public static void Add(uint id, BuffConfig configData)
+        public static void Add(int id, BuffConfig configData)
         {
             if (!config.ContainsKey(id))
             {
@@ -94,7 +94,7 @@ namespace CommonConfig
             }
         }
 
-        public static void Remove(uint id)
+        public static void Remove(int id)
         {
             if (config.ContainsKey(id))
             {

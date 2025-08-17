@@ -9,7 +9,7 @@ namespace CommonConfig
         /// <summary>
         ///序列
         /// </summary>
-        public uint Id;
+        public int Id;
         /// <summary>
         ///名字
         /// </summary>
@@ -80,7 +80,7 @@ namespace CommonConfig
         public string Icon;
 
 
-        public HeroConfig(uint Id, string Name, int Lv, int Atk, int LeadShip, int Inte, int Str, int Total, int Hp, int Side, int MoveSpeed, int Range, int RateWeight, int RateAbs, string Job, int[] Skills, string HitEffect, string Icon)
+        public HeroConfig(int Id, string Name, int Lv, int Atk, int LeadShip, int Inte, int Str, int Total, int Hp, int Side, int MoveSpeed, int Range, int RateWeight, int RateAbs, string Job, int[] Skills, string HitEffect, string Icon)
         {
             this.Id = Id;
             this.Name = Name;
@@ -105,8 +105,8 @@ namespace CommonConfig
 
         public HeroConfig() { }
 
-        private static Dictionary<uint, HeroConfig> config = new Dictionary<uint, HeroConfig>();
-        public static Dictionary<uint, HeroConfig>.ValueCollection ConfigList
+        private static Dictionary<int, HeroConfig> config = new Dictionary<int, HeroConfig>();
+        public static Dictionary<int, HeroConfig>.ValueCollection ConfigList
         {
             get
             {
@@ -114,7 +114,7 @@ namespace CommonConfig
             }
         }
 
-        public static void Refresh(Dictionary<uint, HeroConfig> dict)
+        public static void Refresh(Dictionary<int, HeroConfig> dict)
         {
             config.Clear();
             config = dict;
@@ -250,14 +250,14 @@ namespace CommonConfig
             config[104006] = new HeroConfig(104006, "公孙瓒", 1, 27, 83, 75, 82, 240, 320, 4, 12, 17, 67, 0, "ma", null, "SwordHitYellowCritical", "gongsunzan");
             config[104007] = new HeroConfig(104007, "貂蝉", 1, 21, 65, 80, 65, 210, 280, 4, 10, 17, 39, 0, "", null, "SwordHitYellowCritical", "diaochan");
             config[104008] = new HeroConfig(104008, "张任", 1, 29, 88, 75, 84, 247, 310, 4, 10, 17, 75, 0, "", null, "SwordHitYellowCritical", "zhangren");
-            config[104009] = new HeroConfig(104009, "华佗", 1, 20, 60, 77, 34, 171, 250, 4, 10, 17, 0, 30, "", new int[]{201001}, "SwordHitYellowCritical", "huatuo");
+            config[104009] = new HeroConfig(104009, "华佗", 1, 20, 60, 77, 34, 171, 330, 4, 10, 17, 0, 30, "", new int[]{201001}, "SwordHitYellowCritical", "huatuo");
             config[104010] = new HeroConfig(104010, "臧霸", 1, 26, 78, 53, 75, 206, 250, 4, 10, 17, 36, 0, "", null, "SwordHitYellowCritical", "zangba");
             config[104011] = new HeroConfig(104011, "高顺", 1, 28, 85, 63, 86, 234, 330, 4, 10, 17, 60, 0, "ma", null, "SwordHitYellowCritical", "gaoshun");
-            config[104012] = new HeroConfig(104012, "于吉", 1, 15, 47, 73, 27, 147, 250, 4, 10, 17, 0, 30, "", new int[]{201001}, "SwordHitYellowCritical", "yuji");
+            config[104012] = new HeroConfig(104012, "于吉", 1, 15, 47, 73, 41, 161, 310, 4, 10, 17, 0, 30, "", new int[]{201001}, "SwordHitYellowCritical", "yuji");
 
         }
 
-        public static HeroConfig GetConfig(uint id)
+        public static HeroConfig GetConfig(int id)
         {
             HeroConfig data;
             if (config.TryGetValue(id, out data))
@@ -267,7 +267,7 @@ namespace CommonConfig
             throw new NullReferenceException(string.Format("配置表HeroConfig不存在id={0}", id));
         }
 
-        public static bool HasConfig(uint id)
+        public static bool HasConfig(int id)
         {
             if (config.ContainsKey(id))
             {
@@ -276,12 +276,12 @@ namespace CommonConfig
             return false;
         }
 
-        public static void Assign(uint id, HeroConfig configData)
+        public static void Assign(int id, HeroConfig configData)
         {
             config[id] = configData; 
         }
 
-        public static void Add(uint id, HeroConfig configData)
+        public static void Add(int id, HeroConfig configData)
         {
             if (!config.ContainsKey(id))
             {
@@ -289,7 +289,7 @@ namespace CommonConfig
             }
         }
 
-        public static void Remove(uint id)
+        public static void Remove(int id)
         {
             if (config.ContainsKey(id))
             {

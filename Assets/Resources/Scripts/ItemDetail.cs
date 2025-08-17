@@ -28,7 +28,7 @@ public class ItemDetail : MonoBehaviour
     public void UpdateInfo(int id, int lv)
     {
         heroId = id;
-        var heroConfig = HeroConfig.GetConfig((uint)id);
+        var heroConfig = HeroConfig.GetConfig(id);
         var maxHp = heroConfig.Hp * (9 + lv) / 10;
         var inte = heroConfig.Inte + System.Math.Max(8 * (lv - 1), heroConfig.Inte * (lv - 1) / 10);
         var str = heroConfig.Str + System.Math.Max(8 * (lv - 1), heroConfig.Str * (lv - 1) / 10);

@@ -9,7 +9,7 @@ namespace CommonConfig
         /// <summary>
         ///序列
         /// </summary>
-        public uint Id;
+        public int Id;
         /// <summary>
         ///名字
         /// </summary>
@@ -60,7 +60,7 @@ namespace CommonConfig
         public string Icon;
 
 
-        public SkillConfig(uint Id, string Name, int Lv, float Rate, float CD, float Range, float Strength, uint BuffId, int BuffTime, string ScriptName, string HitEffect, int Price, string Icon)
+        public SkillConfig(int Id, string Name, int Lv, float Rate, float CD, float Range, float Strength, uint BuffId, int BuffTime, string ScriptName, string HitEffect, int Price, string Icon)
         {
             this.Id = Id;
             this.Name = Name;
@@ -80,8 +80,8 @@ namespace CommonConfig
 
         public SkillConfig() { }
 
-        private static Dictionary<uint, SkillConfig> config = new Dictionary<uint, SkillConfig>();
-        public static Dictionary<uint, SkillConfig>.ValueCollection ConfigList
+        private static Dictionary<int, SkillConfig> config = new Dictionary<int, SkillConfig>();
+        public static Dictionary<int, SkillConfig>.ValueCollection ConfigList
         {
             get
             {
@@ -89,7 +89,7 @@ namespace CommonConfig
             }
         }
 
-        public static void Refresh(Dictionary<uint, SkillConfig> dict)
+        public static void Refresh(Dictionary<int, SkillConfig> dict)
         {
             config.Clear();
             config = dict;
@@ -99,15 +99,17 @@ namespace CommonConfig
         {
             config.Clear();
             config[200001] = new SkillConfig(200001, "转转转", 1, 0.2f, 5f, 0, 0.6f, 0, 0, "SpinAttack", "SwordWhirlwindWhite", 5, "spinattack");
-            config[200002] = new SkillConfig(200002, "车愤怒一击", 1, 0.2f, 5f, 0, 0.5f, 0, 0, "CriticalAttack", "SwordHitRedCritical", 2, "");
-            config[200003] = new SkillConfig(200003, "主公技", 1, 0, 0, 0, 0.2f, 300001, 999, "MasterShield", "", 4, "");
-            config[200004] = new SkillConfig(200004, "士技", 1, 0, 0, 0, 0.3f, 0, 0, "HardSkin", "", 2, "");
-            config[200005] = new SkillConfig(200005, "马技-突破", 1, 1f, 7f, 0, 0.3f, 0, 0, "RunCross", "LightningMissileBlue", 2, "");
+            config[200002] = new SkillConfig(200002, "车愤怒一击", 1, 0.2f, 5f, 0, 0.5f, 0, 0, "CriticalAttack", "SwordHitRedCritical", 2, "che");
+            config[200003] = new SkillConfig(200003, "主公技", 1, 0, 0, 0, 0.2f, 300001, 999, "MasterShield", "", 4, "shuai");
+            config[200004] = new SkillConfig(200004, "士技", 1, 0, 0, 0, 0.3f, 0, 0, "HardSkin", "", 2, "shi");
+            config[200005] = new SkillConfig(200005, "马技-突破", 1, 1f, 7f, 0, 0.3f, 0, 0, "RunCross", "LightningMissileBlue", 2, "ma");
+            config[200006] = new SkillConfig(200006, "相", 1, 1f, 99f, 0, 0, 0, 0, "Dumb", "", 0, "xiang");
+            config[200007] = new SkillConfig(200007, "炮", 1, 1f, 99f, 0, 0, 0, 0, "Dumb", "", 0, "pao");
             config[201001] = new SkillConfig(201001, "治疗", 1, 1f, 3f, 0, 0.3f, 0, 0, "Heal", "MagicBuffGreen", 3, "heal");
 
         }
 
-        public static SkillConfig GetConfig(uint id)
+        public static SkillConfig GetConfig(int id)
         {
             SkillConfig data;
             if (config.TryGetValue(id, out data))
@@ -117,7 +119,7 @@ namespace CommonConfig
             throw new NullReferenceException(string.Format("配置表SkillConfig不存在id={0}", id));
         }
 
-        public static bool HasConfig(uint id)
+        public static bool HasConfig(int id)
         {
             if (config.ContainsKey(id))
             {
@@ -126,12 +128,12 @@ namespace CommonConfig
             return false;
         }
 
-        public static void Assign(uint id, SkillConfig configData)
+        public static void Assign(int id, SkillConfig configData)
         {
             config[id] = configData; 
         }
 
-        public static void Add(uint id, SkillConfig configData)
+        public static void Add(int id, SkillConfig configData)
         {
             if (!config.ContainsKey(id))
             {
@@ -139,7 +141,7 @@ namespace CommonConfig
             }
         }
 
-        public static void Remove(uint id)
+        public static void Remove(int id)
         {
             if (config.ContainsKey(id))
             {

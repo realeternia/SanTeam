@@ -131,7 +131,7 @@ public static class HeroSelectionTool
         var skillP = 0;
         if (heroCfg.Skills != null)
             foreach (var skillId in heroCfg.Skills)
-                skillP += SkillConfig.GetConfig((uint)skillId).Price; //加上技能价格
+                skillP += SkillConfig.GetConfig(skillId).Price; //加上技能价格
 
         var finalP = baseP * (1 + bonus) + skillP;
         return Mathf.RoundToInt(finalP);

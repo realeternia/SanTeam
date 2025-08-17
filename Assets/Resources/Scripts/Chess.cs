@@ -64,26 +64,39 @@ public class Chess : MonoBehaviour
 
     public void Init(Color c)
     {
+        // 创建材质实例
+        Material newMaterial = new Material(rend.sharedMaterial);
+        newMaterial.mainTexture = Resources.Load<Texture>("Skins/" + chessName);
+        newMaterial.SetColor("_OutlineColor", c);
+
+        var hasSKill = false;
+
         if (isHero)
         {
             UnityEngine.Debug.Log("Init Hero" + heroId);
 
 
-            var heroCfg = HeroConfig.GetConfig((uint)heroId);
+            var heroCfg = HeroConfig.GetConfig(heroId);
             // 初始化技能
             if (heroCfg.Skills != null)
             {
                 foreach (var skillId in heroCfg.Skills)
                 {
                     skills.Add(SkillManager.CreateSkill(skillId, this));
+                    var skillCfg = SkillConfig.GetConfig(skillId);
+                    if(!string.IsNullOrEmpty(skillCfg.Icon))
+                    {
+                        newMaterial.SetTexture("_SecondTex", Resources.Load<Texture>("SkillPic/" + skillCfg.Icon));
+                        hasSKill = true;
+                    }
                 }
             }
         }
 
-        // 创建材质实例
-        Material newMaterial = new Material(rend.sharedMaterial);
-        newMaterial.mainTexture = Resources.Load<Texture>("Skins/" + chessName);
-        newMaterial.SetColor("_OutlineColor", c);                       
+        if(!hasSKill)
+        {
+            newMaterial.SetFloat("_SecondTexSize", 0.1f);
+        }
 
         rend.material = newMaterial; // 这会为这个渲染器创建一个独立的材质实例
     }
@@ -344,7 +357,7 @@ public class Chess : MonoBehaviour
     {
         level = lv;
 
-        var heroConfig = HeroConfig.GetConfig((uint)heroId);
+        var heroConfig = HeroConfig.GetConfig(heroId);
         maxHp = heroConfig.Hp * (9 + lv) / 10;
         moveSpeed = heroConfig.MoveSpeed;
         attackRange = heroConfig.Range;
@@ -402,7 +415,7 @@ public class Chess : MonoBehaviour
         var effect = "SwordHitBlue";
         if(isHero)
         {
-            var heroConfig = HeroConfig.GetConfig((uint)heroId);
+            var heroConfig = HeroConfig.GetConfig(heroId);
             effect = heroConfig.HitEffect;
         }
         var damageBase = damage;
@@ -436,7 +449,7 @@ public class Chess : MonoBehaviour
     public void OnHpChanged()
     {
         if (heroInfo != null) // 英雄
-            heroInfo.SetHpRate((float)targetChess.hp / targetChess.maxHp);
+            heroInfo.SetHpRate((float)hp / maxHp);
         if (hp <= 0)
         {
             Ondying();

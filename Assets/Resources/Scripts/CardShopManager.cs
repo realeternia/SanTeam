@@ -127,11 +127,11 @@ public class CardShopManager : MonoBehaviour
             if (cardView != null)
             {
                 var heroId = HeroSelectionTool.GetRandomHeroId();
-                var heroCfg = HeroConfig.GetConfig((uint)heroId);
+                var heroCfg = HeroConfig.GetConfig(heroId);
                 cardView.cardId = heroId;
                 cardView.cardImage.sprite = Resources.Load<Sprite>("SkinsBig/" + heroCfg.Icon);
                 cardView.cardName.text = heroCfg.Name;
-                if(!string.IsNullOrEmpty(heroCfg.Skills) && heroCfg.Skills.Length > 0)
+                if(heroCfg.Skills != null && heroCfg.Skills.Length > 0)
                     cardView.jobImage.sprite = Resources.Load<Sprite>("SkillPic/" + SkillConfig.GetConfig(heroCfg.Skills[0]).Icon);
                 else
                     cardView.jobImage.gameObject.SetActive(false);

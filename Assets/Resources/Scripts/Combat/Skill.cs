@@ -21,7 +21,7 @@ public class Skill
         this.id = id;
         this.owner = unit;
 
-        skillCfg = SkillConfig.GetConfig((uint)id);
+        skillCfg = SkillConfig.GetConfig(id);
     }
 
     /// <summary>

@@ -11,7 +11,7 @@ public static class EffectManager
         var needMissile = false;
         if (sourceChess.isHero)
         {
-            var heroConfig = HeroConfig.GetConfig((uint)sourceChess.heroId);
+            var heroConfig = HeroConfig.GetConfig(sourceChess.heroId);
             needMissile = heroConfig.Range >= 20;
 
             if ((sourceChess.side == 1 || sourceChess.side == 2) && effectName.StartsWith("Sword"))

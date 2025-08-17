@@ -60,7 +60,7 @@ public class MySelectControl : MonoBehaviour
             }
 
             // 更新文本内容，这里假设 CardInfo 有一个 GetDisplayText 方法
-            var cardCfg = HeroConfig.GetConfig((uint)cards[i]);
+            var cardCfg = HeroConfig.GetConfig(cards[i]);
             var skillIcon = "";
             if(cardCfg.Skills != null && cardCfg.Skills.Length > 0)
             {

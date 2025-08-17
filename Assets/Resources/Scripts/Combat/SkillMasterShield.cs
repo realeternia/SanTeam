@@ -13,7 +13,7 @@ public class SkillMasterShield : Skill
 
         var unitList = WorldManager.Instance.GetUnitsInRange(owner.transform.position, 0, owner.side, false);
 
-        var mySide = HeroConfig.GetConfig((uint)owner.heroId).Side;
+        var mySide = HeroConfig.GetConfig(owner.heroId).Side;
 
         foreach (var unit in unitList)
         {
@@ -21,7 +21,7 @@ public class SkillMasterShield : Skill
                 continue;
             if(!unit.isHero)
                 continue;
-            var heroCfg = HeroConfig.GetConfig((uint)unit.heroId);
+            var heroCfg = HeroConfig.GetConfig(unit.heroId);
             if (heroCfg.Side == mySide)
             {
                 var shieldHp = (int)(owner.maxHp * skillCfg.Strength);
