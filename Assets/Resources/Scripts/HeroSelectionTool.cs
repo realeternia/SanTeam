@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using CommonConfig;
 using UnityEngine;
@@ -35,7 +36,7 @@ public static class HeroSelectionTool
 
         for (int i = 0; i < actualCount; i++)
         {
-            int randomIndex = Random.Range(0, tempIds.Count);
+            int randomIndex = UnityEngine.Random.Range(0, tempIds.Count);
             result.Add(tempIds[randomIndex]);
             tempIds.RemoveAt(randomIndex);
         }
@@ -43,7 +44,7 @@ public static class HeroSelectionTool
         return result;
     }
 
-    private static List<int> heroPoolCache = new List<int>();
+    private static List<Tuple<int, int>> heroPoolCache = new List<Tuple<int, int>>();
     private static void UpdateHeroPoolCache()
     {
         heroPoolCache.Clear();
@@ -56,10 +57,11 @@ public static class HeroSelectionTool
         {
             if(hero.RateAbs <= 0)
                 continue;
-            int randomValue = Random.Range(1, 101);
+            int randomValue = UnityEngine.Random.Range(1, 101);
             if (randomValue <= hero.RateAbs)
             {
-                heroPoolCache.Add((int)hero.Id);
+                int price = GetPrice(hero);
+                heroPoolCache.Add(new Tuple<int, int>((int)hero.Id, price));
                 sideCounts[hero.Side - 1]++;
             }
             allHeroes.Remove(hero);
@@ -69,14 +71,15 @@ public static class HeroSelectionTool
         List<HeroConfig> side4Heroes = allHeroes.FindAll(hero => hero.Side == 4);
         if (side4Heroes.Count > 0)
         {
-            int side4Count = Random.Range(5, 8);
+            int side4Count = UnityEngine.Random.Range(5, 8);
             side4Count = Mathf.Min(side4Count, side4Heroes.Count);
             
             List<HeroConfig> tempSide4Heroes = new List<HeroConfig>(side4Heroes);
             for (int i = sideCounts[3]; i < side4Count; i++)
             {
-                int randomIndex = Random.Range(0, tempSide4Heroes.Count);
-                heroPoolCache.Add((int)tempSide4Heroes[randomIndex].Id);
+                int randomIndex = UnityEngine.Random.Range(0, tempSide4Heroes.Count);
+                int price = GetPrice(tempSide4Heroes[randomIndex]);
+                heroPoolCache.Add(new Tuple<int, int>((int)tempSide4Heroes[randomIndex].Id, price));
                 allHeroes.Remove(tempSide4Heroes[randomIndex]);
                 tempSide4Heroes.RemoveAt(randomIndex);
                 sideCounts[3]++;
@@ -118,7 +121,7 @@ public static class HeroSelectionTool
 
                 if (totalRate > 0)
                 {
-                    float randomValue = Random.Range(0, totalRate);
+                    float randomValue = UnityEngine.Random.Range(0, totalRate);
                     float accumulatedRate = 0;
                     HeroConfig selectedHero = null;
 
@@ -136,7 +139,8 @@ public static class HeroSelectionTool
 
                     if (selectedHero != null)
                     {
-                        heroPoolCache.Add((int)selectedHero.Id);
+                        int price = GetPrice(selectedHero);
+                        heroPoolCache.Add(new Tuple<int, int>((int)selectedHero.Id, price));
                         allHeroes.Remove(selectedHero);
                         sideHeroes[minIndex].Remove(selectedHero);
                         sideCounts[minIndex]++;
@@ -145,8 +149,9 @@ public static class HeroSelectionTool
                 else
                 {
                     // 如果总权重为0，随机选一张
-                    int randomIndex = Random.Range(0, currentSideHeroes.Count);
-                    heroPoolCache.Add((int)currentSideHeroes[randomIndex].Id);
+                    int randomIndex = UnityEngine.Random.Range(0, currentSideHeroes.Count);
+                    int price = GetPrice(currentSideHeroes[randomIndex]);
+                    heroPoolCache.Add(new Tuple<int, int>((int)currentSideHeroes[randomIndex].Id, price));
                     allHeroes.Remove(currentSideHeroes[randomIndex]);
                     sideHeroes[minIndex].RemoveAt(randomIndex);
                     sideCounts[minIndex]++;
@@ -169,8 +174,8 @@ public static class HeroSelectionTool
 
         heroPoolCache.Sort((a, b) =>
         {
-            var configA = HeroConfig.GetConfig(a);
-            var configB = HeroConfig.GetConfig(b);
+            var configA = HeroConfig.GetConfig(a.Item1);
+            var configB = HeroConfig.GetConfig(b.Item1);
             int sideCompare = configA.Side.CompareTo(configB.Side);
             if (sideCompare != 0)
             {
@@ -178,8 +183,8 @@ public static class HeroSelectionTool
             }
 
             // 检查ID是否在100100以下
-            bool isBelow100100A = a < 100100;
-            bool isBelow100100B = b < 100100;
+            bool isBelow100100A = a.Item1 < 100100;
+            bool isBelow100100B = b.Item1 < 100100;
             if (isBelow100100A != isBelow100100B)
             {
                 return isBelow100100A ? -1 : 1;
@@ -194,28 +199,56 @@ public static class HeroSelectionTool
     public static List<int> GetHeroPoolCache()
     {
         UpdateHeroPoolCache();
-        return heroPoolCache;
+        // 返回只包含heroId的列表
+        List<int> result = new List<int>();
+        foreach (var hero in heroPoolCache)
+        {
+            result.Add(hero.Item1);
+        }
+        return result;
     }
 
     public static void SetBanList(List<int> banList)
     {
-        heroPoolCache.RemoveAll(id => banList.Contains(id));
+        heroPoolCache.RemoveAll(hero => banList.Contains(hero.Item1));
     }
-
-
 
     public static int GetRandomHeroId()
     {
         if (heroPoolCache.Count == 0)
             UpdateHeroPoolCache();
         
-        int randomIndex = Random.Range(0, heroPoolCache.Count);
-        return heroPoolCache[randomIndex];
+        // 实现价格加权随机：价格越高，被选中的概率越低
+        // 使用价格的倒数作为权重
+        float totalWeight = 0;
+        foreach (var hero in heroPoolCache)
+        {
+            // 防止价格为0的情况
+            float weight = hero.Item2 > 0 ? 1f / hero.Item2 : 1f;
+            totalWeight += weight;
+        }
+        
+        float randomValue = UnityEngine.Random.Range(0, totalWeight);
+        float accumulatedWeight = 0;
+        
+        foreach (var hero in heroPoolCache)
+        {
+            float weight = hero.Item2 > 0 ? 1f / hero.Item2 : 1f;
+            accumulatedWeight += weight;
+            
+            if (accumulatedWeight >= randomValue)
+            {
+                return hero.Item1;
+            }
+        }
+        
+        // 如果出现问题，返回第一个英雄（保底）
+        return heroPoolCache[0].Item1;
     }
 
     public static bool HasHeroInPool(int heroId)
     {
-        return heroPoolCache.Contains(heroId);
+        return heroPoolCache.Exists(hero => hero.Item1 == heroId);
     }
 
     public static int GetPrice(HeroConfig heroCfg)
