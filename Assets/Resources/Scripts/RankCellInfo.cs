@@ -40,6 +40,11 @@ public class RankCellInfo : MonoBehaviour
             UpdateLoveBtn();
         });
         UpdateLoveBtn();
+
+        if(!HeroSelectionTool.HasHeroInPool(heroId))
+        {
+            heroName.color = Color.gray;
+        }
     }
 
     private void UpdateLoveBtn()

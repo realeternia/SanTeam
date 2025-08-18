@@ -213,6 +213,10 @@ public static class HeroSelectionTool
         return heroPoolCache[randomIndex];
     }
 
+    public static bool HasHeroInPool(int heroId)
+    {
+        return heroPoolCache.Contains(heroId);
+    }
 
     public static int GetPrice(HeroConfig heroCfg)
     {

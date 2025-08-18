@@ -190,8 +190,8 @@ public class CardShopManager : MonoBehaviour
 
     public void OnP1Pass()
     {
-        // if((round % 6) != 0)  随便按
-        //     return;        
+        if((round % 6) != 0) 
+            return;        
         if(playerPassed[0])
             return;
 

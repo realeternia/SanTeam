@@ -14,6 +14,7 @@ public class PickPanelCellControl : MonoBehaviour
     public Image forbidImg;
     public Button banBtn;
     public int heroId;
+    public bool canBan = false;    
 
     public int banState; //0，不ban，非0，玩家对应的ban
 
@@ -39,6 +40,8 @@ public class PickPanelCellControl : MonoBehaviour
 
     public void SetBan(int pid)
     {
+        if(!canBan)
+            return;
         if(banState > 0)
             return;
 

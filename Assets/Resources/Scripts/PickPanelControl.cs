@@ -43,8 +43,11 @@ public class PickPanelControl : MonoBehaviour
         okBtn.onClick.AddListener(() =>
         {
             refreshBtn.gameObject.SetActive(false); // ok后，不能再refresh
+            foreach (var cell in cellControls)
+                cell.canBan = true;
+
             StartCoroutine(AllPlayerBans());
-            okBtn.gameObject.SetActive(false);          
+            okBtn.gameObject.SetActive(false);
         });
 
         finBtn.gameObject.SetActive(false);

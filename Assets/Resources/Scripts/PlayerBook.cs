@@ -18,8 +18,8 @@ public class PlayerBook
     // 提取 AI 相关配置的类
     public class AICardConfig
     {
-        public int priceLower = 19;
-        public int priceUpper = 22;
+        public int priceLower = 18;
+        public int priceUpper = 23;
         public float priceOutRate = .3f; //价格区间外卡牌的兴趣度折扣
         public float sameCardRate = 3f; //已经拥有卡牌的兴趣倍率
         public int cardLimit = 7; //卡牌上限
@@ -69,7 +69,7 @@ public class PlayerBook
         // 默认ai
         playerCfgDic[8] = new PlayerCfg() { id = 8, name = "巴爸", imgPath = "PlayerPic/baba", aiConfig = new AICardConfig() { futureRate = 0.2f, cardLimit = 9, } };
 
-        playerCfgDic[9] = new PlayerCfg() { id = 9, name = "蜘蛛", imgPath = "PlayerPic/zhizhu", aiConfig = new AICardConfig() { banStrongCard = true,  cardLimit = 11, futureRate = 0.25f, } };
+        playerCfgDic[9] = new PlayerCfg() { id = 9, name = "蜘蛛", imgPath = "PlayerPic/zhizhu", aiConfig = new AICardConfig() {  cardLimit = 11, futureRate = 0.25f, } };
 
         // 孙权流
         playerCfgDic[11] = new PlayerCfg() { id = 11, name = "小红", imgPath = "PlayerPic/xiaohong", aiConfig = new AICardConfig() { banWeakCard = true, pickSide = 3, findMasterRate = 2.5f, } };

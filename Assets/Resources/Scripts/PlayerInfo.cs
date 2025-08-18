@@ -142,7 +142,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     public void CheckBan(List<PickPanelCellControl> cellControls)
     {
         // 根据aiConfig的配置过滤可ban的英雄
-        List<PickPanelCellControl> availableCells = new List<PickPanelCellControl>();
+        List<PickPanelCellControl> availableBans = new List<PickPanelCellControl>();
 
         // 首先筛选出未被ban且不是主公的英雄
         foreach (var cell in cellControls)
@@ -156,27 +156,36 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
                 continue;
 
             var cardPrice = HeroSelectionTool.GetPrice(heroConfig);
-            if(aiConfig.priceLower > 0 && aiConfig.priceLower > cardPrice)
+            if(aiConfig.priceLower > 0 && aiConfig.priceUpper > 0)
+            {
+                if (aiConfig.priceLower <= cardPrice && aiConfig.priceUpper >= cardPrice)
+                    continue;
+            }
+            else
+            {
+                if (aiConfig.priceLower > 0 && aiConfig.priceLower <= cardPrice)
+                    continue;
+                if (aiConfig.priceUpper > 0 && aiConfig.priceUpper >= cardPrice)
+                    continue;
+            }
+
+            if(aiConfig.banStrongCard && heroConfig.Total < 240)
                 continue;
-            if(aiConfig.priceUpper > 0 && aiConfig.priceUpper < cardPrice)
+            if(aiConfig.banWeakCard && heroConfig.Total > 215)
                 continue;
-            if(aiConfig.banStrongCard && heroConfig.Total >= 240)
+            if(aiConfig.banRangeCard && heroConfig.Range < 20)
                 continue;
-            if(aiConfig.banWeakCard && heroConfig.Total <= 215)
-                continue;
-            if(aiConfig.banRangeCard && heroConfig.Range >= 20)
-                continue;
-            if(aiConfig.banCombatCard && heroConfig.Range < 20)
+            if(aiConfig.banCombatCard && heroConfig.Range > 20)
                 continue;
             
-            availableCells.Add(cell);            
+            availableBans.Add(cell);            
         }
 
         // 从目标列表中随机选择一个进行ban
-        if (availableCells.Count > 0)
+        if (availableBans.Count > 0)
         {
-            int randomIndex = UnityEngine.Random.Range(0, availableCells.Count);
-            availableCells[randomIndex].SetBan(pid);
+            int randomIndex = UnityEngine.Random.Range(0, availableBans.Count);
+            availableBans[randomIndex].SetBan(pid);
         }
         else
         {
