@@ -141,20 +141,58 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 
     public void CheckBan(List<PickPanelCellControl> cellControls)
     {
-        //从cellControls随机ban掉一张
-        while (true)
+        // 根据aiConfig的配置过滤可ban的英雄
+        List<PickPanelCellControl> availableCells = new List<PickPanelCellControl>();
+
+        // 首先筛选出未被ban且不是主公的英雄
+        foreach (var cell in cellControls)
         {
-            int randomIndex = UnityEngine.Random.Range(0, cellControls.Count);
-            if (cellControls[randomIndex].banState > 0)
-                continue;
-            var heroId = cellControls[randomIndex].heroId;
-
-            if (heroId < 100100) //主公不能ban
+            if (cell.banState > 0 || cell.heroId < 100100)
                 continue;
 
-            cellControls[randomIndex].SetBan(pid);
+            var heroConfig = HeroConfig.GetConfig(cell.heroId);
+            // 检查阵营限制
+            if (aiConfig.pickSide > 0 && aiConfig.pickSide == heroConfig.Side)
+                continue;
 
-            break;
+            var cardPrice = HeroSelectionTool.GetPrice(heroConfig);
+            if(aiConfig.priceLower > 0 && aiConfig.priceLower > cardPrice)
+                continue;
+            if(aiConfig.priceUpper > 0 && aiConfig.priceUpper < cardPrice)
+                continue;
+            if(aiConfig.banStrongCard && heroConfig.Total >= 240)
+                continue;
+            if(aiConfig.banWeakCard && heroConfig.Total <= 215)
+                continue;
+            if(aiConfig.banRangeCard && heroConfig.Range >= 20)
+                continue;
+            if(aiConfig.banCombatCard && heroConfig.Range < 20)
+                continue;
+            
+            availableCells.Add(cell);            
+        }
+
+        // 从目标列表中随机选择一个进行ban
+        if (availableCells.Count > 0)
+        {
+            int randomIndex = UnityEngine.Random.Range(0, availableCells.Count);
+            availableCells[randomIndex].SetBan(pid);
+        }
+        else
+        {
+            // 如果没有满足所有条件的卡牌，选择一张满足基本条件的卡牌
+            List<PickPanelCellControl> basicAvailableCells = new List<PickPanelCellControl>();
+            foreach (var cell in cellControls)
+            {
+                if (cell.banState == 0 && cell.heroId > 100100)
+                    basicAvailableCells.Add(cell);
+            }
+            
+            if (basicAvailableCells.Count > 0)
+            {
+                int randomIndex = UnityEngine.Random.Range(0, basicAvailableCells.Count);
+                basicAvailableCells[randomIndex].SetBan(pid);
+            }
         }
     }
 

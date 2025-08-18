@@ -30,6 +30,7 @@ public class PickPanelControl : MonoBehaviour
     {
         refreshBtn.onClick.AddListener(() =>
         {
+            GameManager.Instance.PlaySound("Sounds/page");
             RefreshBtnClick();
         });
         finBtn.onClick.AddListener(() =>

@@ -190,8 +190,8 @@ public class CardShopManager : MonoBehaviour
 
     public void OnP1Pass()
     {
-        if((round % 6) != 0)
-            return;        
+        // if((round % 6) != 0)  随便按
+        //     return;        
         if(playerPassed[0])
             return;
 
@@ -255,7 +255,7 @@ public class CardShopManager : MonoBehaviour
         }
 
         // 检查是否4个玩家都放弃或所有卡牌都已售出
-        if (passedPlayers >= 4 || allCardsSold)
+        if (passedPlayers >= 6 || allCardsSold)
         {
             // 进入下一轮并刷新卡牌
             round++;
