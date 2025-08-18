@@ -32,7 +32,6 @@ public class CardShopManager : MonoBehaviour
     void Start()
     {
         Instance = this;
-        ConfigManager.Init();
 
         passBtn.onClick.AddListener(() =>
         {
@@ -48,9 +47,7 @@ public class CardShopManager : MonoBehaviour
             PanelManager.Instance.ShowRank();
         });
 
-
         ShopBegin();
-        WorldManager.Instance.isDebug = false;
     }
 
     string GetColoredText(int value)
@@ -275,10 +272,11 @@ public class CardShopManager : MonoBehaviour
 
     public void ShopBegin()
     {
+        UnityEngine.Debug.Log("ShopBegin");
+
         for(int i = 0; i < 6; i++)
             GameManager.Instance.GetPlayer(i).AddGold(60);
         era = 0;
-        PanelManager.Instance.ShowShop();
         NewEra();     
         StartCoroutine(DelayedUpdate()); 
     }

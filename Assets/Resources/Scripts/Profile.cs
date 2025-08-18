@@ -30,6 +30,7 @@ public class Profile : MonoBehaviour
             cardLoves = data.cardLoves;
         }
         Instance = this;
+        ConfigManager.Init();         
     }
 
     void OnApplicationQuit()

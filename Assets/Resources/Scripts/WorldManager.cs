@@ -77,6 +77,7 @@ public class WorldManager : MonoBehaviour
         }
         chessList.Clear();
 
+        PanelManager.Instance.ShowShop();
         CardShopManager.Instance.ShopBegin();
     }
 

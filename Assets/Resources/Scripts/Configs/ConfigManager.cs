@@ -31,8 +31,8 @@ public static class ConfigManager
                 AddSkill(heroCfg, 200006);
             else if (heroCfg.Job == "pao")   
                 AddSkill(heroCfg, 200007);                
-            if (Profile.Instance.cardLoves.Contains((int)heroCfg.Id))
-                heroCfg.RateAbs += 50;
+            if (Profile.Instance.cardLoves != null && Profile.Instance.cardLoves.Contains((int)heroCfg.Id))
+                heroCfg.RateAbs = 65;
         }
 
     }

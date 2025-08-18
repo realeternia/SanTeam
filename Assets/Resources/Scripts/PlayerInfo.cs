@@ -35,6 +35,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 
     public string soldierName;
     public Color lineColor;
+    public int banCount = 2; //最多两张
 
     // Start is called before the first frame update
     void Start()
@@ -135,6 +136,25 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
                     targetImage.color = new Color(0.1f, 0.1f, 0.1f, 0.8f);
                 }
             }
+        }
+    }
+
+    public void CheckBan(List<PickPanelCellControl> cellControls)
+    {
+        //从cellControls随机ban掉一张
+        while (true)
+        {
+            int randomIndex = UnityEngine.Random.Range(0, cellControls.Count);
+            if (cellControls[randomIndex].banState > 0)
+                continue;
+            var heroId = cellControls[randomIndex].heroId;
+
+            if (heroId < 100100) //主公不能ban
+                continue;
+
+            cellControls[randomIndex].SetBan(pid);
+
+            break;
         }
     }
 

@@ -11,13 +11,13 @@ public class PanelManager : MonoBehaviour
     }
 
     public GameObject cardShopPanel;
-    public GameObject cardShopTxt;
     public GameObject rankPanel;
+    public GameObject pickPanel;
 
 
     public GameObject bagPanel;
 
-    private int panelCount;
+    public int panelCount;
 
     // Start is called before the first frame update
     void Start()
@@ -28,7 +28,7 @@ public class PanelManager : MonoBehaviour
     public void ShowShop()
     {
         cardShopPanel.SetActive(true);
-        cardShopTxt.SetActive(true);
+      //  cardShopTxt.SetActive(true);
 
         ChangePanelCount(1);
     }
@@ -36,7 +36,7 @@ public class PanelManager : MonoBehaviour
     public void HideShop()
     {
         cardShopPanel.SetActive(false);
-        cardShopTxt.SetActive(false);
+     //   cardShopTxt.SetActive(false);
 
         ChangePanelCount(-1);
     }
@@ -76,6 +76,23 @@ public class PanelManager : MonoBehaviour
 
         ChangePanelCount(-1);        
     }
+
+    public void ShowPick()
+    {
+      //  GameManager.Instance.PlaySound("Sounds/deck");
+        pickPanel.SetActive(true);
+
+        ChangePanelCount(1);
+    }
+
+    public void HidePick()
+    {
+     //   GameManager.Instance.PlaySound("Sounds/deck");
+        pickPanel.SetActive(false);
+
+        ChangePanelCount(-1);
+    }
+
 
     private void ChangePanelCount(int change)
     {
