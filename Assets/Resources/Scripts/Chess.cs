@@ -376,20 +376,27 @@ public class Chess : MonoBehaviour
         {
             // 确定英雄的最高属性
             string highestAttr = "";
+            var highestAttrValue = 0;
+
             var total = inte + leadShip + str;
-            if (inte >= leadShip && inte >= str && inte >= 90 )
+            if (inte >= leadShip && inte >= str)
             {
                 highestAttr = "attrinte";
+                highestAttrValue = inte;
             }
-            else if (leadShip >= inte && leadShip >= str && leadShip >= 90)
+            else if (leadShip >= inte && leadShip >= str)
             {
                 highestAttr = "attrlead";
+                highestAttrValue = leadShip;
+
             }
-            else if (str >= inte && str >= leadShip && str >= 90)
+            else if (str >= inte && str >= leadShip)
             {
                 highestAttr = "attrstr";
+                highestAttrValue = str;
+
             }     
-            else if (total >= 230)
+            else if (total >= 235)
             {
                 highestAttr = "attrshield";
             }
@@ -398,14 +405,22 @@ public class Chess : MonoBehaviour
             {       
                 // 根据最高属性加载对应图片
                 heroInfo.classImg.sprite = Resources.Load<Sprite>(highestAttr);
-                if(total >= 280)
-                {
-                    heroInfo.classImg.color = Color.red;
-                }
-                else if (total >= 250)
+                if(highestAttrValue >= 100 || total >= 255)
                 {
                     heroInfo.classImg.color = Color.yellow;
                 }
+                else if (highestAttrValue >= 115 || total >= 285)
+                {
+                    heroInfo.classImg.color = new Color(1, 0.5f, 0);
+                }
+                else if (highestAttrValue >= 135 || total >= 320)
+                {
+                    heroInfo.classImg.color = Color.red;
+                } 
+                else if (highestAttrValue >= 160 || total >= 360)
+                {
+                    heroInfo.classImg.color = new Color(0.8f, 0, 1);
+                }                               
             }
         }
     }
