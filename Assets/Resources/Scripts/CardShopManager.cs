@@ -4,6 +4,7 @@ using CommonConfig;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using System;
 
 public class CardShopManager : MonoBehaviour
 {
@@ -100,6 +101,8 @@ public class CardShopManager : MonoBehaviour
         float startX = -( (CARDS_PER_ROW * cardWidth) + (CARDS_PER_ROW - 1) * spacing ) / 2f + cardWidth / 2f;
         float startY = 145f;
 
+        var shopOpenIndex = GameManager.Instance.GetPlayer(0).GamePlayed(); //第几场比赛
+
         for (int i = 0; i < TOTAL_CARDS; i++)
         {
             // 计算行和列
@@ -128,6 +131,20 @@ public class CardShopManager : MonoBehaviour
                 cardView.cardId = heroId;
                 cardView.cardImage.sprite = Resources.Load<Sprite>("SkinsBig/" + heroCfg.Icon);
                 cardView.cardName.text = heroCfg.Name;
+                cardView.count = 1;
+
+                if(shopOpenIndex >= 2) //第3局后有多张卡
+                {
+                    if(UnityEngine.Random.Range(0, 100) < Math.Clamp((shopOpenIndex-2) * 5, 10, 60))
+                    {
+                        if(shopOpenIndex <= 7)
+                            cardView.count = 2;
+                        else
+                            cardView.count = 2 + UnityEngine.Random.Range(0, shopOpenIndex / 4);
+                        cardView.cardName.text = heroCfg.Name + "x" + cardView.count;
+                    }
+                }
+
                 if(heroCfg.Skills != null && heroCfg.Skills.Length > 0)
                     cardView.jobImage.sprite = Resources.Load<Sprite>("SkillPic/" + SkillConfig.GetConfig(heroCfg.Skills[0]).Icon);
                 else
@@ -137,7 +154,7 @@ public class CardShopManager : MonoBehaviour
                 cardView.str.text = GetColoredText(heroCfg.Str);
 
                 cardView.hp.text = heroCfg.Hp.ToString();
-                cardView.priceI = HeroSelectionTool.GetPrice(heroCfg);
+                cardView.priceI = HeroSelectionTool.GetPrice(heroCfg) * cardView.count;
                 cardView.price.text = cardView.priceI.ToString();
                 if(heroCfg.Side == 1)
                     cardView.gameObject.GetComponent<Image>().color = new Color(40/255f, 70/255f, 0/255f, 255/255f);
@@ -165,12 +182,12 @@ public class CardShopManager : MonoBehaviour
         GameManager.Instance.PlaySound("Sounds/page");
     }
 
-    public void OnPlayerBuyCard(CardViewControl ctr, int pid, int cardId, int price)
+    public void OnPlayerBuyCard(CardViewControl ctr, int pid, int cardId, int price, int count)
     {
         if((round % 6) != 0)
             return;
         var player = GameManager.Instance.GetPlayer(pid);
-        if (player.BuyCard(ctr, cardId, price))
+        if (player.BuyCard(ctr, cardId, price, count))
         {
             mySelect.UpdateCards(player);
 
@@ -274,8 +291,10 @@ public class CardShopManager : MonoBehaviour
     {
         UnityEngine.Debug.Log("ShopBegin");
 
+        var shopOpenIndex = GameManager.Instance.GetPlayer(0).GamePlayed(); //第几场比赛
+        var roundGold = shopOpenIndex * 5 + 45;
         for(int i = 0; i < 6; i++)
-            GameManager.Instance.GetPlayer(i).AddGold(60);
+            GameManager.Instance.GetPlayer(i).AddGold(roundGold);
         era = 0;
         NewEra();     
         StartCoroutine(DelayedUpdate()); 

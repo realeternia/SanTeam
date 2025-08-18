@@ -432,7 +432,19 @@ public class Chess : MonoBehaviour
         // UnityEngine.Debug.Log(heroId.ToString() + " Attack2 " + damageBase.ToString() + " " + damageMulti.ToString());
 
         damage = (int)(damageBase * damageMulti);
-        damage = Mathf.Clamp(damage, 10, 60);
+        var minDamage = 10;
+        var maxDamage = 60;
+        if(isHero && targetChess.isHero)
+        {
+            //等级压制
+            var levelDiff = level - targetChess.level;
+            if(levelDiff != 0)
+            {
+                minDamage = Math.Max(2, minDamage + levelDiff * 2);
+                maxDamage = Math.Max(10, maxDamage + levelDiff * 10);
+            }
+        }
+        damage = Mathf.Clamp(damage, minDamage, maxDamage);
         //这里不改数值，只能伤害吸收
         SkillManager.BeforeAttack(this, targetChess, ref damage);
         // UnityEngine.Debug.Log(heroId.ToString() + " Attack3 " + damage.ToString());

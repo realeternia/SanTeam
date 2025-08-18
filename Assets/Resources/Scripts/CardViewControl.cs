@@ -7,6 +7,7 @@ using TMPro;
 public class CardViewControl : MonoBehaviour
 {
     public int cardId;
+    public int count;
     public bool isSold = false;
     public int priceI;
 
@@ -26,7 +27,7 @@ public class CardViewControl : MonoBehaviour
     {
         buyButton.onClick.AddListener(() =>
         {
-            CardShopManager.Instance.OnPlayerBuyCard(this, 0, cardId, priceI);
+            CardShopManager.Instance.OnPlayerBuyCard(this, 0, cardId, priceI, count);
         });
     }
 

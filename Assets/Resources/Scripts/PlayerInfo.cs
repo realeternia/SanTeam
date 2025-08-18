@@ -82,6 +82,12 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         GameManager.Instance.PlaySound("Sounds/gold");
     }
 
+    public int GamePlayed()
+    {
+        return winCount + loseCount;
+
+    }
+
     // Update is called once per frame
     void Update()
     {
@@ -176,7 +182,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         }
     }
 
-    public bool BuyCard(CardViewControl ctr, int cardId, int price)
+    public bool BuyCard(CardViewControl ctr, int cardId, int price, int count)
     {
         if (gold < price)
         {
@@ -186,11 +192,11 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         goldText.text = gold.ToString();
         if (cards.TryGetValue(cardId, out int exp))
         {
-            cards[cardId] = exp + 1;
+            cards[cardId] = exp + count;
         }
         else
         {
-            cards[cardId] = 1;
+            cards[cardId] = count;
         }
         GameManager.Instance.PlaySound("Sounds/gold");
         ctr.OnSold(this);
@@ -288,7 +294,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
             }
             else if (cards.Count >= aiConfig.cardLimit)
             {
-                if (HeroSelectionTool.GetPrice(pickCardCfg) < weakCardPrice)
+                if (pickCard.priceI < weakCardPrice)
                     continue; //没必要换更弱的卡
             }
 
@@ -376,7 +382,8 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         }
 
         // 购买选中的卡片
-        BuyCard(selectedCard, selectedCard.cardId, selectedCard.priceI);
+        BuyCard(selectedCard, selectedCard.cardId, selectedCard.priceI, selectedCard.count);
+
         return true;
     }
 
