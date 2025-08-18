@@ -148,18 +148,18 @@ public class WorldManager : MonoBehaviour
             int[] match = GetMatch();
             // 在RegionSide1生成单位 (阵营1)
             var p = GameManager.Instance.GetPlayer(match[0]);
-            SpawnUnitsForRegion(p, RegionSide1, unitPrefab, 1, p.soldierName, ref unitId);
+            SpawnUnitsForRegion(p, RegionSide1, unitPrefab, 1, p.imgPath, ref unitId);
             // 在RegionSide2生成单位 (阵营2)
             p = GameManager.Instance.GetPlayer(match[1]);
-            SpawnUnitsForRegion(p, RegionSide2, unitPrefab, 2, p.soldierName, ref unitId);
+            SpawnUnitsForRegion(p, RegionSide2, unitPrefab, 2, p.imgPath, ref unitId);
             p = GameManager.Instance.GetPlayer(match[2]);
-            SpawnUnitsForRegion(p, RegionSide3, unitPrefab, 3, p.soldierName, ref unitId);
+            SpawnUnitsForRegion(p, RegionSide3, unitPrefab, 3, p.imgPath, ref unitId);
             p = GameManager.Instance.GetPlayer(match[3]);
-            SpawnUnitsForRegion(p, RegionSide4, unitPrefab, 4, p.soldierName, ref unitId);
+            SpawnUnitsForRegion(p, RegionSide4, unitPrefab, 4, p.imgPath, ref unitId);
             p = GameManager.Instance.GetPlayer(match[4]);
-            SpawnUnitsForRegion(p, RegionSide5, unitPrefab, 5, p.soldierName, ref unitId);
+            SpawnUnitsForRegion(p, RegionSide5, unitPrefab, 5, p.imgPath, ref unitId);
             p = GameManager.Instance.GetPlayer(match[5]);
-            SpawnUnitsForRegion(p, RegionSide6, unitPrefab, 6, p.soldierName, ref unitId);
+            SpawnUnitsForRegion(p, RegionSide6, unitPrefab, 6, p.imgPath, ref unitId);
 
             var cards = GameManager.Instance.GetPlayer(match[0]).GetBattleCardList();
             for (int i = 0; i < cards.Count && i < RegionHeroSide1.Length; i++)
@@ -199,7 +199,7 @@ public class WorldManager : MonoBehaviour
 
     }
 
-    private void SpawnUnitsForRegion(PlayerInfo p, GameObject[] region, GameObject prefab, int side, string chessName, ref int idCounter)
+    private void SpawnUnitsForRegion(PlayerInfo p, GameObject[] region, GameObject prefab, int side, string imgPath, ref int idCounter)
     {
         foreach (GameObject spawnPoint in region)
         {
@@ -217,7 +217,7 @@ public class WorldManager : MonoBehaviour
                     chessComponent.id = idCounter;
                     chessComponent.isHero = false;
                     chessComponent.side = side;
-                    chessComponent.chessName = chessName;
+                    chessComponent.chessName = imgPath;
                     chessComponent.maxHp = 100;
                     chessComponent.moveSpeed = 10;
                     chessComponent.attackRange = 12;

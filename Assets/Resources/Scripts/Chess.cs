@@ -69,7 +69,10 @@ public class Chess : MonoBehaviour
     {
         // 创建材质实例
         material = new Material(rend.sharedMaterial);
-        material.mainTexture = Resources.Load<Texture>("Skins/" + chessName);
+        if(chessName.StartsWith("PlayerPic"))
+            material.mainTexture = Resources.Load<Texture>(chessName);
+        else
+            material.mainTexture = Resources.Load<Texture>("Skins/" + chessName);
         material.SetColor("_OutlineColor", c);
 
         var hasSKill = false;
@@ -528,7 +531,7 @@ public class Chess : MonoBehaviour
         while (true)
         {
             // 使用正弦函数实现颜色平滑过渡
-            float t = Mathf.Sin(time*50) * 0.5f + 0.5f;
+            float t = Mathf.Sin(time*20) * 0.5f + 0.5f;
             var color = Color.Lerp(start, end, t);
             UnityEngine.Debug.Log("ColorLerpCoroutine " + color);
 

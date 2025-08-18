@@ -33,7 +33,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     // 在 PlayerInfo 类中添加 AICardConfig 实例
     public PlayerBook.AICardConfig aiConfig;
 
-    public string soldierName;
+    public string imgPath;
     public Color lineColor;
     public int banCount = 2; //最多两张
 
@@ -43,46 +43,17 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
   		targetImage = GetComponent<Image>();
     }
 
-    public void Init(int id, string name, string imgPath, int g)
+    public void Init(int id, string name, string img, string colorStr, int g)
     {
         pid = id;
         playerNameText.text = name;
-        playerImage.sprite = Resources.Load<Sprite>(imgPath);
+        imgPath = img;
+        playerImage.sprite = Resources.Load<Sprite>(img);
 
         gold = g;
         goldText.text = g.ToString();
         resultText.text = "准备中";
-
-        if (pid == 0)
-        {
-            soldierName = "tree";
-            lineColor = Color.green;
-        }
-        else if (pid == 1)
-        {
-            soldierName = "bottle";
-            lineColor = Color.blue;
-        }
-        else if (pid == 2)
-        {
-            soldierName = "bird";
-            lineColor = Color.red;
-        }
-        else if (pid == 3)
-        {
-            soldierName = "hill";
-            lineColor = Color.yellow;
-        }
-        else if (pid == 4)
-        {
-            soldierName = "shield";
-            lineColor = Color.magenta;
-        }
-        else if (pid == 5)
-        {
-            soldierName = "wheel";
-            lineColor = Color.cyan;
-        }
+        lineColor = ColorUtility.TryParseHtmlString(colorStr, out lineColor) ? lineColor : Color.white;
         playerBgImg.color = lineColor;
     }
 
