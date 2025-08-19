@@ -6,6 +6,15 @@ using UnityEngine;
 // 定义一个单独的工具类
 public static class HeroSelectionTool
 {
+    public class AttrInfo
+    {
+        public int Str;
+        public int Inte;
+        public int Lead;
+        public int Hp;
+
+    }
+
     // 获取指定阵营的所有英雄ID
     public static List<int> GetAllHeroIdsBySide(int side)
     {
@@ -298,5 +307,64 @@ public static class HeroSelectionTool
         if(level <= 1)
             return 0;
         return (float)(exp - cardExp[level - 1]) / (cardExp[level] - cardExp[level - 1]);
+    }
+
+    public static AttrInfo GetCardAttr(int cardId, int lv)
+    {
+        var attrInfo = new AttrInfo();
+        if (ConfigManager.IsHeroCard(cardId))
+        {
+            var heroConfig = HeroConfig.GetConfig(cardId);
+
+            attrInfo.Hp = heroConfig.Hp * (9 + lv) / 10;
+            attrInfo.Inte = heroConfig.Inte + System.Math.Max(8 * (lv - 1), heroConfig.Inte * (lv - 1) / 10);
+            attrInfo.Str = heroConfig.Str + System.Math.Max(8 * (lv - 1), heroConfig.Str * (lv - 1) / 10);
+            attrInfo.Lead = heroConfig.LeadShip + System.Math.Max(8 * (lv - 1), heroConfig.LeadShip * (lv - 1) / 10);
+        }
+        else
+        {
+            var itemConfig = ItemConfig.GetConfig(cardId);
+            if (itemConfig.Attr1 == "str")
+            {
+                attrInfo.Str = itemConfig.Attr1Val;
+            }
+            else if (itemConfig.Attr1 == "inte")
+            {
+                attrInfo.Inte = itemConfig.Attr1Val;
+            }
+            else if (itemConfig.Attr1 == "lead")
+            {
+                attrInfo.Lead = itemConfig.Attr1Val;
+            }
+            else if (itemConfig.Attr1 == "shield")
+            {
+                attrInfo.Hp = itemConfig.Attr1Val;
+            }
+
+            if (itemConfig.Attr2 == "str")
+            {
+                attrInfo.Str = itemConfig.Attr2Val;
+            }
+            else if (itemConfig.Attr2 == "inte")
+            {
+                attrInfo.Inte = itemConfig.Attr2Val;
+            }
+            else if (itemConfig.Attr2 == "lead")
+            {
+                attrInfo.Lead = itemConfig.Attr2Val;
+            }
+            else if (itemConfig.Attr2 == "shield")
+            {
+                attrInfo.Hp = itemConfig.Attr2Val;
+            }
+
+            attrInfo.Hp = attrInfo.Hp * lv;
+            attrInfo.Inte = attrInfo.Inte * lv;
+            attrInfo.Str = attrInfo.Str * lv;
+            attrInfo.Lead = attrInfo.Lead * lv;
+        }
+
+        return attrInfo;
+
     }
 }

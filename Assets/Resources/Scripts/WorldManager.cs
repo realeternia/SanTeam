@@ -262,7 +262,8 @@ public class WorldManager : MonoBehaviour
                     var heroInfo = heroInfoGroup.AddHero(side, (int)heroConfig.Id, heroData.Item2);
                     chessComponent.heroInfo = heroInfo;
                 }
-                chessComponent.UpdateLevel(heroData.Item2);
+                chessComponent.UpdateLevel(p, heroData.Item2);
+
                 chessComponent.Init(p.lineColor);
                 // 可以在这里设置其他必要的初始化参数
             }

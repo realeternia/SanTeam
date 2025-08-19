@@ -88,7 +88,7 @@ namespace CommonConfig
         public static void Load()
         {
             config.Clear();
-            config[400001] = new ItemConfig(400001, "关王刀", 1, "str", 5, "", 0, null, "SwordHitYellowCritical", 20, "guanwangdao");
+            config[400001] = new ItemConfig(400001, "关王刀", 1, "str", 30, "", 0, null, "SwordHitYellowCritical", 20, "guanwangdao");
 
         }
 

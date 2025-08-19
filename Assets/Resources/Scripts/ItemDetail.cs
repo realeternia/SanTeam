@@ -39,12 +39,12 @@ public class ItemDetail : MonoBehaviour
         var strBase = 0;
         var leadShipBase = 0;
 
-        var maxHpFinal = 0;
-        var inteFinal = 0;
-        var strFinal = 0;
-        var leadShipFinal = 0;
+        HeroSelectionTool.AttrInfo attrFinal = new HeroSelectionTool.AttrInfo();
+        HeroSelectionTool.AttrInfo attrEquip = new HeroSelectionTool.AttrInfo();
 
         equipText.text = "";        
+
+        var player = GameManager.Instance.GetPlayer(0);
 
         if (ConfigManager.IsHeroCard(id))
         {
@@ -60,9 +60,14 @@ public class ItemDetail : MonoBehaviour
 
             if (player.itemEquips.ContainsKey(cardId))
             {
-                var equipName = ItemConfig.GetConfig(player.itemEquips[cardId]).Name;
+                var equipCardId = player.itemEquips[cardId];
+
+                var equipName = ItemConfig.GetConfig(equipCardId).Name;
                 equipText.text = equipName;
-            }            
+                var cardLevel = HeroSelectionTool.GetCardLevel(player.cards[equipCardId]);  
+                attrEquip = HeroSelectionTool.GetCardAttr(equipCardId, cardLevel);
+            } 
+            
         }
         else
         {
@@ -70,38 +75,11 @@ public class ItemDetail : MonoBehaviour
             nameText.text = itemConfig.Name;
             goldText.text = (itemConfig.Price / 2).ToString();
 
-            if (itemConfig.Attr1 == "str")
-            {
-                strBase = itemConfig.Attr1Val;
-            }
-            else if (itemConfig.Attr1 == "inte")
-            {
-                inteBase = itemConfig.Attr1Val;
-            }
-            else if (itemConfig.Attr1 == "lead")
-            {
-                leadShipBase = itemConfig.Attr1Val;
-            }
-            else if (itemConfig.Attr1 == "shield")
-            {
-                maxHpBase = itemConfig.Attr1Val;
-            }
-            if (itemConfig.Attr2 == "str")
-            {
-                strBase = itemConfig.Attr2Val;
-            }
-            else if (itemConfig.Attr2 == "inte")
-            {
-                inteBase = itemConfig.Attr2Val;
-            }
-            else if (itemConfig.Attr2 == "lead")
-            {
-                leadShipBase = itemConfig.Attr2Val;
-            }
-            else if (itemConfig.Attr2 == "hp")
-            {
-                maxHpBase = itemConfig.Attr2Val;
-            }
+            var attrBase = HeroSelectionTool.GetCardAttr(cardId, 1);
+            maxHpBase = attrBase.Hp;
+            inteBase = attrBase.Inte;
+            strBase = attrBase.Str;
+            leadShipBase = attrBase.Lead;
 
             foreach (var item in player.itemEquips)
             {
@@ -114,27 +92,34 @@ public class ItemDetail : MonoBehaviour
             }            
         }
 
-        maxHpFinal = maxHpBase * (9 + lv) / 10;
-        inteFinal = inteBase + System.Math.Max(8 * (lv - 1), inteBase * (lv - 1) / 10);
-        strFinal = strBase + System.Math.Max(8 * (lv - 1), strBase * (lv - 1) / 10);
-        leadShipFinal = leadShipBase + System.Math.Max(8 * (lv - 1), leadShipBase * (lv - 1) / 10);
+        attrFinal = HeroSelectionTool.GetCardAttr(cardId, lv);
 
         leadText.text = leadShipBase.ToString();
-        if (leadShipFinal > leadShipBase)
-            leadText.text += "<color=green>+" + (leadShipFinal - leadShipBase).ToString() + "</color>";
+        if (attrFinal.Lead > leadShipBase)
+
+            leadText.text += "<color=green>+" + (attrFinal.Lead - leadShipBase).ToString() + "</color>";
+            if (attrEquip.Lead > 0)
+            leadText.text += "<color=#FFB6C1>+" + attrEquip.Lead.ToString() + "</color>";
+
         inteText.text = inteBase.ToString();
-        if (inteFinal > inteBase)
-            inteText.text += "<color=green>+" + (inteFinal - inteBase).ToString() + "</color>";
+        if (attrFinal.Inte > inteBase)
+            inteText.text += "<color=green>+" + (attrFinal.Inte - inteBase).ToString() + "</color>";
+        if (attrEquip.Inte > 0)
+            inteText.text += "<color=#FFB6C1>+" + attrEquip.Inte.ToString() + "</color>";            
         strText.text = strBase.ToString();
-        if (strFinal > strBase)
-            strText.text += "<color=green>+" + (strFinal - strBase).ToString() + "</color>";
+        if (attrFinal.Str > strBase)
+            strText.text += "<color=green>+" + (attrFinal.Str - strBase).ToString() + "</color>";
+        if (attrEquip.Str > 0)
+            strText.text += "<color=#FFB6C1>+" + attrEquip.Str.ToString() + "</color>";            
         hpText.text = maxHpBase.ToString();
-        if (maxHpFinal > maxHpBase)
-            hpText.text += "<color=green>+" + (maxHpFinal - maxHpBase).ToString() + "</color>";
+        if (attrFinal.Hp > maxHpBase)
+            hpText.text += "<color=green>+" + (attrFinal.Hp - maxHpBase).ToString() + "</color>";
+        if (attrEquip.Hp > 0)
+            hpText.text += "<color=#FFB6C1>+" + attrEquip.Hp.ToString() + "</color>";
 
     }
 
-    private void UpdateSelf()
+    public void UpdateSelf()
     {
         UpdateInfo(cardId, level);
     }

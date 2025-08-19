@@ -13,7 +13,6 @@ public static class ConfigManager
         ItemConfig.Load();
 
         PostModify();
-
     }
 
     public static void PostModify()

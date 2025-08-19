@@ -359,18 +359,33 @@ public class Chess : MonoBehaviour
         }
     }
 
-    public void UpdateLevel(int lv)
+    public void UpdateLevel(PlayerInfo player, int lv)
     {
         level = lv;
 
         var heroConfig = HeroConfig.GetConfig(heroId);
-        maxHp = heroConfig.Hp * (9 + lv) / 10;
+        var attr = HeroSelectionTool.GetCardAttr(heroId, lv);
+
+        maxHp = attr.Hp;
         moveSpeed = heroConfig.MoveSpeed;
         attackRange = heroConfig.Range;
         attackDamage = heroConfig.Atk * (9 + lv) / 10;
-        inte = heroConfig.Inte + Math.Max(8 * (lv - 1), heroConfig.Inte * (lv - 1) / 10);
-        str = heroConfig.Str + Math.Max(8 * (lv - 1), heroConfig.Str * (lv - 1) / 10);
-        leadShip = heroConfig.LeadShip + Math.Max(8 * (lv - 1), heroConfig.LeadShip * (lv - 1) / 10);
+        inte = attr.Inte;
+        str = attr.Str;
+        leadShip = attr.Lead;
+
+        if (player.itemEquips.ContainsKey(heroId))
+        {
+            var equipId = player.itemEquips[heroId];
+            var cardLevel = HeroSelectionTool.GetCardLevel(player.cards[equipId]);
+
+            var equipAttr = HeroSelectionTool.GetCardAttr(equipId, cardLevel);
+
+            inte += equipAttr.Inte;
+            str += equipAttr.Str;
+            leadShip += equipAttr.Lead;
+            maxHp += equipAttr.Hp;
+        }
 
         if(heroInfo != null)
         {

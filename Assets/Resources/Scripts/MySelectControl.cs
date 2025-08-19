@@ -76,7 +76,7 @@ public class MySelectControl : MonoBehaviour
         }
 
         // 移除多余的 TMP_Text
-        for (int j = cards.Count; j < existingTexts.Count; j++)
+        for (int j = i; j < existingTexts.Count; j++)
         {
             Destroy(existingTexts[j].gameObject);
         }
