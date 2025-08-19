@@ -10,6 +10,7 @@ public static class ConfigManager
         HeroConfig.Load();
         SkillConfig.Load();
         BuffConfig.Load();
+        ItemConfig.Load();
 
         PostModify();
 
@@ -44,5 +45,10 @@ public static class ConfigManager
         else
             System.Array.Resize(ref heroCfg.Skills, heroCfg.Skills.Length + 1);
         heroCfg.Skills[heroCfg.Skills.Length - 1] = skillId;
+    }
+
+    public static bool IsHeroCard(int cardId)
+    {
+        return cardId < 200000;
     }
 }

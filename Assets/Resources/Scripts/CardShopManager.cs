@@ -51,20 +51,6 @@ public class CardShopManager : MonoBehaviour
         ShopBegin();
     }
 
-    string GetColoredText(int value)
-    {
-        if (value >= 95)
-        {
-            return $"<color=red>{value}</color>";
-        }
-        else if (value >= 90)
-        {
-            return $"<color=yellow>{value}</color>";
-        }
-        return value.ToString();
-    }
-
-
     private IEnumerator DelayedUpdate()
     { 
         yield return new WaitForSeconds(.7f);
@@ -122,51 +108,31 @@ public class CardShopManager : MonoBehaviour
                 rectTransform.sizeDelta = new Vector2(cardWidth, cardHeight);
             }
 
+            var count = 1;
+            if (shopOpenIndex >= 2) //第3局后有多张卡
+            {
+                if (UnityEngine.Random.Range(0, 100) < System.Math.Clamp((shopOpenIndex - 2) * 5, 10, 60))
+                {
+                    if (shopOpenIndex <= 7)
+                        count = 2;
+                    else
+                        count = 2 + UnityEngine.Random.Range(0, shopOpenIndex / 4);
+                }
+            }            
+
             // 初始化CardView属性
             CardViewControl cardView = card.GetComponent<CardViewControl>();
-            if (cardView != null)
+            if(i == 0)
+            {
+                cardView.Init(400001, false, count);
+            }
+            else
             {
                 var heroId = HeroSelectionTool.GetRandomHeroId();
-                var heroCfg = HeroConfig.GetConfig(heroId);
-                cardView.cardId = heroId;
-                cardView.cardImage.sprite = Resources.Load<Sprite>("SkinsBig/" + heroCfg.Icon);
-                cardView.cardName.text = heroCfg.Name;
-                cardView.count = 1;
-
-                if(shopOpenIndex >= 2) //第3局后有多张卡
-                {
-                    if(UnityEngine.Random.Range(0, 100) < Math.Clamp((shopOpenIndex-2) * 5, 10, 60))
-                    {
-                        if(shopOpenIndex <= 7)
-                            cardView.count = 2;
-                        else
-                            cardView.count = 2 + UnityEngine.Random.Range(0, shopOpenIndex / 4);
-                        cardView.cardName.text = heroCfg.Name + "x" + cardView.count;
-                    }
-                }
-
-                if(heroCfg.Skills != null && heroCfg.Skills.Length > 0)
-                    cardView.jobImage.sprite = Resources.Load<Sprite>("SkillPic/" + SkillConfig.GetConfig(heroCfg.Skills[0]).Icon);
-                else
-                    cardView.jobImage.gameObject.SetActive(false);
-                cardView.lead.text = GetColoredText(heroCfg.LeadShip);
-                cardView.inte.text = GetColoredText(heroCfg.Inte);
-                cardView.str.text = GetColoredText(heroCfg.Str);
-
-                cardView.hp.text = heroCfg.Hp.ToString();
-                cardView.priceI = HeroSelectionTool.GetPrice(heroCfg) * cardView.count;
-                cardView.price.text = cardView.priceI.ToString();
-                if(heroCfg.Side == 1)
-                    cardView.gameObject.GetComponent<Image>().color = new Color(40/255f, 70/255f, 0/255f, 255/255f);
-                else if(heroCfg.Side == 2)
-                    cardView.gameObject.GetComponent<Image>().color = new Color(0/255f, 35/255f, 100/255f, 255/255f);
-                else if(heroCfg.Side == 3)
-                    cardView.gameObject.GetComponent<Image>().color = new Color(100/255f, 0/255f, 0/255f, 255/255f);
-                else
-                    cardView.gameObject.GetComponent<Image>().color = new Color(50/255f, 50/255f, 50/255f, 255/255f);
-
-                cardViews.Add(cardView);
+                cardView.Init(heroId, true, count);
             }
+
+            cardViews.Add(cardView);
         }
 
         era++;
@@ -182,12 +148,12 @@ public class CardShopManager : MonoBehaviour
         GameManager.Instance.PlaySound("Sounds/page");
     }
 
-    public void OnPlayerBuyCard(CardViewControl ctr, int pid, int cardId, int price, int count)
+    public void OnPlayerBuyCard(CardViewControl ctr, int pid, int cardId, bool isHero, int price, int count)
     {
         if((round % 6) != 0)
             return;
         var player = GameManager.Instance.GetPlayer(pid);
-        if (player.BuyCard(ctr, cardId, price, count))
+        if (player.BuyCard(ctr, cardId, isHero, price, count))
         {
             mySelect.UpdateCards(player);
 

@@ -31,7 +31,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 1, z: 0, w: 0}
   m_LocalPosition: {x: 288, y: 6.29, z: 173.1}
-  m_LocalScale: {x: 5, y: 5, z: 5}
+  m_LocalScale: {x: 5, y: 3, z: 5}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -129,9 +129,16 @@ MonoBehaviour:
   maxHp: 100
   side: 1
   isHero: 0
+  heroId: 0
   chessName: tree
   rend: {fileID: 1654120894988046011}
   moveSpeed: 10
   attackRange: 15
+  inte: 0
+  str: 0
+  leadShip: 0
+  level: 1
   hp: 50
-  atk: 30
+  attackDamage: 30
+  heroInfo: {fileID: 0}
+  canMove: 1

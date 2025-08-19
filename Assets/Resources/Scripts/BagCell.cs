@@ -6,7 +6,7 @@ using TMPro;
 
 public class BagCell : MonoBehaviour
 {
-    public int heroId;
+    public int cardId;
     public int level;
     public TMP_Text itemNameText;
     public Image itemImage;
@@ -28,7 +28,7 @@ public class BagCell : MonoBehaviour
     {
         if(isSelect)
         {
-            cellButton.image.color = Color.red;
+            cellButton.image.color = Color.green;
         }
         else
         {

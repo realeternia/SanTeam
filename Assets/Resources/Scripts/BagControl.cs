@@ -24,8 +24,8 @@ public class BagControl : MonoBehaviour
         sellBtn.onClick.AddListener(() =>
         {
             var p1 = GameManager.Instance.GetPlayer(0);
-            p1.SellCard(detail.heroId);
-            var cell = cellCache.Find(x => x.GetComponent<BagCell>().heroId == detail.heroId);
+            p1.SellCard(detail.cardId);
+            var cell = cellCache.Find(x => x.GetComponent<BagCell>().cardId == detail.cardId);
             if(cell != null)
             {
                 cellCache.Remove(cell);
@@ -47,8 +47,6 @@ public class BagControl : MonoBehaviour
         int index = 0;
         foreach (var item in p1.cards)
         {
-            var heroCfg = HeroConfig.GetConfig(item.Key);
-
             // 修改原代码，将新创建的 cell 加入缓存
             GameObject cell = Instantiate(Resources.Load<GameObject>("Prefabs/BagCellItem"), bagItemRegion.transform);
             cellCache.Add(cell);
@@ -56,10 +54,20 @@ public class BagControl : MonoBehaviour
             int yOff = index / 8;
             cell.transform.localPosition = new Vector3(80 + 104 * xOff, -80 - 104 * yOff, 0);
             BagCell bagCell = cell.GetComponent<BagCell>();
-            bagCell.heroId = item.Key;
+            bagCell.cardId = item.Key;
             bagCell.level = HeroSelectionTool.GetCardLevel(item.Value);
             bagCell.itemNameText.text = bagCell.level.ToString();
-            bagCell.itemImage.sprite = Resources.Load<Sprite>("Skins/" + heroCfg.Icon);
+            if(ConfigManager.IsHeroCard(bagCell.cardId))
+            {       
+                var heroCfg = HeroConfig.GetConfig(item.Key);
+                bagCell.itemImage.sprite = Resources.Load<Sprite>("Skins/" + heroCfg.Icon);
+            }
+            else
+            {
+                var itemCfg = ItemConfig.GetConfig(item.Key);
+                bagCell.itemImage.sprite = Resources.Load<Sprite>("ItemPic/" + itemCfg.Icon);
+            }
+          
             bagCell.bagControl = this;
 
             index++;
@@ -79,7 +87,7 @@ public class BagControl : MonoBehaviour
             bagCell.GetComponent<BagCell>().OnSelect(false);
         }
         cell.GetComponent<BagCell>().OnSelect(true);
-        detail.UpdateInfo(cell.heroId, cell.level);
+        detail.UpdateInfo(cell.cardId, cell.level);
     }
 
     // 一次性销毁所有缓存的 cell 对象的函数

@@ -19,29 +19,21 @@ namespace CommonConfig
         /// </summary>
         public int Lv;
         /// <summary>
-        ///统帅
+        ///属性1
         /// </summary>
-        public int LeadShip;
+        public string Attr1;
         /// <summary>
-        ///智力
+        ///属性1值
         /// </summary>
-        public int Inte;
+        public int Attr1Val;
         /// <summary>
-        ///武力
+        ///属性2
         /// </summary>
-        public int Str;
+        public string Attr2;
         /// <summary>
-        ///生命
+        ///属性2值
         /// </summary>
-        public int Hp;
-        /// <summary>
-        ///移动速度
-        /// </summary>
-        public int MoveSpeed;
-        /// <summary>
-        ///攻击距离
-        /// </summary>
-        public int Range;
+        public int Attr2Val;
         /// <summary>
         ///技能
         /// </summary>
@@ -51,24 +43,27 @@ namespace CommonConfig
         /// </summary>
         public string HitEffect;
         /// <summary>
+        ///价格
+        /// </summary>
+        public int Price;
+        /// <summary>
         ///背景图
         /// </summary>
         public string Icon;
 
 
-        public ItemConfig(int Id, string Name, int Lv, int LeadShip, int Inte, int Str, int Hp, int MoveSpeed, int Range, int[] Skills, string HitEffect, string Icon)
+        public ItemConfig(int Id, string Name, int Lv, string Attr1, int Attr1Val, string Attr2, int Attr2Val, int[] Skills, string HitEffect, int Price, string Icon)
         {
             this.Id = Id;
             this.Name = Name;
             this.Lv = Lv;
-            this.LeadShip = LeadShip;
-            this.Inte = Inte;
-            this.Str = Str;
-            this.Hp = Hp;
-            this.MoveSpeed = MoveSpeed;
-            this.Range = Range;
+            this.Attr1 = Attr1;
+            this.Attr1Val = Attr1Val;
+            this.Attr2 = Attr2;
+            this.Attr2Val = Attr2Val;
             this.Skills = Skills;
             this.HitEffect = HitEffect;
+            this.Price = Price;
             this.Icon = Icon;
 
         }
@@ -93,7 +88,7 @@ namespace CommonConfig
         public static void Load()
         {
             config.Clear();
-            config[400001] = new ItemConfig(400001, "关王刀", 1, 0, 0, 0, 0, 0, 0, null, "SwordHitYellowCritical", "guanwangdao");
+            config[400001] = new ItemConfig(400001, "关王刀", 1, "str", 5, "", 0, null, "SwordHitYellowCritical", 20, "guanwangdao");
 
         }
 

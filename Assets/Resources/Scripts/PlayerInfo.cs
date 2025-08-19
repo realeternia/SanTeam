@@ -77,7 +77,18 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 
     public void SellCard(int cardId)
     {
-        AddGold(HeroSelectionTool.GetPrice(HeroConfig.GetConfig(cardId)) * cards[cardId] / 2);
+        var isHeroCard = ConfigManager.IsHeroCard(cardId);
+        var price = 0;
+        if(isHeroCard)
+        {
+            price = HeroSelectionTool.GetPrice(HeroConfig.GetConfig(cardId));
+        }
+        else
+        {
+            price = ItemConfig.GetConfig(cardId).Price;
+        }
+
+        AddGold(price * cards[cardId] / 2);
         cards.Remove(cardId);
         GameManager.Instance.PlaySound("Sounds/gold");
     }
@@ -182,12 +193,11 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         }
     }
 
-    public bool BuyCard(CardViewControl ctr, int cardId, int price, int count)
+    public bool BuyCard(CardViewControl ctr, int cardId, bool isHero, int price, int count)
     {
         if (gold < price)
-        {
             return false;
-        }
+
         gold -= price;
         goldText.text = gold.ToString();
         if (cards.TryGetValue(cardId, out int exp))
@@ -271,6 +281,9 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         List<(CardViewControl card, float score)> scoredCards = new List<(CardViewControl card, float score)>();
         foreach (var pickCard in affordableCards)
         {
+            if(!pickCard.isHeroCard) //todo 先不管物品卡
+                continue;
+
             float score = 1f;
             var pickCardCfg = HeroConfig.GetConfig(pickCard.cardId);
 
@@ -382,7 +395,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         }
 
         // 购买选中的卡片
-        BuyCard(selectedCard, selectedCard.cardId, selectedCard.priceI, selectedCard.count);
+        BuyCard(selectedCard, selectedCard.cardId, selectedCard.isHeroCard, selectedCard.priceI, selectedCard.count);
 
         return true;
     }
@@ -426,6 +439,9 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         List<Tuple<int, int>> sortDataList = new List<Tuple<int, int>>();
         foreach (int cardId in cards.Keys)
         {
+          if(!ConfigManager.IsHeroCard(cardId))
+                continue;
+
             var price = HeroSelectionTool.GetPrice(HeroConfig.GetConfig(cardId));
             sortDataList.Add(new Tuple<int, int>(cardId, price * cards[cardId] ));
         }
@@ -440,6 +456,9 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         List<Tuple<int, int>> sortDataList = new List<Tuple<int, int>>();
         foreach (int cardId in cards.Keys)
         {
+            if(!ConfigManager.IsHeroCard(cardId))
+                continue;
+
             var heroConfig = HeroConfig.GetConfig(cardId);
             sortDataList.Add(new Tuple<int, int>(cardId, heroConfig.Total * (9 + cards[cardId]) / 10 ));
         }

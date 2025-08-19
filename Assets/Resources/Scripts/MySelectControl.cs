@@ -28,8 +28,12 @@ public class MySelectControl : MonoBehaviour
         List<SelectCardNodeControl> existingTexts = new List<SelectCardNodeControl>(GetComponentsInChildren<SelectCardNodeControl>());
 
         // 遍历 cards 列表
-        for (int i = 0; i < cards.Count; i++)
+        int i = 0;
+        foreach (var cardId in cards)
         {
+            if(!ConfigManager.IsHeroCard(cardId))
+                continue;
+
             SelectCardNodeControl selectNode;
             if (i < existingTexts.Count)
             {
@@ -60,19 +64,21 @@ public class MySelectControl : MonoBehaviour
             }
 
             // 更新文本内容，这里假设 CardInfo 有一个 GetDisplayText 方法
-            var cardCfg = HeroConfig.GetConfig(cards[i]);
+            var cardCfg = HeroConfig.GetConfig(cardId);
             var skillIcon = "";
             if(cardCfg.Skills != null && cardCfg.Skills.Length > 0)
             {
                 skillIcon = SkillConfig.GetConfig(cardCfg.Skills[0]).Icon;
             }
-            selectNode.UpdateExp(cardCfg.Name, playerInfo.cards[cards[i]], skillIcon);
+            selectNode.UpdateExp(cardCfg.Name, playerInfo.cards[cardId], skillIcon);
+
+            i++;
         }
 
         // 移除多余的 TMP_Text
-        for (int i = cards.Count; i < existingTexts.Count; i++)
+        for (int j = cards.Count; j < existingTexts.Count; j++)
         {
-            Destroy(existingTexts[i].gameObject);
+            Destroy(existingTexts[j].gameObject);
         }
     }
 }
