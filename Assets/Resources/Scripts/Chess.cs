@@ -56,9 +56,6 @@ public class Chess : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        // 初始化HP
-        hp = maxHp;
-
         // 创建HUD
         CreateHUD();
 
@@ -105,6 +102,8 @@ public class Chess : MonoBehaviour
         }
 
         rend.material = material; // 这会为这个渲染器创建一个独立的材质实例
+        if (heroInfo != null) // 英雄
+            heroInfo.SetHpRate(hp, maxHp);        
     }
 
     // 创建血条HUD
@@ -386,57 +385,12 @@ public class Chess : MonoBehaviour
             leadShip += equipAttr.Lead;
             maxHp += equipAttr.Hp;
         }
+        hp = maxHp;
 
         if(heroInfo != null)
         {
-            // 确定英雄的最高属性
-            string highestAttr = "";
-            var highestAttrValue = 0;
-
-            var total = inte + leadShip + str;
-            if (inte >= leadShip && inte >= str)
-            {
-                highestAttr = "attrinte";
-                highestAttrValue = inte;
-            }
-            else if (leadShip >= inte && leadShip >= str)
-            {
-                highestAttr = "attrlead";
-                highestAttrValue = leadShip;
-
-            }
-            else if (str >= inte && str >= leadShip)
-            {
-                highestAttr = "attrstr";
-                highestAttrValue = str;
-
-            }     
-            else if (total >= 235)
-            {
-                highestAttr = "attrshield";
-            }
-
-            if(highestAttr != "")
-            {       
-                // 根据最高属性加载对应图片
-                heroInfo.classImg.sprite = Resources.Load<Sprite>(highestAttr);
-                if(highestAttrValue >= 100 || total >= 255)
-                {
-                    heroInfo.classImg.color = Color.yellow;
-                }
-                else if (highestAttrValue >= 115 || total >= 285)
-                {
-                    heroInfo.classImg.color = new Color(1, 0.5f, 0);
-                }
-                else if (highestAttrValue >= 135 || total >= 320)
-                {
-                    heroInfo.classImg.color = Color.red;
-                } 
-                else if (highestAttrValue >= 160 || total >= 360)
-                {
-                    heroInfo.classImg.color = new Color(0.8f, 0, 1);
-                }                               
-            }
+            heroInfo.SetAttr(inte, str, leadShip);
+       
         }
     }
 
@@ -499,7 +453,7 @@ public class Chess : MonoBehaviour
     public void OnHpChanged()
     {
         if (heroInfo != null) // 英雄
-            heroInfo.SetHpRate((float)hp / maxHp);
+            heroInfo.SetHpRate(hp, maxHp);
         if (hp <= 0)
         {
             Ondying();

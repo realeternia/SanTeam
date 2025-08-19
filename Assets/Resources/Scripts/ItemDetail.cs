@@ -31,6 +31,12 @@ public class ItemDetail : MonoBehaviour
 
     public void UpdateInfo(int id, int lv)
     {
+        if(id == 0)
+        {
+            Clear();
+            return;
+        }
+
         cardId = id;
         level = lv;
 

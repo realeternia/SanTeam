@@ -44,14 +44,14 @@ public class HeroInfoGroup : MonoBehaviour
         int count = side == 1 ? countSide1 : countSide2;
         GameObject heroInfoRect = side == 1 ? heroInfoRectSide1 : heroInfoRectSide2;
         HeroInfo heroInfo = Instantiate(heroPrefab, heroInfoRect.transform).GetComponent<HeroInfo>();
-        heroInfo.transform.localPosition = new Vector3(105, 50 - 102 * count, 0);
+        heroInfo.transform.localPosition = new Vector3(115, -63 - 122 * count, 0);
         var heroCfg = HeroConfig.GetConfig(heroId);
 
         heroInfo.heroImage.sprite = Resources.Load<Sprite>("Skins/" + heroCfg.Icon);
 
-
         heroInfo.heroName.text = heroCfg.Name;
-        heroInfo.heroLevelTxt.text = "等级 " + level;
+        heroInfo.heroLevelTxt.text = level.ToString();
+
         if(side == 1)
         {
             countSide1++;

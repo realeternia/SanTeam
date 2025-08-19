@@ -70,7 +70,8 @@ public class MySelectControl : MonoBehaviour
             {
                 skillIcon = SkillConfig.GetConfig(cardCfg.Skills[0]).Icon;
             }
-            selectNode.UpdateExp(cardCfg.Name, playerInfo.cards[cardId], skillIcon);
+            selectNode.cardId = cardId;
+            selectNode.UpdateExp(playerInfo.pid, cardCfg.Name, playerInfo.cards[cardId], skillIcon);
 
             i++;
         }

@@ -24,6 +24,8 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     public Dictionary<int, int> cards = new Dictionary<int, int>(); // cardid - > exp
 
     public Dictionary<int, int> itemEquips = new Dictionary<int, int>(); // heroId -> itemid
+    public List<int> battleCards = new List<int>();
+
 
     public bool isOnTurn;
     public TMP_Text playerNameText;
@@ -380,7 +382,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
                 if (gold > 80 && GamePlayed() > 10)
                     score *= 1.5f;
                 if (itemEquips.Count < 3)
-                    score *= 1 + (3 - itemEquips.Count) * 0.2f;
+                    score *= 1 + (3 - itemEquips.Count) * 0.6f;
             }
 
             // 加入分数列表
@@ -519,7 +521,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     public List<Tuple<int, int>> GetBattleCardList()
     {
         var strongCardIds = GetStrong5CardList();
-        if(pid > 0) 
+        if(pid > 0)
             AutoCheckItem(strongCardIds);
         return RearrangePos(strongCardIds);
     }
@@ -537,9 +539,26 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
             var heroPrice = HeroSelectionTool.GetPrice(heroConfig);
 
             sortDataList.Add(new Tuple<int, int>(cardId, heroPrice * HeroSelectionTool.GetCardLevel(cards[cardId])));
-
         }
-        sortDataList.Sort((a, b) => b.Item2.CompareTo(a.Item2));
+
+        if(pid == 0)
+        {
+            sortDataList.Sort((a, b) => 
+            {
+                // 若 a 在 battleCards 中且 b 不在，则 a 排在前面
+                if (battleCards.Contains(a.Item1) && !battleCards.Contains(b.Item1))
+                    return -1;
+                // 若 b 在 battleCards 中且 a 不在，则 b 排在前面
+                if (!battleCards.Contains(a.Item1) && battleCards.Contains(b.Item1))
+                    return 1;
+                // 若两者都在或都不在 battleCards 中，则按 Item2 降序排序
+                return b.Item2.CompareTo(a.Item2);
+            });
+        }
+        else
+        {
+            sortDataList.Sort((a, b) => a.Item2.CompareTo(b.Item2));
+        }
 
         List<Tuple<int, int>> results = new List<Tuple<int, int>>();
         for (int i = 0; i < sortDataList.Count; i++)
