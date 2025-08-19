@@ -23,6 +23,8 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     public int loseCount;
     public Dictionary<int, int> cards = new Dictionary<int, int>(); // cardid - > exp
 
+    public Dictionary<int, int> itemEquips = new Dictionary<int, int>(); // heroId -> itemid
+
     public bool isOnTurn;
     public TMP_Text playerNameText;
     public Image playerImage;
@@ -75,6 +77,21 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         goldText.text = gold.ToString();
     }
 
+    public void Equip(int heroId, int itemId)
+    {
+        foreach(var item in itemEquips)
+        {
+            if(item.Value == itemId)
+            {
+                itemEquips.Remove(item.Key);
+                break;
+            }
+        }
+
+        itemEquips[heroId] = itemId;
+    }
+
+
     public void SellCard(int cardId)
     {
         var isHeroCard = ConfigManager.IsHeroCard(cardId);
@@ -91,6 +108,19 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         AddGold(price * cards[cardId] / 2);
         cards.Remove(cardId);
         GameManager.Instance.PlaySound("Sounds/gold");
+
+        if(itemEquips.ContainsKey(cardId))
+        {
+            itemEquips.Remove(cardId);
+        }
+        foreach(var item in itemEquips)
+        {
+            if(item.Value == cardId)
+            {
+                itemEquips.Remove(item.Key);
+                break;
+            }
+        }
     }
 
     public int GamePlayed()

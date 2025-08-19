@@ -7,11 +7,17 @@ using UnityEngine.UI;
 public class BagControl : MonoBehaviour
 {
     public Button closeBtn;
-    public Button sellBtn;
+    public Button sellHeroBtn;
+    public Button sellItemBtn;
+
+    public Button equipBtn;
+
+
     // Start is called before the first frame update
     // 声明一个列表用于缓存 cell 对象
     private List<GameObject> cellCache = new List<GameObject>();
-    public ItemDetail detail;
+    public ItemDetail heroDetail;
+    public ItemDetail itemDetail;
     public GameObject bagItemRegion;
 
     void Start()
@@ -21,18 +27,53 @@ public class BagControl : MonoBehaviour
             DestroyAllCells();
             PanelManager.Instance.HideBag();
         });
-        sellBtn.onClick.AddListener(() =>
+        sellHeroBtn.onClick.AddListener(() =>
         {
+            if(heroDetail.cardId == 0)
+                return;
             var p1 = GameManager.Instance.GetPlayer(0);
-            p1.SellCard(detail.cardId);
-            var cell = cellCache.Find(x => x.GetComponent<BagCell>().cardId == detail.cardId);
+            p1.SellCard(heroDetail.cardId);
+            var cell = cellCache.Find(x => x.GetComponent<BagCell>().cardId == heroDetail.cardId);
             if(cell != null)
             {
                 cellCache.Remove(cell);
                 Destroy(cell);
             }
             CardShopManager.Instance.OnPlayerSellCard();
+            heroDetail.Clear();
+            itemDetail.UpdateSelf();
+
         });
+        sellItemBtn.onClick.AddListener(() =>
+        {          
+            if(itemDetail.cardId == 0)
+                return;
+            var p1 = GameManager.Instance.GetPlayer(0);
+            p1.SellCard(itemDetail.cardId);
+            var cell = cellCache.Find(x => x.GetComponent<BagCell>().cardId == itemDetail.cardId);
+            if(cell != null)
+            {
+                cellCache.Remove(cell);
+                Destroy(cell);
+            }
+            itemDetail.Clear();
+            heroDetail.UpdateSelf();
+
+        });    
+        equipBtn.onClick.AddListener(() =>
+        {
+            if(itemDetail.cardId == 0 || heroDetail.cardId == 0)
+                return;
+                
+            var p1 = GameManager.Instance.GetPlayer(0);
+            p1.Equip(heroDetail.cardId, itemDetail.cardId);
+
+            heroDetail.UpdateSelf();
+            itemDetail.UpdateSelf();
+
+            GameManager.Instance.PlaySound("Sounds/equip");
+
+        });    
     }
 
     // Update is called once per frame
@@ -72,6 +113,10 @@ public class BagControl : MonoBehaviour
 
             index++;
         }
+        itemDetail.Clear();
+        heroDetail.Clear();
+
+
     }
 
     public void OnHide()
@@ -82,12 +127,23 @@ public class BagControl : MonoBehaviour
 
     public void OnCellClick(BagCell cell)
     {
+        if (ConfigManager.IsHeroCard(cell.cardId))
+        {
+            heroDetail.UpdateInfo(cell.cardId, cell.level);
+        }
+        else
+        {
+            itemDetail.UpdateInfo(cell.cardId, cell.level);
+        }
         foreach (var bagCell in cellCache)
         {
-            bagCell.GetComponent<BagCell>().OnSelect(false);
+            var bagCellInfo = bagCell.GetComponent<BagCell>();
+            if (bagCellInfo.cardId == heroDetail.cardId || bagCellInfo.cardId == itemDetail.cardId)
+                bagCellInfo.OnSelect(true);
+            else
+                bagCellInfo.OnSelect(false);
+
         }
-        cell.GetComponent<BagCell>().OnSelect(true);
-        detail.UpdateInfo(cell.cardId, cell.level);
     }
 
     // 一次性销毁所有缓存的 cell 对象的函数

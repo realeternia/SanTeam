@@ -7,12 +7,16 @@ using CommonConfig;
 public class ItemDetail : MonoBehaviour
 {
     public int cardId;
+    public int level;
+
     public TMP_Text nameText;
     public TMP_Text leadText;
     public TMP_Text inteText;
     public TMP_Text strText;
     public TMP_Text hpText;
     public TMP_Text goldText;
+    public TMP_Text equipText;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -28,6 +32,7 @@ public class ItemDetail : MonoBehaviour
     public void UpdateInfo(int id, int lv)
     {
         cardId = id;
+        level = lv;
 
         var maxHpBase = 0;
         var inteBase = 0;
@@ -38,6 +43,8 @@ public class ItemDetail : MonoBehaviour
         var inteFinal = 0;
         var strFinal = 0;
         var leadShipFinal = 0;
+
+        equipText.text = "";        
 
         if (ConfigManager.IsHeroCard(id))
         {
@@ -50,12 +57,18 @@ public class ItemDetail : MonoBehaviour
 
             nameText.text = heroConfig.Name;
             goldText.text = (HeroSelectionTool.GetPrice(heroConfig) * GameManager.Instance.GetPlayer(0).cards[cardId] / 2).ToString();
+
+            if (player.itemEquips.ContainsKey(cardId))
+            {
+                var equipName = ItemConfig.GetConfig(player.itemEquips[cardId]).Name;
+                equipText.text = equipName;
+            }            
         }
         else
         {
             var itemConfig = ItemConfig.GetConfig(id);
             nameText.text = itemConfig.Name;
-            goldText.text = itemConfig.Price.ToString();
+            goldText.text = (itemConfig.Price / 2).ToString();
 
             if (itemConfig.Attr1 == "str")
             {
@@ -89,6 +102,16 @@ public class ItemDetail : MonoBehaviour
             {
                 maxHpBase = itemConfig.Attr2Val;
             }
+
+            foreach (var item in player.itemEquips)
+            {
+                if (item.Value == cardId)
+                {
+                    var equipName = HeroConfig.GetConfig(item.Key).Name;
+                    equipText.text = equipName;
+                    break;
+                }
+            }            
         }
 
         maxHpFinal = maxHpBase * (9 + lv) / 10;
@@ -98,16 +121,35 @@ public class ItemDetail : MonoBehaviour
 
         leadText.text = leadShipBase.ToString();
         if (leadShipFinal > leadShipBase)
-            leadText.text = leadShipBase.ToString() + "<color=green>+" + (leadShipFinal - leadShipBase).ToString() + "</color>";
+            leadText.text += "<color=green>+" + (leadShipFinal - leadShipBase).ToString() + "</color>";
         inteText.text = inteBase.ToString();
         if (inteFinal > inteBase)
-            inteText.text = inteBase.ToString() + "<color=green>+" + (inteFinal - inteBase).ToString() + "</color>";
+            inteText.text += "<color=green>+" + (inteFinal - inteBase).ToString() + "</color>";
         strText.text = strBase.ToString();
         if (strFinal > strBase)
-            strText.text = strBase.ToString() + "<color=green>+" + (strFinal - strBase).ToString() + "</color>";
+            strText.text += "<color=green>+" + (strFinal - strBase).ToString() + "</color>";
         hpText.text = maxHpBase.ToString();
         if (maxHpFinal > maxHpBase)
-            hpText.text = maxHpBase.ToString() + "<color=green>+" + (maxHpFinal - maxHpBase).ToString() + "</color>";
+            hpText.text += "<color=green>+" + (maxHpFinal - maxHpBase).ToString() + "</color>";
+
+    }
+
+    private void UpdateSelf()
+    {
+        UpdateInfo(cardId, level);
+    }
+
+    public void Clear()
+    {
+        cardId = 0;
+        nameText.text = "";
+        leadText.text = "";
+        inteText.text = "";
+        strText.text = "";
+        hpText.text = "";
+        goldText.text = "";
+        equipText.text = "";
+
 
     }
 }
