@@ -111,24 +111,25 @@ public class CardShopManager : MonoBehaviour
             var count = 1;
             if (shopOpenIndex >= 2) //第3局后有多张卡
             {
-                if (UnityEngine.Random.Range(0, 100) < System.Math.Clamp((shopOpenIndex - 2) * 5, 10, 60))
-                {
-                    if (shopOpenIndex <= 7)
-                        count = 2;
-                    else
-                        count = 2 + UnityEngine.Random.Range(0, shopOpenIndex / 4);
-                }
+                if (UnityEngine.Random.Range(0, 100) < System.Math.Clamp((shopOpenIndex - 2) * 5, 6, 40))
+                    count = 2;
             }            
 
             // 初始化CardView属性
             CardViewControl cardView = card.GetComponent<CardViewControl>();
             if(i == 0)
+          //  if(shopOpenIndex >= 5 && i <= 1 && UnityEngine.Random.Range(0, 100) < System.Math.Clamp((shopOpenIndex - 5) * 3, 12, 35)) 
             {
-                cardView.Init(400001, false, count);
+                var itemId = HeroSelectionTool.GetRandomItemId();
+                if (shopOpenIndex > 9 && UnityEngine.Random.Range(0, 500) > 200)
+                    count += UnityEngine.Random.Range(0, shopOpenIndex / 5);
+                cardView.Init(itemId, false, count);
             }
             else
             {
                 var heroId = HeroSelectionTool.GetRandomHeroId();
+                if (shopOpenIndex > 7 && UnityEngine.Random.Range(0, 500) > HeroConfig.GetConfig(heroId).Total)
+                    count += UnityEngine.Random.Range(0, shopOpenIndex / 4);
                 cardView.Init(heroId, true, count);
             }
 

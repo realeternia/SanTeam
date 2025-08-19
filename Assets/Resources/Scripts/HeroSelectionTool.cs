@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using CommonConfig;
 using UnityEngine;
 
@@ -259,6 +260,14 @@ public static class HeroSelectionTool
     {
         return heroPoolCache.Exists(hero => hero.Item1 == heroId);
     }
+
+    public static int GetRandomItemId()
+    {
+        var itemList = ItemConfig.ConfigList.ToList();
+        int randomIndex = UnityEngine.Random.Range(0, itemList.Count);
+        return itemList[randomIndex].Id;
+    }
+
 
     public static int GetPrice(HeroConfig heroCfg)
     {

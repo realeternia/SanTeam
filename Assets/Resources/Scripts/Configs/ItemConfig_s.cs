@@ -88,7 +88,17 @@ namespace CommonConfig
         public static void Load()
         {
             config.Clear();
-            config[400001] = new ItemConfig(400001, "关王刀", 1, "str", 30, "", 0, null, "SwordHitYellowCritical", 20, "guanwangdao");
+            config[400001] = new ItemConfig(400001, "关王刀", 1, "str", 10, "", 0, null, "", 25, "guanwangdao");
+            config[400002] = new ItemConfig(400002, "方天画戟", 1, "str", 15, "", 0, null, "", 40, "fangtian");
+            config[400003] = new ItemConfig(400003, "丈八蛇矛", 1, "str", 11, "", 0, null, "", 27, "zhangba");
+            config[400004] = new ItemConfig(400004, "檀木弓", 1, "str", 6, "", 0, null, "", 15, "tanmugong");
+            config[400005] = new ItemConfig(400005, "大斧", 1, "str", 6, "", 0, null, "", 15, "dafu");
+            config[400006] = new ItemConfig(400006, "三丈枪", 1, "str", 6, "", 0, null, "", 15, "sanzhangqiang");
+            config[400007] = new ItemConfig(400007, "孙子兵法", 1, "lead", 15, "", 0, null, "", 40, "sunzi");
+            config[400008] = new ItemConfig(400008, "墨子", 1, "lead", 6, "", 0, null, "", 15, "mozi");
+            config[400009] = new ItemConfig(400009, "六韬", 1, "lead", 10, "", 0, null, "", 25, "liutao");
+            config[400010] = new ItemConfig(400010, "诗经", 1, "inte", 6, "", 0, null, "", 15, "shijing");
+            config[400011] = new ItemConfig(400011, "易经", 1, "inte", 12, "", 0, null, "", 30, "yijing");
 
         }
 

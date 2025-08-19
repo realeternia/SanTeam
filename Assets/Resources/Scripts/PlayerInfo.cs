@@ -262,7 +262,8 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         bool hasSameCard = false;
         int weakCardId = 0;
         int weakCardPrice = 0;
-        if (cards.Count >= aiConfig.cardLimit)
+        var heroCardCount = GetHeroCardList().Count;
+        if (heroCardCount >= aiConfig.cardLimit)
         {
             var weakCard = FindWeakCard();
             weakCardId = weakCard.Item1;
@@ -311,20 +312,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         List<(CardViewControl card, float score)> scoredCards = new List<(CardViewControl card, float score)>();
         foreach (var pickCard in affordableCards)
         {
-            if(!pickCard.isHeroCard) //todo 先不管物品卡
-                continue;
-
             float score = 1f;
-            var pickCardCfg = HeroConfig.GetConfig(pickCard.cardId);
-
-            // 根据价格区间调整分数
-            if (pickCard.priceI < aiConfig.priceLower || pickCard.priceI > aiConfig.priceUpper)
-            {
-                score *= aiConfig.priceOutRate;
-            }
-
-            if(aiConfig.pickSide != 0 && pickCardCfg.Side != aiConfig.pickSide) //单阵营流
-                continue;
 
             // 如果已经拥有该卡片，增加分数
             if (cards.ContainsKey(pickCard.cardId))
@@ -335,46 +323,66 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
                     score *= 1.5f;
                 hasSameCard = true;
             }
-            else if (cards.Count >= aiConfig.cardLimit)
-            {
-                if (pickCard.priceI < weakCardPrice)
-                    continue; //没必要换更弱的卡
-            }
 
-            if (aiConfig.pickSide > 0)
+            if (pickCard.isHeroCard)
             {
-                if(pickCardCfg.Id < 100010) //主公卡一定要拿
-                    score *= aiConfig.findMasterRate;
-            }
-
-            if(strongList.Count >= 3)
-            {
-                if (rangeCount < 2)
+                if (!cards.ContainsKey(pickCard.cardId) && heroCardCount >= aiConfig.cardLimit)
                 {
-                    if (pickCardCfg.Range > 20)
-                        score *= aiConfig.pickRangeCardRate; // 如果射程大于20且射程卡数量少于3，分数乘以1.3
+                    if (pickCard.priceI < weakCardPrice)
+                        continue; //没必要换更弱的卡
                 }
-                if (inteCount < 1)
+                var pickCardCfg = HeroConfig.GetConfig(pickCard.cardId);
+                if (aiConfig.pickSide != 0 && pickCardCfg.Side != aiConfig.pickSide) //单阵营流
+                    continue;
+                if (aiConfig.pickSide > 0)
                 {
-                    if (pickCardCfg.Inte >= 90)
-                        score *= aiConfig.pickInteCardRate; // 如果智力大于等于90且智力卡数量少于2，分数乘以1.5
+                    if (pickCard.cardId < 100010) //主公卡一定要拿
+                        score *= aiConfig.findMasterRate;
                 }
+                // 根据价格区间调整分数
+                if (pickCard.priceI < aiConfig.priceLower || pickCard.priceI > aiConfig.priceUpper)
+                {
+                    score *= aiConfig.priceOutRate;
+                }                
 
-                if(hasLiubei && pickCardCfg.Side == 1)
-                    score *= aiConfig.findMasterRate;
-                else if(hasCaocao && pickCardCfg.Side == 2)
-                    score *= aiConfig.findMasterRate;
-                else if(hasSunquan && pickCardCfg.Side == 3)
-                    score *= aiConfig.findMasterRate;
+                if (strongList.Count >= 3)
+                {
+                    if (rangeCount < 2)
+                    {
+                        if (pickCardCfg.Range > 20)
+                            score *= aiConfig.pickRangeCardRate; // 如果射程大于20且射程卡数量少于3，分数乘以1.3
+                    }
+                    if (inteCount < 1)
+                    {
+                        if (pickCardCfg.Inte >= 90)
+                            score *= aiConfig.pickInteCardRate; // 如果智力大于等于90且智力卡数量少于2，分数乘以1.5
+                    }
 
-                if(side1Count >= 1 && pickCardCfg.Id == 100001)
-                    score *= aiConfig.findMasterRate;
-                else if(side2Count >= 1 && pickCardCfg.Id == 100002)
-                    score *= aiConfig.findMasterRate;
-                else if(side3Count >= 1 && pickCardCfg.Id == 100003)
-                    score *= aiConfig.findMasterRate;
+                    if (hasLiubei && pickCardCfg.Side == 1)
+                        score *= aiConfig.findMasterRate;
+                    else if (hasCaocao && pickCardCfg.Side == 2)
+                        score *= aiConfig.findMasterRate;
+                    else if (hasSunquan && pickCardCfg.Side == 3)
+                        score *= aiConfig.findMasterRate;
+
+                    if (side1Count >= 1 && pickCardCfg.Id == 100001)
+                        score *= aiConfig.findMasterRate;
+                    else if (side2Count >= 1 && pickCardCfg.Id == 100002)
+                        score *= aiConfig.findMasterRate;
+                    else if (side3Count >= 1 && pickCardCfg.Id == 100003)
+                        score *= aiConfig.findMasterRate;
+                }
             }
-            
+            else
+            {
+                if(itemEquips.Count > 6 && !hasSameCard)
+                    continue; //武器太多了
+                if (gold > 80 && GamePlayed() > 10)
+                    score *= 1.5f;
+                if (itemEquips.Count < 3)
+                    score *= 1 + (3 - itemEquips.Count) * 0.2f;
+            }
+
             // 加入分数列表
             scoredCards.Add((pickCard, score));
         }
@@ -419,7 +427,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         if (selectedCard == null)
             return false;
 
-        if (cards.Count >= aiConfig.cardLimit && !cards.ContainsKey(selectedCard.cardId))
+        if (heroCardCount >= aiConfig.cardLimit && !hasSameCard)
         {
             SellCard(weakCardId); //卖掉最弱的卡
         }
@@ -479,27 +487,130 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 
         var weakCard = sortDataList[sortDataList.Count - 1];
         return weakCard;
-    }    
+    }
+
+    public List<int> GetHeroCardList()
+    {
+        List<int> heroCardList = new List<int>();
+        foreach (int cardId in cards.Keys)
+        {
+            if(ConfigManager.IsHeroCard(cardId))
+                heroCardList.Add(cardId);
+        }
+        return heroCardList;
+    }
+
+
+
+    public List<int> GetItemCardList()
+    {
+        List<int> itemCardList = new List<int>();
+        foreach (int cardId in cards.Keys)
+        {
+            if(ConfigManager.IsHeroCard(cardId))
+                continue;
+
+            itemCardList.Add(cardId);
+        }
+        return itemCardList;
+
+    }
 
     public List<Tuple<int, int>> GetBattleCardList()
+    {
+        var strongCardIds = GetStrong5CardList();
+        if(pid > 0) 
+            AutoCheckItem(strongCardIds);
+        return RearrangePos(strongCardIds);
+    }
+
+
+    private List<Tuple<int, int>> GetStrong5CardList()
     {
         List<Tuple<int, int>> sortDataList = new List<Tuple<int, int>>();
         foreach (int cardId in cards.Keys)
         {
-            if(!ConfigManager.IsHeroCard(cardId))
+            if (!ConfigManager.IsHeroCard(cardId))
                 continue;
 
             var heroConfig = HeroConfig.GetConfig(cardId);
-            sortDataList.Add(new Tuple<int, int>(cardId, heroConfig.Total * (9 + cards[cardId]) / 10 ));
+            var heroPrice = HeroSelectionTool.GetPrice(heroConfig);
+
+            sortDataList.Add(new Tuple<int, int>(cardId, heroPrice * HeroSelectionTool.GetCardLevel(cards[cardId])));
+
         }
         sortDataList.Sort((a, b) => b.Item2.CompareTo(a.Item2));
 
-        List<Tuple<int, int>> result = new List<Tuple<int, int>>();
-        for(int i = 0; i < sortDataList.Count; i++)
-            result.Add(new Tuple<int, int>(sortDataList[i].Item1, HeroSelectionTool.GetCardLevel(cards[sortDataList[i].Item1])));
-        if (result.Count >= 5)
-            result = result.Take(5).ToList(); //按战力排出前5
+        List<Tuple<int, int>> results = new List<Tuple<int, int>>();
+        for (int i = 0; i < sortDataList.Count; i++)
+            results.Add(new Tuple<int, int>(sortDataList[i].Item1, HeroSelectionTool.GetCardLevel(cards[sortDataList[i].Item1])));
+        if (results.Count >= 5)
+            results = results.Take(5).ToList(); //按战力排出前5
 
+        return results;
+
+    }
+
+    private void AutoCheckItem(List<Tuple<int, int>> results)
+    {
+        itemEquips.Clear();
+        var itemCardList = GetItemCardList();
+
+        if(itemCardList.Count == 0)
+            return;
+
+        for(int i = 0; i < results.Count; i++)
+        {
+            var heroCfg = HeroConfig.GetConfig(results[i].Item1);
+            // 初始化最高得分和对应装备ID
+            int maxScore = int.MinValue;
+            int bestItemId = -1;
+            
+            // 获取英雄的各项属性
+            int[] heroAttributes = { heroCfg.Str, heroCfg.Inte, heroCfg.LeadShip };
+
+            int minAttr = heroAttributes.Min();
+            int maxAttr = heroAttributes.Max();
+            
+            foreach(var itemId in itemCardList)
+            {
+                var itemCfg = ItemConfig.GetConfig(itemId);
+                int score = itemCfg.Price;
+
+                if (!string.IsNullOrEmpty(itemCfg.Attr1))
+                {
+                    if (itemCfg.Attr1 == "str" && heroCfg.Str == minAttr)
+                        score += 25;
+                    else if (itemCfg.Attr1 == "inte" && heroCfg.Inte == minAttr)
+                        score += 25;
+                    else if (itemCfg.Attr1 == "lead" && heroCfg.LeadShip == minAttr)
+                        score += 25;
+                    else if (itemCfg.Attr1 == "str" && heroCfg.Str == maxAttr)
+                        score += 15;
+                    else if (itemCfg.Attr1 == "inte" && heroCfg.Inte == maxAttr)
+                        score += 15;
+                    else if (itemCfg.Attr1 == "lead" && heroCfg.LeadShip == maxAttr)
+                        score += 15;
+                }
+                
+                // 更新最高得分和对应装备ID
+                if (score > maxScore)
+                {
+                    maxScore = score;
+                    bestItemId = itemId;
+                }
+            }
+            
+            itemEquips[results[i].Item1] = bestItemId;
+
+            itemCardList.Remove(bestItemId);
+            if(itemCardList.Count == 0)
+                break;
+        }
+    }
+
+    private List<Tuple<int, int>> RearrangePos(List<Tuple<int, int>> results)
+    {
         // 根据 Pos 属性重新调整卡牌位置
         List<Tuple<int, int>> newResult = new List<Tuple<int, int>>() { null, null, null, null, null };
         List<Tuple<int, int>> pos12 = new List<Tuple<int, int>>();
@@ -507,7 +618,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         List<Tuple<int, int>> pos45 = new List<Tuple<int, int>>();
 
         // 根据 Pos 分类卡牌
-        foreach (var item in result)
+        foreach (var item in results)
         {
             int pos = HeroConfig.GetConfig(item.Item1).Pos;
             if (pos == 3)
@@ -558,7 +669,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
                 remainingCards.RemoveAt(0);
             }
         }
-        
+
         return newResult;
     }
 
