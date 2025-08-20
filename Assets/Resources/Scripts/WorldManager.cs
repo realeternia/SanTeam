@@ -259,6 +259,8 @@ public class WorldManager : MonoBehaviour
                 chessComponent.side = side;
                 chessComponent.chessName = heroConfig.Icon;
                 chessComponent.hitEffect = heroConfig.HitEffect;
+                chessComponent.missileSpeed = heroConfig.MissileSpeed;
+
                 if (side <= 2)
                 {
                     var heroInfo = heroInfoGroup.AddHero(side, (int)heroConfig.Id, heroData.Item2);

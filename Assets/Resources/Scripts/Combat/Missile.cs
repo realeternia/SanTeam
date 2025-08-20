@@ -26,21 +26,22 @@ public class Missile : MonoBehaviour
         missileEffect.transform.localScale = hitPrefab.transform.localScale;
 
         // 启动协程让导弹飞向目标位置
-        StartCoroutine(MoveMissileToTarget(gameObject, "Prefabs/Effect/" + effectName));
+        StartCoroutine(MoveMissileToTarget(gameObject, owner.missileSpeed, "Prefabs/Effect/" + effectName));
+
         Destroy(missileEffect, 2f);
     }
 
 
     // 定义协程方法，控制导弹移动
-    IEnumerator MoveMissileToTarget(GameObject missile, string effect)
+    IEnumerator MoveMissileToTarget(GameObject missile, int missileSpeed, string effect)
     {
         var targetPos = target.transform.position + new Vector3(0f, 5f, 0f);
 
         float journeyLength = Vector3.Distance(missile.transform.position, targetPos);
         float startTime = Time.time;
-        float speed = 20f; // 导弹移动速度
+        float speed = missileSpeed; // 导弹移动速度
 
-        while (missile != null && !WorldManager.Instance.CheckInRange(missile.transform.position, target.transform.position, 0.5f))
+        while (missile != null && target != null && !WorldManager.Instance.CheckInRange(missile.transform.position, target.transform.position, 0.5f) && !ReferenceEquals(target, null))
         {
             if (owner == null || owner.hp <= 0)
                 yield break;

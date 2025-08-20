@@ -40,6 +40,7 @@ public class Chess : MonoBehaviour
     public int hp = 100;
     public int attackDamage = 30;
     public string hitEffect;
+    public int missileSpeed = 10;
 
     // 攻击冷却时间
     private float attackCooldown = 2f;
