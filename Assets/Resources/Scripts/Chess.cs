@@ -100,6 +100,7 @@ public class Chess : MonoBehaviour
         {
             material.SetFloat("_SecondTexSize", 0.1f);
         }
+        hp = maxHp;
 
         rend.material = material; // 这会为这个渲染器创建一个独立的材质实例
         if (heroInfo != null) // 英雄
@@ -217,7 +218,7 @@ public class Chess : MonoBehaviour
     private IEnumerator MoveAndFightCoroutine()
     {    
         yield return new WaitForSeconds(0.5f);
-        while (true)
+        while (hp > 0)
         {
             MoveAndFight();
             yield return new WaitForSeconds(0.05f);

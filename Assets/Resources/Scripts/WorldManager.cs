@@ -134,7 +134,7 @@ public class WorldManager : MonoBehaviour
             {
                 unitGrids.Add(gridPos);
                 CreateDebugCube(300001, gridPos);
-                UnityEngine.Debug.Log("Lock " + gridPos + " for wall");
+              //  UnityEngine.Debug.Log("Lock " + gridPos + " for wall");
             }
         }
         occupiedGrids[300001] = unitGrids;

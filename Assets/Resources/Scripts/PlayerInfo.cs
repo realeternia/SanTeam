@@ -111,6 +111,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         cards.Remove(cardId);
         GameManager.Instance.PlaySound("Sounds/gold");
 
+        battleCards.Remove(cardId);
         if(itemEquips.ContainsKey(cardId))
         {
             itemEquips.Remove(cardId);
@@ -361,11 +362,11 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
                     }
 
                     if (hasLiubei && pickCardCfg.Side == 1)
-                        score *= aiConfig.findMasterRate;
+                        score *= aiConfig.findMasterRate * .6f;
                     else if (hasCaocao && pickCardCfg.Side == 2)
-                        score *= aiConfig.findMasterRate;
+                        score *= aiConfig.findMasterRate * .6f;
                     else if (hasSunquan && pickCardCfg.Side == 3)
-                        score *= aiConfig.findMasterRate;
+                        score *= aiConfig.findMasterRate * .6f;
 
                     if (side1Count >= 1 && pickCardCfg.Id == 100001)
                         score *= aiConfig.findMasterRate;
@@ -377,11 +378,15 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
             }
             else
             {
-                if(itemEquips.Count > 6 && !hasSameCard)
+                var itemCount = GetItemCardList().Count;
+
+                if (itemCount > 6 && !hasSameCard)
                     continue; //武器太多了
-                if (gold > 80 && GamePlayed() > 10)
-                    score *= 1.5f;
-                if (itemEquips.Count < 3)
+                if (gold > 60 && GamePlayed() > 8)
+                    score *= 2f;
+                if (itemCount == 0)
+                    score *= 4;
+                else if (itemCount < 3)
                     score *= 1 + (3 - itemEquips.Count) * 0.6f;
             }
 
@@ -448,6 +453,9 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         List<(int cardId, int totalPrice)> sortDataList = new List<(int cardId, int totalPrice)>();
         foreach (int cardId in cards.Keys)
         {
+            if(!ConfigManager.IsHeroCard(cardId))
+                continue;
+
             var price = HeroSelectionTool.GetPrice(HeroConfig.GetConfig(cardId));
             sortDataList.Add((cardId, price * cards[cardId]));
         }
@@ -530,10 +538,19 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     private List<Tuple<int, int>> GetStrong5CardList()
     {
         List<Tuple<int, int>> sortDataList = new List<Tuple<int, int>>();
+        bool hasLiubei = false;
+        bool hasCaocao = false;
+        bool hasSunquan = false;
+
         foreach (int cardId in cards.Keys)
         {
             if (!ConfigManager.IsHeroCard(cardId))
                 continue;
+
+            // 检查是否为特殊卡牌
+            if (cardId == 100001) hasLiubei = true;
+            if (cardId == 100002) hasCaocao = true;
+            if (cardId == 100003) hasSunquan = true;              
 
             var heroConfig = HeroConfig.GetConfig(cardId);
             var heroPrice = HeroSelectionTool.GetPrice(heroConfig);
@@ -554,17 +571,64 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
                 // 若两者都在或都不在 battleCards 中，则按 Item2 降序排序
                 return b.Item2.CompareTo(a.Item2);
             });
+
+            if (sortDataList.Count > 5)
+                sortDataList = sortDataList.Take(5).ToList(); //按战力排出前5            
         }
         else
         {
-            sortDataList.Sort((a, b) => a.Item2.CompareTo(b.Item2));
+            sortDataList.Sort((a, b) => b.Item2.CompareTo(a.Item2));
+
+            if (sortDataList.Count > 5)
+                sortDataList = sortDataList.Take(5).ToList(); //按战力排出前5                 
+
+            int side1Count = 0;
+            int side2Count = 0;
+            int side3Count = 0;
+
+            // 统计特殊卡牌数量
+            var hasLiubeiInBattle = false;
+            var hasCaocaoInBattle = false;
+            var hasSunquanInBattle = false;
+
+            for (int i = 0; i < sortDataList.Count; i++)
+            {
+                var cardId = sortDataList[i].Item1;
+                if (cardId == 100001) hasLiubeiInBattle = true;
+                if (cardId == 100002) hasCaocaoInBattle = true;
+                if (cardId == 100003) hasSunquanInBattle = true;
+                // 排除特殊卡牌后统计 side 数量
+                if (cardId > 100010)
+                {
+                    var heroConfig = HeroConfig.GetConfig(cardId);
+                    switch (heroConfig.Side)
+                    {
+                        case 1:
+                            side1Count++;
+                            break;
+                        case 2:
+                            side2Count++;
+                            break;
+                        case 3:
+                            side3Count++;
+                            break;
+                    }
+                }
+            }
+
+            // 如果有2张以上卡，就带上主公
+            if(side1Count > 2 && hasLiubei && !hasLiubeiInBattle)
+                sortDataList[sortDataList.Count - 1] = new Tuple<int, int>(100001, 1);
+            if(side2Count > 2 && hasCaocao && !hasCaocaoInBattle)
+                sortDataList[sortDataList.Count - 1] = new Tuple<int, int>(100002, 1);
+            if(side3Count > 2 && hasSunquan && !hasSunquanInBattle)
+                sortDataList[sortDataList.Count - 1] = new Tuple<int, int>(100003, 1);
+
         }
 
         List<Tuple<int, int>> results = new List<Tuple<int, int>>();
         for (int i = 0; i < sortDataList.Count; i++)
             results.Add(new Tuple<int, int>(sortDataList[i].Item1, HeroSelectionTool.GetCardLevel(cards[sortDataList[i].Item1])));
-        if (results.Count >= 5)
-            results = results.Take(5).ToList(); //按战力排出前5
 
         return results;
 

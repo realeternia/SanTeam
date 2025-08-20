@@ -169,15 +169,15 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 28
-  m_fontSizeBase: 28
+  m_fontSize: 36
+  m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
   m_fontSizeMax: 72
   m_fontStyle: 0
   m_HorizontalAlignment: 1
-  m_VerticalAlignment: 256
+  m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
   m_wordSpacing: 0
@@ -389,14 +389,16 @@ MonoBehaviour:
   gold: 0
   winCount: 0
   loseCount: 0
+  battleCards: 
   isOnTurn: 0
   playerNameText: {fileID: 7220488733435201163}
   playerImage: {fileID: 7347440486663307163}
   goldText: {fileID: 4615870352259222946}
   resultText: {fileID: 835777684304780144}
   playerBgImg: {fileID: 4105999794555204127}
-  soldierName: 
+  imgPath: 
   lineColor: {r: 0, g: 0, b: 0, a: 0}
+  banCount: 2
 --- !u!1 &6727466574539407974
 GameObject:
   m_ObjectHideFlags: 0

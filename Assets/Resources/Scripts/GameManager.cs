@@ -1,11 +1,13 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.IO;
 
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance;
-    public PlayerInfo[] players;   
+    public PlayerInfo[] players;
+    private StreamWriter logWriter;  // 日志写入器
 
     private void Awake()
     {
@@ -14,6 +16,14 @@ public class GameManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        // 初始化日志文件
+        string logPath = Application.persistentDataPath + "/game_log.txt";
+        logWriter = new StreamWriter(logPath, false, System.Text.Encoding.UTF8); 
+        logWriter.WriteLine("Game started at: " + System.DateTime.Now);
+        
+        // 注册日志事件
+        Application.logMessageReceived += LogMessageReceived;
+
         var p1 = PlayerBook.playerWang;
         players[0].Init(0, p1.name, p1.imgPath, "#33FF33", 5);
         var pls = PlayerBook.GetRandomN(5);
@@ -21,6 +31,37 @@ public class GameManager : MonoBehaviour
         {
             players[i + 1].Init(i + 1, pls[i].name, pls[i].imgPath, pls[i].colorStr, 5);
             players[i + 1].aiConfig = pls[i].aiConfig;
+        }
+    }
+
+    // 日志处理函数
+    private void LogMessageReceived(string logString, string stackTrace, LogType type)
+    {
+        if (logWriter != null)
+        {
+            if(logString.Contains("font asset"))
+                return;
+            string logType = type.ToString();
+            logWriter.WriteLine($"[{System.DateTime.Now}] [{logType}] {logString}");
+            if (!string.IsNullOrEmpty(stackTrace))
+            {
+                logWriter.WriteLine($"Stack Trace: {stackTrace}");
+            }
+            logWriter.Flush();  // 立即写入文件
+        }
+    }
+
+    private void OnDestroy()
+    {
+        // 取消注册日志事件
+        Application.logMessageReceived -= LogMessageReceived;
+        
+        // 关闭日志文件
+        if (logWriter != null)
+        {
+            logWriter.WriteLine("Game ended at: " + System.DateTime.Now);
+            logWriter.Close();
+            logWriter = null;
         }
     }
   

@@ -69,11 +69,11 @@ public class HeroInfo : MonoBehaviour
             classImg.sprite = Resources.Load<Sprite>(highestAttr);
             if (total >= 250)
             {
-                classImg.color = Color.yellow;
+                classImg.color = Color.green;
             }
             else if (total >= 280)
             {
-                classImg.color = new Color(1, 0.5f, 0);
+                classImg.color = Color.yellow;
             }
             else if (total >= 320)
             {
@@ -91,11 +91,11 @@ public class HeroInfo : MonoBehaviour
         text.text = val.ToString();
         if (val >= 95)
         {
-            text.color = Color.yellow;
+            text.color = Color.green;
         }
         else if (val >= 110)
         {
-            text.color = new Color(1, 0.5f, 0);
+            text.color = Color.yellow;
         }
         else if (val >= 135)
         {

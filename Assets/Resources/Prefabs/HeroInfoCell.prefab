@@ -314,8 +314,8 @@ MonoBehaviour:
   errorImg: {fileID: 8064065875405272674}
   classImg: {fileID: 8658280103416335861}
   heroInteTxt: {fileID: 1165972560342624310}
-  heroStrTxt: {fileID: 3767406802936462646}
-  heroLeadTxt: {fileID: 7053773401583320483}
+  heroStrTxt: {fileID: 7053773401583320483}
+  heroLeadTxt: {fileID: 3767406802936462646}
 --- !u!1 &3626348444554922844
 GameObject:
   m_ObjectHideFlags: 0
@@ -487,8 +487,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 32
-  m_fontSizeBase: 32
+  m_fontSize: 36
+  m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -499,7 +499,7 @@ MonoBehaviour:
   m_textAlignment: 65535
   m_characterSpacing: 0
   m_wordSpacing: 0
-  m_lineSpacing: 0
+  m_lineSpacing: -32
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
@@ -1413,8 +1413,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 20
-  m_fontSizeBase: 20
+  m_fontSize: 22
+  m_fontSizeBase: 22
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18

@@ -28,6 +28,11 @@ public class CardShopManager : MonoBehaviour
     private int era = 0;
     public TMP_Text eraText;
     public MySelectControl mySelect;
+    private int noItemRound = 0;
+    private bool isShopEnd = false;
+
+    private Coroutine shopCoroutine;
+
 
     // Start is called before the first frame update
     void Start()
@@ -55,14 +60,16 @@ public class CardShopManager : MonoBehaviour
     { 
         yield return new WaitForSeconds(.7f);
         GameManager.Instance.OnPlayerTurn(0);
-        while (true) // 模拟 Update 的循环
+        isShopEnd = false;
+        while (!isShopEnd) // 模拟 Update 的循环
         {    
-            yield return new WaitForSeconds(1.5f);
+            yield return new WaitForSeconds(UnityEngine.Random.Range(0.7f, 1.5f));
+
             // 你的逻辑代码
             doWork();
 
             // 等待 1 秒（不阻塞主线程）
-            yield return new WaitForSeconds(.7f);
+            yield return new WaitForSeconds(UnityEngine.Random.Range(0.3f, 0.6f));
         }
     }      
 
@@ -88,7 +95,7 @@ public class CardShopManager : MonoBehaviour
         float startY = 145f;
 
         var shopOpenIndex = GameManager.Instance.GetPlayer(0).GamePlayed(); //第几场比赛
-
+        bool hasItem = false;
         for (int i = 0; i < TOTAL_CARDS; i++)
         {
             // 计算行和列
@@ -117,13 +124,13 @@ public class CardShopManager : MonoBehaviour
 
             // 初始化CardView属性
             CardViewControl cardView = card.GetComponent<CardViewControl>();
-          //  if(i == 0)
-            if(shopOpenIndex >= 5 && i <= 1 && UnityEngine.Random.Range(0, 100) < System.Math.Clamp((shopOpenIndex - 5) * 3, 12, 35)) 
+            if(shopOpenIndex >= 5 && i <= 1 && UnityEngine.Random.Range(0, 100) < System.Math.Clamp(shopOpenIndex * 3 - 4, 12, 38) + noItemRound * 10)
             {
                 var itemId = HeroSelectionTool.GetRandomItemId();
                 if (shopOpenIndex > 9 && UnityEngine.Random.Range(0, 500) > 200)
                     count += UnityEngine.Random.Range(0, shopOpenIndex / 5);
                 cardView.Init(itemId, false, count);
+                hasItem = true;
             }
             else
             {
@@ -135,6 +142,11 @@ public class CardShopManager : MonoBehaviour
 
             cardViews.Add(cardView);
         }
+
+        if(shopOpenIndex >= 5 && !hasItem)
+            noItemRound++;
+        else
+            noItemRound = 0;
 
         era++;
         passBtn.gameObject.SetActive(true);    
@@ -188,15 +200,16 @@ public class CardShopManager : MonoBehaviour
 
     private void NextTurn()
     {
-        // 找到下一个没有pass的玩家
-        int nextPlayerId;
-        do
+        UnityEngine.Debug.Log("NextTurn");
+        for(int i = 0; i < 6; i++)
         {
             round++;
-            nextPlayerId = round % 6;
-        } while (playerPassed[nextPlayerId]);
-        
-        GameManager.Instance.OnPlayerTurn(nextPlayerId);
+            if (!playerPassed[round % 6])
+            {
+                GameManager.Instance.OnPlayerTurn(round % 6);
+                return;
+            }
+        }
     }
 
     private void doWork()
@@ -238,7 +251,7 @@ public class CardShopManager : MonoBehaviour
             }
         }
 
-        // 检查是否4个玩家都放弃或所有卡牌都已售出
+        // 检查是否6个玩家都放弃或所有卡牌都已售出
         if (passedPlayers >= 6 || allCardsSold)
         {
             // 进入下一轮并刷新卡牌
@@ -264,12 +277,18 @@ public class CardShopManager : MonoBehaviour
             GameManager.Instance.GetPlayer(i).AddGold(roundGold);
         era = 0;
         NewEra();     
-        StartCoroutine(DelayedUpdate()); 
+        shopCoroutine = StartCoroutine(DelayedUpdate()); 
     }
 
     private IEnumerator ShopEnd()
     {
+        isShopEnd = true;
+
         yield return new WaitForSeconds(0.5f);
+        if(shopCoroutine != null)
+            StopCoroutine(shopCoroutine);
+        shopCoroutine = null;
+
         GameManager.Instance.ClearTurn();
 
         var movingCardImages = GameObject.FindGameObjectsWithTag("MovingCard");
