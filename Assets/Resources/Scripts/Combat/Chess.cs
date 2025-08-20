@@ -258,7 +258,7 @@ public class Chess : MonoBehaviour
                 if (Time.time >= lastActionTime + attackCooldown)
                 {
                     lastActionTime = Time.time;
-                    Attack();
+                    Attack(targetChess);
                 }
                 return;
             }
@@ -399,13 +399,13 @@ public class Chess : MonoBehaviour
     }
 
     // 攻击目标
-    private void Attack()
+    private void Attack(Chess victim)
     {
-        if (targetChess == null)
+        if (victim == null)
             return;
 
         // 造成伤害
-        var damage = calculateDamage(this, targetChess, out var damType);
+        var damage = calculateDamage(this, victim, out var damType);
         var effect = "SwordHitBlue";
         if(isHero)
         {
@@ -415,17 +415,15 @@ public class Chess : MonoBehaviour
         var damageBase = damage;
         var damageMulti = 1f;
 
-        // UnityEngine.Debug.Log(heroId.ToString() + " Attack " + damageBase.ToString() + " " + damageMulti.ToString());
-        SkillManager.DuringAttack(this, targetChess, damType, ref damageBase, ref damageMulti, ref effect);
-        // UnityEngine.Debug.Log(heroId.ToString() + " Attack2 " + damageBase.ToString() + " " + damageMulti.ToString());
+        SkillManager.DuringAttack(this, victim, damType, ref damageBase, ref damageMulti, ref effect);
 
         damage = (int)(damageBase * damageMulti);
         var minDamage = 10;
         var maxDamage = 60;
-        if(isHero && targetChess.isHero)
+        if(isHero && victim.isHero)
         {
             //等级压制
-            var levelDiff = level - targetChess.level;
+            var levelDiff = level - victim.level;
             if(levelDiff != 0)
             {
                 minDamage = Math.Max(2, minDamage + levelDiff * 2);
@@ -434,15 +432,16 @@ public class Chess : MonoBehaviour
         }
         damage = Mathf.Clamp(damage, minDamage, maxDamage);
         //这里不改数值，只能伤害吸收
-        SkillManager.BeforeAttack(this, targetChess, ref damage);
-        // UnityEngine.Debug.Log(heroId.ToString() + " Attack3 " + damage.ToString());
+        SkillManager.BeforeAttack(this, victim, ref damage);
 
-        targetChess.hp -= damage;
-        SkillManager.OnAttack(this, targetChess, damage);
+        victim.hp -= damage;
+        SkillManager.OnAttack(this, victim, damage);
+        
+        // 记录日志
+        // Debug.Log($"{attacker.heroId}攻击{defender.heroId}，属性差值：Inte={inteDiff}, LeadShip={leadShipDiff}, Str={strDiff}，最大差值={maxDiff}，伤害：{damage}");
 
-        //Debug.Log($"{gameObject.name} 攻击了 {targetChess.gameObject.name}，造成 {this.attackDamage} 点伤害，目标剩余生命值：{targetChess.hp}");
-        EffectManager.PlayHitEffect(this, targetChess, effect);
-        targetChess.OnHpChanged();
+        EffectManager.PlayHitEffect(this, victim, effect);
+        victim.OnHpChanged();
     }
 
     public void OnSkillDamaged(int damage)
@@ -504,10 +503,6 @@ public class Chess : MonoBehaviour
 
         // 伤害 = 最大差值 * 2
         int damage = Mathf.RoundToInt(maxDiff * 2);
-
-        // 记录日志
-        Debug.Log($"{attacker.heroId}攻击{defender.heroId}，属性差值：Inte={inteDiff}, LeadShip={leadShipDiff}, Str={strDiff}，最大差值={maxDiff}，伤害：{damage}");
-
         return damage;
     }
 
