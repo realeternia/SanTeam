@@ -189,10 +189,10 @@ public class WorldManager : MonoBehaviour
         else
         {
           //  SpawnHerosForRegion(GameManager.Instance.GetPlayer(0), RegionHeroSide1[0], new System.Tuple<int, int>(101002, 1), 1, ref unitId);
-            SpawnHerosForRegion(GameManager.Instance.GetPlayer(0),RegionHeroSide1[3], new System.Tuple<int, int>(104002, 1), 1, ref unitId); 
+            SpawnHerosForRegion(GameManager.Instance.GetPlayer(0),RegionHeroSide1[3], new System.Tuple<int, int>(101016, 1), 1, ref unitId); 
 
             SpawnHerosForRegion(GameManager.Instance.GetPlayer(1), RegionHeroSide2[0], new System.Tuple<int, int>(102037, 1), 2, ref unitId);
-            SpawnHerosForRegion(GameManager.Instance.GetPlayer(1),RegionHeroSide2[1], new System.Tuple<int, int>(102037, 1), 2, ref unitId); 
+         //   SpawnHerosForRegion(GameManager.Instance.GetPlayer(1),RegionHeroSide2[1], new System.Tuple<int, int>(102037, 1), 2, ref unitId); 
         }
 
 
@@ -525,6 +525,15 @@ public class WorldManager : MonoBehaviour
         }
     }
 
+    public bool CheckInRange(Vector3 pos1, Vector3 pos2, float range)
+    {
+        Vector2Int pos1a = WorldManager.Instance.WorldToGridPosition(pos1, true);
+        Vector2Int pos2a = WorldManager.Instance.WorldToGridPosition(pos2, true);
+
+        return Vector2Int.Distance(pos1a, pos2a) <= range;
+    }
+
+
     public List<Chess> GetUnitsInRange(Vector3 wPos, float range, int mySide, bool findEnemy)
     {
         Vector2Int center = WorldManager.Instance.WorldToGridPosition(wPos, true);
@@ -577,20 +586,33 @@ public class WorldManager : MonoBehaviour
     // 战斗文本移动协程
     private IEnumerator MoveText(GameObject battleText, UnityEngine.Vector2 speed, int duration)
     {
+        //获得屏幕分辨率
+        int screenWidth = Screen.width;
+        int screenHeight = Screen.height;
+
+        UnityEngine.Debug.Log($"screenWidth:{screenWidth} screenHeight:{screenHeight}");
+
+        // 假设设计分辨率为 1920x1080，可根据实际项目修改
+        const float designWidth = 2048f;
+        const float designHeight = 1536f;
+        // 根据当前屏幕分辨率计算缩放比例
+        float scaleX = (float)screenWidth / designWidth;
+        float scaleY = (float)screenHeight / designHeight;
+
         float startTime = Time.time;
         float endTime = startTime + duration;
         RectTransform rectTransform = battleText.GetComponent<RectTransform>();
-        Vector3 startPosition = rectTransform.position;
+        var lastTime = Time.time;
 
         while (Time.time < endTime)
         {
-            // 计算移动距离，使用 Time.deltaTime 来保证帧率无关的移动
-            float moveX = speed.x * Time.deltaTime;
-            float moveY = speed.y * Time.deltaTime;
+            // 考虑分辨率和缩放因素计算移动距离
+            var timeDiff = Time.time - lastTime;
+            lastTime = Time.time;
 
-            if(rectTransform == null)
-                yield break;
-
+            float moveX = speed.x * timeDiff * scaleX;
+            float moveY = speed.y * timeDiff * scaleY;
+                    
             // 更新位置
             rectTransform.Translate(new Vector3(moveX, moveY, 0));
 

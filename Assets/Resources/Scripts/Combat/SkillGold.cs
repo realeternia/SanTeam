@@ -16,6 +16,6 @@ public class SkillGold : Skill
         var goldAdd = (int)(skillCfg.Strength);
         owner.GetPlayerInfo().AddGold(goldAdd);
 
-        WorldManager.Instance.AddBattleText(goldAdd.ToString() + "金", owner.transform.position, new UnityEngine.Vector2(0, 300), Color.yellow, 2);
+        WorldManager.Instance.AddBattleText(goldAdd.ToString() + "金", owner.transform.position, new UnityEngine.Vector2(0, 60), Color.yellow, 2);
     }
 }

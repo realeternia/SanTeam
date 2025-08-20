@@ -206,7 +206,7 @@ public class Chess : MonoBehaviour
         score += 100f / (distance + 1f);  // 避免除以0
 
         // 添加最大属性差作为积分项（权重可根据游戏平衡调整）
-        score += calculateDamage(this, target) / 2;
+        score += calculateDamage(this, target, out var type) / 2;
 
         // 生命值权重（生命值越低分数越高）
         if (target.hp < (int)(target.maxHp * 0.5))
@@ -238,7 +238,7 @@ public class Chess : MonoBehaviour
         }
 
         // 检查目标是否存在
-        if (targetChess == null)
+        if (targetChess == null || targetChess.hp <= 0)
         {
             // 如果没有目标，尝试寻找新目标
             FindTarget();
@@ -257,8 +257,8 @@ public class Chess : MonoBehaviour
                 // 检查攻击冷却
                 if (Time.time >= lastActionTime + attackCooldown)
                 {
-                    Attack();
                     lastActionTime = Time.time;
+                    Attack();
                 }
                 return;
             }
@@ -405,7 +405,7 @@ public class Chess : MonoBehaviour
             return;
 
         // 造成伤害
-        var damage = calculateDamage(this, targetChess);
+        var damage = calculateDamage(this, targetChess, out var damType);
         var effect = "SwordHitBlue";
         if(isHero)
         {
@@ -416,7 +416,7 @@ public class Chess : MonoBehaviour
         var damageMulti = 1f;
 
         // UnityEngine.Debug.Log(heroId.ToString() + " Attack " + damageBase.ToString() + " " + damageMulti.ToString());
-        SkillManager.DuringAttack(this, targetChess, ref damageBase, ref damageMulti, ref effect);
+        SkillManager.DuringAttack(this, targetChess, damType, ref damageBase, ref damageMulti, ref effect);
         // UnityEngine.Debug.Log(heroId.ToString() + " Attack2 " + damageBase.ToString() + " " + damageMulti.ToString());
 
         damage = (int)(damageBase * damageMulti);
@@ -443,16 +443,14 @@ public class Chess : MonoBehaviour
         //Debug.Log($"{gameObject.name} 攻击了 {targetChess.gameObject.name}，造成 {this.attackDamage} 点伤害，目标剩余生命值：{targetChess.hp}");
         EffectManager.PlayHitEffect(this, targetChess, effect);
         targetChess.OnHpChanged();
-
-        // 检查目标是否被击败
-        if (targetChess.hp <= 0)
-        {
-            targetChess = null;
-
-            // 寻找新目标
-            FindTarget();
-        }
     }
+
+    public void OnSkillDamaged(int damage)
+    {
+        hp -= damage;
+        OnHpChanged();
+    }
+
 
     public void OnHpChanged()
     {
@@ -475,10 +473,13 @@ public class Chess : MonoBehaviour
     }
   
 
-    private int calculateDamage(Chess attacker, Chess defender)
+    private int calculateDamage(Chess attacker, Chess defender, out string type)
     {
-        if(!attacker.isHero || !defender.isHero)
+        if (!attacker.isHero || !defender.isHero)
+        {
+            type = "leadShip";
             return attacker.attackDamage;
+        }
 
         // 计算攻击者三属性与防御者对应属性的差值
         float inteDiff = attacker.inte - defender.inte;
@@ -487,6 +488,19 @@ public class Chess : MonoBehaviour
 
         // 找出最大差值
         float maxDiff = Mathf.Max(inteDiff, leadShipDiff, strDiff);
+        type = "";
+        if(maxDiff == inteDiff)
+        {
+            type = "inte";
+        }
+        else if(maxDiff == leadShipDiff)
+        {
+            type = "leadShip";
+        }
+        else
+        {
+            type = "str";
+        }
 
         // 伤害 = 最大差值 * 2
         int damage = Mathf.RoundToInt(maxDiff * 2);

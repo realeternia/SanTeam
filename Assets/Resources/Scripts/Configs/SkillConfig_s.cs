@@ -109,10 +109,14 @@ namespace CommonConfig
             config[200004] = new SkillConfig(200004, "坚硬皮肤", "受击时几率发动50%减伤", 1, 0.25f, 7f, 0, 0.5f, 300002, 5, "HardSkin", "", 2, "shi");
             config[200005] = new SkillConfig(200005, "突破", "移动时穿越敌人", 1, 1f, 7f, 0, 0, 0, 0, "RunCross", "LightningExplosionBlue", 2, "ma");
             config[200006] = new SkillConfig(200006, "计谋", "射程较远", 1, 1f, 99f, 0, 0, 0, 0, "Dumb", "", 0, "xiang");
-            config[200007] = new SkillConfig(200007, "远程射击", "射程很远", 1, 1f, 99f, 0, 0, 0, 0, "Dumb", "", 0, "pao");
+            config[200007] = new SkillConfig(200007, "射击", "射程很远", 1, 1f, 99f, 0, 0, 0, 0, "Dumb", "", 0, "pao");
             config[201001] = new SkillConfig(201001, "治疗", "给与友军治疗", 1, 1f, 3f, 50f, 0.3f, 0, 0, "Heal", "MagicBuffGreen", 3, "heal");
             config[201002] = new SkillConfig(201002, "鼓舞", "给与友军攻速祝福", 1, 1f, 3f, 50f, 0.2f, 0, 0, "Song", "MagicChargeYellow", 3, "song");
-            config[201003] = new SkillConfig(201003, "管家", "参战获得5金币", 1, 0, 0, 0, 5f, 0, 0, "Gold", "MagicChargeYellow", 5, "gold");
+            config[201003] = new SkillConfig(201003, "富甲一方", "参战获得5金币", 1, 0, 0, 0, 5f, 0, 0, "Gold", "MagicChargeYellow", 5, "gold");
+            config[201004] = new SkillConfig(201004, "反伤", "反弹30%近战伤害", 1, 0, 0, 20f, 0.3f, 0, 0, "Feedback", "SwordHitBlue", 3, "ci");
+            config[201005] = new SkillConfig(201005, "狙击", "射程非常远", 1, 1f, 99f, 0, 0, 0, 0, "Dumb", "", 1, "ju");
+            config[201006] = new SkillConfig(201006, "连射", "攻击近距离目标时几率加速", 1, 0.4f, 2f, 25f, 0.5f, 0, 0, "SpeedAttack", "", 2, "lian");
+            config[201007] = new SkillConfig(201007, "藤甲兵", "受非智力攻击时高几率发动70%减伤", 1, 0.7f, 1f, 0, 0.7f, 0, 0, "PlantSkin", "", 4, "teng");
 
         }
 

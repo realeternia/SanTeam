@@ -29,6 +29,13 @@ public static class SkillManager
                 return new SkillSong(skillId, owner);
             case "Gold":
                 return new SkillGold(skillId, owner);
+            case "Feedback":
+                return new SkillFeedback(skillId, owner);
+            case "SpeedAttack":
+                return new SkillSpeedAttack(skillId, owner);
+            case "PlantSkin":
+                return new SkillPlantSkin(skillId, owner);
+
             case "Dumb":
                 return new SkillDumb(skillId, owner);               
         }
@@ -45,23 +52,26 @@ public static class SkillManager
     }
 
 
-    public static void DuringAttack(Chess attacker, Chess defender, ref int damageBase, ref float damageMulti, ref string effect)
+    public static void DuringAttack(Chess attacker, Chess defender, string damType, ref int damageBase, ref float damageMulti, ref string effect)
     {       
         foreach(var skill in attacker.skills)
         {
-            skill.DuringAttack(defender, ref damageBase, ref damageMulti, ref effect);
+            skill.DuringAttack(defender, damType, ref damageBase, ref damageMulti, ref effect);
+
         }    
         foreach(var skill in defender.skills)
         {
-            skill.DuringAttacked(attacker, ref damageBase, ref damageMulti, ref effect);
+            skill.DuringAttacked(attacker, damType, ref damageBase, ref damageMulti, ref effect);
+
         }
         foreach(var buff in attacker.buffs)
         {
-            buff.DuringAttack(defender, ref damageBase, ref damageMulti, ref effect);
+            buff.DuringAttack(defender, damType, ref damageBase, ref damageMulti, ref effect);
+
         }   
         foreach(var buff in defender.buffs)
         {
-            buff.DuringAttacked(attacker, ref damageBase, ref damageMulti, ref effect);
+            buff.DuringAttacked(attacker, damType, ref damageBase, ref damageMulti, ref effect);
         }
     }
 
@@ -80,6 +90,11 @@ public static class SkillManager
         {
             skill.OnAttack(defender, damage);
         }
+        foreach (var skill in defender.skills)
+        {
+            skill.OnAttacked(attacker, damage);
+        }
+
         foreach(var buff in attacker.buffs)
         {
             buff.OnAttack(defender, damage);
