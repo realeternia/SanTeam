@@ -98,14 +98,16 @@ namespace CommonConfig
         public static void Load()
         {
             config.Clear();
-            config[200001] = new SkillConfig(200001, "转转转", 1, 0.2f, 5f, 0, 0.6f, 0, 0, "SpinAttack", "SwordWhirlwindWhite", 5, "spinattack");
+            config[200001] = new SkillConfig(200001, "转转转", 1, 0.35f, 6f, 0, 0.3f, 0, 0, "SpinAttack", "SwordWhirlwindWhite", 3, "meng");
             config[200002] = new SkillConfig(200002, "车愤怒一击", 1, 0.2f, 5f, 0, 0.5f, 0, 0, "CriticalAttack", "SwordHitRedCritical", 2, "che");
             config[200003] = new SkillConfig(200003, "主公技", 1, 0, 0, 0, 0.2f, 300001, 999, "MasterShield", "", 4, "shuai");
             config[200004] = new SkillConfig(200004, "士技", 1, 0.25f, 7f, 0, 0.5f, 300002, 5, "HardSkin", "", 2, "shi");
             config[200005] = new SkillConfig(200005, "马技-突破", 1, 1f, 7f, 0, 0.3f, 0, 0, "RunCross", "LightningExplosionBlue", 2, "ma");
             config[200006] = new SkillConfig(200006, "相", 1, 1f, 99f, 0, 0, 0, 0, "Dumb", "", 0, "xiang");
             config[200007] = new SkillConfig(200007, "炮", 1, 1f, 99f, 0, 0, 0, 0, "Dumb", "", 0, "pao");
-            config[201001] = new SkillConfig(201001, "治疗", 1, 1f, 3f, 0, 0.3f, 0, 0, "Heal", "MagicBuffGreen", 3, "heal");
+            config[201001] = new SkillConfig(201001, "治疗", 1, 1f, 3f, 50f, 0.3f, 0, 0, "Heal", "MagicBuffGreen", 3, "heal");
+            config[201002] = new SkillConfig(201002, "鼓舞", 1, 1f, 3f, 50f, 0.2f, 0, 0, "Song", "MagicChargeYellow", 3, "song");
+            config[201003] = new SkillConfig(201003, "管家", 1, 0, 0, 0, 5f, 0, 0, "Gold", "MagicChargeYellow", 5, "gold");
 
         }
 

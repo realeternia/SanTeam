@@ -10,6 +10,8 @@ using UnityEngine.UI;
 public class Chess : MonoBehaviour
 {
     public int id;
+    public int playerId;
+
     public int maxHp = 100;  // 最大生命值
     private Canvas canvas;
     private ChessHUD hud;
@@ -62,8 +64,9 @@ public class Chess : MonoBehaviour
         StartCoroutine(MoveAndFightCoroutine());
     }
 
-    public void Init(Color c)
+    public void Init(int pid, Color c)
     {
+        playerId = pid;
         // 创建材质实例
         material = new Material(rend.sharedMaterial);
         if(chessName.StartsWith("PlayerPic"))
@@ -499,6 +502,17 @@ public class Chess : MonoBehaviour
         hp = Mathf.Clamp(hp + addon, 0, maxHp);
         OnHpChanged();
     }
+
+    public void Cooldown(float time)
+    {
+        lastActionTime -= time;
+    }
+
+    public PlayerInfo GetPlayerInfo()
+    {
+        return GameManager.Instance.GetPlayer(playerId);
+    }
+
 
     public void AddColorEffect(Color start, Color end)
     {

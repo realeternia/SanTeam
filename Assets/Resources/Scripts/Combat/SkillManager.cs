@@ -25,6 +25,10 @@ public static class SkillManager
                 return new SkillRunCross(skillId, owner);
             case "Heal":
                 return new SkillHeal(skillId, owner);
+            case "Song":
+                return new SkillSong(skillId, owner);
+            case "Gold":
+                return new SkillGold(skillId, owner);
             case "Dumb":
                 return new SkillDumb(skillId, owner);               
         }

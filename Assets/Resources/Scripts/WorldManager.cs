@@ -188,11 +188,11 @@ public class WorldManager : MonoBehaviour
         }
         else
         {
-            SpawnHerosForRegion(GameManager.Instance.GetPlayer(0), RegionHeroSide1[0], new System.Tuple<int, int>(101014, 1), 1, ref unitId);
-            // SpawnHerosForRegion(GameManager.Instance.GetPlayer(0),RegionHeroSide1[3], new System.Tuple<int, int>(104009, 1), 1, ref unitId); 
+          //  SpawnHerosForRegion(GameManager.Instance.GetPlayer(0), RegionHeroSide1[0], new System.Tuple<int, int>(101002, 1), 1, ref unitId);
+            SpawnHerosForRegion(GameManager.Instance.GetPlayer(0),RegionHeroSide1[3], new System.Tuple<int, int>(104002, 1), 1, ref unitId); 
 
-            SpawnHerosForRegion(GameManager.Instance.GetPlayer(1), RegionHeroSide2[1], new System.Tuple<int, int>(101002, 1), 2, ref unitId);
-            // SpawnHerosForRegion(GameManager.Instance.GetPlayer(1),RegionHeroSide2[2], new System.Tuple<int, int>(102037, 1), 2, ref unitId); 
+            SpawnHerosForRegion(GameManager.Instance.GetPlayer(1), RegionHeroSide2[0], new System.Tuple<int, int>(102037, 1), 2, ref unitId);
+            SpawnHerosForRegion(GameManager.Instance.GetPlayer(1),RegionHeroSide2[1], new System.Tuple<int, int>(102037, 1), 2, ref unitId); 
         }
 
 
@@ -221,7 +221,7 @@ public class WorldManager : MonoBehaviour
                     chessComponent.moveSpeed = 10;
                     chessComponent.attackRange = 12;
                     chessComponent.attackDamage = 20;
-                    chessComponent.Init(p.lineColor);
+                    chessComponent.Init(p.pid, p.lineColor);
 
                     // 可以在这里设置其他必要的初始化参数
                 }
@@ -263,7 +263,7 @@ public class WorldManager : MonoBehaviour
                 }
                 chessComponent.UpdateLevel(p, heroData.Item2);
 
-                chessComponent.Init(p.lineColor);
+                chessComponent.Init(p.pid, p.lineColor);
                 // 可以在这里设置其他必要的初始化参数
             }
             else
