@@ -16,7 +16,7 @@ public class BagControl : MonoBehaviour
     // Start is called before the first frame update
     // 声明一个列表用于缓存 cell 对象
     private List<GameObject> cellCache = new List<GameObject>();
-    public ItemDetail heroDetail;
+    public ItemHeroDetail heroDetail;
     public ItemDetail itemDetail;
     public GameObject bagItemRegion;
 

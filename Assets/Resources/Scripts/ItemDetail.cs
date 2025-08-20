@@ -1,8 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+
 using TMPro;
 using CommonConfig;
+using System.Runtime.Versioning;
 
 public class ItemDetail : MonoBehaviour
 {
@@ -10,10 +13,10 @@ public class ItemDetail : MonoBehaviour
     public int level;
 
     public TMP_Text nameText;
-    public TMP_Text leadText;
-    public TMP_Text inteText;
-    public TMP_Text strText;
-    public TMP_Text hpText;
+    public Image attr1Icon;
+    public TMP_Text attr1Val;
+    public Image attr2Icon;
+    public TMP_Text attr2Val;
     public TMP_Text goldText;
     public TMP_Text equipText;
 
@@ -40,11 +43,6 @@ public class ItemDetail : MonoBehaviour
         cardId = id;
         level = lv;
 
-        var maxHpBase = 0;
-        var inteBase = 0;
-        var strBase = 0;
-        var leadShipBase = 0;
-
         HeroSelectionTool.AttrInfo attrFinal = new HeroSelectionTool.AttrInfo();
         HeroSelectionTool.AttrInfo attrEquip = new HeroSelectionTool.AttrInfo();
 
@@ -52,40 +50,38 @@ public class ItemDetail : MonoBehaviour
 
         var player = GameManager.Instance.GetPlayer(0);
 
-        if (ConfigManager.IsHeroCard(id))
-        {
-            var heroConfig = HeroConfig.GetConfig(id);
-
-            maxHpBase = heroConfig.Hp;
-            inteBase = heroConfig.Inte;
-            strBase = heroConfig.Str;
-            leadShipBase = heroConfig.LeadShip;
-
-            nameText.text = heroConfig.Name;
-            goldText.text = (HeroSelectionTool.GetPrice(heroConfig) * GameManager.Instance.GetPlayer(0).cards[cardId] / 2).ToString();
-
-            if (player.itemEquips.ContainsKey(cardId))
-            {
-                var equipCardId = player.itemEquips[cardId];
-
-                var equipName = ItemConfig.GetConfig(equipCardId).Name;
-                equipText.text = equipName;
-                var cardLevel = HeroSelectionTool.GetCardLevel(player.cards[equipCardId]);  
-                attrEquip = HeroSelectionTool.GetCardAttr(equipCardId, cardLevel);
-            } 
-            
-        }
-        else
+        if (!ConfigManager.IsHeroCard(id))
         {
             var itemConfig = ItemConfig.GetConfig(id);
             nameText.text = itemConfig.Name;
-            goldText.text = (itemConfig.Price / 2).ToString();
+            goldText.text = (itemConfig.Price * GameManager.Instance.GetPlayer(0).cards[cardId] / 2).ToString();
 
-            var attrBase = HeroSelectionTool.GetCardAttr(cardId, 1);
-            maxHpBase = attrBase.Hp;
-            inteBase = attrBase.Inte;
-            strBase = attrBase.Str;
-            leadShipBase = attrBase.Lead;
+            if(string.IsNullOrEmpty(itemConfig.Attr1))
+            {
+                attr1Icon.gameObject.SetActive(false);
+                attr1Val.gameObject.SetActive(false);
+            }
+            else
+            {
+                attr1Icon.gameObject.SetActive(true);
+                attr1Val.gameObject.SetActive(true);
+                attr1Icon.sprite = Resources.Load<Sprite>("attr" + itemConfig.Attr1);
+                attr1Val.text = (itemConfig.Attr1Val * lv).ToString();
+            }
+
+            if(string.IsNullOrEmpty(itemConfig.Attr2))
+            {
+                attr2Icon.gameObject.SetActive(false);
+                attr2Val.gameObject.SetActive(false);
+            }
+            else
+            {
+                attr2Icon.gameObject.SetActive(true);
+                attr2Val.gameObject.SetActive(true);
+                attr2Icon.sprite = Resources.Load<Sprite>("attr" + itemConfig.Attr2);
+                attr2Val.text = (itemConfig.Attr2Val * lv).ToString();
+            }
+
 
             foreach (var item in player.itemEquips)
             {
@@ -97,32 +93,6 @@ public class ItemDetail : MonoBehaviour
                 }
             }            
         }
-
-        attrFinal = HeroSelectionTool.GetCardAttr(cardId, lv);
-
-        leadText.text = leadShipBase.ToString();
-        if (attrFinal.Lead > leadShipBase)
-
-            leadText.text += "<color=green>+" + (attrFinal.Lead - leadShipBase).ToString() + "</color>";
-            if (attrEquip.Lead > 0)
-            leadText.text += "<color=#FFB6C1>+" + attrEquip.Lead.ToString() + "</color>";
-
-        inteText.text = inteBase.ToString();
-        if (attrFinal.Inte > inteBase)
-            inteText.text += "<color=green>+" + (attrFinal.Inte - inteBase).ToString() + "</color>";
-        if (attrEquip.Inte > 0)
-            inteText.text += "<color=#FFB6C1>+" + attrEquip.Inte.ToString() + "</color>";            
-        strText.text = strBase.ToString();
-        if (attrFinal.Str > strBase)
-            strText.text += "<color=green>+" + (attrFinal.Str - strBase).ToString() + "</color>";
-        if (attrEquip.Str > 0)
-            strText.text += "<color=#FFB6C1>+" + attrEquip.Str.ToString() + "</color>";            
-        hpText.text = maxHpBase.ToString();
-        if (attrFinal.Hp > maxHpBase)
-            hpText.text += "<color=green>+" + (attrFinal.Hp - maxHpBase).ToString() + "</color>";
-        if (attrEquip.Hp > 0)
-            hpText.text += "<color=#FFB6C1>+" + attrEquip.Hp.ToString() + "</color>";
-
     }
 
     public void UpdateSelf()
@@ -133,13 +103,10 @@ public class ItemDetail : MonoBehaviour
     public void Clear()
     {
         cardId = 0;
-        nameText.text = "";
-        leadText.text = "";
-        inteText.text = "";
-        strText.text = "";
-        hpText.text = "";
-        goldText.text = "";
-        equipText.text = "";
+        attr1Icon.gameObject.SetActive(false);
+        attr1Val.gameObject.SetActive(false);
+        attr2Icon.gameObject.SetActive(false);
+        attr2Val.gameObject.SetActive(false);
 
 
     }

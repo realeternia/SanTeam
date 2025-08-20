@@ -124,6 +124,7 @@ public class CardShopManager : MonoBehaviour
 
             // 初始化CardView属性
             CardViewControl cardView = card.GetComponent<CardViewControl>();
+           // if(i == 0)
             if(shopOpenIndex >= 5 && i <= 1 && UnityEngine.Random.Range(0, 100) < System.Math.Clamp(shopOpenIndex * 3 - 4, 12, 38) + noItemRound * 10)
             {
                 var itemId = HeroSelectionTool.GetRandomItemId();

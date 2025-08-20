@@ -14,7 +14,7 @@ public class SkillSpinAttack : Skill
         if(CheckBurst())
         {
             Debug.Log("SkillSpinAttack");
-            var unitsInRange = WorldManager.Instance.GetUnitsInRange(owner.transform.position, 20, owner.side, true);
+            var unitsInRange = WorldManager.Instance.GetUnitsInRange(owner.transform.position, skillCfg.Range, owner.side, true);
             foreach(var unit in unitsInRange)
             {
                 if(unit == defender)

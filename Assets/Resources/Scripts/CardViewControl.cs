@@ -4,8 +4,9 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using CommonConfig;
+using UnityEngine.EventSystems;
 
-public class CardViewControl : MonoBehaviour
+public class CardViewControl : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 {
     public int cardId;
     public int count;
@@ -38,11 +39,43 @@ public class CardViewControl : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        cardName.raycastTarget = false;
+        lead.raycastTarget = false;
+        inte.raycastTarget = false;
+        str.raycastTarget = false;
+        hp.raycastTarget = false;
+
         buyButton.onClick.AddListener(() =>
         {
             CardShopManager.Instance.OnPlayerBuyCard(this, 0, cardId, isHeroCard, priceI, count);
-
         });
+    }
+
+    public void OnPointerUp(PointerEventData eventData)
+    {
+        if (Tooltip.Instance != null)
+        {
+            Tooltip.Instance.HideTooltip();
+        }
+    }
+
+    public void OnPointerDown(PointerEventData eventData)
+    {
+        Debug.Log($"UI 元素被按下，位置：{eventData.position}");
+
+        if (isHeroCard)
+        {
+            var heroCfg = HeroConfig.GetConfig(cardId);
+            if (heroCfg != null && heroCfg.Skills != null && heroCfg.Skills.Length > 0)
+            { 
+                for (int i = 0; i < heroCfg.Skills.Length; i++)
+                {
+                     Tooltip.Instance.ShowTooltip(heroCfg.Skills[i]);
+                    return;
+                }
+            }
+        }
+
     }
 
     // Update is called once per frame

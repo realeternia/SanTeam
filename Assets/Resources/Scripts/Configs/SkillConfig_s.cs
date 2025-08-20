@@ -15,6 +15,10 @@ namespace CommonConfig
         /// </summary>
         public string Name;
         /// <summary>
+        ///说明
+        /// </summary>
+        public string Descript;
+        /// <summary>
         ///等级
         /// </summary>
         public int Lv;
@@ -60,10 +64,11 @@ namespace CommonConfig
         public string Icon;
 
 
-        public SkillConfig(int Id, string Name, int Lv, float Rate, float CD, float Range, float Strength, int BuffId, int BuffTime, string ScriptName, string HitEffect, int Price, string Icon)
+        public SkillConfig(int Id, string Name, string Descript, int Lv, float Rate, float CD, float Range, float Strength, int BuffId, int BuffTime, string ScriptName, string HitEffect, int Price, string Icon)
         {
             this.Id = Id;
             this.Name = Name;
+            this.Descript = Descript;
             this.Lv = Lv;
             this.Rate = Rate;
             this.CD = CD;
@@ -98,16 +103,16 @@ namespace CommonConfig
         public static void Load()
         {
             config.Clear();
-            config[200001] = new SkillConfig(200001, "转转转", 1, 0.35f, 6f, 0, 0.3f, 0, 0, "SpinAttack", "SwordWhirlwindWhite", 3, "meng");
-            config[200002] = new SkillConfig(200002, "车愤怒一击", 1, 0.2f, 5f, 0, 0.5f, 0, 0, "CriticalAttack", "SwordHitRedCritical", 2, "che");
-            config[200003] = new SkillConfig(200003, "主公技", 1, 0, 0, 0, 0.2f, 300001, 999, "MasterShield", "", 4, "shuai");
-            config[200004] = new SkillConfig(200004, "士技", 1, 0.25f, 7f, 0, 0.5f, 300002, 5, "HardSkin", "", 2, "shi");
-            config[200005] = new SkillConfig(200005, "马技-突破", 1, 1f, 7f, 0, 0.3f, 0, 0, "RunCross", "LightningExplosionBlue", 2, "ma");
-            config[200006] = new SkillConfig(200006, "相", 1, 1f, 99f, 0, 0, 0, 0, "Dumb", "", 0, "xiang");
-            config[200007] = new SkillConfig(200007, "炮", 1, 1f, 99f, 0, 0, 0, 0, "Dumb", "", 0, "pao");
-            config[201001] = new SkillConfig(201001, "治疗", 1, 1f, 3f, 50f, 0.3f, 0, 0, "Heal", "MagicBuffGreen", 3, "heal");
-            config[201002] = new SkillConfig(201002, "鼓舞", 1, 1f, 3f, 50f, 0.2f, 0, 0, "Song", "MagicChargeYellow", 3, "song");
-            config[201003] = new SkillConfig(201003, "管家", 1, 0, 0, 0, 5f, 0, 0, "Gold", "MagicChargeYellow", 5, "gold");
+            config[200001] = new SkillConfig(200001, "旋风斩", "攻击对附近敌人造成35%伤害", 1, 0.35f, 6f, 20f, 0.3f, 0, 0, "SpinAttack", "SwordWhirlwindWhite", 3, "meng");
+            config[200002] = new SkillConfig(200002, "愤怒一击", "攻击20%几率造成1.5倍伤害", 1, 0.2f, 5f, 0, 0.5f, 0, 0, "CriticalAttack", "SwordHitRedCritical", 2, "che");
+            config[200003] = new SkillConfig(200003, "主公技", "给与我方同阵营单位20%生命值护盾", 1, 0, 0, 0, 0.2f, 300001, 999, "MasterShield", "", 4, "shuai");
+            config[200004] = new SkillConfig(200004, "坚硬皮肤", "受击时几率发动50%减伤", 1, 0.25f, 7f, 0, 0.5f, 300002, 5, "HardSkin", "", 2, "shi");
+            config[200005] = new SkillConfig(200005, "突破", "移动时穿越敌人", 1, 1f, 7f, 0, 0, 0, 0, "RunCross", "LightningExplosionBlue", 2, "ma");
+            config[200006] = new SkillConfig(200006, "计谋", "射程较远", 1, 1f, 99f, 0, 0, 0, 0, "Dumb", "", 0, "xiang");
+            config[200007] = new SkillConfig(200007, "远程射击", "射程很远", 1, 1f, 99f, 0, 0, 0, 0, "Dumb", "", 0, "pao");
+            config[201001] = new SkillConfig(201001, "治疗", "给与友军治疗", 1, 1f, 3f, 50f, 0.3f, 0, 0, "Heal", "MagicBuffGreen", 3, "heal");
+            config[201002] = new SkillConfig(201002, "鼓舞", "给与友军攻速祝福", 1, 1f, 3f, 50f, 0.2f, 0, 0, "Song", "MagicChargeYellow", 3, "song");
+            config[201003] = new SkillConfig(201003, "管家", "参战获得5金币", 1, 0, 0, 0, 5f, 0, 0, "Gold", "MagicChargeYellow", 5, "gold");
 
         }
 

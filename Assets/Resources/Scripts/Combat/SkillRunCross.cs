@@ -8,7 +8,6 @@ using System.Collections;
 public class SkillRunCross : Skill
 {
     public SkillRunCross(int id, Chess unit) : base(id, unit)
-
     {
     }
 
