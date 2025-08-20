@@ -189,7 +189,7 @@ public class WorldManager : MonoBehaviour
         else
         {
           //  SpawnHerosForRegion(GameManager.Instance.GetPlayer(0), RegionHeroSide1[0], new System.Tuple<int, int>(101002, 1), 1, ref unitId);
-            SpawnHerosForRegion(GameManager.Instance.GetPlayer(0),RegionHeroSide1[3], new System.Tuple<int, int>(101016, 1), 1, ref unitId); 
+            SpawnHerosForRegion(GameManager.Instance.GetPlayer(0),RegionHeroSide1[3], new System.Tuple<int, int>(101008, 1), 1, ref unitId); 
 
             SpawnHerosForRegion(GameManager.Instance.GetPlayer(1), RegionHeroSide2[0], new System.Tuple<int, int>(102037, 1), 2, ref unitId);
          //   SpawnHerosForRegion(GameManager.Instance.GetPlayer(1),RegionHeroSide2[1], new System.Tuple<int, int>(102037, 1), 2, ref unitId); 
@@ -221,6 +221,8 @@ public class WorldManager : MonoBehaviour
                     chessComponent.moveSpeed = 10;
                     chessComponent.attackRange = 12;
                     chessComponent.attackDamage = 20;
+                    chessComponent.hitEffect = "SwordHitBlue";
+
                     chessComponent.Init(p.pid, p.lineColor);
 
                     // 可以在这里设置其他必要的初始化参数
@@ -256,6 +258,7 @@ public class WorldManager : MonoBehaviour
                 chessComponent.heroId = (int)heroConfig.Id;
                 chessComponent.side = side;
                 chessComponent.chessName = heroConfig.Icon;
+                chessComponent.hitEffect = heroConfig.HitEffect;
                 if (side <= 2)
                 {
                     var heroInfo = heroInfoGroup.AddHero(side, (int)heroConfig.Id, heroData.Item2);
@@ -274,6 +277,18 @@ public class WorldManager : MonoBehaviour
             idCounter++;
         }
     }
+
+    public void CreateMissile(Chess sourceChess, Chess targetChess)
+    {
+        // 首先加载导弹预制体
+        Missile missilePrefab = Resources.Load<Missile>("Prefabs/MissileCom");
+        
+        // 实例化导弹
+        var missile = Instantiate<Missile>(missilePrefab, sourceChess.transform.position, Quaternion.identity, Units.transform);
+        missile.Init(sourceChess, targetChess, sourceChess.hitEffect);
+
+    }
+
 
     // 世界坐标转格子坐标
     public Vector2Int WorldToGridPosition(Vector3 worldPosition, bool FloorToInt)

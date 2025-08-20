@@ -39,6 +39,7 @@ public class Chess : MonoBehaviour
     // 是否正在使用偏移路径
     public int hp = 100;
     public int attackDamage = 30;
+    public string hitEffect;
 
     // 攻击冷却时间
     private float attackCooldown = 2f;
@@ -258,7 +259,19 @@ public class Chess : MonoBehaviour
                 if (Time.time >= lastActionTime + attackCooldown)
                 {
                     lastActionTime = Time.time;
-                    Attack(targetChess);
+                    if (targetChess != null)
+                    {
+                        if(attackRange >= 20)
+                        {
+                            WorldManager.Instance.CreateMissile(this, targetChess);
+                        }
+                        else
+                        {
+                            // 普通攻击
+                            Attack(targetChess);
+                        }
+
+                    }
                 }
                 return;
             }
@@ -399,19 +412,14 @@ public class Chess : MonoBehaviour
     }
 
     // 攻击目标
-    private void Attack(Chess victim)
+    public void Attack(Chess victim)
     {
         if (victim == null)
             return;
 
         // 造成伤害
         var damage = calculateDamage(this, victim, out var damType);
-        var effect = "SwordHitBlue";
-        if(isHero)
-        {
-            var heroConfig = HeroConfig.GetConfig(heroId);
-            effect = heroConfig.HitEffect;
-        }
+        var effect = hitEffect;
         var damageBase = damage;
         var damageMulti = 1f;
 
