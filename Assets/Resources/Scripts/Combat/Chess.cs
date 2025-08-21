@@ -152,7 +152,7 @@ public class Chess : MonoBehaviour
         // 收集所有有效目标及其距离
         foreach (Chess chess in allChess)
         {
-            if (chess.side != this.side && (chess.side + 1) / 2 == (side + 1) / 2 && chess != this)
+            if (chess != this && WorldManager.Instance.IsEnemy(this.side, chess.side))
             {
                 float distance = Vector3.Distance(transform.position, chess.transform.position);
                 validTargets.Add((chess, distance));

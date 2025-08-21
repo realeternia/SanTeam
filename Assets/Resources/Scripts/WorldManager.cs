@@ -52,11 +52,15 @@ public class WorldManager : MonoBehaviour
 
     public void BattleBegin()
     {
-        if (mapConfig == null)
+        var newMapId = UnityEngine.Random.Range(1, 3);
+        if (mapConfig == null || newMapId != mapConfig.Mapid)
         {
             // 打印加载耗时
             var startTime = Time.realtimeSinceStartup;
-            var mapNode = Resources.Load<GameObject>("Prefabs/Map1");
+            var mapNode = Resources.Load<GameObject>("Prefabs/Map" + newMapId);
+            if(mapConfig != null)
+                Destroy(mapConfig.gameObject);
+
             GameObject cell = Instantiate(mapNode, gameObject.transform.parent);
             mapConfig = cell.GetComponent<MapConfig>();
             var endTime = Time.realtimeSinceStartup;
@@ -451,91 +455,113 @@ public class WorldManager : MonoBehaviour
         }
     }
 
+    public bool IsEnemy(int a, int b)
+    {
+        if(mapConfig.TeamMode)
+        {
+            // 阵营1、3、4为一个阵营，阵营2、5、6为另一个阵营
+            bool isTeam1 = a == 1 || a == 3 || a == 5;
+            bool isTeam2 = a == 2 || a == 4 || a == 6;
+            bool targetIsTeam1 = b == 1 || b == 3 || b == 5;
+            bool targetIsTeam2 = b == 2 || b == 4 || b == 6;
+            
+            // 不同阵营之间是敌人
+            return (isTeam1 && targetIsTeam2) || (isTeam2 && targetIsTeam1);
+        }
+        else
+        {
+            return a != b && (a + 1) / 2 == (b + 1) / 2;
+        }
+    }
+
     public void OnUnitDying(Chess dieUnit)
     {
         // 从chessList中移除死亡单位
         chessList.Remove(dieUnit);
-        
-        // 检查所有阵营是否还有存活单位
-        bool side1HasUnits = false;
-        bool side2HasUnits = false;
-        bool side3HasUnits = false;
-        bool side4HasUnits = false;
-        bool side5HasUnits = false;
-        bool side6HasUnits = false;
 
-        int aliveSideCount = 0;
-
-        foreach (var chessComponent in chessList)
+        if (!mapConfig.TeamMode)
         {
-            if (chessComponent != null && chessComponent.hp > 0)
+            // 检查所有阵营是否还有存活单位
+            // 创建一个数组来统计每个阵营是否有存活单位，数组索引对应阵营编号减1
+            bool[] sideHasUnits = new bool[6];
+            int aliveSideCount = 0;
+
+            foreach (var chessComponent in chessList)
             {
-                switch (chessComponent.side)
+                if (chessComponent != null && chessComponent.hp > 0)
                 {
-                    case 1:
-                        if (!side1HasUnits)
+                    int sideIndex = chessComponent.side - 1;
+                    if (sideIndex >= 0 && sideIndex < sideHasUnits.Length)
+                    {
+                        if (!sideHasUnits[sideIndex])
                         {
-                            side1HasUnits = true;
+                            sideHasUnits[sideIndex] = true;
                             aliveSideCount++;
                         }
-                        break;
-                    case 2:
-                        if (!side2HasUnits)
-                        {
-                            side2HasUnits = true;
-                            aliveSideCount++;
-                        }
-                        break;
-                    case 3:
-                        if (!side3HasUnits)
-                        {
-                            side3HasUnits = true;
-                            aliveSideCount++;
-                        }
-                        break;
-                    case 4:
-                        if (!side4HasUnits)
-                        {
-                            side4HasUnits = true;
-                            aliveSideCount++;
-                        }
-                        break;
-                    case 5:
-                        if (!side5HasUnits)
-                        {
-                            side5HasUnits = true;
-                            aliveSideCount++;
-                        }
-                        break;
-                    case 6:
-                        if (!side6HasUnits)
-                        {
-                            side6HasUnits = true;
-                            aliveSideCount++;
-                        }
-                        break;
+                    }
+                }
+            }
+
+            UnityEngine.Debug.Log($"id:{dieUnit.id} dieUnit.side:{dieUnit.side} 存活阵营数:{aliveSideCount}");
+            // 如果只剩一个阵营有存活单位，显示重启按钮
+            if (aliveSideCount == 3)
+            {
+                buttonRestart.gameObject.SetActive(true);
+                textRestart.gameObject.SetActive(true);
+                if (sideHasUnits[0])
+                    textRestart.text = "你获胜了!!!";
+                else if (sideHasUnits[1])
+                    textRestart.text = "你输了!!!";
+
+                int[] match = GetMatch();
+                for (int i = 0; i < match.Length; i++)
+                {
+                    GameManager.Instance.GetPlayer(match[i]).onBattleResult(sideHasUnits[i]);
                 }
             }
         }
-
-        UnityEngine.Debug.Log($"id:{dieUnit.id} dieUnit.side:{dieUnit.side} 存活阵营数:{aliveSideCount}");
-        // 如果只剩一个阵营有存活单位，显示重启按钮
-        if (aliveSideCount == 3)
+        else
         {
-            buttonRestart.gameObject.SetActive(true);
-            textRestart.gameObject.SetActive(true);
-            if (side1HasUnits)
-                textRestart.text = "你获胜了!!!";
-            else if (side2HasUnits)
-                textRestart.text = "你输了!!!";
+            // 团队模式逻辑：检查两个阵营是否还有存活单位
+            bool team1HasUnits = false; // 阵营1、3、4
+            bool team2HasUnits = false; // 阵营2、5、6
 
-            int[] match = GetMatch();
-            GameManager.Instance.GetPlayer(match[0]).onBattleResult(side1HasUnits);
-            GameManager.Instance.GetPlayer(match[1]).onBattleResult(side2HasUnits);
-            GameManager.Instance.GetPlayer(match[2]).onBattleResult(side3HasUnits);
-            GameManager.Instance.GetPlayer(match[3]).onBattleResult(side4HasUnits);
-            GameManager.Instance.GetPlayer(match[4]).onBattleResult(side5HasUnits);
-            GameManager.Instance.GetPlayer(match[5]).onBattleResult(side6HasUnits);
+            foreach (var chessComponent in chessList)
+            {
+                if (chessComponent != null && chessComponent.hp > 0)
+                {
+                    if (chessComponent.side == 1 || chessComponent.side == 3 || chessComponent.side == 5)
+                    {
+                        team1HasUnits = true;
+                    }
+                    else if (chessComponent.side == 2 || chessComponent.side == 4 || chessComponent.side == 6)
+                    {
+                        team2HasUnits = true;
+                    }
+                }
+            }
+
+            UnityEngine.Debug.Log($"id:{dieUnit.id} dieUnit.side:{dieUnit.side} 团队1存活:{team1HasUnits} 团队2存活:{team2HasUnits}");
+            // 如果一个阵营被全灭，另一个阵营获胜
+            if (!team1HasUnits || !team2HasUnits)
+            {
+                buttonRestart.gameObject.SetActive(true);
+                textRestart.gameObject.SetActive(true);
+                if (team1HasUnits)
+                    textRestart.text = "你获胜了!!!";
+                else
+                    textRestart.text = "你输了!!!";
+
+                // 通知玩家战斗结果
+                int[] match = GetMatch();
+                for (int i = 0; i < match.Length; i++)
+                {
+                    int playerSide = i + 1; // 假设match索引对应阵营1-6
+                    bool isTeam1 = playerSide == 1 || playerSide == 3 || playerSide == 5;
+                    bool isWinner = (isTeam1 && team1HasUnits) || (!isTeam1 && team2HasUnits);
+                    GameManager.Instance.GetPlayer(match[i]).onBattleResult(isWinner);
+                }
+            }
         }
     }
 
@@ -561,12 +587,12 @@ public class WorldManager : MonoBehaviour
                 {
                     if(findEnemy)
                     {
-                        if(chessComponent.side != mySide)
+                        if(IsEnemy(chessComponent.side, mySide))
                             unitsInRange.Add(chessComponent);
                     }
                     else
                     {
-                        if(chessComponent.side == mySide)
+                        if(!IsEnemy(chessComponent.side, mySide))
                             unitsInRange.Add(chessComponent);
                     }
                 }
@@ -626,7 +652,13 @@ public class WorldManager : MonoBehaviour
 
             float moveX = speed.x * timeDiff * scaleX;
             float moveY = speed.y * timeDiff * scaleY;
-                    
+
+            if (rectTransform == null)
+            {
+                Destroy(battleText);
+                yield break;
+            }
+
             // 更新位置
             rectTransform.Translate(new Vector3(moveX, moveY, 0));
 
