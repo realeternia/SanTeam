@@ -21,31 +21,12 @@ public class WorldManager : MonoBehaviour
 
     private List<Chess> chessList = new List<Chess>(); // 所有棋子
 
-    public GameObject[] RegionSide1; // 阵营1的出生点数组
-    public GameObject[] RegionSide2; // 阵营2的出生点数组
-
-    public GameObject[] RegionSide3; // 阵营3的出生点数组
-    public GameObject[] RegionSide4; // 阵营4的出生点数组    
-
-    public GameObject[] RegionSide5; // 阵营3的出生点数组
-    public GameObject[] RegionSide6; // 阵营4的出生点数组   
-
-
-    
-    public GameObject[] RegionHeroSide1; // 阵营1的出生点数组
-    public GameObject[] RegionHeroSide2; // 阵营2的出生点数组
-      
-    public GameObject[] RegionHeroSide3; // 阵营3的出生点数组
-    public GameObject[] RegionHeroSide4; // 阵营4的出生点数组
-
-    public GameObject[] RegionHeroSide5; // 阵营5的出生点数组
-    public GameObject[] RegionHeroSide6; // 阵营6的出生点数组    
-
+    private MapConfig mapConfig;
+   
     public HeroInfoGroup heroInfoGroup;
     public Button buttonRestart;
     public TMP_Text textRestart;
 
-    public GameObject WallNode;
     public GameObject HudNode;
     public GameObject BattleTextNode;
 
@@ -69,20 +50,19 @@ public class WorldManager : MonoBehaviour
         }
     }    
 
-    public void BattleEnd()
-    {
-        foreach (Transform child in Units.transform)
-        {
-            Destroy(child.gameObject);
-        }
-        chessList.Clear();
-
-        PanelManager.Instance.ShowShop();
-        CardShopManager.Instance.ShopBegin();
-    }
-
     public void BattleBegin()
     {
+        if (mapConfig == null)
+        {
+            // 打印加载耗时
+            var startTime = Time.realtimeSinceStartup;
+            var mapNode = Resources.Load<GameObject>("Prefabs/Map1");
+            GameObject cell = Instantiate(mapNode, gameObject.transform.parent);
+            mapConfig = cell.GetComponent<MapConfig>();
+            var endTime = Time.realtimeSinceStartup;
+            Debug.Log("加载地图耗时：" + (endTime - startTime) + "秒");
+        }
+
         battleIndex++;
 
         buttonRestart.gameObject.SetActive(false);
@@ -94,6 +74,18 @@ public class WorldManager : MonoBehaviour
         {
             SkillManager.BattleBegin(chess);
         }
+    }    
+
+    public void BattleEnd()
+    {
+        foreach (Transform child in Units.transform)
+        {
+            Destroy(child.gameObject);
+        }
+        chessList.Clear();
+
+        PanelManager.Instance.ShowShop();
+        CardShopManager.Instance.ShopBegin();
     }
 
     private int[] GetMatch()
@@ -123,9 +115,9 @@ public class WorldManager : MonoBehaviour
 
         List<Vector2Int> unitGrids = new List<Vector2Int>();
         // 生成墙
-        for (int i = 0; i < WallNode.transform.childCount; i++)
+        for (int i = 0; i < mapConfig.WallNode.transform.childCount; i++)
         {
-            var wallNodeCell = WallNode.transform.GetChild(i);
+            var wallNodeCell = mapConfig.WallNode.transform.GetChild(i);
             // 使用GetOccupiedGrids方法获取需要锁定的格子列表
             List<Vector2Int> requiredGrids = GetOccupiedGrids(wallNodeCell.transform.position, wallNodeCell.GetComponent<Collider>());
             // 锁定新格子
@@ -145,51 +137,53 @@ public class WorldManager : MonoBehaviour
             int[] match = GetMatch();
             // 在RegionSide1生成单位 (阵营1)
             var p = GameManager.Instance.GetPlayer(match[0]);
-            SpawnUnitsForRegion(p, RegionSide1, 1, p.imgPath, ref unitId);
+            SpawnUnitsForRegion(p, mapConfig.RegionSide1, 1, p.imgPath, ref unitId);
             // 在RegionSide2生成单位 (阵营2)
             p = GameManager.Instance.GetPlayer(match[1]);
-            SpawnUnitsForRegion(p, RegionSide2, 2, p.imgPath, ref unitId);
+            SpawnUnitsForRegion(p, mapConfig.RegionSide2, 2, p.imgPath, ref unitId);
+
             p = GameManager.Instance.GetPlayer(match[2]);
-            SpawnUnitsForRegion(p, RegionSide3, 3, p.imgPath, ref unitId);
-            p = GameManager.Instance.GetPlayer(match[3]);
-            SpawnUnitsForRegion(p, RegionSide4, 4, p.imgPath, ref unitId);
+            SpawnUnitsForRegion(p, mapConfig.RegionSide3, 3, p.imgPath, ref unitId);
+
+            SpawnUnitsForRegion(p, mapConfig.RegionSide4, 4, p.imgPath, ref unitId);
+            SpawnUnitsForRegion(p, mapConfig.RegionSide5, 5, p.imgPath, ref unitId);
             p = GameManager.Instance.GetPlayer(match[4]);
-            SpawnUnitsForRegion(p, RegionSide5, 5, p.imgPath, ref unitId);
+            SpawnUnitsForRegion(p, mapConfig.RegionSide5, 5, p.imgPath, ref unitId);
             p = GameManager.Instance.GetPlayer(match[5]);
-            SpawnUnitsForRegion(p, RegionSide6, 6, p.imgPath, ref unitId);
+            SpawnUnitsForRegion(p, mapConfig.RegionSide6, 6, p.imgPath, ref unitId);
 
             var cards = GameManager.Instance.GetPlayer(match[0]).GetBattleCardList();
-            for (int i = 0; i < cards.Count && i < RegionHeroSide1.Length; i++)
+            for (int i = 0; i < cards.Count && i < mapConfig.RegionHeroSide1.Length; i++)
                 if (cards[i] != null)
-                    SpawnHerosForRegion(GameManager.Instance.GetPlayer(match[0]), RegionHeroSide1[i], cards[i], 1, ref unitId);
+                    SpawnHerosForRegion(GameManager.Instance.GetPlayer(match[0]), mapConfig.RegionHeroSide1[i], cards[i], 1, ref unitId);
             cards = GameManager.Instance.GetPlayer(match[1]).GetBattleCardList();
-            for (int i = 0; i < cards.Count && i < RegionHeroSide2.Length; i++)
+            for (int i = 0; i < cards.Count && i < mapConfig.RegionHeroSide2.Length; i++)
                 if (cards[i] != null)
-                    SpawnHerosForRegion(GameManager.Instance.GetPlayer(match[1]), RegionHeroSide2[i], cards[i], 2, ref unitId);
+                    SpawnHerosForRegion(GameManager.Instance.GetPlayer(match[1]), mapConfig.RegionHeroSide2[i], cards[i], 2, ref unitId);
             cards = GameManager.Instance.GetPlayer(match[2]).GetBattleCardList();
-            for (int i = 0; i < cards.Count && i < RegionHeroSide3.Length; i++)
+            for (int i = 0; i < cards.Count && i < mapConfig.RegionHeroSide3.Length; i++)
                 if (cards[i] != null)
-                    SpawnHerosForRegion(GameManager.Instance.GetPlayer(match[2]), RegionHeroSide3[i], cards[i], 3, ref unitId);
+                    SpawnHerosForRegion(GameManager.Instance.GetPlayer(match[2]), mapConfig.RegionHeroSide3[i], cards[i], 3, ref unitId);
             cards = GameManager.Instance.GetPlayer(match[3]).GetBattleCardList();
-            for (int i = 0; i < cards.Count && i < RegionHeroSide4.Length; i++)
+            for (int i = 0; i < cards.Count && i < mapConfig.RegionHeroSide4.Length; i++)
                 if (cards[i] != null)
-                    SpawnHerosForRegion(GameManager.Instance.GetPlayer(match[3]), RegionHeroSide4[i], cards[i], 4, ref unitId);
+                    SpawnHerosForRegion(GameManager.Instance.GetPlayer(match[3]), mapConfig.RegionHeroSide4[i], cards[i], 4, ref unitId);
             cards = GameManager.Instance.GetPlayer(match[4]).GetBattleCardList();
-            for (int i = 0; i < cards.Count && i < RegionHeroSide5.Length; i++)
+            for (int i = 0; i < cards.Count && i < mapConfig.RegionHeroSide5.Length; i++)
                 if (cards[i] != null)
-                    SpawnHerosForRegion(GameManager.Instance.GetPlayer(match[4]), RegionHeroSide5[i], cards[i], 5, ref unitId);
+                    SpawnHerosForRegion(GameManager.Instance.GetPlayer(match[4]), mapConfig.RegionHeroSide5[i], cards[i], 5, ref unitId);
             cards = GameManager.Instance.GetPlayer(match[5]).GetBattleCardList();
-            for (int i = 0; i < cards.Count && i < RegionHeroSide6.Length; i++)
+            for (int i = 0; i < cards.Count && i < mapConfig.RegionHeroSide6.Length; i++)
                 if (cards[i] != null)
-                    SpawnHerosForRegion(GameManager.Instance.GetPlayer(match[5]), RegionHeroSide6[i], cards[i], 6, ref unitId);
+                    SpawnHerosForRegion(GameManager.Instance.GetPlayer(match[5]), mapConfig.RegionHeroSide6[i], cards[i], 6, ref unitId);
         }
         else
         {
-          //  SpawnHerosForRegion(GameManager.Instance.GetPlayer(0), RegionHeroSide1[0], new System.Tuple<int, int>(101002, 1), 1, ref unitId);
-            SpawnHerosForRegion(GameManager.Instance.GetPlayer(0),RegionHeroSide1[3], new System.Tuple<int, int>(103004, 1), 1, ref unitId); 
+            //  SpawnHerosForRegion(GameManager.Instance.GetPlayer(0), RegionHeroSide1[0], new System.Tuple<int, int>(101002, 1), 1, ref unitId);
+            SpawnHerosForRegion(GameManager.Instance.GetPlayer(0), mapConfig.RegionHeroSide1[3], new System.Tuple<int, int>(103004, 1), 1, ref unitId);
 
-            SpawnHerosForRegion(GameManager.Instance.GetPlayer(1), RegionHeroSide2[0], new System.Tuple<int, int>(102037, 1), 2, ref unitId);
-            SpawnHerosForRegion(GameManager.Instance.GetPlayer(1),RegionHeroSide2[1], new System.Tuple<int, int>(102037, 1), 2, ref unitId); 
+            SpawnHerosForRegion(GameManager.Instance.GetPlayer(1), mapConfig.RegionHeroSide2[0], new System.Tuple<int, int>(102037, 1), 2, ref unitId);
+            SpawnHerosForRegion(GameManager.Instance.GetPlayer(1), mapConfig.RegionHeroSide2[1], new System.Tuple<int, int>(102037, 1), 2, ref unitId);
         }
 
 
