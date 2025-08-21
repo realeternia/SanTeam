@@ -67,6 +67,12 @@ public class Skill
 
     }
 
+    public virtual void AimTarget(Chess target)
+    {
+
+    }
+
+
 
     public virtual void OnAttack(Chess defender, int damage)
     {

@@ -262,16 +262,15 @@ public class Chess : MonoBehaviour
                     lastActionTime = Time.time;
                     if (targetChess != null)
                     {
+                        SkillManager.AimTarget(this, targetChess);
                         if(attackRange >= 20)
                         {
-                            WorldManager.Instance.CreateMissile(this, targetChess);
+                            WorldManager.Instance.CreateMissile(this, targetChess, hitEffect);
                         }
                         else
                         {
-                            // 普通攻击
-                            Attack(targetChess);
+                            Attack(targetChess); // 普通攻击
                         }
-
                     }
                 }
                 return;

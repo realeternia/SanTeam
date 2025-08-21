@@ -67,21 +67,21 @@ public class HeroInfo : MonoBehaviour
         {
             // 根据最高属性加载对应图片
             classImg.sprite = Resources.Load<Sprite>(highestAttr);
-            if (total >= 250)
+            if (total >= 360)
             {
-                classImg.color = Color.green;
-            }
-            else if (total >= 280)
-            {
-                classImg.color = Color.yellow;
+                classImg.color = new Color(0.8f, 0, 1);
             }
             else if (total >= 320)
             {
                 classImg.color = Color.red;
             }
-            else if (total >= 360)
+            else if (total >= 280)
             {
-                classImg.color = new Color(0.8f, 0, 1);
+                classImg.color = Color.yellow;
+            }
+            else if (total >= 250)
+            {
+                classImg.color = Color.green;
             }
         }
     }
@@ -89,23 +89,22 @@ public class HeroInfo : MonoBehaviour
     private void SetText(TMP_Text text, int val)
     {
         text.text = val.ToString();
-        if (val >= 95)
+        if (val >= 160)
         {
-            text.color = Color.green;
-        }
-        else if (val >= 110)
-        {
-            text.color = Color.yellow;
+            text.color = new Color(0.8f, 0, 1);
         }
         else if (val >= 135)
         {
             text.color = Color.red;
         }
-        else if (val >= 160)
+        else if (val >= 110)
         {
-            text.color = new Color(0.8f, 0, 1);
+            text.color = Color.yellow;
         }
-
+        else if (val >= 95)
+        {
+            text.color = Color.green;
+        }
     }
 
 

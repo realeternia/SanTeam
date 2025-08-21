@@ -33,6 +33,8 @@ public static class SkillManager
                 return new SkillFeedback(skillId, owner);
             case "SpeedAttack":
                 return new SkillSpeedAttack(skillId, owner);
+            case "MultiArrow":
+                return new SkillMultiArrow(skillId, owner);
             case "PlantSkin":
                 return new SkillPlantSkin(skillId, owner);
 
@@ -51,6 +53,13 @@ public static class SkillManager
         }
     }
 
+    public static void AimTarget(Chess attacker, Chess defender)
+    {
+        foreach (var skill in attacker.skills)
+        {
+            skill.AimTarget(defender);
+        }
+    }
 
     public static void DuringAttack(Chess attacker, Chess defender, string damType, ref int damageBase, ref float damageMulti, ref string effect)
     {       

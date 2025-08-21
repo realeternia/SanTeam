@@ -139,27 +139,24 @@ public class WorldManager : MonoBehaviour
         }
         occupiedGrids[300001] = unitGrids;
 
-        // 加载UnitBing预制体
-        GameObject unitPrefab = Resources.Load<GameObject>("Prefabs/UnitBing");
-
         int unitId = 100;
         if (!isDebug)
         {
             int[] match = GetMatch();
             // 在RegionSide1生成单位 (阵营1)
             var p = GameManager.Instance.GetPlayer(match[0]);
-            SpawnUnitsForRegion(p, RegionSide1, unitPrefab, 1, p.imgPath, ref unitId);
+            SpawnUnitsForRegion(p, RegionSide1, 1, p.imgPath, ref unitId);
             // 在RegionSide2生成单位 (阵营2)
             p = GameManager.Instance.GetPlayer(match[1]);
-            SpawnUnitsForRegion(p, RegionSide2, unitPrefab, 2, p.imgPath, ref unitId);
+            SpawnUnitsForRegion(p, RegionSide2, 2, p.imgPath, ref unitId);
             p = GameManager.Instance.GetPlayer(match[2]);
-            SpawnUnitsForRegion(p, RegionSide3, unitPrefab, 3, p.imgPath, ref unitId);
+            SpawnUnitsForRegion(p, RegionSide3, 3, p.imgPath, ref unitId);
             p = GameManager.Instance.GetPlayer(match[3]);
-            SpawnUnitsForRegion(p, RegionSide4, unitPrefab, 4, p.imgPath, ref unitId);
+            SpawnUnitsForRegion(p, RegionSide4, 4, p.imgPath, ref unitId);
             p = GameManager.Instance.GetPlayer(match[4]);
-            SpawnUnitsForRegion(p, RegionSide5, unitPrefab, 5, p.imgPath, ref unitId);
+            SpawnUnitsForRegion(p, RegionSide5, 5, p.imgPath, ref unitId);
             p = GameManager.Instance.GetPlayer(match[5]);
-            SpawnUnitsForRegion(p, RegionSide6, unitPrefab, 6, p.imgPath, ref unitId);
+            SpawnUnitsForRegion(p, RegionSide6, 6, p.imgPath, ref unitId);
 
             var cards = GameManager.Instance.GetPlayer(match[0]).GetBattleCardList();
             for (int i = 0; i < cards.Count && i < RegionHeroSide1.Length; i++)
@@ -189,52 +186,58 @@ public class WorldManager : MonoBehaviour
         else
         {
           //  SpawnHerosForRegion(GameManager.Instance.GetPlayer(0), RegionHeroSide1[0], new System.Tuple<int, int>(101002, 1), 1, ref unitId);
-            SpawnHerosForRegion(GameManager.Instance.GetPlayer(0),RegionHeroSide1[3], new System.Tuple<int, int>(101008, 1), 1, ref unitId); 
+            SpawnHerosForRegion(GameManager.Instance.GetPlayer(0),RegionHeroSide1[3], new System.Tuple<int, int>(103004, 1), 1, ref unitId); 
 
             SpawnHerosForRegion(GameManager.Instance.GetPlayer(1), RegionHeroSide2[0], new System.Tuple<int, int>(102037, 1), 2, ref unitId);
-         //   SpawnHerosForRegion(GameManager.Instance.GetPlayer(1),RegionHeroSide2[1], new System.Tuple<int, int>(102037, 1), 2, ref unitId); 
+            SpawnHerosForRegion(GameManager.Instance.GetPlayer(1),RegionHeroSide2[1], new System.Tuple<int, int>(102037, 1), 2, ref unitId); 
         }
 
 
     }
 
-    private void SpawnUnitsForRegion(PlayerInfo p, GameObject[] region, GameObject prefab, int side, string imgPath, ref int idCounter)
+    private void SpawnUnitsForRegion(PlayerInfo p, GameObject[] region, int side, string imgPath, ref int idCounter)
     {
+        // 加载UnitBing预制体
+        GameObject unitPrefab = Resources.Load<GameObject>("Prefabs/UnitBing2");
+        GameObject unitPrefab2 = Resources.Load<GameObject>("Prefabs/UnitBing");
+        var soldierConfig = SoldierConfig.GetConfig(500001);
+
+        int i = 0;
         foreach (GameObject spawnPoint in region)
         {
-            if (spawnPoint != null)
+            // 实例化单位
+            GameObject unitInstance = Instantiate(i < 3 ? unitPrefab : unitPrefab2, spawnPoint.transform.position, Quaternion.identity, Units.transform);
+            if(i >= 3)
+                soldierConfig = SoldierConfig.GetConfig(500002);
+
+            unitInstance.name = $"UnitBing_{side}_{idCounter}";
+            unitInstance.transform.localRotation = Quaternion.Euler(0f, 180f, 0f);
+
+            // 获取并初始化Chess组件
+            Chess chessComponent = unitInstance.GetComponent<Chess>();
+            if (chessComponent != null)
             {
-                // 实例化单位
-                GameObject unitInstance = Instantiate(prefab, spawnPoint.transform.position, Quaternion.identity, Units.transform);
-                unitInstance.name = $"UnitBing_{side}_{idCounter}";
-                unitInstance.transform.localRotation = Quaternion.Euler(0f, 180f, 0f);
+                chessComponent.id = idCounter;
+                chessComponent.isHero = false;
+                chessComponent.side = side;
+                chessComponent.chessName = imgPath;
+                chessComponent.maxHp = soldierConfig.Hp;
+                chessComponent.moveSpeed = soldierConfig.MoveSpeed;
+                chessComponent.attackRange = soldierConfig.Range;
+                chessComponent.attackDamage = soldierConfig.Atk;
 
-                // 获取并初始化Chess组件
-                Chess chessComponent = unitInstance.GetComponent<Chess>();
-                if (chessComponent != null)
-                {
-                    chessComponent.id = idCounter;
-                    chessComponent.isHero = false;
-                    chessComponent.side = side;
-                    chessComponent.chessName = imgPath;
-                    chessComponent.maxHp = 100;
-                    chessComponent.moveSpeed = 10;
-                    chessComponent.attackRange = 12;
-                    chessComponent.attackDamage = 20;
-                    chessComponent.hitEffect = "SwordHitBlue";
+                chessComponent.hitEffect = soldierConfig.HitEffect;
 
-                    chessComponent.Init(p.pid, p.lineColor);
-
-                    // 可以在这里设置其他必要的初始化参数
-                }
-                else
-                {
-                    Debug.LogError("Chess component not found on UnitBing prefab");
-                }
-                chessList.Add(chessComponent);
-
-                idCounter++;
+                chessComponent.Init(p.pid, p.lineColor);
             }
+            else
+            {
+                Debug.LogError("Chess component not found on UnitBing prefab");
+            }
+            chessList.Add(chessComponent);
+
+            idCounter++;
+            i++;
         }
     }
 
@@ -280,14 +283,14 @@ public class WorldManager : MonoBehaviour
         }
     }
 
-    public void CreateMissile(Chess sourceChess, Chess targetChess)
+    public void CreateMissile(Chess sourceChess, Chess targetChess, string effectName)
     {
         // 首先加载导弹预制体
         Missile missilePrefab = Resources.Load<Missile>("Prefabs/MissileCom");
         
         // 实例化导弹
         var missile = Instantiate<Missile>(missilePrefab, sourceChess.transform.position, Quaternion.identity, Units.transform);
-        missile.Init(sourceChess, targetChess, sourceChess.hitEffect);
+        missile.Init(sourceChess, targetChess, effectName);
 
     }
 
