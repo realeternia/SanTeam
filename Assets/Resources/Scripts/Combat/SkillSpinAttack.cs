@@ -20,7 +20,8 @@ public class SkillSpinAttack : Skill
                 if(unit == defender)
                     continue;
 
-                unit.OnSkillDamaged((int)(damage * skillCfg.Strength));
+                unit.OnSkillDamaged(owner, (int)(damage * skillCfg.Strength));
+
             }
 
             EffectManager.PlaySkillEffect(owner, skillCfg.HitEffect);

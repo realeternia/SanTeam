@@ -31,6 +31,8 @@ public class Chess : MonoBehaviour
     public int leadShip;
     public int level = 1;
 
+    public int lastDamagedPlayerId = -1;
+
     private Vector3? moveDirection = null;
     // 移动失败计数器
     private int moveFailCount = 0;
@@ -443,6 +445,9 @@ public class Chess : MonoBehaviour
         SkillManager.BeforeAttack(this, victim, ref damage);
 
         victim.hp -= damage;
+        if(victim != this)
+            victim.lastDamagedPlayerId = playerId;
+
         SkillManager.OnAttack(this, victim, damage);
         
         // 记录日志
@@ -452,9 +457,12 @@ public class Chess : MonoBehaviour
         victim.OnHpChanged();
     }
 
-    public void OnSkillDamaged(int damage)
+    public void OnSkillDamaged(Chess speller, int damage)
     {
         hp -= damage;
+        if(speller != this)
+            lastDamagedPlayerId = speller.playerId;
+
         OnHpChanged();
     }
 
@@ -472,7 +480,8 @@ public class Chess : MonoBehaviour
     public void Ondying()
     {
         buffs.Clear();
-        WorldManager.Instance.OnUnitDying(this);
+        WorldManager.Instance.OnUnitDying(this, lastDamagedPlayerId);
+
         Destroy(gameObject);
 
         if (side == 1 || side == 2)

@@ -21,6 +21,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     public int gold;
     public int winCount;
     public int loseCount;
+    public int mark;
     public Dictionary<int, int> cards = new Dictionary<int, int>(); // cardid - > exp
 
     public Dictionary<int, int> itemEquips = new Dictionary<int, int>(); // heroId -> itemid
@@ -756,13 +757,14 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         return newResult;
     }
 
-    public void onBattleResult(bool isWin)
+    public void onBattleResult(bool isWin, int add)
     {
         if(isWin)
             winCount++;
         else
             loseCount++;
-        resultText.text = winCount.ToString() + "胜" + loseCount.ToString() + "败";
+        mark += add;
+        resultText.text = mark.ToString() + "分";
     }
 }
 

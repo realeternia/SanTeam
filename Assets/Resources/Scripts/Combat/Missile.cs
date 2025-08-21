@@ -28,7 +28,7 @@ public class Missile : MonoBehaviour
         // 启动协程让导弹飞向目标位置
         StartCoroutine(MoveMissileToTarget(gameObject, owner.missileSpeed, "Prefabs/Effect/" + effectName));
 
-        Destroy(missileEffect, 2f);
+       // Destroy(missileEffect, 2f);
     }
 
 
@@ -44,7 +44,10 @@ public class Missile : MonoBehaviour
         while (missile != null && target != null && !WorldManager.Instance.CheckInRange(missile.transform.position, target.transform.position, 0.5f) && !ReferenceEquals(target, null))
         {
             if (owner == null || owner.hp <= 0)
+            {
+                Destroy(missile);
                 yield break;
+            }
 
             targetPos = target.transform.position + new Vector3(0f, 5f, 0f);
             float distCovered = (Time.time - startTime) * speed;
@@ -57,9 +60,9 @@ public class Missile : MonoBehaviour
         {
             if (target != null && owner != null)
             {
-                Destroy(missile);
                 owner.Attack(target);
             }
+            Destroy(missile);
         }
     }
 

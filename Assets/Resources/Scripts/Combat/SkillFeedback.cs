@@ -16,7 +16,7 @@ public class SkillFeedback : Skill
 
             if (WorldManager.Instance.CheckInRange(owner.transform.position, attacker.transform.position, skillCfg.Range))
             {
-                attacker.OnSkillDamaged((int)(damage * skillCfg.Strength));
+                attacker.OnSkillDamaged(owner, (int)(damage * skillCfg.Strength));
                 EffectManager.PlaySkillEffect(attacker, skillCfg.HitEffect);
 
                 WorldManager.Instance.AddBattleText("反" +damage.ToString(), attacker.transform.position, new UnityEngine.Vector2(0, 150), new UnityEngine.Color(0.65f, 0.31f, 0), 3);
