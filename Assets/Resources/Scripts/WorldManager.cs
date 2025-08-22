@@ -23,6 +23,8 @@ public class WorldManager : MonoBehaviour
 
     private List<Chess> chessList = new List<Chess>(); // 所有棋子
     private int[] killMark = new int[6];
+    private int[] deathOrder = new int[6]; // 记录各阵营的死亡顺序，0表示未死亡
+    private int deathCount = 0; // 记录已死亡的阵营数量
 
 
     private MapConfig mapConfig;
@@ -59,7 +61,9 @@ public class WorldManager : MonoBehaviour
 
     public void BattleBegin()
     {
-        var newMapId = 3;// UnityEngine.Random.Range(1, 3);
+        var newMapId = 1;
+        if(battleIndex >= 5)
+            newMapId = UnityEngine.Random.Range(1, 5);
         if (mapConfig == null || newMapId != mapConfig.Mapid)
         {
             // 打印加载耗时
@@ -76,6 +80,8 @@ public class WorldManager : MonoBehaviour
 
         battleIndex++;
         killMark = new int[6];
+        deathOrder = new int[6];
+        deathCount = 0;
 
         BattleResultPanel.gameObject.SetActive(false);
         SpawnUnitsInRegions();
@@ -474,20 +480,24 @@ public class WorldManager : MonoBehaviour
 
     public bool IsEnemy(int a, int b)
     {
-        if(mapConfig.TeamMode)
+        if (mapConfig.TeamMode == 1)
         {
             // 阵营1、3、4为一个阵营，阵营2、5、6为另一个阵营
             bool isTeam1 = a == 1 || a == 3 || a == 5;
             bool isTeam2 = a == 2 || a == 4 || a == 6;
             bool targetIsTeam1 = b == 1 || b == 3 || b == 5;
             bool targetIsTeam2 = b == 2 || b == 4 || b == 6;
-            
+
             // 不同阵营之间是敌人
             return (isTeam1 && targetIsTeam2) || (isTeam2 && targetIsTeam1);
         }
-        else
+        else if (mapConfig.TeamMode == 0)
         {
             return a != b && (a + 1) / 2 == (b + 1) / 2;
+        }
+        else
+        {
+            return a != b;
         }
     }
 
@@ -500,7 +510,7 @@ public class WorldManager : MonoBehaviour
 
         bool gameFinish = false;
         bool hasWin = false;
-        if (!mapConfig.TeamMode)
+        if (mapConfig.TeamMode == 0)
         {
             // 检查所有阵营是否还有存活单位
             // 创建一个数组来统计每个阵营是否有存活单位，数组索引对应阵营编号减1
@@ -541,7 +551,7 @@ public class WorldManager : MonoBehaviour
                 hasWin = sideHasUnits[0];
             }
         }
-        else
+        else if (mapConfig.TeamMode == 1)
         {
             // 团队模式逻辑：检查两个阵营是否还有存活单位
             bool team1HasUnits = false; // 阵营1、3、4
@@ -583,6 +593,92 @@ public class WorldManager : MonoBehaviour
                 }
                 gameFinish = true;
                 hasWin = team1HasUnits;
+            }
+        }
+       else if (mapConfig.TeamMode == 2)
+        {
+            // 检查所有阵营是否还有存活单位
+            // 创建一个数组来统计每个阵营是否有存活单位，数组索引对应阵营编号减1
+            bool[] sideHasUnits = new bool[6];
+            int aliveSideCount = 0;
+
+            foreach (var chessComponent in chessList)
+            {
+                if (chessComponent != null && chessComponent.hp > 0)
+                {
+                    int sideIndex = chessComponent.side - 1;
+                    if (sideIndex >= 0 && sideIndex < sideHasUnits.Length)
+                    {
+                        if (!sideHasUnits[sideIndex])
+                        {
+                            sideHasUnits[sideIndex] = true;
+                            aliveSideCount++;
+                        }
+                    }
+                }
+            }
+
+            // 记录死亡顺序
+            int dieSideIndex = dieUnit.side - 1;
+            if (dieSideIndex >= 0 && dieSideIndex < 6)
+            {
+                // 检查该阵营是否刚刚被消灭
+                if (sideHasUnits[dieSideIndex] == false && deathOrder[dieSideIndex] == 0)
+                {
+                    deathCount++;
+
+                    deathOrder[dieSideIndex] = deathCount;
+                    UnityEngine.Debug.Log($"阵营 {dieUnit.side} 被消灭，死亡顺序: {deathCount}");
+                }
+            }
+
+            UnityEngine.Debug.Log($"id:{dieUnit.id} dieUnit.side:{dieUnit.side} 存活阵营数:{aliveSideCount}");
+
+            // 如果只剩一个阵营有存活单位，计算分数并结束游戏
+            if (aliveSideCount == 1)
+            {
+                int winnerSide = -1;
+                for (int i = 0; i < sideHasUnits.Length; i++)
+                {
+                    if (sideHasUnits[i])
+                    {
+                        winnerSide = i + 1; // 阵营编号从1开始
+                        break;
+                    }
+                }
+
+                // 计算分数：存活的阵营得1分，死亡顺序越晚分数越高
+                int[] scores = new int[6];
+                for (int i = 0; i < scores.Length; i++)
+                {
+                    if (i + 1 == winnerSide)
+                        scores[i] = 10; // 胜利者得1分
+                    else if (deathOrder[i] == 5)
+                        scores[i] = 8;
+                    else if (deathOrder[i] == 4)
+                        scores[i] = 6;
+                    else if (deathOrder[i] == 3)
+                        scores[i] = 4;
+                    else if (deathOrder[i] == 2)
+                        scores[i] = 3;
+                    else if (deathOrder[i] == 1)
+                        scores[i] = 2;
+                }
+
+                // 通知玩家战斗结果
+                int[] match = GetMatch();
+                for (int i = 0; i < match.Length; i++)
+                {
+                    int playerId = match[i];
+                    int playerSide = i + 1; // 假设match索引对应阵营1-6
+                    bool isWinner = (playerSide == winnerSide);
+
+                    killMark[playerId] = scores[i];
+                    GameManager.Instance.GetPlayer(playerId).onBattleResult(isWinner, killMark[playerId]);
+                }
+
+                gameFinish = true;
+                hasWin = sideHasUnits[0]; // 假设阵营1是玩家阵营
             }
         }
 

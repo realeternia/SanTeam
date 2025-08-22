@@ -28,7 +28,7 @@ public class MapConfig : MonoBehaviour
     public GameObject WallNode;
     public GameObject RegionNode;
 
-    public bool TeamMode;
+    public int TeamMode;
     public int Mapid;
     // Start is called before the first frame update
     void Start()
