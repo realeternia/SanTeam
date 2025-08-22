@@ -2,8 +2,8 @@ public class BuffShield : Buff
 {
     private int hp;
 
-    public BuffShield(int id, Chess unit, float lastTime, int str)
-     : base(id, unit, lastTime, str)
+    public BuffShield(int id, int skillId, Chess unit, float lastTime)
+     : base(id, skillId, unit, lastTime)
     {
     }
 
@@ -13,9 +13,9 @@ public class BuffShield : Buff
         hp = strength;
     }
 
-    public override void Refresh(Chess caster, float lastTime, int str)
+    public override void Refresh(Chess caster, float lastTime)
     {
-        base.Refresh(caster, lastTime, str);
+        base.Refresh(caster, lastTime);
         hp = strength;
     }
 

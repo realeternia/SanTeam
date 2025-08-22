@@ -10,16 +10,19 @@ public class Buff
     public Chess owner;
     
     public BuffConfig buffCfg;
+    public SkillConfig skillCfg;
+
     public float endTime;
     public GameObject effect;
     public int strength;
 
 
-    public Buff(int id, Chess unit, float lastTime, int strength = 0)
+    public Buff(int id, int skillId, Chess unit, float lastTime)
     {
         this.id = id;
         owner = unit;
         buffCfg = BuffConfig.GetConfig(id);
+        skillCfg = SkillConfig.GetConfig(skillId);
         endTime = Time.time + lastTime;
         this.strength = strength;
 
@@ -59,7 +62,7 @@ public class Buff
     }
 
     //刷新
-    public virtual void Refresh(Chess caster, float lastTime, int strength = 0)
+    public virtual void Refresh(Chess caster, float lastTime)
     {
         endTime = Math.Max(endTime, Time.time + lastTime);
 

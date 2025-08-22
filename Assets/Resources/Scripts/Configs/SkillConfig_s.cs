@@ -104,10 +104,10 @@ namespace CommonConfig
         {
             config.Clear();
             config[200001] = new SkillConfig(200001, "旋风斩", "攻击对附近敌人造成35%伤害", 1, 0.35f, 6f, 20f, 0.3f, 0, 0, "SpinAttack", "SwordWhirlwindWhite", 3, "meng");
-            config[200002] = new SkillConfig(200002, "愤怒一击", "攻击30%几率造成1.5倍伤害", 1, 0.3f, 5f, 0, 0.5f, 0, 0, "CriticalAttack", "SwordHitRedCritical", 2, "che");
+            config[200002] = new SkillConfig(200002, "愤怒一击", "攻击30%几率造成大量伤害", 1, 0.3f, 5f, 0, 0.01f, 0, 0, "CriticalAttack", "SwordHitRedCritical", 3, "che");
             config[200003] = new SkillConfig(200003, "主公技", "给与我方同阵营单位20%生命值护盾", 1, 0, 0, 0, 0.2f, 300001, 999, "MasterShield", "", 4, "shuai");
-            config[200004] = new SkillConfig(200004, "坚硬皮肤", "受击时几率发动50%减伤", 1, 0.25f, 7f, 0, 0.5f, 300002, 5, "HardSkin", "", 2, "shi");
-            config[200005] = new SkillConfig(200005, "突破", "移动时穿越敌人，降低远程伤害", 1, 1f, 7f, 20f, 0, 0, 0, "RunCross", "LightningExplosionBlue", 3, "ma");
+            config[200004] = new SkillConfig(200004, "坚硬皮肤", "受击时几率发动减伤", 1, 0.3f, 7f, 0, 0.4f, 300002, 5, "HardSkin", "", 2, "shi");
+            config[200005] = new SkillConfig(200005, "突破", "移动时穿越敌人，降低远程伤害", 1, 1f, 7f, 20f, 0.1f, 0, 0, "RunCross", "LightningExplosionBlue", 3, "ma");
             config[200006] = new SkillConfig(200006, "部署", "射程较远,提升士兵等级", 1, 0, 0, 0, 1f, 0, 0, "SoldierUp", "MagicChargeYellow", 2, "xiang");
             config[200007] = new SkillConfig(200007, "射击", "射程很远", 1, 1f, 99f, 0, 0, 0, 0, "Dumb", "", 2, "pao");
             config[201001] = new SkillConfig(201001, "治疗", "给与友军治疗", 1, 1f, 3f, 50f, 0.3f, 0, 0, "Heal", "MagicBuffGreen", 3, "heal");

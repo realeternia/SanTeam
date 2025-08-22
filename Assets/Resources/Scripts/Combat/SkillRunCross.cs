@@ -4,6 +4,7 @@ using CommonConfig;
 using UnityEngine;    
 // 添加协程命名空间
 using System.Collections;
+using System;
 
 public class SkillRunCross : Skill
 {
@@ -13,14 +14,16 @@ public class SkillRunCross : Skill
 
     public override void DuringAttacked(Chess attacker, string damType, ref int damageBase, ref float damageMulti, ref string effect)
     {
+        var maxVal = Math.Max(owner.leadShip, owner.str);
+
         if(!WorldManager.Instance.CheckInRange(owner.transform.position, attacker.transform.position, skillCfg.Range * 2))
         {
-            damageBase -= 20;
+            damageBase -= Math.Max(10, (int)(maxVal * skillCfg.Strength * 2));
             return;
         }
         if(!WorldManager.Instance.CheckInRange(owner.transform.position, attacker.transform.position, skillCfg.Range))
         {
-            damageBase -= 10;
+            damageBase -= Math.Max(5, (int)(maxVal * skillCfg.Strength));
         }
     }
 

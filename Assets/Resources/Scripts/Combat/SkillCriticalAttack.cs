@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using CommonConfig;
@@ -14,9 +15,11 @@ public class SkillCriticalAttack : Skill
     {
         if(CheckBurst())
         {
+            var maxVal = Math.Max(10, Math.Max(owner.leadShip - defender.leadShip, owner.str - defender.str));
             Debug.Log("CriticalAttack " + damageBase.ToString() + " " + damageMulti.ToString() + " " + effect);
 
-            damageMulti += skillCfg.Strength;
+            damageMulti += 0.4f + (float)maxVal * skillCfg.Strength;
+
             effect = skillCfg.HitEffect;
         }
     }
