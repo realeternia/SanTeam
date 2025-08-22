@@ -43,6 +43,8 @@ public class Chess : MonoBehaviour
     public int attackDamage = 30;
     public string hitEffect;
     public int missileSpeed = 10;
+    private int soldierLevel = 0;
+
 
     // 攻击冷却时间
     private float attackCooldown = 2f;
@@ -407,11 +409,36 @@ public class Chess : MonoBehaviour
         hp = maxHp;
 
         if(heroInfo != null)
-        {
             heroInfo.SetAttr(inte, str, leadShip);
-       
-        }
     }
+
+    public void UpdateAttr(int inte, int str, int leadShip)
+    {
+        if (inte > 0)
+            this.inte = inte;
+        if (str > 0)
+            this.str = str;
+        if (leadShip > 0)
+            this.leadShip = leadShip;
+        if (heroInfo != null)
+            heroInfo.SetAttr(this.inte, this.str, this.leadShip);
+    }
+
+    // 只能开场用
+    public void AddSoldierLevel(int lv)
+    {
+        if(isHero)
+            return;
+
+        //根据level变化模型scale
+        soldierLevel += lv;        
+        transform.localScale = new Vector3(5 + soldierLevel * 0.75f, 3, 5 + soldierLevel * 0.75f);
+
+        attackDamage += lv * 2;
+        maxHp += lv * 10;
+        hp = maxHp;
+    }
+
 
     // 攻击目标
     public void Attack(Chess victim)

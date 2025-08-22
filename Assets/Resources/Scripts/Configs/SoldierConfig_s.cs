@@ -84,7 +84,7 @@ namespace CommonConfig
         {
             config.Clear();
             config[500001] = new SoldierConfig(500001, "小兵", 1, 24, 120, 10, 12, 0, null, "SwordHitBlue");
-            config[500002] = new SoldierConfig(500002, "远程小兵", 1, 18, 90, 7, 40, 15, null, "BulletExplosionFire");
+            config[500002] = new SoldierConfig(500002, "远程小兵", 1, 17, 90, 7, 35, 15, null, "BulletExplosionFire");
 
         }
 

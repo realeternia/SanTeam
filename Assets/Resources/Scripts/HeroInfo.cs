@@ -113,11 +113,16 @@ public class HeroInfo : MonoBehaviour
         var hpRate = (float)hp / maxHp;
         heroHpTxt.text = hp + " / " + maxHp;
         healthImg.rectTransform.sizeDelta = new Vector2((int)(hpRate * 230), healthImg.rectTransform.sizeDelta.y);
-        if(hpRate <=0 )
+        if (hpRate <= 0)
         {
             errorImg.gameObject.SetActive(true);
             heroName.color = Color.gray;
             heroLevelTxt.color = Color.gray;
         }
+        else if(hpRate <= 0.5)
+            healthImg.color = Color.yellow;
+        else
+            healthImg.color = Color.green;
+
     }
 }

@@ -15,13 +15,11 @@ public class ChessHUD : MonoBehaviour
     {
         mainCamera = Camera.main;
 
+        healthImg.gameObject.transform.parent.gameObject.SetActive(false);
+
         if (chessUnit != null)
         {
             UpdateHealthDisplay();
-        }
-        else
-        {
-            Debug.LogError("ChessUnit is null in ChessHUD");
         }
     }
 
@@ -50,15 +48,19 @@ public class ChessHUD : MonoBehaviour
             return;
         }
 
+        if(chessUnit.hp < chessUnit.maxHp)
+        {
+            healthImg.gameObject.transform.parent.gameObject.SetActive(true);
+            if(chessUnit.hp < chessUnit.maxHp * 0.5)
+                healthImg.color = Color.yellow;
+            else
+                healthImg.color = Color.green;
+        }
+
         if (healthImg != null)
         {
             var wid = chessUnit.isHero ? 70f : 50f;
             healthImg.rectTransform.sizeDelta = new Vector2(chessUnit.hp * wid / chessUnit.maxHp, healthImg.rectTransform.sizeDelta.y);
-         //   Debug.Log($"Health updated: {chessUnit.hp}/{chessUnit.maxHp}");
-        }
-        else
-        {
-            Debug.LogError("HealthSlider is null in ChessHUD");
         }
     }
 }

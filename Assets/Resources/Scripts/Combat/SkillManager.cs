@@ -37,6 +37,11 @@ public static class SkillManager
                 return new SkillMultiArrow(skillId, owner);
             case "PlantSkin":
                 return new SkillPlantSkin(skillId, owner);
+            case "Help":
+                return new SkillHelp(skillId, owner);
+            case "SoldierUp":
+                return new SkillSoldierUp(skillId, owner);
+
 
             case "Dumb":
                 return new SkillDumb(skillId, owner);               

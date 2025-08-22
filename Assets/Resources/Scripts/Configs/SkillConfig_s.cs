@@ -104,20 +104,21 @@ namespace CommonConfig
         {
             config.Clear();
             config[200001] = new SkillConfig(200001, "旋风斩", "攻击对附近敌人造成35%伤害", 1, 0.35f, 6f, 20f, 0.3f, 0, 0, "SpinAttack", "SwordWhirlwindWhite", 3, "meng");
-            config[200002] = new SkillConfig(200002, "愤怒一击", "攻击20%几率造成1.5倍伤害", 1, 0.2f, 5f, 0, 0.5f, 0, 0, "CriticalAttack", "SwordHitRedCritical", 2, "che");
+            config[200002] = new SkillConfig(200002, "愤怒一击", "攻击30%几率造成1.5倍伤害", 1, 0.3f, 5f, 0, 0.5f, 0, 0, "CriticalAttack", "SwordHitRedCritical", 2, "che");
             config[200003] = new SkillConfig(200003, "主公技", "给与我方同阵营单位20%生命值护盾", 1, 0, 0, 0, 0.2f, 300001, 999, "MasterShield", "", 4, "shuai");
             config[200004] = new SkillConfig(200004, "坚硬皮肤", "受击时几率发动50%减伤", 1, 0.25f, 7f, 0, 0.5f, 300002, 5, "HardSkin", "", 2, "shi");
-            config[200005] = new SkillConfig(200005, "突破", "移动时穿越敌人", 1, 1f, 7f, 0, 0, 0, 0, "RunCross", "LightningExplosionBlue", 2, "ma");
-            config[200006] = new SkillConfig(200006, "谋略", "射程较远", 1, 1f, 99f, 0, 0, 0, 0, "Dumb", "", 1, "xiang");
-            config[200007] = new SkillConfig(200007, "射击", "射程很远", 1, 1f, 99f, 0, 0, 0, 0, "Dumb", "", 1, "pao");
+            config[200005] = new SkillConfig(200005, "突破", "移动时穿越敌人，降低远程伤害", 1, 1f, 7f, 20f, 0, 0, 0, "RunCross", "LightningExplosionBlue", 3, "ma");
+            config[200006] = new SkillConfig(200006, "部署", "射程较远,提升士兵等级", 1, 0, 0, 0, 1f, 0, 0, "SoldierUp", "MagicChargeYellow", 2, "xiang");
+            config[200007] = new SkillConfig(200007, "射击", "射程很远", 1, 1f, 99f, 0, 0, 0, 0, "Dumb", "", 2, "pao");
             config[201001] = new SkillConfig(201001, "治疗", "给与友军治疗", 1, 1f, 3f, 50f, 0.3f, 0, 0, "Heal", "MagicBuffGreen", 3, "heal");
-            config[201002] = new SkillConfig(201002, "鼓舞", "给与友军攻速祝福", 1, 1f, 3f, 50f, 0.2f, 0, 0, "Song", "MagicChargeYellow", 3, "song");
+            config[201002] = new SkillConfig(201002, "鼓舞", "给与友军攻速祝福", 1, 1f, 3f, 50f, 0.2f, 0, 0, "Song", "MagicChargePink", 3, "song");
             config[201003] = new SkillConfig(201003, "富甲一方", "参战获得5金币", 1, 0, 0, 0, 5f, 0, 0, "Gold", "MagicChargeYellow", 5, "gold");
             config[201004] = new SkillConfig(201004, "反伤", "反弹30%近战伤害", 1, 0, 0, 20f, 0.3f, 0, 0, "Feedback", "SwordHitBlue", 3, "ci");
-            config[201005] = new SkillConfig(201005, "狙击", "射程非常远", 1, 1f, 99f, 0, 0, 0, 0, "Dumb", "", 1, "ju");
+            config[201005] = new SkillConfig(201005, "狙击", "射程非常远", 1, 1f, 99f, 0, 0, 0, 0, "Dumb", "", 3, "ju");
             config[201006] = new SkillConfig(201006, "连射", "攻击近距离目标时40%触发连射", 1, 0.4f, 3f, 25f, 0.5f, 0, 0, "SpeedAttack", "", 2, "lian");
             config[201007] = new SkillConfig(201007, "藤甲", "受非智力攻击时高几率发动70%减伤", 1, 0.7f, 1f, 0, 0.7f, 0, 0, "PlantSkin", "", 4, "teng");
             config[201008] = new SkillConfig(201008, "多重箭", "攻击时40%发出2只箭", 1, 0.4f, 4f, 22f, 0, 0, 0, "MultiArrow", "", 3, "duo");
+            config[201009] = new SkillConfig(201009, "指导", "提升队伍最低武将智力", 1, 0, 0, 0, 0.4f, 0, 0, "Help", "MagicChargeYellow", 2, "shi2");
 
         }
 

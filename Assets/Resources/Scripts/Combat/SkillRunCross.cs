@@ -11,6 +11,20 @@ public class SkillRunCross : Skill
     {
     }
 
+    public override void DuringAttacked(Chess attacker, string damType, ref int damageBase, ref float damageMulti, ref string effect)
+    {
+        if(!WorldManager.Instance.CheckInRange(owner.transform.position, attacker.transform.position, skillCfg.Range * 2))
+        {
+            damageBase -= 20;
+            return;
+        }
+        if(!WorldManager.Instance.CheckInRange(owner.transform.position, attacker.transform.position, skillCfg.Range))
+        {
+            damageBase -= 10;
+        }
+    }
+
+
     public override void OnAttack(Chess defender, int damage)
     {
        if(CheckBurst())
