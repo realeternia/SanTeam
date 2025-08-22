@@ -11,7 +11,7 @@ public class SkillMasterShield : Skill
     {
         UnityEngine.Debug.Log("BattleBegin SkillMasterShield " + owner.heroId.ToString());
 
-        var unitList = WorldManager.Instance.GetUnitsInRange(owner.transform.position, 0, owner.side, false);
+        var unitList = WorldManager.Instance.GetUnitsMySide(owner.transform.position, 0, owner.side);
 
         var mySide = HeroConfig.GetConfig(owner.heroId).Side;
 

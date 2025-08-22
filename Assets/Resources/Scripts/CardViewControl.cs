@@ -11,7 +11,7 @@ public class CardViewControl : MonoBehaviour, IPointerDownHandler, IPointerUpHan
     public int cardId;
     public int count;
     public bool isSold = false;
-    public int priceI;
+    public int priceI; //总价
     public bool isHeroCard;
     public Image soldImage;    
     public TMP_Text cardName;    

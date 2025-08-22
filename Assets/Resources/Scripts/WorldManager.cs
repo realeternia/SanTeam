@@ -776,9 +776,28 @@ public class WorldManager : MonoBehaviour
                     }
                     else
                     {
-                        if(!IsEnemy(chessComponent.side, mySide))
+                        if(!IsEnemy(chessComponent.side, mySide)) 
                             unitsInRange.Add(chessComponent);
                     }
+                }
+            }
+        }
+        return unitsInRange;
+    }
+
+    public List<Chess> GetUnitsMySide(Vector3 wPos, float range, int mySide)
+    {
+        Vector2Int center = WorldManager.Instance.WorldToGridPosition(wPos, true);
+        List<Chess> unitsInRange = new List<Chess>();
+        foreach (var chessComponent in chessList)
+        {
+            if (chessComponent != null && chessComponent.hp > 0)
+            {
+                Vector2Int chessPos = WorldToGridPosition(chessComponent.transform.position, true);
+                if (Vector2Int.Distance(center, chessPos) <= range || range == 0)
+                {
+                    if(chessComponent.side == mySide)
+                        unitsInRange.Add(chessComponent);
                 }
             }
         }

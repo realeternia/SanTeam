@@ -49,11 +49,11 @@ public class PlayerBook
     private static void Load()
     {
         // 低级叠卡
-        playerCfgDic[2] = new PlayerCfg() { id = 2, name = "甲鱼", imgPath = "PlayerPic/jiayu", colorStr = "#333333", aiConfig = new AICardConfig() { banRangeCard = true, banStrongCard = true, priceLower = 15, priceUpper = 18, sameCardRate = 5f, futureRate = 0.7f, priceOutRate = 0.1f } };
+        playerCfgDic[2] = new PlayerCfg() { id = 2, name = "甲鱼", imgPath = "PlayerPic/jiayu", colorStr = "#333333", aiConfig = new AICardConfig() { banRangeCard = true, banStrongCard = true, priceLower = 1, priceUpper = 17, sameCardRate = 5f, futureRate = 0.7f, priceOutRate = 0.1f } };
 
 
         // 默认ai
-        playerCfgDic[3] = new PlayerCfg() { id = 3, name = "三哥", imgPath = "PlayerPic/sange", colorStr = "#FFFFFF", aiConfig = new AICardConfig() { cardLimit = 8, } };
+        playerCfgDic[3] = new PlayerCfg() { id = 3, name = "三哥", imgPath = "PlayerPic/sange", colorStr = "#FFFFFF", aiConfig = new AICardConfig() { cardLimit = 9, } };
 
 
         playerCfgDic[4] = new PlayerCfg() { id = 4, name = "魔童", imgPath = "PlayerPic/nezha", colorStr = "#8C0000", aiConfig = new AICardConfig() { banCombatCard = true, banWeakCard = true, pickInteCardRate = 3f } };
@@ -72,7 +72,7 @@ public class PlayerBook
         // 默认ai
         playerCfgDic[8] = new PlayerCfg() { id = 8, name = "巴爸", imgPath = "PlayerPic/baba", colorStr = "#FF73FF", aiConfig = new AICardConfig() { futureRate = 0.2f, cardLimit = 8, } };
 
-        playerCfgDic[9] = new PlayerCfg() { id = 9, name = "蜘蛛", imgPath = "PlayerPic/zhizhu", colorStr = "#FF0000", aiConfig = new AICardConfig() {  cardLimit = 9, futureRate = 0.25f, } };
+        playerCfgDic[9] = new PlayerCfg() { id = 9, name = "蜘蛛", imgPath = "PlayerPic/zhizhu", colorStr = "#FF0000", aiConfig = new AICardConfig() {  cardLimit = 10, futureRate = 0.25f, } };
 
         // 孙权流
         playerCfgDic[11] = new PlayerCfg() { id = 11, name = "小红", imgPath = "PlayerPic/xiaohong", colorStr = "#FF3333", aiConfig = new AICardConfig() { banWeakCard = true, pickSide = 3, findMasterRate = 2.5f, } };

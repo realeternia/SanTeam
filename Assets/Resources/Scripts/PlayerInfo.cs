@@ -344,7 +344,8 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
                         score *= aiConfig.findMasterRate;
                 }
                 // 根据价格区间调整分数
-                if (pickCard.priceI < aiConfig.priceLower || pickCard.priceI > aiConfig.priceUpper)
+                var priceS = pickCard.priceI / pickCard.count;
+                if (priceS < aiConfig.priceLower || priceS > aiConfig.priceUpper)
                 {
                     score *= aiConfig.priceOutRate;
                 }                
@@ -435,7 +436,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         if (selectedCard == null)
             return false;
 
-        if (heroCardCount >= aiConfig.cardLimit && !hasSameCard)
+        if (heroCardCount >= aiConfig.cardLimit && !cards.ContainsKey(selectedCard.cardId))
         {
             SellCard(weakCardId); //卖掉最弱的卡
         }
