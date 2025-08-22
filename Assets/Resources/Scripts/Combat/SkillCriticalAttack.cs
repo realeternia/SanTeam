@@ -13,12 +13,12 @@ public class SkillCriticalAttack : Skill
 
     public override void DuringAttack(Chess defender, string damType, ref int damageBase, ref float damageMulti, ref string effect)
     {
-        if(CheckBurst())
+        var maxVal = Math.Max(skillCfg.Rate, 0.2f + 0.1f * Math.Max(owner.leadShip - defender.leadShip, owner.str - defender.str));
+        if(CheckBurst(maxVal))
         {
-            var maxVal = Math.Max(10, Math.Max(owner.leadShip - defender.leadShip, owner.str - defender.str));
             Debug.Log("CriticalAttack " + damageBase.ToString() + " " + damageMulti.ToString() + " " + effect);
 
-            damageMulti += 0.4f + (float)maxVal * skillCfg.Strength;
+            damageMulti += skillCfg.Strength;
 
             effect = skillCfg.HitEffect;
         }

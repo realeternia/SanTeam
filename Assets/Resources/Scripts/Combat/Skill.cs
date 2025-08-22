@@ -53,9 +53,9 @@ public class Skill
         return Time.time < lastUpdateTime + skillCfg.CD;
     }
 
-    public bool CheckBurst()
+    public bool CheckBurst(float rateReal = 0)
     {
-        isBurst = !IsInCD() && (skillCfg.Rate <= 0 || UnityEngine.Random.value < skillCfg.Rate);
+        isBurst = !IsInCD() && (skillCfg.Rate <= 0 || UnityEngine.Random.value < Math.Max(rateReal, skillCfg.Rate));
         UnityEngine.Debug.Log("CheckBurst isBurst=" + isBurst.ToString() + " skillId=" + id.ToString());
         if(isBurst)
             UpdateCD();
