@@ -47,7 +47,7 @@ public class Chess : MonoBehaviour
 
 
     // 攻击冷却时间
-    private float attackCooldown = 2f;
+    private float attackPoint;
     private float lastActionTime = 0f;
     private float lastTargetUpdateTime = 0f; // 上次更新目标的时间
 
@@ -56,7 +56,8 @@ public class Chess : MonoBehaviour
     public List<Skill> skills = new List<Skill>();
 
     public List<Buff> buffs = new List<Buff>();
-    public bool canMove = true;
+    public int noMoveCount = 0;
+    public int noActionCount = 0;
 
     Material material;
     private Coroutine colorEffectCoroutine; // 协程引用，用于追踪颜色效果协程
@@ -230,12 +231,16 @@ public class Chess : MonoBehaviour
         while (hp > 0)
         {
             MoveAndFight();
+            lastActionTime = Time.time;            
             yield return new WaitForSeconds(0.05f);
         }
     }
 
     void MoveAndFight()
     {
+        if(noActionCount > 0)
+            return;
+
         // 每3秒重新寻找目标
         if (Time.time - lastTargetUpdateTime >= 3f)
         {
@@ -248,54 +253,41 @@ public class Chess : MonoBehaviour
         {
             // 如果没有目标，尝试寻找新目标
             FindTarget();
-            return;
+
+            if(targetChess == null)
+                return;
         }
 
         // 检查是否有辅助技能
-        var ckResult = SkillManager.CheckAidSkill(this);
-        if(!ckResult)
-        {
-            // 检查目标是否在攻击范围内
-            float distanceToTarget = Vector3.Distance(transform.position, targetChess.transform.position);
+        if (SkillManager.CheckAidSkill(this))
+            return;
 
-            if (distanceToTarget <= attackRange)
+        // 检查目标是否在攻击范围内
+        if (WorldManager.Instance.CheckInRange(transform.position, targetChess.transform.position, attackRange))
+        {
+            attackPoint += Time.time - lastActionTime;
+            // 检查攻击冷却
+            if (attackPoint >= 2) //集气2s
             {
-                // 检查攻击冷却
-                if (Time.time >= lastActionTime + attackCooldown)
+                attackPoint -= 2;
+                SkillManager.AimTarget(this, targetChess);
+                if (attackRange >= 20)
                 {
-                    lastActionTime = Time.time;
-                    if (targetChess != null)
-                    {
-                        SkillManager.AimTarget(this, targetChess);
-                        if(attackRange >= 20)
-                        {
-                            WorldManager.Instance.CreateMissile(this, targetChess, hitEffect);
-                        }
-                        else
-                        {
-                            Attack(targetChess); // 普通攻击
-                        }
-                    }
+                    WorldManager.Instance.CreateMissile(this, targetChess, hitEffect);
                 }
-                return;
+                else
+                {
+                    Attack(targetChess); // 普通攻击
+                }
             }
-        }
-        else
-        {
-            lastActionTime = Time.time;
             return;
         }
 
-        if(!canMove)
-        {
+        if (noMoveCount > 0)
             return;
-        }
-
 
         if(moveDirection == null)
-        {
             moveDirection = targetChess.transform.position;
-        }
 
         //如果当前位置很接近moveDirection，就直接移动到moveDirection
         if (Vector3.Distance(transform.position, moveDirection.Value) <= moveSpeed * 0.1f)
@@ -603,6 +595,21 @@ public class Chess : MonoBehaviour
             time += Time.deltaTime;
             yield return new WaitForSeconds(0.1f);
 
+        }
+    }
+
+    public int GetAttr(string attr)
+    {
+        switch (attr)
+        {
+            case "inte":
+                return inte;
+            case "leadShip":
+                return leadShip;
+            case "str":
+                return str;
+            default:
+                return 0;
         }
     }
 

@@ -45,7 +45,7 @@ public class SkillRunCross : Skill
             if (WorldManager.Instance.TryLockGridPositions(owner, mirrorPos))
             {
                 // 启动协程移动
-                owner.canMove = false;
+                owner.noMoveCount ++;
                 EffectManager.PlaySkillEffect(owner, skillCfg.HitEffect);
 
                 owner.StartCoroutine(JumpToPosition(mirrorPos));
@@ -81,7 +81,7 @@ public class SkillRunCross : Skill
         
         // 确保到达目标位置
         owner.transform.position = targetPos;
-        owner.canMove = true;
+        owner.noMoveCount --;
     }
 
 }

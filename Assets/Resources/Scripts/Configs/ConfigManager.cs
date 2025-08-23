@@ -31,7 +31,9 @@ public static class ConfigManager
             else if (heroCfg.Job == "xiang")
                 AddSkill(heroCfg, 200006);
             else if (heroCfg.Job == "pao")   
-                AddSkill(heroCfg, 200007);                
+                AddSkill(heroCfg, 200007);          
+            else if (heroCfg.Job == "mou")   
+                AddSkill(heroCfg, 200008);                         
             if (Profile.Instance.cardLoves != null && Profile.Instance.cardLoves.Contains((int)heroCfg.Id))
                 heroCfg.RateAbs = 65;
         }

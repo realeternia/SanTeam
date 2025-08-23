@@ -128,16 +128,22 @@ public class CardShopManager : MonoBehaviour
             if(shopOpenIndex >= 5 && i <= 1 && UnityEngine.Random.Range(0, 100) < System.Math.Clamp(shopOpenIndex * 3 - 4, 12, 38) + noItemRound * 10)
             {
                 var itemId = HeroSelectionTool.GetRandomItemId();
-                if (shopOpenIndex > 9 && UnityEngine.Random.Range(0, 500) > 200)
-                    count += UnityEngine.Random.Range(0, shopOpenIndex / 5);
+                var cardPrice = ItemConfig.GetConfig(itemId).Price;
+                var countLimit = (shopOpenIndex * 5 + 8) / cardPrice;
+
+                if (countLimit > 2 && UnityEngine.Random.Range(0, 500) > 200)
+                    count += UnityEngine.Random.Range(0, countLimit - 2) + 1;
                 cardView.Init(itemId, false, count);
                 hasItem = true;
             }
             else
             {
                 var heroId = HeroSelectionTool.GetRandomHeroId();
-                if (shopOpenIndex > 7 && UnityEngine.Random.Range(0, 500) > HeroConfig.GetConfig(heroId).Total)
-                    count += UnityEngine.Random.Range(0, shopOpenIndex / 4);
+                var heroPrice = HeroSelectionTool.GetPrice(HeroConfig.GetConfig(heroId));
+                var countLimit = (shopOpenIndex * 6 + 10) / heroPrice;
+
+                if (countLimit > 2 && UnityEngine.Random.Range(0, 500) > HeroConfig.GetConfig(heroId).Total)
+                    count += UnityEngine.Random.Range(0, countLimit - 2) + 1;
                 cardView.Init(heroId, true, count);
             }
 

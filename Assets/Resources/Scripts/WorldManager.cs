@@ -207,12 +207,12 @@ public class WorldManager : MonoBehaviour
         else
         {
             
-            SpawnHerosForRegion(GameManager.Instance.GetPlayer(0), mapConfig.RegionHeroSide1[4], new System.Tuple<int, int>(101023, 1), 1, ref unitId);
-            SpawnHerosForRegion(GameManager.Instance.GetPlayer(0), mapConfig.RegionHeroSide1[3], new System.Tuple<int, int>(101023, 1), 1, ref unitId);
-            SpawnHerosForRegion(GameManager.Instance.GetPlayer(0), mapConfig.RegionHeroSide1[0], new System.Tuple<int, int>(104002, 1), 1, ref unitId);
+            SpawnHerosForRegion(GameManager.Instance.GetPlayer(0), mapConfig.RegionHeroSide1[4], new System.Tuple<int, int>(101004, 1), 1, ref unitId);
+         //   SpawnHerosForRegion(GameManager.Instance.GetPlayer(0), mapConfig.RegionHeroSide1[3], new System.Tuple<int, int>(101023, 1), 1, ref unitId);
+         //   SpawnHerosForRegion(GameManager.Instance.GetPlayer(0), mapConfig.RegionHeroSide1[0], new System.Tuple<int, int>(104002, 1), 1, ref unitId);
 
-            SpawnHerosForRegion(GameManager.Instance.GetPlayer(1), mapConfig.RegionHeroSide2[0], new System.Tuple<int, int>(101005, 1), 2, ref unitId);
-            SpawnHerosForRegion(GameManager.Instance.GetPlayer(1), mapConfig.RegionHeroSide2[1], new System.Tuple<int, int>(101005, 1), 2, ref unitId);
+            SpawnHerosForRegion(GameManager.Instance.GetPlayer(1), mapConfig.RegionHeroSide2[0], new System.Tuple<int, int>(101002, 1), 2, ref unitId);
+        //    SpawnHerosForRegion(GameManager.Instance.GetPlayer(1), mapConfig.RegionHeroSide2[1], new System.Tuple<int, int>(101005, 1), 2, ref unitId);
         }
 
 

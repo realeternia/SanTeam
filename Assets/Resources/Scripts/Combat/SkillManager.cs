@@ -41,6 +41,9 @@ public static class SkillManager
                 return new SkillHelp(skillId, owner);
             case "SoldierUp":
                 return new SkillSoldierUp(skillId, owner);
+            case "SkillHitBuff":
+                return new SkillHitBuff(skillId, owner);
+
 
 
             case "Dumb":
