@@ -14,7 +14,6 @@ public class Buff
 
     public float endTime;
     public GameObject effect;
-    public int strength;
 
 
     public Buff(int id, int skillId, Chess unit, float lastTime)
@@ -24,7 +23,6 @@ public class Buff
         buffCfg = BuffConfig.GetConfig(id);
         skillCfg = SkillConfig.GetConfig(skillId);
         endTime = Time.time + lastTime;
-        this.strength = strength;
 
     }
 

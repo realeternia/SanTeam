@@ -26,7 +26,8 @@ public class WorldManager : MonoBehaviour
     private int[] deathOrder = new int[6]; // 记录各阵营的死亡顺序，0表示未死亡
     private int deathCount = 0; // 记录已死亡的阵营数量
 
-
+    bool gameFinish = false;
+    bool hasWin;
     private MapConfig mapConfig;
    
     public HeroInfoGroup heroInfoGroup;
@@ -57,19 +58,20 @@ public class WorldManager : MonoBehaviour
         {
             BattleBegin();
         }
-    }    
+    }
 
     public void BattleBegin()
     {
         var newMapId = 1;
-        if(battleIndex >= 5)
+        gameFinish = false;
+        if (battleIndex >= 5)
             newMapId = UnityEngine.Random.Range(1, 5);
         if (mapConfig == null || newMapId != mapConfig.Mapid)
         {
             // 打印加载耗时
             var startTime = Time.realtimeSinceStartup;
             var mapNode = Resources.Load<GameObject>("Prefabs/Map" + newMapId);
-            if(mapConfig != null)
+            if (mapConfig != null)
                 Destroy(mapConfig.gameObject);
 
             GameObject cell = Instantiate(mapNode, gameObject.transform.parent);
@@ -88,10 +90,9 @@ public class WorldManager : MonoBehaviour
 
         // 初始化技能
         foreach (var chess in chessList)
-        {
             SkillManager.BattleBegin(chess);
-        }
-    }    
+        StartCoroutine(GameUpdate());
+    }
 
     public void BattleEnd()
     {
@@ -171,9 +172,8 @@ public class WorldManager : MonoBehaviour
 
             p = GameManager.Instance.GetPlayer(match[2]);
             SpawnUnitsForRegion(p, mapConfig.RegionSide3, 3, p.imgPath, ref unitId);
-
+            p = GameManager.Instance.GetPlayer(match[3]);
             SpawnUnitsForRegion(p, mapConfig.RegionSide4, 4, p.imgPath, ref unitId);
-            SpawnUnitsForRegion(p, mapConfig.RegionSide5, 5, p.imgPath, ref unitId);
             p = GameManager.Instance.GetPlayer(match[4]);
             SpawnUnitsForRegion(p, mapConfig.RegionSide5, 5, p.imgPath, ref unitId);
             p = GameManager.Instance.GetPlayer(match[5]);
@@ -208,7 +208,7 @@ public class WorldManager : MonoBehaviour
         {
             
             SpawnHerosForRegion(GameManager.Instance.GetPlayer(0), mapConfig.RegionHeroSide1[4], new System.Tuple<int, int>(101004, 1), 1, ref unitId);
-         //   SpawnHerosForRegion(GameManager.Instance.GetPlayer(0), mapConfig.RegionHeroSide1[3], new System.Tuple<int, int>(101023, 1), 1, ref unitId);
+            SpawnHerosForRegion(GameManager.Instance.GetPlayer(0), mapConfig.RegionHeroSide1[3], new System.Tuple<int, int>(100001, 1), 1, ref unitId);
          //   SpawnHerosForRegion(GameManager.Instance.GetPlayer(0), mapConfig.RegionHeroSide1[0], new System.Tuple<int, int>(104002, 1), 1, ref unitId);
 
             SpawnHerosForRegion(GameManager.Instance.GetPlayer(1), mapConfig.RegionHeroSide2[0], new System.Tuple<int, int>(101002, 1), 2, ref unitId);
@@ -305,6 +305,86 @@ public class WorldManager : MonoBehaviour
             idCounter++;
         }
     }
+
+    private IEnumerator GameUpdate()
+    {
+        yield return new WaitForSeconds(0.5f);
+        while (!gameFinish)
+        {
+            yield return new WaitForSeconds(0.05f);
+            foreach (var chess in chessList.ToArray())
+            {
+                if (chess != null && chess.hp > 0)
+                    chess.LogicUpdate();
+            }
+        }
+
+        {
+            if (hasWin)
+                textRestart.text = "你获胜了!!!";
+            else
+                textRestart.text = "你输了!!!";
+
+            // 销毁之前的结果单元格
+            foreach (GameObject cell in battleResultCells)
+            {
+                if (cell != null)
+                {
+                    Destroy(cell);
+                }
+            }
+            battleResultCells.Clear();
+
+            // 为每个玩家创建结果单元格
+            if (BattleResultCellPrefab != null)
+            {
+                int[] match = GetMatch();
+                // 根据玩家的 mark 进行排序
+                var sortedPlayers = match
+                    .Select(id => new { Id = id, Mark = GameManager.Instance.GetPlayer(id)?.mark ?? 0 })
+                    .OrderByDescending(p => p.Mark)
+                    .Select(p => p.Id)
+                    .ToArray();
+                for (int i = 0; i < sortedPlayers.Length; i++)
+                {
+                    int playerId = sortedPlayers[i];
+                    // 创建结果单元格
+                    GameObject cell = Instantiate(BattleResultCellPrefab, BattleResultPanel.transform);
+
+                    // 设置位置，每个单元格垂直偏移50
+                    RectTransform rectTransform = cell.GetComponent<RectTransform>();
+                    if (rectTransform != null)
+                    {
+                        rectTransform.anchoredPosition = new Vector2(302, -120 - i * 50); // 起始位置向下100，每个单元格间距50
+                    }
+
+                    // 获取并设置单元格数据
+                    BattleResultCellControl cellControl = cell.GetComponent<BattleResultCellControl>();
+                    if (cellControl != null)
+                    {
+                        var player = GameManager.Instance.GetPlayer(playerId);
+                        if (player != null)
+                        {
+                            // 设置玩家信息
+                            cellControl.playerName.text = player.playerNameText.text;
+
+                            cellControl.playerRank.text = (i + 1).ToString(); // 假设按match顺序排列
+                            cellControl.playerMark.text = $"<color=white>{player.mark}</color> (<color=green>+{killMark[playerId]}</color>)";
+
+
+                            cellControl.playerIcon.sprite = player.playerImage.sprite;
+
+                        }
+                    }
+
+                    // 添加到维护列表
+                    battleResultCells.Add(cell);
+                }
+            }
+            BattleResultPanel.gameObject.SetActive(true);
+        }
+    }
+
 
     public void CreateMissile(Chess sourceChess, Chess targetChess, string effectName)
     {
@@ -510,8 +590,8 @@ public class WorldManager : MonoBehaviour
         // 从chessList中移除死亡单位
         chessList.Remove(dieUnit);
 
-        bool gameFinish = false;
-        bool hasWin = false;
+        gameFinish = false;
+        hasWin = false;
         if (mapConfig.TeamMode == 0)
         {
             // 检查所有阵营是否还有存活单位
@@ -683,72 +763,6 @@ public class WorldManager : MonoBehaviour
                 hasWin = sideHasUnits[0]; // 假设阵营1是玩家阵营
             }
         }
-
-        if (gameFinish)
-        {
-            if (hasWin)
-                textRestart.text = "你获胜了!!!";
-            else
-                textRestart.text = "你输了!!!";
-        
-            // 销毁之前的结果单元格
-            foreach (GameObject cell in battleResultCells)
-            {
-                if (cell != null)
-                {
-                    Destroy(cell);
-                }
-            }
-            battleResultCells.Clear();
-            
-            // 为每个玩家创建结果单元格
-            if (BattleResultCellPrefab != null)
-            {
-                int[] match = GetMatch();
-                // 根据玩家的 mark 进行排序
-                var sortedPlayers = match
-                    .Select(id => new { Id = id, Mark = GameManager.Instance.GetPlayer(id)?.mark ?? 0 })
-                    .OrderByDescending(p => p.Mark)
-                    .Select(p => p.Id)
-                    .ToArray();
-                for (int i = 0; i < sortedPlayers.Length; i++)
-                {
-                    int playerId = sortedPlayers[i];
-                    // 创建结果单元格
-                    GameObject cell = Instantiate(BattleResultCellPrefab, BattleResultPanel.transform);
-                    
-                    // 设置位置，每个单元格垂直偏移50
-                    RectTransform rectTransform = cell.GetComponent<RectTransform>();
-                    if (rectTransform != null)
-                    {
-                        rectTransform.anchoredPosition = new Vector2(302, -120 - i * 50); // 起始位置向下100，每个单元格间距50
-                    }
-                    
-                    // 获取并设置单元格数据
-                    BattleResultCellControl cellControl = cell.GetComponent<BattleResultCellControl>();
-                    if (cellControl != null)
-                    {
-                        var player = GameManager.Instance.GetPlayer(playerId);
-                        if (player != null)
-                        {
-                            // 设置玩家信息
-                            cellControl.playerName.text = player.playerNameText.text;
-
-                            cellControl.playerRank.text = (i + 1).ToString(); // 假设按match顺序排列
-                            cellControl.playerMark.text = $"<color=white>{player.mark}</color> (<color=green>+{killMark[playerId]}</color>)";
-
-
-                            cellControl.playerIcon.sprite = player.playerImage.sprite;
-
-                        }
-                    }
-                    
-                    // 添加到维护列表
-                    battleResultCells.Add(cell);
-                }
-            }
-            BattleResultPanel.gameObject.SetActive(true);            
-        }
     }
 
     public bool CheckInRange(Vector3 pos1, Vector3 pos2, float range)
@@ -796,7 +810,7 @@ public class WorldManager : MonoBehaviour
             if (chessComponent != null && chessComponent.hp > 0)
             {
                 Vector2Int chessPos = WorldToGridPosition(chessComponent.transform.position, true);
-                if (Vector2Int.Distance(center, chessPos) <= range || range == 0)
+                if (range == 0 || Vector2Int.Distance(center, chessPos) <= range)
                 {
                     if(chessComponent.side == mySide)
                         unitsInRange.Add(chessComponent);

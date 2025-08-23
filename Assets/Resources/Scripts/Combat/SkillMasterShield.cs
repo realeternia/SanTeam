@@ -27,7 +27,8 @@ public class SkillMasterShield : Skill
                 var shieldHp = (int)(owner.maxHp * skillCfg.Strength);
                 UnityEngine.Debug.Log("BattleBegin 护盾值 " + shieldHp);
 
-                BuffManager.AddBuff(unit, owner, skillCfg.BuffId, skillCfg.BuffTime, shieldHp);
+                BuffManager.AddBuff(unit, owner, skillCfg.Id, skillCfg.BuffId, skillCfg.BuffTime);
+
             }
 
         }

@@ -32,7 +32,7 @@ public class Tooltip : MonoBehaviour
     {
         var skillConfig = SkillConfig.GetConfig(skillId);
         tooltipTitle.text = skillConfig.Name;
-        tooltipText.text = "<color=yellow>（" + skillConfig.Price.ToString() + "元）</color>" + skillConfig.Descript; //富文本
+        tooltipText.text = "<color=yellow>[" + skillConfig.Price.ToString() + "元]</color>" + skillConfig.Descript; //富文本
         tooltipIcon.sprite = Resources.Load<Sprite>("SkillPic/" + skillConfig.Icon);
 
         rect.sizeDelta = new Vector2(300, 100 + tooltipText.preferredHeight);

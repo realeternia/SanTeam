@@ -67,8 +67,6 @@ public class Chess : MonoBehaviour
     {
         // 创建HUD
         CreateHUD();
-
-        StartCoroutine(MoveAndFightCoroutine());
     }
 
     public void Init(int pid, Color c)
@@ -224,16 +222,17 @@ public class Chess : MonoBehaviour
         return score;
     }
 
-    // Update is called once per frame
-    private IEnumerator MoveAndFightCoroutine()
-    {    
-        yield return new WaitForSeconds(0.5f);
-        while (hp > 0)
-        {
+    public void LogicUpdate()
+    {
+        if (hp <= 0)
+            return;
+
+        if (lastActionTime < 1)
+            lastActionTime = Time.time;
+
+        if (hp > 0)
             MoveAndFight();
-            lastActionTime = Time.time;            
-            yield return new WaitForSeconds(0.05f);
-        }
+        lastActionTime = Time.time;
     }
 
     void MoveAndFight()
@@ -550,7 +549,7 @@ public class Chess : MonoBehaviour
 
     public void Cooldown(float time)
     {
-        lastActionTime -= time;
+        attackPoint += time;
     }
 
     public PlayerInfo GetPlayerInfo()
