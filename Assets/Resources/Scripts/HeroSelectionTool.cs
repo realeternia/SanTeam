@@ -325,7 +325,7 @@ public static class HeroSelectionTool
         {
             var heroConfig = HeroConfig.GetConfig(cardId);
 
-            attrInfo.Hp = heroConfig.Hp * (9 + lv) / 10;
+            attrInfo.Hp = heroConfig.Hp + heroConfig.Hp * (lv - 1) / 10;
             attrInfo.Inte = heroConfig.Inte + System.Math.Max(8 * (lv - 1), heroConfig.Inte * (lv - 1) / 10);
             attrInfo.Str = heroConfig.Str + System.Math.Max(8 * (lv - 1), heroConfig.Str * (lv - 1) / 10);
             attrInfo.Lead = heroConfig.LeadShip + System.Math.Max(8 * (lv - 1), heroConfig.LeadShip * (lv - 1) / 10);

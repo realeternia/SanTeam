@@ -10,15 +10,17 @@ public static class BuffManager
         switch (buffCfg.ScriptName)
         {
             case "BuffShield":
-                buff = new BuffShield(buffId, skillId, target, time);
+                buff = new BuffShield(buffId, skillId, caster, target, time);
                 break;
             case "BuffShieldRate":
-                buff = new BuffShieldRate(buffId, skillId, target, time);                
+                buff = new BuffShieldRate(buffId, skillId, caster, target, time);
                 break;
             case "BuffNoAction":
-                buff = new BuffNoAction(buffId, skillId, target, time);
+                buff = new BuffNoAction(buffId, skillId, caster, target, time);
                 break;
-
+            case "BuffLock":
+                buff = new BuffLock(buffId, skillId, caster, target, time);
+                break;
 
         }
 

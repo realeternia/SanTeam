@@ -41,10 +41,14 @@ public static class SkillManager
                 return new SkillHelp(skillId, owner);
             case "SoldierUp":
                 return new SkillSoldierUp(skillId, owner);
-            case "SkillHitBuff":
+            case "HitBuff":
                 return new SkillHitBuff(skillId, owner);
-
-
+            case "HitBuffArea":
+                return new SkillHitBuffArea(skillId, owner);
+            case "HitArea":
+                return new SkillHitArea(skillId, owner);
+            case "HitWall":
+                return new SkillHitWall(skillId, owner);
 
             case "Dumb":
                 return new SkillDumb(skillId, owner);               

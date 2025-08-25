@@ -71,6 +71,7 @@ namespace CommonConfig
             config[300001] = new BuffConfig(300001, "护盾", "BuffShield", "", "", "ShieldSoftBlue", "");
             config[300002] = new BuffConfig(300002, "减伤盾", "BuffShieldRate", "#B25900", "#FFD24D", "", "");
             config[301001] = new BuffConfig(301001, "晕眩", "BuffNoAction", "", "", "StunnedCirclingStarsSimple", "");
+            config[301002] = new BuffConfig(301002, "连锁", "BuffLock", "", "", "StunnedLock", "");
 
         }
 

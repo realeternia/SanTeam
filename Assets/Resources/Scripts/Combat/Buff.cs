@@ -7,6 +7,7 @@ public class Buff
 {
     public int id;
 
+    public Chess caster;
     public Chess owner;
     
     public BuffConfig buffCfg;
@@ -16,9 +17,10 @@ public class Buff
     public GameObject effect;
 
 
-    public Buff(int id, int skillId, Chess unit, float lastTime)
+    public Buff(int id, int skillId, Chess caster, Chess unit, float lastTime)
     {
         this.id = id;
+        this.caster = caster;
         owner = unit;
         buffCfg = BuffConfig.GetConfig(id);
         skillCfg = SkillConfig.GetConfig(skillId);

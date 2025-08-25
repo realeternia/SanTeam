@@ -15,13 +15,11 @@ public class SkillSpinAttack : Skill
         {
             Debug.Log("SkillSpinAttack");
             var unitsInRange = WorldManager.Instance.GetUnitsInRange(owner.transform.position, skillCfg.Range, owner.side, true);
+            unitsInRange.Remove(defender);
+            WorldManager.Instance.RandomSelect(unitsInRange, skillCfg.TargetCount);
             foreach(var unit in unitsInRange)
             {
-                if(unit == defender)
-                    continue;
-
                 unit.OnSkillDamaged(owner, (int)(damage * skillCfg.Strength));
-
             }
 
             EffectManager.PlaySkillEffect(owner, skillCfg.HitEffect);

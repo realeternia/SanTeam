@@ -39,16 +39,24 @@ namespace CommonConfig
         /// </summary>
         public int MissileSpeed;
         /// <summary>
+        ///是否隐藏
+        /// </summary>
+        public bool IsShadow;
+        /// <summary>
         ///技能
         /// </summary>
         public int[] Skills;
+        /// <summary>
+        ///模型
+        /// </summary>
+        public string Model;
         /// <summary>
         ///hit
         /// </summary>
         public string HitEffect;
 
 
-        public SoldierConfig(int Id, string Name, int Lv, int Atk, int Hp, int MoveSpeed, int Range, int MissileSpeed, int[] Skills, string HitEffect)
+        public SoldierConfig(int Id, string Name, int Lv, int Atk, int Hp, int MoveSpeed, int Range, int MissileSpeed, bool IsShadow, int[] Skills, string Model, string HitEffect)
         {
             this.Id = Id;
             this.Name = Name;
@@ -58,7 +66,9 @@ namespace CommonConfig
             this.MoveSpeed = MoveSpeed;
             this.Range = Range;
             this.MissileSpeed = MissileSpeed;
+            this.IsShadow = IsShadow;
             this.Skills = Skills;
+            this.Model = Model;
             this.HitEffect = HitEffect;
 
         }
@@ -83,8 +93,9 @@ namespace CommonConfig
         public static void Load()
         {
             config.Clear();
-            config[500001] = new SoldierConfig(500001, "小兵", 1, 24, 120, 10, 12, 0, null, "SwordHitBlue");
-            config[500002] = new SoldierConfig(500002, "远程小兵", 1, 17, 90, 7, 35, 15, null, "BulletExplosionFire");
+            config[500001] = new SoldierConfig(500001, "小兵", 1, 24, 120, 10, 12, 0, false, null, "UnitBing", "SwordHitBlue");
+            config[500002] = new SoldierConfig(500002, "远程小兵", 1, 17, 90, 7, 35, 15, false, null, "UnitBing2", "BulletExplosionFire");
+            config[501001] = new SoldierConfig(501001, "法术场", 1, 0, 9999, 0, 0, 0, true, null, "UnitSpell", "");
 
         }
 

@@ -1,7 +1,7 @@
 public class BuffNoAction : Buff
 {
-    public BuffNoAction(int id, int skillId, Chess unit, float lastTime)
-     : base(id, skillId, unit, lastTime)
+    public BuffNoAction(int id, int skillId, Chess caster, Chess target, float lastTime)
+     : base(id, skillId, caster, target, lastTime)
     {
     }
 

@@ -30,6 +30,7 @@ public class Chess : MonoBehaviour
     public int str;
     public int leadShip;
     public int level = 1;
+    public bool isShadow;
 
     public int lastDamagedPlayerId = -1;
 
@@ -62,6 +63,9 @@ public class Chess : MonoBehaviour
     Material material;
     private Coroutine colorEffectCoroutine; // 协程引用，用于追踪颜色效果协程
 
+    private bool DieAfterLifeTime;
+    private float LifeTime;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -74,10 +78,13 @@ public class Chess : MonoBehaviour
         playerId = pid;
         // 创建材质实例
         material = new Material(rend.sharedMaterial);
-        if(chessName.StartsWith("PlayerPic"))
-            material.mainTexture = Resources.Load<Texture>(chessName);
-        else
-            material.mainTexture = Resources.Load<Texture>("Skins/" + chessName);
+        if(!string.IsNullOrEmpty(chessName))
+        {
+            if(chessName.StartsWith("PlayerPic"))
+                material.mainTexture = Resources.Load<Texture>(chessName);
+            else
+                material.mainTexture = Resources.Load<Texture>("Skins/" + chessName);
+        }
         material.SetColor("_OutlineColor", c);
 
         var hasSKill = false;
@@ -85,7 +92,6 @@ public class Chess : MonoBehaviour
         if (isHero)
         {
             UnityEngine.Debug.Log("Init Hero" + heroId);
-
 
             var heroCfg = HeroConfig.GetConfig(heroId);
             // 初始化技能
@@ -148,6 +154,9 @@ public class Chess : MonoBehaviour
     // 寻找side不等于自己的单位
     private void FindTarget()
     {
+        if(attackRange == 0)
+            return;
+
         // 获取所有Chess组件
         Chess[] allChess = FindObjectsOfType<Chess>();
         List<(Chess chess, float distance)> validTargets = new List<(Chess, float)>();
@@ -155,7 +164,7 @@ public class Chess : MonoBehaviour
         // 收集所有有效目标及其距离
         foreach (Chess chess in allChess)
         {
-            if (chess != this && WorldManager.Instance.IsEnemy(this.side, chess.side))
+            if (chess != this && !chess.isShadow && WorldManager.Instance.IsEnemy(this.side, chess.side))
             {
                 float distance = Vector3.Distance(transform.position, chess.transform.position);
                 validTargets.Add((chess, distance));
@@ -222,7 +231,7 @@ public class Chess : MonoBehaviour
         return score;
     }
 
-    public void LogicUpdate()
+    public void LogicUpdate(float deltaTime)
     {
         if (hp <= 0)
             return;
@@ -233,6 +242,15 @@ public class Chess : MonoBehaviour
         if (hp > 0)
             MoveAndFight();
         lastActionTime = Time.time;
+
+        if(DieAfterLifeTime)
+        {
+            LifeTime -= deltaTime;
+            if(LifeTime <= 0)
+            {
+                Ondying();
+            }
+        }
     }
 
     void MoveAndFight()
@@ -265,10 +283,11 @@ public class Chess : MonoBehaviour
         if (WorldManager.Instance.CheckInRange(transform.position, targetChess.transform.position, attackRange))
         {
             attackPoint += Time.time - lastActionTime;
+
             // 检查攻击冷却
-            if (attackPoint >= 2) //集气2s
+            if (attackPoint >= (attackRange > 20 ? 2 : 1.5f)) //集气2s
             {
-                attackPoint -= 2;
+                attackPoint = 0;
                 SkillManager.AimTarget(this, targetChess);
                 if (attackRange >= 20)
                 {
@@ -282,7 +301,7 @@ public class Chess : MonoBehaviour
             return;
         }
 
-        if (noMoveCount > 0)
+        if (noMoveCount > 0 || moveSpeed == 0)
             return;
 
         if(moveDirection == null)
@@ -502,7 +521,7 @@ public class Chess : MonoBehaviour
 
         Destroy(gameObject);
 
-        if (side == 1 || side == 2)
+        if ((side == 1 || side == 2 && !isShadow ))
             GameManager.Instance.PlaySound("Sounds/tnt", 7);            
     }
   
@@ -550,6 +569,12 @@ public class Chess : MonoBehaviour
     public void Cooldown(float time)
     {
         attackPoint += time;
+    }
+
+    public void SetLifeTime(float time)
+    {
+        DieAfterLifeTime = true;
+        LifeTime = time;
     }
 
     public PlayerInfo GetPlayerInfo()
@@ -610,6 +635,12 @@ public class Chess : MonoBehaviour
             default:
                 return 0;
         }
+    }   
+
+    public bool HasBuff(int id)
+    {
+        // Use Exists method since buffs is a List<Buff>
+        return buffs.Exists(buff => buff.id == id);
     }
 
 }

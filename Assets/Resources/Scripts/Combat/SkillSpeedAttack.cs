@@ -11,14 +11,11 @@ public class SkillSpeedAttack : Skill
 
     public override void OnAttack(Chess defender, int damage)
     {
-        if (WorldManager.Instance.CheckInRange(owner.transform.position, defender.transform.position, skillCfg.Range))
+        if (CheckBurst())
         {
-            if (CheckBurst())
-            {
-                Debug.Log("SkillSpeedAttack");
+            Debug.Log("SkillSpeedAttack");
 
-                owner.Cooldown(2 * skillCfg.Strength);
-            }
+            owner.Cooldown(2 * skillCfg.Strength);
         }
     }
 }
