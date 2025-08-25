@@ -13,18 +13,25 @@ public class SkillHitBuffArea : Skill
     {
         var myAttr = owner.GetAttr(skillCfg.Attr);
         var defAttr = defender.GetAttr(skillCfg.Attr);
-        var rate = (myAttr - defAttr) * 0.01f;
+        var rate = (myAttr - defAttr) * skillCfg.RateAttrHP;
+
+        if(rate > 0)
+            rate = skillCfg.RateAttrH + rate;
+        else
+            rate = skillCfg.Rate;
 
         var unitsInRange = WorldManager.Instance.GetUnitsInRange(defender.transform.position, skillCfg.Range, owner.side, true);
         unitsInRange.Remove(defender);
-        if(unitsInRange.Count > 0 && CheckBurst(rate))
+        if(CheckBurst(rate))
         {
             BuffManager.AddBuff(defender, owner, id, skillCfg.BuffId, skillCfg.BuffTime);
-            WorldManager.Instance.RandomSelect(unitsInRange, skillCfg.TargetCount);
 
-            foreach(var unit in unitsInRange)
+            if (unitsInRange.Count > 0)
             {
-                BuffManager.AddBuff(unit, owner, id, skillCfg.BuffId, skillCfg.BuffTime);
+                WorldManager.Instance.RandomSelect(unitsInRange, skillCfg.TargetCount);
+
+                foreach (var unit in unitsInRange)
+                    BuffManager.AddBuff(unit, owner, id, skillCfg.BuffId, skillCfg.BuffTime);
             }
         }
     }

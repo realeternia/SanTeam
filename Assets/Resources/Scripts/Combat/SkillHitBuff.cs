@@ -13,7 +13,12 @@ public class SkillHitBuff : Skill
     {
         var myAttr = owner.GetAttr(skillCfg.Attr);
         var defAttr = defender.GetAttr(skillCfg.Attr);
-        var rate = (myAttr - defAttr) * 0.01f;
+        var rate = (myAttr - defAttr) * skillCfg.RateAttrHP;
+
+        if(rate > 0)
+            rate = skillCfg.RateAttrH + rate;
+        else
+            rate = skillCfg.Rate;
 
         if(CheckBurst(rate))
         {

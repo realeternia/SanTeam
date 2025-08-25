@@ -135,9 +135,9 @@ namespace CommonConfig
             config.Clear();
             config[101004] = new HeroConfig(101004, "诸葛亮", 1, 32, 98, 100, 45, 243, 300, 1, 7, 35, 18, 70, 0, "", 3, new int[]{201013}, "LightningExplosionBlue", "zhugeliang");
             config[101017] = new HeroConfig(101017, "庞统", 1, 28, 85, 98, 42, 225, 260, 1, 7, 35, 15, 51, 0, "", 3, new int[]{201014}, "ExplosionFireballFire", "pangtong");
-            config[102001] = new HeroConfig(102001, "郭嘉", 1, 24, 72, 98, 43, 213, 260, 2, 7, 35, 15, 41, 0, "mou", 3, new int[]{201011}, "LightningExplosionBlue", "guojia");
+            config[102001] = new HeroConfig(102001, "郭嘉", 1, 24, 72, 98, 43, 213, 260, 2, 7, 35, 15, 41, 0, "", 3, new int[]{201011}, "LightningExplosionBlue", "guojia");
             config[102019] = new HeroConfig(102019, "司马懿", 1, 32, 98, 98, 63, 259, 250, 2, 7, 35, 15, 93, 0, "mou", 3, null, "ShadowExplosion", "simayi");
-            config[102016] = new HeroConfig(102016, "贾诩", 1, 28, 86, 97, 50, 233, 250, 2, 7, 35, 15, 59, 0, "mou", 3, null, "StormExplosion", "jiaxu");
+            config[102016] = new HeroConfig(102016, "贾诩", 1, 28, 86, 97, 50, 233, 250, 2, 7, 35, 15, 59, 0, "", 3, new int[]{201015}, "StormExplosion", "jiaxu");
             config[102003] = new HeroConfig(102003, "荀彧", 1, 21, 65, 96, 43, 204, 270, 2, 7, 35, 14, 35, 0, "xiang", 3, null, "FrostExplosionBlue", "xunyu");
             config[103008] = new HeroConfig(103008, "周瑜", 1, 32, 96, 96, 71, 263, 250, 3, 7, 35, 15, 100, 0, "", 3, new int[]{201012}, "ExplosionFireballFire", "zhouyu");
             config[101033] = new HeroConfig(101033, "法正", 1, 27, 83, 94, 52, 229, 255, 1, 7, 35, 15, 55, 0, "mou", 3, null, "GasExplosionFire", "fazheng");
