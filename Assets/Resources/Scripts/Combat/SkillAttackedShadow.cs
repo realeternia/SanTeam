@@ -1,0 +1,33 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using CommonConfig;
+using UnityEngine;
+
+public class SkillAttackedShadow : Skill
+{
+    private int count = 3;
+    public SkillAttackedShadow(int id, Chess unit) : base(id, unit)
+    {
+    }
+
+    public override void OnAttacked(Chess attacker, int damage)
+    {
+        if (count > 0 && CheckBurst(Math.Min(skillCfg.Rate, count * 0.1f)))
+        {
+            Vector2 randomDir = UnityEngine.Random.insideUnitCircle.normalized;
+            Vector3 randomPosition = owner.transform.position + new Vector3(randomDir.x, 0, randomDir.y) * skillCfg.Range;
+            var unit = WorldManager.Instance.SpawnUnitsForRegion(owner.GetPlayerInfo(), 501002, randomPosition, owner.side, HeroConfig.GetConfig(owner.heroId).Icon);
+            unit.attackDamage = (int)(owner.attackDamage * skillCfg.Strength);
+            unit.maxHp = (int)(owner.maxHp * skillCfg.Strength);
+            unit.hp = unit.maxHp;
+            unit.material.SetFloat("_SecondTexSize", 2f);
+            unit.material.SetTexture("_SecondTex", Resources.Load<Texture>("SkillPic/" + skillCfg.Icon));
+            EffectManager.PlaySkillEffect(owner, skillCfg.HitEffect);
+            EffectManager.PlaySkillEffect(unit, skillCfg.HitEffect);
+
+            count--;
+        }
+    }
+
+}

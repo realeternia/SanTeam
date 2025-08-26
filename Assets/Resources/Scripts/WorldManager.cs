@@ -212,7 +212,7 @@ public class WorldManager : MonoBehaviour
         else
         {
             
-            SpawnHerosForRegion(GameManager.Instance.GetPlayer(0), mapConfig.RegionHeroSide1[4], new System.Tuple<int, int>(104002, 1), 1);
+            SpawnHerosForRegion(GameManager.Instance.GetPlayer(0), mapConfig.RegionHeroSide1[4], new System.Tuple<int, int>(101005, 1), 1);
             //SpawnHerosForRegion(GameManager.Instance.GetPlayer(0), mapConfig.RegionHeroSide1[3], new System.Tuple<int, int>(100001, 1), 1);
          //   SpawnHerosForRegion(GameManager.Instance.GetPlayer(0), mapConfig.RegionHeroSide1[0], new System.Tuple<int, int>(104002, 1), 1);
 
@@ -247,6 +247,7 @@ public class WorldManager : MonoBehaviour
             chessComponent.moveSpeed = soldierConfig.MoveSpeed;
             chessComponent.attackRange = soldierConfig.Range;
             chessComponent.attackDamage = soldierConfig.Atk;
+            chessComponent.isFakeHero = soldierConfig.Model == "UnitHero";
 
             chessComponent.hitEffect = soldierConfig.HitEffect;
 

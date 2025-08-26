@@ -158,7 +158,8 @@ namespace CommonConfig
             config[201016] = new SkillConfig(201016, "强军", "提升士兵2级", 1, 0, 0, "", 0, 0, 0, 0, 2f, 0, 0, 0, 0, "SoldierUp", "MagicChargeYellow", 3, "xiang2");
             config[201017] = new SkillConfig(201017, "鬼谋", "攻击几率造成1.3倍伤害,防御几率降低30%伤害", 1, 0.15f, 1f, "inte", 0.15f, 0.01f, 0, 0, 0.3f, 0, 0, 0, 0, "AtkDefRate", "", 3, "gui");
             config[201018] = new SkillConfig(201018, "国士", "增加一个远程士兵,提升射程", 1, 0, 0, "", 0, 0, 15f, 0, 10f, 0, 0, 0, 0, "SoldierSummon", "MagicChargeGreen", 3, "guo");
-            config[201019] = new SkillConfig(201019, "豪杰", "攻击时回复生命", 1, 0.35f, 8f, "", 0, 0, 0, 0, 0.2f, 300003, 4.5f, 0, 0, "AttackedBuff", "MagicBuffGreen", 3, "hao");
+            config[201019] = new SkillConfig(201019, "豪杰", "攻击时回复生命", 1, 0.35f, 8f, "", 0, 0, 0, 0, 0.5f, 300003, 5f, 0, 0, "AttackedBuff", "MagicBuffGreen", 3, "hao");
+            config[201020] = new SkillConfig(201020, "分兵抗敌", "产生一个幻影军队", 1, 0.35f, 15f, "", 0, 0, 15f, 0, 0.35f, 0, 0, 0, 0, "AttackedShadow", "MagicFieldGreen", 4, "huan");
 
         }
 

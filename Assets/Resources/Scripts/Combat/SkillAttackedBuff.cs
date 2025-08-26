@@ -9,13 +9,12 @@ public class SkillAttackedBuff : Skill
     {
     }
 
-    public override void DuringAttacked(Chess attacker, string damType, ref int damageBase, ref float damageMulti, ref string effect)
+    public override void OnAttacked(Chess attacker, int damage)
     {
-        if(damageBase > 10 && CheckBurst())
+        if(damage > 10 && CheckBurst())
         {
             //damageMulti -= skillCfg.Strength;
             BuffManager.AddBuff(owner, owner, id, skillCfg.BuffId, skillCfg.BuffTime);
-
 
         }
     }

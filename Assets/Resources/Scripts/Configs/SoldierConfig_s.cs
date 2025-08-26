@@ -96,6 +96,7 @@ namespace CommonConfig
             config[500001] = new SoldierConfig(500001, "小兵", 1, 24, 120, 10, 12, 0, false, null, "UnitBing", "SwordHitBlue");
             config[500002] = new SoldierConfig(500002, "远程小兵", 1, 17, 90, 7, 35, 15, false, null, "UnitBing2", "BulletExplosionFire");
             config[501001] = new SoldierConfig(501001, "法术场", 1, 0, 9999, 0, 0, 0, true, null, "UnitSpell", "");
+            config[501002] = new SoldierConfig(501002, "关羽影子", 1, 2, 2, 10, 17, 0, false, null, "UnitHero", "SwordHitYellowCritical");
 
         }
 

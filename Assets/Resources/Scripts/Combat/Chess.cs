@@ -31,6 +31,7 @@ public class Chess : MonoBehaviour
     public int leadShip;
     public int level = 1;
     public bool isShadow;
+    public bool isFakeHero;
 
     public int lastDamagedPlayerId = -1;
 
@@ -60,7 +61,7 @@ public class Chess : MonoBehaviour
     public int noMoveCount = 0;
     public int noActionCount = 0;
 
-    Material material;
+    public Material material;
     private Coroutine colorEffectCoroutine; // 协程引用，用于追踪颜色效果协程
 
     private bool DieAfterLifeTime;
@@ -128,7 +129,7 @@ public class Chess : MonoBehaviour
         canvas = FindObjectOfType<Canvas>();
 
         // 加载Hud预制体
-        GameObject hudPrefab = Resources.Load<GameObject>( isHero ? "Prefabs/Hud" : "Prefabs/HudSmall");
+        GameObject hudPrefab = Resources.Load<GameObject>(isHero || isFakeHero ? "Prefabs/Hud" : "Prefabs/HudSmall");
 
         // 实例化HUD对象
         GameObject hudObj = Instantiate(hudPrefab, WorldManager.Instance.HudNode.transform);

@@ -53,6 +53,8 @@ public static class SkillManager
                 return new SkillSoldierSummon(skillId, owner);
             case "AtkDefRate":
                 return new SkillAtkDefRate(skillId, owner);
+            case "AttackedShadow":
+                return new SkillAttackedShadow(skillId, owner);
 
 
             case "Dumb":
