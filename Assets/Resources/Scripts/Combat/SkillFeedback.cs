@@ -9,19 +9,23 @@ public class SkillFeedback : Skill
     {
     }
 
-    public override void OnAttacked(Chess attacker, int damage)
+    public override void OnAttacked(Chess attacker, string damType, int damage)
     {
-        if(CheckBurst())
+        if(skillCfg.Attr != null && skillCfg.Attr !=damType)
+            return;
+
+        if(skillCfg.RangeOut && WorldManager.Instance.CheckInRange(owner.transform.position, attacker.transform.position, skillCfg.Range))
+            return;
+        if(!skillCfg.RangeOut && !WorldManager.Instance.CheckInRange(owner.transform.position, attacker.transform.position, skillCfg.Range))
+            return;            
+
+        if (CheckBurst())
         {
+            var damageBack = (int)(damage * skillCfg.Strength);
+            attacker.OnSkillDamaged(owner, damageBack);
+            EffectManager.PlaySkillEffect(attacker, skillCfg.HitEffect);
 
-            if (WorldManager.Instance.CheckInRange(owner.transform.position, attacker.transform.position, skillCfg.Range))
-            {
-                attacker.OnSkillDamaged(owner, (int)(damage * skillCfg.Strength));
-                EffectManager.PlaySkillEffect(attacker, skillCfg.HitEffect);
-
-                WorldManager.Instance.AddBattleText("反" +damage.ToString(), attacker.transform.position, new UnityEngine.Vector2(0, 150), new UnityEngine.Color(0.65f, 0.31f, 0), 3);
-            }
-            
+            WorldManager.Instance.AddBattleText("反" + damageBack.ToString(), attacker.transform.position, new UnityEngine.Vector2(0, 150), new UnityEngine.Color(0.65f, 0.31f, 0), 3);
         }
     }
 }

@@ -9,7 +9,7 @@ public class SkillAttackedBuff : Skill
     {
     }
 
-    public override void OnAttacked(Chess attacker, int damage)
+    public override void OnAttacked(Chess attacker, string damType, int damage)
     {
         if(damage > 10 && CheckBurst())
         {

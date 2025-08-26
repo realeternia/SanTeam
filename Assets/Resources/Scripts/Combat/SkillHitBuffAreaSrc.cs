@@ -3,22 +3,18 @@ using System.Collections.Generic;
 using CommonConfig;
 using UnityEngine;
 
-public class SkillHitBuffArea : Skill
+public class SkillHitBuffAreaSrc : Skill
 {
-    public SkillHitBuffArea(int id, Chess unit) : base(id, unit)
+    public SkillHitBuffAreaSrc(int id, Chess unit) : base(id, unit)
     {
     }
 
     public override void OnAttack(Chess defender, string damType, int damage)
     {
-        var rate = GetRate(defender);
-
-        var unitsInRange = WorldManager.Instance.GetUnitsInRange(defender.transform.position, skillCfg.Range, owner.side, true);
-        unitsInRange.Remove(defender);
-        if(CheckBurst(rate))
+        if(CheckBurst())
         {
-            BuffManager.AddBuff(defender, owner, id, skillCfg.BuffId, skillCfg.BuffTime);
-
+            EffectManager.PlaySkillEffect(owner, skillCfg.HitEffect);
+            var unitsInRange = WorldManager.Instance.GetUnitsInRange(owner.transform.position, skillCfg.Range, owner.side, true);
             if (unitsInRange.Count > 0)
             {
                 WorldManager.Instance.RandomSelect(unitsInRange, skillCfg.TargetCount);

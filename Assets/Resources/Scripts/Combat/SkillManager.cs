@@ -55,6 +55,12 @@ public static class SkillManager
                 return new SkillAtkDefRate(skillId, owner);
             case "AttackedShadow":
                 return new SkillAttackedShadow(skillId, owner);
+            case "RunCrossPlus":
+                return new SkillRunCrossPlus(skillId, owner);
+            case "HitTeleport":
+                return new SkillHitTeleport(skillId, owner);
+            case "HitBuffAreaSrc":
+                return new SkillHitBuffAreaSrc(skillId, owner);
 
 
             case "Dumb":
@@ -112,15 +118,15 @@ public static class SkillManager
         }
     }
 
-    public static void OnAttack(Chess attacker, Chess defender, int damage)
+    public static void OnAttack(Chess attacker, Chess defender, string damType, int damage)
     {
         foreach (var skill in attacker.skills)
         {
-            skill.OnAttack(defender, damage);
+            skill.OnAttack(defender, damType, damage);
         }
         foreach (var skill in defender.skills)
         {
-            skill.OnAttacked(attacker, damage);
+            skill.OnAttacked(attacker, damType, damage);
         }
 
         foreach(var buff in attacker.buffs)

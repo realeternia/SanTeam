@@ -320,8 +320,9 @@ public class Chess : MonoBehaviour
             Vector3 nextPosition = Vector3.MoveTowards(transform.position, moveDirection.Value, moveSpeed * 0.05f);
 
             // 尝试锁定目标格子
-            if (WorldManager.Instance.TryLockGridPositions(this, nextPosition))
+            if (WorldManager.Instance.TryLockGridPositions(this, nextPosition, out List<Vector2Int> requiredGrids))
             {
+                WorldManager.Instance.DoLockGridPositions(this, requiredGrids);
                 // 锁定成功，移动到新位置
                 transform.position = nextPosition;
                 moveFailCount = 0; // 重置失败计数器
@@ -356,8 +357,9 @@ public class Chess : MonoBehaviour
                 nextPosition = transform.position + newDirection * moveSpeed * 0.05f;
 
                 // 尝试移动到新位置
-                if (WorldManager.Instance.TryLockGridPositions(this, nextPosition))
+                if (WorldManager.Instance.TryLockGridPositions(this, nextPosition, out requiredGrids))
                 {
+                    WorldManager.Instance.DoLockGridPositions(this, requiredGrids);
                     transform.position = nextPosition;
                     moveDirection = transform.position + newDirection * moveSpeed * 0.05f * 10;
                     moveFailCount = 0; // 重置失败计数器
@@ -486,7 +488,7 @@ public class Chess : MonoBehaviour
         if(victim != this)
             victim.lastDamagedPlayerId = playerId;
 
-        SkillManager.OnAttack(this, victim, damage);
+        SkillManager.OnAttack(this, victim, damType, damage);
         
         // 记录日志
         // Debug.Log($"{attacker.heroId}攻击{defender.heroId}，属性差值：Inte={inteDiff}, LeadShip={leadShipDiff}, Str={strDiff}，最大差值={maxDiff}，伤害：{damage}");
@@ -642,6 +644,11 @@ public class Chess : MonoBehaviour
     {
         // Use Exists method since buffs is a List<Buff>
         return buffs.Exists(buff => buff.id == id);
+    }
+
+    public bool MoveTo(Vector3 targetPosition, bool isForce = false)
+    {
+        return WorldManager.Instance.MoveTo(this, targetPosition, isForce);
     }
 
 }

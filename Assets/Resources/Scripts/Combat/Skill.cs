@@ -88,11 +88,11 @@ public class Skill
 
 
 
-    public virtual void OnAttack(Chess defender, int damage)
+    public virtual void OnAttack(Chess defender, string damType, int damage)
     {
     }
 
-    public virtual void OnAttacked(Chess attacker, int damage)
+    public virtual void OnAttacked(Chess attacker, string damType, int damage)
     {
     }
 

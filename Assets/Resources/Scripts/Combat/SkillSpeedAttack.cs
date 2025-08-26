@@ -9,7 +9,7 @@ public class SkillSpeedAttack : Skill
     {
     }
 
-    public override void OnAttack(Chess defender, int damage)
+    public override void OnAttack(Chess defender, string damType, int damage)
     {
         if (CheckBurst())
         {

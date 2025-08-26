@@ -11,7 +11,7 @@ public class SkillAttackedShadow : Skill
     {
     }
 
-    public override void OnAttacked(Chess attacker, int damage)
+    public override void OnAttacked(Chess attacker, string damType, int damage)
     {
         if (count > 0 && CheckBurst(Math.Min(skillCfg.Rate, count * 0.1f)))
         {
