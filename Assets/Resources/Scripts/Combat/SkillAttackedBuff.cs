@@ -3,10 +3,9 @@ using System.Collections.Generic;
 using CommonConfig;
 using UnityEngine;
 
-public class SkillHardSkin : Skill
+public class SkillAttackedBuff : Skill
 {
-    public SkillHardSkin(int id, Chess unit) : base(id, unit)
-
+    public SkillAttackedBuff(int id, Chess unit) : base(id, unit)
     {
     }
 

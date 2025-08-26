@@ -19,8 +19,8 @@ public static class SkillManager
                 return new SkillCriticalAttack(skillId, owner);
             case "MasterShield":
                 return new SkillMasterShield(skillId, owner);
-            case "HardSkin":
-                return new SkillHardSkin(skillId, owner);
+            case "AttackedBuff":
+                return new SkillAttackedBuff(skillId, owner);
             case "RunCross":
                 return new SkillRunCross(skillId, owner);
             case "Heal":
@@ -49,6 +49,11 @@ public static class SkillManager
                 return new SkillHitArea(skillId, owner);
             case "HitWall":
                 return new SkillHitWall(skillId, owner);
+            case "SoldierSummon":
+                return new SkillSoldierSummon(skillId, owner);
+            case "AtkDefRate":
+                return new SkillAtkDefRate(skillId, owner);
+
 
             case "Dumb":
                 return new SkillDumb(skillId, owner);               

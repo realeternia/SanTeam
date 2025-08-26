@@ -62,6 +62,20 @@ public class Skill
         return isBurst;
     }
 
+    protected float GetRate(Chess defender)
+    {
+        var myAttr = owner.GetAttr(skillCfg.Attr);
+        var defAttr = defender.GetAttr(skillCfg.Attr);
+        var rate = (myAttr - defAttr) * skillCfg.RateAttrHP;
+
+        if (rate > 0)
+            rate = skillCfg.RateAttrH + rate;
+        else
+            rate = skillCfg.Rate;
+
+        return rate;
+    }
+
     public virtual void BattleBegin()
     {
 
@@ -83,12 +97,10 @@ public class Skill
     }
 
     public virtual void DuringAttack(Chess defender, string damType, ref int damageBase, ref float damageMulti, ref string effect)
-
     {
     }
 
     public virtual void DuringAttacked(Chess attacker, string damType, ref int damageBase, ref float damageMulti, ref string effect)
-
     {
     }
 

@@ -21,12 +21,18 @@ public static class BuffManager
             case "BuffLock":
                 buff = new BuffLock(buffId, skillId, caster, target, time);
                 break;
+            case "BuffSuck":
+                buff = new BuffSuck(buffId, skillId, caster, target, time);
+                break;
 
         }
 
         if (buff == null)
+        {
+            UnityEngine.Debug.LogError("Buff not found");
             return;
-        
+        }
+
         foreach(var item in target.buffs)
         {
             if(item.id == buffId)

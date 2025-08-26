@@ -11,14 +11,7 @@ public class SkillHitBuffArea : Skill
 
     public override void OnAttack(Chess defender, int damage)
     {
-        var myAttr = owner.GetAttr(skillCfg.Attr);
-        var defAttr = defender.GetAttr(skillCfg.Attr);
-        var rate = (myAttr - defAttr) * skillCfg.RateAttrHP;
-
-        if(rate > 0)
-            rate = skillCfg.RateAttrH + rate;
-        else
-            rate = skillCfg.Rate;
+        var rate = GetRate(defender);
 
         var unitsInRange = WorldManager.Instance.GetUnitsInRange(defender.transform.position, skillCfg.Range, owner.side, true);
         unitsInRange.Remove(defender);
