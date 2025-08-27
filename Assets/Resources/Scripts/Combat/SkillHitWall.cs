@@ -1,3 +1,4 @@
+using System;
 using System.Buffers;
 using System.Collections;
 using System.Collections.Generic;
@@ -19,7 +20,7 @@ public class SkillHitWall : Skill
             var targetPos = defender.transform.position;
 
             var chess = WorldManager.Instance.SpawnUnitsForRegion(owner.GetPlayerInfo(), 501001, targetPos, owner.side, "");
-            chess.SetLifeTime(skillCfg.LastTime);
+            chess.SetLifeTime(skillCfg.SummonTime);
             
             // 计算owner到defender的方向
             Vector3 direction = (defender.transform.position - owner.transform.position).normalized;
@@ -29,15 +30,22 @@ public class SkillHitWall : Skill
             Vector3 leftDirection = Quaternion.Euler(0, -90, 0) * direction;
 
             targetPosList = new List<Vector3>();
+            
             targetPosList.Add(targetPos);
-            targetPosList.Add(targetPos + rightDirection * 10);
-            targetPosList.Add(targetPos + rightDirection * 20);
-            targetPosList.Add(targetPos + leftDirection * 10);
-            targetPosList.Add(targetPos + leftDirection * 20);
-
+            if (skillCfg.SummonCount > 1)
+            {
+                targetPosList.Add(targetPos + leftDirection * 10);
+                targetPosList.Add(targetPos + rightDirection * 10);
+            }
+            if (skillCfg.SummonCount > 3)
+            {
+                targetPosList.Add(targetPos + rightDirection * 20);
+                targetPosList.Add(targetPos + leftDirection * 20);
+            }
+            
             foreach(var pos in targetPosList)
             {
-                EffectManager.PlayPosSkillEffect(chess, pos, skillCfg.Range, skillCfg.HitEffect, skillCfg.LastTime);
+                EffectManager.PlayPosSkillEffect(chess, pos, skillCfg.Range, skillCfg.HitEffect, skillCfg.SummonTime);
             }
             owner.StartCoroutine(DelayDamage());
         }
@@ -45,7 +53,8 @@ public class SkillHitWall : Skill
 
     IEnumerator DelayDamage()
     {
-        for (int i = 0; i < 6; i++)
+        var term = (int)Math.Floor(skillCfg.SummonTime / skillCfg.SummonHitInterval);
+        for (int i = 0; i < term; i++)
         {
             if (owner == null || owner.hp <= 0)
                 yield break;
@@ -63,13 +72,13 @@ public class SkillHitWall : Skill
                     unitList.Add(unit);
                 }
             }
-            var damage = (int)(owner.inte * skillCfg.Strength);
+            var damage = (int)(owner.GetAttr(skillCfg.Attr) * skillCfg.Strength);
             foreach (var unit in unitList)
             {
                 unit.OnSkillDamaged(owner, damage);
             }
 
-            yield return new WaitForSeconds(skillCfg.LastInterval);
+            yield return new WaitForSeconds(skillCfg.SummonHitInterval);
         }
     }
 
