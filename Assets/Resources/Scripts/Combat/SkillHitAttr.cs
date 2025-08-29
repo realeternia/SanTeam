@@ -1,0 +1,23 @@
+using System.Collections;
+using System.Collections.Generic;
+using CommonConfig;
+using UnityEngine;
+
+public class SkillHitAttr : Skill
+{
+    public SkillHitAttr(int id, Chess unit) : base(id, unit)
+    {
+    }
+
+    public override void OnAttack(Chess defender, string damType, int damage)
+    {
+        if(CheckBurst())
+        {
+            var roll = Random.Range(0, 3);
+            var attr = roll == 0 ? "inte" : (roll == 1 ? "str" : "leadShip");
+            owner.AddAttr(attr, (int)(owner.GetAttr(attr) * skillCfg.Strength));
+            EffectManager.PlaySkillEffect(owner, skillCfg.HitEffect);
+        }
+    }
+
+}

@@ -61,6 +61,10 @@ public static class SkillManager
                 return new SkillHitTeleport(skillId, owner);
             case "HitBuffAreaSrc":
                 return new SkillHitBuffAreaSrc(skillId, owner);
+            case "HitRepeat":
+                return new SkillHitRepeat(skillId, owner);
+            case "HitAttr":
+                return new SkillHitAttr(skillId, owner);
 
 
             case "Dumb":

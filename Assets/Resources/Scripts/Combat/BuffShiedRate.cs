@@ -9,10 +9,10 @@ public class BuffShieldRate : Buff
 
     public override void DuringAttacked(Chess attacker, string damType, ref int damageBase, ref float damageMulti, ref string effect)
     {
-        var ratio = skillCfg.Strength + (owner.str - 80) * 0.005f;
+        var ratio = 0.3f + (owner.str - attacker.str) * skillCfg.Strength;
         if (damType == "inte")
             ratio = ratio * 2 / 3;
-        ratio = Math.Clamp(ratio, 0.4f, 0.85f);
+        ratio = Math.Clamp(ratio, 0.35f, 0.85f);
 
         damageMulti -= ratio;
     }

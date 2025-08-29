@@ -638,7 +638,25 @@ public class Chess : MonoBehaviour
             default:
                 return 0;
         }
-    }   
+    }
+
+    public void AddAttr(string attr, int value)
+    {
+        switch (attr)
+        {
+            case "inte":
+                inte += value;
+                break;
+            case "leadShip":
+                leadShip += value;
+                break;
+            case "str":
+                str += value;
+                break;
+        }
+        if(heroInfo != null)
+            heroInfo.SetAttr(inte, str, leadShip);
+    }
 
     public bool HasBuff(int id)
     {
