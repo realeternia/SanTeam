@@ -254,6 +254,12 @@ public class Chess : MonoBehaviour
         }
     }
 
+    public void LockTarget(Chess target1)
+    {
+        targetChess = target1;
+        lastTargetUpdateTime = Time.time;
+    }
+
     void MoveAndFight()
     {
         if(noActionCount > 0)

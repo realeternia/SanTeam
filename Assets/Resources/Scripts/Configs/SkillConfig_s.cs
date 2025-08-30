@@ -155,7 +155,7 @@ namespace CommonConfig
             config.Clear();
             config[200002] = new SkillConfig(200002, "愤怒一击", "攻击几率造成1.5倍伤害", 1, 0.15f, 5f, "leadShip", 0.25f, 0.01f, 0, false, 0, 0.5f, 0, 0, 0, 0, 0, 0, 0, "CriticalAttack", "SwordHitRedCritical", 3, "che");
             config[200003] = new SkillConfig(200003, "主公技", "给与我方同阵营单位20%生命值护盾", 1, 0, 0, "", 0, 0, 0, false, 0, 0.2f, 0, 0, 300001, 999f, 0, 0, 0, "MasterShield", "", 4, "shuai");
-            config[200004] = new SkillConfig(200004, "坚韧", "受击时几率发动减伤", 1, 0.4f, 4.5f, "str", 0, 0, 0, false, 0, 0.01f, 0, 0, 300002, 4f, 0, 0, 0, "AttackedBuff", "", 2, "shi");
+            config[200004] = new SkillConfig(200004, "坚韧", "受击时几率发动减伤", 1, 0.4f, 4.5f, "str", 0, 0, 0, false, 0, 0.5f, 0, 0, 300002, 4f, 0, 0, 0, "AttackedBuff", "", 2, "shi");
             config[200005] = new SkillConfig(200005, "突破", "移动时穿越敌人,降低远程伤害", 1, 1f, 7f, "", 0, 0, 20f, false, 0, 0.1f, 0, 0, 0, 0, 0, 0, 0, "RunCross", "LightningExplosionBlue", 3, "ma");
             config[200006] = new SkillConfig(200006, "部署", "提升士兵等级", 1, 0, 0, "", 0, 0, 0, false, 0, 1f, 0, 0, 0, 0, 0, 0, 0, "SoldierUp", "MagicChargeYellow", 2, "xiang");
             config[200007] = new SkillConfig(200007, "射击", "射程很远", 1, 1f, 99f, "", 0, 0, 0, false, 0, 0, 0, 0, 0, 0, 0, 0, 0, "Dumb", "", 2, "pao");
@@ -179,13 +179,13 @@ namespace CommonConfig
             config[201017] = new SkillConfig(201017, "鬼谋", "攻击几率造成1.3倍伤害,防御几率降低30%伤害", 1, 0.15f, 1f, "inte", 0.15f, 0.01f, 0, false, 0, 0.3f, 0, 0, 0, 0, 0, 0, 0, "AtkDefRate", "", 3, "gui");
             config[201018] = new SkillConfig(201018, "国士", "增加一个远程士兵,提升射程", 1, 0, 0, "", 0, 0, 15f, false, 0, 10f, 0, 0, 0, 0, 0, 0, 0, "SoldierSummon", "MagicChargeGreen", 3, "guo");
             config[201019] = new SkillConfig(201019, "豪杰", "攻击时回复生命", 1, 0.35f, 8f, "", 0, 0, 0, false, 0, 0.5f, 0, 0, 300003, 5f, 0, 0, 0, "AttackedBuff", "MagicBuffGreen", 3, "hao");
-            config[201020] = new SkillConfig(201020, "分兵抗敌", "产生一个幻影军队", 1, 0.35f, 15f, "", 0, 0, 15f, false, 0, 0.35f, 0, 0, 0, 0, 0, 0, 0, "AttackedShadow", "MagicFieldGreen", 3, "huan");
+            config[201020] = new SkillConfig(201020, "分兵抗敌", "产生一个幻影军队", 1, 0.35f, 15f, "", 0, 0, 15f, false, 0, 0.4f, 0, 0, 0, 0, 0, 0, 0, "AttackedShadow", "MagicFieldGreen", 3, "huan");
             config[201021] = new SkillConfig(201021, "突进", "移动时穿越敌人,降低远程伤害", 1, 1f, 7f, "", 0, 0, 20f, false, 0, 0.12f, 0, 0, 0, 0, 0, 0, 0, "RunCrossPlus", "LightningExplosionBlue", 4, "ma2");
-            config[201022] = new SkillConfig(201022, "埋伏", "被攻击时,瞬移到远程攻击者附近", 1, 0.4f, 5f, "", 0, 0, 38f, false, 0, 0, 0, 0, 301001, 1f, 0, 0, 0, "HitTeleport", "MagicNovaBlue", 2, "fu");
+            config[201022] = new SkillConfig(201022, "埋伏", "被攻击时,瞬移到远程攻击者附近", 1, 0.4f, 5f, "", 0, 0, 35f, false, 0, 0, 0, 0, 301001, 1f, 0, 0, 0, "HitTeleport", "MagicNovaBlue", 2, "fu");
             config[201023] = new SkillConfig(201023, "明镜", "反弹50%智力伤害", 1, 0, 0, "inte", 0, 0, 20f, true, 0, 0.5f, 0, 0, 0, 0, 0, 0, 0, "Feedback", "SwordHitBlue", 3, "jing");
             config[201024] = new SkillConfig(201024, "威震", "攻击时晕眩周围目标", 1, 0.2f, 5f, "", 0, 0, 20f, false, 3, 0, 0, 0, 301001, 1.5f, 0, 0, 0, "HitBuffAreaSrc", "MagicNovaYellow", 4, "wei");
             config[201025] = new SkillConfig(201025, "火矢", "攻击时射出火箭", 1, 0.35f, 3f, "str", 0, 0, 8f, false, 1, 0.2f, 0, 0, 0, 0, 1, 3.2f, 1f, "HitWall", "SoftFireBigRed", 3, "shi3");
-            config[201026] = new SkillConfig(201026, "坚毅", "受击时几率发动大减伤", 1, 0.5f, 6f, "str", 0, 0, 0, false, 0, 0.02f, 0, 0, 300002, 5f, 0, 0, 0, "AttackedBuff", "", 3, "shi4");
+            config[201026] = new SkillConfig(201026, "坚毅", "受击时几率发动大减伤", 1, 0.4f, 6f, "str", 0, 0, 0, false, 0, 0.7f, 0, 0, 300002, 5f, 0, 0, 0, "AttackedBuff", "", 3, "shi4");
             config[201027] = new SkillConfig(201027, "虎卫队", "攻击时几率对目标进行三连击", 1, 0.15f, 5f, "str", 0.2f, 0.005f, 0, false, 0, 1f, 2, 0.3f, 0, 0, 0, 0, 0, "HitRepeat", "SwordHitRedCritical", 4, "hu");
             config[201028] = new SkillConfig(201028, "青州兵", "攻击时几率对目标进行2连击", 1, 0.15f, 5.5f, "leadShip", 0.2f, 0.01f, 0, false, 0, 1f, 1, 0.4f, 0, 0, 0, 0, 0, "HitRepeat", "SwordHitGreenCritical", 3, "qing");
             config[201029] = new SkillConfig(201029, "成长", "攻击时几率提升自己的属性", 1, 0.3f, 0, "", 0, 0, 0, false, 0, 0.05f, 0, 0, 0, 0, 0, 0, 0, "HitAttr", "MagicChargeYellow", 3, "zhang");

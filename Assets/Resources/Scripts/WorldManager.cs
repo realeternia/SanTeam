@@ -213,12 +213,12 @@ public class WorldManager : MonoBehaviour
         {
             
          //   SpawnHerosForRegion(GameManager.Instance.GetPlayer(0), mapConfig.RegionHeroSide1[4], new System.Tuple<int, int>(101008, 1), 1);
-            SpawnHerosForRegion(GameManager.Instance.GetPlayer(0), mapConfig.RegionHeroSide1[3], new System.Tuple<int, int>(103010, 1), 1);
+            SpawnHerosForRegion(GameManager.Instance.GetPlayer(0), mapConfig.RegionHeroSide1[3], new System.Tuple<int, int>(102030, 1), 1);
          //   SpawnHerosForRegion(GameManager.Instance.GetPlayer(0), mapConfig.RegionHeroSide1[0], new System.Tuple<int, int>(104002, 1), 1);
 
-            SpawnHerosForRegion(GameManager.Instance.GetPlayer(1), mapConfig.RegionHeroSide2[0], new System.Tuple<int, int>(103037, 1), 2);
+            SpawnHerosForRegion(GameManager.Instance.GetPlayer(1), mapConfig.RegionHeroSide2[0], new System.Tuple<int, int>(101023, 1), 2);
          //   SpawnHerosForRegion(GameManager.Instance.GetPlayer(1), mapConfig.RegionHeroSide2[1], new System.Tuple<int, int>(103008, 1), 2);
-            SpawnHerosForRegion(GameManager.Instance.GetPlayer(1), mapConfig.RegionHeroSide2[2], new System.Tuple<int, int>(103037, 1), 2);
+            SpawnHerosForRegion(GameManager.Instance.GetPlayer(1), mapConfig.RegionHeroSide2[2], new System.Tuple<int, int>(101023, 1), 2);
         }
 
 
@@ -823,6 +823,14 @@ public class WorldManager : MonoBehaviour
         Vector2Int pos2a = WorldManager.Instance.WorldToGridPosition(pos2, true);
 
         return Vector2Int.Distance(pos1a, pos2a) <= range;
+    }
+
+    public float GetRange(Vector3 pos1, Vector3 pos2)
+    {
+        Vector2Int pos1a = WorldManager.Instance.WorldToGridPosition(pos1, true);
+        Vector2Int pos2a = WorldManager.Instance.WorldToGridPosition(pos2, true);
+
+        return Vector2Int.Distance(pos1a, pos2a);
     }
 
 

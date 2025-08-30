@@ -17,6 +17,7 @@ public class SkillHitTeleport : Skill
             Vector3 randomPosition = attacker.transform.position + new Vector3(randomDir.x, 0, randomDir.y) * 12;
 
             owner.MoveTo(randomPosition, true);
+            owner.LockTarget(attacker);
             EffectManager.PlaySkillEffect(owner, skillCfg.HitEffect);
 
             BuffManager.AddBuff(attacker, owner, id, skillCfg.BuffId, skillCfg.BuffTime);
