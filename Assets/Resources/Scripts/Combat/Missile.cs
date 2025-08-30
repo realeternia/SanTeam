@@ -21,7 +21,7 @@ public class Missile : MonoBehaviour
         if (hitPrefab == null)
             hitPrefab = Resources.Load<GameObject>("Prefabs/Effect/" + effectName);
 
-        transform.position = sourceChess.transform.position + new Vector3(0f, 7.5f, 0f);
+        transform.position = sourceChess.transform.position + new Vector3(0f, 5f, 0f);
         GameObject missileEffect = Instantiate(hitPrefab, transform.position, Quaternion.identity, transform);
 
         missileEffect.transform.localScale = hitPrefab.transform.localScale;
@@ -51,11 +51,11 @@ public class Missile : MonoBehaviour
         var lastTime = Time.time;
         while (missile != null && target != null && !WorldManager.Instance.CheckInRange(missile.transform.position, targetPos, 0.5f) && !ReferenceEquals(target, null))
         {
-            if (owner == null || owner.hp <= 0)
-            {
-                Destroy(missile);
-                yield break;
-            }
+            // if (owner == null || owner.hp <= 0)
+            // {
+            //     Destroy(missile);
+            //     yield break;
+            // }
 
             targetPos = target.transform.position + new Vector3(0f, 5f, 0f); //修正目标点
             float distCovered = (Time.time - lastTime) * speed;
@@ -67,7 +67,7 @@ public class Missile : MonoBehaviour
                 Vector3 horizontalPos = Vector3.Lerp(missile.transform.position, targetPos, fractionOfJourney);
 
                 UnityEngine.Debug.Log("fractionOfJourney: " + fractionOfJourney);
-                realLen += distCovered;
+                realLen += distCovered * 1.1f;
                 if(realLen > totalLen)
                     realLen = totalLen;
 
@@ -88,7 +88,7 @@ public class Missile : MonoBehaviour
 
         if (missile != null)
         {
-            if (target != null && owner != null)
+            if (target != null && owner != null && owner.hp > 0)
             {
                 owner.Attack(target);
             }
