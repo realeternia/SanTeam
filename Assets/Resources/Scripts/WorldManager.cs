@@ -213,7 +213,7 @@ public class WorldManager : MonoBehaviour
         {
             
          //   SpawnHerosForRegion(GameManager.Instance.GetPlayer(0), mapConfig.RegionHeroSide1[4], new System.Tuple<int, int>(101008, 1), 1);
-            SpawnHerosForRegion(GameManager.Instance.GetPlayer(0), mapConfig.RegionHeroSide1[3], new System.Tuple<int, int>(102030, 1), 1);
+            SpawnHerosForRegion(GameManager.Instance.GetPlayer(0), mapConfig.RegionHeroSide1[3], new System.Tuple<int, int>(104003, 1), 1);
          //   SpawnHerosForRegion(GameManager.Instance.GetPlayer(0), mapConfig.RegionHeroSide1[0], new System.Tuple<int, int>(104002, 1), 1);
 
             SpawnHerosForRegion(GameManager.Instance.GetPlayer(1), mapConfig.RegionHeroSide2[0], new System.Tuple<int, int>(101023, 1), 2);

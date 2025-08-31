@@ -14,7 +14,8 @@ public class SkillHitWall : Skill
 
     public override void OnAttack(Chess defender, string damType, int damage)
     {
-        if (CheckBurst())
+        var rate = GetRate(defender);
+        if (CheckBurst(rate))
         {
             // 在目标位置，以及owner和defender方向90度两侧，各创建一个effect
             var targetPos = defender.transform.position;

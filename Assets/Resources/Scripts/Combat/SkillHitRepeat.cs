@@ -11,7 +11,8 @@ public class SkillHitRepeat : Skill
 
     public override void OnAttack(Chess defender, string damType, int damage)
     {
-        if(CheckBurst())
+        var rate = GetRate(defender);
+        if(CheckBurst(rate))
         {
             WorldManager.Instance.AddBattleText(damage.ToString() + "!", defender.transform.position, new UnityEngine.Vector2(0, 60), Color.red, 3);
             owner.StartCoroutine(DelayAttack(defender, damage));

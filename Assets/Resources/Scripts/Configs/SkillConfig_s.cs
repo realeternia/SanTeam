@@ -185,10 +185,11 @@ namespace CommonConfig
             config[201023] = new SkillConfig(201023, "明镜", "反弹50%智力伤害", 1, 0, 0, "inte", 0, 0, 20f, true, 0, 0.5f, 0, 0, 0, 0, 0, 0, 0, "Feedback", "SwordHitBlue", 3, "jing");
             config[201024] = new SkillConfig(201024, "威震", "攻击时晕眩周围目标", 1, 0.2f, 5f, "", 0, 0, 20f, false, 3, 0, 0, 0, 301001, 1.5f, 0, 0, 0, "HitBuffAreaSrc", "MagicNovaYellow", 4, "wei");
             config[201025] = new SkillConfig(201025, "火矢", "攻击时射出火箭", 1, 0.35f, 3f, "str", 0, 0, 8f, false, 1, 0.2f, 0, 0, 0, 0, 1, 3.2f, 1f, "HitWall", "SoftFireBigRed", 3, "shi3");
-            config[201026] = new SkillConfig(201026, "坚毅", "受击时几率发动大减伤", 1, 0.4f, 6f, "str", 0, 0, 0, false, 0, 0.7f, 0, 0, 300002, 5f, 0, 0, 0, "AttackedBuff", "", 3, "shi4");
+            config[201026] = new SkillConfig(201026, "坚毅", "受击时几率发动大减伤", 1, 0.4f, 6f, "str", 0, 0, 0, false, 0, 0.75f, 0, 0, 300002, 5f, 0, 0, 0, "AttackedBuff", "", 3, "shi4");
             config[201027] = new SkillConfig(201027, "虎卫队", "攻击时几率对目标进行三连击", 1, 0.15f, 5f, "str", 0.2f, 0.005f, 0, false, 0, 1f, 2, 0.3f, 0, 0, 0, 0, 0, "HitRepeat", "SwordHitRedCritical", 4, "hu");
             config[201028] = new SkillConfig(201028, "青州兵", "攻击时几率对目标进行2连击", 1, 0.15f, 5.5f, "leadShip", 0.2f, 0.01f, 0, false, 0, 1f, 1, 0.4f, 0, 0, 0, 0, 0, "HitRepeat", "SwordHitGreenCritical", 3, "qing");
             config[201029] = new SkillConfig(201029, "成长", "攻击时几率提升自己的属性", 1, 0.3f, 0, "", 0, 0, 0, false, 0, 0.05f, 0, 0, 0, 0, 0, 0, 0, "HitAttr", "MagicChargeYellow", 3, "zhang");
+            config[201030] = new SkillConfig(201030, "击破", "使目标增伤20%", 1, 0.3f, 2f, "", 0, 0, 0, false, 0, 0.2f, 0, 0, 301003, 3f, 0, 0, 0, "HitBuff", "SoftFireBigRed", 2, "po");
 
         }
 
