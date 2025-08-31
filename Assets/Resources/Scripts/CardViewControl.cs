@@ -40,10 +40,13 @@ public class CardViewControl : MonoBehaviour, IPointerDownHandler, IPointerUpHan
     void Start()
     {
         cardName.raycastTarget = false;
-        lead.raycastTarget = false;
-        inte.raycastTarget = false;
-        str.raycastTarget = false;
-        hp.raycastTarget = false;
+        if (isHeroCard)
+        {
+            lead.raycastTarget = false;
+            inte.raycastTarget = false;
+            str.raycastTarget = false;
+            hp.raycastTarget = false;
+        }
 
         buyButton.onClick.AddListener(() =>
         {

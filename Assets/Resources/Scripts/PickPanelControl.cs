@@ -146,10 +146,10 @@ public class PickPanelControl : MonoBehaviour
         int totalItems = Mathf.Min(heroPool.Count, itemsPerRow * rows);
         
         // 单元格大小和间距
-        float cellWidth = 114f;
-        float cellHeight = 114f;
+        float cellWidth = 130f;
+        float cellHeight = 130f;
         float spacingX = 0f;
-        float spacingY = 14f;
+        float spacingY = 15f;
 
         // 创建单元格
         for (int i = 0; i < totalItems; i++)

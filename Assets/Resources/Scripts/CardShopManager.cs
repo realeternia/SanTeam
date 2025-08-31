@@ -12,7 +12,9 @@ public class CardShopManager : MonoBehaviour
     public List<CardViewControl> cardViews = new List<CardViewControl>();
 
     public GameObject cardViewPrefab; // 拖拽CardView预制体到此处
-    private const int TOTAL_CARDS = 12;
+    public GameObject cardItemViewPrefab; // 拖拽CardView预制体到此处
+    public GameObject cardItemView;
+    private const int TOTAL_HERO_CARDS = 12;
     private const int CARDS_PER_ROW = 6;
     private float cardWidth = 176f;
     private float cardHeight = 288f;
@@ -28,7 +30,6 @@ public class CardShopManager : MonoBehaviour
     private int era = 0;
     public TMP_Text eraText;
     public MySelectControl mySelect;
-    private int noItemRound = 0;
     private bool isShopEnd = false;
 
     private Coroutine shopCoroutine;
@@ -95,8 +96,8 @@ public class CardShopManager : MonoBehaviour
         float startY = 145f;
 
         var shopOpenIndex = GameManager.Instance.GetPlayer(0).GamePlayed(); //第几场比赛
-        bool hasItem = false;
-        for (int i = 0; i < TOTAL_CARDS; i++)
+        // hero card
+        for (int i = 0; i < TOTAL_HERO_CARDS; i++)
         {
             // 计算行和列
             int row = i / CARDS_PER_ROW;
@@ -110,50 +111,55 @@ public class CardShopManager : MonoBehaviour
             GameObject card = Instantiate(cardViewPrefab, transform);
             RectTransform rectTransform = card.GetComponent<RectTransform>();
             if (rectTransform != null)
-            {
                 rectTransform.anchoredPosition = new Vector2(x, y);
-                rectTransform.sizeDelta = new Vector2(cardWidth, cardHeight);
-            }
 
             var count = 1;
             if (shopOpenIndex >= 2) //第3局后有多张卡
             {
                 if (UnityEngine.Random.Range(0, 100) < System.Math.Clamp((shopOpenIndex - 2) * 5, 6, 40))
                     count = 2;
-            }            
-
-            // 初始化CardView属性
+            }
             CardViewControl cardView = card.GetComponent<CardViewControl>();
-           // if(i == 0)
-            if(shopOpenIndex >= 5 && i <= 1 && UnityEngine.Random.Range(0, 100) < System.Math.Clamp(shopOpenIndex * 3 - 4, 12, 38) + noItemRound * 10)
-            {
-                var itemId = HeroSelectionTool.GetRandomItemId();
-                var cardPrice = ItemConfig.GetConfig(itemId).Price;
-                var countLimit = (shopOpenIndex * 5 + 8) / cardPrice;
+            var heroId = HeroSelectionTool.GetRandomHeroId();
+            var heroPrice = HeroSelectionTool.GetPrice(HeroConfig.GetConfig(heroId));
+            var countLimit = (shopOpenIndex * 6 + 10) / heroPrice;
 
-                if (countLimit > 2 && UnityEngine.Random.Range(0, 500) > 200)
-                    count += UnityEngine.Random.Range(0, countLimit - 2) + 1;
-                cardView.Init(itemId, false, count);
-                hasItem = true;
-            }
-            else
-            {
-                var heroId = HeroSelectionTool.GetRandomHeroId();
-                var heroPrice = HeroSelectionTool.GetPrice(HeroConfig.GetConfig(heroId));
-                var countLimit = (shopOpenIndex * 6 + 10) / heroPrice;
-
-                if (countLimit > 2 && UnityEngine.Random.Range(0, 500) > HeroConfig.GetConfig(heroId).Total)
-                    count += UnityEngine.Random.Range(0, countLimit - 2) + 1;
-                cardView.Init(heroId, true, count);
-            }
-
+            if (countLimit > 2 && UnityEngine.Random.Range(0, 500) > HeroConfig.GetConfig(heroId).Total)
+                count += UnityEngine.Random.Range(0, countLimit - 2) + 1;
+            cardView.Init(heroId, true, count);  
             cardViews.Add(cardView);
         }
 
-        if(shopOpenIndex >= 5 && !hasItem)
-            noItemRound++;
-        else
-            noItemRound = 0;
+        // item card
+        for (int i = 0; i < 8; i++)
+        {
+            // 计算位置
+            float x = -500 + i * (140 + 5);
+            float y = 0;
+
+            // 创建CardView实例
+            GameObject card = Instantiate(cardItemViewPrefab, cardItemView.transform);
+            RectTransform rectTransform = card.GetComponent<RectTransform>();
+            if (rectTransform != null)
+                rectTransform.anchoredPosition = new Vector2(x, y);
+
+            var count = 1;
+            if (shopOpenIndex >= 2) //第3局后有多张卡
+            {
+                if (UnityEngine.Random.Range(0, 100) < System.Math.Clamp((shopOpenIndex - 2) * 5, 6, 40))
+                    count = 2;
+            }                
+
+            CardViewControl cardView = card.GetComponent<CardViewControl>();
+            var itemId = HeroSelectionTool.GetRandomItemId();
+            var cardPrice = ItemConfig.GetConfig(itemId).Price;
+            var countLimit = (shopOpenIndex * 5 + 8) / cardPrice;
+
+            if (countLimit > 2 && UnityEngine.Random.Range(0, 500) > 200)
+                count += UnityEngine.Random.Range(0, countLimit - 2) + 1;
+            cardView.Init(itemId, false, count);
+            cardViews.Add(cardView);
+        }        
 
         era++;
         passBtn.gameObject.SetActive(true);    
