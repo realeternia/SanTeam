@@ -1,0 +1,14 @@
+{
+    "friendlyName": "A HUAWEI MATE70 pro",
+    "version": 1,
+    "screens": [
+        {
+            "width": 1316,
+            "height": 2832,
+            "dpi": 450.0
+        }
+    ],
+    "systemInfo": {
+        "operatingSystem": "Android"
+    }
+}

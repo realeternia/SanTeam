@@ -1,0 +1,14 @@
+{
+    "friendlyName": "A HUAWEIMATEpad",
+    "version": 1,
+    "screens": [
+        {
+            "width": 1600,
+            "height": 2560,
+            "dpi": 450.0
+        }
+    ],
+    "systemInfo": {
+        "operatingSystem": "Android"
+    }
+}
