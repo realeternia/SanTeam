@@ -33,6 +33,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     public Image playerImage;
     public TMP_Text goldText;
     public TMP_Text resultText;
+    public TMP_Text fightMarkText;
     public Image playerBgImg;
 
     // 在 PlayerInfo 类中添加 AICardConfig 实例
@@ -57,7 +58,8 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 
         gold = g;
         goldText.text = g.ToString();
-        resultText.text = "准备中";
+        resultText.text = "0分";
+        fightMarkText.text = "";
         lineColor = ColorUtility.TryParseHtmlString(colorStr, out lineColor) ? lineColor : Color.white;
         playerBgImg.color = lineColor;
     }
@@ -533,6 +535,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         var strongCardIds = GetStrong5CardList();
         if(pid > 0)
             AutoCheckItem(strongCardIds);
+        CheckFightMark(strongCardIds);
         return RearrangePos(strongCardIds);
     }
 
@@ -692,6 +695,30 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
             if(itemCardList.Count == 0)
                 break;
         }
+    }
+
+    private void CheckFightMark(List<Tuple<int, int>> results)
+    {
+        int mark = 0;
+        foreach(var item in results)
+            mark += HeroSelectionTool.GetPrice(HeroConfig.GetConfig(item.Item1)) * cards[item.Item1];
+        foreach (var item in itemEquips)
+        {
+            // 检查英雄ID是否存在于results中
+            bool heroExists = false;
+            foreach(var hero in results)
+            {
+                if(hero.Item1 == item.Key)
+                {
+                    heroExists = true;
+                    break;
+                }
+            }
+            if(!heroExists)
+                continue;
+            mark += ItemConfig.GetConfig(item.Value).Price * cards[item.Value];
+        }
+        fightMarkText.text = "$" + mark.ToString();
     }
 
     private List<Tuple<int, int>> RearrangePos(List<Tuple<int, int>> results)
