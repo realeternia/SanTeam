@@ -30,7 +30,7 @@ public static class ConfigManager
                 AddSkill(heroCfg, 200005);
             else if (heroCfg.Job == "xiang")
                 AddSkill(heroCfg, 200006);
-            else if (heroCfg.Job == "pao")   
+            else if (heroCfg.Job == "gong")   
                 AddSkill(heroCfg, 200007);          
             else if (heroCfg.Job == "mou")   
                 AddSkill(heroCfg, 200008);                         

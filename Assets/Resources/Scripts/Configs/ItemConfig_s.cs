@@ -98,7 +98,11 @@ namespace CommonConfig
             config[400008] = new ItemConfig(400008, "墨子", 1, "lead", 6, "", 0, null, "", 15, "mozi");
             config[400009] = new ItemConfig(400009, "六韬", 1, "lead", 10, "", 0, null, "", 25, "liutao");
             config[400010] = new ItemConfig(400010, "诗经", 1, "inte", 6, "", 0, null, "", 15, "shijing");
-            config[400011] = new ItemConfig(400011, "易经", 1, "inte", 12, "", 0, null, "", 30, "yijing");
+            config[400011] = new ItemConfig(400011, "易经", 1, "inte", 10, "", 0, null, "", 25, "yijing");
+            config[400012] = new ItemConfig(400012, "道德经", 1, "inte", 15, "", 0, null, "", 40, "daode");
+            config[400013] = new ItemConfig(400013, "赤兔马", 1, "shield", 60, "", 0, null, "", 40, "chitu");
+            config[400014] = new ItemConfig(400014, "的卢马", 1, "shield", 40, "", 0, null, "", 25, "dilu");
+            config[400015] = new ItemConfig(400015, "大宛宝马", 1, "shield", 24, "", 0, null, "", 15, "dawan");
 
         }
 

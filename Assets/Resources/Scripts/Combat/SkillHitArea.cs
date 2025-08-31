@@ -6,7 +6,6 @@ using UnityEngine;
 
 public class SkillHitArea : Skill
 {
-    private Vector3 targetPos;
     public SkillHitArea(int id, Chess unit) : base(id, unit)
     {
     }
@@ -15,35 +14,20 @@ public class SkillHitArea : Skill
     {
         if (CheckBurst())
         {
-            targetPos = defender.transform.position;
-
-            var chess = WorldManager.Instance.SpawnUnitsForRegion(owner.GetPlayerInfo(), 501001, targetPos, owner.side, "");
-            chess.SetLifeTime(skillCfg.SummonTime);
+            var targetPos = defender.transform.position;
 
             //创建一个hitEffect
-            EffectManager.PlayPosSkillEffect(chess, targetPos, skillCfg.Range, skillCfg.HitEffect, skillCfg.SummonTime);
-
-            owner.StartCoroutine(DelayDamage());
-        }
-    }
-
-    IEnumerator DelayDamage()
-    {
-        var term = (int) System.Math.Floor(skillCfg.SummonTime / skillCfg.SummonHitInterval);
-        for (int i = 0; i < term; i++)
-        {
-            if(owner == null || owner.hp <= 0)
-                yield break;
+            EffectManager.PlaySkillEffect(defender, skillCfg.HitEffect);
 
             var unitsInRange = WorldManager.Instance.GetUnitsInRange(targetPos, skillCfg.Range, owner.side, true);
+            unitsInRange.Remove(defender);
             if (unitsInRange.Count > 0)
             {
                 WorldManager.Instance.RandomSelect(unitsInRange, skillCfg.TargetCount);
-                var damage = (int)(owner.GetAttr(skillCfg.Attr) * skillCfg.Strength);
+                var damage2 = (int)(damage * skillCfg.Strength);
                 foreach(var unit in unitsInRange)
-                    unit.OnSkillDamaged(owner, damage);
+                    unit.OnSkillDamaged(owner, damage2);
             }
-            yield return new WaitForSeconds(skillCfg.SummonHitInterval);
         }
     }
 

@@ -45,8 +45,8 @@ public static class SkillManager
                 return new SkillHitBuff(skillId, owner);
             case "HitBuffArea":
                 return new SkillHitBuffArea(skillId, owner);
-            case "HitArea":
-                return new SkillHitArea(skillId, owner);
+            case "HitRegion":
+                return new SkillHitRegion(skillId, owner);
             case "HitWall":
                 return new SkillHitWall(skillId, owner);
             case "SoldierSummon":
@@ -65,7 +65,8 @@ public static class SkillManager
                 return new SkillHitRepeat(skillId, owner);
             case "HitAttr":
                 return new SkillHitAttr(skillId, owner);
-
+            case "HitArea":
+                return new SkillHitArea(skillId, owner);
 
             case "Dumb":
                 return new SkillDumb(skillId, owner);               

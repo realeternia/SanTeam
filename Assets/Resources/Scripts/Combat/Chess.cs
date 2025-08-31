@@ -45,6 +45,7 @@ public class Chess : MonoBehaviour
     public int attackDamage = 30;
     public string hitEffect;
     public int missileSpeed = 10;
+    public float missileHight;
     private int soldierLevel = 0;
 
 

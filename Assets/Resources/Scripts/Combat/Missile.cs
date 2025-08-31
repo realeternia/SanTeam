@@ -27,14 +27,14 @@ public class Missile : MonoBehaviour
         missileEffect.transform.localScale = hitPrefab.transform.localScale;
 
         // 启动协程让导弹飞向目标位置
-        StartCoroutine(MoveMissileToTarget(gameObject, owner.missileSpeed, effectName.StartsWith("Bullet")));
+        StartCoroutine(MoveMissileToTarget(gameObject, owner.missileSpeed, owner.missileHight));
 
        // Destroy(missileEffect, 2f);
     }
 
 
     // 定义协程方法，控制导弹移动
-    IEnumerator MoveMissileToTarget(GameObject missile, int missileSpeed, bool isBullet)
+    IEnumerator MoveMissileToTarget(GameObject missile, int missileSpeed, float missileHight)
     {
         var targetPos = target.transform.position + new Vector3(0f, 5f, 0f);
 
@@ -44,9 +44,7 @@ public class Missile : MonoBehaviour
         float startTime = Time.time;
         float speed = missileSpeed * 3; // 导弹移动速度
 
-        float maxY = 0;
-        if(isBullet)
-            maxY = 1.5f; //抛物线最高点高度
+        float maxY = missileHight;
 
         var lastTime = Time.time;
         while (missile != null && target != null && !WorldManager.Instance.CheckInRange(missile.transform.position, targetPos, 0.5f) && !ReferenceEquals(target, null))

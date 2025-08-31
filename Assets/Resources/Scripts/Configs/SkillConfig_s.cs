@@ -158,19 +158,19 @@ namespace CommonConfig
             config[200004] = new SkillConfig(200004, "坚韧", "受击时几率发动减伤", 1, 0.4f, 4.5f, "str", 0, 0, 0, false, 0, 0.5f, 0, 0, 300002, 4f, 0, 0, 0, "AttackedBuff", "", 2, "shi");
             config[200005] = new SkillConfig(200005, "突破", "移动时穿越敌人,降低远程伤害", 1, 1f, 7f, "", 0, 0, 20f, false, 0, 0.1f, 0, 0, 0, 0, 0, 0, 0, "RunCross", "LightningExplosionBlue", 3, "ma");
             config[200006] = new SkillConfig(200006, "部署", "提升士兵等级", 1, 0, 0, "", 0, 0, 0, false, 0, 1f, 0, 0, 0, 0, 0, 0, 0, "SoldierUp", "MagicChargeYellow", 2, "xiang");
-            config[200007] = new SkillConfig(200007, "射击", "射程很远", 1, 1f, 99f, "", 0, 0, 0, false, 0, 0, 0, 0, 0, 0, 0, 0, 0, "Dumb", "", 2, "pao");
+            config[200007] = new SkillConfig(200007, "射击", "射程很远", 1, 1f, 99f, "", 0, 0, 0, false, 0, 0, 0, 0, 0, 0, 0, 0, 0, "Dumb", "", 2, "gong");
             config[200008] = new SkillConfig(200008, "决胜", "一定几率晕眩目标单位2s", 1, 0.15f, 4f, "inte", 0.2f, 0.01f, 0, false, 0, 0, 0, 0, 301001, 2f, 0, 0, 0, "HitBuff", "MagicChargeYellow", 2, "mou");
             config[201001] = new SkillConfig(201001, "治疗", "给与友军治疗", 1, 1f, 3f, "", 0, 0, 50f, false, 0, 0.5f, 0, 0, 0, 0, 0, 0, 0, "Heal", "MagicBuffGreen", 2, "heal");
             config[201002] = new SkillConfig(201002, "鼓舞", "给与友军攻速祝福", 1, 1f, 3f, "", 0, 0, 50f, false, 0, 0.4f, 0, 0, 0, 0, 0, 0, 0, "Song", "MagicChargePink", 2, "song");
             config[201003] = new SkillConfig(201003, "富甲一方", "参战获得5金币", 1, 0, 0, "", 0, 0, 0, false, 0, 5f, 0, 0, 0, 0, 0, 0, 0, "Gold", "MagicChargeYellow", 3, "gold");
-            config[201004] = new SkillConfig(201004, "反伤", "反弹40%近战伤害", 1, 0, 0, "", 0, 0, 20f, false, 0, 0.4f, 0, 0, 0, 0, 0, 0, 0, "Feedback", "SwordHitBlue", 2, "ci");
-            config[201005] = new SkillConfig(201005, "狙击", "射程非常远", 1, 1f, 99f, "", 0, 0, 0, false, 0, 0, 0, 0, 0, 0, 0, 0, 0, "Dumb", "", 3, "ju");
+            config[201004] = new SkillConfig(201004, "刺甲", "反弹40%近战伤害", 1, 0, 0, "", 0, 0, 20f, false, 0, 0.4f, 0, 0, 0, 0, 0, 0, 0, "Feedback", "SwordHitBlue", 2, "ci");
+            config[201005] = new SkillConfig(201005, "诸葛弩", "射程非常远", 1, 1f, 99f, "", 0, 0, 0, false, 0, 0, 0, 0, 0, 0, 0, 0, 0, "Dumb", "", 3, "nu");
             config[201006] = new SkillConfig(201006, "连射", "攻击时几率触发连射", 1, 0.3f, 5f, "", 0, 0, 0, false, 0, 0.8f, 0, 0, 0, 0, 0, 0, 0, "SpeedAttack", "", 3, "lian");
             config[201007] = new SkillConfig(201007, "藤甲", "受非智力攻击时高几率发动70%减伤", 1, 0.7f, 1f, "", 0, 0, 0, false, 0, 0.7f, 0, 0, 0, 0, 0, 0, 0, "PlantSkin", "", 3, "teng");
             config[201008] = new SkillConfig(201008, "多重箭", "攻击时40%发出2只箭", 1, 0.4f, 4f, "", 0, 0, 25f, false, 1, 0, 0, 0, 0, 0, 0, 0, 0, "MultiArrow", "", 3, "duo");
             config[201009] = new SkillConfig(201009, "指导", "提升队伍最低武将智力", 1, 0, 0, "", 0, 0, 0, false, 0, 0.4f, 0, 0, 0, 0, 0, 0, 0, "Help", "MagicChargeYellow", 2, "shi2");
             config[201010] = new SkillConfig(201010, "旋风斩", "攻击时几率对附近敌人造成伤害", 1, 0.4f, 5f, "", 0, 0, 25f, false, 99, 0.8f, 0, 0, 0, 0, 0, 0, 0, "SpinAttack", "SwordWhirlwindWhite", 3, "meng");
-            config[201011] = new SkillConfig(201011, "落雷", "攻击召唤出持续伤害的雷电阵", 1, 0.3f, 10f, "inte", 0, 0, 25f, false, 1, 0.1f, 0, 0, 0, 0, 0, 5.2f, 0.5f, "HitArea", "SummonStorm", 4, "tian");
+            config[201011] = new SkillConfig(201011, "落雷", "攻击召唤出持续伤害的雷电阵", 1, 0.3f, 10f, "inte", 0, 0, 25f, false, 1, 0.1f, 0, 0, 0, 0, 0, 5.2f, 0.5f, "HitRegion", "SummonStorm", 4, "tian");
             config[201012] = new SkillConfig(201012, "火墙", "攻击召唤出持续伤害的火墙", 1, 0.3f, 8f, "inte", 0, 0, 8f, false, 99, 0.15f, 0, 0, 0, 0, 5, 3.2f, 1f, "HitWall", "SoftFireBigRed", 4, "yan");
             config[201013] = new SkillConfig(201013, "神算", "高几率晕眩目标单位2s", 1, 0.2f, 3.5f, "inte", 0.55f, 0.01f, 0, false, 0, 0, 0, 0, 301001, 2f, 0, 0, 0, "HitBuff", "MagicChargeYellow", 5, "shen");
             config[201014] = new SkillConfig(201014, "连锁", "锁定敌人目标,传递一半受到伤害", 1, 0.5f, 3f, "inte", 0, 0, 25f, false, 1, 0.5f, 0, 0, 301002, 8f, 0, 0, 0, "HitBuffArea", "", 3, "suo");
@@ -190,6 +190,7 @@ namespace CommonConfig
             config[201028] = new SkillConfig(201028, "青州兵", "攻击时几率对目标进行2连击", 1, 0.15f, 5.5f, "leadShip", 0.2f, 0.01f, 0, false, 0, 1f, 1, 0.4f, 0, 0, 0, 0, 0, "HitRepeat", "SwordHitGreenCritical", 3, "qing");
             config[201029] = new SkillConfig(201029, "成长", "攻击时几率提升自己的属性", 1, 0.3f, 0, "", 0, 0, 0, false, 0, 0.05f, 0, 0, 0, 0, 0, 0, 0, "HitAttr", "MagicChargeYellow", 3, "zhang");
             config[201030] = new SkillConfig(201030, "击破", "使目标增伤20%", 1, 0.3f, 2f, "", 0, 0, 0, false, 0, 0.2f, 0, 0, 301003, 3f, 0, 0, 0, "HitBuff", "SoftFireBigRed", 2, "po");
+            config[201031] = new SkillConfig(201031, "炮车", "攻击目标发生爆炸", 1, 0.5f, 0, "", 0, 0, 20f, false, 3, 0.6f, 0, 0, 0, 0, 0, 0, 0, "HitArea", "MagicNovaYellow", 3, "pao");
 
         }
 
