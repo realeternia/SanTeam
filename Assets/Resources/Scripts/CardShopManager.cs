@@ -302,6 +302,7 @@ public class CardShopManager : MonoBehaviour
         foreach(var img in movingCardImages)
             Destroy(img);
 
+        Tooltip.Instance.HideTooltip();
         PanelManager.Instance.HideShop();
         WorldManager.Instance.BattleBegin(); 
     }

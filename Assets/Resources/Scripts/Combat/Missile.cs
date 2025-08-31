@@ -42,7 +42,7 @@ public class Missile : MonoBehaviour
         float totalLen = journeyLength;
         float realLen = 0;
         float startTime = Time.time;
-        float speed = missileSpeed * 3; // 导弹移动速度
+        float speed = missileSpeed * 2.5f; // 导弹移动速度
 
         float maxY = missileHight;
 
@@ -74,6 +74,7 @@ public class Missile : MonoBehaviour
                 horizontalPos.y += parabolaHeight;
                 
                 missile.transform.position = horizontalPos;
+                missile.transform.rotation = Quaternion.LookRotation(targetPos - missile.transform.position);
             }
             else
             {
