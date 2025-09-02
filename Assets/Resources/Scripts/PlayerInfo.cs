@@ -269,7 +269,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         int weakCardId = 0;
         int weakCardPrice = 0;
         var heroCardCount = GetHeroCardList().Count;
-        if (heroCardCount >= aiConfig.cardLimit)
+        if (heroCardCount >= aiConfig.cardHeroLimit)
         {
             var weakCard = FindWeakCard();
             weakCardId = weakCard.Item1;
@@ -325,14 +325,25 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
             {
                 score *= aiConfig.sameCardRate;
                 score *= (1 + Math.Max(0.2f, 0.3f * (4 - cards[pickCard.cardId]))); // 优先拿低等级卡
-                if(strongList.Contains(pickCard.cardId)) //主力卡再增加权重
-                    score *= 1.5f;
+                if(!strongList.Contains(pickCard.cardId)) //非主力卡-权重
+                    score *= 0.7f;
                 hasSameCard = true;
             }
 
+            var shopCfg = ShopConfig.GetConfig(GamePlayed() + 1);
+            if (!hasSameCard)
+            {
+                if (era < 2 && gold < (int)(shopCfg.RoundGold * 0.6) || era < 3 && gold < (int)(shopCfg.RoundGold * 0.35))
+                {
+                    var cardRate = Math.Max(0, (9 - availableCards.Count) * 0.05f);
+                    if (UnityEngine.Random.value < aiConfig.futureRate + cardRate)
+                        return false;
+                }
+            }            
+
             if (pickCard.isHeroCard)
             {
-                if (!cards.ContainsKey(pickCard.cardId) && heroCardCount >= aiConfig.cardLimit)
+                if (!cards.ContainsKey(pickCard.cardId) && heroCardCount >= aiConfig.cardHeroLimit)
                 {
                     if (pickCard.priceI < weakCardPrice)
                         continue; //没必要换更弱的卡
@@ -371,7 +382,6 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
                         score *= aiConfig.findMasterRate * .6f;
                     else if (hasSunquan && pickCardCfg.Side == 3)
                         score *= aiConfig.findMasterRate * .6f;
-
                     if (side1Count >= 1 && pickCardCfg.Id == 100001)
                         score *= aiConfig.findMasterRate;
                     else if (side2Count >= 1 && pickCardCfg.Id == 100002)
@@ -383,15 +393,18 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
             else
             {
                 var itemCount = GetItemCardList().Count;
-
-                if (itemCount > 6 && !hasSameCard)
+                if (itemCount >= aiConfig.cardItemLimit && !hasSameCard)
                     continue; //武器太多了
-                if (gold > 60 && GamePlayed() > 8)
-                    score *= 2f;
-                if (itemCount == 0)
-                    score *= 4;
-                else if (itemCount < 3)
-                    score *= 1 + (3 - itemEquips.Count) * 0.6f;
+
+                if (!hasSameCard)
+                {
+                    if (gold > 60 && GamePlayed() > 8)
+                        score *= 2f;
+                    else if (itemCount == 0)
+                        score *= 4;
+                    else if (itemCount < 3)
+                        score *= 1 + (3 - itemCount) * 0.6f;
+                }
             }
 
             // 加入分数列表
@@ -402,19 +415,13 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         if (scoredCards.Count == 0)
             return false;
 
-        if (!hasSameCard)
+        //scoredCards的key的priceI前三3的卡分别（1.5，1.3，1.1）
+        var top3Cards = scoredCards.OrderByDescending(x => x.card.priceI).Take(3).ToList();
+        for(int i = 0; i < top3Cards.Count; i++)
         {
-            if (availableCards.Count <= 7 && era < 3 && gold < 50) //最后几张牌考虑放弃
-            {
-                if (UnityEngine.Random.value < aiConfig.futureRate + (49 - gold) * 0.015f + (7 - availableCards.Count) * 0.08f + (2 - era) * 0.15f)
-                    return false;
-            }            
-            else if (era < 2 && gold < 50 || era < 3 && gold < 25)
-            {
-                if (UnityEngine.Random.value < aiConfig.futureRate)
-                    return false;
-            }
-
+            var card = top3Cards[i];
+            card.score = card.score * (1.5f - i * 0.2f);
+            top3Cards[i] = card;
         }
 
         // 根据分数计算总权重
@@ -438,10 +445,8 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         if (selectedCard == null)
             return false;
 
-        if (heroCardCount >= aiConfig.cardLimit && !cards.ContainsKey(selectedCard.cardId))
-        {
+        if (heroCardCount >= aiConfig.cardHeroLimit && !hasSameCard)
             SellCard(weakCardId); //卖掉最弱的卡
-        }
 
         // 购买选中的卡片
         BuyCard(selectedCard, selectedCard.cardId, selectedCard.isHeroCard, selectedCard.priceI, selectedCard.count);

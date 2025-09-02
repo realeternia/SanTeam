@@ -295,7 +295,7 @@ public class CardShopManager : MonoBehaviour
         UnityEngine.Debug.Log("ShopBegin");
 
         var shopOpenIndex = GameManager.Instance.GetPlayer(0).GamePlayed(); //第几场比赛
-        var roundGold = shopOpenIndex * 5 + 45;
+        var roundGold = ShopConfig.GetConfig(shopOpenIndex + 1).RoundGold;
         for(int i = 0; i < 6; i++)
             GameManager.Instance.GetPlayer(i).AddGold(roundGold);
         era = 0;
