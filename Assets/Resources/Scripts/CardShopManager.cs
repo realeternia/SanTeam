@@ -32,6 +32,8 @@ public class CardShopManager : MonoBehaviour
     public MySelectControl mySelect;
     private bool isShopEnd = false;
 
+    public int nextFirstPicker = -1;
+
     private Coroutine shopCoroutine;
 
 
@@ -83,18 +85,19 @@ public class CardShopManager : MonoBehaviour
     private void NewEra()
     {
         var movingCardImages = GameObject.FindGameObjectsWithTag("MovingCard");
-        foreach(var img in movingCardImages)
+        foreach (var img in movingCardImages)
             Destroy(img);
-        
+
         //移除并销毁旧卡片
         foreach (Transform child in transform)
             Destroy(child.gameObject);
-        foreach(Transform child in cardItemView.transform)
+        foreach (Transform child in cardItemView.transform)
             Destroy(child.gameObject);
+        var unsoldItems = cardViews.FindAll(x => !x.isHeroCard && !x.isSold && !ItemConfig.GetConfig(x.cardId).AutoRemove).ConvertAll(a => a.cardId);
         cardViews.Clear();
 
         // 计算起始位置，使其居中显示
-        float startX = -( (CARDS_PER_ROW * cardWidth) + (CARDS_PER_ROW - 1) * spacing ) / 2f + cardWidth / 2f;
+        float startX = -((CARDS_PER_ROW * cardWidth) + (CARDS_PER_ROW - 1) * spacing) / 2f + cardWidth / 2f;
         float startY = 145f;
 
         var shopOpenIndex = GameManager.Instance.GetPlayer(0).GamePlayed(); //第几场比赛
@@ -125,7 +128,7 @@ public class CardShopManager : MonoBehaviour
             }
             CardViewControl cardView = card.GetComponent<CardViewControl>();
 
-            cardView.Init(heroId, true, count);  
+            cardView.Init(heroId, true, count, shopOpenIndex);
             cardViews.Add(cardView);
         }
 
@@ -133,7 +136,7 @@ public class CardShopManager : MonoBehaviour
         UnityEngine.Debug.Log("totalItem = " + total);
         // 先把ItemConfig里所有RateAbs非0的item随出来，放到一个列表
         var itemIds = new List<int>();
-        foreach(var itemCfg in ItemConfig.ConfigList)
+        foreach (var itemCfg in ItemConfig.ConfigList)
         {
             if (itemCfg.RateAbs > 0 && UnityEngine.Random.Range(0, 100) < itemCfg.RateAbs)
                 itemIds.Add(itemCfg.Id);
@@ -143,10 +146,12 @@ public class CardShopManager : MonoBehaviour
         {
             itemIds.Add(HeroSelectionTool.GetRandomItemId(shopCfg.Id));
         }
+        if(unsoldItems.Count > 0)
+            itemIds.InsertRange(0, unsoldItems);
 
         int ids = 0;
         // item card
-        foreach(var itemId in itemIds)
+        foreach (var itemId in itemIds)
         {
             // 计算位置
             float x = -500 + ids * (140 + 5);
@@ -160,26 +165,33 @@ public class CardShopManager : MonoBehaviour
                 rectTransform.anchoredPosition = new Vector2(x, y);
 
             var count = 1;
-            var cardPrice = ItemConfig.GetConfig(itemId).Price;            
+            var cardPrice = ItemConfig.GetConfig(itemId).Price;
             if (shopCfg.MultiPriceTotal > 2 * cardPrice && UnityEngine.Random.Range(0, 100) < shopCfg.MultiCardRate) //第3局后有多张卡
             {
                 count = UnityEngine.Random.Range(1, shopCfg.MultiPriceTotal / cardPrice + 1);
-            }              
+            }
             CardViewControl cardView = card.GetComponent<CardViewControl>();
 
-            cardView.Init(itemId, false, count);
+            cardView.Init(itemId, false, count, shopOpenIndex);
             cardViews.Add(cardView);
-        }        
+        }
 
         era++;
-        passBtn.gameObject.SetActive(true);    
+        passBtn.gameObject.SetActive(true);
         mySelect.UpdateCards(GameManager.Instance.GetPlayer(0));
         eraText.text = "第" + era + "轮";
 
         // 重置所有玩家的pass状态
         for (int i = 0; i < playerPassed.Length; i++)
             playerPassed[i] = false;
-        passedPlayers = 0;        
+        passedPlayers = 0;
+
+        if (nextFirstPicker >= 0)
+        {
+            round = 6 * 100 + nextFirstPicker;
+            GameManager.Instance.OnPlayerTurn(nextFirstPicker);
+        }
+        nextFirstPicker = -1;
 
         GameManager.Instance.PlaySound("Sounds/page");
     }
@@ -274,20 +286,18 @@ public class CardShopManager : MonoBehaviour
             }
         }
 
+        NextTurn();
+
         // 检查是否6个玩家都放弃或所有卡牌都已售出
         if (passedPlayers >= 6 || allCardsSold)
         {
-            // 进入下一轮并刷新卡牌
-            round++;
             if (era == 3)
             {
                 StartCoroutine(ShopEnd());
                 return;
             }
             NewEra();
-
         }
-        NextTurn();
     }
 
     public void ShopBegin()

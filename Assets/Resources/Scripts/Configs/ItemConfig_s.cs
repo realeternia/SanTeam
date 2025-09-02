@@ -15,9 +15,17 @@ namespace CommonConfig
         /// </summary>
         public string Name;
         /// <summary>
+        ///效果说明
+        /// </summary>
+        public string Des;
+        /// <summary>
         ///等级
         /// </summary>
         public int Lv;
+        /// <summary>
+        ///效果
+        /// </summary>
+        public string Effect;
         /// <summary>
         ///属性1
         /// </summary>
@@ -51,20 +59,34 @@ namespace CommonConfig
         /// </summary>
         public int ShopIdx;
         /// <summary>
+        ///自动使用
+        /// </summary>
+        public bool AutoUse;
+        /// <summary>
+        ///自动回收
+        /// </summary>
+        public bool AutoRemove;
+        /// <summary>
         ///价格
         /// </summary>
         public int Price;
+        /// <summary>
+        ///价格回合
+        /// </summary>
+        public int PriceRound;
         /// <summary>
         ///背景图
         /// </summary>
         public string Icon;
 
 
-        public ItemConfig(int Id, string Name, int Lv, string Attr1, int Attr1Val, string Attr2, int Attr2Val, int[] Skills, string HitEffect, int RateAbs, int ShopIdx, int Price, string Icon)
+        public ItemConfig(int Id, string Name, string Des, int Lv, string Effect, string Attr1, int Attr1Val, string Attr2, int Attr2Val, int[] Skills, string HitEffect, int RateAbs, int ShopIdx, bool AutoUse, bool AutoRemove, int Price, int PriceRound, string Icon)
         {
             this.Id = Id;
             this.Name = Name;
+            this.Des = Des;
             this.Lv = Lv;
+            this.Effect = Effect;
             this.Attr1 = Attr1;
             this.Attr1Val = Attr1Val;
             this.Attr2 = Attr2;
@@ -73,7 +95,10 @@ namespace CommonConfig
             this.HitEffect = HitEffect;
             this.RateAbs = RateAbs;
             this.ShopIdx = ShopIdx;
+            this.AutoUse = AutoUse;
+            this.AutoRemove = AutoRemove;
             this.Price = Price;
+            this.PriceRound = PriceRound;
             this.Icon = Icon;
 
         }
@@ -98,21 +123,22 @@ namespace CommonConfig
         public static void Load()
         {
             config.Clear();
-            config[400001] = new ItemConfig(400001, "关王刀", 1, "str", 10, "", 0, null, "", 0, 5, 25, "guanwangdao");
-            config[400002] = new ItemConfig(400002, "方天画戟", 1, "str", 15, "", 0, null, "", 0, 8, 40, "fangtian");
-            config[400003] = new ItemConfig(400003, "丈八蛇矛", 1, "str", 11, "", 0, null, "", 0, 5, 27, "zhangba");
-            config[400004] = new ItemConfig(400004, "檀木弓", 1, "str", 6, "", 0, null, "", 0, 0, 15, "tanmugong");
-            config[400005] = new ItemConfig(400005, "大斧", 1, "str", 6, "", 0, null, "", 0, 0, 15, "dafu");
-            config[400006] = new ItemConfig(400006, "三丈枪", 1, "str", 6, "", 0, null, "", 0, 0, 15, "sanzhangqiang");
-            config[400007] = new ItemConfig(400007, "孙子兵法", 1, "lead", 15, "", 0, null, "", 0, 8, 40, "sunzi");
-            config[400008] = new ItemConfig(400008, "墨子", 1, "lead", 6, "", 0, null, "", 0, 0, 15, "mozi");
-            config[400009] = new ItemConfig(400009, "六韬", 1, "lead", 10, "", 0, null, "", 0, 5, 25, "liutao");
-            config[400010] = new ItemConfig(400010, "诗经", 1, "inte", 6, "", 0, null, "", 0, 0, 15, "shijing");
-            config[400011] = new ItemConfig(400011, "易经", 1, "inte", 10, "", 0, null, "", 0, 5, 25, "yijing");
-            config[400012] = new ItemConfig(400012, "道德经", 1, "inte", 15, "", 0, null, "", 0, 8, 40, "daode");
-            config[400013] = new ItemConfig(400013, "赤兔马", 1, "shield", 60, "", 0, null, "", 0, 8, 40, "chitu");
-            config[400014] = new ItemConfig(400014, "的卢马", 1, "shield", 40, "", 0, null, "", 0, 5, 25, "dilu");
-            config[400015] = new ItemConfig(400015, "大宛宝马", 1, "shield", 24, "", 0, null, "", 0, 0, 15, "dawan");
+            config[400001] = new ItemConfig(400001, "关王刀", "", 1, "attr", "str", 10, "", 0, null, "", 0, 5, false, false, 25, 0, "guanwangdao");
+            config[400002] = new ItemConfig(400002, "方天画戟", "", 1, "attr", "str", 15, "", 0, null, "", 0, 8, false, false, 40, 0, "fangtian");
+            config[400003] = new ItemConfig(400003, "丈八蛇矛", "", 1, "attr", "str", 11, "", 0, null, "", 0, 5, false, false, 27, 0, "zhangba");
+            config[400004] = new ItemConfig(400004, "檀木弓", "", 1, "attr", "str", 6, "", 0, null, "", 0, 0, false, false, 15, 0, "tanmugong");
+            config[400005] = new ItemConfig(400005, "大斧", "", 1, "attr", "str", 6, "", 0, null, "", 0, 0, false, false, 15, 0, "dafu");
+            config[400006] = new ItemConfig(400006, "三丈枪", "", 1, "attr", "str", 6, "", 0, null, "", 0, 0, false, false, 15, 0, "sanzhangqiang");
+            config[400007] = new ItemConfig(400007, "孙子兵法", "", 1, "attr", "lead", 15, "", 0, null, "", 0, 8, false, false, 40, 0, "sunzi");
+            config[400008] = new ItemConfig(400008, "墨子", "", 1, "attr", "lead", 6, "", 0, null, "", 0, 0, false, false, 15, 0, "mozi");
+            config[400009] = new ItemConfig(400009, "六韬", "", 1, "attr", "lead", 10, "", 0, null, "", 0, 5, false, false, 25, 0, "liutao");
+            config[400010] = new ItemConfig(400010, "诗经", "", 1, "attr", "inte", 6, "", 0, null, "", 0, 0, false, false, 15, 0, "shijing");
+            config[400011] = new ItemConfig(400011, "易经", "", 1, "attr", "inte", 10, "", 0, null, "", 0, 5, false, false, 25, 0, "yijing");
+            config[400012] = new ItemConfig(400012, "道德经", "", 1, "attr", "inte", 15, "", 0, null, "", 0, 8, false, false, 40, 0, "daode");
+            config[400013] = new ItemConfig(400013, "赤兔马", "", 1, "attr", "shield", 60, "", 0, null, "", 0, 8, false, false, 40, 0, "chitu");
+            config[400014] = new ItemConfig(400014, "的卢马", "", 1, "attr", "shield", 40, "", 0, null, "", 0, 5, false, false, 25, 0, "dilu");
+            config[400015] = new ItemConfig(400015, "大宛宝马", "", 1, "attr", "shield", 24, "", 0, null, "", 0, 0, false, false, 15, 0, "dawan");
+            config[401015] = new ItemConfig(401015, "和氏璧", "先手选牌", 1, "first", "", 0, "", 0, null, "", 100, 0, true, true, 5, 1, "heshi");
 
         }
 

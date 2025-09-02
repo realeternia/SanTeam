@@ -35,6 +35,7 @@ public class CardViewControl : MonoBehaviour, IPointerDownHandler, IPointerUpHan
     public Image itemAttrImage2;
     public TMP_Text itemAttrName1;
     public TMP_Text itemAttrName2;
+    public TMP_Text itemDes;
 
     // Start is called before the first frame update
     void Start()
@@ -87,7 +88,7 @@ public class CardViewControl : MonoBehaviour, IPointerDownHandler, IPointerUpHan
         
     }
 
-    public void Init(int cid, bool isHero, int count)
+    public void Init(int cid, bool isHero, int count, int shopOpenIndex)
     {
         cardId = cid;
         isHeroCard = isHero;
@@ -157,7 +158,17 @@ public class CardViewControl : MonoBehaviour, IPointerDownHandler, IPointerUpHan
                 itemAttrName2.gameObject.SetActive(false);
             }
 
-            priceI = itemCfg.Price * count;
+            if (!string.IsNullOrEmpty(itemCfg.Des))
+            {
+                itemDes.gameObject.SetActive(true);
+                itemDes.text = itemCfg.Des;
+            }
+            else
+            {
+                itemDes.gameObject.SetActive(false);
+            }
+
+            priceI = itemCfg.Price * count + itemCfg.PriceRound * shopOpenIndex;
         }
 
         price.text = priceI.ToString();

@@ -58,7 +58,7 @@ namespace CommonConfig
         public static void Load()
         {
             config.Clear();
-            config[1] = new ShopConfig(1, 50, 0f, 0, 1);
+            config[1] = new ShopConfig(1, 50, 0f, 0, 2);
             config[2] = new ShopConfig(2, 55, 0f, 0, 1);
             config[3] = new ShopConfig(3, 60, 5f, 36, 1);
             config[4] = new ShopConfig(4, 65, 10f, 39, 2);
