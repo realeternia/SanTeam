@@ -193,7 +193,7 @@ public class CardViewControl : MonoBehaviour, IPointerDownHandler, IPointerUpHan
         var movingCardImage = new GameObject("MovingCardImage");
         movingCardImage.tag = "MovingCard";
         Image img = movingCardImage.AddComponent<Image>();
-        img.sprite = heroImage.sprite;
+        img.sprite = isHeroCard ? heroImage.sprite : itemImage.sprite;
         img.rectTransform.sizeDelta = new Vector2(100, 140);
         // 设置初始位置为当前卡片的屏幕位置
         RectTransform cardRect = GetComponent<RectTransform>();

@@ -261,9 +261,13 @@ public static class HeroSelectionTool
         return heroPoolCache.Exists(hero => hero.Item1 == heroId);
     }
 
-    public static int GetRandomItemId()
+    public static int GetRandomItemId(int shopIdx)
     {
         var itemList = ItemConfig.ConfigList.ToList();
+        // 剔除所有RateAbs非0的item
+        itemList.RemoveAll(item => item.RateAbs > 0);
+        // 剔除所有ShopId非0的item
+        itemList.RemoveAll(item => item.ShopIdx > shopIdx);
         int randomIndex = UnityEngine.Random.Range(0, itemList.Count);
         return itemList[randomIndex].Id;
     }

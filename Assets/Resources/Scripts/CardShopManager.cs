@@ -89,6 +89,8 @@ public class CardShopManager : MonoBehaviour
         //移除并销毁旧卡片
         foreach (Transform child in transform)
             Destroy(child.gameObject);
+        foreach(Transform child in cardItemView.transform)
+            Destroy(child.gameObject);
         cardViews.Clear();
 
         // 计算起始位置，使其居中显示
@@ -96,6 +98,7 @@ public class CardShopManager : MonoBehaviour
         float startY = 145f;
 
         var shopOpenIndex = GameManager.Instance.GetPlayer(0).GamePlayed(); //第几场比赛
+        var shopCfg = ShopConfig.GetConfig(Math.Min(100, shopOpenIndex + 1));
         // hero card
         for (int i = 0; i < TOTAL_HERO_CARDS; i++)
         {
@@ -114,27 +117,40 @@ public class CardShopManager : MonoBehaviour
                 rectTransform.anchoredPosition = new Vector2(x, y);
 
             var count = 1;
-            if (shopOpenIndex >= 2) //第3局后有多张卡
-            {
-                if (UnityEngine.Random.Range(0, 100) < System.Math.Clamp((shopOpenIndex - 2) * 5, 6, 40))
-                    count = 2;
-            }
-            CardViewControl cardView = card.GetComponent<CardViewControl>();
             var heroId = HeroSelectionTool.GetRandomHeroId();
             var heroPrice = HeroSelectionTool.GetPrice(HeroConfig.GetConfig(heroId));
-            var countLimit = (shopOpenIndex * 6 + 10) / heroPrice;
+            if (shopCfg.MultiPriceTotal > 2 * heroPrice && UnityEngine.Random.Range(0, 100) < shopCfg.MultiCardRate) //第3局后有多张卡
+            {
+                count = UnityEngine.Random.Range(1, shopCfg.MultiPriceTotal / heroPrice + 1);
+            }
+            CardViewControl cardView = card.GetComponent<CardViewControl>();
 
-            if (countLimit > 2 && UnityEngine.Random.Range(0, 500) > HeroConfig.GetConfig(heroId).Total)
-                count += UnityEngine.Random.Range(0, countLimit - 2) + 1;
             cardView.Init(heroId, true, count);  
             cardViews.Add(cardView);
         }
 
+        var total = shopCfg.ItemCount;
+        UnityEngine.Debug.Log("totalItem = " + total);
+        // 先把ItemConfig里所有RateAbs非0的item随出来，放到一个列表
+        var itemIds = new List<int>();
+        foreach(var itemCfg in ItemConfig.ConfigList)
+        {
+            if (itemCfg.RateAbs > 0 && UnityEngine.Random.Range(0, 100) < itemCfg.RateAbs)
+                itemIds.Add(itemCfg.Id);
+        }
+
+        for (int i = itemIds.Count; i < total; i++)
+        {
+            itemIds.Add(HeroSelectionTool.GetRandomItemId(shopCfg.Id));
+        }
+
+        int ids = 0;
         // item card
-        for (int i = 0; i < 8; i++)
+        foreach(var itemId in itemIds)
         {
             // 计算位置
-            float x = -500 + i * (140 + 5);
+            float x = -500 + ids * (140 + 5);
+            ids++;
             float y = 0;
 
             // 创建CardView实例
@@ -144,19 +160,13 @@ public class CardShopManager : MonoBehaviour
                 rectTransform.anchoredPosition = new Vector2(x, y);
 
             var count = 1;
-            if (shopOpenIndex >= 2) //第3局后有多张卡
+            var cardPrice = ItemConfig.GetConfig(itemId).Price;            
+            if (shopCfg.MultiPriceTotal > 2 * cardPrice && UnityEngine.Random.Range(0, 100) < shopCfg.MultiCardRate) //第3局后有多张卡
             {
-                if (UnityEngine.Random.Range(0, 100) < System.Math.Clamp((shopOpenIndex - 2) * 5, 6, 40))
-                    count = 2;
-            }                
-
+                count = UnityEngine.Random.Range(1, shopCfg.MultiPriceTotal / cardPrice + 1);
+            }              
             CardViewControl cardView = card.GetComponent<CardViewControl>();
-            var itemId = HeroSelectionTool.GetRandomItemId();
-            var cardPrice = ItemConfig.GetConfig(itemId).Price;
-            var countLimit = (shopOpenIndex * 5 + 8) / cardPrice;
 
-            if (countLimit > 2 && UnityEngine.Random.Range(0, 500) > 200)
-                count += UnityEngine.Random.Range(0, countLimit - 2) + 1;
             cardView.Init(itemId, false, count);
             cardViews.Add(cardView);
         }        
