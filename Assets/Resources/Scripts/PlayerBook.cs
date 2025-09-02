@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -21,7 +22,7 @@ public class PlayerBook
     public class AICardConfig
     {
         public int priceLower = 18;
-        public int priceUpper = 23;
+        public int priceUpper = 26;
         public float priceOutRate = .3f; //价格区间外卡牌的兴趣度折扣
         public float sameCardRate = 3f; //已经拥有卡牌的兴趣倍率
         public int cardHeroLimit = 7; //英雄上限
@@ -29,14 +30,12 @@ public class PlayerBook
         public float futureRate = 0.3f;
         public float findMasterRate = 1f; //寻找主卡的兴趣倍率
 
-        public float pickRangeCardRate = 1.5f;
-        public float pickInteCardRate = 1.6f;
         public float pickSide = 0; //0表示所有阵营
 
         public bool banStrongCard = false;
         public bool banWeakCard = false;
-        public bool banRangeCard = false;
-        public bool banCombatCard = false;
+
+        public List<Tuple<string, int>> cardsNeed = new List<Tuple<string, int>>() { new Tuple<string, int>("atk", 1), new Tuple<string, int>("def", 1), new Tuple<string, int>("inte", 1) }; //需要的卡牌
 
     }    
 
@@ -50,30 +49,33 @@ public class PlayerBook
     private static void Load()
     {
         // 低级叠卡
-        playerCfgDic[2] = new PlayerCfg() { id = 2, name = "甲鱼", imgPath = "PlayerPic/jiayu", colorStr = "#333333", aiConfig = new AICardConfig() { banRangeCard = true, banStrongCard = true, priceLower = 1, priceUpper = 17, sameCardRate = 5f, futureRate = 0.6f, priceOutRate = 0.1f,cardItemLimit = 4, } };
-
+        playerCfgDic[2] = new PlayerCfg() { id = 2, name = "甲鱼", imgPath = "PlayerPic/jiayu", colorStr = "#333333", aiConfig = new AICardConfig() { banStrongCard = true, priceLower = 6, priceUpper = 16, sameCardRate = 5f, futureRate = 0.6f, priceOutRate = 0.1f,cardItemLimit = 4, } };
 
         // 默认ai
         playerCfgDic[3] = new PlayerCfg() { id = 3, name = "三哥", imgPath = "PlayerPic/sange", colorStr = "#FFFFFF", aiConfig = new AICardConfig() { cardHeroLimit = 8, cardItemLimit = 7, } };
 
 
-        playerCfgDic[4] = new PlayerCfg() { id = 4, name = "魔童", imgPath = "PlayerPic/nezha", colorStr = "#8C0000", aiConfig = new AICardConfig() { banCombatCard = true, banWeakCard = true, pickInteCardRate = 3f } };
+        playerCfgDic[4] = new PlayerCfg() { id = 4, name = "魔童", imgPath = "PlayerPic/nezha", colorStr = "#8C0000", aiConfig = new AICardConfig() { banWeakCard = true } };
 
 
-        playerCfgDic[5] = new PlayerCfg() { id = 5, name = "八戒", imgPath = "PlayerPic/bajie", colorStr = "#FFCC99", aiConfig = new AICardConfig() { futureRate = 0.1f, banCombatCard = true, banStrongCard = true, cardHeroLimit = 8, pickRangeCardRate = 2.5f, pickInteCardRate = 2.5f, } };
+        playerCfgDic[5] = new PlayerCfg() { id = 5, name = "八戒", imgPath = "PlayerPic/bajie", colorStr = "#FFCC99", aiConfig = new AICardConfig() { futureRate = 0.1f, banStrongCard = true, cardHeroLimit = 8 } };
+        playerCfgDic[5].aiConfig.cardsNeed = new List<Tuple<string, int>>() { new Tuple<string, int>("shoot", 1), new Tuple<string, int>("def", 1), new Tuple<string, int>("inte", 1) };
 
 
         // 高级叠卡
-        playerCfgDic[6] = new PlayerCfg() { id = 6, name = "大虎", imgPath = "PlayerPic/dahu", colorStr = "#006633", aiConfig = new AICardConfig() { banRangeCard = true, banWeakCard = true, priceLower = 20, priceUpper = 33, cardHeroLimit = 6, cardItemLimit = 4, sameCardRate = 5f, futureRate = 0.5f, priceOutRate = 0.1f, } };
+        playerCfgDic[6] = new PlayerCfg() { id = 6, name = "大虎", imgPath = "PlayerPic/dahu", colorStr = "#006633", aiConfig = new AICardConfig() { banWeakCard = true, priceLower = 21, priceUpper = 30, cardHeroLimit = 6, cardItemLimit = 4, sameCardRate = 5f, futureRate = 0.5f, priceOutRate = 0.1f, } };
+        playerCfgDic[6].aiConfig.cardsNeed = new List<Tuple<string, int>>() { new Tuple<string, int>("shoot", 2), new Tuple<string, int>("def", 1), new Tuple<string, int>("inte", 1) };
 
 
         // 曹操流
         playerCfgDic[7] = new PlayerCfg() { id = 7, name = "蓝猫", imgPath = "PlayerPic/mao", colorStr = "#5555FF", aiConfig = new AICardConfig() { banWeakCard = true,pickSide = 2, findMasterRate = 2.5f, cardItemLimit = 6, } };
 
         // 默认ai
-        playerCfgDic[8] = new PlayerCfg() { id = 8, name = "巴爸", imgPath = "PlayerPic/baba", colorStr = "#FF73FF", aiConfig = new AICardConfig() { futureRate = 0.1f, cardHeroLimit = 8, } };
+        playerCfgDic[8] = new PlayerCfg() { id = 8, name = "巴爸", imgPath = "PlayerPic/baba", colorStr = "#FF73FF", aiConfig = new AICardConfig() { futureRate = 0.1f, cardHeroLimit = 8, priceLower = 17, priceUpper = 23 } };
+        playerCfgDic[8].aiConfig.cardsNeed = new List<Tuple<string, int>>() { new Tuple<string, int>("shoot", 2), new Tuple<string, int>("help", 2) };
 
         playerCfgDic[9] = new PlayerCfg() { id = 9, name = "蜘蛛", imgPath = "PlayerPic/zhizhu", colorStr = "#FF0000", aiConfig = new AICardConfig() {  cardHeroLimit = 9, futureRate = 0.25f, } };
+        playerCfgDic[9].aiConfig.cardsNeed = new List<Tuple<string, int>>() { new Tuple<string, int>("inte", 1), new Tuple<string, int>("help", 1), new Tuple<string, int>("shoot", 1) };
 
         // 孙权流
         playerCfgDic[11] = new PlayerCfg() { id = 11, name = "小红", imgPath = "PlayerPic/xiaohong", colorStr = "#FF3333", aiConfig = new AICardConfig() { banWeakCard = true, pickSide = 3, findMasterRate = 2.5f, cardItemLimit = 4, } };

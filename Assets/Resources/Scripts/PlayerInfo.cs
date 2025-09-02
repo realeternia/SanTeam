@@ -203,9 +203,16 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
                 continue;
             if(aiConfig.banWeakCard && heroConfig.Total > 215)
                 continue;
-            if(aiConfig.banRangeCard && heroConfig.Range < 20)
-                continue;
-            if(aiConfig.banCombatCard && heroConfig.Range > 20)
+            bool find = false;
+            foreach(var item in aiConfig.cardsNeed)
+            {
+                if(!string.IsNullOrEmpty(heroConfig.Group) && item.Item1 == heroConfig.Group)
+                {
+                    find = true;
+                    break;
+                }
+            }
+            if(find)
                 continue;
             
             availableBans.Add(cell);            
@@ -293,7 +300,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         }
 
         //把战力前五的卡放到一个队列里
-        var strongList = GetStrongCards(out int rangeCount, out int inteCount);
+        var strongList = GetStrongCards(out var groupList);
 
         // 初始化 side 卡牌数量
         int side1Count = 0;
@@ -368,8 +375,8 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
                     if (pickCard.priceI < weakCardPrice)
                         continue; //没必要换更弱的卡
                 }
-                var pickCardCfg = HeroConfig.GetConfig(pickCard.cardId);
-                if (aiConfig.pickSide != 0 && pickCardCfg.Side != aiConfig.pickSide) //单阵营流
+                var heroCfg = HeroConfig.GetConfig(pickCard.cardId);
+                if (aiConfig.pickSide != 0 && heroCfg.Side != aiConfig.pickSide) //单阵营流
                     continue;
                 if (aiConfig.pickSide > 0)
                 {
@@ -381,32 +388,42 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
                 if (priceS < aiConfig.priceLower || priceS > aiConfig.priceUpper)
                 {
                     score *= aiConfig.priceOutRate;
+                }
+                else
+                {
+                    var rate = priceS / aiConfig.priceLower; //高分卡加成
+                    if(rate > 1)
+                        score *= rate * rate;
+                }
+
+                if(heroCardCount < 3)
+                { //前几张不拿辅助卡
+                    if(string.IsNullOrEmpty(heroCfg.Group) || heroCfg.Group == "help")
+                        score *= 0.4f;
+                }
+                if (!string.IsNullOrEmpty(heroCfg.Group) && aiConfig.cardsNeed.Exists(x => x.Item1 == heroCfg.Group))
+                {
+                    int count = 0;
+                    var find = groupList.Find(x => x.Item1 == heroCfg.Group);
+                    if (find != null)
+                        count = find.Item2;
+                    if (count < aiConfig.cardsNeed.Find(x => x.Item1 == heroCfg.Group).Item2)
+                        score *= 1.8f;
                 }                
 
                 if (strongList.Count >= 3)
                 {
-                    if (rangeCount < 2)
-                    {
-                        if (pickCardCfg.Range > 20)
-                            score *= aiConfig.pickRangeCardRate; // 如果射程大于20且射程卡数量少于3，分数乘以1.3
-                    }
-                    if (inteCount < 1)
-                    {
-                        if (pickCardCfg.Inte >= 90)
-                            score *= aiConfig.pickInteCardRate; // 如果智力大于等于90且智力卡数量少于2，分数乘以1.5
-                    }
-
-                    if (hasLiubei && pickCardCfg.Side == 1)
+                    if (hasLiubei && heroCfg.Side == 1)
                         score *= aiConfig.findMasterRate * .6f;
-                    else if (hasCaocao && pickCardCfg.Side == 2)
+                    else if (hasCaocao && heroCfg.Side == 2)
                         score *= aiConfig.findMasterRate * .6f;
-                    else if (hasSunquan && pickCardCfg.Side == 3)
+                    else if (hasSunquan && heroCfg.Side == 3)
                         score *= aiConfig.findMasterRate * .6f;
-                    if (side1Count >= 1 && pickCardCfg.Id == 100001)
+                    if (side1Count >= 1 && heroCfg.Id == 100001)
                         score *= aiConfig.findMasterRate;
-                    else if (side2Count >= 1 && pickCardCfg.Id == 100002)
+                    else if (side2Count >= 1 && heroCfg.Id == 100002)
                         score *= aiConfig.findMasterRate;
-                    else if (side3Count >= 1 && pickCardCfg.Id == 100003)
+                    else if (side3Count >= 1 && heroCfg.Id == 100003)
                         score *= aiConfig.findMasterRate;
                 }
             }
@@ -496,12 +513,11 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         return true;
     }
 
-    private List<int> GetStrongCards(out int rangeCount, out int inteCount)
-    {
-        rangeCount = 0;
-        inteCount = 0;        
+    private List<int> GetStrongCards(out List<Tuple<string, int>> groupList)
+    {  
         // 创建一个列表存储卡牌ID和对应的总战力
         List<(int cardId, int totalPrice)> sortDataList = new List<(int cardId, int totalPrice)>();
+        groupList = new List<Tuple<string, int>>();
         foreach (int cardId in cards.Keys)
         {
             if(!ConfigManager.IsHeroCard(cardId))
@@ -521,14 +537,21 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 
             // 获取当前卡牌的配置
             var heroConfig = HeroConfig.GetConfig(sortDataList[i].cardId);
-
-            // 计算射程大于20的卡牌数量
-            if (heroConfig.Range > 20)
-                rangeCount++;
-
-            // 计算智力大于等于90的卡牌数量
-            if (heroConfig.Inte >= 90)
-                inteCount++;
+            if(!string.IsNullOrEmpty(heroConfig.Group))
+            {
+                var group = heroConfig.Group;
+                int existingIndex = groupList.FindIndex(x => x.Item1 == group);
+                if(existingIndex >= 0)
+                {
+                    // 使用索引更新元组
+                    var existingTuple = groupList[existingIndex];
+                    groupList[existingIndex] = new Tuple<string, int>(existingTuple.Item1, existingTuple.Item2 + 1);
+                }
+                else
+                {
+                    groupList.Add(new Tuple<string, int>(group, 1));
+                }
+            }
         }
         return strongCardIds;
     }
