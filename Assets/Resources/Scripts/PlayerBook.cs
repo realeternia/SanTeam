@@ -74,7 +74,7 @@ public class PlayerBook
         playerCfgDic[8] = new PlayerCfg() { id = 8, name = "巴爸", imgPath = "PlayerPic/baba", colorStr = "#FF73FF", aiConfig = new AICardConfig() { futureRate = 0.1f, cardHeroLimit = 8, priceLower = 17, priceUpper = 23 } };
         playerCfgDic[8].aiConfig.cardsNeed = new List<Tuple<string, int>>() { new Tuple<string, int>("shoot", 2), new Tuple<string, int>("help", 2) };
 
-        playerCfgDic[9] = new PlayerCfg() { id = 9, name = "蜘蛛", imgPath = "PlayerPic/zhizhu", colorStr = "#FF0000", aiConfig = new AICardConfig() {  cardHeroLimit = 9, futureRate = 0.25f, } };
+        playerCfgDic[9] = new PlayerCfg() { id = 9, name = "巴妈", imgPath = "PlayerPic/bama", colorStr = "#333333", aiConfig = new AICardConfig() {  cardHeroLimit = 9, futureRate = 0.25f, } };
         playerCfgDic[9].aiConfig.cardsNeed = new List<Tuple<string, int>>() { new Tuple<string, int>("inte", 1), new Tuple<string, int>("help", 1), new Tuple<string, int>("shoot", 1) };
 
         // 孙权流
