@@ -24,13 +24,14 @@ public class GameManager : MonoBehaviour
         // 注册日志事件
         Application.logMessageReceived += LogMessageReceived;
 
-        var p1 = PlayerBook.playerWang;
-        players[0].Init(0, p1.name, p1.imgPath, "#33FF33", 5);
+        var p1 = PlayerBook.GetWang();
+        players[0].Init(0, p1.Name, p1.Imgpath, p1.Colorstr, 5);
+        players[0].playerConfig = p1;
         var pls = PlayerBook.GetRandomN(5);
         for (int i = 0; i < 5; i++)
         {
-            players[i + 1].Init(i + 1, pls[i].name, pls[i].imgPath, pls[i].colorStr, 5);
-            players[i + 1].aiConfig = pls[i].aiConfig;
+            players[i + 1].Init(i + 1, pls[i].Name, pls[i].Imgpath, pls[i].Colorstr, 5);
+            players[i + 1].playerConfig = pls[i];
         }
     }
 

@@ -165,8 +165,9 @@ public class CardShopManager : MonoBehaviour
                 rectTransform.anchoredPosition = new Vector2(x, y);
 
             var count = 1;
-            var cardPrice = ItemConfig.GetConfig(itemId).Price;
-            if (shopCfg.MultiPriceTotal > 2 * cardPrice && UnityEngine.Random.Range(0, 100) < shopCfg.MultiCardRate) //第3局后有多张卡
+            var itemCfg = ItemConfig.GetConfig(itemId);
+            var cardPrice = itemCfg.Price;
+            if (!itemCfg.SellOne && shopCfg.MultiPriceTotal > 2 * cardPrice && UnityEngine.Random.Range(0, 100) < shopCfg.MultiCardRate) //第3局后有多张卡
             {
                 count = UnityEngine.Random.Range(1, shopCfg.MultiPriceTotal / cardPrice + 1);
             }

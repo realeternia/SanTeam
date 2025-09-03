@@ -1,113 +1,59 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using CommonConfig;
 using UnityEngine;
 
 public class PlayerBook
 {
-    public class PlayerCfg
+    public static PlayerConfig GetWang()
     {
-        public int id;
-        public string name;
-        public string imgPath;
-
-        public string colorStr;
-
-        public AICardConfig aiConfig = new AICardConfig();
-
+        return PlayerConfig.GetConfig(1);
     }
 
-
-    // 提取 AI 相关配置的类
-    public class AICardConfig
-    {
-        public int priceLower = 18;
-        public int priceUpper = 26;
-        public float priceOutRate = .3f; //价格区间外卡牌的兴趣度折扣
-        public float sameCardRate = 3f; //已经拥有卡牌的兴趣倍率
-        public int cardHeroLimit = 7; //英雄上限
-        public int cardItemLimit = 6; //道具上限
-        public float futureRate = 0.3f;
-        public float findMasterRate = 1f; //寻找主卡的兴趣倍率
-
-        public float pickSide = 0; //0表示所有阵营
-
-        public bool banStrongCard = false;
-        public bool banWeakCard = false;
-
-        public List<Tuple<string, int>> cardsNeed = new List<Tuple<string, int>>() { new Tuple<string, int>("atk", 1), new Tuple<string, int>("def", 1), new Tuple<string, int>("inte", 1) }; //需要的卡牌
-
-    }    
-
-    public static PlayerCfg playerWang = new PlayerCfg() { id = 1, name = "旺仔", imgPath = "PlayerPic/wang", };
-    private static Dictionary<int, PlayerCfg> playerCfgDic = new Dictionary<int, PlayerCfg>();
-    static PlayerBook()
-    {
-        Load();
-    }
-
-    private static void Load()
-    {
-        // 低级叠卡
-        playerCfgDic[2] = new PlayerCfg() { id = 2, name = "甲鱼", imgPath = "PlayerPic/jiayu", colorStr = "#333333", aiConfig = new AICardConfig() { banStrongCard = true, priceLower = 6, priceUpper = 16, sameCardRate = 5f, futureRate = 0.6f, priceOutRate = 0.1f,cardItemLimit = 4, } };
-
-        // 默认ai
-        playerCfgDic[3] = new PlayerCfg() { id = 3, name = "三哥", imgPath = "PlayerPic/sange", colorStr = "#FFFFFF", aiConfig = new AICardConfig() { cardHeroLimit = 8, cardItemLimit = 7, } };
-
-
-        playerCfgDic[4] = new PlayerCfg() { id = 4, name = "魔童", imgPath = "PlayerPic/nezha", colorStr = "#8C0000", aiConfig = new AICardConfig() { banWeakCard = true } };
-
-
-        playerCfgDic[5] = new PlayerCfg() { id = 5, name = "八戒", imgPath = "PlayerPic/bajie", colorStr = "#FFCC99", aiConfig = new AICardConfig() { futureRate = 0.1f, banStrongCard = true, cardHeroLimit = 8 } };
-        playerCfgDic[5].aiConfig.cardsNeed = new List<Tuple<string, int>>() { new Tuple<string, int>("shoot", 1), new Tuple<string, int>("def", 1), new Tuple<string, int>("inte", 1) };
-
-
-        // 高级叠卡
-        playerCfgDic[6] = new PlayerCfg() { id = 6, name = "大虎", imgPath = "PlayerPic/dahu", colorStr = "#006633", aiConfig = new AICardConfig() { banWeakCard = true, priceLower = 21, priceUpper = 30, cardHeroLimit = 6, cardItemLimit = 4, sameCardRate = 5f, futureRate = 0.5f, priceOutRate = 0.1f, } };
-        playerCfgDic[6].aiConfig.cardsNeed = new List<Tuple<string, int>>() { new Tuple<string, int>("shoot", 2), new Tuple<string, int>("def", 1), new Tuple<string, int>("inte", 1) };
-
-
-        // 曹操流
-        playerCfgDic[7] = new PlayerCfg() { id = 7, name = "蓝猫", imgPath = "PlayerPic/mao", colorStr = "#5555FF", aiConfig = new AICardConfig() { banWeakCard = true,pickSide = 2, findMasterRate = 2.5f, cardItemLimit = 6, } };
-
-        // 默认ai
-        playerCfgDic[8] = new PlayerCfg() { id = 8, name = "巴爸", imgPath = "PlayerPic/baba", colorStr = "#FF73FF", aiConfig = new AICardConfig() { futureRate = 0.1f, cardHeroLimit = 8, priceLower = 17, priceUpper = 23 } };
-        playerCfgDic[8].aiConfig.cardsNeed = new List<Tuple<string, int>>() { new Tuple<string, int>("shoot", 2), new Tuple<string, int>("help", 2) };
-
-        playerCfgDic[9] = new PlayerCfg() { id = 9, name = "巴妈", imgPath = "PlayerPic/bama", colorStr = "#333333", aiConfig = new AICardConfig() {  cardHeroLimit = 9, futureRate = 0.25f, } };
-        playerCfgDic[9].aiConfig.cardsNeed = new List<Tuple<string, int>>() { new Tuple<string, int>("inte", 1), new Tuple<string, int>("help", 1), new Tuple<string, int>("shoot", 1) };
-
-        // 孙权流
-        playerCfgDic[11] = new PlayerCfg() { id = 11, name = "小红", imgPath = "PlayerPic/xiaohong", colorStr = "#FF3333", aiConfig = new AICardConfig() { banWeakCard = true, pickSide = 3, findMasterRate = 2.5f, cardItemLimit = 4, } };
-        // 刘备
-        playerCfgDic[12] = new PlayerCfg() { id = 12, name = "电怪", imgPath = "PlayerPic/picaqiu", colorStr = "#FFFF00", aiConfig = new AICardConfig() { banWeakCard = true, pickSide = 1, findMasterRate = 3f, cardHeroLimit = 6, futureRate = 0.4f, cardItemLimit = 4, } };
-
-    }
-
-    public static PlayerCfg GetPlayerCfg(int id)
-    {
-        if (playerCfgDic.TryGetValue(id, out PlayerCfg cfg))
-        {
-            return cfg;
-        }
-        return null;
-    }
-
-    public static PlayerCfg[] GetRandomN(int n)
+    public static PlayerConfig[] GetRandomN(int n)
     {
         // 确保 n 不超过玩家配置数量，避免数组越界
-        int count = playerCfgDic.Count;
+        int count = PlayerConfig.ConfigList.Count;
         n = Mathf.Min(n, count);
-        PlayerCfg[] cfgs = new PlayerCfg[n];
-        List<int> ids = new List<int>(playerCfgDic.Keys);
+        PlayerConfig[] cfgs = new PlayerConfig[n];
+        List<int> ids = new List<int>();
+        foreach (PlayerConfig cfg in PlayerConfig.ConfigList)
+            if(cfg.Id > 1)
+                ids.Add(cfg.Id);
         for (int i = 0; i < n; i++)
         {
             int index = UnityEngine.Random.Range(0, ids.Count);
             int id = ids[index];
-            cfgs[i] = GetPlayerCfg(id);
+            cfgs[i] = PlayerConfig.GetConfig(id);
             ids.RemoveAt(index);
         }
         return cfgs;
+    }
+
+    public static List<Tuple<string, int>> GetCardNeeds(int id)
+    {
+        List<Tuple<string, int>> needs = new List<Tuple<string, int>>();
+        PlayerConfig cfg = PlayerConfig.GetConfig(id);
+        if (cfg == null)
+            return needs;
+        //cfg.Cardsneed是字符串数组，形如["atk","1","def","1","inte","1"]
+        string[] needsStr = cfg.Cardsneed;
+        if (needsStr == null)
+            return needs;
+            
+        for (int i = 0; i < needsStr.Length; i += 2)
+        {
+            if (i + 1 < needsStr.Length)
+            {
+                string type = needsStr[i].Trim('"');
+                if (int.TryParse(needsStr[i + 1].Trim('"'), out int num))
+                {
+                    needs.Add(new Tuple<string, int>(type, num));
+                }
+            }
+        }
+        return needs;
     }
     
 }

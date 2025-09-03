@@ -37,7 +37,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     public Image playerBgImg;
 
     // 在 PlayerInfo 类中添加 AICardConfig 实例
-    public PlayerBook.AICardConfig aiConfig;
+    public PlayerConfig playerConfig;
 
     public string imgPath;
     public Color lineColor;
@@ -171,7 +171,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 
     public void CheckBan(List<PickPanelCellControl> cellControls)
     {
-        // 根据aiConfig的配置过滤可ban的英雄
+        // 根据playerConfig的配置过滤可ban的英雄
         List<PickPanelCellControl> availableBans = new List<PickPanelCellControl>();
 
         // 首先筛选出未被ban且不是主公的英雄
@@ -182,29 +182,30 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 
             var heroConfig = HeroConfig.GetConfig(cell.heroId);
             // 检查阵营限制
-            if (aiConfig.pickSide > 0 && aiConfig.pickSide == heroConfig.Side)
+            if (playerConfig.Pickside > 0 && playerConfig.Pickside == heroConfig.Side)
                 continue;
 
             var cardPrice = HeroSelectionTool.GetPrice(heroConfig);
-            if(aiConfig.priceLower > 0 && aiConfig.priceUpper > 0)
+            if(playerConfig.Pricelower > 0 && playerConfig.Priceupper > 0)
             {
-                if (aiConfig.priceLower <= cardPrice && aiConfig.priceUpper >= cardPrice)
+                if (playerConfig.Pricelower <= cardPrice && playerConfig.Priceupper >= cardPrice)
                     continue;
             }
             else
             {
-                if (aiConfig.priceLower > 0 && aiConfig.priceLower <= cardPrice)
+                if (playerConfig.Pricelower > 0 && playerConfig.Pricelower <= cardPrice)
                     continue;
-                if (aiConfig.priceUpper > 0 && aiConfig.priceUpper >= cardPrice)
+                if (playerConfig.Priceupper > 0 && playerConfig.Priceupper >= cardPrice)
                     continue;
             }
 
-            if(aiConfig.banStrongCard && heroConfig.Total < 240)
+            if(playerConfig.Banstrongcard && heroConfig.Total < 240)
                 continue;
-            if(aiConfig.banWeakCard && heroConfig.Total > 215)
+            if(playerConfig.Banweakcard && heroConfig.Total > 215)
                 continue;
             bool find = false;
-            foreach(var item in aiConfig.cardsNeed)
+            var cardsNeed = PlayerBook.GetCardNeeds(playerConfig.Id);
+            foreach(var item in cardsNeed)
             {
                 if(!string.IsNullOrEmpty(heroConfig.Group) && item.Item1 == heroConfig.Group)
                 {
@@ -292,7 +293,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         int weakCardId = 0;
         int weakCardPrice = 0;
         var heroCardCount = GetHeroCardList().Count;
-        if (heroCardCount >= aiConfig.cardHeroLimit)
+        if (heroCardCount >= playerConfig.Cardherolimit)
         {
             var weakCard = FindWeakCard();
             weakCardId = weakCard.Item1;
@@ -350,7 +351,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
             // 如果已经拥有该卡片，增加分数
             if (cards.ContainsKey(pickCard.cardId))
             {
-                score *= aiConfig.sameCardRate;
+                score *= playerConfig.sameCardRate;
                 score *= (1 + Math.Max(0.2f, 0.3f * (4 - cards[pickCard.cardId]))); // 优先拿低等级卡
                 if(!strongList.Contains(pickCard.cardId)) //非主力卡-权重
                     score *= 0.7f;
@@ -363,35 +364,35 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
                 if (era == 1 && gold < (int)(shopCfg.RoundGold * 0.6) || era == 2 && gold < (int)(shopCfg.RoundGold * 0.35))
                 {
                     var cardRate = Math.Max(0, (9 - availableCards.Count) * 0.05f);
-                    if (UnityEngine.Random.value < aiConfig.futureRate + cardRate)
+                    if (UnityEngine.Random.value < playerConfig.Futurerate + cardRate)
                         return false;
                 }
             }
 
             if (pickCard.isHeroCard)
             {
-                if (!cards.ContainsKey(pickCard.cardId) && heroCardCount >= aiConfig.cardHeroLimit)
+                if (!cards.ContainsKey(pickCard.cardId) && heroCardCount >= playerConfig.Cardherolimit)
                 {
                     if (pickCard.priceI < weakCardPrice)
                         continue; //没必要换更弱的卡
                 }
                 var heroCfg = HeroConfig.GetConfig(pickCard.cardId);
-                if (aiConfig.pickSide != 0 && heroCfg.Side != aiConfig.pickSide) //单阵营流
+                if (playerConfig.Pickside != 0 && heroCfg.Side != playerConfig.Pickside) //单阵营流
                     continue;
-                if (aiConfig.pickSide > 0)
+                if (playerConfig.Pickside > 0)
                 {
                     if (pickCard.cardId < 100010) //主公卡一定要拿
-                        score *= aiConfig.findMasterRate;
+                        score *= playerConfig.Findmasterrate;
                 }
                 // 根据价格区间调整分数
                 var priceS = pickCard.priceI / pickCard.count;
-                if (priceS < aiConfig.priceLower || priceS > aiConfig.priceUpper)
+                if (priceS < playerConfig.Pricelower || priceS > playerConfig.Priceupper)
                 {
-                    score *= aiConfig.priceOutRate;
+                    score *= playerConfig.Priceoutrate;
                 }
                 else
                 {
-                    var rate = priceS / aiConfig.priceLower; //高分卡加成
+                    var rate = priceS / playerConfig.Pricelower; //高分卡加成
                     if(rate > 1)
                         score *= rate * rate;
                 }
@@ -401,36 +402,37 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
                     if(string.IsNullOrEmpty(heroCfg.Group) || heroCfg.Group == "help")
                         score *= 0.4f;
                 }
-                if (!string.IsNullOrEmpty(heroCfg.Group) && aiConfig.cardsNeed.Exists(x => x.Item1 == heroCfg.Group))
+                var needs = PlayerBook.GetCardNeeds(playerConfig.Id);
+                if (!string.IsNullOrEmpty(heroCfg.Group) && needs.Exists(x => x.Item1 == heroCfg.Group))
                 {
                     int count = 0;
                     var find = groupList.Find(x => x.Item1 == heroCfg.Group);
                     if (find != null)
                         count = find.Item2;
-                    if (count < aiConfig.cardsNeed.Find(x => x.Item1 == heroCfg.Group).Item2)
+                    if (count < needs.Find(x => x.Item1 == heroCfg.Group).Item2)
                         score *= 1.8f;
                 }                
 
                 if (strongList.Count >= 3)
                 {
                     if (hasLiubei && heroCfg.Side == 1)
-                        score *= aiConfig.findMasterRate * .6f;
+                        score *= playerConfig.Findmasterrate * .6f;
                     else if (hasCaocao && heroCfg.Side == 2)
-                        score *= aiConfig.findMasterRate * .6f;
+                        score *= playerConfig.Findmasterrate * .6f;
                     else if (hasSunquan && heroCfg.Side == 3)
-                        score *= aiConfig.findMasterRate * .6f;
+                        score *= playerConfig.Findmasterrate * .6f;
                     if (side1Count >= 1 && heroCfg.Id == 100001)
-                        score *= aiConfig.findMasterRate;
+                        score *= playerConfig.Findmasterrate;
                     else if (side2Count >= 1 && heroCfg.Id == 100002)
-                        score *= aiConfig.findMasterRate;
+                        score *= playerConfig.Findmasterrate;
                     else if (side3Count >= 1 && heroCfg.Id == 100003)
-                        score *= aiConfig.findMasterRate;
+                        score *= playerConfig.Findmasterrate;
                 }
             }
             else
             {
                 var itemCount = GetItemCardList().Count;
-                if (itemCount >= aiConfig.cardItemLimit && !hasSameCard)
+                if (itemCount >= playerConfig.Carditemlimit && !hasSameCard)
                     continue; //武器太多了
 
                 if(heroCardCount < 3)
@@ -504,7 +506,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
             Debug.Log("未选中任何卡片");
         }
 
-        if (heroCardCount >= aiConfig.cardHeroLimit && !hasSameCard)
+        if (heroCardCount >= playerConfig.Cardherolimit && !hasSameCard)
             SellCard(weakCardId); //卖掉最弱的卡
 
         // 购买选中的卡片

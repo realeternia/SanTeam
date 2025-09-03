@@ -13,6 +13,7 @@ public static class ConfigManager
         ItemConfig.Load();
         SoldierConfig.Load();
         ShopConfig.Load();
+        PlayerConfig.Load();
 
         PostModify();
     }
