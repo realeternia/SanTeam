@@ -181,7 +181,7 @@ namespace CommonConfig
             config[201019] = new SkillConfig(201019, "豪杰", "攻击时回复生命", 1, 0.35f, 8f, "", 0, 0, 0, false, 0, 0.5f, 0, 0, 300003, 5f, 0, 0, 0, "AttackedBuff", "MagicBuffGreen", 3, "hao");
             config[201020] = new SkillConfig(201020, "分兵抗敌", "产生一个幻影军队", 1, 0.35f, 15f, "", 0, 0, 15f, false, 0, 0.4f, 0, 0, 0, 0, 0, 0, 0, "AttackedShadow", "MagicFieldGreen", 3, "huan");
             config[201021] = new SkillConfig(201021, "突进", "移动时穿越敌人,降低远程伤害", 1, 1f, 7f, "", 0, 0, 20f, false, 0, 0.12f, 0, 0, 0, 0, 0, 0, 0, "RunCrossPlus", "LightningExplosionBlue", 4, "ma2");
-            config[201022] = new SkillConfig(201022, "埋伏", "被攻击时,瞬移到远程攻击者附近", 1, 0.4f, 5f, "", 0, 0, 35f, false, 0, 0, 0, 0, 301001, 1f, 0, 0, 0, "HitTeleport", "MagicNovaBlue", 2, "fu");
+            config[201022] = new SkillConfig(201022, "埋伏", "被攻击时,瞬移到远程攻击者附近", 1, 0.4f, 4f, "", 0, 0, 30f, false, 0, 0, 0, 0, 301001, 1f, 0, 0, 0, "HitTeleport", "MagicNovaBlue", 2, "fu");
             config[201023] = new SkillConfig(201023, "明镜", "反弹50%智力伤害", 1, 0, 0, "inte", 0, 0, 20f, true, 0, 0.5f, 0, 0, 0, 0, 0, 0, 0, "Feedback", "SwordHitBlue", 3, "jing");
             config[201024] = new SkillConfig(201024, "威震", "攻击时晕眩周围目标", 1, 0.2f, 5f, "", 0, 0, 20f, false, 3, 0, 0, 0, 301001, 1.5f, 0, 0, 0, "HitBuffAreaSrc", "MagicNovaYellow", 4, "wei");
             config[201025] = new SkillConfig(201025, "火矢", "攻击时射出火箭", 1, 0.35f, 3f, "str", 0, 0, 8f, false, 1, 0.2f, 0, 0, 0, 0, 1, 3.2f, 1f, "HitWall", "SoftFireBigRed", 3, "shi3");

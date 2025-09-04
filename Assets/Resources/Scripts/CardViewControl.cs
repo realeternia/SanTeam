@@ -5,6 +5,7 @@ using UnityEngine.UI;
 using TMPro;
 using CommonConfig;
 using UnityEngine.EventSystems;
+using System;
 
 public class CardViewControl : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 {
@@ -168,7 +169,7 @@ public class CardViewControl : MonoBehaviour, IPointerDownHandler, IPointerUpHan
                 itemDes.gameObject.SetActive(false);
             }
 
-            priceI = itemCfg.Price * count + itemCfg.PriceRound * shopOpenIndex;
+            priceI = itemCfg.Price * count + (int)Math.Floor(itemCfg.PriceRound * shopOpenIndex);
         }
 
         price.text = priceI.ToString();

@@ -54,7 +54,6 @@ public class Missile : MonoBehaviour
             //     Destroy(missile);
             //     yield break;
             // }
-
             targetPos = target.transform.position + new Vector3(0f, 5f, 0f); //修正目标点
             float distCovered = (Time.time - lastTime) * speed;
             journeyLength = WorldManager.Instance.GetRange(missile.transform.position, targetPos);
@@ -64,7 +63,7 @@ public class Missile : MonoBehaviour
             {
                 Vector3 horizontalPos = Vector3.Lerp(missile.transform.position, targetPos, fractionOfJourney);
 
-                UnityEngine.Debug.Log("fractionOfJourney: " + fractionOfJourney);
+                // UnityEngine.Debug.Log("fractionOfJourney: " + fractionOfJourney);
                 realLen += distCovered * 1.1f;
                 if(realLen > totalLen)
                     realLen = totalLen;

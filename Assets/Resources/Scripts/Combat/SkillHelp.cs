@@ -33,7 +33,10 @@ public class SkillHelp : Skill
 
         if(unitWithLowestInte != null && unitWithLowestInte.inte < owner.inte)
         {
-            var newInte = unitWithLowestInte.inte + (owner.inte - unitWithLowestInte.inte) * skillCfg.Strength;
+            var addon = (owner.inte - unitWithLowestInte.inte) * skillCfg.Strength;
+            if(addon < 10)
+                addon = 10;
+            var newInte = Math.Min(owner.inte, unitWithLowestInte.inte + addon);
 
             unitWithLowestInte.UpdateAttr((int)newInte, 0, 0);
             EffectManager.PlaySkillEffect(unitWithLowestInte, skillCfg.HitEffect);

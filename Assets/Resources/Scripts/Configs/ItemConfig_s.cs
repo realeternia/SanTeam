@@ -73,7 +73,7 @@ namespace CommonConfig
         /// <summary>
         ///价格回合
         /// </summary>
-        public int PriceRound;
+        public float PriceRound;
         /// <summary>
         ///只卖一个
         /// </summary>
@@ -84,7 +84,7 @@ namespace CommonConfig
         public string Icon;
 
 
-        public ItemConfig(int Id, string Name, string Des, int Lv, string Effect, string Attr1, int Attr1Val, string Attr2, int Attr2Val, int[] Skills, string HitEffect, int RateAbs, int ShopIdx, bool AutoUse, bool AutoRemove, int Price, int PriceRound, bool SellOne, string Icon)
+        public ItemConfig(int Id, string Name, string Des, int Lv, string Effect, string Attr1, int Attr1Val, string Attr2, int Attr2Val, int[] Skills, string HitEffect, int RateAbs, int ShopIdx, bool AutoUse, bool AutoRemove, int Price, float PriceRound, bool SellOne, string Icon)
         {
             this.Id = Id;
             this.Name = Name;
@@ -143,7 +143,9 @@ namespace CommonConfig
             config[400013] = new ItemConfig(400013, "赤兔马", "", 1, "attr", "shield", 60, "", 0, null, "", 0, 8, false, false, 40, 0, false, "chitu");
             config[400014] = new ItemConfig(400014, "的卢马", "", 1, "attr", "shield", 40, "", 0, null, "", 0, 5, false, false, 25, 0, false, "dilu");
             config[400015] = new ItemConfig(400015, "大宛宝马", "", 1, "attr", "shield", 24, "", 0, null, "", 0, 0, false, false, 15, 0, false, "dawan");
-            config[401015] = new ItemConfig(401015, "和氏璧", "先手选牌", 1, "first", "", 0, "", 0, null, "", 100, 0, true, true, 5, 1, true, "heshi");
+            config[401001] = new ItemConfig(401001, "和氏璧", "先手选牌", 1, "first", "", 0, "", 0, null, "", 100, 0, true, true, 5, 0.6f, true, "heshi");
+            config[401002] = new ItemConfig(401002, "士兵剑", "士兵攻up", 1, "sodatk", "", 0, "", 0, null, "", 50, 3, true, true, 15, 0, true, "jian1");
+            config[401003] = new ItemConfig(401003, "士兵甲", "士兵命up", 1, "sodhp", "", 0, "", 0, null, "", 50, 3, true, true, 15, 0, true, "jia1");
 
         }
 

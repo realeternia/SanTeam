@@ -23,6 +23,14 @@ namespace CommonConfig
         /// </summary>
         public string Colorstr;
         /// <summary>
+        ///ban强卡
+        /// </summary>
+        public bool Banstrongcard;
+        /// <summary>
+        ///ban弱卡
+        /// </summary>
+        public bool Banweakcard;
+        /// <summary>
         ///低价区间
         /// </summary>
         public int Pricelower;
@@ -59,25 +67,35 @@ namespace CommonConfig
         /// </summary>
         public int Pickside;
         /// <summary>
-        ///ban强卡
+        ///拿先手
         /// </summary>
-        public bool Banstrongcard;
+        public float PickFirst;
         /// <summary>
-        ///ban弱卡
+        ///拿士兵强化
         /// </summary>
-        public bool Banweakcard;
+        public float PickSoldierUp;
+        /// <summary>
+        ///英雄花钱比警戒线
+        /// </summary>
+        public float HeroGoldRate;
+        /// <summary>
+        ///道具花钱比警戒线
+        /// </summary>
+        public float ItemGoldRate;
         /// <summary>
         ///需求
         /// </summary>
         public string[] Cardsneed;
 
 
-        public PlayerConfig(int Id, string Name, string Imgpath, string Colorstr, int Pricelower, int Priceupper, float Priceoutrate, float sameCardRate, int Cardherolimit, int Carditemlimit, float Futurerate, float Findmasterrate, int Pickside, bool Banstrongcard, bool Banweakcard, string[] Cardsneed)
+        public PlayerConfig(int Id, string Name, string Imgpath, string Colorstr, bool Banstrongcard, bool Banweakcard, int Pricelower, int Priceupper, float Priceoutrate, float sameCardRate, int Cardherolimit, int Carditemlimit, float Futurerate, float Findmasterrate, int Pickside, float PickFirst, float PickSoldierUp, float HeroGoldRate, float ItemGoldRate, string[] Cardsneed)
         {
             this.Id = Id;
             this.Name = Name;
             this.Imgpath = Imgpath;
             this.Colorstr = Colorstr;
+            this.Banstrongcard = Banstrongcard;
+            this.Banweakcard = Banweakcard;
             this.Pricelower = Pricelower;
             this.Priceupper = Priceupper;
             this.Priceoutrate = Priceoutrate;
@@ -87,8 +105,10 @@ namespace CommonConfig
             this.Futurerate = Futurerate;
             this.Findmasterrate = Findmasterrate;
             this.Pickside = Pickside;
-            this.Banstrongcard = Banstrongcard;
-            this.Banweakcard = Banweakcard;
+            this.PickFirst = PickFirst;
+            this.PickSoldierUp = PickSoldierUp;
+            this.HeroGoldRate = HeroGoldRate;
+            this.ItemGoldRate = ItemGoldRate;
             this.Cardsneed = Cardsneed;
 
         }
@@ -113,17 +133,17 @@ namespace CommonConfig
         public static void Load()
         {
             config.Clear();
-            config[1] = new PlayerConfig(1, "旺仔", "PlayerPic/wang", "", 0, 0, 0, 0, 0, 0, 0, 0, 0, false, false, null);
-            config[2] = new PlayerConfig(2, "甲鱼", "PlayerPic/jiayu", "#333333", 6, 16, 0.1f, 5f, 7, 4, 0.6f, 1f, 0, true, false, new string[]{"\"atk\"，\"1\"，\"def\"，\"1\"，\"inte\"，\"1\""});
-            config[3] = new PlayerConfig(3, "三哥", "PlayerPic/sange", "#FFFFFF", 18, 26, 0.3f, 3f, 8, 7, 0.3f, 1f, 0, false, false, new string[]{"\"atk\"，\"1\"，\"def\"，\"1\"，\"inte\"，\"1\""});
-            config[4] = new PlayerConfig(4, "魔童", "PlayerPic/nezha", "#8C0000", 18, 26, 0.3f, 3f, 7, 6, 0.3f, 1f, 0, false, true, new string[]{"\"atk\"，\"1\"，\"def\"，\"1\"，\"inte\"，\"1\""});
-            config[5] = new PlayerConfig(5, "八戒", "PlayerPic/bajie", "#FFCC99", 18, 26, 0.3f, 3f, 8, 6, 0.1f, 1f, 0, true, false, new string[]{"\"shoot\"，\"1\"，\"def\"，\"1\"，\"inte\"，\"1\""});
-            config[6] = new PlayerConfig(6, "大虎", "PlayerPic/dahu", "#006633", 21, 30, 0.1f, 5f, 6, 4, 0.5f, 1f, 0, false, true, new string[]{"\"shoot\"，\"2\"，\"def\"，\"1\"，\"inte\"，\"1\""});
-            config[7] = new PlayerConfig(7, "蓝猫", "PlayerPic/mao", "#5555FF", 18, 26, 0.3f, 3f, 7, 6, 0.3f, 2.5f, 2, false, true, new string[]{"\"atk\"，\"1\"，\"def\"，\"1\"，\"inte\"，\"1\""});
-            config[8] = new PlayerConfig(8, "巴爸", "PlayerPic/baba", "#FF73FF", 17, 23, 0.3f, 3f, 8, 6, 0.1f, 1f, 0, false, false, new string[]{"\"shoot\"，\"2\"，\"help\"，\"2\""});
-            config[9] = new PlayerConfig(9, "巴妈", "PlayerPic/bama", "#333333", 18, 26, 0.3f, 3f, 9, 6, 0.25f, 1f, 0, false, false, new string[]{"\"inte\"，\"1\"，\"help\"，\"1\"，\"shoot\"，\"1\""});
-            config[11] = new PlayerConfig(11, "小红", "PlayerPic/xiaohong", "#FF3333", 18, 26, 0.3f, 3f, 7, 4, 0.3f, 2.5f, 3, false, true, new string[]{"\"atk\"，\"1\"，\"def\"，\"1\"，\"inte\"，\"1\""});
-            config[12] = new PlayerConfig(12, "电怪", "PlayerPic/picaqiu", "#FFFF00", 18, 26, 0.3f, 3f, 6, 4, 0.4f, 3f, 1, false, true, new string[]{"\"atk\"，\"1\"，\"def\"，\"1\"，\"inte\"，\"1\""});
+            config[1] = new PlayerConfig(1, "旺仔", "PlayerPic/wang", "#00FF00", false, false, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, null);
+            config[2] = new PlayerConfig(2, "甲鱼", "PlayerPic/jiayu", "#333333", true, false, 6, 16, 0.1f, 5f, 7, 4, 0.6f, 1f, 0, 0.5f, 0.5f, 0.85f, 0.25f, new string[]{"\"atk\"，\"1\"，\"def\"，\"1\"，\"inte\"，\"1\""});
+            config[3] = new PlayerConfig(3, "三哥", "PlayerPic/sange", "#FFFFFF", false, false, 18, 26, 0.3f, 3f, 8, 7, 0.3f, 1f, 0, 0.5f, 0.5f, 0.8f, 0.3f, new string[]{"\"atk\"，\"1\"，\"def\"，\"1\"，\"inte\"，\"1\""});
+            config[4] = new PlayerConfig(4, "魔童", "PlayerPic/nezha", "#8C0000", false, true, 18, 26, 0.3f, 3f, 7, 6, 0.3f, 1f, 0, 1f, 0.5f, 0.85f, 0.25f, new string[]{"\"atk\"，\"1\"，\"def\"，\"1\"，\"inte\"，\"1\""});
+            config[5] = new PlayerConfig(5, "八戒", "PlayerPic/bajie", "#FFCC99", true, false, 18, 26, 0.3f, 3f, 8, 6, 0.1f, 1f, 0, 0.5f, 0.5f, 0.85f, 0.25f, new string[]{"\"shoot\"，\"1\"，\"def\"，\"1\"，\"inte\"，\"1\""});
+            config[6] = new PlayerConfig(6, "大虎", "PlayerPic/dahu", "#006633", false, true, 21, 30, 0.1f, 5f, 6, 4, 0.5f, 1f, 0, 3f, 1f, 0.8f, 0.35f, new string[]{"\"shoot\"，\"2\"，\"def\"，\"1\"，\"inte\"，\"1\""});
+            config[7] = new PlayerConfig(7, "蓝猫", "PlayerPic/mao", "#5555FF", false, true, 18, 26, 0.3f, 3f, 7, 6, 0.3f, 2.5f, 2, 2f, 0.5f, 0.84f, 0.23f, new string[]{"\"atk\"，\"1\"，\"def\"，\"1\"，\"inte\"，\"1\""});
+            config[8] = new PlayerConfig(8, "巴爸", "PlayerPic/baba", "#FF73FF", false, false, 17, 23, 0.3f, 3f, 7, 6, 0.1f, 1f, 0, 1f, 2f, 0.95f, 0.13f, new string[]{"\"shoot\"，\"2\"，\"help\"，\"2\""});
+            config[9] = new PlayerConfig(9, "巴妈", "PlayerPic/bama", "#333333", false, false, 18, 26, 0.3f, 3f, 8, 6, 0.25f, 1f, 0, 1f, 1.5f, 0.95f, 0.12f, new string[]{"\"inte\"，\"1\"，\"help\"，\"1\"，\"shoot\"，\"1\""});
+            config[11] = new PlayerConfig(11, "小红", "PlayerPic/xiaohong", "#FF3333", false, true, 18, 26, 0.3f, 3f, 7, 4, 0.3f, 2.5f, 3, 2f, 0.5f, 0.85f, 0.2f, new string[]{"\"atk\"，\"1\"，\"def\"，\"1\"，\"inte\"，\"1\""});
+            config[12] = new PlayerConfig(12, "电怪", "PlayerPic/picaqiu", "#FFFF00", false, true, 18, 26, 0.3f, 3f, 6, 4, 0.4f, 3f, 1, 2f, 0.5f, 0.85f, 0.2f, new string[]{"\"atk\"，\"1\"，\"def\"，\"1\"，\"inte\"，\"1\""});
 
         }
 

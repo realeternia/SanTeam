@@ -8,6 +8,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
+using System.Text;
 
 public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 {
@@ -42,6 +43,12 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     public string imgPath;
     public Color lineColor;
     public int banCount = 2; //最多两张
+
+    private bool nextSkip = false; //下一轮skip
+    public int sodatk = 0; //士兵atk强化
+    public int sodhp = 0; //士兵def强化
+    private int goldCostHero = 0;
+    private int goldCostItem = 0;
 
     // Start is called before the first frame update
     void Start()
@@ -82,10 +89,20 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         goldText.text = gold.ToString();
     }
 
-    public void SubGold(int g)
+    public void SubGold(int g, bool isHero)
     {
         gold -= g;
         goldText.text = gold.ToString();
+
+        if(isHero)
+            goldCostHero += g;
+        else
+            goldCostItem += g;
+    }
+
+    public void OnEra(int era)
+    {
+        nextSkip = false;
     }
 
     public void Equip(int heroId, int itemId)
@@ -248,17 +265,26 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         if (gold < price)
             return false;
 
-        SubGold(price);
-        if(!ctr.isHeroCard)
+        SubGold(price, isHero);
+        if (!ctr.isHeroCard)
         {
             var itemCfg = ItemConfig.GetConfig(cardId);
             if (itemCfg.AutoUse)
             {
                 GameManager.Instance.PlaySound("Sounds/gold");
                 ctr.OnSold(this);
-                CardShopManager.Instance.nextFirstPicker = pid;
+                if (itemCfg.Effect == "first")
+                {
+                    nextSkip = true;
+                    CardShopManager.Instance.nextFirstPicker = pid;
+                }
+                else if (itemCfg.Effect == "sodatk")
+                    sodatk++;
+                else if (itemCfg.Effect == "sodhp")
+                    sodhp++;
                 return true;
             }
+
         }
         if (cards.TryGetValue(cardId, out int exp))
         {
@@ -275,6 +301,9 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 
     public bool AiCheckBuyCard(int era)
     {
+        if(nextSkip)
+            return false;
+
         // 获取所有未售出的卡片
         List<CardViewControl> availableCards = CardShopManager.Instance.cardViews
             .Where(card => !card.isSold)
@@ -290,14 +319,14 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
             return false;
 
         bool hasSameCard = false;
-        int weakCardId = 0;
-        int weakCardPrice = 0;
+        int weakHeroCardId = 0;
+        int weakHeroCardPrice = 0;
         var heroCardCount = GetHeroCardList().Count;
         if (heroCardCount >= playerConfig.Cardherolimit)
         {
             var weakCard = FindWeakCard();
-            weakCardId = weakCard.Item1;
-            weakCardPrice = weakCard.Item2;
+            weakHeroCardId = weakCard.Item1;
+            weakHeroCardPrice = weakCard.Item2;
         }
 
         //把战力前五的卡放到一个队列里
@@ -311,6 +340,8 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         bool hasLiubei = false;
         bool hasCaocao = false;
         bool hasSunquan = false;
+
+        CardViewControl checkFirst = null;
 
         foreach (int cardId in strongList)
         {
@@ -352,12 +383,11 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
             if (cards.ContainsKey(pickCard.cardId))
             {
                 score *= playerConfig.sameCardRate;
-                score *= (1 + Math.Max(0.2f, 0.3f * (4 - cards[pickCard.cardId]))); // 优先拿低等级卡
-                if(!strongList.Contains(pickCard.cardId)) //非主力卡-权重
+                score *= (1 + Math.Max(-.5f, 0.3f * (4 - cards[pickCard.cardId]))); // 优先拿低等级卡
+                if(pickCard.isHeroCard && !strongList.Contains(pickCard.cardId)) //非主力卡-权重
                     score *= 0.7f;
                 hasSameCard = true;
             }
-
 
             if (!hasSameCard)
             {
@@ -367,13 +397,19 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
                     if (UnityEngine.Random.value < playerConfig.Futurerate + cardRate)
                         return false;
                 }
+                if (goldCostHero > 200)
+                {
+                    var heroRate = (goldCostHero / goldCostHero + goldCostItem);
+                    if (heroRate > playerConfig.HeroGoldRate)
+                        score *= 0.5f;
+                }
             }
 
             if (pickCard.isHeroCard)
             {
                 if (!cards.ContainsKey(pickCard.cardId) && heroCardCount >= playerConfig.Cardherolimit)
                 {
-                    if (pickCard.priceI < weakCardPrice)
+                    if (pickCard.priceI < weakHeroCardPrice)
                         continue; //没必要换更弱的卡
                 }
                 var heroCfg = HeroConfig.GetConfig(pickCard.cardId);
@@ -431,17 +467,27 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
             }
             else
             {
-                var itemCount = GetItemCardList().Count;
-                if (itemCount >= playerConfig.Carditemlimit && !hasSameCard)
-                    continue; //武器太多了
-
                 if(heroCardCount < 3)
                     continue;
 
+                var itemCfg = ItemConfig.GetConfig(pickCard.cardId);
+                var itemCount = GetItemCardList().Count;
                 if (!hasSameCard)
                 {
-                    if (gold > 60 && GamePlayed() > 8)
-                        score *= 2f;
+                    if (itemCount >= playerConfig.Carditemlimit && itemCfg.Effect == "attr")
+                        continue; //武器太多了
+                    if (goldCostItem > 100)
+                    {
+                        var itemRate = (goldCostItem / goldCostHero + goldCostItem);
+                        if (itemRate > playerConfig.ItemGoldRate)
+                            score *= 0.5f;
+                    }
+                }
+
+                if (itemCfg.Effect == "attr" && !hasSameCard)
+                {
+                    if (gold > 60 && GamePlayed() >= 8)
+                        score *= 1.5f;
                     else if (heroCardCount >= 3)
                     {
                         if (itemCount == 0)
@@ -449,6 +495,14 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
                         else if (itemCount < 3)
                             score *= 1 + (3 - itemCount) * 0.6f;
                     }
+                }
+                else if(itemCfg.Effect == "first")
+                {
+                    checkFirst = pickCard;
+                }
+                else if(itemCfg.Effect == "sodatk" || itemCfg.Effect == "sodhp")
+                {
+                    score *= playerConfig.PickSoldierUp;
                 }
             }
 
@@ -461,13 +515,37 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
             return false;
 
         //scoredCards的key的priceI前三3的卡分别（1.5，1.3，1.1）
-        var top3Cards = scoredCards.OrderByDescending(x => x.card.priceI).Take(3).ToList();
-        for(int i = 0; i < top3Cards.Count; i++)
+        if (scoredCards.Count >= 5 && scoredCards.Max(x => x.score) < 1.6f)
         {
-            var card = top3Cards[i];
-            var index = scoredCards.FindIndex(x => x.card == card.card);
-            scoredCards[index] = (card.card, card.score * (1.5f - i * 0.2f));
+            var top3Cards = scoredCards.OrderByDescending(x => x.card.priceI).Take(3).ToList();
+            for (int i = 0; i < top3Cards.Count; i++)
+            {
+                var card = top3Cards[i];
+                var index = scoredCards.FindIndex(x => x.card == card.card);
+                scoredCards[index] = (card.card, card.score * (1.9f - i * 0.3f));
+            }
         }
+
+        var mostScore = scoredCards.Max(x => x.score);
+        if (checkFirst != null && mostScore < 1 && gold > 40)
+        {
+            var index = scoredCards.FindIndex(x => x.card == checkFirst);
+            scoredCards[index] = (scoredCards[index].card, scoredCards[index].score * playerConfig.PickFirst);
+        }
+
+        scoredCards = scoredCards.OrderByDescending(x => x.score).ToList();
+        //日志打印scoredCards和selectedCard
+
+        var sb = new StringBuilder();
+        sb.AppendLine($"{playerNameText.text} 选卡 scoredCards数量: {scoredCards.Count}");
+        for (int i = 0; i < scoredCards.Count; i++)
+        {
+            var card = scoredCards[i];
+            sb.AppendLine($"  [{i+1}] 卡片ID: {card.card.cardId}, 名称: {card.card.cardName.text}, 分数: {card.score}, 价格: {card.card.priceI}");
+        }
+
+        if(scoredCards.Count > 3)
+            scoredCards = scoredCards.Take(3).ToList();     
 
         // 根据分数计算总权重
         float totalWeight = scoredCards.Sum(item => item.score);
@@ -490,24 +568,19 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         if (selectedCard == null)
             return false;
 
-        //日志打印scoredCards和selectedCard
-        Debug.Log($"{playerNameText.text} scoredCards数量: {scoredCards.Count}");
-        for (int i = 0; i < scoredCards.Count; i++)
-        {
-            var card = scoredCards[i];
-            Debug.Log($"  [{i}] 卡片ID: {card.card.cardId}, 名称: {card.card.cardName.text}, 分数: {card.score}, 价格: {card.card.priceI}");
-        }
         if (selectedCard != null)
         {
-            Debug.Log($"选中卡片: ID={selectedCard.cardId}, 名称={selectedCard.cardName.text}, 价格={selectedCard.priceI}, 英雄卡={selectedCard.isHeroCard}");
+            sb.AppendLine($"选中卡片: ID={selectedCard.cardId}, 名称={selectedCard.cardName.text}, roll={randomValue}, 英雄卡={selectedCard.isHeroCard}");
         }
         else
         {
-            Debug.Log("未选中任何卡片");
-        }
+            sb.AppendLine("未选中任何卡片");
+        }      
+        Debug.Log(sb.ToString());                
 
-        if (heroCardCount >= playerConfig.Cardherolimit && !hasSameCard)
-            SellCard(weakCardId); //卖掉最弱的卡
+        hasSameCard = cards.ContainsKey(selectedCard.cardId);
+        if (selectedCard.isHeroCard && heroCardCount >= playerConfig.Cardherolimit && !hasSameCard)
+            SellCard(weakHeroCardId); //卖掉最弱的卡
 
         // 购买选中的卡片
         BuyCard(selectedCard, selectedCard.cardId, selectedCard.isHeroCard, selectedCard.priceI, selectedCard.count);
@@ -567,7 +640,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
                 continue;
 
             var price = HeroSelectionTool.GetPrice(HeroConfig.GetConfig(cardId));
-            sortDataList.Add(new Tuple<int, int>(cardId, price * cards[cardId] ));
+            sortDataList.Add(new Tuple<int, int>(cardId, price * cards[cardId]));
         }
         sortDataList.Sort((a, b) => b.Item2.CompareTo(a.Item2));
 

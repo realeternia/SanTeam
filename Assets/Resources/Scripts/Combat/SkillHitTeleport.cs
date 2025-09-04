@@ -13,8 +13,8 @@ public class SkillHitTeleport : Skill
     {
         if(!WorldManager.Instance.CheckInRange(owner.transform.position, attacker.transform.position, skillCfg.Range) && CheckBurst())
         {
-            Vector2 randomDir = UnityEngine.Random.insideUnitCircle.normalized;
-            Vector3 randomPosition = attacker.transform.position + new Vector3(randomDir.x, 0, randomDir.y) * 12;
+            Vector3 direction = (attacker.transform.position - owner.transform.position).normalized;
+            Vector3 randomPosition = attacker.transform.position - direction * 12;
 
             owner.MoveTo(randomPosition, true);
             owner.LockTarget(attacker);

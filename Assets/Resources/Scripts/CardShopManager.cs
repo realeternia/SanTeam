@@ -95,6 +95,11 @@ public class CardShopManager : MonoBehaviour
             Destroy(child.gameObject);
         var unsoldItems = cardViews.FindAll(x => !x.isHeroCard && !x.isSold && !ItemConfig.GetConfig(x.cardId).AutoRemove).ConvertAll(a => a.cardId);
         cardViews.Clear();
+        if(era == 0) //第一个回合不存装备
+            unsoldItems.Clear();
+
+        foreach(var player in GameManager.Instance.players)
+            player.OnEra(era);
 
         // 计算起始位置，使其居中显示
         float startX = -((CARDS_PER_ROW * cardWidth) + (CARDS_PER_ROW - 1) * spacing) / 2f + cardWidth / 2f;
@@ -138,7 +143,7 @@ public class CardShopManager : MonoBehaviour
         var itemIds = new List<int>();
         foreach (var itemCfg in ItemConfig.ConfigList)
         {
-            if (itemCfg.RateAbs > 0 && UnityEngine.Random.Range(0, 100) < itemCfg.RateAbs)
+            if (itemCfg.RateAbs > 0 && itemCfg.ShopIdx <= shopCfg.Id && UnityEngine.Random.Range(0, 100) < itemCfg.RateAbs)
                 itemIds.Add(itemCfg.Id);
         }
 

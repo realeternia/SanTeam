@@ -46,6 +46,7 @@ public class Chess : MonoBehaviour
     public string hitEffect;
     public int missileSpeed = 10;
     public float missileHight;
+    public int soldierId;
     private int soldierLevel = 0;
 
 
@@ -115,6 +116,17 @@ public class Chess : MonoBehaviour
         if(!hasSKill)
         {
             material.SetFloat("_SecondTexSize", 0.1f);
+        }
+        
+        if(!isHero)
+        {
+            var soldierCfg = SoldierConfig.GetConfig(soldierId);
+            var playerInfo = GameManager.Instance.GetPlayer(playerId);
+            if(playerInfo != null && soldierCfg.IsSoldier)
+            {
+                maxHp += playerInfo.sodhp * 5;
+                attackDamage += playerInfo.sodatk;
+            }
         }
         hp = maxHp;
 
@@ -447,11 +459,15 @@ public class Chess : MonoBehaviour
     // 只能开场用
     public void AddSoldierLevel(int lv)
     {
-        if(isHero)
+        if (isHero)
+            return;
+
+        var soldierCfg = SoldierConfig.GetConfig(soldierId);
+        if (!soldierCfg.IsSoldier)
             return;
 
         //根据level变化模型scale
-        soldierLevel += lv;        
+        soldierLevel += lv;
         transform.localScale = new Vector3(5 + soldierLevel * 0.75f, 3, 5 + soldierLevel * 0.75f);
 
         attackDamage += lv * 2;

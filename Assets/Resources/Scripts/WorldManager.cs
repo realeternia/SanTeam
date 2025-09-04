@@ -250,6 +250,7 @@ public class WorldManager : MonoBehaviour
             chessComponent.isFakeHero = soldierConfig.Model == "UnitHero";
 
             chessComponent.hitEffect = soldierConfig.HitEffect;
+            chessComponent.soldierId = soldierId;
 
             chessComponent.Init(p.pid, p.lineColor);
         }
