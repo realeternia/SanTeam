@@ -280,7 +280,10 @@ public static class HeroSelectionTool
         if (heroCfg.Str >= 90) bonus += (heroCfg.Str - 89) * 0.01f;
         if (heroCfg.Inte >= 90) bonus += (heroCfg.Inte - 89) * 0.01f;
         if (heroCfg.LeadShip >= 90) bonus += (heroCfg.LeadShip - 89) * 0.01f;
-        bonus += ((float)heroCfg.Hp + (float)heroCfg.Range / 17 * 30 - 330) / 330;
+        var rangeMark = (float)heroCfg.Range / 17 * 40;
+        if(heroCfg.Range >= 20)
+            rangeMark += 20;
+        bonus += ((float)heroCfg.Hp + rangeMark - 340) / 340;
 
         if (heroCfg.Total >= 220)
         { //救一下偏科的人
