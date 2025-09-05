@@ -60,7 +60,7 @@ public static class HeroSelectionTool
         heroPoolCache.Clear();
         List<HeroConfig> allHeroes = new List<HeroConfig>(HeroConfig.ConfigList);
 
-        int[] sideCounts = new int[4];
+        int[] sideCounts = new int[10];
         // 先对allHeroes遍历，1-100随机，如果大于RateAbs，加入返回队列
         List<HeroConfig> tempHeroes = new List<HeroConfig>(allHeroes);
         foreach (var hero in tempHeroes)
@@ -78,7 +78,7 @@ public static class HeroSelectionTool
         }       
 
         // 先随机选择5-7张Side=4的卡牌
-        List<HeroConfig> side4Heroes = allHeroes.FindAll(hero => hero.Side == 4);
+        List<HeroConfig> side4Heroes = allHeroes.FindAll(hero => hero.Side >= 4);
         if (side4Heroes.Count > 0)
         {
             int side4Count = UnityEngine.Random.Range(5, 8);
@@ -382,5 +382,23 @@ public static class HeroSelectionTool
 
         return attrInfo;
 
+    }
+
+    public static Color GetSideColor(int side)
+    {
+        if (side == 1)
+            return new Color(40 / 255f, 70 / 255f, 0 / 255f, 255 / 255f);
+        else if (side == 2)
+            return new Color(0 / 255f, 35 / 255f, 100 / 255f, 255 / 255f);
+        else if (side == 3)
+            return new Color(100 / 255f, 0 / 255f, 0 / 255f, 255 / 255f);
+        else if (side == 4)
+            return new Color(30 / 255f, 100 / 255f, 110 / 255f, 255 / 255f);
+        else if (side == 5)
+            return new Color(90 / 255f, 50 / 255f, 110 / 255f, 255 / 255f);
+        else if (side == 6)
+            return new Color(120 / 255f, 90 / 255f, 30 / 255f, 255 / 255f);                                    
+        else
+            return new Color(50 / 255f, 50 / 255f, 50 / 255f, 255 / 255f);
     }
 }

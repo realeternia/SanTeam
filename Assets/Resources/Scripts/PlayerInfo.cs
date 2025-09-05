@@ -12,6 +12,11 @@ using System.Text;
 
 public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 {
+    class SideInfo
+    {
+        public bool HasShuai;
+        public int Count;
+    }
     private Image targetImage;
     public float blinkDuration = 1f;
     public Color startColor = Color.white;
@@ -329,50 +334,32 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
             weakHeroCardPrice = weakCard.Item2;
         }
 
+        var shopCfg = ShopConfig.GetConfig(GamePlayed() + 1);
+        if(shopCfg.Id <= 2 && affordableCards.Count < 3 - shopCfg.Id + (3 - era) * 3)
+            return false;        
+
         //把战力前五的卡放到一个队列里
         var strongList = GetStrongCards(out var groupList);
-
         // 初始化 side 卡牌数量
-        int side1Count = 0;
-        int side2Count = 0;
-        int side3Count = 0;
-        // 初始化特殊卡牌标志
-        bool hasLiubei = false;
-        bool hasCaocao = false;
-        bool hasSunquan = false;
-
-        CardViewControl checkFirst = null;
-
+        Dictionary<int, SideInfo> sideInfos = new Dictionary<int, SideInfo>();
         foreach (int cardId in strongList)
         {
-            // 检查是否为特殊卡牌
-            if (cardId == 100001) hasLiubei = true;
-            if (cardId == 100002) hasCaocao = true;
-            if (cardId == 100003) hasSunquan = true;
-
-            // 排除特殊卡牌后统计 side 数量
-            if (cardId > 100010)
+            var heroConfig = HeroConfig.GetConfig(cardId);
+            if (!sideInfos.TryGetValue(heroConfig.Side, out var info))
             {
-                var heroConfig = HeroConfig.GetConfig(cardId);
-                switch (heroConfig.Side)
-                {
-                    case 1:
-                        side1Count++;
-                        break;
-                    case 2:
-                        side2Count++;
-                        break;
-                    case 3:
-                        side3Count++;
-                        break;
-                }
+                sideInfos[heroConfig.Side] = new SideInfo();
+            }
+            if (heroConfig.Job == "shuai")
+            {
+                sideInfos[heroConfig.Side].HasShuai = true;
+            }
+            else
+            {
+                sideInfos[heroConfig.Side].Count++;
             }
         }
 
-        var shopCfg = ShopConfig.GetConfig(GamePlayed() + 1);
-        if(shopCfg.Id <= 2 && affordableCards.Count < 3 - shopCfg.Id + (3 - era) * 3)
-            return false;
-
+        CardViewControl checkFirst = null;            
         // 计算每张卡片的加权分
         List<(CardViewControl card, float score)> scoredCards = new List<(CardViewControl card, float score)>();
         foreach (var pickCard in affordableCards)
@@ -451,18 +438,13 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 
                 if (strongList.Count >= 3)
                 {
-                    if (hasLiubei && heroCfg.Side == 1)
-                        score *= playerConfig.Findmasterrate * .6f;
-                    else if (hasCaocao && heroCfg.Side == 2)
-                        score *= playerConfig.Findmasterrate * .6f;
-                    else if (hasSunquan && heroCfg.Side == 3)
-                        score *= playerConfig.Findmasterrate * .6f;
-                    if (side1Count >= 1 && heroCfg.Id == 100001)
-                        score *= playerConfig.Findmasterrate;
-                    else if (side2Count >= 1 && heroCfg.Id == 100002)
-                        score *= playerConfig.Findmasterrate;
-                    else if (side3Count >= 1 && heroCfg.Id == 100003)
-                        score *= playerConfig.Findmasterrate;
+                    if (sideInfos.TryGetValue(heroCfg.Side, out var info))
+                    {
+                        if (heroCfg.Job != "shuai" && info.HasShuai)
+                            score *= playerConfig.Findmasterrate * .6f;
+                        else if(heroCfg.Job == "shuai" && info.Count > 1)
+                            score *= playerConfig.Findmasterrate;
+                    }
                 }
             }
             else
@@ -688,19 +670,11 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     private List<Tuple<int, int>> GetStrong5CardList()
     {
         List<Tuple<int, int>> sortDataList = new List<Tuple<int, int>>();
-        bool hasLiubei = false;
-        bool hasCaocao = false;
-        bool hasSunquan = false;
 
         foreach (int cardId in cards.Keys)
         {
             if (!ConfigManager.IsHeroCard(cardId))
-                continue;
-
-            // 检查是否为特殊卡牌
-            if (cardId == 100001) hasLiubei = true;
-            if (cardId == 100002) hasCaocao = true;
-            if (cardId == 100003) hasSunquan = true;              
+                continue;         
 
             var heroConfig = HeroConfig.GetConfig(cardId);
             var heroPrice = HeroSelectionTool.GetPrice(heroConfig);
@@ -732,48 +706,39 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
             if (sortDataList.Count > 5)
                 sortDataList = sortDataList.Take(5).ToList(); //按战力排出前5                 
 
-            int side1Count = 0;
-            int side2Count = 0;
-            int side3Count = 0;
-
-            // 统计特殊卡牌数量
-            var hasLiubeiInBattle = false;
-            var hasCaocaoInBattle = false;
-            var hasSunquanInBattle = false;
+            Dictionary<int, SideInfo> sideInfos = new Dictionary<int, SideInfo>();
 
             for (int i = 0; i < sortDataList.Count; i++)
             {
                 var cardId = sortDataList[i].Item1;
-                if (cardId == 100001) hasLiubeiInBattle = true;
-                if (cardId == 100002) hasCaocaoInBattle = true;
-                if (cardId == 100003) hasSunquanInBattle = true;
-                // 排除特殊卡牌后统计 side 数量
-                if (cardId > 100010)
+                var heroConfig = HeroConfig.GetConfig(cardId);
+
+                if (!sideInfos.TryGetValue(heroConfig.Side, out var info))
                 {
-                    var heroConfig = HeroConfig.GetConfig(cardId);
-                    switch (heroConfig.Side)
-                    {
-                        case 1:
-                            side1Count++;
-                            break;
-                        case 2:
-                            side2Count++;
-                            break;
-                        case 3:
-                            side3Count++;
-                            break;
-                    }
+                    sideInfos[heroConfig.Side] = new SideInfo();
+                }
+                if (heroConfig.Job == "shuai")
+                {
+                    sideInfos[heroConfig.Side].HasShuai = true;
+                }
+                else
+                {
+                    sideInfos[heroConfig.Side].Count++;
                 }
             }
 
-            // 如果有2张以上卡，就带上主公
-            if(side1Count > 2 && hasLiubei && !hasLiubeiInBattle)
-                sortDataList[sortDataList.Count - 1] = new Tuple<int, int>(100001, 1);
-            if(side2Count > 2 && hasCaocao && !hasCaocaoInBattle)
-                sortDataList[sortDataList.Count - 1] = new Tuple<int, int>(100002, 1);
-            if(side3Count > 2 && hasSunquan && !hasSunquanInBattle)
-                sortDataList[sortDataList.Count - 1] = new Tuple<int, int>(100003, 1);
-
+            foreach (var sideItem in sideInfos)
+            {
+                if (!sideItem.Value.HasShuai && sideItem.Value.Count >= 2)
+                {
+                    var shuaiId = 100000 + sideItem.Key;
+                    if (cards.ContainsKey(shuaiId))
+                    {
+                        sortDataList[sortDataList.Count - 1] = new Tuple<int, int>(shuaiId, 1);
+                        break;
+                    }
+                }
+            }
         }
 
         List<Tuple<int, int>> results = new List<Tuple<int, int>>();

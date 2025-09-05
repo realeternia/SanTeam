@@ -182,15 +182,7 @@ public class PickPanelControl : MonoBehaviour
 
                 // 设置英雄名称
                 cellControl.heroName.text = heroCfg.Name;
-
-                if (heroCfg.Side == 1)
-                    cellControl.bgImg.GetComponent<Image>().color = new Color(40 / 255f, 70 / 255f, 0 / 255f, 255 / 255f);
-                else if (heroCfg.Side == 2)
-                    cellControl.bgImg.GetComponent<Image>().color = new Color(0 / 255f, 35 / 255f, 100 / 255f, 255 / 255f);
-                else if (heroCfg.Side == 3)
-                    cellControl.bgImg.GetComponent<Image>().color = new Color(100 / 255f, 0 / 255f, 0 / 255f, 255 / 255f);
-                else
-                    cellControl.bgImg.GetComponent<Image>().color = new Color(50 / 255f, 50 / 255f, 50 / 255f, 255 / 255f);
+                cellControl.bgImg.GetComponent<Image>().color = HeroSelectionTool.GetSideColor(heroCfg.Side);
 
                 // 默认隐藏禁止图标
                 cellControl.forbidImg.gameObject.SetActive(false);
