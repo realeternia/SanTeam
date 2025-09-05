@@ -84,7 +84,7 @@ public class PickPanelControl : MonoBehaviour
             var player = GameManager.Instance.GetPlayer(pid);
             if (player.banCount > 0)
             {
-                player.CheckBan(cellControls);
+                PlayerAI.CheckBan(player, cellControls);
                 yield return new WaitForSeconds(UnityEngine.Random.Range(0.5f, 1.5f));
             }
         }
