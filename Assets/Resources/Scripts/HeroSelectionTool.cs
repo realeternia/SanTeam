@@ -75,24 +75,71 @@ public static class HeroSelectionTool
                 sideCounts[hero.Side - 1]++;
             }
             allHeroes.Remove(hero);
-        }       
+        }
 
         // 先随机选择5-7张Side=4的卡牌
-        List<HeroConfig> side4Heroes = allHeroes.FindAll(hero => hero.Side >= 4);
-        if (side4Heroes.Count > 0)
+        int[] sides = {4, 5, 6, 10};
+        for (int i = 0; i < 2; i++)
         {
-            int side4Count = UnityEngine.Random.Range(5, 8);
-            side4Count = Mathf.Min(side4Count, side4Heroes.Count);
-            
-            List<HeroConfig> tempSide4Heroes = new List<HeroConfig>(side4Heroes);
-            for (int i = sideCounts[3]; i < side4Count; i++)
+            var side = sides[UnityEngine.Random.Range(0, sides.Length)];
+            sides = sides.Where(s => s != side).ToArray();
+
+            List<HeroConfig> side4Heroes = allHeroes.FindAll(hero => hero.Side == side);
+            if (side4Heroes.Count > 0)
             {
-                int randomIndex = UnityEngine.Random.Range(0, tempSide4Heroes.Count);
-                int price = GetPrice(tempSide4Heroes[randomIndex]);
-                heroPoolCache.Add(new Tuple<int, int>((int)tempSide4Heroes[randomIndex].Id, price));
-                allHeroes.Remove(tempSide4Heroes[randomIndex]);
-                tempSide4Heroes.RemoveAt(randomIndex);
-                sideCounts[3]++;
+                int side4Count = i + 5;
+                side4Count = Mathf.Min(side4Count, side4Heroes.Count);
+
+                if(HeroConfig.HasConfig(100000 + side))
+                {
+                    var heroConfig = HeroConfig.GetConfig(100000 + side);
+                    heroPoolCache.Add(new Tuple<int, int>((int)heroConfig.Id, GetPrice(heroConfig)));
+                    sideCounts[side - 1]++;
+                    allHeroes.Remove(heroConfig);
+                    side4Heroes.Remove(heroConfig);
+                }
+                
+                List<HeroConfig> tempSide4Heroes = new List<HeroConfig>(side4Heroes);
+                for (int j = sideCounts[side - 1]; j < side4Count; j++)
+                {
+                    // 计算当前阵营总权重
+                    float totalRate = 0;
+                    foreach (var hero in tempSide4Heroes)
+                    {
+                        totalRate += hero.RateWeight;
+                    }
+
+                    HeroConfig heroCfg = null;
+                    if (totalRate > 0)
+                    {
+                        float randomValue = UnityEngine.Random.Range(0, totalRate);
+                        float accumulatedRate = 0;
+                        HeroConfig selectedHero = null;
+
+                        foreach (var hero in tempSide4Heroes)
+                        {
+                            if (hero.RateWeight <= 0)
+                                continue;
+                            accumulatedRate += hero.RateWeight;
+                            if (accumulatedRate >= randomValue)
+                            {
+                                selectedHero = hero;
+                                break;
+                            }
+                        }
+                        heroCfg = selectedHero;
+                    }
+                    else
+                    {
+                        // 如果总权重为0，随机选一张
+                        int randomIndex = UnityEngine.Random.Range(0, tempSide4Heroes.Count);
+                        heroCfg = tempSide4Heroes[randomIndex];
+                    }
+                    heroPoolCache.Add(new Tuple<int, int>((int)heroCfg.Id, GetPrice(heroCfg)));
+                    allHeroes.Remove(heroCfg);
+                    tempSide4Heroes.Remove(heroCfg);
+                    sideCounts[side - 1]++;
+                }
             }
         }
 
@@ -104,7 +151,7 @@ public static class HeroSelectionTool
             allHeroes.FindAll(hero => hero.Side == 3)
         };
 
-        int targetCount = Mathf.Min(50, allHeroes.Count);
+        int targetCount = Mathf.Min(55, allHeroes.Count);
 
         while (heroPoolCache.Count < targetCount)
         {

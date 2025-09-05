@@ -78,7 +78,7 @@ public class PickPanelControl : MonoBehaviour
         // 等待1秒
         yield return new WaitForSeconds(1f);
 
-        for (int i = 1; i <= 10; i++)
+        for (int i = 1; i <= 11; i++)
         {
             var pid = (i % 5) + 1;
             var player = GameManager.Instance.GetPlayer(pid);
@@ -141,7 +141,7 @@ public class PickPanelControl : MonoBehaviour
         List<int> heroPool = HeroSelectionTool.GetHeroPoolCache();
         
         // 每行显示10个，共5行
-        int itemsPerRow = 10;
+        int itemsPerRow = 11;
         int rows = 5;
         int totalItems = Mathf.Min(heroPool.Count, itemsPerRow * rows);
         
