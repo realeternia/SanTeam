@@ -113,6 +113,11 @@ public class WorldManager : MonoBehaviour
         }
         chessList.Clear();
 
+        foreach (Transform cell in HudNode.transform)
+        {
+            Destroy(cell.gameObject);
+        }
+
         PanelManager.Instance.ShowShop();
         CardShopManager.Instance.ShopBegin();
     }
@@ -208,19 +213,25 @@ public class WorldManager : MonoBehaviour
             for (int i = 0; i < cards.Count && i < mapConfig.RegionHeroSide6.Length; i++)
                 if (cards[i] != null)
                     SpawnHerosForRegion(GameManager.Instance.GetPlayer(match[5]), mapConfig.RegionHeroSide6[i], cards[i], 6);
+
+            CreateCastleHUD(GameManager.Instance.GetPlayer(match[0]), mapConfig.RegionHeroSide1[2]);
+            CreateCastleHUD(GameManager.Instance.GetPlayer(match[1]), mapConfig.RegionHeroSide2[2]);
+            CreateCastleHUD(GameManager.Instance.GetPlayer(match[2]), mapConfig.RegionHeroSide3[2]);
+            CreateCastleHUD(GameManager.Instance.GetPlayer(match[3]), mapConfig.RegionHeroSide4[2]);
+            CreateCastleHUD(GameManager.Instance.GetPlayer(match[4]), mapConfig.RegionHeroSide5[2]);
+            CreateCastleHUD(GameManager.Instance.GetPlayer(match[5]), mapConfig.RegionHeroSide6[2]);
         }
         else
         {
             
          //   SpawnHerosForRegion(GameManager.Instance.GetPlayer(0), mapConfig.RegionHeroSide1[4], new System.Tuple<int, int>(101008, 1), 1);
-            SpawnHerosForRegion(GameManager.Instance.GetPlayer(0), mapConfig.RegionHeroSide1[3], new System.Tuple<int, int>(101008, 1), 1);
+            SpawnHerosForRegion(GameManager.Instance.GetPlayer(0), mapConfig.RegionHeroSide1[3], new System.Tuple<int, int>(101008, 1), 1); 
          //   SpawnHerosForRegion(GameManager.Instance.GetPlayer(0), mapConfig.RegionHeroSide1[0], new System.Tuple<int, int>(104002, 1), 1);
 
             SpawnHerosForRegion(GameManager.Instance.GetPlayer(1), mapConfig.RegionHeroSide2[0], new System.Tuple<int, int>(101018, 1), 2);
          //   SpawnHerosForRegion(GameManager.Instance.GetPlayer(1), mapConfig.RegionHeroSide2[1], new System.Tuple<int, int>(103008, 1), 2);
             SpawnHerosForRegion(GameManager.Instance.GetPlayer(1), mapConfig.RegionHeroSide2[2], new System.Tuple<int, int>(101018, 1), 2);
         }
-
 
     }
 
@@ -305,7 +316,35 @@ public class WorldManager : MonoBehaviour
             }
             chessList.Add(chessComponent);
             idCounter++;
+       
         }
+    }
+
+
+    // 创建血条HUD
+    private void CreateCastleHUD(PlayerInfo p, GameObject castleSpawn)
+    {
+        // 查找或创建Canvas
+        var canvas = FindObjectOfType<Canvas>();
+
+        // 加载Hud预制体
+        GameObject hudPrefab = Resources.Load<GameObject>("Prefabs/HudCastle");
+
+        // 实例化HUD对象
+        GameObject hudObj = Instantiate(hudPrefab, HudNode.transform);
+        hudObj.name = "CastleHUD";
+
+        // 获取ChessHUD组件
+        var hud = hudObj.GetComponent<CastleHUD>();
+        if (hud == null)
+        {
+            Debug.LogError("CastleHUD component not found on Hud.prefab");
+            return;
+        }
+
+        // 初始化血条显示
+        hud.Init(p, castleSpawn);
+        p.castleHUD = hud;
     }
 
     private IEnumerator GameUpdate()

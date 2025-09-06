@@ -50,6 +50,8 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     public int goldCostHero = 0;
     public int goldCostItem = 0;
 
+    public CastleHUD castleHUD;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -205,9 +207,9 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
                     CardShopManager.Instance.nextFirstPicker = pid;
                 }
                 else if (itemCfg.Effect == "sodatk")
-                    sodatk++;
+                    sodatk += 2;
                 else if (itemCfg.Effect == "sodhp")
-                    sodhp++;
+                    sodhp += 2;
                 return true;
             }
 

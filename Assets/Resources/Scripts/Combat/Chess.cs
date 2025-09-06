@@ -470,8 +470,8 @@ public class Chess : MonoBehaviour
         soldierLevel += lv;
         transform.localScale = new Vector3(5 + soldierLevel * 0.75f, 3, 5 + soldierLevel * 0.75f);
 
-        attackDamage += lv * 2;
-        maxHp += lv * 10;
+        attackDamage += lv * 4;
+        maxHp += lv * 20;
         hp = maxHp;
     }
 
