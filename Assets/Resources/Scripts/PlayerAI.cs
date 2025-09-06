@@ -172,11 +172,20 @@ public static class PlayerAI
                     if (UnityEngine.Random.value < playerConfig.Futurerate + cardRate)
                         return false;
                 }
-                if (playerInfo.goldCostHero > 200)
+
+                //获取现在拥有这张卡牌的玩家人数
+                int playersWithThisCard = 0;
+                foreach (var player in GameManager.Instance.players)
                 {
-                    var heroRate = (playerInfo.goldCostHero / playerInfo.goldCostHero + playerInfo.goldCostItem);
-                    if (heroRate > playerConfig.HeroGoldRate)
-                        score *= 0.5f;
+                    if (player.cards.ContainsKey(pickCard.cardId))
+                        playersWithThisCard++;
+                }
+
+                //根据拥有人数调整分数，人数越多分数越低
+                if (playersWithThisCard > 0)
+                {
+                    float rarityFactor = 1f / (playersWithThisCard + 1);
+                    score *= (float)Math.Pow(playerConfig.OwnTooMuchCardRate, playersWithThisCard);
                 }
             }
 
@@ -196,15 +205,15 @@ public static class PlayerAI
                         score *= playerConfig.Findmasterrate;
                 }
                 // 根据价格区间调整分数
-                var priceS = pickCard.priceI / pickCard.count;
+                float priceS = pickCard.priceI / pickCard.count;
                 if (priceS < playerConfig.Pricelower || priceS > playerConfig.Priceupper)
                 {
                     score *= playerConfig.Priceoutrate;
                 }
                 else
                 {
-                    var rate = priceS / playerConfig.Pricelower; //高分卡加成
-                    if(rate > 1)
+                    var rate = priceS / (playerConfig.Pricelower / 2 + playerConfig.Priceupper / 2); //高分卡加成
+                    if (rate > 1)
                         score *= rate * rate;
                 }
 
@@ -232,6 +241,15 @@ public static class PlayerAI
                             score *= playerConfig.Findmasterrate * .6f;
                         else if(heroCfg.Job == "shuai" && info.Count > 1)
                             score *= playerConfig.Findmasterrate;
+                    }
+                }
+                if (!hasSameCard)
+                {
+                    if (playerInfo.goldCostHero > 200)
+                    {
+                        var heroRate = (playerInfo.goldCostHero / playerInfo.goldCostHero + playerInfo.goldCostItem);
+                        if (heroRate > playerConfig.HeroGoldRate)
+                            score *= 0.5f;
                     }
                 }
             }
