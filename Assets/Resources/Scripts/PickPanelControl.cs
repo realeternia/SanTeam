@@ -141,15 +141,15 @@ public class PickPanelControl : MonoBehaviour
         List<int> heroPool = HeroSelectionTool.GetHeroPoolCache();
         
         // 每行显示10个，共5行
-        int itemsPerRow = 11;
-        int rows = 5;
+        int itemsPerRow = 13;
+        int rows = 7;
         int totalItems = Mathf.Min(heroPool.Count, itemsPerRow * rows);
         
         // 单元格大小和间距
-        float cellWidth = 130f;
-        float cellHeight = 130f;
+        float cellWidth = 108f;
+        float cellHeight = 108f;
         float spacingX = 0f;
-        float spacingY = 15f;
+        float spacingY = 2f;
 
         // 创建单元格
         for (int i = 0; i < totalItems; i++)
@@ -164,8 +164,8 @@ public class PickPanelControl : MonoBehaviour
             // 计算位置
             int row = i / itemsPerRow;
             int col = i % itemsPerRow;
-            float posX = col * (cellWidth + spacingX) + 60;
-            float posY = -row * (cellHeight + spacingY) - 60;
+            float posX = 5 + col * (cellWidth + spacingX) + 60;
+            float posY = -5 -row * (cellHeight + spacingY) - 60;
 
             // 设置位置
             RectTransform rectTransform = cell.GetComponent<RectTransform>();

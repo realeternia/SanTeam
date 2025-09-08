@@ -144,8 +144,8 @@ namespace CommonConfig
             config[400014] = new ItemConfig(400014, "的卢马", "", 1, "attr", "shield", 40, "", 0, null, "", 0, 5, false, false, 25, 0, false, "dilu");
             config[400015] = new ItemConfig(400015, "大宛宝马", "", 1, "attr", "shield", 24, "", 0, null, "", 0, 0, false, false, 15, 0, false, "dawan");
             config[401001] = new ItemConfig(401001, "和氏璧", "先手选牌", 1, "first", "", 0, "", 0, null, "", 100, 0, true, true, 5, 0.6f, true, "heshi");
-            config[401002] = new ItemConfig(401002, "士兵剑", "士兵攻up", 1, "sodatk", "", 0, "", 0, null, "", 50, 3, true, true, 15, 0, true, "jian1");
-            config[401003] = new ItemConfig(401003, "士兵甲", "士兵命up", 1, "sodhp", "", 0, "", 0, null, "", 50, 3, true, true, 15, 0, true, "jia1");
+            config[401002] = new ItemConfig(401002, "士兵剑", "士兵攻up", 1, "sodatk", "", 0, "", 0, null, "", 50, 3, true, true, 20, 0, true, "jian1");
+            config[401003] = new ItemConfig(401003, "士兵甲", "士兵命up", 1, "sodhp", "", 0, "", 0, null, "", 50, 3, true, true, 20, 0, true, "jia1");
 
         }
 

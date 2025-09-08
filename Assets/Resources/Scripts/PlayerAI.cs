@@ -123,7 +123,7 @@ public static class PlayerAI
         }
 
         var shopCfg = ShopConfig.GetConfig(playerInfo.GamePlayed() + 1);
-        if(shopCfg.Id <= 2 && affordableCards.Count < 3 - shopCfg.Id + (3 - era) * 3)
+        if(shopCfg.Id <= 2 && affordableCards.Count < 6 - shopCfg.Id * 2 + (3 - era) * 4)
             return false;        
 
         //把战力前五的卡放到一个队列里
@@ -166,13 +166,6 @@ public static class PlayerAI
 
             if (!hasSameCard)
             {
-                if (era == 1 && playerInfo.gold < (int)(shopCfg.RoundGold * 0.6) || era == 2 && playerInfo.gold < (int)(shopCfg.RoundGold * 0.35))
-                {
-                    var cardRate = Math.Max(0, (9 - availableCards.Count) * 0.05f);
-                    if (UnityEngine.Random.value < playerConfig.Futurerate + cardRate)
-                        return false;
-                }
-
                 //获取现在拥有这张卡牌的玩家人数
                 int playersWithThisCard = 0;
                 foreach (var player in GameManager.Instance.players)
@@ -197,13 +190,14 @@ public static class PlayerAI
                         continue; //没必要换更弱的卡
                 }
                 var heroCfg = HeroConfig.GetConfig(pickCard.cardId);
-                if (playerConfig.Pickside != 0 && heroCfg.Side != playerConfig.Pickside) //单阵营流
-                    continue;
-                if (playerConfig.Pickside > 0)
+                if (playerConfig.Pickside != 0) //单阵营流
                 {
+                    if (heroCfg.Side != playerConfig.Pickside)
+                        continue;
                     if (pickCard.cardId < 100010) //主公卡一定要拿
                         score *= playerConfig.Findmasterrate;
                 }
+
                 // 根据价格区间调整分数
                 float priceS = pickCard.priceI / pickCard.count;
                 if (priceS < playerConfig.Pricelower || priceS > playerConfig.Priceupper)
@@ -310,7 +304,7 @@ public static class PlayerAI
             {
                 var card = top3Cards[i];
                 var index = scoredCards.FindIndex(x => x.card == card.card);
-                scoredCards[index] = (card.card, card.score * (1.9f - i * 0.3f));
+                scoredCards[index] = (card.card, card.score * (1.6f - i * 0.2f));
             }
         }
 
@@ -319,6 +313,14 @@ public static class PlayerAI
         {
             var index = scoredCards.FindIndex(x => x.card == checkFirst);
             scoredCards[index] = (scoredCards[index].card, scoredCards[index].score * playerConfig.PickFirst);
+        }
+
+        if (mostScore <= 1.6 && (era < 3 && UnityEngine.Random.value < playerConfig.Futurerate * (1 + (2 - era) * 0.3f)))
+        {
+            var cardRate = Math.Min(0.5f, Math.Max(0, (18 - availableCards.Count) * 0.05f));
+            var scoreRate = Math.Min(0.4f, (1.6f - mostScore) / 1.6f / 2);
+            if (UnityEngine.Random.value < cardRate + scoreRate)
+                return false;
         }
 
         scoredCards = scoredCards.OrderByDescending(x => x.score).ToList();

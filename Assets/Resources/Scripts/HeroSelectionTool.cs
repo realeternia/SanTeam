@@ -87,7 +87,7 @@ public static class HeroSelectionTool
             List<HeroConfig> side4Heroes = allHeroes.FindAll(hero => hero.Side == side);
             if (side4Heroes.Count > 0)
             {
-                int side4Count = i + 5;
+                int side4Count = i + 6;
                 side4Count = Mathf.Min(side4Count, side4Heroes.Count);
 
                 if(HeroConfig.HasConfig(100000 + side))
@@ -151,7 +151,7 @@ public static class HeroSelectionTool
             allHeroes.FindAll(hero => hero.Side == 3)
         };
 
-        int targetCount = Mathf.Min(55, allHeroes.Count);
+        int targetCount = Mathf.Min(91, allHeroes.Count);
 
         while (heroPoolCache.Count < targetCount)
         {

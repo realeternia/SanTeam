@@ -14,11 +14,11 @@ public class CardShopManager : MonoBehaviour
     public GameObject cardViewPrefab; // 拖拽CardView预制体到此处
     public GameObject cardItemViewPrefab; // 拖拽CardView预制体到此处
     public GameObject cardItemView;
-    private const int TOTAL_HERO_CARDS = 12;
-    private const int CARDS_PER_ROW = 6;
+    private const int TOTAL_HERO_CARDS = 21;
+    private const int CARDS_PER_ROW = 7;
     private float cardWidth = 176f;
-    private float cardHeight = 288f;
-    private float spacing = 10f;
+    private float cardHeight = 245f;
+    private float spacing = 5f;
     private int round = 10002;
     private bool[] playerPassed = new bool[6]; // 记录每个玩家是否pass过
     private int passedPlayers = 0; // 记录pass的玩家数量
@@ -103,13 +103,53 @@ public class CardShopManager : MonoBehaviour
 
         // 计算起始位置，使其居中显示
         float startX = -((CARDS_PER_ROW * cardWidth) + (CARDS_PER_ROW - 1) * spacing) / 2f + cardWidth / 2f;
-        float startY = 145f;
+        float startY = 250f;
 
         var shopOpenIndex = GameManager.Instance.GetPlayer(0).GamePlayed(); //第几场比赛
         var shopCfg = ShopConfig.GetConfig(Math.Min(100, shopOpenIndex + 1));
+        List<Tuple<int, int>> heroIds = new List<Tuple<int, int>>();
         // hero card
         for (int i = 0; i < TOTAL_HERO_CARDS; i++)
         {
+            var count = 1;
+            var heroId = HeroSelectionTool.GetRandomHeroId();
+
+            var existingIndex = heroIds.FindIndex(x => x.Item1 == heroId);
+            if (shopOpenIndex > 3 && existingIndex >= 0)
+            { //重复卡的处理
+                var existingTuple = heroIds[existingIndex];
+                heroIds[existingIndex] = new Tuple<int, int>(existingTuple.Item1, existingTuple.Item2 + count);
+                i--;
+                continue;
+            }
+
+            var heroPrice = HeroSelectionTool.GetPrice(HeroConfig.GetConfig(heroId));
+            if (shopCfg.MultiPriceTotal > 2 * heroPrice && UnityEngine.Random.Range(0, 100) < shopCfg.MultiCardRate) //第3局后有多张卡
+                count = UnityEngine.Random.Range(1, shopCfg.MultiPriceTotal / heroPrice + 1);
+
+            heroIds.Add(new Tuple<int, int>(heroId, count));
+        }
+        heroIds.Sort((a, b) =>
+        {
+            // 先按卡单价排序
+            int priceCompare = HeroSelectionTool.GetPrice(HeroConfig.GetConfig(b.Item1)).CompareTo(HeroSelectionTool.GetPrice(HeroConfig.GetConfig(a.Item1)));
+            if (priceCompare != 0)
+                return priceCompare;
+
+            // 单价相同，按id排序
+            int idCompare = b.Item1.CompareTo(a.Item1);
+            if (idCompare != 0)
+                return idCompare;
+
+            // id相同按item2排序
+            return b.Item2.CompareTo(a.Item2);
+        });
+
+        for(int i = 0; i < heroIds.Count; i++)
+        {
+            var heroId = heroIds[i].Item1;
+            var heroCount = heroIds[i].Item2;
+
             // 计算行和列
             int row = i / CARDS_PER_ROW;
             int col = i % CARDS_PER_ROW;
@@ -124,17 +164,10 @@ public class CardShopManager : MonoBehaviour
             if (rectTransform != null)
                 rectTransform.anchoredPosition = new Vector2(x, y);
 
-            var count = 1;
-            var heroId = HeroSelectionTool.GetRandomHeroId();
-            var heroPrice = HeroSelectionTool.GetPrice(HeroConfig.GetConfig(heroId));
-            if (shopCfg.MultiPriceTotal > 2 * heroPrice && UnityEngine.Random.Range(0, 100) < shopCfg.MultiCardRate) //第3局后有多张卡
-            {
-                count = UnityEngine.Random.Range(1, shopCfg.MultiPriceTotal / heroPrice + 1);
-            }
             CardViewControl cardView = card.GetComponent<CardViewControl>();
 
-            cardView.Init(heroId, true, count, shopOpenIndex);
-            cardViews.Add(cardView);
+            cardView.Init(heroId, true, heroCount, shopOpenIndex);
+            cardViews.Add(cardView);            
         }
 
         var total = shopCfg.ItemCount;
@@ -198,6 +231,42 @@ public class CardShopManager : MonoBehaviour
             GameManager.Instance.OnPlayerTurn(nextFirstPicker);
         }
         nextFirstPicker = -1;
+
+        // 获取所有玩家
+        var players = new List<(int id, int gold)>();
+        foreach (var player in GameManager.Instance.players)
+            players.Add((player.pid, player.gold));
+
+        // 按金币数量升序排序
+        players.Sort((a, b) => a.gold.CompareTo(b.gold));
+
+        if(players[0].gold == players[1].gold && players[1].gold == players[2].gold)
+        {
+            
+        }
+        else
+        {
+            if (players[0].gold < players[1].gold)
+            {
+                GameManager.Instance.GetPlayer(players[0].id).AddGold(5);
+                if (players[1].gold < players[2].gold)
+                {
+                    GameManager.Instance.GetPlayer(players[1].id).AddGold(3);
+                    GameManager.Instance.GetPlayer(players[2].id).AddGold(1);
+                }
+                else
+                {
+                    GameManager.Instance.GetPlayer(players[1].id).AddGold(2);
+                    GameManager.Instance.GetPlayer(players[2].id).AddGold(2);
+                }
+            }
+            else
+            {
+                GameManager.Instance.GetPlayer(players[0].id).AddGold(4);
+                GameManager.Instance.GetPlayer(players[1].id).AddGold(4);
+                GameManager.Instance.GetPlayer(players[2].id).AddGold(1);
+            }
+        }
 
         GameManager.Instance.PlaySound("Sounds/page");
     }
