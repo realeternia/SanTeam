@@ -43,8 +43,8 @@ public class ItemDetail : MonoBehaviour
         cardId = id;
         level = lv;
 
-        HeroSelectionTool.AttrInfo attrFinal = new HeroSelectionTool.AttrInfo();
-        HeroSelectionTool.AttrInfo attrEquip = new HeroSelectionTool.AttrInfo();
+        AttrInfo attrFinal = new AttrInfo();
+        AttrInfo attrEquip = new AttrInfo();
 
         equipText.text = "";        
 

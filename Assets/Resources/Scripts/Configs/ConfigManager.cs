@@ -5,6 +5,8 @@ using UnityEngine;
 
 public static class ConfigManager
 {
+    private static Dictionary<int, HashSet<int>> heroFriendDict = new Dictionary<int, HashSet<int>>();
+
     public static void Init()
     {
         HeroConfig.Load();
@@ -14,6 +16,8 @@ public static class ConfigManager
         SoldierConfig.Load();
         ShopConfig.Load();
         PlayerConfig.Load();
+        HeroFriendConfig.Load();
+        FormulaLearnAttrConfig.Load();
 
         PostModify();
     }
@@ -40,6 +44,37 @@ public static class ConfigManager
                 heroCfg.RateAbs = 65;
         }
 
+        foreach (var heroFriendCfg in HeroFriendConfig.ConfigList)
+        {
+            var friendIds = heroFriendCfg.Heros;
+            for (int i = 0; i < friendIds.Length; i++)
+            {
+                for (int j = i + 1; j < friendIds.Length; j++)
+                {
+                    int id1 = friendIds[i];
+                    int id2 = friendIds[j];
+                    
+                    // 双向添加，确保两两配对
+                    if (!heroFriendDict.ContainsKey(id1))
+                        heroFriendDict.Add(id1, new HashSet<int>());
+                    heroFriendDict[id1].Add(id2);
+
+                    if (!heroFriendDict.ContainsKey(id2))
+                        heroFriendDict.Add(id2, new HashSet<int>());
+                    heroFriendDict[id2].Add(id1);
+                }
+            }
+        }
+
+    }
+
+    public static bool IsFriend(int heroId, int friendId)
+    {
+        if (heroFriendDict.TryGetValue(heroId, out HashSet<int> value))
+        {
+            return value.Contains(friendId);
+        }
+        return false;
     }
 
     private static void AddSkill(HeroConfig heroCfg, int skillId)

@@ -51,8 +51,8 @@ public class ItemHeroDetail : MonoBehaviour
         var strBase = 0;
         var leadShipBase = 0;
 
-        HeroSelectionTool.AttrInfo attrFinal = new HeroSelectionTool.AttrInfo();
-        HeroSelectionTool.AttrInfo attrEquip = new HeroSelectionTool.AttrInfo();
+        AttrInfo attrFinal = new AttrInfo();
+        AttrInfo attrEquip = new AttrInfo();
 
         equipText.text = "";        
 

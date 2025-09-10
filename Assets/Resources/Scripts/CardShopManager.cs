@@ -111,18 +111,21 @@ public class CardShopManager : MonoBehaviour
         // hero card
         for (int i = 0; i < TOTAL_HERO_CARDS; i++)
         {
-            var count = 1;
             var heroId = HeroSelectionTool.GetRandomHeroId();
-
             var existingIndex = heroIds.FindIndex(x => x.Item1 == heroId);
-            if (shopOpenIndex > 3 && existingIndex >= 0)
+            if (existingIndex >= 0)
             { //重复卡的处理
-                var existingTuple = heroIds[existingIndex];
-                heroIds[existingIndex] = new Tuple<int, int>(existingTuple.Item1, existingTuple.Item2 + count);
+                if (shopCfg.Id > 3)
+                {
+                    var existingTuple = heroIds[existingIndex];
+                    heroIds[existingIndex] = new Tuple<int, int>(existingTuple.Item1, existingTuple.Item2 + 1);
+                }
+
                 i--;
                 continue;
             }
 
+            var count = 1;
             var heroPrice = HeroSelectionTool.GetPrice(HeroConfig.GetConfig(heroId));
             if (shopCfg.MultiPriceTotal > 2 * heroPrice && UnityEngine.Random.Range(0, 100) < shopCfg.MultiCardRate) //第3局后有多张卡
                 count = UnityEngine.Random.Range(1, shopCfg.MultiPriceTotal / heroPrice + 1);

@@ -7,15 +7,6 @@ using UnityEngine;
 // 定义一个单独的工具类
 public static class HeroSelectionTool
 {
-    public class AttrInfo
-    {
-        public int Str;
-        public int Inte;
-        public int Lead;
-        public int Hp;
-
-    }
-
     // 获取指定阵营的所有英雄ID
     public static List<int> GetAllHeroIdsBySide(int side)
     {

@@ -25,12 +25,12 @@ public class GameManager : MonoBehaviour
         Application.logMessageReceived += LogMessageReceived;
 
         var p1 = PlayerBook.GetWang();
-        players[0].Init(0, p1.Name, p1.Imgpath, p1.Colorstr, 5);
+        players[0].Init(0, p1.Name, p1.Imgpath, p1.Colorstr, 0);
         players[0].playerConfig = p1;
         var pls = PlayerBook.GetRandomN(5);
         for (int i = 0; i < 5; i++)
         {
-            players[i + 1].Init(i + 1, pls[i].Name, pls[i].Imgpath, pls[i].Colorstr, 5);
+            players[i + 1].Init(i + 1, pls[i].Name, pls[i].Imgpath, pls[i].Colorstr, 0);
             players[i + 1].playerConfig = pls[i];
         }
     }

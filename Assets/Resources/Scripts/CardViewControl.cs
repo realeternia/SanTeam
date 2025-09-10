@@ -111,10 +111,10 @@ public class CardViewControl : MonoBehaviour, IPointerDownHandler, IPointerUpHan
                 jobImage.sprite = Resources.Load<Sprite>("SkillPic/" + SkillConfig.GetConfig(heroCfg.Skills[0]).Icon);
             else
                 jobImage.gameObject.SetActive(false);
-            lead.text = GetColoredText(heroCfg.LeadShip);
-            inte.text = GetColoredText(heroCfg.Inte);
-            str.text = GetColoredText(heroCfg.Str);
-            hp.text = heroCfg.Hp.ToString();
+            SetColoredText(lead, heroCfg.LeadShip);
+            SetColoredText(inte, heroCfg.Inte);
+            SetColoredText(str, heroCfg.Str);
+            SetColoredText(hp, heroCfg.Hp);
 
             gameObject.GetComponent<Image>().color = HeroSelectionTool.GetSideColor(heroCfg.Side);
             priceI = HeroSelectionTool.GetPrice(heroCfg) * count;
@@ -169,17 +169,18 @@ public class CardViewControl : MonoBehaviour, IPointerDownHandler, IPointerUpHan
 
     }
 
-    string GetColoredText(int value)
+    private void SetColoredText(TMP_Text text, int value)
     {
         if (value >= 95)
         {
-            return $"<color=red>{value}</color>";
+            text.color = Color.red;
         }
         else if (value >= 90)
         {
-            return $"<color=yellow>{value}</color>";
+            text.color = Color.yellow;
         }
-        return value.ToString();
+
+        text.text = value.ToString();
     }    
 
     public void OnSold(PlayerInfo playerInfo)
@@ -188,8 +189,38 @@ public class CardViewControl : MonoBehaviour, IPointerDownHandler, IPointerUpHan
         buyButton.gameObject.SetActive(false);
         soldImage.gameObject.SetActive(true);
 
+        //把heroImage变灰色 - 改为将整个panel变成灰度图
+        SetGrayscaleEffect();
+        soldImage.color = playerInfo.lineColor;
+
         //创建一个Image，启动携程 飞到 PlayerInfo的位置 
         StartCoroutine(MoveToPlayerInfo(playerInfo));
+    }
+
+    private void SetGrayscaleEffect()
+    {
+        // 获取所有Image组件并应用灰度效果
+        Image[] allImages = GetComponentsInChildren<Image>(true);
+        
+        foreach (Image img in allImages)
+        {
+            if (img != null)
+            {
+                // 设置灰度颜色
+                img.color = new Color(0.3f, 0.3f, 0.3f, img.color.a);
+            }
+        }
+        
+        // 获取所有TextMeshProUGUI组件并应用灰度效果
+        TMP_Text[] allTMPTexts = GetComponentsInChildren<TMP_Text>(true);
+        foreach (var tmpText in allTMPTexts)
+        {
+            if (tmpText != null)
+            {
+                // 设置TMP文本为灰色
+                tmpText.color = Color.gray;
+            }
+        }
     }
 
     private System.Collections.IEnumerator MoveToPlayerInfo(PlayerInfo playerInfo)

@@ -68,6 +68,7 @@ public class Chess : MonoBehaviour
 
     private bool DieAfterLifeTime;
     private float LifeTime;
+    private Dictionary<int, AttrInfo> supportAttrs = new Dictionary<int, AttrInfo>();
 
     // Start is called before the first frame update
     void Start()
@@ -81,9 +82,9 @@ public class Chess : MonoBehaviour
         playerId = pid;
         // 创建材质实例
         material = new Material(rend.sharedMaterial);
-        if(!string.IsNullOrEmpty(chessName))
+        if (!string.IsNullOrEmpty(chessName))
         {
-            if(chessName.StartsWith("PlayerPic"))
+            if (chessName.StartsWith("PlayerPic"))
                 material.mainTexture = Resources.Load<Texture>(chessName);
             else
                 material.mainTexture = Resources.Load<Texture>("Skins/" + chessName);
@@ -104,7 +105,7 @@ public class Chess : MonoBehaviour
                 {
                     skills.Add(SkillManager.CreateSkill(skillId, this));
                     var skillCfg = SkillConfig.GetConfig(skillId);
-                    if(!string.IsNullOrEmpty(skillCfg.Icon))
+                    if (!string.IsNullOrEmpty(skillCfg.Icon))
                     {
                         material.SetTexture("_SecondTex", Resources.Load<Texture>("SkillPic/" + skillCfg.Icon));
                         hasSKill = true;
@@ -113,16 +114,16 @@ public class Chess : MonoBehaviour
             }
         }
 
-        if(!hasSKill)
+        if (!hasSKill)
         {
             material.SetFloat("_SecondTexSize", 0.1f);
         }
-        
-        if(!isHero)
+
+        if (!isHero)
         {
             var soldierCfg = SoldierConfig.GetConfig(soldierId);
             var playerInfo = GameManager.Instance.GetPlayer(playerId);
-            if(playerInfo != null && soldierCfg.IsSoldier)
+            if (playerInfo != null && soldierCfg.IsSoldier)
             {
                 maxHp += playerInfo.sodhp * 5;
                 attackDamage += playerInfo.sodatk;
@@ -132,7 +133,7 @@ public class Chess : MonoBehaviour
 
         rend.material = material; // 这会为这个渲染器创建一个独立的材质实例
         if (heroInfo != null) // 英雄
-            heroInfo.SetHpRate(hp, maxHp);        
+            heroInfo.SetHpRate(hp, maxHp);
     }
 
     // 创建血条HUD
@@ -158,17 +159,17 @@ public class Chess : MonoBehaviour
 
         // 设置属性
         hud.chessUnit = this;
-      //  hud.canvas = canvas;
+        //  hud.canvas = canvas;
 
         // 初始化血条显示
         hud.UpdateHealthDisplay();
-    
+
     }
 
     // 寻找side不等于自己的单位
     private void FindTarget()
     {
-        if(attackRange == 0)
+        if (attackRange == 0)
             return;
 
         // 获取所有Chess组件
@@ -257,10 +258,10 @@ public class Chess : MonoBehaviour
             MoveAndFight();
         lastActionTime = Time.time;
 
-        if(DieAfterLifeTime)
+        if (DieAfterLifeTime)
         {
             LifeTime -= deltaTime;
-            if(LifeTime <= 0)
+            if (LifeTime <= 0)
             {
                 Ondying();
             }
@@ -275,7 +276,7 @@ public class Chess : MonoBehaviour
 
     void MoveAndFight()
     {
-        if(noActionCount > 0)
+        if (noActionCount > 0)
             return;
 
         // 每3秒重新寻找目标
@@ -291,7 +292,7 @@ public class Chess : MonoBehaviour
             // 如果没有目标，尝试寻找新目标
             FindTarget();
 
-            if(targetChess == null)
+            if (targetChess == null)
                 return;
         }
 
@@ -324,7 +325,7 @@ public class Chess : MonoBehaviour
         if (noMoveCount > 0 || moveSpeed == 0)
             return;
 
-        if(moveDirection == null)
+        if (moveDirection == null)
             moveDirection = targetChess.transform.position;
 
         //如果当前位置很接近moveDirection，就直接移动到moveDirection
@@ -353,7 +354,7 @@ public class Chess : MonoBehaviour
 
                 // 根据连续失败次数尝试不同角度找路
                 // 如果已经在使用偏移路径或者失败次数达到阈值，则继续使用偏移
-              // 计算原始方向
+                // 计算原始方向
                 Vector3 direction = (targetChess.transform.position - transform.position).normalized;
                 float angleOffset = 0f;
 
@@ -391,7 +392,7 @@ public class Chess : MonoBehaviour
     {
         buffs.Where(x => Time.time > x.endTime).ToList().ForEach(x => BuffManager.RemoveBuff(this, x.id));
 
-        foreach(var buff in buffs)
+        foreach (var buff in buffs)
         {
             buff.Update();
         }
@@ -411,7 +412,7 @@ public class Chess : MonoBehaviour
         }
     }
 
-    public void UpdateLevel(PlayerInfo player, int lv)
+    public void CheckInitAttr(PlayerInfo player, int lv, List<int> friendIds)
     {
         level = lv;
 
@@ -438,10 +439,101 @@ public class Chess : MonoBehaviour
             leadShip += equipAttr.Lead;
             maxHp += equipAttr.Hp;
         }
+
+        if (friendIds != null)
+        {
+            foreach (var friendId in friendIds)
+            {
+                var friendAttr = GetSupportAttr(friendId, lv);
+                if (friendAttr != null)
+                {
+                    supportAttrs[friendId] = friendAttr;
+                    var friendChess = WorldManager.Instance.FindByHeroIdAndSide(friendId, side);
+                    if (friendChess != null)
+                    {
+                        GameObject heroPrefab = Resources.Load<GameObject>("Prefabs/LaserLine");
+                        GameObject heroInstance = Instantiate(heroPrefab, Vector3.zero, Quaternion.identity);
+                        heroInstance.transform.SetParent(transform);
+                        heroInstance.transform.localScale = new Vector3(1, 1, 1);
+                        var beam = heroInstance.transform.Find("Beam").GetComponent<GlowBeamController>();
+                        beam.SetSourceAndTarget(this, friendChess);
+                        beam.SetGlowColor(GetPlayerInfo().lineColor);
+                    }
+                }
+            }
+
+            foreach (var friendAttr in supportAttrs.Values)
+            {
+                inte += friendAttr.Inte;
+                str += friendAttr.Str;
+                leadShip += friendAttr.Lead;
+            }
+        }
+
         hp = maxHp;
 
-        if(heroInfo != null)
+        if (heroInfo != null)
             heroInfo.SetAttr(inte, str, leadShip);
+    }
+
+    public AttrInfo GetSupportAttr(int pid, int lv)
+    {
+        if(!ConfigManager.IsFriend(heroId, pid))
+            return null;
+        
+        var friendHeroCfg = HeroConfig.GetConfig(pid);
+        var myHeroCfg = HeroConfig.GetConfig(heroId);
+        
+        // 获取三个属性值
+        int friendStr = friendHeroCfg.Str;
+        int friendInte = friendHeroCfg.Inte;
+        int friendLead = friendHeroCfg.LeadShip;
+        
+        int myStr = myHeroCfg.Str;
+        int myInte = myHeroCfg.Inte;
+        int myLead = myHeroCfg.LeadShip;
+        
+        // 计算差值
+        int strDiff = friendStr - myStr;
+        int inteDiff = friendInte - myInte;
+        int leadDiff = friendLead - myLead;
+        
+        // 判断情况
+        bool allLower = strDiff < 0 && inteDiff < 0 && leadDiff < 0;
+        bool allHigher = strDiff > 0 && inteDiff > 0 && leadDiff > 0;
+        
+        int totalPoints;
+        float[] weights = new float[3];
+
+        weights[0] = FormulaLearnAttrConfig.GetConfig(friendStr - myStr).Weight;
+        weights[1] = FormulaLearnAttrConfig.GetConfig(friendInte - myInte).Weight;
+        weights[2] = FormulaLearnAttrConfig.GetConfig(friendLead - myLead).Weight;
+        totalPoints = Math.Clamp((strDiff + inteDiff + leadDiff) / 2, 15, 25);
+
+        // 计算总权重
+        float totalWeight = weights[0] + weights[1] + weights[2];
+        if (totalWeight <= 0)
+            return new AttrInfo();
+        
+        // 计算属性点分配，避免四舍五入导致总和不等的问题
+        float[] diffs = { weights[0], weights[1], weights[2] };
+        int[] addValues = new int[3];
+        
+        // 找出三个差值中的排序索引（从小到大）
+        int[] indices = { 0, 1, 2 }; // 0=Str, 1=Inte, 2=Lead
+        Array.Sort(indices, (a, b) => diffs[a].CompareTo(diffs[b]));
+        
+        // 先计算最低差值的属性
+        addValues[indices[0]] = Mathf.FloorToInt(totalPoints * weights[indices[0]] / totalWeight);
+        addValues[indices[1]] = Mathf.FloorToInt(totalPoints * weights[indices[1]] / totalWeight);
+        addValues[indices[2]] = totalPoints - addValues[indices[0]] - addValues[indices[1]];
+
+        var attr = new AttrInfo();
+        attr.Str = addValues[0] * (lv + 9) / 10;
+        attr.Inte = addValues[1] * (lv + 9) / 10;
+        attr.Lead = addValues[2] * (lv + 9) / 10;
+        
+        return attr;
     }
 
     public void UpdateAttr(int inte, int str, int leadShip)
@@ -548,9 +640,35 @@ public class Chess : MonoBehaviour
         Destroy(gameObject);
 
         if ((side == 1 || side == 2 && !isShadow ))
-            GameManager.Instance.PlaySound("Sounds/tnt", 7);            
+            GameManager.Instance.PlaySound("Sounds/tnt", 7);
+
+        if (isHero)
+        {
+            foreach (var chess in WorldManager.Instance.GetUnitsMySide(transform.position, 0, side))
+            {
+                if (!chess.isHero)
+                    continue;
+                chess.OnFriendDie(heroId);
+            }
+        }
     }
-  
+
+    public void OnFriendDie(int friendId)
+    {
+        if (supportAttrs.ContainsKey(friendId))
+        {
+            var friendAttr = supportAttrs[friendId];
+            inte -= friendAttr.Inte;
+            str -= friendAttr.Str;
+            leadShip -= friendAttr.Lead;
+            supportAttrs.Remove(friendId);
+
+
+            if (heroInfo != null)
+                heroInfo.SetAttr(inte, str, leadShip);
+        }
+    }
+
 
     private int calculateDamage(Chess attacker, Chess defender, out string type)
     {
