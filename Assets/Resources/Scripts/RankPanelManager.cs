@@ -56,6 +56,7 @@ public class RankPanelManager : MonoBehaviour
         });
         closeBtn.onClick.AddListener(() =>
         {      
+            PanelManager.Instance.ShowShop();
             PanelManager.Instance.HideRank();
         });
 

@@ -299,6 +299,17 @@ public static class HeroSelectionTool
         return heroPoolCache.Exists(hero => hero.Item1 == heroId);
     }
 
+    public static int CountFriendInPool(int heroId)
+    {
+        int count = 0;
+        foreach (var hero in heroPoolCache)
+        {
+            if (ConfigManager.IsFriend(heroId, hero.Item1))
+                count++;
+        }
+        return count;
+    }
+
     public static int GetRandomItemId(int shopIdx)
     {
         var itemList = ItemConfig.ConfigList.ToList();

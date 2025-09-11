@@ -38,6 +38,9 @@ public class CardViewControl : MonoBehaviour, IPointerDownHandler, IPointerUpHan
     public TMP_Text itemAttrName2;
     public TMP_Text itemDes;
 
+    public GameObject effectGreen;
+    public GameObject effectYellow;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -97,7 +100,6 @@ public class CardViewControl : MonoBehaviour, IPointerDownHandler, IPointerUpHan
             isHeroCardNode.SetActive(true);
             isItemCardNode.SetActive(false);
 
-
             var heroCfg = HeroConfig.GetConfig(cid);
             heroImage.sprite = Resources.Load<Sprite>("SkinsBig/" + heroCfg.Icon);
             cardName.text = heroCfg.Name;
@@ -115,6 +117,23 @@ public class CardViewControl : MonoBehaviour, IPointerDownHandler, IPointerUpHan
 
             gameObject.GetComponent<Image>().color = HeroSelectionTool.GetSideColor(heroCfg.Side);
             priceI = HeroSelectionTool.GetPrice(heroCfg) * count;
+
+            var playerInfo = GameManager.Instance.GetPlayer(0);
+            if(playerInfo.HasCard(cardId))
+            {
+                effectGreen.SetActive(true);
+                effectYellow.SetActive(false);
+            }
+            else if(playerInfo.HasFriend(cardId))
+            {
+                effectGreen.SetActive(false);
+                effectYellow.SetActive(true);
+            }
+            else
+            {
+                effectGreen.SetActive(false);
+                effectYellow.SetActive(false);
+            }
         }
         else
         {
@@ -160,6 +179,16 @@ public class CardViewControl : MonoBehaviour, IPointerDownHandler, IPointerUpHan
             }
 
             priceI = itemCfg.Price * count + (int)Math.Floor(itemCfg.PriceRound * shopOpenIndex);
+
+            var playerInfo = GameManager.Instance.GetPlayer(0);
+            if(playerInfo.HasCard(cardId))
+            {
+                effectGreen.SetActive(true);
+            }
+            else
+            {
+                effectGreen.SetActive(false);
+            }            
         }
 
         price.text = priceI.ToString();
@@ -178,13 +207,18 @@ public class CardViewControl : MonoBehaviour, IPointerDownHandler, IPointerUpHan
         }
 
         text.text = value.ToString();
-    }    
+    }
 
     public void OnSold(PlayerInfo playerInfo)
     {
         isSold = true;
         buyButton.gameObject.SetActive(false);
         soldImage.gameObject.SetActive(true);
+
+        if(effectGreen != null) //道具的情况
+            effectGreen.SetActive(false);
+        if(effectYellow != null) //道具的情况
+            effectYellow.SetActive(false);
 
         //把heroImage变灰色 - 改为将整个panel变成灰度图
         SetGrayscaleEffect();
@@ -223,44 +257,45 @@ public class CardViewControl : MonoBehaviour, IPointerDownHandler, IPointerUpHan
     private System.Collections.IEnumerator MoveToPlayerInfo(PlayerInfo playerInfo)
     {
         // 创建一个新的Image对象并缓存
-        var movingCardImage = new GameObject("MovingCardImage");
-        movingCardImage.tag = "MovingCard";
-        Image img = movingCardImage.AddComponent<Image>();
-        img.sprite = isHeroCard ? heroImage.sprite : itemImage.sprite;
-        img.rectTransform.sizeDelta = new Vector2(100, 140);
-        // 设置初始位置为当前卡片的屏幕位置
-        RectTransform cardRect = GetComponent<RectTransform>();
-        Vector2 screenPos;
-
+        var movingCardPrefab = Resources.Load<GameObject>("Prefabs/MovingCard");
+        var movingCardImage = Instantiate(movingCardPrefab);
         Canvas canvas = FindObjectOfType<Canvas>();
-        RectTransform canvasRect = canvas.transform as RectTransform;
-        RectTransformUtility.ScreenPointToLocalPointInRectangle(canvasRect,
-            transform.position, canvas.worldCamera, out screenPos);
-        img.rectTransform.anchoredPosition = screenPos;
         movingCardImage.transform.SetParent(canvas.transform, false);
+        Image img = movingCardImage.GetComponent<Image>();
+        img.sprite = isHeroCard ? heroImage.sprite : itemImage.sprite;
+
+        // 获取Canvas的RectTransform
+        RectTransform canvasRect = canvas.transform as RectTransform;
+
+        // 计算起始位置：将当前卡片的屏幕坐标转换为Canvas局部坐标
+        Vector2 screenPoint = RectTransformUtility.WorldToScreenPoint(WorldManager.Instance.uiCamera, transform.position);
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(canvasRect, screenPoint, WorldManager.Instance.uiCamera, out Vector2 startLocalPos);
+        
+        // 计算目标位置：将PlayerInfo的屏幕坐标转换为Canvas局部坐标
+        Vector2 targetScreenPoint = RectTransformUtility.WorldToScreenPoint(WorldManager.Instance.uiCamera, playerInfo.transform.position);
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(canvasRect, targetScreenPoint, WorldManager.Instance.uiCamera, out Vector2 targetLocalPos);
+
+        targetLocalPos += new Vector2(80, 0);
+
+        // 设置初始位置
+        movingCardImage.GetComponent<RectTransform>().anchoredPosition = startLocalPos;
 
         // 移动动画
         float duration = 0.7f; // 移动持续时间
         float elapsedTime = 0;
-        Vector3 startPos = movingCardImage.transform.position;
-        // 计算目标PlayerInfo在Canvas中的局部位置
-        Vector2 targetScreenPos;
-        RectTransformUtility.ScreenPointToLocalPointInRectangle(canvas.transform as RectTransform,
-            playerInfo.transform.position + new Vector3(120, 0), canvas.worldCamera, out targetScreenPos);
-        Vector3 endPos = canvas.transform.TransformPoint(targetScreenPos);
 
         while (elapsedTime < duration)
         {
             elapsedTime += Time.deltaTime;
             float t = Mathf.Clamp01(elapsedTime / duration);
             // 使用平滑插值
-            movingCardImage.transform.position = Vector3.Lerp(startPos, endPos, t);
+            movingCardImage.GetComponent<RectTransform>().anchoredPosition = Vector2.Lerp(startLocalPos, targetLocalPos, t);
             //逐渐缩小，最终缩小到50%
             img.rectTransform.sizeDelta = new Vector2(100, 140) * (1f - 0.5f * t);
             yield return null;
         }
 
-        // 到达目标后重置引用，由Hide方法统一销毁
+        // 到达目标后销毁
         Destroy(movingCardImage);
         movingCardImage = null;
     }

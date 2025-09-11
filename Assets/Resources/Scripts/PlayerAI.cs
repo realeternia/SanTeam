@@ -211,9 +211,9 @@ public static class PlayerAI
                         score *= rate * rate;
                 }
 
-                if(heroCardCount < 3)
+                if (heroCardCount < 3)
                 { //前几张不拿辅助卡
-                    if(string.IsNullOrEmpty(heroCfg.Group) || heroCfg.Group == "help")
+                    if (string.IsNullOrEmpty(heroCfg.Group) || heroCfg.Group == "help")
                         score *= 0.4f;
                 }
                 var needs = PlayerBook.GetCardNeeds(playerConfig.Id);
@@ -225,7 +225,7 @@ public static class PlayerAI
                         count = find.Item2;
                     if (count < needs.Find(x => x.Item1 == heroCfg.Group).Item2)
                         score *= 1.8f;
-                }                
+                }
 
                 if (strongList.Count >= 3)
                 {
@@ -233,10 +233,25 @@ public static class PlayerAI
                     {
                         if (heroCfg.Job != "shuai" && info.HasShuai)
                             score *= playerConfig.Findmasterrate * .6f;
-                        else if(heroCfg.Job == "shuai" && info.Count > 1)
+                        else if (heroCfg.Job == "shuai" && info.Count > 1)
                             score *= playerConfig.Findmasterrate;
                     }
                 }
+
+                //朋友卡判定
+                var friendCount = HeroSelectionTool.CountFriendInPool(pickCard.cardId);
+                if (friendCount > 2)
+                    score *= 1 + playerConfig.FriendFactor * (friendCount - 2) * .1f;
+
+                var nowFriendCount = 0;
+                foreach (var hero in playerInfo.cards)
+                {
+                    if (ConfigManager.IsFriend(pickCard.cardId, hero.Key))
+                        nowFriendCount++;
+                }
+                if(nowFriendCount > 0)
+                    score *= 1 + playerConfig.FriendFactor * nowFriendCount * .25f;
+
                 if (!hasSameCard)
                 {
                     if (playerInfo.goldCostHero > 200)
@@ -249,7 +264,7 @@ public static class PlayerAI
             }
             else
             {
-                if(heroCardCount < 3)
+                if (heroCardCount < 3)
                     continue;
 
                 var itemCfg = ItemConfig.GetConfig(pickCard.cardId);
@@ -278,11 +293,11 @@ public static class PlayerAI
                             score *= 1 + (3 - itemCount) * 0.6f;
                     }
                 }
-                else if(itemCfg.Effect == "first")
+                else if (itemCfg.Effect == "first")
                 {
                     checkFirst = pickCard;
                 }
-                else if(itemCfg.Effect == "sodatk" || itemCfg.Effect == "sodhp")
+                else if (itemCfg.Effect == "sodatk" || itemCfg.Effect == "sodhp")
                 {
                     score *= playerConfig.PickSoldierUp;
                 }

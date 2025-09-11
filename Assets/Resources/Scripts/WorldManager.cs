@@ -10,6 +10,7 @@ using System.Linq;
 public class WorldManager : MonoBehaviour
 {
     public static WorldManager Instance;
+    public Camera uiCamera;
     public bool isDebug = true; //自动判定的，不要改
     public GameObject Units;
     public int gridCellSize = 3; // 每个格子的实际大小(米)
@@ -190,27 +191,37 @@ public class WorldManager : MonoBehaviour
                 SpawnUnitsForRegion(p, i < 3 ? 500001 : 500002, mapConfig.RegionSide6[i].transform.position, 6, p.imgPath);
 
             var cards = GameManager.Instance.GetPlayer(match[0]).GetBattleCardList();
-            var cardsFriend = cards.ConvertAll(a => a.Item1);
+            foreach (var card in cards)
+            {
+                UnityEngine.Debug.Log("card: " + (card == null ? "null" : card.Item1));
+            }
+            
+            var cardsFriend = cards.Where(a => a != null).Select(a => a.Item1).ToList();
             for (int i = 0; i < cards.Count && i < mapConfig.RegionHeroSide1.Length; i++)
                 if (cards[i] != null)
                     SpawnHerosForRegion(GameManager.Instance.GetPlayer(match[0]), mapConfig.RegionHeroSide1[i], cards[i], cardsFriend, 1);
             cards = GameManager.Instance.GetPlayer(match[1]).GetBattleCardList();
+           cardsFriend = cards.Where(a => a != null).Select(a => a.Item1).ToList();
             for (int i = 0; i < cards.Count && i < mapConfig.RegionHeroSide2.Length; i++)
                 if (cards[i] != null)
                     SpawnHerosForRegion(GameManager.Instance.GetPlayer(match[1]), mapConfig.RegionHeroSide2[i], cards[i], cardsFriend, 2);
             cards = GameManager.Instance.GetPlayer(match[2]).GetBattleCardList();
+           cardsFriend = cards.Where(a => a != null).Select(a => a.Item1).ToList();
             for (int i = 0; i < cards.Count && i < mapConfig.RegionHeroSide3.Length; i++)
                 if (cards[i] != null)
                     SpawnHerosForRegion(GameManager.Instance.GetPlayer(match[2]), mapConfig.RegionHeroSide3[i], cards[i], cardsFriend, 3);
             cards = GameManager.Instance.GetPlayer(match[3]).GetBattleCardList();
+          cardsFriend = cards.Where(a => a != null).Select(a => a.Item1).ToList();
             for (int i = 0; i < cards.Count && i < mapConfig.RegionHeroSide4.Length; i++)
                 if (cards[i] != null)
                     SpawnHerosForRegion(GameManager.Instance.GetPlayer(match[3]), mapConfig.RegionHeroSide4[i], cards[i], cardsFriend, 4);
             cards = GameManager.Instance.GetPlayer(match[4]).GetBattleCardList();
+         cardsFriend = cards.Where(a => a != null).Select(a => a.Item1).ToList();
             for (int i = 0; i < cards.Count && i < mapConfig.RegionHeroSide5.Length; i++)
                 if (cards[i] != null)
                     SpawnHerosForRegion(GameManager.Instance.GetPlayer(match[4]), mapConfig.RegionHeroSide5[i], cards[i], cardsFriend, 5);
             cards = GameManager.Instance.GetPlayer(match[5]).GetBattleCardList();
+           cardsFriend = cards.Where(a => a != null).Select(a => a.Item1).ToList();
             for (int i = 0; i < cards.Count && i < mapConfig.RegionHeroSide6.Length; i++)
                 if (cards[i] != null)
                     SpawnHerosForRegion(GameManager.Instance.GetPlayer(match[5]), mapConfig.RegionHeroSide6[i], cards[i], cardsFriend, 6);
@@ -226,11 +237,11 @@ public class WorldManager : MonoBehaviour
         {
 
             //   SpawnHerosForRegion(GameManager.Instance.GetPlayer(0), mapConfig.RegionHeroSide1[4], new System.Tuple<int, int>(101008, 1), 1);
-            var heroList = new List<int> { 101007, 101008 };
+            var heroList = new List<int> {101007 };
             for (int i = 0; i < heroList.Count; i++)
                 SpawnHerosForRegion(GameManager.Instance.GetPlayer(0), mapConfig.RegionHeroSide1[i], new System.Tuple<int, int>(heroList[i], 1), heroList, 1);
 
-            heroList = new List<int> { 102005,102007 };
+            heroList = new List<int> { 101007 };
             for (int i = 0; i < heroList.Count; i++)
                 SpawnHerosForRegion(GameManager.Instance.GetPlayer(1), mapConfig.RegionHeroSide2[i], new System.Tuple<int, int>(heroList[i], 1), heroList, 2);
 
@@ -957,11 +968,13 @@ public class WorldManager : MonoBehaviour
     {
         var prefab = Resources.Load<GameObject>("Prefabs/BattleTxt");
         var battleText = Instantiate(prefab, BattleTextNode.transform);
-        
+
         // 将世界坐标转换为屏幕坐标
-        Vector3 screenPos = Camera.main.WorldToScreenPoint(worldPos);
-        
-        battleText.transform.position = screenPos;
+        RectTransform rectTransform = battleText.GetComponent<RectTransform>();
+        RectTransform parentCanvas = rectTransform.parent as RectTransform;
+        var screenPos = TransformWorldToScreen(worldPos + new UnityEngine.Vector3(5, 0, 5), parentCanvas);
+
+        rectTransform.anchoredPosition = screenPos;
 
         var textCtr = battleText.transform.GetChild(0).GetComponent<TMP_Text>();
         textCtr.color = color;
@@ -1003,7 +1016,7 @@ public class WorldManager : MonoBehaviour
             lastTime = Time.time;
 
             float moveX = speed.x * timeDiff * scaleX;
-            float moveY = speed.y * timeDiff * scaleY;
+            float moveY = speed.y * timeDiff * scaleY / 80;
 
             if (rectTransform == null)
             {
@@ -1017,6 +1030,21 @@ public class WorldManager : MonoBehaviour
             yield return new WaitForSeconds(0.05f); // 使用 yield return null 在下一帧继续执行，保证流畅移动
 
         }
+    }
+
+    public Vector2 TransformWorldToScreen(Vector3 worldPosition, RectTransform canvas)
+    {
+        Vector3 screenPosition = Camera.main.WorldToScreenPoint(worldPosition);
+
+        Vector2 localPosition;
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(
+            canvas,
+            screenPosition,
+            uiCamera,
+            out localPosition
+        );
+
+        return localPosition;
     }
 
 

@@ -40,9 +40,11 @@ public class CastleHUD : MonoBehaviour
 
     private void UpdatePosition(GameObject castleSpawn)
     {
-        Vector3 worldPosition = new Vector3(castleSpawn.transform.position.x, castleSpawn.transform.position.y + 3f, castleSpawn.transform.position.z);
-        Vector3 screenPosition = Camera.main.WorldToScreenPoint(worldPosition);
-        transform.position = screenPosition + new Vector3(-55, 25, 0);
+        Vector3 worldPosition = new Vector3(castleSpawn.transform.position.x + 5, castleSpawn.transform.position.y + 3f, castleSpawn.transform.position.z + 5);
+        RectTransform rectTransform = GetComponent<RectTransform>();
+        RectTransform parentCanvas = rectTransform.parent as RectTransform;
+        var screenPosition = WorldManager.Instance.TransformWorldToScreen(worldPosition, parentCanvas);
+        rectTransform.anchoredPosition = screenPosition + new Vector2(-55, 25);
     }
 
     public void AddSoldierLevel(int level)

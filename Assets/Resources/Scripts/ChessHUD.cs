@@ -9,12 +9,8 @@ public class ChessHUD : MonoBehaviour
     public Chess chessUnit;
     public Image healthImg;
 
-    private Camera mainCamera;
-
     void Start()
     {
-        mainCamera = Camera.main;
-
         healthImg.gameObject.transform.parent.gameObject.SetActive(false);
 
         if (chessUnit != null)
@@ -32,9 +28,13 @@ public class ChessHUD : MonoBehaviour
         }
 
         // 更新血条位置，使其跟随单位
-        Vector3 worldPosition = new Vector3(chessUnit.transform.position.x, chessUnit.transform.position.y + 3f, chessUnit.transform.position.z);
-        Vector3 screenPosition = mainCamera.WorldToScreenPoint(worldPosition);
-        transform.position = screenPosition + new Vector3(chessUnit.isHero ? -50 : -35, chessUnit.isHero ? 25 : 15, 0);
+        Vector3 worldPosition = new Vector3(chessUnit.transform.position.x + 5, chessUnit.transform.position.y + 3f, chessUnit.transform.position.z + 5);
+        // 将屏幕坐标转换为UI相机的Canvas局部坐标
+        RectTransform rectTransform = GetComponent<RectTransform>();
+        RectTransform parentCanvas = rectTransform.parent as RectTransform;
+        var screenPosition = WorldManager.Instance.TransformWorldToScreen(worldPosition, parentCanvas);
+
+        rectTransform.anchoredPosition = screenPosition + new Vector2(chessUnit.isHero ? -50 : -35, chessUnit.isHero ? 25 : 15);
 
         // 更新血条显示
         UpdateHealthDisplay();

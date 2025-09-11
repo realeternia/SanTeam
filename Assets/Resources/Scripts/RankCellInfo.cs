@@ -70,8 +70,13 @@ public class RankCellInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandle
     {
         Debug.Log($"UI 元素被按下，位置：{eventData.position}");
 
-        // 如何判断点中的是heroSkill区域
-        if(eventData.position.x < heroSkill.rectTransform.position.x - 50 || eventData.position.x > heroSkill.rectTransform.position.x + heroSkill.rectTransform.sizeDelta.x + 10)
+        // 判断点击是否在heroSkill区域内
+        bool isClickOnHeroSkill = RectTransformUtility.RectangleContainsScreenPoint(
+            heroSkill.rectTransform, 
+            eventData.position, 
+            eventData.pressEventCamera);
+
+        if (!isClickOnHeroSkill)
             return;
 
         var heroCfg = HeroConfig.GetConfig(heroId);

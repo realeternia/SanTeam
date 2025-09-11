@@ -298,6 +298,34 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         {
             sortDataList.Sort((a, b) => b.Item2.CompareTo(a.Item2));
 
+            // 获取前5卡
+            var top5Cards = sortDataList.Take(5).ToList();
+            
+            // 计算所有卡对前5卡的friend数量，如果没有friend则item2*1.1
+            for (int i = 0; i < sortDataList.Count; i++)
+            {
+                var currentCardId = sortDataList[i].Item1;
+                var currentHeroConfig = HeroConfig.GetConfig(currentCardId);
+                
+                float friendCountMark = 0;
+
+                // 检查当前卡是否与前5卡中的任何一个有friend关系
+                for (int j = 0; j < top5Cards.Count; j++)
+                {
+                    if (currentCardId == top5Cards[j].Item1)
+                        continue;
+
+                    if (ConfigManager.IsFriend(currentCardId, top5Cards[j].Item1))
+                        friendCountMark += 0.13f - 0.02f * j; //名次前的卡因子大
+                }
+
+                if (friendCountMark > 0)
+                    sortDataList[i] = new Tuple<int, int>(currentCardId, (int)(sortDataList[i].Item2 * (1 + friendCountMark)));
+            }
+            
+            // 重新排序
+            sortDataList.Sort((a, b) => b.Item2.CompareTo(a.Item2));
+
             if (sortDataList.Count > 5)
                 sortDataList = sortDataList.Take(5).ToList(); //按战力排出前5                 
 
@@ -498,6 +526,21 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
             loseCount++;
         mark += add;
         resultText.text = mark.ToString() + "分";
+    }
+
+    public bool HasCard(int cardId)
+    {
+        return cards.ContainsKey(cardId);
+    }
+
+    public bool HasFriend(int cardId)
+    {
+        foreach(var card in cards)
+        {
+            if(ConfigManager.IsFriend(card.Key, cardId))
+                return true;
+        }
+        return false;
     }
 }
 

@@ -50,10 +50,12 @@ public class CardShopManager : MonoBehaviour
         bagBtn.onClick.AddListener(() =>
         {
             PanelManager.Instance.ShowBag();
+            PanelManager.Instance.HideShop();
         });
         rankBtn.onClick.AddListener(() =>
         {
             PanelManager.Instance.ShowRank();
+            PanelManager.Instance.HideShop();
         });
 
         ShopBegin();
