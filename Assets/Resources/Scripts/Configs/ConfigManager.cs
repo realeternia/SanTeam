@@ -6,6 +6,7 @@ using UnityEngine;
 public static class ConfigManager
 {
     private static Dictionary<int, HashSet<int>> heroFriendDict = new Dictionary<int, HashSet<int>>();
+    private static Dictionary<int, HashSet<int>> heroFriendInfoDict = new Dictionary<int, HashSet<int>>();
 
     public static void Init()
     {
@@ -62,7 +63,11 @@ public static class ConfigManager
                     if (!heroFriendDict.ContainsKey(id2))
                         heroFriendDict.Add(id2, new HashSet<int>());
                     heroFriendDict[id2].Add(id1);
+
                 }
+                if(!heroFriendInfoDict.ContainsKey(friendIds[i]))
+                    heroFriendInfoDict.Add(friendIds[i], new HashSet<int>());
+                heroFriendInfoDict[friendIds[i]].Add(heroFriendCfg.Id);
             }
         }
 
@@ -75,6 +80,15 @@ public static class ConfigManager
             return value.Contains(friendId);
         }
         return false;
+    }
+
+    public static HashSet<int> GetHeroFriendInfo(int heroId)
+    {
+        if (heroFriendInfoDict.TryGetValue(heroId, out HashSet<int> value))
+        {
+            return value;
+        }
+        return null;
     }
 
     private static void AddSkill(HeroConfig heroCfg, int skillId)

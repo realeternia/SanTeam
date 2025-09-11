@@ -79,7 +79,6 @@ public class Chess : MonoBehaviour
 
     public void Init(int pid, Color c)
     {
-        playerId = pid;
         // 创建材质实例
         material = new Material(rend.sharedMaterial);
         if (!string.IsNullOrEmpty(chessName))

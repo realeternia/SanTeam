@@ -72,17 +72,13 @@ public class RankCellInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandle
 
         // 如何判断点中的是heroSkill区域
         if(eventData.position.x < heroSkill.rectTransform.position.x - 50 || eventData.position.x > heroSkill.rectTransform.position.x + heroSkill.rectTransform.sizeDelta.x + 10)
-
             return;
 
         var heroCfg = HeroConfig.GetConfig(heroId);
-        if (heroCfg != null && heroCfg.Skills != null && heroCfg.Skills.Length > 0)
+        var friendInfo = ConfigManager.GetHeroFriendInfo(heroId);
+        if (heroCfg.Skills != null && heroCfg.Skills.Length > 0 || friendInfo != null)
         {
-            for (int i = 0; i < heroCfg.Skills.Length; i++)
-            {
-                Tooltip.Instance.ShowTooltip(heroCfg.Skills[i]);
-                return;
-            }
+            Tooltip.Instance.ShowTooltip(heroCfg.Skills, friendInfo, heroId);
         }
     }
 

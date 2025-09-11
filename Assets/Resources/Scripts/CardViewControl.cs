@@ -71,13 +71,10 @@ public class CardViewControl : MonoBehaviour, IPointerDownHandler, IPointerUpHan
         if (isHeroCard)
         {
             var heroCfg = HeroConfig.GetConfig(cardId);
-            if (heroCfg != null && heroCfg.Skills != null && heroCfg.Skills.Length > 0)
+            var friendInfo = ConfigManager.GetHeroFriendInfo(cardId);
+            if (heroCfg.Skills != null && heroCfg.Skills.Length > 0 || friendInfo != null)
             { 
-                for (int i = 0; i < heroCfg.Skills.Length; i++)
-                {
-                     Tooltip.Instance.ShowTooltip(heroCfg.Skills[i]);
-                    return;
-                }
+                Tooltip.Instance.ShowTooltip(heroCfg.Skills, friendInfo, cardId);
             }
         }
 

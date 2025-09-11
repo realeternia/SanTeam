@@ -125,7 +125,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   beamColor: {r: 1, g: 1, b: 1, a: 1}
   glowColor: {r: 1, g: 0.11022415, b: 0, a: 1}
-  beamWidth: 0.98
+  beamWidth: 0.68
   glowIntensity: 3
   scrollSpeed: 1
   opacity: 0.8
