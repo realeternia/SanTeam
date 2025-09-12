@@ -83,35 +83,59 @@ public class Tooltip : MonoBehaviour
         float height = Mathf.Max(50f, currentY + 10f);
         rect.sizeDelta = new Vector2(400, height);
         
-        // 调整位置 - 将屏幕坐标转换为Canvas局部坐标
+        // 调整位置 - 直接在屏幕坐标系下进行边界检测
         Vector2 mouseScreenPos = Input.mousePosition;
         
-        // 获取Canvas的RectTransform
+        // 获取屏幕尺寸
+        float screenWidth = Screen.width;
+        float screenHeight = Screen.height;
+        
+        // 计算tooltip的宽高
+        float tooltipWidth = rect.sizeDelta.x;
+        float tooltipHeight = rect.sizeDelta.y;
+        
+        // 计算tooltip位置（鼠标右侧偏移30像素）
+        
+        
+        // 边界判定：确保tooltip完全在屏幕内
+        // X轴边界（左右边界）
+        UnityEngine.Debug.Log("mouseScreenPos.x: " + mouseScreenPos.x + " w=" + tooltipWidth + " l=" + screenWidth);
+        if (mouseScreenPos.x + tooltipWidth > screenWidth -tooltipWidth/2)
+        {
+            // 如果超出右边界，显示在鼠标左侧
+            mouseScreenPos.x = screenWidth - tooltipWidth-tooltipWidth/2;
+        }
+        if (mouseScreenPos.x < 0)
+        {
+            // 如果超出左边界，紧贴左边缘
+            mouseScreenPos.x = 10;
+        }
+        
+        // Y轴边界（上下边界）
+        if (mouseScreenPos.y < 0)
+        {
+            // 如果超出下边界，显示在鼠标上方
+            mouseScreenPos.y = mouseScreenPos.y + 20;
+        }
+        if (mouseScreenPos.y + tooltipHeight > screenHeight)
+        {
+            // 如果超出上边界，紧贴顶部
+            mouseScreenPos.y = screenHeight - tooltipHeight - 10;
+        }
+        Vector2 tooltipScreenPos = mouseScreenPos + new Vector2(30, -tooltipHeight/2);
+        
+        // 将屏幕坐标转换为Canvas局部坐标
         RectTransform canvasRect = transform.parent as RectTransform;
         if (canvasRect != null)
         {
-            // 将屏幕坐标转换为Canvas局部坐标
             Vector2 localPoint;
             RectTransformUtility.ScreenPointToLocalPointInRectangle(
                 canvasRect, 
-                mouseScreenPos, 
+                tooltipScreenPos, 
                 WorldManager.Instance.uiCamera, 
                 out localPoint);
             
-            // 计算tooltip位置（考虑偏移和tooltip大小）
-            // 注意：Canvas局部坐标系原点在中心，Y轴向上为正
-            // 但UI元素的Y轴通常向下为正，所以需要调整Y方向
-            Vector2 tooltipPosition = localPoint + new Vector2(30, -height/2); // Y轴反向
-            
-          //  // 确保在Canvas边界内
-          //  float canvasWidth = canvasRect.rect.width;
-          //  float canvasHeight = canvasRect.rect.height;
-            
-            // 调整边界计算，考虑锚点在左上角的情况
-         //   tooltipPosition.x = Mathf.Clamp(tooltipPosition.x, -canvasWidth/2 - rect.sizeDelta.x/2, canvasWidth/2 - rect.sizeDelta.x/2);
-          //  tooltipPosition.y = Mathf.Clamp(tooltipPosition.y, -canvasHeight/2 - rect.sizeDelta.y/2, canvasHeight/2-rect.sizeDelta.y/2);
-            
-            rect.anchoredPosition = tooltipPosition;
+            rect.anchoredPosition = localPoint;
         }
         
         gameObject.SetActive(true);
