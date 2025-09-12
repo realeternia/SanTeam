@@ -496,18 +496,17 @@ public class Chess : MonoBehaviour
         int strDiff = friendStr - myStr;
         int inteDiff = friendInte - myInte;
         int leadDiff = friendLead - myLead;
-        
-        // 判断情况
-        bool allLower = strDiff < 0 && inteDiff < 0 && leadDiff < 0;
-        bool allHigher = strDiff > 0 && inteDiff > 0 && leadDiff > 0;
-        
+           
         int totalPoints;
         float[] weights = new float[3];
 
-        weights[0] = FormulaLearnAttrConfig.GetConfig(friendStr - myStr).Weight;
-        weights[1] = FormulaLearnAttrConfig.GetConfig(friendInte - myInte).Weight;
-        weights[2] = FormulaLearnAttrConfig.GetConfig(friendLead - myLead).Weight;
-        totalPoints = Math.Clamp((strDiff + inteDiff + leadDiff) / 2, 15, 25);
+        weights[0] = FormulaLearnAttrConfig.GetConfig(strDiff).Weight;
+        weights[1] = FormulaLearnAttrConfig.GetConfig(inteDiff).Weight;
+        weights[2] = FormulaLearnAttrConfig.GetConfig(leadDiff).Weight;
+        strDiff = Math.Clamp(strDiff, -10, 44);
+        inteDiff = Math.Clamp(inteDiff, -10, 44);
+        leadDiff = Math.Clamp(leadDiff, -10, 44);
+        totalPoints = Math.Clamp((strDiff + inteDiff + leadDiff) / 3, 10, 30);
 
         // 计算总权重
         float totalWeight = weights[0] + weights[1] + weights[2];

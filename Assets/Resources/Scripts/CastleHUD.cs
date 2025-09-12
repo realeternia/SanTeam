@@ -44,7 +44,7 @@ public class CastleHUD : MonoBehaviour
         RectTransform rectTransform = GetComponent<RectTransform>();
         RectTransform parentCanvas = rectTransform.parent as RectTransform;
         var screenPosition = WorldManager.Instance.TransformWorldToScreen(worldPosition, parentCanvas);
-        rectTransform.anchoredPosition = screenPosition + new Vector2(-55, 25);
+        rectTransform.anchoredPosition = screenPosition + new Vector2(-75, 0);
     }
 
     public void AddSoldierLevel(int level)

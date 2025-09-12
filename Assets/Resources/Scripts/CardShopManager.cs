@@ -50,15 +50,23 @@ public class CardShopManager : MonoBehaviour
         bagBtn.onClick.AddListener(() =>
         {
             PanelManager.Instance.ShowBag();
-            PanelManager.Instance.HideShop();
+            for(int i = 0; i < cardViews.Count; i++)
+                cardViews[i].ShowEffectLayer(false);
         });
         rankBtn.onClick.AddListener(() =>
         {
             PanelManager.Instance.ShowRank();
-            PanelManager.Instance.HideShop();
+            for(int i = 0; i < cardViews.Count; i++)
+                cardViews[i].ShowEffectLayer(false);
         });
 
         ShopBegin();
+    }
+
+    public void OnShow()
+    {
+        for(int i = 0; i < cardViews.Count; i++)
+            cardViews[i].ShowEffectLayer(true);
     }
 
     private IEnumerator DelayedUpdate()

@@ -34,7 +34,7 @@ public class ChessHUD : MonoBehaviour
         RectTransform parentCanvas = rectTransform.parent as RectTransform;
         var screenPosition = WorldManager.Instance.TransformWorldToScreen(worldPosition, parentCanvas);
 
-        rectTransform.anchoredPosition = screenPosition + new Vector2(chessUnit.isHero ? -50 : -35, chessUnit.isHero ? 25 : 15);
+        rectTransform.anchoredPosition = screenPosition + new Vector2(chessUnit.isHero ? -70 : -55, 0);
 
         // 更新血条显示
         UpdateHealthDisplay();

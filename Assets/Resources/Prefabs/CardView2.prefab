@@ -173,7 +173,7 @@ RectTransform:
   - {fileID: 2441195905408105747}
   - {fileID: 7315517321536803421}
   - {fileID: 8008707153581935434}
-  - {fileID: 4879935016139323241}
+  - {fileID: 4292073037119332434}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
@@ -256,6 +256,7 @@ MonoBehaviour:
   itemDes: {fileID: 3268655698861173083}
   effectGreen: {fileID: 4879935016139323246}
   effectYellow: {fileID: 0}
+  effectLayer: {fileID: 3535521740441806855}
 --- !u!1 &1318948519500699597
 GameObject:
   m_ObjectHideFlags: 0
@@ -454,6 +455,43 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!1 &3535521740441806855
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 7
+  m_Component:
+  - component: {fileID: 4292073037119332434}
+  m_Layer: 5
+  m_HasEditorInfo: 1
+  m_Name: EffLayer
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &4292073037119332434
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3535521740441806855}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 4879935016139323241}
+  m_Father: {fileID: 3035600686921835022}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 100, y: 100}
+  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &4345784271750052668
 GameObject:
   m_ObjectHideFlags: 0
@@ -1382,7 +1420,7 @@ PrefabInstance:
   serializedVersion: 2
   m_Modification:
     serializedVersion: 3
-    m_TransformParent: {fileID: 3035600686921835022}
+    m_TransformParent: {fileID: 4292073037119332434}
     m_Modifications:
     - target: {fileID: 5657785707989161767, guid: 859729c5eb07b9f47bc47da740143ef4, type: 3}
       propertyPath: m_Layer

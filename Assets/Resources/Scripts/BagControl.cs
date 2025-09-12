@@ -25,8 +25,8 @@ public class BagControl : MonoBehaviour
         closeBtn.onClick.AddListener(() =>
         {      
             DestroyAllCells();
-            PanelManager.Instance.ShowShop();
             PanelManager.Instance.HideBag();
+            CardShopManager.Instance.OnShow();
         });
         sellHeroBtn.onClick.AddListener(() =>
         {

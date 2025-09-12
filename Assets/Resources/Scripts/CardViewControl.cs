@@ -40,6 +40,7 @@ public class CardViewControl : MonoBehaviour, IPointerDownHandler, IPointerUpHan
 
     public GameObject effectGreen;
     public GameObject effectYellow;
+    public GameObject effectLayer;
 
     // Start is called before the first frame update
     void Start()
@@ -298,6 +299,11 @@ public class CardViewControl : MonoBehaviour, IPointerDownHandler, IPointerUpHan
         // 到达目标后销毁
         Destroy(movingCardImage);
         movingCardImage = null;
+    }
+
+    public void ShowEffectLayer(bool isShow)
+    {
+        effectLayer.SetActive(isShow);
     }
 
 }
