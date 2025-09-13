@@ -7,8 +7,8 @@ using UnityEngine;
 
 public static class ConfigManager
 {
-    private static Dictionary<int, HashSet<int>> heroFriendDict = new Dictionary<int, HashSet<int>>();
-    private static Dictionary<int, HashSet<int>> heroFriendInfoDict = new Dictionary<int, HashSet<int>>();
+    private static Dictionary<int, Dictionary<int, int>> heroFriendDict = new Dictionary<int, Dictionary<int, int>>();
+    private static Dictionary<int, HashSet<int>> heroFriendInfoDict = new Dictionary<int, HashSet<int>>(); // heroId, heroId, level
     private static int tempFriendIdIdx = 1000;
     private static bool hasInit = false;
 
@@ -110,12 +110,12 @@ public static class ConfigManager
 
                     // 双向添加，确保两两配对
                     if (!heroFriendDict.ContainsKey(id1))
-                        heroFriendDict.Add(id1, new HashSet<int>());
-                    heroFriendDict[id1].Add(id2);
+                        heroFriendDict.Add(id1, new Dictionary<int, int>());
+                    heroFriendDict[id1][id2] = Math.Max(heroFriendCfg.Level, heroFriendDict[id1].ContainsKey(id2) ? heroFriendDict[id1][id2] : 0);
 
                     if (!heroFriendDict.ContainsKey(id2))
-                        heroFriendDict.Add(id2, new HashSet<int>());
-                    heroFriendDict[id2].Add(id1);
+                        heroFriendDict.Add(id2, new Dictionary<int, int>());
+                    heroFriendDict[id2][id1] = Math.Max(heroFriendCfg.Level, heroFriendDict[id2].ContainsKey(id1) ? heroFriendDict[id2][id1] : 0);
 
                 }
                 if (!heroFriendInfoDict.ContainsKey(friendIds[i]))
@@ -126,13 +126,13 @@ public static class ConfigManager
 
     }
 
-    public static bool IsFriend(int heroId, int friendId)
+    public static int GetFriendLevel(int heroId, int friendId)
     {
-        if (heroFriendDict.TryGetValue(heroId, out HashSet<int> value))
-        {
-            return value.Contains(friendId);
+        if (heroFriendDict.TryGetValue(heroId, out Dictionary<int, int> value))
+        {   
+            return value.ContainsKey(friendId) ? value[friendId] : 0;
         }
-        return false;
+        return 0;
     }
 
     public static HashSet<int> GetHeroFriendInfo(int heroId)

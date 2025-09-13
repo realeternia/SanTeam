@@ -304,7 +304,7 @@ public static class HeroSelectionTool
         int count = 0;
         foreach (var hero in heroPoolCache)
         {
-            if (ConfigManager.IsFriend(heroId, hero.Item1))
+            if (ConfigManager.GetFriendLevel(heroId, hero.Item1) > 0)
                 count++;
         }
         return count;
@@ -334,14 +334,14 @@ public static class HeroSelectionTool
             rangeMark += 20;
         bonus += ((float)heroCfg.Hp + rangeMark - 340) / 340;
 
-        if (heroCfg.Total >= 220)
+        if (heroCfg.Total >= 210)
         { //救一下偏科的人
-            if (heroCfg.Str < 70)
-                bonus -= (70 - heroCfg.Str) * 0.005f;
-            if (heroCfg.Inte < 70)
-                bonus -= (70 - heroCfg.Inte) * 0.005f;
-            if (heroCfg.LeadShip < 70)
-                bonus -= (70 - heroCfg.LeadShip) * 0.005f;
+            if (heroCfg.Str < 60)
+                bonus -= (60 - heroCfg.Str) * 0.005f;
+            if (heroCfg.Inte < 60)
+                bonus -= (60 - heroCfg.Inte) * 0.005f;
+            if (heroCfg.LeadShip < 60)
+                bonus -= (60 - heroCfg.LeadShip) * 0.005f;
         }
 
         var skillP = 0;
@@ -450,4 +450,69 @@ public static class HeroSelectionTool
         else
             return new Color(50 / 255f, 50 / 255f, 50 / 255f, 255 / 255f);
     }
+
+    public static AttrInfo GetSupportAttr(int heroId, int pid, int lv)
+    {
+        var friendLevel = ConfigManager.GetFriendLevel(heroId, pid);
+        if(friendLevel <= 0)
+            return null;
+        
+        var friendHeroCfg = HeroConfig.GetConfig(pid);
+        var myHeroCfg = HeroConfig.GetConfig(heroId);
+        
+        // 获取三个属性值
+        int friendStr = friendHeroCfg.Str;
+        int friendInte = friendHeroCfg.Inte;
+        int friendLead = friendHeroCfg.LeadShip;
+        
+        int myStr = myHeroCfg.Str;
+        int myInte = myHeroCfg.Inte;
+        int myLead = myHeroCfg.LeadShip;
+        
+        // 计算差值
+        int strDiff = friendStr - myStr;
+        int inteDiff = friendInte - myInte;
+        int leadDiff = friendLead - myLead;
+           
+        int totalPoints;
+        float[] weights = new float[3];
+
+        weights[0] = FormulaLearnAttrConfig.GetConfig(strDiff).Weight;
+        weights[1] = FormulaLearnAttrConfig.GetConfig(inteDiff).Weight;
+        weights[2] = FormulaLearnAttrConfig.GetConfig(leadDiff).Weight;
+        strDiff = Math.Clamp(strDiff, -6, 50);
+        inteDiff = Math.Clamp(inteDiff, -6, 50);
+        leadDiff = Math.Clamp(leadDiff, -6, 50);
+        var factor = 1f; //单属性老师，给1.5倍属性
+        if ( strDiff > 0 && inteDiff < 0 && leadDiff < 0 || strDiff < 0 && inteDiff > 0 && leadDiff < 0 || strDiff < 0 && inteDiff < 0 && leadDiff > 0)
+            factor = 1.5f;
+        totalPoints = (int)Math.Clamp((strDiff + inteDiff + leadDiff) * factor / 2.2f, 10, 30);
+        if(friendLevel > 1)
+            totalPoints = (int)Math.Clamp(totalPoints * (1 + 0.2f * (friendLevel - 1)), 10, 30);
+
+        // 计算总权重
+        float totalWeight = weights[0] + weights[1] + weights[2];
+        if (totalWeight <= 0)
+            return new AttrInfo();
+        
+        // 计算属性点分配，避免四舍五入导致总和不等的问题
+        float[] diffs = { weights[0], weights[1], weights[2] };
+        int[] addValues = new int[3];
+        
+        // 找出三个差值中的排序索引（从小到大）
+        int[] indices = { 0, 1, 2 }; // 0=Str, 1=Inte, 2=Lead
+        Array.Sort(indices, (a, b) => diffs[a].CompareTo(diffs[b]));
+        
+        // 先计算最低差值的属性
+        addValues[indices[0]] = Mathf.FloorToInt(totalPoints * weights[indices[0]] / totalWeight);
+        addValues[indices[1]] = Mathf.FloorToInt(totalPoints * weights[indices[1]] / totalWeight);
+        addValues[indices[2]] = totalPoints - addValues[indices[0]] - addValues[indices[1]];
+
+        var attr = new AttrInfo();
+        attr.Str = addValues[0] * (lv + 9) / 10;
+        attr.Inte = addValues[1] * (lv + 9) / 10;
+        attr.Lead = addValues[2] * (lv + 9) / 10;
+        
+        return attr;
+    }    
 }

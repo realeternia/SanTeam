@@ -443,7 +443,7 @@ public class Chess : MonoBehaviour
         {
             foreach (var friendId in friendIds)
             {
-                var friendAttr = GetSupportAttr(friendId, lv);
+                var friendAttr = HeroSelectionTool.GetSupportAttr(heroId, friendId, lv);
                 if (friendAttr != null)
                 {
                     supportAttrs[friendId] = friendAttr;
@@ -473,65 +473,6 @@ public class Chess : MonoBehaviour
 
         if (heroInfo != null)
             heroInfo.SetAttr(inte, str, leadShip);
-    }
-
-    public AttrInfo GetSupportAttr(int pid, int lv)
-    {
-        if(!ConfigManager.IsFriend(heroId, pid))
-            return null;
-        
-        var friendHeroCfg = HeroConfig.GetConfig(pid);
-        var myHeroCfg = HeroConfig.GetConfig(heroId);
-        
-        // 获取三个属性值
-        int friendStr = friendHeroCfg.Str;
-        int friendInte = friendHeroCfg.Inte;
-        int friendLead = friendHeroCfg.LeadShip;
-        
-        int myStr = myHeroCfg.Str;
-        int myInte = myHeroCfg.Inte;
-        int myLead = myHeroCfg.LeadShip;
-        
-        // 计算差值
-        int strDiff = friendStr - myStr;
-        int inteDiff = friendInte - myInte;
-        int leadDiff = friendLead - myLead;
-           
-        int totalPoints;
-        float[] weights = new float[3];
-
-        weights[0] = FormulaLearnAttrConfig.GetConfig(strDiff).Weight;
-        weights[1] = FormulaLearnAttrConfig.GetConfig(inteDiff).Weight;
-        weights[2] = FormulaLearnAttrConfig.GetConfig(leadDiff).Weight;
-        strDiff = Math.Clamp(strDiff, -10, 44);
-        inteDiff = Math.Clamp(inteDiff, -10, 44);
-        leadDiff = Math.Clamp(leadDiff, -10, 44);
-        totalPoints = Math.Clamp((strDiff + inteDiff + leadDiff) / 3, 10, 30);
-
-        // 计算总权重
-        float totalWeight = weights[0] + weights[1] + weights[2];
-        if (totalWeight <= 0)
-            return new AttrInfo();
-        
-        // 计算属性点分配，避免四舍五入导致总和不等的问题
-        float[] diffs = { weights[0], weights[1], weights[2] };
-        int[] addValues = new int[3];
-        
-        // 找出三个差值中的排序索引（从小到大）
-        int[] indices = { 0, 1, 2 }; // 0=Str, 1=Inte, 2=Lead
-        Array.Sort(indices, (a, b) => diffs[a].CompareTo(diffs[b]));
-        
-        // 先计算最低差值的属性
-        addValues[indices[0]] = Mathf.FloorToInt(totalPoints * weights[indices[0]] / totalWeight);
-        addValues[indices[1]] = Mathf.FloorToInt(totalPoints * weights[indices[1]] / totalWeight);
-        addValues[indices[2]] = totalPoints - addValues[indices[0]] - addValues[indices[1]];
-
-        var attr = new AttrInfo();
-        attr.Str = addValues[0] * (lv + 9) / 10;
-        attr.Inte = addValues[1] * (lv + 9) / 10;
-        attr.Lead = addValues[2] * (lv + 9) / 10;
-        
-        return attr;
     }
 
     public void UpdateAttr(int inte, int str, int leadShip)

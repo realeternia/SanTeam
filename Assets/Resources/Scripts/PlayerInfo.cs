@@ -315,7 +315,8 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
                     if (currentCardId == top5Cards[j].Item1)
                         continue;
 
-                    if (ConfigManager.IsFriend(currentCardId, top5Cards[j].Item1))
+                    var friendLevel = ConfigManager.GetFriendLevel(currentCardId, top5Cards[j].Item1);
+                    if (friendLevel > 0)
                         friendCountMark += 0.13f - 0.02f * j; //名次前的卡因子大
                 }
 
@@ -537,7 +538,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     {
         foreach(var card in cards)
         {
-            if(ConfigManager.IsFriend(card.Key, cardId))
+            if(ConfigManager.GetFriendLevel(card.Key, cardId) > 0)
                 return true;
         }
         return false;

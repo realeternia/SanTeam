@@ -62,10 +62,23 @@ public class Tooltip : MonoBehaviour
                 foreach (var hid in friendCfg.Heros)
                 {
                     var heroConfig = HeroConfig.GetConfig(hid);
-                    if(hid == heroId)
-                        tooltipFriendText.text += "<color=yellow>" + heroConfig.Name + "</color> ";
+                    var friendAttr = HeroSelectionTool.GetSupportAttr(heroId, hid, 1);
+                    if(friendAttr == null)
+                        tooltipFriendText.text += heroConfig.Name + " ";
                     else if(!HeroSelectionTool.HasHeroInPool(hid))
-                        tooltipFriendText.text += "<color=#808080>" + heroConfig.Name + "</color> ";
+                        tooltipFriendText.text += "<color=#808080>" + heroConfig.Name + "</color> ";                    
+                    else if(friendAttr.Total <= 10)
+                        tooltipFriendText.text += "<color=blue>" + heroConfig.Name + "</color> ";
+                    else if(friendAttr.Total <= 15)
+                        tooltipFriendText.text += "<color=green>" + heroConfig.Name + "</color> ";
+                    else if(friendAttr.Total <= 20)
+                        tooltipFriendText.text += "<color=yellow>" + heroConfig.Name + "</color> ";
+                    else if(friendAttr.Total <= 25)
+                        tooltipFriendText.text += "<color=#d96d00>" + heroConfig.Name + "</color> ";
+                    else if(friendAttr.Total < 30)
+                        tooltipFriendText.text += "<color=red>" + heroConfig.Name + "</color> ";
+                    else if(friendAttr.Total == 30)
+                        tooltipFriendText.text += "<color=#d900d9>" + heroConfig.Name + "</color> ";                        
                     else
                         tooltipFriendText.text += heroConfig.Name + " ";
                 }

@@ -6,4 +6,9 @@
         public int Lead;
         public int Hp;
 
+        public int Total
+        {
+            get{return Str + Inte + Lead ;}
+        }
+
     }

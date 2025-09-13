@@ -246,7 +246,7 @@ public static class PlayerAI
                 var nowFriendCount = 0;
                 foreach (var hero in playerInfo.cards)
                 {
-                    if (ConfigManager.IsFriend(pickCard.cardId, hero.Key))
+                    if (ConfigManager.GetFriendLevel(pickCard.cardId, hero.Key) > 0)
                         nowFriendCount++;
                 }
                 if(nowFriendCount > 0)
