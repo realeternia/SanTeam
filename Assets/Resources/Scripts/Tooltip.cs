@@ -8,10 +8,10 @@ public class Tooltip : MonoBehaviour
 {
     public static Tooltip Instance;
 
-    public TMP_Text tooltipText;
-    public TMP_Text tooltipFriendText;
+    public TMP_Text[] textSkills;
+    public TMP_Text textFriend;
     public RectTransform rect;
-    public Image tooltipIcon;
+    public Image[] imageSkills;
     public int maxWidth = 300;
 
     private void Awake()
@@ -35,61 +35,72 @@ public class Tooltip : MonoBehaviour
         bool hasFriend = friendInfo != null && friendInfo.Count > 0;
         
         // 重置所有控件位置
-        tooltipText.gameObject.SetActive(hasSkill);
-        tooltipIcon.gameObject.SetActive(hasSkill);
-        tooltipFriendText.gameObject.SetActive(hasFriend);
+        for(int i = 0; i < textSkills.Length; i++)
+        {
+            textSkills[i].gameObject.SetActive(skillIds!=null && skillIds.Length > i);
+            imageSkills[i].gameObject.SetActive(skillIds!=null && skillIds.Length > i);
+        }
+        textFriend.gameObject.SetActive(hasFriend);
         
-        float currentY = 0f; // 起始Y位置
-        float spacing = 10f;   // 控件间距
+        float currentY = 10f; // 起始Y位置
+        float spacing = 15f;   // 控件间距
         
         if (hasSkill)
         {
-            var skillConfig = SkillConfig.GetConfig(skillIds[0]);
-            tooltipText.text = skillConfig.Name + "[<color=yellow>" + skillConfig.Price.ToString() + "元]</color>" + skillConfig.Descript; //富文本
-            tooltipIcon.sprite = Resources.Load<Sprite>("SkillPic/" + skillConfig.Icon);
-            
-            tooltipText.rectTransform.sizeDelta = new Vector2(tooltipText.rectTransform.sizeDelta.x, tooltipText.preferredHeight);
-            currentY +=Mathf.Max(tooltipText.preferredHeight, 65f) + spacing;
+            for(int i = 0; i < skillIds.Length; i++)
+            {
+                var skillConfig = SkillConfig.GetConfig(skillIds[i]);
+                textSkills[i].text = skillConfig.Name + "[<color=yellow>" + skillConfig.Price.ToString() + "元]</color>" + skillConfig.Descript; //富文本
+                imageSkills[i].sprite = Resources.Load<Sprite>("SkillPic/" + skillConfig.Icon);
+            }
+
+            for (int i = 0; i < skillIds.Length; i++)
+            {
+                textSkills[i].rectTransform.anchoredPosition = new Vector2(textSkills[i].rectTransform.anchoredPosition.x, -currentY);
+                imageSkills[i].rectTransform.anchoredPosition = new Vector2(imageSkills[i].rectTransform.anchoredPosition.x, -currentY - 27);
+                textSkills[i].rectTransform.sizeDelta = new Vector2(textSkills[i].rectTransform.sizeDelta.x, textSkills[i].preferredHeight);
+                currentY += Mathf.Max(textSkills[i].preferredHeight, 65f) + spacing;
+            }
         }
         
         if (hasFriend)
         {
-            tooltipFriendText.text = "相性:";
+            textFriend.text = "相性:";
             foreach (var item in friendInfo)
             {
                 var friendCfg = HeroFriendConfig.GetConfig(item);
-                tooltipFriendText.text += "\n<color=green>" + friendCfg.Name + "</color>\n  ";
+                textFriend.text += "\n<color=green>" + friendCfg.Name + "</color>\n  ";
                 foreach (var hid in friendCfg.Heros)
                 {
                     var heroConfig = HeroConfig.GetConfig(hid);
                     var friendAttr = HeroSelectionTool.GetSupportAttr(heroId, hid, 1);
                     if(friendAttr == null)
-                        tooltipFriendText.text += heroConfig.Name + " ";
+                        textFriend.text += heroConfig.Name + " ";
                     else if(!HeroSelectionTool.HasHeroInPool(hid))
-                        tooltipFriendText.text += "<color=#808080>" + heroConfig.Name + "</color> ";                    
+                        textFriend.text += "<color=#808080>" + heroConfig.Name + "</color> ";                    
                     else if(friendAttr.Total <= 10)
-                        tooltipFriendText.text += "<color=blue>" + heroConfig.Name + "</color> ";
+                        textFriend.text += "<color=blue>" + heroConfig.Name + "</color> ";
                     else if(friendAttr.Total <= 15)
-                        tooltipFriendText.text += "<color=green>" + heroConfig.Name + "</color> ";
+                        textFriend.text += "<color=green>" + heroConfig.Name + "</color> ";
                     else if(friendAttr.Total <= 20)
-                        tooltipFriendText.text += "<color=yellow>" + heroConfig.Name + "</color> ";
+                        textFriend.text += "<color=yellow>" + heroConfig.Name + "</color> ";
                     else if(friendAttr.Total <= 25)
-                        tooltipFriendText.text += "<color=#d96d00>" + heroConfig.Name + "</color> ";
+                        textFriend.text += "<color=#d96d00>" + heroConfig.Name + "</color> ";
                     else if(friendAttr.Total < 30)
-                        tooltipFriendText.text += "<color=red>" + heroConfig.Name + "</color> ";
+                        textFriend.text += "<color=red>" + heroConfig.Name + "</color> ";
                     else if(friendAttr.Total == 30)
-                        tooltipFriendText.text += "<color=#d900d9>" + heroConfig.Name + "</color> ";                        
+                        textFriend.text += "<color=#d900d9>" + heroConfig.Name + "</color> ";                        
                     else
-                        tooltipFriendText.text += heroConfig.Name + " ";
+                        textFriend.text += heroConfig.Name + " ";
                 }
             }
             
             // 设置好友加成位置
-            tooltipFriendText.rectTransform.anchoredPosition = new Vector2(tooltipFriendText.rectTransform.anchoredPosition.x, -currentY);
+            textFriend.rectTransform.anchoredPosition = new Vector2(textFriend.rectTransform.anchoredPosition.x, -currentY);
             
             // 调整text组件高度以减少空白
-            tooltipFriendText.rectTransform.sizeDelta = new Vector2(tooltipFriendText.rectTransform.sizeDelta.x, tooltipFriendText.preferredHeight);
-            currentY += tooltipFriendText.preferredHeight + spacing;
+            textFriend.rectTransform.sizeDelta = new Vector2(textFriend.rectTransform.sizeDelta.x, textFriend.preferredHeight);
+            currentY += textFriend.preferredHeight + spacing;
         }
         
         // 调整背景大小

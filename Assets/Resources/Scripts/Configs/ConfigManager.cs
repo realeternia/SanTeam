@@ -49,6 +49,7 @@ public static class ConfigManager
                 AddSkill(heroCfg, 200007);
             else if (heroCfg.Job == "mou")
                 AddSkill(heroCfg, 200008);
+            AddSkill(heroCfg, 200008);
             if (Profile.Instance.cardLoves != null && Profile.Instance.cardLoves.Contains((int)heroCfg.Id))
                 heroCfg.RateAbs = 65;
         }

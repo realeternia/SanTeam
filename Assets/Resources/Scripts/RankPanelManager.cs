@@ -115,61 +115,7 @@ public class RankPanelManager : MonoBehaviour
             RankCellInfo cellInfo = cell.GetComponent<RankCellInfo>();
             if (cellInfo != null)
             {
-                // 设置英雄信息
-                cellInfo.heroPic.sprite = Resources.Load<Sprite>("Skins/" + heroConfig.Icon);
-
-                var skillIcon = "";
-                if(heroConfig.Skills != null && heroConfig.Skills.Length > 0)
-                {
-                    skillIcon = SkillConfig.GetConfig(heroConfig.Skills[0]).Icon;
-                }                
-                if(!string.IsNullOrEmpty(skillIcon))
-                {
-                    cellInfo.heroSkill.sprite = Resources.Load<Sprite>("SkillPic/" + skillIcon);
-                }
-
-                cellInfo.heroName.text = heroConfig.Name;
-                cellInfo.heroId = (int)heroConfig.Id;
-                cellInfo.str = heroConfig.Str;
-                cellInfo.inte = heroConfig.Inte;
-                cellInfo.leadShip = heroConfig.LeadShip;
-                cellInfo.hp = heroConfig.Hp;
-                cellInfo.price = HeroSelectionTool.GetPrice(heroConfig);
-                if(heroConfig.Job == "shuai")
-                    cellInfo.loveBtn.gameObject.SetActive(false);
-
-                var bg = cell.GetComponent<Image>();
-                bg.color = HeroSelectionTool.GetSideColor(heroConfig.Side);
-
-                cellInfo.heroStr.text = heroConfig.Str.ToString();
-                if(heroConfig.Str >= 95)
-                    cellInfo.heroStr.text = "<color=red>" + heroConfig.Str.ToString() + "</color>";
-                else if(heroConfig.Str >= 90)
-                    cellInfo.heroStr.text = "<color=yellow>" + heroConfig.Str.ToString() + "</color>";
-
-                cellInfo.heroInte.text = heroConfig.Inte.ToString();
-                if(heroConfig.Inte >= 95)
-                    cellInfo.heroInte.text = "<color=red>" + heroConfig.Inte.ToString() + "</color>";
-                else if(heroConfig.Inte >= 90)
-                    cellInfo.heroInte.text = "<color=yellow>" + heroConfig.Inte.ToString() + "</color>";
-
-                cellInfo.heroLeadShip.text = heroConfig.LeadShip.ToString();
-                if(heroConfig.LeadShip >= 95)
-                    cellInfo.heroLeadShip.text = "<color=red>" + heroConfig.LeadShip.ToString() + "</color>";
-                else if(heroConfig.LeadShip >= 90)
-                    cellInfo.heroLeadShip.text = "<color=yellow>" + heroConfig.LeadShip.ToString() + "</color>";
-
-                var price =  cellInfo.price;
-                cellInfo.heroPrice.text = price.ToString();
-                if(price >= 22)
-                    cellInfo.heroPrice.text = "<color=red>" + price.ToString() + "</color>";
-                else if(price >= 19)
-                    cellInfo.heroPrice.text = "<color=yellow>" + price.ToString() + "</color>";
-
-                cellInfo.heroHp.text = heroConfig.Hp.ToString();
-
-                // 这里可以添加设置英雄图片的逻辑
-                // 例如: cellInfo.heroPic.sprite = Resources.Load<Sprite>("PlayerPic/" + heroConfig.Icon);
+                cellInfo.Init(heroConfig);
             }
         }
         // Get the RectTransform components

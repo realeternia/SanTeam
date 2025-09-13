@@ -24,7 +24,7 @@ public class CardViewControl : MonoBehaviour, IPointerDownHandler, IPointerUpHan
 
     //英雄卡相关
     public Image heroImage;
-    public Image jobImage;
+    public Image[] heroJobImage;
     public TMP_Text lead;
     public TMP_Text inte;
     public TMP_Text str;
@@ -107,10 +107,20 @@ public class CardViewControl : MonoBehaviour, IPointerDownHandler, IPointerUpHan
             if (count > 1)
                 cardName.text += "x" + count;
 
-            if (heroCfg.Skills != null && heroCfg.Skills.Length > 0)
-                jobImage.sprite = Resources.Load<Sprite>("SkillPic/" + SkillConfig.GetConfig(heroCfg.Skills[0]).Icon);
-            else
-                jobImage.gameObject.SetActive(false);
+            for (int i = 0; i < heroJobImage.Length; i++)
+            {
+                if (i < heroCfg.Skills.Length)
+                {
+                    heroJobImage[i].gameObject.SetActive(true);
+                    heroJobImage[i].sprite = Resources.Load<Sprite>("SkillPic/" + SkillConfig.GetConfig(heroCfg.Skills[i]).Icon);
+                }
+                else
+                {
+                    heroJobImage[i].gameObject.SetActive(false);
+                }
+
+            }
+
             SetColoredText(lead, heroCfg.LeadShip);
             SetColoredText(inte, heroCfg.Inte);
             SetColoredText(str, heroCfg.Str);
