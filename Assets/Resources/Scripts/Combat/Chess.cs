@@ -254,7 +254,7 @@ public class Chess : MonoBehaviour
             lastActionTime = Time.time;
 
         if (hp > 0)
-            MoveAndFight();
+            MoveAndFight(deltaTime);
         lastActionTime = Time.time;
 
         if (DieAfterLifeTime)
@@ -273,7 +273,7 @@ public class Chess : MonoBehaviour
         lastTargetUpdateTime = Time.time;
     }
 
-    void MoveAndFight()
+    void MoveAndFight(float deltaTime)
     {
         if (noActionCount > 0)
             return;
@@ -302,11 +302,13 @@ public class Chess : MonoBehaviour
         // 检查目标是否在攻击范围内
         if (WorldManager.Instance.CheckInRange(transform.position, targetChess.transform.position, attackRange))
         {
-            attackPoint += Time.time - lastActionTime;
+            attackPoint += deltaTime;
 
             // 检查攻击冷却
-            if (attackPoint >= (attackRange > 20 ? 2 : 1.5f)) //集气2s
+            if (attackPoint >= (attackRange > 20 ? 2 : 2f)) //集气2s
             {
+                UnityEngine.Debug.Log("PlayerAnim jump " + id + " " + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff"));
+                PlayerAnim("jumpspin");
                 attackPoint = 0;
                 SkillManager.AimTarget(this, targetChess);
                 if (attackRange >= 20)
@@ -326,7 +328,6 @@ public class Chess : MonoBehaviour
 
         if (moveDirection == null)
             moveDirection = targetChess.transform.position;
-
         //如果当前位置很接近moveDirection，就直接移动到moveDirection
         if (Vector3.Distance(transform.position, moveDirection.Value) <= moveSpeed * 0.1f)
         {
@@ -748,5 +749,65 @@ public class Chess : MonoBehaviour
     {
         return WorldManager.Instance.MoveTo(this, targetPosition, isForce);
     }
+
+    private Coroutine jumpCoroutine = null;
+
+    public void PlayerAnim(string name)
+    {
+        GetComponent<Animator>().Play(name);
+    }
+
+    public void StartJump(float time)
+    {
+        var height = 15;
+        UnityEngine.Debug.Log("StartJump " + height + " " + id + " " + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff"));
+
+        // 如果已经在跳跃，先打断当前跳跃
+        if (jumpCoroutine != null)
+        {
+            StopCoroutine(jumpCoroutine);
+            jumpCoroutine = null;
+            transform.position = new Vector3(transform.position.x, 7, transform.position.z); // 恢复到原始位置
+        }
+        
+        jumpCoroutine = StartCoroutine(JumpCoroutine(height, time));
+    }
+
+    public void StopJump()
+    {
+        if (jumpCoroutine != null)
+        {
+            StopCoroutine(jumpCoroutine);
+            jumpCoroutine = null;
+            transform.position = new Vector3(transform.position.x, 7, transform.position.z); // 恢复到原始位置
+        }
+    }
+
+    IEnumerator JumpCoroutine(int jumpHeight, float jumpDuration)
+    {
+        float elapsedTime = 0f;
+        
+        Vector3 originalPosition = transform.position;
+        while (elapsedTime < jumpDuration)
+        {
+            float progress = elapsedTime / jumpDuration;
+            
+            // 使用抛物线运动：y = 4h * (x - x²) 其中h是最大高度
+            float height = 4f * jumpHeight * (progress - progress * progress) + 7;
+            
+            // 更新位置
+            Vector3 newPosition = originalPosition;
+            newPosition.y += height;
+            transform.position = Vector3.Lerp(originalPosition, newPosition, progress);
+            
+            elapsedTime += Time.deltaTime;
+            yield return null;
+        }
+        
+        // 确保最终回到原始位置
+        transform.position = new Vector3(transform.position.x, 7, transform.position.z);
+        jumpCoroutine = null;
+    }
+
 
 }

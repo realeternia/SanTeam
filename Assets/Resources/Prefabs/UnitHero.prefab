@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 965843959451955951}
   - component: {fileID: 2842746484604272339}
   - component: {fileID: 8533340402532140938}
+  - component: {fileID: 6736996303604821587}
   m_Layer: 0
   m_HasEditorInfo: 1
   m_Name: UnitHero
@@ -124,6 +125,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   id: 1
+  playerId: 0
   maxHp: 300
   side: 1
   isHero: 1
@@ -136,7 +138,39 @@ MonoBehaviour:
   str: 0
   leadShip: 0
   level: 1
+  isShadow: 0
+  isFakeHero: 0
+  lastDamagedPlayerId: -1
   hp: 300
   attackDamage: 30
+  hitEffect: 
+  missileSpeed: 10
+  missileHight: 0
+  soldierId: 0
   heroInfo: {fileID: 0}
-  canMove: 1
+  noMoveCount: 0
+  noActionCount: 0
+  material: {fileID: 0}
+--- !u!95 &6736996303604821587
+Animator:
+  serializedVersion: 6
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4749144538699207148}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: ab472a0cae7d1874f97a53e0ef68d966, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_UpdateFrequencyMode: 0
+  m_UpdateFrequency: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
