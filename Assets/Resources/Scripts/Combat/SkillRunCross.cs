@@ -71,8 +71,8 @@ public class SkillRunCross : Skill
             owner.transform.position = currentPos;
 
             // 等待下一帧
-            elapsedTime += 0.05f;
-            yield return new WaitForSeconds(0.05f);
+            elapsedTime += 0.025f;
+            yield return new WaitForSeconds(0.025f);
         }
         
         // 确保到达目标位置

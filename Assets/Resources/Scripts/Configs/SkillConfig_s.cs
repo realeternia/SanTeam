@@ -153,18 +153,20 @@ namespace CommonConfig
         public static void Load()
         {
             config.Clear();
-            config[200002] = new SkillConfig(200002, "愤怒一击", "攻击几率造成1.5倍伤害", 1, 0.15f, 5f, "leadShip", 0.25f, 0.01f, 0, false, 0, 0.5f, 0, 0, 0, 0, 0, 0, 0, "CriticalAttack", "SwordHitRedCritical", 3, "che");
-            config[200003] = new SkillConfig(200003, "主公技", "给与我方同阵营单位20%生命值护盾", 1, 0, 0, "", 0, 0, 0, false, 0, 0.2f, 0, 0, 300001, 999f, 0, 0, 0, "MasterShield", "", 4, "shuai");
+            config[200001] = new SkillConfig(200001, "主公技", "给与我方同阵营单位20%生命值护盾", 1, 0, 0, "", 0, 0, 0, false, 0, 0.2f, 0, 0, 300001, 999f, 0, 0, 0, "MasterShield", "", 4, "shuai");
+            config[200003] = new SkillConfig(200003, "愤怒一击", "攻击几率造成1.5倍伤害", 1, 0.1f, 5f, "leadShip", 0.1f, 0.01f, 0, false, 0, 0.5f, 0, 0, 0, 0, 0, 0, 0, "CriticalAttack", "SwordHitRedCritical", 1, "dao");
             config[200004] = new SkillConfig(200004, "坚韧", "受击时几率发动减伤", 1, 0.4f, 4.5f, "str", 0, 0, 0, false, 0, 0.5f, 0, 0, 300002, 4f, 0, 0, 0, "AttackedBuff", "", 2, "shi");
             config[200005] = new SkillConfig(200005, "突破", "移动时穿越敌人,降低远程伤害", 1, 1f, 7f, "", 0, 0, 20f, false, 0, 0.1f, 0, 0, 0, 0, 0, 0, 0, "RunCross", "LightningExplosionBlue", 3, "ma");
             config[200006] = new SkillConfig(200006, "部署", "提升士兵等级", 1, 0, 0, "", 0, 0, 0, false, 0, 1f, 0, 0, 0, 0, 0, 0, 0, "SoldierUp", "MagicChargeYellow", 2, "xiang");
             config[200007] = new SkillConfig(200007, "射击", "射程很远", 1, 1f, 99f, "", 0, 0, 0, false, 0, 0, 0, 0, 0, 0, 0, 0, 0, "Dumb", "", 2, "gong");
             config[200008] = new SkillConfig(200008, "决胜", "一定几率晕眩目标单位2s", 1, 0.15f, 4f, "inte", 0.2f, 0.01f, 0, false, 0, 0, 0, 0, 301001, 2f, 0, 0, 0, "HitBuff", "MagicChargeYellow", 2, "mou");
+            config[200009] = new SkillConfig(200009, "炮车", "攻击目标发生爆炸", 1, 0.5f, 0, "", 0, 0, 20f, false, 3, 0.6f, 0, 0, 0, 0, 0, 0, 0, "HitArea", "MagicNovaYellow", 3, "pao");
+            config[200010] = new SkillConfig(200010, "弩手", "射程非常远", 1, 1f, 99f, "", 0, 0, 0, false, 0, 0, 0, 0, 0, 0, 0, 0, 0, "Dumb", "", 3, "nu");
+            config[200011] = new SkillConfig(200011, "冲锋", "移动时穿越敌人,降低目标防御", 1, 1f, 7f, "", 0, 0, 20f, false, 0, 0.12f, 0, 0, 301003, 3f, 0, 0, 0, "RunCrossPlus", "LightningExplosionRed", 4, "che");
             config[201001] = new SkillConfig(201001, "治疗", "给与友军治疗", 1, 1f, 3f, "", 0, 0, 50f, false, 0, 0.5f, 0, 0, 0, 0, 0, 0, 0, "Heal", "MagicBuffGreen", 2, "heal");
             config[201002] = new SkillConfig(201002, "鼓舞", "给与友军攻速祝福", 1, 1f, 3f, "", 0, 0, 50f, false, 0, 0.4f, 0, 0, 0, 0, 0, 0, 0, "Song", "MagicChargePink", 2, "song");
             config[201003] = new SkillConfig(201003, "富甲一方", "参战获得5金币", 1, 0, 0, "", 0, 0, 0, false, 0, 5f, 0, 0, 0, 0, 0, 0, 0, "Gold", "MagicChargeYellow", 3, "gold");
             config[201004] = new SkillConfig(201004, "刺甲", "反弹50%近战伤害", 1, 0, 0, "", 0, 0, 20f, false, 0, 0.5f, 0, 0, 0, 0, 0, 0, 0, "Feedback", "SwordHitBlue", 2, "ci");
-            config[201005] = new SkillConfig(201005, "诸葛弩", "射程非常远", 1, 1f, 99f, "", 0, 0, 0, false, 0, 0, 0, 0, 0, 0, 0, 0, 0, "Dumb", "", 3, "nu");
             config[201006] = new SkillConfig(201006, "连射", "攻击时几率触发连射", 1, 0.3f, 5f, "", 0, 0, 0, false, 0, 0.8f, 0, 0, 0, 0, 0, 0, 0, "SpeedAttack", "", 3, "lian");
             config[201007] = new SkillConfig(201007, "藤甲", "受非智力攻击时高几率发动70%减伤", 1, 0.7f, 1f, "", 0, 0, 0, false, 0, 0.7f, 0, 0, 0, 0, 0, 0, 0, "PlantSkin", "", 3, "teng");
             config[201008] = new SkillConfig(201008, "多重箭", "攻击时40%发出2只箭", 1, 0.4f, 4f, "", 0, 0, 25f, false, 1, 0, 0, 0, 0, 0, 0, 0, 0, "MultiArrow", "", 3, "duo");
@@ -180,7 +182,6 @@ namespace CommonConfig
             config[201018] = new SkillConfig(201018, "国士", "增加一个远程士兵,提升射程", 1, 0, 0, "", 0, 0, 15f, false, 0, 10f, 0, 0, 0, 0, 0, 0, 0, "SoldierSummon", "MagicChargeGreen", 4, "guo");
             config[201019] = new SkillConfig(201019, "豪杰", "攻击时回复生命", 1, 0.35f, 6f, "", 0, 0, 0, false, 0, 0.5f, 0, 0, 300003, 5f, 0, 0, 0, "AttackedBuff", "MagicBuffGreen", 3, "hao");
             config[201020] = new SkillConfig(201020, "分兵抗敌", "产生一个幻影军队", 1, 0.35f, 15f, "", 0, 0, 15f, false, 0, 0.4f, 0, 0, 0, 0, 0, 0, 0, "AttackedShadow", "MagicFieldGreen", 3, "huan");
-            config[201021] = new SkillConfig(201021, "突进", "移动时穿越敌人,降低远程伤害", 1, 1f, 7f, "", 0, 0, 20f, false, 0, 0.12f, 0, 0, 0, 0, 0, 0, 0, "RunCrossPlus", "LightningExplosionBlue", 4, "ma2");
             config[201022] = new SkillConfig(201022, "埋伏", "被攻击时,瞬移到远程攻击者附近", 1, 0.4f, 4f, "", 0, 0, 30f, false, 0, 0, 0, 0, 301001, 1f, 0, 0, 0, "HitTeleport", "MagicNovaBlue", 2, "fu");
             config[201023] = new SkillConfig(201023, "明镜", "反弹50%智力伤害", 1, 0, 0, "inte", 0, 0, 20f, true, 0, 0.5f, 0, 0, 0, 0, 0, 0, 0, "Feedback", "SwordHitBlue", 3, "jing");
             config[201024] = new SkillConfig(201024, "威震", "攻击时晕眩周围目标", 1, 0.2f, 5f, "", 0, 0, 20f, false, 3, 0, 0, 0, 301001, 1.5f, 0, 0, 0, "HitBuffAreaSrc", "MagicNovaYellow", 4, "wei");
@@ -190,7 +191,6 @@ namespace CommonConfig
             config[201028] = new SkillConfig(201028, "青州兵", "攻击时几率对目标进行2连击", 1, 0.15f, 5.5f, "leadShip", 0.2f, 0.01f, 0, false, 0, 1f, 1, 0.4f, 0, 0, 0, 0, 0, "HitRepeat", "SwordHitGreenCritical", 3, "qing");
             config[201029] = new SkillConfig(201029, "成长", "攻击时几率提升自己的属性", 1, 0.3f, 0, "", 0, 0, 0, false, 0, 0.05f, 0, 0, 0, 0, 0, 0, 0, "HitAttr", "MagicChargeYellow", 3, "zhang");
             config[201030] = new SkillConfig(201030, "击破", "使目标增伤40%", 1, 0.4f, 2f, "", 0, 0, 0, false, 0, 0.4f, 0, 0, 301003, 3f, 0, 0, 0, "HitBuff", "SoftFireBigRed", 3, "po");
-            config[201031] = new SkillConfig(201031, "炮车", "攻击目标发生爆炸", 1, 0.5f, 0, "", 0, 0, 20f, false, 3, 0.6f, 0, 0, 0, 0, 0, 0, 0, "HitArea", "MagicNovaYellow", 3, "pao");
 
         }
 

@@ -9,6 +9,8 @@ public static class ConfigManager
 {
     private static Dictionary<int, Dictionary<int, int>> heroFriendDict = new Dictionary<int, Dictionary<int, int>>();
     private static Dictionary<int, HashSet<int>> heroFriendInfoDict = new Dictionary<int, HashSet<int>>(); // heroId, heroId, level
+    private static Dictionary<string, JobConfig> jobDict = new Dictionary<string, JobConfig>();
+
     private static int tempFriendIdIdx = 1000;
     private static bool hasInit = false;
 
@@ -27,31 +29,27 @@ public static class ConfigManager
         PlayerConfig.Load();
         HeroFriendConfig.Load();
         FormulaLearnAttrConfig.Load();
+        JobConfig.Load();
 
         PostModify();
     }
 
     public static void PostModify()
     {
+        foreach (var jobCfg in JobConfig.ConfigList)
+        {
+            jobDict.Add(jobCfg.Name, jobCfg);
+        }
+
         foreach (var heroCfg in HeroConfig.ConfigList)
         {
-            if (heroCfg.Job == "shuai")
-                AddSkill(heroCfg, 200003);
-            else if (heroCfg.Job == "shi")
-                AddSkill(heroCfg, 200004);
-            else if (heroCfg.Job == "che")
-                AddSkill(heroCfg, 200002);
-            else if (heroCfg.Job == "ma")
-                AddSkill(heroCfg, 200005);
-            else if (heroCfg.Job == "xiang")
-                AddSkill(heroCfg, 200006);
-            else if (heroCfg.Job == "gong")
-                AddSkill(heroCfg, 200007);
-            else if (heroCfg.Job == "mou")
-                AddSkill(heroCfg, 200008);
-            AddSkill(heroCfg, 200008);
             if (Profile.Instance.cardLoves != null && Profile.Instance.cardLoves.Contains((int)heroCfg.Id))
                 heroCfg.RateAbs = 65;
+
+            var jobCfg = GetJobConfig(heroCfg.Job);
+            if (jobCfg == null)
+                continue;
+            AddSkill(heroCfg, jobCfg.SkillId);
         }
 
         for (int i = 1; i <= 6; i++)
@@ -184,8 +182,17 @@ public static class ConfigManager
         }
     }
 
- public static bool IsHeroCard(int cardId)
+    public static bool IsHeroCard(int cardId)
     {
         return cardId < 200000;
+    }
+
+    public static JobConfig GetJobConfig(string jobName)
+    {
+        if (jobDict.TryGetValue(jobName, out JobConfig value))
+        {
+            return value;
+        }
+        return null;
     }
 }

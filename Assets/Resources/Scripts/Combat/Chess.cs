@@ -308,7 +308,7 @@ public class Chess : MonoBehaviour
             if (attackPoint >= (attackRange > 20 ? 2 : 2f)) //集气2s
             {
                 UnityEngine.Debug.Log("PlayerAnim jump " + id + " " + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff"));
-                PlayerAnim("jumpspin");
+            //    PlayerAnim("jumpspin");
                 attackPoint = 0;
                 SkillManager.AimTarget(this, targetChess);
                 if (attackRange >= 20)
@@ -754,7 +754,10 @@ public class Chess : MonoBehaviour
 
     public void PlayerAnim(string name)
     {
-        GetComponent<Animator>().Play(name);
+        var animator = GetComponent<Animator>();
+        if(animator == null)
+            return;
+        animator.Play(name);
     }
 
     public void StartJump(float time)

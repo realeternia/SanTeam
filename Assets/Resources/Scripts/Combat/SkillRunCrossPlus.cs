@@ -1,10 +1,8 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using CommonConfig;
 using UnityEngine;    
-// 添加协程命名空间
-using System.Collections;
-using System;
 
 public class SkillRunCrossPlus : Skill
 {
@@ -93,13 +91,15 @@ public class SkillRunCrossPlus : Skill
                 // 计算推送后的位置
                 chess.MoveTo(chess.transform.position + pushDirection * 15f, true);
                 pushedList.Add(chess.id);
+
+                BuffManager.AddBuff(chess, owner, id, skillCfg.BuffId, skillCfg.BuffTime); //加负面buff
             }
 
             owner.transform.position = currentPos;
             
             // 等待下一帧
-            elapsedTime += 0.05f;
-            yield return new WaitForSeconds(0.05f);
+            elapsedTime += 0.025f;
+            yield return new WaitForSeconds(0.025f);
         }
         
         // 确保到达目标位置

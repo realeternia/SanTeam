@@ -4850,7 +4850,7 @@ GameObject:
   - component: {fileID: 11418604}
   m_Layer: 0
   m_HasEditorInfo: 1
-  m_Name: LightningExplosionBlue
+  m_Name: LightningExplosionRed
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -11171,7 +11171,7 @@ ParticleSystem:
       maxGradient:
         serializedVersion: 2
         key0: {r: 1, g: 1, b: 1, a: 1}
-        key1: {r: 0, g: 1, b: 1, a: 0.7058824}
+        key1: {r: 1, g: 0.10950938, b: 0, a: 0.7058824}
         key2: {r: 0, g: 0, b: 1, a: 0.27450982}
         key3: {r: 0, g: 0, b: 0, a: 1}
         key4: {r: 0, g: 0, b: 0, a: 0}
@@ -11195,7 +11195,7 @@ ParticleSystem:
         atime6: 0
         atime7: 0
         m_Mode: 0
-        m_ColorSpace: -1
+        m_ColorSpace: 0
         m_NumColorKeys: 2
         m_NumAlphaKeys: 5
       minGradient:
@@ -19695,7 +19695,7 @@ ParticleSystem:
       serializedVersion: 2
       minMaxState: 0
       minColor: {r: 1, g: 1, b: 1, a: 1}
-      maxColor: {r: 0.45588237, g: 0.9445214, b: 1, a: 1}
+      maxColor: {r: 1, g: 0.45490193, b: 0.46580154, a: 1}
       maxGradient:
         serializedVersion: 2
         key0: {r: 1, g: 1, b: 1, a: 1}
