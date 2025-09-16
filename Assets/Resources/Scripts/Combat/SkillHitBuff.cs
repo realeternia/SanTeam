@@ -14,6 +14,8 @@ public class SkillHitBuff : Skill
         var rate = GetRate(defender);
         if(CheckBurst(rate))
         {
+            if(!string.IsNullOrEmpty(skillCfg.Action))
+                owner.PlayerAnim(skillCfg.Action);
             BuffManager.AddBuff(defender, owner, id, skillCfg.BuffId, skillCfg.BuffTime);
         }
     }

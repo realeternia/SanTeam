@@ -26,7 +26,7 @@ public static class EffectManager
         UnityEngine.Object.Destroy(hitEffect, 1.3f);
     }
 
-    public static void PlaySkillEffect(Chess sourceChess, string effect, float time = 1.3f)
+    public static GameObject PlaySkillEffect(Chess sourceChess, string effect, float time = 1.3f)
     {
         var hitPrefab = Resources.Load<GameObject>("Prefabs/Effect/" + effect);
         UnityEngine.Debug.Log("PlaySkillEffect: " + effect);
@@ -38,12 +38,13 @@ public static class EffectManager
         hitEffect.transform.localPosition += new Vector3(0f, 1f, 0f);
         // 可以添加代码设置特效的生命周期，例如几秒钟后自动销毁
         UnityEngine.Object.Destroy(hitEffect, time);
+        return hitEffect;
     }
 
     public static void PlayPosSkillEffect(Chess sourceChess, Vector3 sourcePos, float range, string effect, float time = 1.3f)
     {
         var hitPrefab = Resources.Load<GameObject>("Prefabs/Effect/" + effect);
-        UnityEngine.Debug.Log("PlaySkillEffect: " + effect);
+        UnityEngine.Debug.Log("PlayPosSkillEffect: " + effect);
 
         GameObject hitEffect = UnityEngine.Object.Instantiate(hitPrefab, sourcePos, hitPrefab.transform.rotation);
         // 设置特效的父对象为目标单位，使其跟随目标移动

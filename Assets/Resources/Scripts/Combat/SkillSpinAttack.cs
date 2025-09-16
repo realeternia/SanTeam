@@ -13,7 +13,8 @@ public class SkillSpinAttack : Skill
     {
         if(CheckBurst())
         {
-            Debug.Log("SkillSpinAttack");
+            if(!string.IsNullOrEmpty(skillCfg.Action))
+                owner.PlayerAnim(skillCfg.Action);
             var unitsInRange = WorldManager.Instance.GetUnitsInRange(owner.transform.position, skillCfg.Range, owner.side, true);
             unitsInRange.Remove(defender);
             WorldManager.Instance.RandomSelect(unitsInRange, skillCfg.TargetCount);

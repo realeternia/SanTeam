@@ -15,7 +15,9 @@ public class SkillCriticalAttack : Skill
         var rate = GetRate(defender);
         if(CheckBurst(rate))
         {
-            Debug.Log("CriticalAttack " + damageBase.ToString() + " " + damageMulti.ToString() + " " + effect);
+            if(!string.IsNullOrEmpty(skillCfg.Action))
+                owner.PlayerAnim(skillCfg.Action);            
+            // Debug.Log("CriticalAttack " + damageBase.ToString() + " " + damageMulti.ToString() + " " + effect);
 
             damageMulti += skillCfg.Strength;
             effect = skillCfg.HitEffect;

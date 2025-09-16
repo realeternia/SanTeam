@@ -59,14 +59,14 @@ public static class SkillManager
                 return new SkillRunCrossPlus(skillId, owner);
             case "HitTeleport":
                 return new SkillHitTeleport(skillId, owner);
-            case "HitBuffAreaSrc":
-                return new SkillHitBuffAreaSrc(skillId, owner);
             case "HitRepeat":
                 return new SkillHitRepeat(skillId, owner);
             case "HitAttr":
                 return new SkillHitAttr(skillId, owner);
             case "HitArea":
                 return new SkillHitArea(skillId, owner);
+            case "HitAround":
+                return new SkillHitAround(skillId, owner);
 
             case "Dumb":
                 return new SkillDumb(skillId, owner);               

@@ -16,6 +16,9 @@ public class SkillHitRegion : Skill
         var rate = GetRate(defender);
         if (CheckBurst(rate))
         {
+            if(!string.IsNullOrEmpty(skillCfg.Action))
+                owner.PlayerAnim(skillCfg.Action);
+                            
             targetPos = defender.transform.position;
 
             var chess = WorldManager.Instance.SpawnUnitsForRegion(owner.GetPlayerInfo(), 501001, targetPos, owner.side, "");

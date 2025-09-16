@@ -307,7 +307,6 @@ public class Chess : MonoBehaviour
             // 检查攻击冷却
             if (attackPoint >= (attackRange > 20 ? 2 : 2f)) //集气2s
             {
-                UnityEngine.Debug.Log("PlayerAnim jump " + id + " " + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff"));
             //    PlayerAnim("jumpspin");
                 attackPoint = 0;
                 SkillManager.AimTarget(this, targetChess);
@@ -548,7 +547,8 @@ public class Chess : MonoBehaviour
         // 记录日志
         // Debug.Log($"{attacker.heroId}攻击{defender.heroId}，属性差值：Inte={inteDiff}, LeadShip={leadShipDiff}, Str={strDiff}，最大差值={maxDiff}，伤害：{damage}");
 
-        EffectManager.PlayHitEffect(this, victim, effect);
+        if(!string.IsNullOrEmpty(effect))
+            EffectManager.PlayHitEffect(this, victim, effect);
         victim.OnHpChanged();
     }
 

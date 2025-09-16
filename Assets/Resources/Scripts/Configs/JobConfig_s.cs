@@ -61,13 +61,15 @@ namespace CommonConfig
             config[203] = new JobConfig(203, "gongpao", 200009, 201);
             config[301] = new JobConfig(301, "shi", 200004, 0);
             config[302] = new JobConfig(302, "shidun", 0, 301);
-            config[401] = new JobConfig(401, "shan", 0, 0);
+            config[401] = new JobConfig(401, "shan", 200002, 0);
             config[402] = new JobConfig(402, "shanxiang", 200006, 401);
             config[403] = new JobConfig(403, "shanmou", 200008, 401);
             config[501] = new JobConfig(501, "gu", 0, 0);
+            config[502] = new JobConfig(502, "song", 200012, 501);
+            config[503] = new JobConfig(503, "yi", 200013, 501);
             config[601] = new JobConfig(601, "dao", 200003, 0);
-            config[602] = new JobConfig(602, "daoqiang", 0, 601);
-            config[603] = new JobConfig(603, "daoji", 0, 601);
+            config[602] = new JobConfig(602, "daoqiang", 200014, 601);
+            config[603] = new JobConfig(603, "daoji", 200015, 601);
 
         }
 

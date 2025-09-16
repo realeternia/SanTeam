@@ -12,12 +12,12 @@ public class SkillHitBuffArea : Skill
     public override void OnAttack(Chess defender, string damType, int damage)
     {
         var rate = GetRate(defender);
-        if(CheckBurst(rate))
+        if (CheckBurst(rate))
         {
-            BuffManager.AddBuff(defender, owner, id, skillCfg.BuffId, skillCfg.BuffTime);
+            var targetUnit = skillCfg.TargetType == "targetUnit" ? defender : owner;
+            EffectManager.PlaySkillEffect(targetUnit, skillCfg.HitEffect);
 
-            var unitsInRange = WorldManager.Instance.GetUnitsInRange(defender.transform.position, skillCfg.Range, owner.side, true);
-            unitsInRange.Remove(defender);
+            var unitsInRange = WorldManager.Instance.GetUnitsInRange(targetUnit.transform.position, skillCfg.Range, owner.side, true);
             if (unitsInRange.Count > 0)
             {
                 WorldManager.Instance.RandomSelect(unitsInRange, skillCfg.TargetCount);
