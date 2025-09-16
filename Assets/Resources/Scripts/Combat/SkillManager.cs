@@ -23,10 +23,10 @@ public static class SkillManager
                 return new SkillAttackedBuff(skillId, owner);
             case "RunCross":
                 return new SkillRunCross(skillId, owner);
-            case "Heal":
-                return new SkillHeal(skillId, owner);
-            case "Song":
-                return new SkillSong(skillId, owner);
+            case "HelpHeal":
+                return new SkillHelpHeal(skillId, owner);
+            case "HelpAidBuff":
+                return new SkillHelpAidBuff(skillId, owner);
             case "Gold":
                 return new SkillGold(skillId, owner);
             case "Feedback":
@@ -37,8 +37,8 @@ public static class SkillManager
                 return new SkillMultiArrow(skillId, owner);
             case "PlantSkin":
                 return new SkillPlantSkin(skillId, owner);
-            case "Help":
-                return new SkillHelp(skillId, owner);
+            case "HelpTeach":
+                return new SkillHelpTeach(skillId, owner);
             case "SoldierUp":
                 return new SkillSoldierUp(skillId, owner);
             case "HitBuff":

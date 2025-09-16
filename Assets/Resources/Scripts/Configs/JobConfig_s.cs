@@ -64,7 +64,7 @@ namespace CommonConfig
             config[401] = new JobConfig(401, "shan", 200002, 0);
             config[402] = new JobConfig(402, "shanxiang", 200006, 401);
             config[403] = new JobConfig(403, "shanmou", 200008, 401);
-            config[501] = new JobConfig(501, "gu", 0, 0);
+            config[501] = new JobConfig(501, "gu", 200016, 0);
             config[502] = new JobConfig(502, "song", 200012, 501);
             config[503] = new JobConfig(503, "yi", 200013, 501);
             config[601] = new JobConfig(601, "dao", 200003, 0);

@@ -73,7 +73,9 @@ namespace CommonConfig
             config[300003] = new BuffConfig(300003, "吸血", "BuffSuck", "#FF0000", "#993333", "", "");
             config[301001] = new BuffConfig(301001, "晕眩", "BuffNoAction", "", "", "StunnedCirclingStarsSimple", "");
             config[301002] = new BuffConfig(301002, "连锁", "BuffLock", "", "", "StunnedLock", "");
-            config[301003] = new BuffConfig(301003, "增伤", "BuffAddDamageRate", "", "", "StunnedDamageUp", "");
+            config[301003] = new BuffConfig(301003, "增伤", "BuffDamagedAddRate", "", "", "StunnedDamageUp", "");
+            config[301004] = new BuffConfig(301004, "伤害提升", "BuffDamageAddRate", "", "", "SparkleAreaWhite", "");
+            config[301005] = new BuffConfig(301005, "攻速提升", "BuffCoolDown", "", "", "HeartStream", "");
 
         }
 

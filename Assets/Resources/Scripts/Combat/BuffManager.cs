@@ -15,6 +15,9 @@ public static class BuffManager
             case "BuffShieldValue":
                 buff = new BuffShieldValue(buffId, skillId, caster, target, time);
                 break;
+            case "BuffCoolDown":
+                buff = new BuffCoolDown(buffId, skillId, caster, target, time);
+                break; 
             case "BuffNoAction":
                 buff = new BuffNoAction(buffId, skillId, caster, target, time);
                 break;
@@ -24,8 +27,11 @@ public static class BuffManager
             case "BuffSuck":
                 buff = new BuffSuck(buffId, skillId, caster, target, time);
                 break;
-            case "BuffAddDamageRate":
-                buff = new BuffAddDamageRate(buffId, skillId, caster, target, time);
+            case "BuffDamagedAddRate":
+                buff = new BuffDamagedAddRate(buffId, skillId, caster, target, time);
+                break;
+            case "BuffDamageAddRate":
+                buff = new BuffDamageAddRate(buffId, skillId, caster, target, time);
                 break;
 
         }

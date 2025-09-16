@@ -35,7 +35,7 @@ public class Chess : MonoBehaviour
 
     public int lastDamagedPlayerId = -1;
 
-    private Vector3? moveDirection = null;
+    private Vector3? moveDest = null;
     // 移动失败计数器
     private int moveFailCount = 0;
     // 最大连续移动尝试次数
@@ -180,7 +180,7 @@ public class Chess : MonoBehaviour
         {
             if (chess != this && !chess.isShadow && WorldManager.Instance.IsEnemy(this.side, chess.side))
             {
-                float distance = Vector3.Distance(transform.position, chess.transform.position);
+                float distance = WorldManager.Instance.GetRange(transform.position, chess.transform.position);
                 validTargets.Add((chess, distance));
             }
         }
@@ -325,18 +325,19 @@ public class Chess : MonoBehaviour
         if (noMoveCount > 0 || moveSpeed == 0)
             return;
 
-        if (moveDirection == null)
-            moveDirection = targetChess.transform.position;
+        if (moveDest == null || WorldManager.Instance.GetRange(targetChess.transform.position, moveDest.Value) > 40)
+            moveDest = targetChess.transform.position;
+        
         //如果当前位置很接近moveDirection，就直接移动到moveDirection
-        if (Vector3.Distance(transform.position, moveDirection.Value) <= moveSpeed * 0.1f)
+        if (WorldManager.Instance.GetRange(transform.position, moveDest.Value) <= moveSpeed * 0.1f)
         {
-            moveDirection = targetChess.transform.position;
+            moveDest = targetChess.transform.position;
         }
 
-        if (moveDirection != null)
+        if (moveDest != null)
         {
             // 计算下一步位置
-            Vector3 nextPosition = Vector3.MoveTowards(transform.position, moveDirection.Value, moveSpeed * 0.05f);
+            Vector3 nextPosition = Vector3.MoveTowards(transform.position, moveDest.Value, moveSpeed * 0.05f);
 
             // 尝试锁定目标格子
             if (WorldManager.Instance.TryLockGridPositions(this, nextPosition, out List<Vector2Int> requiredGrids))
@@ -380,7 +381,7 @@ public class Chess : MonoBehaviour
                 {
                     WorldManager.Instance.DoLockGridPositions(this, requiredGrids);
                     transform.position = nextPosition;
-                    moveDirection = transform.position + newDirection * moveSpeed * 0.05f * 10;
+                    moveDest = transform.position + newDirection * moveSpeed * 0.05f * 10;
                     moveFailCount = 0; // 重置失败计数器
                 }
             }
@@ -719,6 +720,11 @@ public class Chess : MonoBehaviour
             default:
                 return 0;
         }
+    }
+
+    public int GetAttrTotal()
+    {
+        return inte + leadShip + str;
     }
 
     public void AddAttr(string attr, int value)

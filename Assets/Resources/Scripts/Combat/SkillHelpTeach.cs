@@ -2,16 +2,14 @@ using System;
 using CommonConfig;
 using UnityEngine;
 
-public class SkillHelp : Skill
+public class SkillHelpTeach : Skill
 {
-    public SkillHelp(int id, Chess chess) : base(id, chess)
+    public SkillHelpTeach(int id, Chess chess) : base(id, chess)
     {
     }
 
     public override void BattleBegin()
     {
-        UnityEngine.Debug.Log("SkillHelp BattleBegin");
-
         var unitsInRange = WorldManager.Instance.GetUnitsMySide(owner.transform.position, skillCfg.Range, owner.side);
         Chess unitWithLowestInte = null;
         float lowestInte = float.MaxValue;
