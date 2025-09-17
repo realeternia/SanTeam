@@ -10,7 +10,7 @@ public class SkillHitAround : Skill
     {
     }
 
-    public override void DuringAttack(Chess defender, string damType, ref int damageBase, ref float damageMulti, ref string effect)
+    public override void DuringAttack(Chess defender, string damType, ref int damageBase, ref float damageMulti,ref int damageReal,  ref string effect)
     {
         if (CheckBurst())
             effect = "";
@@ -56,7 +56,7 @@ public class SkillHitAround : Skill
                     WorldManager.Instance.RandomSelect(filteredUnits, skillCfg.TargetCount);
                     var damage2 = (int)(damage * skillCfg.Strength);
                     foreach(var unit in filteredUnits)
-                        unit.OnSkillDamaged(owner, damage2);
+                        unit.OnSkillDamaged(owner, skillId, damage2);
                 }
             }
         }

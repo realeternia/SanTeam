@@ -519,8 +519,9 @@ public class Chess : MonoBehaviour
         var effect = hitEffect;
         var damageBase = damage;
         var damageMulti = 1f;
+        var damageReal = 0;
 
-        SkillManager.DuringAttack(this, victim, damType, ref damageBase, ref damageMulti, ref effect);
+        SkillManager.DuringAttack(this, victim, damType, ref damageBase, ref damageMulti, ref damageReal, ref effect);
 
         damage = (int)(damageBase * damageMulti);
         var minDamage = 10;
@@ -535,7 +536,7 @@ public class Chess : MonoBehaviour
                 maxDamage = Math.Max(10, maxDamage + levelDiff * 10);
             }
         }
-        damage = Mathf.Clamp(damage, minDamage, maxDamage);
+        damage = Math.Max(damageReal, Mathf.Clamp(damage, minDamage, maxDamage));
         //这里不改数值，只能伤害吸收
         SkillManager.BeforeAttack(this, victim, ref damage);
 
@@ -553,14 +554,16 @@ public class Chess : MonoBehaviour
         victim.OnHpChanged();
     }
 
-    public void OnSkillDamaged(Chess speller, int damage)
+    public void OnSkillDamaged(Chess caster, int skillId, int damage)
     {
+        SkillManager.OnDoSkillDamage(this, caster, SkillConfig.GetConfig(skillId), ref damage);
+
         if(hp <= 0)
             return;
 
         hp -= damage;
-        if(speller != this)
-            lastDamagedPlayerId = speller.playerId;
+        if(caster != this)
+            lastDamagedPlayerId = caster.playerId;
 
         OnHpChanged();
     }

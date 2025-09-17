@@ -45,7 +45,7 @@ public class SkillHitRegion : Skill
                 WorldManager.Instance.RandomSelect(unitsInRange, skillCfg.TargetCount);
                 var damage = (int)(owner.GetAttr(skillCfg.Attr) * skillCfg.Strength);
                 foreach(var unit in unitsInRange)
-                    unit.OnSkillDamaged(owner, damage);
+                    unit.OnSkillDamaged(owner, skillId, damage);
             }
             yield return new WaitForSeconds(skillCfg.SummonHitInterval);
         }

@@ -198,7 +198,7 @@ namespace CommonConfig
             config[102002] = new HeroConfig(102002, "夏侯惇", 1, 30, 91, 63, 91, 245, 320, 2, 10, 17, 0, 0, 73, 0, "mache", 1, new int[]{201028}, "atk", "SwordHitYellowCritical", "xiahoudun", 2);
             config[102003] = new HeroConfig(102003, "荀彧", 1, 22, 67, 96, 47, 210, 285, 2, 10, 17, 14, 0, 39, 0, "shanxiang", 3, new int[]{209002}, "help", "FrostExplosionBlue", "xunyu", 3);
             config[102004] = new HeroConfig(102004, "张辽", 1, 31, 95, 78, 92, 265, 295, 2, 10, 17, 0, 0, 103, 0, "ma", 1, new int[]{201010}, "def", "SwordHitYellowCritical", "zhangliao", 5);
-            config[102005] = new HeroConfig(102005, "许褚", 1, 21, 65, 44, 96, 205, 400, 2, 10, 17, 0, 0, 36, 0, "shi", 1, new int[]{202004}, "def", "SwordHitYellowCritical", "xuchu", 2);
+            config[102005] = new HeroConfig(102005, "许褚", 1, 21, 65, 44, 96, 205, 400, 2, 10, 17, 0, 0, 36, 0, "shi", 1, new int[]{201013}, "def", "SwordHitYellowCritical", "xuchu", 2);
             config[102006] = new HeroConfig(102006, "夏侯渊", 1, 30, 90, 68, 89, 247, 230, 2, 10, 17, 22, 1.5f, 75, 0, "gong", 3, new int[]{201008}, "shoot", "BulletExplosionBlue", "xiahouyuan", 2);
             config[102007] = new HeroConfig(102007, "典韦", 1, 19, 59, 43, 95, 197, 415, 2, 10, 17, 0, 0, 31, 0, "shi", 1, new int[]{202004}, "def", "SwordHitYellowCritical", "dianwei", 1);
             config[102008] = new HeroConfig(102008, "张郃", 1, 29, 89, 75, 90, 254, 300, 2, 10, 17, 0, 0, 85, 0, "mache", 1, null, "def", "SwordHitYellowCritical", "zhanghe", 3);

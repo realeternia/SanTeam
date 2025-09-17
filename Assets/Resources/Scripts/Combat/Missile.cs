@@ -152,7 +152,7 @@ public class Missile : MonoBehaviour
                 if (owner != null && owner.hp > 0)
                 {
                     foreach (var unit in damageUnitList)
-                        unit.OnSkillDamaged(owner, damage);
+                        unit.OnSkillDamaged(owner, skillId, damage);
                 }
                 lastCheckTime = timePast;
             }

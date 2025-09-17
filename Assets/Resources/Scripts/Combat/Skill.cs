@@ -16,6 +16,8 @@ public class Skill
     private float lastUpdateTime; // 上次更新CD的时间
     public bool isBurst;
 
+    public int skillId{ get{ return skillCfg.Id; } }
+
     public Skill(int id, Chess unit)
     {
         this.id = id;
@@ -55,7 +57,9 @@ public class Skill
 
     public bool CheckBurst(float rateReal = 0)
     {
-        isBurst = !IsInCD() && (skillCfg.Rate <= 0 || UnityEngine.Random.value < Math.Max(rateReal, skillCfg.Rate));
+        var rate = Math.Max(rateReal, skillCfg.Rate);
+        SkillManager.OnCheckBurst(owner, skillCfg, ref rate);
+        isBurst = !IsInCD() && (skillCfg.Rate <= 0 || UnityEngine.Random.value < rate);
         UnityEngine.Debug.Log("CheckBurst isBurst=" + isBurst.ToString() + " skillId=" + id.ToString());
         if(isBurst)
             UpdateCD();
@@ -86,8 +90,6 @@ public class Skill
 
     }
 
-
-
     public virtual void OnAttack(Chess defender, string damType, int damage)
     {
     }
@@ -96,7 +98,7 @@ public class Skill
     {
     }
 
-    public virtual void DuringAttack(Chess defender, string damType, ref int damageBase, ref float damageMulti, ref string effect)
+    public virtual void DuringAttack(Chess defender, string damType, ref int damageBase, ref float damageMulti, ref int damageReal, ref string effect)
     {
     }
 
@@ -107,6 +109,31 @@ public class Skill
     public virtual bool CheckAidSkill()
     {
         return false;
+    }
+
+    public virtual void OnCheckBurst(SkillConfig checkSkillCfg, ref float rate)
+    {
+        
+    }
+
+    public virtual void OnAddBuff(BuffConfig buffCfg, ref float time)
+    {
+        
+    }
+
+    public virtual void OnBeAddBuff(BuffConfig buffCfg, ref float time)
+    {
+        
+    }
+
+    public virtual void OnDoSkillDamage(SkillConfig checkSkillCfg, ref int damage)
+    {
+        
+    }
+
+    public virtual void OnBeDoSkillDamage(SkillConfig checkSkillCfg, ref int damage)
+    {
+        
     }
 
 }

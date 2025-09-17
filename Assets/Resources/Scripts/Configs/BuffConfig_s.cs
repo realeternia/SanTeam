@@ -27,6 +27,10 @@ namespace CommonConfig
         /// </summary>
         public string ColorEnd;
         /// <summary>
+        ///是否证明
+        /// </summary>
+        public bool IsPositive;
+        /// <summary>
         ///hit
         /// </summary>
         public string BuffEffect;
@@ -36,13 +40,14 @@ namespace CommonConfig
         public string Icon;
 
 
-        public BuffConfig(int Id, string Name, string ScriptName, string ColorStart, string ColorEnd, string BuffEffect, string Icon)
+        public BuffConfig(int Id, string Name, string ScriptName, string ColorStart, string ColorEnd, bool IsPositive, string BuffEffect, string Icon)
         {
             this.Id = Id;
             this.Name = Name;
             this.ScriptName = ScriptName;
             this.ColorStart = ColorStart;
             this.ColorEnd = ColorEnd;
+            this.IsPositive = IsPositive;
             this.BuffEffect = BuffEffect;
             this.Icon = Icon;
 
@@ -68,14 +73,14 @@ namespace CommonConfig
         public static void Load()
         {
             config.Clear();
-            config[300001] = new BuffConfig(300001, "护盾", "BuffShield", "", "", "ShieldSoftBlue", "");
-            config[300002] = new BuffConfig(300002, "减伤盾", "BuffShieldValue", "#B25900", "#FFD24D", "", "");
-            config[300003] = new BuffConfig(300003, "吸血", "BuffSuck", "#FF0000", "#993333", "", "");
-            config[301001] = new BuffConfig(301001, "晕眩", "BuffNoAction", "", "", "StunnedCirclingStarsSimple", "");
-            config[301002] = new BuffConfig(301002, "连锁", "BuffLock", "", "", "StunnedLock", "");
-            config[301003] = new BuffConfig(301003, "增伤", "BuffDamagedAddRate", "", "", "StunnedDamageUp", "");
-            config[301004] = new BuffConfig(301004, "伤害提升", "BuffDamageAddRate", "", "", "SparkleAreaWhite", "");
-            config[301005] = new BuffConfig(301005, "攻速提升", "BuffCoolDown", "", "", "HeartStream", "");
+            config[300001] = new BuffConfig(300001, "护盾", "BuffShield", "", "", true, "ShieldSoftBlue", "");
+            config[300002] = new BuffConfig(300002, "减伤盾", "BuffShieldValue", "#B25900", "#FFD24D", true, "", "");
+            config[300003] = new BuffConfig(300003, "吸血", "BuffSuck", "#FF0000", "#993333", true, "", "");
+            config[301001] = new BuffConfig(301001, "晕眩", "BuffNoAction", "", "", false, "StunnedCirclingStarsSimple", "");
+            config[301002] = new BuffConfig(301002, "连锁", "BuffLock", "", "", false, "StunnedLock", "");
+            config[301003] = new BuffConfig(301003, "增伤", "BuffDamagedAddRate", "", "", false, "StunnedDamageUp", "");
+            config[301004] = new BuffConfig(301004, "伤害提升", "BuffDamageAddRate", "", "", true, "SparkleAreaWhite", "");
+            config[301005] = new BuffConfig(301005, "攻速提升", "BuffCoolDown", "", "", true, "HeartStream", "");
 
         }
 

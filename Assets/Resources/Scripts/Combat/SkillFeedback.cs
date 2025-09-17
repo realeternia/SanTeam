@@ -22,7 +22,7 @@ public class SkillFeedback : Skill
         if (CheckBurst())
         {
             var damageBack = (int)(damage * skillCfg.Strength);
-            attacker.OnSkillDamaged(owner, damageBack);
+            attacker.OnSkillDamaged(owner, skillId, damageBack);
             EffectManager.PlaySkillEffect(attacker, skillCfg.HitEffect);
 
             WorldManager.Instance.AddBattleText("反" + damageBack.ToString(), attacker.transform.position, new UnityEngine.Vector2(0, 150), new UnityEngine.Color(0.65f, 0.31f, 0), 3);

@@ -27,8 +27,8 @@ public class WorldManager : MonoBehaviour
     private int[] deathOrder = new int[6]; // 记录各阵营的死亡顺序，0表示未死亡
     private int deathCount = 0; // 记录已死亡的阵营数量
 
-    bool gameFinish = false;
-    bool hasWin;
+    private bool gameFinish = false;
+    private bool hasWin;
     private MapConfig mapConfig;
    
     public HeroInfoGroup heroInfoGroup;
@@ -237,11 +237,11 @@ public class WorldManager : MonoBehaviour
         {
 
             //   SpawnHerosForRegion(GameManager.Instance.GetPlayer(0), mapConfig.RegionHeroSide1[4], new System.Tuple<int, int>(101008, 1), 1);
-            var heroList = new List<int> {100006 };
+            var heroList = new List<int> {102018 };
             for (int i = 0; i < heroList.Count; i++)
                 SpawnHerosForRegion(GameManager.Instance.GetPlayer(0), mapConfig.RegionHeroSide1[i], new System.Tuple<int, int>(heroList[i], 1), heroList, 1);
 
-            heroList = new List<int> { 102020,101008 };
+            heroList = new List<int> { 102020 };
             for (int i = 0; i < heroList.Count; i++)
                 SpawnHerosForRegion(GameManager.Instance.GetPlayer(1), mapConfig.RegionHeroSide2[i], new System.Tuple<int, int>(heroList[i], 1), heroList, 2);
 

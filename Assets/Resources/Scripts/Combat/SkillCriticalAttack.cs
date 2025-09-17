@@ -10,7 +10,7 @@ public class SkillCriticalAttack : Skill
     {
     }
 
-    public override void DuringAttack(Chess defender, string damType, ref int damageBase, ref float damageMulti, ref string effect)
+    public override void DuringAttack(Chess defender, string damType, ref int damageBase, ref float damageMulti, ref int damageReal, ref string effect)
     {
         var rate = GetRate(defender);
         if(CheckBurst(rate))

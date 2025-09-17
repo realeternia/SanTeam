@@ -51,8 +51,8 @@ public static class SkillManager
                 return new SkillHitWall(skillId, owner);
             case "SoldierSummon":
                 return new SkillSoldierSummon(skillId, owner);
-            case "AtkDefRate":
-                return new SkillAtkDefRate(skillId, owner);
+            case "DamageReal":
+                return new SkillDamageReal(skillId, owner);
             case "AttackedShadow":
                 return new SkillAttackedShadow(skillId, owner);
             case "RunCrossPlus":
@@ -69,12 +69,14 @@ public static class SkillManager
                 return new SkillHitAround(skillId, owner);
             case "ShockWave":
                 return new SkillShockWave(skillId, owner);
+            case "ModifyInteRateTime":
+                return new SkillModifyInteRateTime(skillId, owner);
 
             case "Dumb":
                 return new SkillDumb(skillId, owner);               
         }
 
-        throw new System.Exception("Skill not found");
+        throw new System.Exception("Skill not found " + skillCfg.ScriptName);
     }
 
     public static void BattleBegin(Chess chess)
@@ -93,11 +95,20 @@ public static class SkillManager
         }
     }
 
-    public static void DuringAttack(Chess attacker, Chess defender, string damType, ref int damageBase, ref float damageMulti, ref string effect)
+    public static void OnCheckBurst(Chess caster, SkillConfig skillCfg, ref float rate)
+    {
+        foreach (var skill in caster.skills)
+        {
+            if(skill.skillId != skillCfg.Id) //防止自己判定自己
+                skill.OnCheckBurst(skillCfg, ref rate);
+        }
+    }
+
+    public static void DuringAttack(Chess attacker, Chess defender, string damType, ref int damageBase, ref float damageMulti, ref int damageReal, ref string effect)
     {       
         foreach(var skill in attacker.skills)
         {
-            skill.DuringAttack(defender, damType, ref damageBase, ref damageMulti, ref effect);
+            skill.DuringAttack(defender, damType, ref damageBase, ref damageMulti, ref damageReal, ref effect);
 
         }    
         foreach(var skill in defender.skills)
@@ -154,6 +165,34 @@ public static class SkillManager
                 return true;
         }
         return false;
+    }
+
+    public static void OnAddBuff(Chess target, Chess caster, BuffConfig buffCfg, ref float time)
+    {
+        foreach (var skill in caster.skills)
+        {
+            skill.OnAddBuff(buffCfg, ref time);
+        }
+        foreach (var skill in target.skills)
+        {
+            skill.OnBeAddBuff(buffCfg, ref time);
+        }
+    }
+
+    public static void OnDoSkillDamage(Chess target, Chess caster, SkillConfig skillCfg, ref int damage)
+    {
+        foreach (var skill in caster.skills)
+        {
+            if(skillCfg.Id == skill.skillId)
+                continue;
+            skill.OnDoSkillDamage(skillCfg, ref damage);
+        }
+        foreach (var skill in target.skills)
+        {
+            if (skillCfg.Id == skill.skillId)
+                continue;
+            skill.OnBeDoSkillDamage(skillCfg, ref damage);
+        }
     }
 
 }

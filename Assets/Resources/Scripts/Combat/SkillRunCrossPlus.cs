@@ -29,7 +29,7 @@ public class SkillRunCrossPlus : Skill
             EffectManager.PlaySkillEffect(owner, skillCfg.HitEffect);
 
             owner.StartCoroutine(JumpToPosition(mirrorPos));
-            defender.OnSkillDamaged(owner, (int)(damage * skillCfg.Strength));
+            defender.OnSkillDamaged(owner, skillId, (int)(damage * skillCfg.Strength));
         }
     }
 
