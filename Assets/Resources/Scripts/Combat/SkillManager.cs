@@ -69,8 +69,10 @@ public static class SkillManager
                 return new SkillHitAround(skillId, owner);
             case "ShockWave":
                 return new SkillShockWave(skillId, owner);
-            case "ModifyInteRateTime":
-                return new SkillModifyInteRateTime(skillId, owner);
+            case "ModifyRateTime":
+                return new SkillModifyRateTime(skillId, owner);
+            case "ModifyCD":
+                return new SkillModifyCD(skillId, owner);
 
             case "Dumb":
                 return new SkillDumb(skillId, owner);               
@@ -101,6 +103,15 @@ public static class SkillManager
         {
             if(skill.skillId != skillCfg.Id) //防止自己判定自己
                 skill.OnCheckBurst(skillCfg, ref rate);
+        }
+    }
+
+    public static void OnCheckCD(Chess caster, SkillConfig skillCfg, ref float cdTime)
+    {
+        foreach (var skill in caster.skills)
+        {
+            if(skill.skillId != skillCfg.Id) //防止自己判定自己
+                skill.OnCheckCD(skillCfg, ref cdTime);
         }
     }
 

@@ -12,6 +12,12 @@ public class SkillDamageReal : Skill
 
     public override void DuringAttack(Chess defender, string damType, ref int damageBase, ref float damageMulti, ref int damageReal, ref string effect)
     {
+        if((float)defender.hp / defender.maxHp > skillCfg.ConditionParm)
+            return;
+
+        if(!string.IsNullOrEmpty(skillCfg.HitEffect))
+            effect = skillCfg.HitEffect;
+
         var rate = GetRate(defender);
         if(CheckBurst(rate))
         {

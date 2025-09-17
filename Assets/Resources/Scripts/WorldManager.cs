@@ -237,11 +237,11 @@ public class WorldManager : MonoBehaviour
         {
 
             //   SpawnHerosForRegion(GameManager.Instance.GetPlayer(0), mapConfig.RegionHeroSide1[4], new System.Tuple<int, int>(101008, 1), 1);
-            var heroList = new List<int> {102018 };
+            var heroList = new List<int> {101028 };
             for (int i = 0; i < heroList.Count; i++)
                 SpawnHerosForRegion(GameManager.Instance.GetPlayer(0), mapConfig.RegionHeroSide1[i], new System.Tuple<int, int>(heroList[i], 1), heroList, 1);
 
-            heroList = new List<int> { 102020 };
+            heroList = new List<int> { 101021 };
             for (int i = 0; i < heroList.Count; i++)
                 SpawnHerosForRegion(GameManager.Instance.GetPlayer(1), mapConfig.RegionHeroSide2[i], new System.Tuple<int, int>(heroList[i], 1), heroList, 2);
 

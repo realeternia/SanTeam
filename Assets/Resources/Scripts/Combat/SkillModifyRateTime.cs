@@ -4,9 +4,9 @@ using System.Collections.Generic;
 using CommonConfig;
 using UnityEngine;
 
-public class SkillModifyInteRateTime : Skill
+public class SkillModifyRateTime : Skill
 {
-    public SkillModifyInteRateTime(int id, Chess unit) : base(id, unit)
+    public SkillModifyRateTime(int id, Chess unit) : base(id, unit)
     {
     }
 

@@ -38,8 +38,10 @@ public class Skill
                 return;
             }
 
-            float currentTime = Time.time;
-            lastUpdateTime = currentTime;
+            var cdTime = skillCfg.CD;
+            SkillManager.OnCheckCD(owner, skillCfg, ref cdTime);
+
+            lastUpdateTime = Time.time - skillCfg.CD + cdTime;
         }
     }
 
@@ -80,6 +82,7 @@ public class Skill
         return rate;
     }
 
+
     public virtual void BattleBegin()
     {
 
@@ -119,6 +122,11 @@ public class Skill
     public virtual void OnAddBuff(BuffConfig buffCfg, ref float time)
     {
         
+    }
+
+    public virtual void OnCheckCD(SkillConfig checkSkillCfg, ref float cdTime)
+    {
+
     }
 
     public virtual void OnBeAddBuff(BuffConfig buffCfg, ref float time)
