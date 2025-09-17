@@ -65,7 +65,7 @@ public class SkillHitWall : Skill
             var unitList = new List<Chess>();
             foreach (var pos in targetPosList)
             {
-                var unitsInRange = WorldManager.Instance.GetUnitsInRange(pos, skillCfg.Range * 1.5f, owner.side, true);
+                var unitsInRange = WorldManager.Instance.GetUnitsInRange(pos, skillCfg.SummonArea * 1.5f, owner.side, true);
                 WorldManager.Instance.RandomSelect(unitsInRange, skillCfg.TargetCount);
 
                 foreach (var unit in unitsInRange)

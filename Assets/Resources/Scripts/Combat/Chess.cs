@@ -312,7 +312,7 @@ public class Chess : MonoBehaviour
                 SkillManager.AimTarget(this, targetChess);
                 if (attackRange >= 20)
                 {
-                    WorldManager.Instance.CreateMissile(this, targetChess, hitEffect);
+                    WorldManager.Instance.CreateAttackMissile(this, targetChess, hitEffect);
                 }
                 else
                 {
@@ -721,7 +721,7 @@ public class Chess : MonoBehaviour
             case "str":
                 return str;
             default:
-                return 0;
+                throw new ArgumentException("Invalid attribute name: " + attr);
         }
     }
 

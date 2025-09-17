@@ -241,7 +241,7 @@ public class WorldManager : MonoBehaviour
             for (int i = 0; i < heroList.Count; i++)
                 SpawnHerosForRegion(GameManager.Instance.GetPlayer(0), mapConfig.RegionHeroSide1[i], new System.Tuple<int, int>(heroList[i], 1), heroList, 1);
 
-            heroList = new List<int> { 102020,102020 };
+            heroList = new List<int> { 102020,101008 };
             for (int i = 0; i < heroList.Count; i++)
                 SpawnHerosForRegion(GameManager.Instance.GetPlayer(1), mapConfig.RegionHeroSide2[i], new System.Tuple<int, int>(heroList[i], 1), heroList, 2);
 
@@ -443,15 +443,24 @@ public class WorldManager : MonoBehaviour
     }
 
 
-    public void CreateMissile(Chess sourceChess, Chess targetChess, string effectName)
+    public void CreateAttackMissile(Chess sourceChess, Chess targetChess, string effectName)
     {
         // 首先加载导弹预制体
         Missile missilePrefab = Resources.Load<Missile>("Prefabs/MissileCom");
         
         // 实例化导弹
         var missile = Instantiate<Missile>(missilePrefab, sourceChess.transform.position, Quaternion.identity, Units.transform);
-        missile.Init(sourceChess, targetChess, effectName);
+        missile.Init(sourceChess, targetChess, sourceChess.missileSpeed, sourceChess.missileHight, effectName);
+    }
 
+    public void CreateSpellMissile(Chess sourceChess, Vector3 targetPos, float time, float speed, float size, int skillId, string effectName)
+    {
+        // 首先加载导弹预制体
+        Missile missilePrefab = Resources.Load<Missile>("Prefabs/MissileCom");
+        
+        // 实例化导弹
+        var missile = Instantiate<Missile>(missilePrefab, sourceChess.transform.position, Quaternion.identity, Units.transform);
+        missile.Init(sourceChess, targetPos, time, speed, size, skillId, effectName);
     }
 
 

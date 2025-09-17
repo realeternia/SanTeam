@@ -18,7 +18,7 @@ public class SkillMultiArrow : Skill
         {
             WorldManager.Instance.RandomSelect(unitsInRange, skillCfg.TargetCount);
             foreach (var unit in unitsInRange)
-                WorldManager.Instance.CreateMissile(owner, unit, owner.hitEffect);
+                WorldManager.Instance.CreateAttackMissile(owner, unit, owner.hitEffect);
         }
     }
 }

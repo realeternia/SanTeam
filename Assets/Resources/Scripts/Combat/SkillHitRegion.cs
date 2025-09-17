@@ -39,7 +39,7 @@ public class SkillHitRegion : Skill
             if(owner == null || owner.hp <= 0)
                 yield break;
 
-            var unitsInRange = WorldManager.Instance.GetUnitsInRange(targetPos, skillCfg.Range, owner.side, true);
+            var unitsInRange = WorldManager.Instance.GetUnitsInRange(targetPos, skillCfg.SummonArea, owner.side, true);
             if (unitsInRange.Count > 0)
             {
                 WorldManager.Instance.RandomSelect(unitsInRange, skillCfg.TargetCount);
