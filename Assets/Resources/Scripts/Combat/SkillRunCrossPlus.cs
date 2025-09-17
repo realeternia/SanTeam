@@ -10,21 +10,6 @@ public class SkillRunCrossPlus : Skill
     {
     }
 
-    public override void DuringAttacked(Chess attacker, string damType, ref int damageBase, ref float damageMulti, ref string effect)
-    {
-        var maxVal = Math.Max(owner.leadShip, owner.str);
-
-        if(!WorldManager.Instance.CheckInRange(owner.transform.position, attacker.transform.position, skillCfg.Range * 2))
-        {
-            damageBase -= Math.Max(10, (int)(maxVal * skillCfg.Strength * 2));
-            return;
-        }
-        if(!WorldManager.Instance.CheckInRange(owner.transform.position, attacker.transform.position, skillCfg.Range))
-        {
-            damageBase -= Math.Max(5, (int)(maxVal * skillCfg.Strength));
-        }
-    }
-
     public override void OnAttack(Chess defender, string damType, int damage)
     {
         // 计算镜像位置
@@ -44,6 +29,7 @@ public class SkillRunCrossPlus : Skill
             EffectManager.PlaySkillEffect(owner, skillCfg.HitEffect);
 
             owner.StartCoroutine(JumpToPosition(mirrorPos));
+            defender.OnSkillDamaged(owner, (int)(damage * skillCfg.Strength));
         }
     }
 

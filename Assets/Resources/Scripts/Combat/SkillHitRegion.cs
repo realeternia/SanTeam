@@ -21,11 +21,11 @@ public class SkillHitRegion : Skill
                             
             targetPos = defender.transform.position;
 
-            var chess = WorldManager.Instance.SpawnUnitsForRegion(owner.GetPlayerInfo(), 501001, targetPos, owner.side, "");
-            chess.SetLifeTime(skillCfg.SummonTime);
+            var magicStub = WorldManager.Instance.SpawnUnitsForRegion(owner.GetPlayerInfo(), 501001, targetPos, owner.side, "");
+            magicStub.SetLifeTime(skillCfg.SummonTime);
 
             //创建一个hitEffect
-            EffectManager.PlayPosSkillEffect(chess, targetPos, skillCfg.Range, skillCfg.HitEffect, skillCfg.SummonTime);
+            EffectManager.PlayPosSkillEffect(magicStub, targetPos, skillCfg.EffectSize, skillCfg.HitEffect, skillCfg.SummonTime);
 
             owner.StartCoroutine(DelayDamage());
         }

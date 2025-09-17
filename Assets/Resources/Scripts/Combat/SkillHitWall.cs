@@ -22,8 +22,8 @@ public class SkillHitWall : Skill
             // 在目标位置，以及owner和defender方向90度两侧，各创建一个effect
             var targetPos = defender.transform.position;
 
-            var chess = WorldManager.Instance.SpawnUnitsForRegion(owner.GetPlayerInfo(), 501001, targetPos, owner.side, "");
-            chess.SetLifeTime(skillCfg.SummonTime);
+            var magicStub = WorldManager.Instance.SpawnUnitsForRegion(owner.GetPlayerInfo(), 501001, targetPos, owner.side, "");
+            magicStub.SetLifeTime(skillCfg.SummonTime);
             
             // 计算owner到defender的方向
             Vector3 direction = (defender.transform.position - owner.transform.position).normalized;
@@ -48,7 +48,7 @@ public class SkillHitWall : Skill
             
             foreach(var pos in targetPosList)
             {
-                EffectManager.PlayPosSkillEffect(chess, pos, skillCfg.Range, skillCfg.HitEffect, skillCfg.SummonTime);
+                EffectManager.PlayPosSkillEffect(magicStub, pos, skillCfg.EffectSize, skillCfg.HitEffect, skillCfg.SummonTime);
             }
             owner.StartCoroutine(DelayDamage());
         }

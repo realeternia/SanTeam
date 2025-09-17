@@ -123,6 +123,32 @@ public static class ConfigManager
             }
         }
 
+        foreach (var heroCfg in HeroConfig.ConfigList)
+        {
+            if (heroCfg.Job.StartsWith("ma"))
+                heroCfg.MoveSpeed = 12;
+            else if (heroCfg.Job.StartsWith("gongnu"))
+            {
+                heroCfg.Range = 70;
+                heroCfg.MoveSpeed = 7;
+            }
+            else if (heroCfg.Job.StartsWith("gong"))
+            {
+                heroCfg.Range = 50;
+                heroCfg.MoveSpeed = 8;
+            }          
+            else if (heroCfg.Job.StartsWith("shan"))
+            {
+                heroCfg.Range = 35;
+                heroCfg.MoveSpeed = 8;
+            }     
+            else if (heroCfg.Job.StartsWith("gu"))
+            {
+                heroCfg.Range = 35;
+                heroCfg.MoveSpeed = 8;
+            }
+        }
+
     }
 
     public static int GetFriendLevel(int heroId, int friendId)
@@ -149,7 +175,10 @@ public static class ConfigManager
             heroCfg.Skills = new int[1] { skillId };
         else
             System.Array.Resize(ref heroCfg.Skills, heroCfg.Skills.Length + 1);
-        heroCfg.Skills[heroCfg.Skills.Length - 1] = skillId;
+        // 将数组元素后移一位
+        for (int i = heroCfg.Skills.Length - 1; i > 0; i--)
+            heroCfg.Skills[i] = heroCfg.Skills[i - 1];
+        heroCfg.Skills[0] = skillId;
     }
 
     private static void CreateRandomFriendPairs(List<HeroConfig> inteHighList, List<HeroConfig> inteLowList, string name)

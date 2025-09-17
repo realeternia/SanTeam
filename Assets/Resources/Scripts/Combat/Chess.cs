@@ -22,7 +22,7 @@ public class Chess : MonoBehaviour
     public Renderer rend;
 
     // 目标单位
-    private Chess targetChess;
+    public Chess targetChess;
     // 移动速度
     public float moveSpeed = 5f;
     public float attackRange = 10f;
@@ -555,6 +555,9 @@ public class Chess : MonoBehaviour
 
     public void OnSkillDamaged(Chess speller, int damage)
     {
+        if(hp <= 0)
+            return;
+
         hp -= damage;
         if(speller != this)
             lastDamagedPlayerId = speller.playerId;
