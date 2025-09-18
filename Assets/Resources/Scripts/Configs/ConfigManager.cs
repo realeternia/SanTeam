@@ -10,6 +10,7 @@ public static class ConfigManager
     private static Dictionary<int, Dictionary<int, int>> heroFriendDict = new Dictionary<int, Dictionary<int, int>>();
     private static Dictionary<int, HashSet<int>> heroFriendInfoDict = new Dictionary<int, HashSet<int>>(); // heroId, heroId, level
     private static Dictionary<string, JobConfig> jobDict = new Dictionary<string, JobConfig>();
+    private static Dictionary<string, SkillConfig> skillDict = new Dictionary<string, SkillConfig>();
 
     private static int tempFriendIdIdx = 1000;
     private static bool hasInit = false;
@@ -36,9 +37,15 @@ public static class ConfigManager
 
     public static void PostModify()
     {
+        var jobNameConvDict = new Dictionary<string, string>();
         foreach (var jobCfg in JobConfig.ConfigList)
         {
             jobDict.Add(jobCfg.Name, jobCfg);
+            jobNameConvDict[jobCfg.NameS] = jobCfg.Name;
+        }      
+        foreach (var skillCfg in SkillConfig.ConfigList)
+        {
+            skillDict.Add(skillCfg.Sname, skillCfg);
         }
 
         foreach (var heroCfg in HeroConfig.ConfigList)
@@ -46,10 +53,20 @@ public static class ConfigManager
             if (Profile.Instance.cardLoves != null && Profile.Instance.cardLoves.Contains((int)heroCfg.Id))
                 heroCfg.RateAbs = 65;
 
+            heroCfg.Job = jobNameConvDict.ContainsKey(heroCfg.Job) ? jobNameConvDict[heroCfg.Job] : heroCfg.Job;
+
             var jobCfg = GetJobConfig(heroCfg.Job);
-            if (jobCfg == null)
-                continue;
-            AddSkill(heroCfg, jobCfg.SkillId);
+            if (jobCfg != null)
+                AddSkill(heroCfg, jobCfg.SkillId);
+
+            if (!string.IsNullOrEmpty(heroCfg.Skill1))
+            { 
+                AddSkill(heroCfg, skillDict[heroCfg.Skill1].Id);
+            }
+            if (!string.IsNullOrEmpty(heroCfg.Skill2))
+            { 
+                AddSkill(heroCfg, skillDict[heroCfg.Skill2].Id);
+            }
         }
 
         for (int i = 1; i <= 6; i++)
@@ -172,13 +189,14 @@ public static class ConfigManager
     private static void AddSkill(HeroConfig heroCfg, int skillId)
     {
         if (heroCfg.Skills == null)
+        {
             heroCfg.Skills = new int[1] { skillId };
+        }
         else
+        {
             System.Array.Resize(ref heroCfg.Skills, heroCfg.Skills.Length + 1);
-        // 将数组元素后移一位
-        for (int i = heroCfg.Skills.Length - 1; i > 0; i--)
-            heroCfg.Skills[i] = heroCfg.Skills[i - 1];
-        heroCfg.Skills[0] = skillId;
+            heroCfg.Skills[heroCfg.Skills.Length - 1] = skillId;
+        }   
     }
 
     private static void CreateRandomFriendPairs(List<HeroConfig> inteHighList, List<HeroConfig> inteLowList, string name)

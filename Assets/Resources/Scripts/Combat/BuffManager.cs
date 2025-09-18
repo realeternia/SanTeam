@@ -5,7 +5,7 @@ public static class BuffManager
     public static void AddBuff(Chess target, Chess caster, int skillId, int buffId, float time)
     {
         var buffCfg = BuffConfig.GetConfig(buffId);
-        SkillManager.OnAddBuff(target, caster, buffCfg, ref time);
+        SkillManager.OnAddBuff(target, caster, buffCfg, skillId, ref time);
 
         Buff buff = null;
         switch (buffCfg.ScriptName)

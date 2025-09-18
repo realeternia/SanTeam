@@ -69,10 +69,8 @@ public static class SkillManager
                 return new SkillHitAround(skillId, owner);
             case "ShockWave":
                 return new SkillShockWave(skillId, owner);
-            case "ModifyRateTime":
-                return new SkillModifyRateTime(skillId, owner);
-            case "ModifyCD":
-                return new SkillModifyCD(skillId, owner);
+            case "ModifySkillRateTime":
+                return new SkillModifySkillRateTime(skillId, owner);
 
             case "Dumb":
                 return new SkillDumb(skillId, owner);               
@@ -178,15 +176,15 @@ public static class SkillManager
         return false;
     }
 
-    public static void OnAddBuff(Chess target, Chess caster, BuffConfig buffCfg, ref float time)
+    public static void OnAddBuff(Chess target, Chess caster, BuffConfig buffCfg, int skillId, ref float time)
     {
         foreach (var skill in caster.skills)
         {
-            skill.OnAddBuff(buffCfg, ref time);
+            skill.OnAddBuff(buffCfg, skillId, ref time);
         }
         foreach (var skill in target.skills)
         {
-            skill.OnBeAddBuff(buffCfg, ref time);
+            skill.OnBeAddBuff(buffCfg, skillId, ref time);
         }
     }
 

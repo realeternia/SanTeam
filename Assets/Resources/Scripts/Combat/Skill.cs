@@ -119,7 +119,7 @@ public class Skill
         
     }
 
-    public virtual void OnAddBuff(BuffConfig buffCfg, ref float time)
+    public virtual void OnAddBuff(BuffConfig buffCfg, int skillId, ref float time)
     {
         
     }
@@ -129,7 +129,7 @@ public class Skill
 
     }
 
-    public virtual void OnBeAddBuff(BuffConfig buffCfg, ref float time)
+    public virtual void OnBeAddBuff(BuffConfig buffCfg, int checkSkillId, ref float time)
     {
         
     }
