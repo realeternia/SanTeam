@@ -8,7 +8,8 @@ public class BagCell : MonoBehaviour
 {
     public int cardId;
     public int level;
-    public TMP_Text itemNameText;
+    public TMP_Text textItemCount;
+    public TMP_Text textItemName;
     public Image itemImage;
     public Button cellButton;
     public BagControl bagControl;
