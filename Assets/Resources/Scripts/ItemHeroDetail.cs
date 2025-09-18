@@ -17,8 +17,7 @@ public class ItemHeroDetail : MonoBehaviour
     public TMP_Text strText;
     public TMP_Text hpText;
     public Image skillImg;
-    public TMP_Text skillText;
-
+    
 
     public TMP_Text goldText;
     public TMP_Text equipText;
@@ -75,14 +74,11 @@ public class ItemHeroDetail : MonoBehaviour
                 var skillConfig = SkillConfig.GetConfig(heroConfig.Skills[0]);
 
                 skillImg.sprite = Resources.Load<Sprite>("SkillPic/" + skillConfig.Icon);
-                skillText.text = skillConfig.Descript;
                 skillImg.gameObject.SetActive(true);
-                skillText.gameObject.SetActive(true);
             }
             else
             {
                 skillImg.gameObject.SetActive(false);
-                skillText.gameObject.SetActive(false);
             }
 
             if (player.itemEquips.ContainsKey(cardId))
@@ -99,28 +95,19 @@ public class ItemHeroDetail : MonoBehaviour
 
         attrFinal = HeroSelectionTool.GetCardAttr(cardId, lv);
 
-        leadText.text = leadShipBase.ToString();
-        if (attrFinal.Lead > leadShipBase)
+        leadText.text = attrFinal.Lead.ToString();
+        if (attrEquip.Lead > 0)
+            leadText.text += "\n<color=#FFB6C1>+" + attrEquip.Lead.ToString() + "</color>";
 
-            leadText.text += "<color=green>+" + (attrFinal.Lead - leadShipBase).ToString() + "</color>";
-            if (attrEquip.Lead > 0)
-            leadText.text += "<color=#FFB6C1>+" + attrEquip.Lead.ToString() + "</color>";
-
-        inteText.text = inteBase.ToString();
-        if (attrFinal.Inte > inteBase)
-            inteText.text += "<color=green>+" + (attrFinal.Inte - inteBase).ToString() + "</color>";
+        inteText.text = attrFinal.Inte.ToString();
         if (attrEquip.Inte > 0)
-            inteText.text += "<color=#FFB6C1>+" + attrEquip.Inte.ToString() + "</color>";            
-        strText.text = strBase.ToString();
-        if (attrFinal.Str > strBase)
-            strText.text += "<color=green>+" + (attrFinal.Str - strBase).ToString() + "</color>";
+            inteText.text += "\n<color=#FFB6C1>+" + attrEquip.Inte.ToString() + "</color>";            
+        strText.text = attrFinal.Str.ToString();
         if (attrEquip.Str > 0)
-            strText.text += "<color=#FFB6C1>+" + attrEquip.Str.ToString() + "</color>";            
-        hpText.text = maxHpBase.ToString();
-        if (attrFinal.Hp > maxHpBase)
-            hpText.text += "<color=green>+" + (attrFinal.Hp - maxHpBase).ToString() + "</color>";
+            strText.text += "\n<color=#FFB6C1>+" + attrEquip.Str.ToString() + "</color>";            
+        hpText.text = attrFinal.Hp.ToString();
         if (attrEquip.Hp > 0)
-            hpText.text += "<color=#FFB6C1>+" + attrEquip.Hp.ToString() + "</color>";
+            hpText.text += "\n<color=#FFB6C1>+" + attrEquip.Hp.ToString() + "</color>";
 
     }
 
@@ -140,9 +127,6 @@ public class ItemHeroDetail : MonoBehaviour
         goldText.text = "";
         equipText.text = "";
         skillImg.gameObject.SetActive(false);
-        skillText.gameObject.SetActive(false);
-
-
 
     }
 }
