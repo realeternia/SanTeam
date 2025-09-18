@@ -10,6 +10,7 @@ public class PickPanelCellControl : MonoBehaviour
 {
     public Image bgImg;
     public Image heroImg;
+    public Image jobImg;
     public TMP_Text heroName;
     public Image forbidImg;
     public Button banBtn;

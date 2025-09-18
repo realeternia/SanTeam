@@ -179,9 +179,15 @@ public class PickPanelControl : MonoBehaviour
             {
                 // 设置英雄图片
                 cellControl.heroImg.sprite = Resources.Load<Sprite>("Skins/" + heroCfg.Icon);
+                // 设置job图片
+                var icon = SkillConfig.GetConfig(heroCfg.Skills[0]).Icon;
+                cellControl.jobImg.sprite = Resources.Load<Sprite>("SkillPic/" + icon);
 
                 // 设置英雄名称
                 cellControl.heroName.text = heroCfg.Name;
+                if(heroCfg.Str >= 90 || heroCfg.LeadShip >= 90 || heroCfg.Inte >= 90 || heroCfg.Total >= 240)
+                    cellControl.heroName.color = new Color(1, .7f, 0);
+
                 cellControl.bgImg.GetComponent<Image>().color = HeroSelectionTool.GetSideColor(heroCfg.Side);
 
                 // 默认隐藏禁止图标
