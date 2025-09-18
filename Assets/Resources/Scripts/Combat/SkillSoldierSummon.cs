@@ -24,7 +24,7 @@ public class SkillSoldierSummon : Skill
             if(unit.attackRange < 20)
                 continue;
 
-            unit.attackRange += skillCfg.Strength;
+            unit.attackRange += skillCfg.StrengthInt;
             EffectManager.PlaySkillEffect(unit, skillCfg.HitEffect);
         }
     }

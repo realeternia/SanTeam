@@ -13,7 +13,7 @@ public class SkillGold : Skill
 
         EffectManager.PlaySkillEffect(owner, skillCfg.HitEffect);
 
-        var goldAdd = (int)(skillCfg.Strength);
+        var goldAdd = skillCfg.StrengthInt;
         owner.GetPlayerInfo().AddGold(goldAdd);
 
         WorldManager.Instance.AddBattleText(goldAdd.ToString() + "金", owner.transform.position, new UnityEngine.Vector2(0, 60), Color.yellow, 2);

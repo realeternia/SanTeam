@@ -19,9 +19,9 @@ public class SkillSoldierUp : Skill
             if(unit.isHero)
                 continue;
 
-            unit.AddSoldierLevel((int)skillCfg.Strength);
+            unit.AddSoldierLevel(skillCfg.StrengthInt);
             EffectManager.PlaySkillEffect(unit, skillCfg.HitEffect);
         }
-        owner.GetPlayerInfo().castleHUD.AddSoldierLevel((int)skillCfg.Strength);
+        owner.GetPlayerInfo().castleHUD.AddSoldierLevel(skillCfg.StrengthInt);
     }
 }

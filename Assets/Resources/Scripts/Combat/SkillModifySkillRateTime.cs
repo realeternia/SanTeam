@@ -19,7 +19,7 @@ public class SkillModifySkillRateTime : Skill
         rate += Math.Min(rate, checkSkillCfg.Rate);
     }
 
-    public override void OnAddBuff(BuffConfig buffCfg, int checkSkillId, ref float time)
+    public override void OnAddBuff(Chess target, BuffConfig buffCfg, int checkSkillId, ref float time)
     {
         if(skillCfg.BuffTime == 0)
             return;

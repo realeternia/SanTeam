@@ -4,9 +4,9 @@ using System.Collections.Generic;
 using CommonConfig;
 using UnityEngine;
 
-public class SkillCriticalAttack : Skill
+public class SkillAttackAddDamage : Skill
 {
-    public SkillCriticalAttack(int id, Chess unit) : base(id, unit)
+    public SkillAttackAddDamage(int id, Chess unit) : base(id, unit)
     {
     }
 
@@ -17,8 +17,8 @@ public class SkillCriticalAttack : Skill
         {
             if(!string.IsNullOrEmpty(skillCfg.Action))
                 owner.PlayerAnim(skillCfg.Action);            
-            // Debug.Log("CriticalAttack " + damageBase.ToString() + " " + damageMulti.ToString() + " " + effect);
 
+            damageBase += skillCfg.StrengthInt;
             damageMulti += skillCfg.Strength;
             effect = skillCfg.HitEffect;
         }

@@ -15,8 +15,8 @@ public static class SkillManager
         {
             case "SpinAttack":
                 return new SkillSpinAttack(skillId, owner);
-            case "CriticalAttack":
-                return new SkillCriticalAttack(skillId, owner);
+            case "AttackAddDamage":
+                return new SkillAttackAddDamage(skillId, owner);
             case "MasterShield":
                 return new SkillMasterShield(skillId, owner);
             case "AttackedBuff":
@@ -71,6 +71,8 @@ public static class SkillManager
                 return new SkillShockWave(skillId, owner);
             case "ModifySkillRateTime":
                 return new SkillModifySkillRateTime(skillId, owner);
+            case "ModifyBuffExpand":
+                return new SkillModifyBuffExpand(skillId, owner);
 
             case "Dumb":
                 return new SkillDumb(skillId, owner);               
@@ -180,11 +182,11 @@ public static class SkillManager
     {
         foreach (var skill in caster.skills)
         {
-            skill.OnAddBuff(buffCfg, skillId, ref time);
+            skill.OnAddBuff(target, buffCfg, skillId, ref time);
         }
         foreach (var skill in target.skills)
         {
-            skill.OnBeAddBuff(buffCfg, skillId, ref time);
+            skill.OnBeAddBuff(caster, buffCfg, skillId, ref time);
         }
     }
 
