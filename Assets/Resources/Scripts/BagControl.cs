@@ -8,10 +8,8 @@ using UnityEngine.UI;
 public class BagControl : MonoBehaviour
 {
     public Button closeBtn;
-    public Button sellHeroBtn;
-    public Button sellItemBtn;
 
-    public Button equipBtn;
+    public Button fieldAutoBtn;
 
 
     // Start is called before the first frame update
@@ -22,8 +20,9 @@ public class BagControl : MonoBehaviour
     public GameObject bagHeroRegion;
     public GameObject bagItemRegion;
     public GameObject fieldRegion;
+    public BagRecycler bagRecycler;
 
-    public PlayerInfo bindPlayer;
+    private PlayerInfo bindPlayer;
 
     void Start()
     {
@@ -42,65 +41,29 @@ public class BagControl : MonoBehaviour
             DestroyAllCells();
             PanelManager.Instance.HideBag();
             CardShopManager.Instance.OnShow();
-        });
-        sellHeroBtn.onClick.AddListener(() =>
+        });  
+        fieldAutoBtn.onClick.AddListener(() =>
         {
-            if(heroDetail.cardId == 0)
-                return;
             var p1 = GameManager.Instance.GetPlayer(0);
-            p1.SellCard(heroDetail.cardId);
-            var cell = cellCache.Find(x => x.GetComponent<BagCell>().cardId == heroDetail.cardId);
-            if(cell != null)
-            {
-                cellCache.Remove(cell);
-                Destroy(cell);
-            }
-            CardShopManager.Instance.OnPlayerSellCard();
-            heroDetail.Clear();
-            itemDetail.UpdateSelf();
-
-        });
-        sellItemBtn.onClick.AddListener(() =>
-        {          
-            if(itemDetail.cardId == 0)
-                return;
-            var p1 = GameManager.Instance.GetPlayer(0);
-            p1.SellCard(itemDetail.cardId);
-            var cell = cellCache.Find(x => x.GetComponent<BagCell>().cardId == itemDetail.cardId);
-            if(cell != null)
-            {
-                cellCache.Remove(cell);
-                Destroy(cell);
-            }
-            itemDetail.Clear();
-            heroDetail.UpdateSelf();
-
-        });    
-        equipBtn.onClick.AddListener(() =>
-        {
-            if(itemDetail.cardId == 0 || heroDetail.cardId == 0)
-                return;
-                
-            var p1 = GameManager.Instance.GetPlayer(0);
-            p1.Equip(heroDetail.cardId, itemDetail.cardId);
-
-            heroDetail.UpdateSelf();
-            itemDetail.UpdateSelf();
-
-            GameManager.Instance.PlaySound("Sounds/equip");
-
+            p1.AutoSetBattleCard();
+            UpdateFieldView();
         });
 
         for (int i = 0; i < 6; i++)
         {
             GameObject fieldUnit = Instantiate(Resources.Load<GameObject>("Prefabs/FieldUnit"), fieldRegion.transform);
             var fieldUnitControl = fieldUnit.GetComponent<BagFieldUnitControl>();
-            fieldUnitControl.Init(0);
+            fieldUnitControl.SetInfo(i, 0);
+            fieldUnitControl.bagControl = this;
 
-            int xOff = i % 3;
-            int yOff = i / 3;
+            int xOff = 135 * (i % 3);
+            int yOff = 135 * (i / 3);
+            if (i == 1)
+                yOff -= 30;
+            else if (i == 4)
+                yOff += 30;
 
-            fieldUnit.transform.localPosition = new Vector3(121 + 135 * xOff, -186 - 135 * yOff, 0);
+            fieldUnit.transform.localPosition = new Vector3(121 + xOff, -186 - yOff, 0);
         }
     }
 
@@ -112,12 +75,18 @@ public class BagControl : MonoBehaviour
 
     public void OnShow()
     {
+        bindPlayer = GameManager.Instance.GetPlayer(0);
         UpdateView();
     }
 
     public void OnHide()
     {
         
+    }
+
+    public void Bind(PlayerInfo p)
+    {
+        bindPlayer = p;
     }
 
     public void UpdateView()
@@ -191,6 +160,15 @@ public class BagControl : MonoBehaviour
         }
     }
 
+    public void UpdateFieldView()
+    {
+        foreach (Transform child in fieldRegion.transform)
+        {
+            var fieldUnit = child.GetComponent<BagFieldUnitControl>();
+            fieldUnit.SetInfo(fieldUnit.posId, bindPlayer.battleCards[fieldUnit.posId]);
+        }
+    }
+
     private void UpdatItemInfo(BagCell bagCell)
     {
         bagCell.textItemCount.text = bagCell.level.ToString();
@@ -241,6 +219,31 @@ public class BagControl : MonoBehaviour
         UpdateEquips();
     }
 
+    public void SetHeroForBattle(int heroId, int pos)
+    {
+        var p1 = GameManager.Instance.GetPlayer(0);
+        p1.SetBattlePos(heroId, pos);
+
+        GameManager.Instance.PlaySound("Sounds/equip");
+        UpdateFieldView();
+    }
+
+    public void SellCard(int cardId)
+    {
+        var p1 = GameManager.Instance.GetPlayer(0);
+        p1.SellCard(cardId);
+        var cell = cellCache.Find(x => x.GetComponent<BagCell>().cardId == cardId);
+        if(cell != null)
+        {
+            cellCache.Remove(cell);
+            Destroy(cell);
+        }
+        if(CardShopManager.Instance != null)
+            CardShopManager.Instance.OnPlayerSellCard();
+        heroDetail.Clear();
+        itemDetail.Clear();
+        UpdateFieldView();
+    }
 
     public void OnCellClick(BagCell cell)
     {

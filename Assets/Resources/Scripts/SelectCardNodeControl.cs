@@ -22,22 +22,23 @@ public class SelectCardNodeControl : MonoBehaviour
         {
             var player = GameManager.Instance.GetPlayer(0);
 
-            if (isChecked)
-            {
-                checkBtn.gameObject.GetComponent<Image>().color = Color.gray;
-                 player.battleCards.Remove(cardId);
-            }
-            else
-            {
-                if(player.battleCards.Count >= 5)
-                    return;
+            // if (isChecked)
+            // {
+            //     checkBtn.gameObject.GetComponent<Image>().color = Color.gray;
+            //     player.battleCards.Remove(cardId);
+            // }
+            // else
+            // {
+            //     if(player.battleCards.Count >= 5)
+            //         return;
 
-                checkBtn.gameObject.GetComponent<Image>().color = Color.red;
-                player.battleCards.Add(cardId);
+            //     checkBtn.gameObject.GetComponent<Image>().color = Color.red;
+            //     player.battleCards.Add(cardId);
 
-            }
+            // }
             isChecked = !isChecked;
         });
+        checkBtn.gameObject.SetActive(false);
 
     }
 
@@ -62,9 +63,9 @@ public class SelectCardNodeControl : MonoBehaviour
         }
         if (pid == 0)
         {
-            checkBtn.gameObject.SetActive(true);
+            checkBtn.gameObject.SetActive(false);
             var player = GameManager.Instance.GetPlayer(0);
-            isChecked = player.battleCards.Contains(cardId);
+         //   isChecked = player.battleCards.Contains(cardId);
             if (isChecked)
             {
                 checkBtn.gameObject.GetComponent<Image>().color = Color.red;

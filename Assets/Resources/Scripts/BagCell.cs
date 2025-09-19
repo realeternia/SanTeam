@@ -43,11 +43,7 @@ public class BagCell : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragH
 
     // 开始拖动时调用
     public void OnBeginDrag(PointerEventData eventData)
-    {
-        // 只有物品才能被拖动
-        if (ConfigManager.IsHeroCard(cardId))
-            return;
-        
+    {       
         // 保存原始位置和父对象
         originalParent = transform.parent;
         originalPosition = transform.localPosition;
@@ -59,7 +55,13 @@ public class BagCell : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragH
         
         // 添加Image组件显示图标
         Image dragImage = dragInstance.AddComponent<Image>();
-        dragImage.sprite = itemImage.sprite;
+        if(ConfigManager.IsHeroCard(cardId))
+        {
+            var heroCfg = HeroConfig.GetConfig(cardId);
+            dragImage.sprite = Resources.Load<Sprite>("Skins/" + heroCfg.Icon);
+        }
+        else
+            dragImage.sprite = itemImage.sprite;
         dragImage.rectTransform.sizeDelta = new Vector2(100, 100); // 适当放大图标以便于查看
         dragImage.raycastTarget = false; // 不阻挡射线检测
         
@@ -105,7 +107,7 @@ public class BagCell : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragH
         RemoveTagImg();
     }
 
-    private void RemoveTagImg()
+    public void RemoveTagImg()
     {
         UnityEngine.Debug.Log("RemoveTagImg");
             // 恢复对象的透明度和射线检测
@@ -119,7 +121,6 @@ public class BagCell : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragH
         // 确保拖动实例被正确销毁
         if (dragInstance != null)
         {
-            UnityEngine.Debug.Log("RemoveTagImg222");
             // 立即隐藏拖动图标
             Image dragImage = dragInstance.GetComponent<Image>();
             if (dragImage != null)

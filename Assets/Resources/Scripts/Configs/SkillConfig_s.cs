@@ -238,7 +238,7 @@ namespace CommonConfig
             config[203006] = new SkillConfig(203006, "影分队", "影", "产生一个幻影军队", "", 1, 0.35f, 15f, 0, "leadShip", 0, 0, 15f, false, "", 0, 0.4f, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "AttackedShadow", "", "MagicFieldGreen", 0, 3, "ying");
             config[208001] = new SkillConfig(208001, "百出", "百", "降低法术CD时间", "智技up", 1, 0, 0, 0, "inte", 0, 0, 0, false, "", 0, 0.3f, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "ModifySkillRateTime", "", "", 0, 2, "bai");
             config[208002] = new SkillConfig(208002, "神算", "神", "提升法术命中率和持续时间", "智技up", 1, 0.3f, 0, 0, "inte", 0, 0, 0, false, "", 0, 0.5f, 0, 0, 0, 0, 0.5f, 0, 0, 0, 0, 0, "ModifySkillRateTime", "", "", 0, 3, "shen");
-            config[208003] = new SkillConfig(208003, "蔓延", "延", "法术负面状态概率扩散", "智技up", 1, 0.5f, 4f, 0, "inte", 0.2f, 0.01f, 25f, false, "", 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "ModifyBuffExpand", "", "", 0, 3, "yan2");
+            config[208003] = new SkillConfig(208003, "蔓延", "延", "法术负面状态概率扩散", "智技up", 1, 0.5f, 4f, 0, "inte", 0.2f, 0.01f, 30f, false, "", 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "ModifyBuffExpand", "", "", 0, 3, "yan2");
             config[209001] = new SkillConfig(209001, "富甲", "商", "参战获得5金币", "", 1, 0, 0, 0, "inte", 0, 0, 0, false, "", 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, "Gold", "", "MagicChargeYellow", 0, 3, "gold");
             config[209002] = new SkillConfig(209002, "国士", "国", "增加一个远程士兵,提升射程", "", 1, 0, 0, 0, "inte", 0, 0, 15f, false, "", 0, 0, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, "SoldierSummon", "", "MagicChargeGreen", 0, 4, "guo");
             config[209003] = new SkillConfig(209003, "指导", "师", "提升队伍最低武将智力", "", 1, 0, 0, 0, "inte", 0, 0, 0, false, "", 0, 0.6f, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "HelpTeach", "", "MagicChargeYellow", 0, 2, "shi2");

@@ -26,8 +26,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     public Dictionary<int, int> cards = new Dictionary<int, int>(); // cardid - > exp
 
     public Dictionary<int, int> itemEquips = new Dictionary<int, int>(); // heroId -> itemid
-    public List<int> battleCards = new List<int>();
-
+    public int[] battleCards = new int[6];
 
     public bool isOnTurn;
     public TMP_Text playerNameText;
@@ -121,6 +120,20 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         itemEquips[heroId] = itemId;
     }
 
+    public void SetBattlePos(int heroId, int pos)
+    {
+        if(pos < 0 || pos >= battleCards.Length)
+            return;
+        for(int i = 0; i < battleCards.Length; i++)
+        {
+            if(battleCards[i] == heroId)
+            {
+                battleCards[i] = 0;
+                break;
+            }
+        }
+        battleCards[pos] = heroId;
+    }
 
     public void SellCard(int cardId)
     {
@@ -139,7 +152,14 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         cards.Remove(cardId);
         GameManager.Instance.PlaySound("Sounds/gold");
 
-        battleCards.Remove(cardId);
+        for(int i = 0; i < battleCards.Length; i++)
+        {
+            if(battleCards[i] == cardId)
+            {
+                battleCards[i] = 0;
+                break;
+            }
+        }   
         if(itemEquips.ContainsKey(cardId))
         {
             itemEquips.Remove(cardId);
@@ -252,17 +272,45 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 
     }
 
-    public List<Tuple<int, int>> GetBattleCardList()
+    public void AutoSetBattleCard()
     {
-        var strongCardIds = GetStrong5CardList();
+        var strongCardIds = GetBattleCardList(true);
+        for(int i = 0; i < battleCards.Length; i++)
+        {
+            if (strongCardIds[i] != null)
+                battleCards[i] = strongCardIds[i].Item1;
+            else
+                battleCards[i] = 0;
+        }
+    }
+
+    public List<Tuple<int, int>> GetBattleCardList(bool isTest = false)
+    {
+        var strongCardIds = GetStrong6CardList();
+        if(!isTest && battleCards.Any(c => c > 0))
+        {
+            for(int i = 0; i < battleCards.Length; i++)
+            {
+                if (battleCards[i] > 0)
+                {
+                    var heroConfig = HeroConfig.GetConfig(battleCards[i]);
+                    var heroPrice = HeroSelectionTool.GetPrice(heroConfig);
+                    strongCardIds.Add(new Tuple<int, int>(battleCards[i], heroPrice * HeroSelectionTool.GetCardLevel(cards[heroConfig.Id])));
+                }
+            }
+
+            UpdateFightMark(strongCardIds);
+            return strongCardIds;
+        }
         if(pid > 0)
             AutoCheckItem(strongCardIds);
-        CheckFightMark(strongCardIds);
+        if(!isTest)
+            UpdateFightMark(strongCardIds);
         return RearrangePos(strongCardIds);
     }
 
 
-    private List<Tuple<int, int>> GetStrong5CardList()
+    private List<Tuple<int, int>> GetStrong6CardList()
     {
         List<Tuple<int, int>> sortDataList = new List<Tuple<int, int>>();
 
@@ -277,29 +325,11 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
             sortDataList.Add(new Tuple<int, int>(cardId, heroPrice * HeroSelectionTool.GetCardLevel(cards[cardId])));
         }
 
-        if(pid == 0)
+        sortDataList.Sort((a, b) => b.Item2.CompareTo(a.Item2));
+        if(pid > 0)
         {
-            sortDataList.Sort((a, b) => 
-            {
-                // 若 a 在 battleCards 中且 b 不在，则 a 排在前面
-                if (battleCards.Contains(a.Item1) && !battleCards.Contains(b.Item1))
-                    return -1;
-                // 若 b 在 battleCards 中且 a 不在，则 b 排在前面
-                if (!battleCards.Contains(a.Item1) && battleCards.Contains(b.Item1))
-                    return 1;
-                // 若两者都在或都不在 battleCards 中，则按 Item2 降序排序
-                return b.Item2.CompareTo(a.Item2);
-            });
-
-            if (sortDataList.Count > 5)
-                sortDataList = sortDataList.Take(5).ToList(); //按战力排出前5            
-        }
-        else
-        {
-            sortDataList.Sort((a, b) => b.Item2.CompareTo(a.Item2));
-
             // 获取前5卡
-            var top5Cards = sortDataList.Take(5).ToList();
+            var top5Cards = sortDataList.Take(6).ToList();
             
             // 计算所有卡对前5卡的friend数量，如果没有friend则item2*1.1
             for (int i = 0; i < sortDataList.Count; i++)
@@ -326,41 +356,54 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
             
             // 重新排序
             sortDataList.Sort((a, b) => b.Item2.CompareTo(a.Item2));
+        }
 
-            if (sortDataList.Count > 5)
-                sortDataList = sortDataList.Take(5).ToList(); //按战力排出前5                 
-
-            Dictionary<int, SideInfo> sideInfos = new Dictionary<int, SideInfo>();
-
-            for (int i = 0; i < sortDataList.Count; i++)
+        if(sortDataList.Count > 6)
+        {
+            int combatCount = 0;
+            int rangeCount = 0;
+            CountCard(sortDataList, ref combatCount, ref rangeCount);
+            while (combatCount > 3)
             {
-                var cardId = sortDataList[i].Item1;
-                var heroConfig = HeroConfig.GetConfig(cardId);
+                if (!SwapCard(sortDataList, true))
+                    break;
 
-                if (!sideInfos.TryGetValue(heroConfig.Side, out var info))
-                {
-                    sideInfos[heroConfig.Side] = new SideInfo();
-                }
-                if (heroConfig.Job == "shuai")
-                {
-                    sideInfos[heroConfig.Side].HasShuai = true;
-                }
-                else
-                {
-                    sideInfos[heroConfig.Side].Count++;
-                }
+                CountCard(sortDataList, ref combatCount, ref rangeCount);
             }
-
-            foreach (var sideItem in sideInfos)
+            CountCard(sortDataList, ref combatCount, ref rangeCount);
+            while (rangeCount > 3)
             {
-                if (!sideItem.Value.HasShuai && sideItem.Value.Count >= 2)
+                if (!SwapCard(sortDataList, false))
+                    break;
+
+                CountCard(sortDataList, ref combatCount, ref rangeCount);
+            }
+            sortDataList = sortDataList.Take(6).ToList(); //按战力排出前6   
+        }
+
+        Dictionary<int, SideInfo> sideInfos = new Dictionary<int, SideInfo>();
+        for (int i = 0; i < sortDataList.Count; i++)
+        {
+            var cardId = sortDataList[i].Item1;
+            var heroConfig = HeroConfig.GetConfig(cardId);
+
+            if (!sideInfos.TryGetValue(heroConfig.Side, out var info))
+                sideInfos[heroConfig.Side] = new SideInfo();
+            if (heroConfig.Job == "shuai")
+                sideInfos[heroConfig.Side].HasShuai = true;
+            else
+                sideInfos[heroConfig.Side].Count++;
+        }
+
+        foreach (var sideItem in sideInfos)
+        {
+            if (!sideItem.Value.HasShuai && sideItem.Value.Count >= 2)
+            {
+                var shuaiId = 100000 + sideItem.Key;
+                if (cards.ContainsKey(shuaiId))
                 {
-                    var shuaiId = 100000 + sideItem.Key;
-                    if (cards.ContainsKey(shuaiId))
-                    {
-                        sortDataList[sortDataList.Count - 1] = new Tuple<int, int>(shuaiId, 1);
-                        break;
-                    }
+                    sortDataList[sortDataList.Count - 1] = new Tuple<int, int>(shuaiId, 1);
+                    break;
                 }
             }
         }
@@ -371,6 +414,70 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 
         return results;
 
+    }
+
+    private static bool SwapCard(List<Tuple<int, int>> sortDataList, bool checkCombat)
+    {
+        // 找到6以内最后一张combat卡
+        int lastCombatIndex = -1;
+        for (int i = 5; i >= 3; i--)
+        {
+            var cardId = sortDataList[i].Item1;
+            var heroConfig = HeroConfig.GetConfig(cardId);
+            if (checkCombat && heroConfig.Pos == 1 || !checkCombat && heroConfig.Pos > 1) // combat类型
+            {
+                lastCombatIndex = i;
+                break;
+            }
+        }
+
+        if (lastCombatIndex >= 0)
+        {
+            UnityEngine.Debug.Log("SwapCard lastCombatIndex: " + lastCombatIndex);
+            // 在6以外且index+3内（即前9名内）寻找range卡
+            int rangeCardIndex = -1;
+            for (int i = 6; i < Math.Min(sortDataList.Count, lastCombatIndex + 3); i++)
+            {
+                var cardId = sortDataList[i].Item1;
+                var heroConfig = HeroConfig.GetConfig(cardId);
+                if (checkCombat && heroConfig.Pos != 1 || !checkCombat && heroConfig.Pos == 1) // range类型
+                {
+                    rangeCardIndex = i;
+                    break;
+                }
+            }
+
+            // 如果找到合适的range卡，则进行交换
+            UnityEngine.Debug.Log("SwapCard lastCombatIndex: " + lastCombatIndex + " rangeCardIndex: " + rangeCardIndex);
+            if (rangeCardIndex >= 0)
+            {
+                var temp = sortDataList[lastCombatIndex];
+                sortDataList[lastCombatIndex] = sortDataList[rangeCardIndex];
+                sortDataList[rangeCardIndex] = temp;
+            }
+            else
+                return false;
+        }
+        else
+        {
+            return false;
+        }
+        return true;
+    }
+
+    private static void CountCard(List<Tuple<int, int>> sortDataList, ref int combatCount, ref int rangeCount)
+    {
+        combatCount = 0;
+        rangeCount = 0;
+        for (int i = 0; i < 6; i++)
+        {
+            var cardId = sortDataList[i].Item1;
+            var heroConfig = HeroConfig.GetConfig(cardId);
+            if (heroConfig.Pos == 1)
+                combatCount++;
+            else
+                rangeCount++;
+        }
     }
 
     private void AutoCheckItem(List<Tuple<int, int>> results)
@@ -431,7 +538,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         }
     }
 
-    private void CheckFightMark(List<Tuple<int, int>> results)
+    private void UpdateFightMark(List<Tuple<int, int>> results)
     {
         int mark = 0;
         foreach(var item in results)
@@ -458,54 +565,42 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     private List<Tuple<int, int>> RearrangePos(List<Tuple<int, int>> results)
     {
         // 根据 Pos 属性重新调整卡牌位置
-        List<Tuple<int, int>> newResult = new List<Tuple<int, int>>() { null, null, null, null, null };
-        List<Tuple<int, int>> pos12 = new List<Tuple<int, int>>();
-        List<Tuple<int, int>> pos3 = new List<Tuple<int, int>>();
-        List<Tuple<int, int>> pos45 = new List<Tuple<int, int>>();
+        List<Tuple<int, int>> newResult = new List<Tuple<int, int>>() { null, null, null, null, null, null };
+        List<Tuple<int, int>> pos123 = new List<Tuple<int, int>>();
+        List<Tuple<int, int>> pos456 = new List<Tuple<int, int>>();
 
         // 根据 Pos 分类卡牌
         foreach (var item in results)
         {
             int pos = HeroConfig.GetConfig(item.Item1).Pos;
-            if (pos == 3)
-                pos45.Add(item);
-            else if (pos == 2)
-                pos3.Add(item);
+            if (pos == 3 || pos == 2)
+                pos456.Add(item);
             else
-                pos12.Add(item);
+                pos123.Add(item);
         }
 
         // 填充 1-2 位置
         int index = 0;
-        while (index < 2 && pos12.Count > 0)
+        while (index < 3 && pos123.Count > 0)
         {
-            newResult[index] = pos12[0];
-            pos12.RemoveAt(0);
+            newResult[index] = pos123[0];
+            pos123.RemoveAt(0);
             index++;
-        }
-
-        // 填充 3 位置
-        index = 2;
-        if (pos3.Count > 0)
-        {
-            newResult[index] = pos3[0];
-            pos3.RemoveAt(0);
         }
 
         // 填充 4-5 位置
         index = 3;
-        while (index < 5 && pos45.Count > 0)
+        while (index < 6 && pos456.Count > 0)
         {
-            newResult[index] = pos45[0];
-            pos45.RemoveAt(0);
+            newResult[index] = pos456[0];
+            pos456.RemoveAt(0);
             index++;
         }
 
         // 处理剩余卡牌，放到相邻位置
         List<Tuple<int, int>> remainingCards = new List<Tuple<int, int>>();
-        remainingCards.AddRange(pos12);
-        remainingCards.AddRange(pos3);
-        remainingCards.AddRange(pos45);
+        remainingCards.AddRange(pos123);
+        remainingCards.AddRange(pos456);
 
         for(int i = 0; i < newResult.Count; i++)
         {

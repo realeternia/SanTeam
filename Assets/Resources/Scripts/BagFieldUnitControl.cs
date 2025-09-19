@@ -1,14 +1,18 @@
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 using CommonConfig;
 
-public class BagFieldUnitControl : MonoBehaviour
+public class BagFieldUnitControl : MonoBehaviour, IDropHandler
 {
+    public int posId;
     public Image heroIcon;
     public Image jobIcon;
+    public BagControl bagControl;    
 
-    public void Init(int heroId)
+    public void SetInfo(int id, int heroId)
     {
+        posId = id;
         if (heroId == 0)
         {
             heroIcon.gameObject.SetActive(false);
@@ -26,5 +30,22 @@ public class BagFieldUnitControl : MonoBehaviour
                 jobIcon.sprite = Resources.Load<Sprite>("SkillPic/" + skillConfig.Icon);
             }
         }
+    }
+
+        // 当有物体拖放到此对象上时调用
+    public void OnDrop(PointerEventData eventData)
+    {       
+        // 获取拖动的BagCell
+        GameObject draggedObject = eventData.pointerDrag;
+        if (draggedObject == null)
+            return;
+        
+        BagCell draggedCell = draggedObject.GetComponent<BagCell>();
+        if (draggedCell == null || !ConfigManager.IsHeroCard(draggedCell.cardId))
+            return;
+        
+        // 调用装备方法，与equipBtn相同的功能
+        draggedCell.RemoveTagImg();
+        bagControl.SetHeroForBattle(draggedCell.cardId, posId);
     }
 }
