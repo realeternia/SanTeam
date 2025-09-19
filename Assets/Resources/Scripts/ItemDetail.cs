@@ -11,6 +11,7 @@ public class ItemDetail : MonoBehaviour
 {
     public int cardId;
     public int level;
+    public BagControl bagControl;
 
     public TMP_Text nameText;
     public Image attr1Icon;
@@ -48,13 +49,13 @@ public class ItemDetail : MonoBehaviour
 
         equipText.text = "";        
 
-        var player = GameManager.Instance.GetPlayer(0);
+        var player = bagControl.bindPlayer;
 
         if (!ConfigManager.IsHeroCard(id))
         {
             var itemConfig = ItemConfig.GetConfig(id);
             nameText.text = itemConfig.Name;
-            goldText.text = (itemConfig.Price * GameManager.Instance.GetPlayer(0).cards[cardId] / 2).ToString();
+            goldText.text = (itemConfig.Price * player.cards[cardId] / 2).ToString();
 
             if(string.IsNullOrEmpty(itemConfig.Attr1))
             {

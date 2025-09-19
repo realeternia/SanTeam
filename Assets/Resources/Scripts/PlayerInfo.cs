@@ -75,13 +75,19 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     public void OnPointerUp(PointerEventData eventData)
     {
         Debug.Log($"UI 元素被抬起，位置：{eventData.position}");
-        CardShopManager.Instance.UpdateCards(0);
+
+        if(CardShopManager.Instance != null)
+            CardShopManager.Instance.UpdateCards(0);
     }    
 
     public void OnPointerDown(PointerEventData eventData)
     {
         Debug.Log($"UI 元素被按下，位置：{eventData.position}");
-        CardShopManager.Instance.UpdateCards(pid);
+
+        if(CardShopManager.Instance != null)
+            CardShopManager.Instance.UpdateCards(pid);
+
+        PanelManager.Instance.SendSignal("SelectPlayer", "", pid);
     }
 
     public void AddGold(int g)
@@ -306,7 +312,19 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
             AutoCheckItem(strongCardIds);
         if(!isTest)
             UpdateFightMark(strongCardIds);
-        return RearrangePos(strongCardIds);
+        var results = RearrangePos(strongCardIds);
+
+        if (pid > 0)
+        {
+            //把results保存到battleCards
+            battleCards = new int[6];
+            for (int i = 0; i < 6; i++)
+                battleCards[i] = 0;
+            for (int i = 0; i < results.Count; i++)
+                battleCards[i] = results[i].Item1;
+        }
+
+        return results;
     }
 
 

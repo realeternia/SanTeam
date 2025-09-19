@@ -10,6 +10,7 @@ public class ItemHeroDetail : MonoBehaviour
 {
     public int cardId;
     public int level;
+    public BagControl bagControl;
 
     public TMP_Text nameText;
     public TMP_Text leadText;
@@ -55,7 +56,7 @@ public class ItemHeroDetail : MonoBehaviour
 
         equipText.text = "";        
 
-        var player = GameManager.Instance.GetPlayer(0);
+        var player = bagControl.bindPlayer;
 
         if (ConfigManager.IsHeroCard(id))
         {
@@ -67,7 +68,7 @@ public class ItemHeroDetail : MonoBehaviour
             leadShipBase = heroConfig.LeadShip;
 
             nameText.text = heroConfig.Name;
-            goldText.text = (HeroSelectionTool.GetPrice(heroConfig) * GameManager.Instance.GetPlayer(0).cards[cardId] / 2).ToString();
+            goldText.text = (HeroSelectionTool.GetPrice(heroConfig) * player.cards[cardId] / 2).ToString();
 
             if (heroConfig.Skills != null && heroConfig.Skills.Length > 0)
             {

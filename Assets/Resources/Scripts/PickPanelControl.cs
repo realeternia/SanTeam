@@ -76,7 +76,7 @@ public class PickPanelControl : MonoBehaviour
     private IEnumerator AllPlayerBans()
     {
         // 等待1秒
-        yield return new WaitForSeconds(1f);
+        yield return new WaitForSeconds(.3f);
 
         for (int i = 1; i <= 11; i++)
         {
@@ -85,7 +85,7 @@ public class PickPanelControl : MonoBehaviour
             if (player.banCount > 0)
             {
                 PlayerAI.CheckBan(player, cellControls);
-                yield return new WaitForSeconds(UnityEngine.Random.Range(0.5f, 1.5f));
+                yield return new WaitForSeconds(UnityEngine.Random.Range(0.1f, 0.3f));
             }
         }
         

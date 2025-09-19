@@ -5,7 +5,7 @@ using CommonConfig;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class BagControl : MonoBehaviour
+public class BagControl : MonoBehaviour, IPanelEvent
 {
     public Button closeBtn;
 
@@ -22,7 +22,7 @@ public class BagControl : MonoBehaviour
     public GameObject fieldRegion;
     public BagRecycler bagRecycler;
 
-    private PlayerInfo bindPlayer;
+    public PlayerInfo bindPlayer;
 
     void Start()
     {
@@ -87,6 +87,23 @@ public class BagControl : MonoBehaviour
     public void Bind(PlayerInfo p)
     {
         bindPlayer = p;
+        UpdateView();
+
+        if (bagRecycler != null)
+            bagRecycler.gameObject.SetActive(p.pid == 0);
+        if (fieldAutoBtn != null)
+            fieldAutoBtn.gameObject.SetActive(p.pid == 0);
+
+        heroDetail.gameObject.SetActive(false);
+        itemDetail.gameObject.SetActive(false);
+
+        UpdateFieldView();
+    }
+
+    public void SendSignal(string name, string parm1, int parm2)
+    {
+        if(name == "SelectPlayer")
+            Bind(GameManager.Instance.GetPlayer(parm2));
     }
 
     public void UpdateView()
@@ -165,7 +182,7 @@ public class BagControl : MonoBehaviour
         foreach (Transform child in fieldRegion.transform)
         {
             var fieldUnit = child.GetComponent<BagFieldUnitControl>();
-            fieldUnit.SetInfo(fieldUnit.posId, bindPlayer.battleCards[fieldUnit.posId]);
+            fieldUnit.SetInfo(fieldUnit.posId, bindPlayer.battleCards.Length > fieldUnit.posId ? bindPlayer.battleCards[fieldUnit.posId] : 0);
         }
     }
 
@@ -212,6 +229,8 @@ public class BagControl : MonoBehaviour
         var p1 = GameManager.Instance.GetPlayer(0);
         p1.Equip(heroCardId, itemCardId);
 
+        heroDetail.gameObject.SetActive(true);
+        itemDetail.gameObject.SetActive(true);
         heroDetail.UpdateInfo(heroCardId, HeroSelectionTool.GetCardLevel(p1.cards[heroCardId]));
         itemDetail.UpdateInfo(itemCardId, HeroSelectionTool.GetCardLevel(p1.cards[itemCardId]));
 
@@ -242,6 +261,8 @@ public class BagControl : MonoBehaviour
             CardShopManager.Instance.OnPlayerSellCard();
         heroDetail.Clear();
         itemDetail.Clear();
+        heroDetail.gameObject.SetActive(false);
+        itemDetail.gameObject.SetActive(false);
         UpdateFieldView();
     }
 
@@ -250,10 +271,12 @@ public class BagControl : MonoBehaviour
         if (ConfigManager.IsHeroCard(cell.cardId))
         {
             heroDetail.UpdateInfo(cell.cardId, cell.level);
+            heroDetail.gameObject.SetActive(true);
         }
         else
         {
             itemDetail.UpdateInfo(cell.cardId, cell.level);
+            itemDetail.gameObject.SetActive(true);
         }
         foreach (var bagCell in cellCache)
         {
