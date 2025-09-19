@@ -67,6 +67,10 @@ namespace CommonConfig
         /// </summary>
         public bool AutoRemove;
         /// <summary>
+        ///使用后消失
+        /// </summary>
+        public bool RemoveWhenUse;
+        /// <summary>
         ///价格
         /// </summary>
         public int Price;
@@ -84,7 +88,7 @@ namespace CommonConfig
         public string Icon;
 
 
-        public ItemConfig(int Id, string Name, string Des, int Lv, string Effect, string Attr1, int Attr1Val, string Attr2, int Attr2Val, int[] Skills, string HitEffect, int RateAbs, int ShopIdx, bool AutoUse, bool AutoRemove, int Price, float PriceRound, bool SellOne, string Icon)
+        public ItemConfig(int Id, string Name, string Des, int Lv, string Effect, string Attr1, int Attr1Val, string Attr2, int Attr2Val, int[] Skills, string HitEffect, int RateAbs, int ShopIdx, bool AutoUse, bool AutoRemove, bool RemoveWhenUse, int Price, float PriceRound, bool SellOne, string Icon)
         {
             this.Id = Id;
             this.Name = Name;
@@ -101,6 +105,7 @@ namespace CommonConfig
             this.ShopIdx = ShopIdx;
             this.AutoUse = AutoUse;
             this.AutoRemove = AutoRemove;
+            this.RemoveWhenUse = RemoveWhenUse;
             this.Price = Price;
             this.PriceRound = PriceRound;
             this.SellOne = SellOne;
@@ -128,24 +133,27 @@ namespace CommonConfig
         public static void Load()
         {
             config.Clear();
-            config[400001] = new ItemConfig(400001, "关王刀", "", 1, "attr", "str", 10, "", 0, null, "", 0, 5, false, false, 25, 0, false, "guanwangdao");
-            config[400002] = new ItemConfig(400002, "方天画戟", "", 1, "attr", "str", 15, "", 0, null, "", 0, 8, false, false, 40, 0, false, "fangtian");
-            config[400003] = new ItemConfig(400003, "丈八蛇矛", "", 1, "attr", "str", 11, "", 0, null, "", 0, 5, false, false, 27, 0, false, "zhangba");
-            config[400004] = new ItemConfig(400004, "檀木弓", "", 1, "attr", "str", 6, "", 0, null, "", 0, 0, false, false, 15, 0, false, "tanmugong");
-            config[400005] = new ItemConfig(400005, "大斧", "", 1, "attr", "str", 6, "", 0, null, "", 0, 0, false, false, 15, 0, false, "dafu");
-            config[400006] = new ItemConfig(400006, "三丈枪", "", 1, "attr", "str", 6, "", 0, null, "", 0, 0, false, false, 15, 0, false, "sanzhangqiang");
-            config[400007] = new ItemConfig(400007, "孙子兵法", "", 1, "attr", "lead", 15, "", 0, null, "", 0, 8, false, false, 40, 0, false, "sunzi");
-            config[400008] = new ItemConfig(400008, "墨子", "", 1, "attr", "lead", 6, "", 0, null, "", 0, 0, false, false, 15, 0, false, "mozi");
-            config[400009] = new ItemConfig(400009, "六韬", "", 1, "attr", "lead", 10, "", 0, null, "", 0, 5, false, false, 25, 0, false, "liutao");
-            config[400010] = new ItemConfig(400010, "诗经", "", 1, "attr", "inte", 6, "", 0, null, "", 0, 0, false, false, 15, 0, false, "shijing");
-            config[400011] = new ItemConfig(400011, "易经", "", 1, "attr", "inte", 10, "", 0, null, "", 0, 5, false, false, 25, 0, false, "yijing");
-            config[400012] = new ItemConfig(400012, "道德经", "", 1, "attr", "inte", 15, "", 0, null, "", 0, 8, false, false, 40, 0, false, "daode");
-            config[400013] = new ItemConfig(400013, "赤兔马", "", 1, "attr", "shield", 60, "", 0, null, "", 0, 8, false, false, 40, 0, false, "chitu");
-            config[400014] = new ItemConfig(400014, "的卢马", "", 1, "attr", "shield", 40, "", 0, null, "", 0, 5, false, false, 25, 0, false, "dilu");
-            config[400015] = new ItemConfig(400015, "大宛宝马", "", 1, "attr", "shield", 24, "", 0, null, "", 0, 0, false, false, 15, 0, false, "dawan");
-            config[401001] = new ItemConfig(401001, "和氏璧", "先手选牌", 1, "first", "", 0, "", 0, null, "", 100, 0, true, true, 5, 0.6f, true, "heshi");
-            config[401002] = new ItemConfig(401002, "士兵剑", "士兵攻up", 1, "sodatk", "", 0, "", 0, null, "", 50, 3, true, true, 20, 0, true, "jian1");
-            config[401003] = new ItemConfig(401003, "士兵甲", "士兵命up", 1, "sodhp", "", 0, "", 0, null, "", 50, 3, true, true, 20, 0, true, "jia1");
+            config[400001] = new ItemConfig(400001, "关王刀", "", 1, "attr", "str", 10, "", 0, null, "", 0, 5, false, false, false, 25, 0, false, "guanwangdao");
+            config[400002] = new ItemConfig(400002, "方天画戟", "", 1, "attr", "str", 15, "", 0, null, "", 0, 8, false, false, false, 40, 0, false, "fangtian");
+            config[400003] = new ItemConfig(400003, "丈八蛇矛", "", 1, "attr", "str", 11, "", 0, null, "", 0, 5, false, false, false, 27, 0, false, "zhangba");
+            config[400004] = new ItemConfig(400004, "檀木弓", "", 1, "attr", "str", 6, "", 0, null, "", 0, 0, false, false, false, 15, 0, false, "tanmugong");
+            config[400005] = new ItemConfig(400005, "大斧", "", 1, "attr", "str", 6, "", 0, null, "", 0, 0, false, false, false, 15, 0, false, "dafu");
+            config[400006] = new ItemConfig(400006, "三丈枪", "", 1, "attr", "str", 6, "", 0, null, "", 0, 0, false, false, false, 15, 0, false, "sanzhangqiang");
+            config[400007] = new ItemConfig(400007, "孙子兵法", "", 1, "attr", "lead", 15, "", 0, null, "", 0, 8, false, false, false, 40, 0, false, "sunzi");
+            config[400008] = new ItemConfig(400008, "墨子", "", 1, "attr", "lead", 6, "", 0, null, "", 0, 0, false, false, false, 15, 0, false, "mozi");
+            config[400009] = new ItemConfig(400009, "六韬", "", 1, "attr", "lead", 10, "", 0, null, "", 0, 5, false, false, false, 25, 0, false, "liutao");
+            config[400010] = new ItemConfig(400010, "诗经", "", 1, "attr", "inte", 6, "", 0, null, "", 0, 0, false, false, false, 15, 0, false, "shijing");
+            config[400011] = new ItemConfig(400011, "易经", "", 1, "attr", "inte", 10, "", 0, null, "", 0, 5, false, false, false, 25, 0, false, "yijing");
+            config[400012] = new ItemConfig(400012, "道德经", "", 1, "attr", "inte", 15, "", 0, null, "", 0, 8, false, false, false, 40, 0, false, "daode");
+            config[400013] = new ItemConfig(400013, "赤兔马", "", 1, "attr", "shield", 60, "", 0, null, "", 0, 8, false, false, false, 40, 0, false, "chitu");
+            config[400014] = new ItemConfig(400014, "的卢马", "", 1, "attr", "shield", 40, "", 0, null, "", 0, 5, false, false, false, 25, 0, false, "dilu");
+            config[400015] = new ItemConfig(400015, "大宛宝马", "", 1, "attr", "shield", 24, "", 0, null, "", 0, 0, false, false, false, 15, 0, false, "dawan");
+            config[401001] = new ItemConfig(401001, "和氏璧", "先手选牌", 1, "first", "", 0, "", 0, null, "", 100, 0, true, true, false, 5, 0.6f, true, "heshi");
+            config[401002] = new ItemConfig(401002, "士兵剑", "士兵攻up", 1, "sodatk", "", 0, "", 0, null, "", 50, 3, true, true, false, 20, 0, true, "jian1");
+            config[401003] = new ItemConfig(401003, "士兵甲", "士兵命up", 1, "sodhp", "", 0, "", 0, null, "", 50, 3, true, true, false, 20, 0, true, "jia1");
+            config[401004] = new ItemConfig(401004, "豆腐", "武力+5", 1, "attr", "str", 5, "", 0, null, "", 50, 1, false, false, true, 17, 1f, true, "doufu");
+            config[401005] = new ItemConfig(401005, "沙拉", "智力+5", 1, "attr", "inte", 5, "", 0, null, "", 50, 1, false, false, true, 17, 1f, true, "shala");
+            config[401006] = new ItemConfig(401006, "烤鸭", "统帅+5", 1, "attr", "lead", 5, "", 0, null, "", 50, 1, false, false, true, 17, 1f, true, "kaoya");
 
         }
 

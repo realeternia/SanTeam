@@ -417,7 +417,7 @@ public class Chess : MonoBehaviour
         level = lv;
 
         var heroConfig = HeroConfig.GetConfig(heroId);
-        var attr = HeroSelectionTool.GetCardAttr(heroId, lv);
+        var attr = HeroSelectionTool.GetCardAttr(player, heroId, lv);
 
         maxHp = attr.Hp;
         moveSpeed = heroConfig.MoveSpeed;
@@ -432,7 +432,7 @@ public class Chess : MonoBehaviour
             var equipId = player.itemEquips[heroId];
             var cardLevel = HeroSelectionTool.GetCardLevel(player.cards[equipId]);
 
-            var equipAttr = HeroSelectionTool.GetCardAttr(equipId, cardLevel);
+            var equipAttr = HeroSelectionTool.GetCardAttr(player, equipId, cardLevel);
 
             inte += equipAttr.Inte;
             str += equipAttr.Str;
@@ -750,6 +750,8 @@ public class Chess : MonoBehaviour
         if(heroInfo != null)
             heroInfo.SetAttr(inte, str, leadShip);
     }
+
+    public float HpRate{ get { return (float)hp / maxHp; } }
 
     public bool HasBuff(int id)
     {

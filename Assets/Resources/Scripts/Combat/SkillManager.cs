@@ -35,8 +35,10 @@ public static class SkillManager
                 return new SkillSpeedAttack(skillId, owner);
             case "MultiArrow":
                 return new SkillMultiArrow(skillId, owner);
-            case "PlantSkin":
-                return new SkillPlantSkin(skillId, owner);
+            case "DefPlantSkin":
+                return new SkillDefPlantSkin(skillId, owner);
+            case "DefHpLow":
+                return new SkillDefHpLow(skillId, owner);
             case "HelpTeach":
                 return new SkillHelpTeach(skillId, owner);
             case "SoldierUp":

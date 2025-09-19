@@ -374,7 +374,7 @@ public static class HeroSelectionTool
         return (float)(exp - cardExp[level - 1]) / (cardExp[level] - cardExp[level - 1]);
     }
 
-    public static AttrInfo GetCardAttr(int cardId, int lv)
+    public static AttrInfo GetCardAttr(PlayerInfo player, int cardId, int lv)
     {
         var attrInfo = new AttrInfo();
         if (ConfigManager.IsHeroCard(cardId))
@@ -428,6 +428,8 @@ public static class HeroSelectionTool
             attrInfo.Str = attrInfo.Str * lv;
             attrInfo.Lead = attrInfo.Lead * lv;
         }
+        if(player.attrAddons.ContainsKey(cardId))
+            attrInfo.AddAttr(player.attrAddons[cardId]);
 
         return attrInfo;
 

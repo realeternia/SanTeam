@@ -28,27 +28,23 @@ public class BagControl : MonoBehaviour, IPanelEvent
 
     void Start()
     {
-        // bindPlayer = GameManager.Instance.GetPlayer(0);
-        // bindPlayer.cards[100003] = 1;
-        // bindPlayer.cards[100005] = 1;
-        // bindPlayer.cards[100006] = 3;
-        // for(int i = 0; i < 6; i++)
-        //     bindPlayer.cards[101001 + i + 1] = 1;
-        // for(int i = 0; i < 13; i++)
-        //     bindPlayer.cards[400001 + i + 1] = 1;            
-        // OnShow();
+        bindPlayer = GameManager.Instance.GetPlayer(0);
+        bindPlayer.cards[401004] = 1;         
+       // OnShow();
 
         closeBtn.onClick.AddListener(() =>
         {      
             DestroyAllCells();
             PanelManager.Instance.HideBag();
             CardShopManager.Instance.OnShow();
-        });  
+        });
         fieldAutoBtn.onClick.AddListener(() =>
         {
             var p1 = GameManager.Instance.GetPlayer(0);
             p1.AutoSetBattleCard();
             UpdateFieldView();
+
+            GameManager.Instance.PlaySound("Sounds/equip");
         });
 
         for (int i = 0; i < 6; i++)
@@ -235,12 +231,29 @@ public class BagControl : MonoBehaviour, IPanelEvent
         var p1 = GameManager.Instance.GetPlayer(0);
         p1.Equip(heroCardId, itemCardId);
 
-        heroDetail.gameObject.SetActive(true);
-        itemDetail.gameObject.SetActive(true);
-        heroDetail.UpdateInfo(heroCardId, HeroSelectionTool.GetCardLevel(p1.cards[heroCardId]));
-        itemDetail.UpdateInfo(itemCardId, HeroSelectionTool.GetCardLevel(p1.cards[itemCardId]));
+        var itemCfg = ItemConfig.GetConfig(itemCardId);
+        if(itemCfg.RemoveWhenUse)
+        {
+            itemDetail.gameObject.SetActive(false);
+            GameManager.Instance.PlaySound("Sounds/eat");
+            
+            var cell = cellCache.Find(x => x.GetComponent<BagCell>().cardId == itemCardId);
+            if (cell != null)
+            {
+                cellCache.Remove(cell);
+                Destroy(cell);
+            }
+        }
+        else
+        {
+            itemDetail.gameObject.SetActive(true);
+            itemDetail.UpdateInfo(itemCardId, HeroSelectionTool.GetCardLevel(p1.cards[itemCardId]));
+            GameManager.Instance.PlaySound("Sounds/equip");
+        }
 
-        GameManager.Instance.PlaySound("Sounds/equip");
+        heroDetail.gameObject.SetActive(true);
+        heroDetail.UpdateInfo(heroCardId, HeroSelectionTool.GetCardLevel(p1.cards[heroCardId]));
+        
         UpdateEquips();
     }
 
@@ -274,6 +287,9 @@ public class BagControl : MonoBehaviour, IPanelEvent
 
     public void OnCellClick(BagCell cell)
     {
+        if(!bindPlayer.cards.ContainsKey(cell.cardId))
+            return;
+
         if (ConfigManager.IsHeroCard(cell.cardId))
         {
             heroDetail.UpdateInfo(cell.cardId, cell.level);

@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using CommonConfig;
 using UnityEngine;
 
-public class SkillPlantSkin : Skill
+public class SkillDefPlantSkin : Skill
 {
-    public SkillPlantSkin(int id, Chess unit) : base(id, unit)
+    public SkillDefPlantSkin(int id, Chess unit) : base(id, unit)
     {
     }
 

@@ -47,6 +47,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     public int sodhp = 0; //士兵def强化
     public int goldCostHero = 0;
     public int goldCostItem = 0;
+    public Dictionary<int, AttrInfo> attrAddons = new Dictionary<int, AttrInfo>();
 
     public int lastFightMark;
 
@@ -114,6 +115,14 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 
     public void Equip(int heroId, int itemId)
     {
+        var itemCfg = ItemConfig.GetConfig(itemId);
+        if (itemCfg.RemoveWhenUse && itemCfg.Effect == "attr")
+        {
+            AddAttrAddon(heroId, HeroSelectionTool.GetCardAttr(this, itemId, 1));
+            RemoveCard(itemId);
+            return;
+        }
+
         foreach(var item in itemEquips)
         {
             if(item.Value == itemId)
@@ -155,24 +164,30 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         }
 
         AddGold(price * cards[cardId] / 2);
-        cards.Remove(cardId);
-        GameManager.Instance.PlaySound("Sounds/gold");
 
-        for(int i = 0; i < battleCards.Length; i++)
+        GameManager.Instance.PlaySound("Sounds/gold");
+        RemoveCard(cardId);
+
+    }
+
+    private void RemoveCard(int cardId)
+    {
+        cards.Remove(cardId);
+        for (int i = 0; i < battleCards.Length; i++)
         {
-            if(battleCards[i] == cardId)
+            if (battleCards[i] == cardId)
             {
                 battleCards[i] = 0;
                 break;
             }
-        }   
-        if(itemEquips.ContainsKey(cardId))
+        }
+        if (itemEquips.ContainsKey(cardId))
         {
             itemEquips.Remove(cardId);
         }
-        foreach(var item in itemEquips)
+        foreach (var item in itemEquips)
         {
-            if(item.Value == cardId)
+            if (item.Value == cardId)
             {
                 itemEquips.Remove(item.Key);
                 break;
@@ -657,6 +672,14 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
                 return true;
         }
         return false;
+    }
+
+    public void AddAttrAddon(int cardId, AttrInfo attr)
+    {
+        if(!attrAddons.ContainsKey(cardId))
+            attrAddons.Add(cardId, attr);
+        else
+            attrAddons[cardId].AddAttr(attr);
     }
 }
 
