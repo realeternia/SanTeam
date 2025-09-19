@@ -33,7 +33,6 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     public Image playerImage;
     public TMP_Text goldText;
     public TMP_Text resultText;
-    public TMP_Text fightMarkText;
     public Image playerBgImg;
 
     // 在 PlayerInfo 类中添加 AICardConfig 实例
@@ -48,6 +47,8 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     public int sodhp = 0; //士兵def强化
     public int goldCostHero = 0;
     public int goldCostItem = 0;
+
+    public int lastFightMark;
 
     public CastleHUD castleHUD;
 
@@ -67,7 +68,6 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         gold = g;
         goldText.text = g.ToString();
         resultText.text = "0分";
-        fightMarkText.text = "";
         lineColor = ColorUtility.TryParseHtmlString(colorStr, out lineColor) ? lineColor : Color.white;
         playerBgImg.color = lineColor;
     }
@@ -292,22 +292,23 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 
     public List<Tuple<int, int>> GetBattleCardList(bool isTest = false)
     {
-        var strongCardIds = GetStrong6CardList();
-        if(!isTest && battleCards.Any(c => c > 0))
+        if(!isTest && pid == 0 && battleCards.Any(c => c > 0))
         {
+            var saveCardIds = new List<Tuple<int, int>>();
             for(int i = 0; i < battleCards.Length; i++)
             {
                 if (battleCards[i] > 0)
                 {
                     var heroConfig = HeroConfig.GetConfig(battleCards[i]);
                     var heroPrice = HeroSelectionTool.GetPrice(heroConfig);
-                    strongCardIds.Add(new Tuple<int, int>(battleCards[i], heroPrice * HeroSelectionTool.GetCardLevel(cards[heroConfig.Id])));
+                    saveCardIds.Add(new Tuple<int, int>(battleCards[i], HeroSelectionTool.GetCardLevel(cards[heroConfig.Id])));
                 }
             }
 
-            UpdateFightMark(strongCardIds);
-            return strongCardIds;
+            UpdateFightMark(saveCardIds);
+            return saveCardIds;
         }
+        var strongCardIds = GetStrong6CardList();        
         if(pid > 0)
             AutoCheckItem(strongCardIds);
         if(!isTest)
@@ -321,7 +322,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
             for (int i = 0; i < 6; i++)
                 battleCards[i] = 0;
             for (int i = 0; i < results.Count; i++)
-                battleCards[i] = results[i].Item1;
+                battleCards[i] = results[i] == null ? 0 : results[i].Item1;
         }
 
         return results;
@@ -577,7 +578,8 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
                 continue;
             mark += ItemConfig.GetConfig(item.Value).Price * cards[item.Value];
         }
-        fightMarkText.text = "$" + mark.ToString();
+        lastFightMark = mark;
+        
     }
 
     private List<Tuple<int, int>> RearrangePos(List<Tuple<int, int>> results)

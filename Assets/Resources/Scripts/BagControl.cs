@@ -4,6 +4,7 @@ using System.Linq;
 using CommonConfig;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 public class BagControl : MonoBehaviour, IPanelEvent
 {
@@ -21,20 +22,21 @@ public class BagControl : MonoBehaviour, IPanelEvent
     public GameObject bagItemRegion;
     public GameObject fieldRegion;
     public BagRecycler bagRecycler;
+    public TMP_Text infoText;
 
     public PlayerInfo bindPlayer;
 
     void Start()
     {
-        bindPlayer = GameManager.Instance.GetPlayer(0);
-        bindPlayer.cards[100003] = 1;
-        bindPlayer.cards[100005] = 1;
-        bindPlayer.cards[100006] = 3;
-        for(int i = 0; i < 6; i++)
-            bindPlayer.cards[101001 + i + 1] = 1;
-        for(int i = 0; i < 13; i++)
-            bindPlayer.cards[400001 + i + 1] = 1;            
-        OnShow();
+        // bindPlayer = GameManager.Instance.GetPlayer(0);
+        // bindPlayer.cards[100003] = 1;
+        // bindPlayer.cards[100005] = 1;
+        // bindPlayer.cards[100006] = 3;
+        // for(int i = 0; i < 6; i++)
+        //     bindPlayer.cards[101001 + i + 1] = 1;
+        // for(int i = 0; i < 13; i++)
+        //     bindPlayer.cards[400001 + i + 1] = 1;            
+        // OnShow();
 
         closeBtn.onClick.AddListener(() =>
         {      
@@ -75,8 +77,7 @@ public class BagControl : MonoBehaviour, IPanelEvent
 
     public void OnShow()
     {
-        bindPlayer = GameManager.Instance.GetPlayer(0);
-        UpdateView();
+        Bind(GameManager.Instance.GetPlayer(0));
     }
 
     public void OnHide()
@@ -98,6 +99,11 @@ public class BagControl : MonoBehaviour, IPanelEvent
         itemDetail.gameObject.SetActive(false);
 
         UpdateFieldView();
+
+        var soldierCfg = SoldierConfig.GetConfig(500001);
+        var textAtk = (soldierCfg.Atk + p.sodatk).ToString();
+        var textHp = (soldierCfg.Hp + p.sodhp * 5).ToString();
+        infoText.text = "<color=yellow>战斗力-</color>" + bindPlayer.lastFightMark + " <color=red>士兵攻击-</color>" + textAtk + " <color=green>士兵生命值-</color>" + textHp;
     }
 
     public void SendSignal(string name, string parm1, int parm2)

@@ -43,7 +43,10 @@ public class BagCell : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragH
 
     // 开始拖动时调用
     public void OnBeginDrag(PointerEventData eventData)
-    {       
+    {
+        if(bagControl.bindPlayer.pid != 0)
+            return;
+
         // 保存原始位置和父对象
         originalParent = transform.parent;
         originalPosition = transform.localPosition;
@@ -109,7 +112,7 @@ public class BagCell : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragH
 
     public void RemoveTagImg()
     {
-        UnityEngine.Debug.Log("RemoveTagImg");
+       // UnityEngine.Debug.Log("RemoveTagImg");
             // 恢复对象的透明度和射线检测
         CanvasGroup canvasGroup = GetComponent<CanvasGroup>();
         if (canvasGroup != null)

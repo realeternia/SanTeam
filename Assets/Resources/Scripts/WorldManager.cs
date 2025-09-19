@@ -226,12 +226,12 @@ public class WorldManager : MonoBehaviour
                 if (cards[i] != null)
                     SpawnHerosForRegion(GameManager.Instance.GetPlayer(match[5]), mapConfig.RegionHeroSide6[i], cards[i], cardsFriend, 6);
 
-            CreateCastleHUD(GameManager.Instance.GetPlayer(match[0]), mapConfig.RegionHeroSide1[2]);
-            CreateCastleHUD(GameManager.Instance.GetPlayer(match[1]), mapConfig.RegionHeroSide2[2]);
-            CreateCastleHUD(GameManager.Instance.GetPlayer(match[2]), mapConfig.RegionHeroSide3[2]);
-            CreateCastleHUD(GameManager.Instance.GetPlayer(match[3]), mapConfig.RegionHeroSide4[2]);
-            CreateCastleHUD(GameManager.Instance.GetPlayer(match[4]), mapConfig.RegionHeroSide5[2]);
-            CreateCastleHUD(GameManager.Instance.GetPlayer(match[5]), mapConfig.RegionHeroSide6[2]);
+            CreateCastleHUD(GameManager.Instance.GetPlayer(match[0]), mapConfig.RegionHeroSide1[4]);
+            CreateCastleHUD(GameManager.Instance.GetPlayer(match[1]), mapConfig.RegionHeroSide2[4]);
+            CreateCastleHUD(GameManager.Instance.GetPlayer(match[2]), mapConfig.RegionHeroSide3[4]);
+            CreateCastleHUD(GameManager.Instance.GetPlayer(match[3]), mapConfig.RegionHeroSide4[4]);
+            CreateCastleHUD(GameManager.Instance.GetPlayer(match[4]), mapConfig.RegionHeroSide5[4]);
+            CreateCastleHUD(GameManager.Instance.GetPlayer(match[5]), mapConfig.RegionHeroSide6[4]);
         }
         else
         {
