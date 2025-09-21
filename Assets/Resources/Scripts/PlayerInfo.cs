@@ -9,6 +9,14 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using System.Text;
+using System;
+using System.Runtime.Serialization;
+
+// 自定义序列化属性类
+[AttributeUsage(AttributeTargets.Field)]
+public class CustomSerializeFieldAttribute : Attribute
+{
+}
 
 public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 {
@@ -18,14 +26,22 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     public Color endColor = new Color(0.1f, 0.1f, 0.1f, 0.8f);
     private float timer = 0f;
 
+    [CustomSerializeField]
     public int pid;
+    [CustomSerializeField]
     public int gold;
+    [CustomSerializeField]
     public int winCount;
+    [CustomSerializeField]
     public int loseCount;
+    [CustomSerializeField]
     public int mark;
+    [CustomSerializeField]
     public Dictionary<int, int> cards = new Dictionary<int, int>(); // cardid - > exp
 
+    [CustomSerializeField]
     public Dictionary<int, int> itemEquips = new Dictionary<int, int>(); // heroId -> itemid
+    [CustomSerializeField]
     public int[] battleCards = new int[6];
 
     public bool isOnTurn;
@@ -38,17 +54,25 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     // 在 PlayerInfo 类中添加 AICardConfig 实例
     public PlayerConfig playerConfig;
 
+    [CustomSerializeField]
     public string imgPath;
+    [CustomSerializeField]
     public Color lineColor;
     public int banCount = 2; //最多两张
 
     public bool nextSkip = false; //下一轮skip
+    [CustomSerializeField]
     public int sodatk = 0; //士兵atk强化
+    [CustomSerializeField]
     public int sodhp = 0; //士兵def强化
+    [CustomSerializeField]
     public int goldCostHero = 0;
+    [CustomSerializeField]
     public int goldCostItem = 0;
+    [CustomSerializeField]
     public Dictionary<int, AttrInfo> attrAddons = new Dictionary<int, AttrInfo>();
 
+    [CustomSerializeField]
     public int lastFightMark;
 
     public CastleHUD castleHUD;
@@ -563,8 +587,8 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
                     bestItemId = itemId;
                 }
             }
-            
-            itemEquips[results[i].Item1] = bestItemId;
+
+            Equip(results[i].Item1, bestItemId);
 
             itemCardList.Remove(bestItemId);
             if(itemCardList.Count == 0)
@@ -680,6 +704,234 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
             attrAddons.Add(cardId, attr);
         else
             attrAddons[cardId].AddAttr(attr);
+    }
+
+    // 序列化方法：将PlayerInfo对象转换为JSON字符串
+    public string Serialize()
+    {
+        try
+        {
+            // 创建一个临时类来存储需要序列化的数据
+            SerializableData serializableData = new SerializableData();
+            
+            // 获取所有带有[CustomSerializeField]属性的字段
+            var fields = GetType().GetFields();
+            foreach (var field in fields)
+            {
+                var attribute = Attribute.GetCustomAttribute(field, typeof(CustomSerializeFieldAttribute));
+                if (attribute != null)
+                {
+                    object fieldValue = field.GetValue(this);
+                    if (fieldValue != null)
+                    {
+                        string stringValue = "";
+                        string typeName = field.FieldType.Name;
+                        
+                        // 对于Unity的Color类型，特殊处理为可序列化的格式
+                        if (field.FieldType == typeof(Color))
+                        {
+                            Color color = (Color)fieldValue;
+                            stringValue = string.Format("{0},{1},{2},{3}", color.r, color.g, color.b, color.a);
+                        }
+                        // 对于字典类型，将其转换为JSON字符串
+                        else if (fieldValue is Dictionary<int, int>)
+                        {
+                            Dictionary<int, int> dict = (Dictionary<int, int>)fieldValue;
+                            List<string> dictEntries = new List<string>();
+                            foreach (var kvp in dict)
+                            {
+                                dictEntries.Add(kvp.Key + ":" + kvp.Value);
+                            }
+                            stringValue = string.Join(",", dictEntries);
+                        }
+                        else if (fieldValue is Dictionary<int, AttrInfo>)
+                        {
+                            Dictionary<int, AttrInfo> dict = (Dictionary<int, AttrInfo>)fieldValue;
+                            List<string> dictEntries = new List<string>();
+                            foreach (var kvp in dict)
+                            {
+                                AttrInfo attr = kvp.Value;
+                                dictEntries.Add(kvp.Key + ":" + JsonUtility.ToJson(attr));
+                            }
+                            stringValue = string.Join("; ", dictEntries);
+                        }
+                        // 对于数组类型，转换为逗号分隔的字符串
+                        else if (fieldValue is int[])
+                        {
+                            int[] array = (int[])fieldValue;
+                            stringValue = string.Join(",", array);
+                        }
+                        // 对于其他基本类型，直接存储
+                        else if (field.FieldType.IsPrimitive || field.FieldType == typeof(string) || field.FieldType == typeof(decimal))
+                        {
+                            stringValue = fieldValue.ToString();
+                        }
+                        // 对于可序列化的类，使用JsonUtility
+                        else if (field.FieldType.GetCustomAttributes(typeof(System.SerializableAttribute), true).Length > 0)
+                        {
+                            stringValue = JsonUtility.ToJson(fieldValue);
+                        }
+                        
+                        if (!string.IsNullOrEmpty(stringValue))
+                        {
+                            serializableData.playerData.Add(new SaveDataPair(field.Name, stringValue));
+                        }
+                    }
+                }
+            }
+            
+            // 使用JsonUtility序列化
+            string json = JsonUtility.ToJson(serializableData);
+            return json;
+        }
+        catch (Exception e)
+        {
+            Debug.LogError("序列化PlayerInfo失败: " + e.Message);
+            return null;
+        }
+    }
+    
+    // 反序列化方法：从JSON字符串恢复PlayerInfo对象
+    public void Deserialize(string json)
+    {
+        try
+        {
+            if (string.IsNullOrEmpty(json))
+                return;
+            
+            // 使用JsonUtility反序列化
+            SerializableData serializableData = JsonUtility.FromJson<SerializableData>(json);
+            
+            // 获取所有带有[CustomSerializeField]属性的字段
+            var fields = GetType().GetFields();
+            
+            // 遍历所有序列化的数据项
+            foreach (var kvp in serializableData.playerData)
+            {
+                string fieldName = kvp.key;
+                string stringValue = kvp.value;
+                
+                if (string.IsNullOrEmpty(stringValue))
+                    continue;
+                
+                // 查找对应的字段
+                var field = fields.FirstOrDefault(f => f.Name == fieldName);
+                if (field == null)
+                    continue;
+                    
+                    // 根据存储的类型信息进行反序列化
+                    if (field.FieldType == typeof(Color))
+                    {
+                        string[] colorComponents = stringValue.Split(',');
+                        if (colorComponents.Length == 4)
+                        {
+                            float r = float.Parse(colorComponents[0]);
+                            float g = float.Parse(colorComponents[1]);
+                            float b = float.Parse(colorComponents[2]);
+                            float a = float.Parse(colorComponents[3]);
+                            field.SetValue(this, new Color(r, g, b, a));
+                        }
+                    }
+                    else if (field.FieldType == typeof(Dictionary<int,int>))
+                    {
+                        var dict = new Dictionary<int, int>();
+                        string[] entries = stringValue.Split(',');
+                        foreach (string entry in entries)
+                        {
+                            if (!string.IsNullOrEmpty(entry))
+                            {
+                                string[] parts = entry.Split(':');
+                                if (parts.Length == 2 && int.TryParse(parts[0], out int key) && int.TryParse(parts[1], out int value))
+                                {
+                                    dict[key] = value;
+                                }
+                            }
+                        }
+                        field.SetValue(this, dict);
+                    }
+                    else if (field.FieldType == typeof(Dictionary<int,AttrInfo>))
+                    {
+                        var dict = new Dictionary<int, AttrInfo>();
+                        string[] entries = stringValue.Split(';');
+                        foreach (string entry in entries)
+                        {
+                            if (!string.IsNullOrEmpty(entry))
+                            {
+                                int colonIndex = entry.IndexOf(':');
+                                if (colonIndex > 0 && int.TryParse(entry.Substring(0, colonIndex), out int key))
+                                {
+                                    string jsonValue = entry.Substring(colonIndex + 1);
+                                    AttrInfo attrInfo = JsonUtility.FromJson<AttrInfo>(jsonValue);
+                                    dict[key] = attrInfo;
+                                }
+                            }
+                        }
+                        field.SetValue(this, dict);
+                    }
+                    else if (field.FieldType == typeof(int[]))
+                    {
+                        string[] parts = stringValue.Split(',');
+                        int[] array = new int[parts.Length];
+                        for (int j = 0; j < parts.Length; j++)
+                        {
+                            if (!int.TryParse(parts[j], out array[j]))
+                            {
+                                array[j] = 0;
+                            }
+                        }
+                        field.SetValue(this, array);
+                    }
+                    // 对于其他基本类型
+                    else if (field.FieldType == typeof(int))
+                    {
+                        field.SetValue(this, int.Parse(stringValue));
+                    }
+                    else if (field.FieldType == typeof(float))
+                    {
+                        field.SetValue(this, float.Parse(stringValue));
+                    }
+                    else if (field.FieldType == typeof(bool))
+                    {
+                        field.SetValue(this, bool.Parse(stringValue));
+                    }
+                    else if (field.FieldType == typeof(string))
+                    {
+                        field.SetValue(this, stringValue);
+                    }
+                    // 对于可序列化的类，使用JsonUtility
+                    else if (field.FieldType.GetCustomAttributes(typeof(System.SerializableAttribute), true).Length > 0)
+                    {
+                        object obj = System.Activator.CreateInstance(field.FieldType);
+                        JsonUtility.FromJsonOverwrite(stringValue, obj);
+                        field.SetValue(this, obj);
+                    }
+                
+            }
+        }
+        catch (Exception e)
+        {
+            Debug.LogError("反序列化PlayerInfo失败: " + e.Message);
+        }
+    }
+    
+    // 用于JsonUtility序列化的辅助类
+    [System.Serializable]
+    private class SerializableData
+    {
+        public List<SaveDataPair> playerData = new List<SaveDataPair>();
+    }
+
+    [System.Serializable]
+    private class SaveDataPair
+    {
+        public string key;
+        public string value;
+
+        public SaveDataPair(string key, string value)
+        {
+            this.key = key;
+            this.value = value;
+        }
     }
 }
 

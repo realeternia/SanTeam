@@ -17,6 +17,10 @@ public class PickPanelControl : MonoBehaviour
 
     private List<PickPanelCellControl> cellControls = new List<PickPanelCellControl>();
 
+    public GameObject loadGamePanel;
+    public Button loadGameBtn;
+    public Button newGameBtn;
+
     public Button finBtn;
 
 
@@ -56,6 +60,25 @@ public class PickPanelControl : MonoBehaviour
 
         StartCoroutine(DelaySetMode());
         PanelManager.Instance.ShowPick();
+        if(GameManager.Instance.IsGameSaveExist())
+        {
+            loadGamePanel.SetActive(true);
+            loadGameBtn.onClick.AddListener(() =>
+            {
+                GameManager.Instance.LoadFromSave();
+                PanelManager.Instance.ShowShop();
+                PanelManager.Instance.HidePick();
+            });
+            newGameBtn.onClick.AddListener(() =>
+            {
+                loadGamePanel.SetActive(false);
+            });            
+        }
+        else
+        {
+            loadGamePanel.SetActive(false);
+
+        }
     
     }
 

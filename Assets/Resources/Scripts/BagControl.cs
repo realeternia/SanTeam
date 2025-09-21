@@ -28,8 +28,8 @@ public class BagControl : MonoBehaviour, IPanelEvent
 
     void Start()
     {
-        bindPlayer = GameManager.Instance.GetPlayer(0);
-        bindPlayer.cards[401004] = 1;         
+       // bindPlayer = GameManager.Instance.GetPlayer(0);
+      //  bindPlayer.cards[401004] = 1;         
        // OnShow();
 
         closeBtn.onClick.AddListener(() =>

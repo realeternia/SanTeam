@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
+using System.Text;
 
 public class GameManager : MonoBehaviour
 {
@@ -127,5 +128,87 @@ public class GameManager : MonoBehaviour
             audioSource.Stop();
             audioSource.Play();
         }
-    }    
+    }
+
+    public bool IsGameSaveExist()
+    {
+        string savePath = Application.persistentDataPath + "/game_save.json";
+        return File.Exists(savePath);
+    }
+
+    public void LoadFromSave()
+    {
+        string savePath = Application.persistentDataPath + "/game_save.json";
+        if (File.Exists(savePath))
+        {
+            try
+            {
+                string json = File.ReadAllText(savePath);
+                SaveData saveData = JsonUtility.FromJson<SaveData>(json);
+                
+                // 确保players数组不为null且长度足够
+                if (players != null && players.Length >= saveData.players.Count)
+                {
+                    for (int i = 0; i < saveData.players.Count; i++)
+                    {
+                        // 直接使用PlayerInfo的Deserialize方法
+                        players[i].Deserialize(saveData.players[i]);
+                    }
+                    
+                    Debug.Log("游戏数据加载成功");
+                }
+                else
+                {
+                    Debug.LogError("players数组未初始化或长度不足");
+                }
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogError("加载游戏数据失败: " + e.Message);
+            }
+        }
+        else
+        {
+            Debug.Log("没有找到存档文件");
+        }
+    }
+
+    public void SaveToFile()
+    {
+        string savePath = Application.persistentDataPath + "/game_save.json";
+        try
+        {
+            SaveData saveData = new SaveData();
+            
+            // 序列化每个PlayerInfo对象
+            foreach (PlayerInfo player in players)
+            {
+                if (player != null)
+                {
+                    string playerJson = player.Serialize();
+                    if (!string.IsNullOrEmpty(playerJson))
+                    {
+                        saveData.players.Add(playerJson);
+                    }
+                }
+            }
+            
+            // 使用JsonUtility序列化数据
+            string json = JsonUtility.ToJson(saveData);
+            File.WriteAllText(savePath, json);
+            
+            Debug.Log("游戏数据保存成功: " + savePath);
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError("保存游戏数据失败: " + e.Message);
+        }
+    }
+    
+    // 用于Unity JsonUtility序列化的辅助类
+    [System.Serializable]
+    private class SaveData
+    {
+        public List<string> players = new List<string>();
+    }
 }
