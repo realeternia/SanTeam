@@ -93,6 +93,7 @@ public class CardShopManager : MonoBehaviour
                     // AI玩家放弃购买
                     playerPassed[currentPlayerId] = true;
                     passedPlayers++;
+                    playerInfo.SetRoundOver(true);
                 }
             }
 
@@ -262,7 +263,10 @@ public class CardShopManager : MonoBehaviour
 
         // 重置所有玩家的pass状态
         for (int i = 0; i < playerPassed.Length; i++)
+        {
             playerPassed[i] = false;
+            GameManager.Instance.GetPlayer(i).SetRoundOver(false);
+        }
         passedPlayers = 0;
 
         if (nextFirstPicker >= 0)
@@ -346,6 +350,7 @@ public class CardShopManager : MonoBehaviour
         passBtn.gameObject.SetActive(false);
         playerPassed[nowPlayer.pid] = true;
         passedPlayers++;
+        nowPlayer.SetRoundOver(true);
 
         AfterAct();
     }
@@ -428,5 +433,8 @@ public class CardShopManager : MonoBehaviour
         Tooltip.Instance.HideTooltip();
         PanelManager.Instance.HideShop();
         WorldManager.Instance.BattleBegin(); 
+
+        for(int i = 0; i < 8; i++)
+            GameManager.Instance.GetPlayer(i).SetRoundOver(false);
     }
 }

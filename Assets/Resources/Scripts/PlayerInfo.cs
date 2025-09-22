@@ -54,6 +54,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     public TMP_Text goldText;
     public TMP_Text resultText;
     public Image playerBgImg;
+    public Image roundOverImg;
 
     // 在 PlayerInfo 类中添加 AICardConfig 实例
     public PlayerConfig playerConfig;
@@ -143,6 +144,11 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     public void OnEra(int era)
     {
         nextSkip = false;
+    }
+
+    public void SetRoundOver(bool isOver)
+    {
+        roundOverImg.gameObject.SetActive(isOver);
     }
 
     public void Equip(int heroId, int itemId)
