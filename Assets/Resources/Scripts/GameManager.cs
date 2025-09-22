@@ -3,12 +3,35 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
 using System.Text;
+using System.Linq;
+using CommonConfig;
 
 public class GameManager : MonoBehaviour
 {
+    [System.Serializable]
+    public class FriendRandomData
+    {
+        public int id;
+        public string name;
+        public int[] friendIds;
+    }
+    
+    // 用于Unity JsonUtility序列化的辅助类
+    [System.Serializable]
+    private class SaveData
+    {
+        public List<string> players = new List<string>();
+        public List<FriendRandomData> friendRdData = new List<FriendRandomData>();
+        public List<int> heroIds = new List<int>();
+    }
+
     public static GameManager Instance;
     public PlayerInfo[] players;
+    public List<FriendRandomData> friendRdData;
+    public List<int> heroIds;
     private StreamWriter logWriter;  // 日志写入器
+    
+    private int tempFriendIdIdx = 1000;
 
     private void Awake()
     {
@@ -133,44 +156,58 @@ public class GameManager : MonoBehaviour
     public bool IsGameSaveExist()
     {
         string savePath = Application.persistentDataPath + "/game_save.json";
-        return File.Exists(savePath);
+        
+        if(!File.Exists(savePath))
+            return false;
+        GameManager tmp = new GameManager();
+        return tmp.LoadFromSave();
     }
 
-    public void LoadFromSave()
+    public bool LoadFromSave()
     {
         string savePath = Application.persistentDataPath + "/game_save.json";
-        if (File.Exists(savePath))
+        try
         {
-            try
+            string json = File.ReadAllText(savePath);
+            SaveData saveData = JsonUtility.FromJson<SaveData>(json);
+
+            // 确保players数组不为null且长度足够
+            if (players != null && players.Length >= saveData.players.Count)
             {
-                string json = File.ReadAllText(savePath);
-                SaveData saveData = JsonUtility.FromJson<SaveData>(json);
-                
-                // 确保players数组不为null且长度足够
-                if (players != null && players.Length >= saveData.players.Count)
+                for (int i = 0; i < saveData.players.Count; i++)
                 {
-                    for (int i = 0; i < saveData.players.Count; i++)
-                    {
-                        // 直接使用PlayerInfo的Deserialize方法
-                        players[i].Deserialize(saveData.players[i]);
-                    }
-                    
-                    Debug.Log("游戏数据加载成功");
+                    // 直接使用PlayerInfo的Deserialize方法
+                    players[i].Deserialize(saveData.players[i]);
                 }
-                else
+
+                // 加载friendRdData
+                if (saveData.friendRdData != null)
                 {
-                    Debug.LogError("players数组未初始化或长度不足");
+                    friendRdData = new List<FriendRandomData>();
+                    friendRdData.AddRange(saveData.friendRdData);
                 }
+
+                // 加载heroIds
+                if (saveData.heroIds != null)
+                {
+                    heroIds = new List<int>();
+                    heroIds.AddRange(saveData.heroIds);
+                }
+
+                Debug.Log("游戏数据加载成功");
             }
-            catch (System.Exception e)
+            else
             {
-                Debug.LogError("加载游戏数据失败: " + e.Message);
+                Debug.LogError("players数组未初始化或长度不足");
+                return false;
             }
         }
-        else
+        catch (System.Exception e)
         {
-            Debug.Log("没有找到存档文件");
+            Debug.LogError("加载游戏数据失败: " + e.Message);
+            return false;
         }
+        return true;
     }
 
     public void SaveToFile()
@@ -193,6 +230,18 @@ public class GameManager : MonoBehaviour
                 }
             }
             
+            // 保存friendRdData
+            if (friendRdData != null)
+            {
+                saveData.friendRdData.AddRange(friendRdData);
+            }
+            
+            // 保存heroIds
+            if (heroIds != null)
+            {
+                saveData.heroIds.AddRange(heroIds);
+            }
+            
             // 使用JsonUtility序列化数据
             string json = JsonUtility.ToJson(saveData);
             File.WriteAllText(savePath, json);
@@ -204,11 +253,268 @@ public class GameManager : MonoBehaviour
             Debug.LogError("保存游戏数据失败: " + e.Message);
         }
     }
-    
-    // 用于Unity JsonUtility序列化的辅助类
-    [System.Serializable]
-    private class SaveData
+
+    public void InitFriend(bool loadSave)
     {
-        public List<string> players = new List<string>();
+        if (!loadSave)
+        {
+            friendRdData = new List<FriendRandomData>();
+            for (int i = 1; i <= 6; i++)
+            {
+                // 筛选side=i且FriendCount<4的英雄
+                var heroList = HeroConfig.ConfigList.Where(x => x.Side == i && x.FriendCount < 4).ToList();
+
+                // 智力分组
+                var inteHighList = heroList.Where(x => x.Inte > 80).ToList();
+                var inteLowList = heroList.Where(x => x.Inte < 60).ToList();
+
+                // 随机2v2匹配
+                CreateRandomFriendPairs(inteHighList, inteLowList, "智力辅佐");
+
+                // 武力分组和匹配
+                var strHighList = heroList.Where(x => x.Str > 80).ToList();
+                var strLowList = heroList.Where(x => x.Str < 60).ToList();
+
+                CreateRandomFriendPairs(strHighList, strLowList, "武力指导");
+
+                heroList = HeroConfig.ConfigList.Where(x => x.Side == i && x.FriendCount < 2).ToList();
+                if (heroList.Count > 2)
+                {
+                    // 随机打乱heroList，然后分成前一半和后一半
+                    var random = new System.Random();
+                    var shuffledList = heroList.OrderBy(x => random.Next()).ToList();
+                    int halfCount = shuffledList.Count / 2;
+                    var firstHalf = shuffledList.Take(halfCount).ToList();
+                    var secondHalf = shuffledList.Skip(halfCount).ToList();
+
+                    CreateRandomFriendPairs(firstHalf, secondHalf, "协作如坚");
+                }
+
+                heroList = HeroConfig.ConfigList.Where(x => x.Side == i && x.FriendCount < 1).ToList();
+                if (heroList.Count > 2)
+                {
+                    // 随机打乱heroList，然后分成前一半和后一半
+                    var random = new System.Random();
+                    var shuffledList = heroList.OrderBy(x => random.Next()).ToList();
+                    int halfCount = shuffledList.Count / 2;
+                    var firstHalf = shuffledList.Take(halfCount).ToList();
+                    var secondHalf = shuffledList.Skip(halfCount).ToList();
+
+                    CreateRandomFriendPairs(firstHalf, secondHalf, "协作如坚2");
+                }
+            }
+        }
+
+        ConfigManager.InitFriend();
+    }
+
+    private void CreateRandomFriendPairs(List<HeroConfig> inteHighList, List<HeroConfig> inteLowList, string name)
+    {
+        if (inteHighList.Count < 1 || inteLowList.Count < 1)
+            return;
+
+        var rnd = new System.Random();
+        var shuffledHigh = inteHighList.OrderBy(x => rnd.Next()).ToList();
+        var shuffledLow = inteLowList.OrderBy(x => rnd.Next()).ToList();
+
+        // 循环配对直到消耗完所有英雄
+        while (shuffledHigh.Count > 0 && shuffledLow.Count > 0)
+        {
+            // 每次取2个高智力和2个低智力
+            var highPair = shuffledHigh.Take(UnityEngine.Random.Range(1, 3)).ToList();
+            var lowPair = shuffledLow.Take(UnityEngine.Random.Range(1, 3)).ToList();
+            
+            var heroes = highPair.Concat(lowPair).Select(x => x.Id).ToArray();
+
+            var friendPair = new FriendRandomData();
+            friendPair.id = tempFriendIdIdx;
+            friendPair.name = name;
+            friendPair.friendIds = heroes;
+            friendRdData.Add(friendPair);
+
+            // 移除已配对的英雄
+            shuffledHigh.RemoveRange(0, highPair.Count);
+            shuffledLow.RemoveRange(0, lowPair.Count);
+        }
+    } 
+
+    public void InitHeros(bool loadSave)
+    {
+        if(!loadSave)
+            BuildHeros();
+
+        HeroSelectionTool.UpdateHeroPoolCache(heroIds);
+    }
+
+    private void BuildHeros()
+    {
+        List<HeroConfig> allHeroes = new List<HeroConfig>(HeroConfig.ConfigList);
+        heroIds = new List<int>();
+
+        int[] sideCounts = new int[10];
+        // 先对allHeroes遍历，1-100随机，如果大于RateAbs，加入返回队列
+        List<HeroConfig> tempHeroes = new List<HeroConfig>(allHeroes);
+        foreach (var hero in tempHeroes)
+        {
+            if(hero.RateAbs <= 0)
+                continue;
+            int randomValue = UnityEngine.Random.Range(1, 101);
+            if (randomValue <= hero.RateAbs)
+            {
+                heroIds.Add(hero.Id);
+                sideCounts[hero.Side - 1]++;
+            }
+            allHeroes.Remove(hero);
+        }
+
+        // 先随机选择5-7张Side=4的卡牌
+        int[] sides = {4, 5, 6, 10};
+        for (int i = 0; i < 2; i++)
+        {
+            var side = sides[UnityEngine.Random.Range(0, sides.Length)];
+            sides = sides.Where(s => s != side).ToArray();
+
+            List<HeroConfig> side4Heroes = allHeroes.FindAll(hero => hero.Side == side);
+            if (side4Heroes.Count > 0)
+            {
+                int side4Count = i + 6;
+                side4Count = Mathf.Min(side4Count, side4Heroes.Count);
+
+                if(HeroConfig.HasConfig(100000 + side))
+                {
+                    var heroConfig = HeroConfig.GetConfig(100000 + side);
+                    heroIds.Add((int)heroConfig.Id);
+                    sideCounts[side - 1]++;
+                    allHeroes.Remove(heroConfig);
+                    side4Heroes.Remove(heroConfig);
+                }
+                
+                List<HeroConfig> tempSide4Heroes = new List<HeroConfig>(side4Heroes);
+                for (int j = sideCounts[side - 1]; j < side4Count; j++)
+                {
+                    // 计算当前阵营总权重
+                    float totalRate = 0;
+                    foreach (var hero in tempSide4Heroes)
+                    {
+                        totalRate += hero.RateWeight;
+                    }
+
+                    HeroConfig heroCfg = null;
+                    if (totalRate > 0)
+                    {
+                        float randomValue = UnityEngine.Random.Range(0, totalRate);
+                        float accumulatedRate = 0;
+                        HeroConfig selectedHero = null;
+
+                        foreach (var hero in tempSide4Heroes)
+                        {
+                            if (hero.RateWeight <= 0)
+                                continue;
+                            accumulatedRate += hero.RateWeight;
+                            if (accumulatedRate >= randomValue)
+                            {
+                                selectedHero = hero;
+                                break;
+                            }
+                        }
+                        heroCfg = selectedHero;
+                    }
+                    else
+                    {
+                        // 如果总权重为0，随机选一张
+                        int randomIndex = UnityEngine.Random.Range(0, tempSide4Heroes.Count);
+                        heroCfg = tempSide4Heroes[randomIndex];
+                    }
+                    heroIds.Add((int)heroCfg.Id);
+                    allHeroes.Remove(heroCfg);
+                    tempSide4Heroes.Remove(heroCfg);
+                    sideCounts[side - 1]++;
+                }
+            }
+        }
+
+        // 准备按阵营1-3选择卡牌，保证各阵营相差最多一张
+        List<List<HeroConfig>> sideHeroes = new List<List<HeroConfig>>
+        {
+            allHeroes.FindAll(hero => hero.Side == 1),
+            allHeroes.FindAll(hero => hero.Side == 2),
+            allHeroes.FindAll(hero => hero.Side == 3)
+        };
+
+        int targetCount = Mathf.Min(91, allHeroes.Count);
+
+        while (heroIds.Count < targetCount)
+        {
+            // 找出当前数量最少的阵营
+            int minIndex = 0;
+            for (int i = 1; i < 3; i++)
+            {
+                if (sideCounts[i] < sideCounts[minIndex])
+                {
+                    minIndex = i;
+                }
+            }
+
+            // 从最少的阵营中按权重选择一张卡牌
+            List<HeroConfig> currentSideHeroes = sideHeroes[minIndex];
+            if (currentSideHeroes.Count > 0)
+            {
+                // 计算当前阵营总权重
+                float totalRate = 0;
+                foreach (var hero in currentSideHeroes)
+                {
+                    totalRate += hero.RateWeight;
+                }
+
+                if (totalRate > 0)
+                {
+                    float randomValue = UnityEngine.Random.Range(0, totalRate);
+                    float accumulatedRate = 0;
+                    HeroConfig selectedHero = null;
+
+                    foreach (var hero in currentSideHeroes)
+                    {
+                        if (hero.RateWeight <= 0)
+                            continue;
+                        accumulatedRate += hero.RateWeight;
+                        if (accumulatedRate >= randomValue)
+                        {
+                            selectedHero = hero;
+                            break;
+                        }
+                    }
+
+                    if (selectedHero != null)
+                    {
+                        heroIds.Add((int)selectedHero.Id);
+                        allHeroes.Remove(selectedHero);
+                        sideHeroes[minIndex].Remove(selectedHero);
+                        sideCounts[minIndex]++;
+                    }
+                }
+                else
+                {
+                    // 如果总权重为0，随机选一张
+                    int randomIndex = UnityEngine.Random.Range(0, currentSideHeroes.Count);
+                    heroIds.Add((int)currentSideHeroes[randomIndex].Id);
+                    allHeroes.Remove(currentSideHeroes[randomIndex]);
+                    sideHeroes[minIndex].RemoveAt(randomIndex);
+                    sideCounts[minIndex]++;
+                }
+            }
+            else
+            {
+                // 如果当前阵营没有卡牌了，跳过该阵营
+                // 找到下一个还有卡牌的阵营
+                for (int i = 0; i < 3; i++)
+                {
+                    if (sideHeroes[i].Count > 0)
+                    {
+                        minIndex = i;
+                        break;
+                    }
+                }
+            }
+        }
     }
 }

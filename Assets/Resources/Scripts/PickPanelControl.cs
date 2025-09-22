@@ -66,27 +66,33 @@ public class PickPanelControl : MonoBehaviour
             loadGameBtn.onClick.AddListener(() =>
             {
                 GameManager.Instance.LoadFromSave();
+                GameManager.Instance.InitFriend(true);
+                GameManager.Instance.InitHeros(true);
                 PanelManager.Instance.ShowShop();
                 PanelManager.Instance.HidePick();
             });
             newGameBtn.onClick.AddListener(() =>
             {
                 loadGamePanel.SetActive(false);
+                GameManager.Instance.InitHeros(false);
+                GameManager.Instance.InitFriend(false);
+                RefreshBtnClick();
             });            
         }
         else
         {
             loadGamePanel.SetActive(false);
-
+            GameManager.Instance.InitHeros(false);
+            GameManager.Instance.InitFriend(false);
+            RefreshBtnClick();
         }
-    
+
     }
 
     IEnumerator DelaySetMode()
     {
         yield return new WaitForSeconds(0.1f);
         WorldManager.Instance.isDebug = false;
-        RefreshBtnClick();
     }
 
     // Update is called once per frame
@@ -135,7 +141,6 @@ public class PickPanelControl : MonoBehaviour
         RefreshHeroPool();
         okBtn.gameObject.SetActive(true);
         
-
         refreshCount--;
         refreshText.text = "刷新(" + refreshCount + ")";
         if (refreshCount <= 0)

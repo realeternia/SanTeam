@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
-using System.Collections.Generic;
 
 // 用于序列化的数据类
 [System.Serializable]

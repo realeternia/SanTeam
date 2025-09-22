@@ -1,6 +1,8 @@
 using System;
+using System.Text;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.Serialization;
 using System.Linq;
 using System.Numerics;
 using CommonConfig;
@@ -8,9 +10,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
-using System.Text;
-using System;
-using System.Runtime.Serialization;
+
 
 // 自定义序列化属性类
 [AttributeUsage(AttributeTargets.Field)]
@@ -30,6 +30,8 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     public int pid;
     [CustomSerializeField]
     public int gold;
+    [CustomSerializeField]
+    public string playerName;
     [CustomSerializeField]
     public int winCount;
     [CustomSerializeField]
@@ -86,14 +88,21 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     public void Init(int id, string name, string img, string colorStr, int g)
     {
         pid = id;
-        playerNameText.text = name;
-        imgPath = img;
-        playerImage.sprite = Resources.Load<Sprite>(img);
+        playerName = name;
 
+        imgPath = img;
         gold = g;
-        goldText.text = g.ToString();
+        lineColor = ColorUtility.TryParseHtmlString(colorStr, out lineColor) ? lineColor : Color.white;        
+
+        UpdateView();
+    }
+
+    private void UpdateView()
+    {
+        playerNameText.text = playerName;        
+        playerImage.sprite = Resources.Load<Sprite>(imgPath);
+        goldText.text = gold.ToString();
         resultText.text = "0分";
-        lineColor = ColorUtility.TryParseHtmlString(colorStr, out lineColor) ? lineColor : Color.white;
         playerBgImg.color = lineColor;
     }
 
@@ -912,6 +921,8 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         {
             Debug.LogError("反序列化PlayerInfo失败: " + e.Message);
         }
+
+        UpdateView();
     }
     
     // 用于JsonUtility序列化的辅助类

@@ -7,6 +7,8 @@ using UnityEngine;
 // 定义一个单独的工具类
 public static class HeroSelectionTool
 {
+    private static List<Tuple<int, int>> heroPoolCache = new List<Tuple<int, int>>();
+
     // 获取指定阵营的所有英雄ID
     public static List<int> GetAllHeroIdsBySide(int side)
     {
@@ -45,178 +47,16 @@ public static class HeroSelectionTool
         return result;
     }
 
-    private static List<Tuple<int, int>> heroPoolCache = new List<Tuple<int, int>>();
-    private static void UpdateHeroPoolCache()
+
+    public static void UpdateHeroPoolCache(List<int> heroIds)
     {
         heroPoolCache.Clear();
-        List<HeroConfig> allHeroes = new List<HeroConfig>(HeroConfig.ConfigList);
-
-        int[] sideCounts = new int[10];
-        // 先对allHeroes遍历，1-100随机，如果大于RateAbs，加入返回队列
-        List<HeroConfig> tempHeroes = new List<HeroConfig>(allHeroes);
-        foreach (var hero in tempHeroes)
+        foreach (var heroId in heroIds)
         {
-            if(hero.RateAbs <= 0)
-                continue;
-            int randomValue = UnityEngine.Random.Range(1, 101);
-            if (randomValue <= hero.RateAbs)
+            var config = HeroConfig.GetConfig(heroId);
+            if (config != null)
             {
-                int price = GetPrice(hero);
-                heroPoolCache.Add(new Tuple<int, int>((int)hero.Id, price));
-                sideCounts[hero.Side - 1]++;
-            }
-            allHeroes.Remove(hero);
-        }
-
-        // 先随机选择5-7张Side=4的卡牌
-        int[] sides = {4, 5, 6, 10};
-        for (int i = 0; i < 2; i++)
-        {
-            var side = sides[UnityEngine.Random.Range(0, sides.Length)];
-            sides = sides.Where(s => s != side).ToArray();
-
-            List<HeroConfig> side4Heroes = allHeroes.FindAll(hero => hero.Side == side);
-            if (side4Heroes.Count > 0)
-            {
-                int side4Count = i + 6;
-                side4Count = Mathf.Min(side4Count, side4Heroes.Count);
-
-                if(HeroConfig.HasConfig(100000 + side))
-                {
-                    var heroConfig = HeroConfig.GetConfig(100000 + side);
-                    heroPoolCache.Add(new Tuple<int, int>((int)heroConfig.Id, GetPrice(heroConfig)));
-                    sideCounts[side - 1]++;
-                    allHeroes.Remove(heroConfig);
-                    side4Heroes.Remove(heroConfig);
-                }
-                
-                List<HeroConfig> tempSide4Heroes = new List<HeroConfig>(side4Heroes);
-                for (int j = sideCounts[side - 1]; j < side4Count; j++)
-                {
-                    // 计算当前阵营总权重
-                    float totalRate = 0;
-                    foreach (var hero in tempSide4Heroes)
-                    {
-                        totalRate += hero.RateWeight;
-                    }
-
-                    HeroConfig heroCfg = null;
-                    if (totalRate > 0)
-                    {
-                        float randomValue = UnityEngine.Random.Range(0, totalRate);
-                        float accumulatedRate = 0;
-                        HeroConfig selectedHero = null;
-
-                        foreach (var hero in tempSide4Heroes)
-                        {
-                            if (hero.RateWeight <= 0)
-                                continue;
-                            accumulatedRate += hero.RateWeight;
-                            if (accumulatedRate >= randomValue)
-                            {
-                                selectedHero = hero;
-                                break;
-                            }
-                        }
-                        heroCfg = selectedHero;
-                    }
-                    else
-                    {
-                        // 如果总权重为0，随机选一张
-                        int randomIndex = UnityEngine.Random.Range(0, tempSide4Heroes.Count);
-                        heroCfg = tempSide4Heroes[randomIndex];
-                    }
-                    heroPoolCache.Add(new Tuple<int, int>((int)heroCfg.Id, GetPrice(heroCfg)));
-                    allHeroes.Remove(heroCfg);
-                    tempSide4Heroes.Remove(heroCfg);
-                    sideCounts[side - 1]++;
-                }
-            }
-        }
-
-        // 准备按阵营1-3选择卡牌，保证各阵营相差最多一张
-        List<List<HeroConfig>> sideHeroes = new List<List<HeroConfig>>
-        {
-            allHeroes.FindAll(hero => hero.Side == 1),
-            allHeroes.FindAll(hero => hero.Side == 2),
-            allHeroes.FindAll(hero => hero.Side == 3)
-        };
-
-        int targetCount = Mathf.Min(91, allHeroes.Count);
-
-        while (heroPoolCache.Count < targetCount)
-        {
-            // 找出当前数量最少的阵营
-            int minIndex = 0;
-            for (int i = 1; i < 3; i++)
-            {
-                if (sideCounts[i] < sideCounts[minIndex])
-                {
-                    minIndex = i;
-                }
-            }
-
-            // 从最少的阵营中按权重选择一张卡牌
-            List<HeroConfig> currentSideHeroes = sideHeroes[minIndex];
-            if (currentSideHeroes.Count > 0)
-            {
-                // 计算当前阵营总权重
-                float totalRate = 0;
-                foreach (var hero in currentSideHeroes)
-                {
-                    totalRate += hero.RateWeight;
-                }
-
-                if (totalRate > 0)
-                {
-                    float randomValue = UnityEngine.Random.Range(0, totalRate);
-                    float accumulatedRate = 0;
-                    HeroConfig selectedHero = null;
-
-                    foreach (var hero in currentSideHeroes)
-                    {
-                        if (hero.RateWeight <= 0)
-                            continue;
-                        accumulatedRate += hero.RateWeight;
-                        if (accumulatedRate >= randomValue)
-                        {
-                            selectedHero = hero;
-                            break;
-                        }
-                    }
-
-                    if (selectedHero != null)
-                    {
-                        int price = GetPrice(selectedHero);
-                        heroPoolCache.Add(new Tuple<int, int>((int)selectedHero.Id, price));
-                        allHeroes.Remove(selectedHero);
-                        sideHeroes[minIndex].Remove(selectedHero);
-                        sideCounts[minIndex]++;
-                    }
-                }
-                else
-                {
-                    // 如果总权重为0，随机选一张
-                    int randomIndex = UnityEngine.Random.Range(0, currentSideHeroes.Count);
-                    int price = GetPrice(currentSideHeroes[randomIndex]);
-                    heroPoolCache.Add(new Tuple<int, int>((int)currentSideHeroes[randomIndex].Id, price));
-                    allHeroes.Remove(currentSideHeroes[randomIndex]);
-                    sideHeroes[minIndex].RemoveAt(randomIndex);
-                    sideCounts[minIndex]++;
-                }
-            }
-            else
-            {
-                // 如果当前阵营没有卡牌了，跳过该阵营
-                // 找到下一个还有卡牌的阵营
-                for (int i = 0; i < 3; i++)
-                {
-                    if (sideHeroes[i].Count > 0)
-                    {
-                        minIndex = i;
-                        break;
-                    }
-                }
+                heroPoolCache.Add(new Tuple<int, int>(heroId, GetPrice(config)));
             }
         }
 
@@ -246,7 +86,6 @@ public static class HeroSelectionTool
 
     public static List<int> GetHeroPoolCache()
     {
-        UpdateHeroPoolCache();
         // 返回只包含heroId的列表
         List<int> result = new List<int>();
         foreach (var hero in heroPoolCache)
@@ -263,9 +102,6 @@ public static class HeroSelectionTool
 
     public static int GetRandomHeroId()
     {
-        if (heroPoolCache.Count == 0)
-            UpdateHeroPoolCache();
-        
         // 实现价格加权随机：价格越高，被选中的概率越低
         // 使用价格的倒数作为权重
         float totalWeight = 0;

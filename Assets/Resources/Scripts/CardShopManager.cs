@@ -14,11 +14,7 @@ public class CardShopManager : MonoBehaviour
     public GameObject cardViewPrefab; // 拖拽CardView预制体到此处
     public GameObject cardItemViewPrefab; // 拖拽CardView预制体到此处
     public GameObject cardItemView;
-    private const int TOTAL_HERO_CARDS = 21;
-    private const int CARDS_PER_ROW = 7;
-    private float cardWidth = 176f;
-    private float cardHeight = 245f;
-    private float spacing = 5f;
+
     private int round = 10002;
     private bool[] playerPassed = new bool[6]; // 记录每个玩家是否pass过
     private int passedPlayers = 0; // 记录pass的玩家数量
@@ -111,13 +107,10 @@ public class CardShopManager : MonoBehaviour
         foreach(var player in GameManager.Instance.players)
             player.OnEra(era);
 
-        // 计算起始位置，使其居中显示
-        float startX = -((CARDS_PER_ROW * cardWidth) + (CARDS_PER_ROW - 1) * spacing) / 2f + cardWidth / 2f;
-        float startY = 250f;
-
         var shopOpenIndex = GameManager.Instance.GetPlayer(0).GamePlayed(); //第几场比赛
         var shopCfg = ShopConfig.GetConfig(Math.Min(100, shopOpenIndex + 1));
         List<Tuple<int, int>> heroIds = new List<Tuple<int, int>>();
+        int TOTAL_HERO_CARDS = 21;        
         // hero card
         for (int i = 0; i < TOTAL_HERO_CARDS; i++)
         {
@@ -157,6 +150,16 @@ public class CardShopManager : MonoBehaviour
             // id相同按item2排序
             return b.Item2.CompareTo(a.Item2);
         });
+
+
+        int CARDS_PER_ROW = 7;
+        float cardWidth = 176f;
+        float cardHeight = 245f;
+        float spacing = 5f;
+
+        // 计算起始位置，使其居中显示
+        float startX = -((CARDS_PER_ROW * cardWidth) + (CARDS_PER_ROW - 1) * spacing) / 2f + cardWidth / 2f;
+        float startY = 250f;        
 
         for(int i = 0; i < heroIds.Count; i++)
         {

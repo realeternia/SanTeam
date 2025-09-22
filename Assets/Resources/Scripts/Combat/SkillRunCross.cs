@@ -1,10 +1,9 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using CommonConfig;
 using UnityEngine;    
-// 添加协程命名空间
-using System.Collections;
-using System;
+
 
 public class SkillRunCross : Skill
 {
