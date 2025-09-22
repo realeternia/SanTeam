@@ -11,8 +11,11 @@ public class MapConfig : MonoBehaviour
     public GameObject[] RegionSide3; // 阵营3的出生点数组
     public GameObject[] RegionSide4; // 阵营4的出生点数组    
 
-    public GameObject[] RegionSide5; // 阵营3的出生点数组
-    public GameObject[] RegionSide6; // 阵营4的出生点数组   
+    public GameObject[] RegionSide5; // 阵营5的出生点数组
+    public GameObject[] RegionSide6; // 阵营6的出生点数组   
+
+    public GameObject[] RegionSide7; // 阵营7的出生点数组
+    public GameObject[] RegionSide8; // 阵营8的出生点数组       
 
 
     
@@ -24,6 +27,9 @@ public class MapConfig : MonoBehaviour
 
     public GameObject[] RegionHeroSide5; // 阵营5的出生点数组
     public GameObject[] RegionHeroSide6; // 阵营6的出生点数组 
+
+    public GameObject[] RegionHeroSide7; // 阵营7的出生点数组
+    public GameObject[] RegionHeroSide8; // 阵营8的出生点数组
 
     public GameObject WallNode;
     public GameObject RegionNode;

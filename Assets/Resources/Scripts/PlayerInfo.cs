@@ -45,6 +45,8 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     public Dictionary<int, int> itemEquips = new Dictionary<int, int>(); // heroId -> itemid
     [CustomSerializeField]
     public int[] battleCards = new int[6];
+    [CustomSerializeField]
+    public bool isAI = false;
 
     public bool isOnTurn;
     public TMP_Text playerNameText;
@@ -89,6 +91,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     {
         pid = id;
         playerName = name;
+        isAI = id > 0;
 
         imgPath = img;
         gold = g;
@@ -97,29 +100,25 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         UpdateView();
     }
 
-    private void UpdateView()
+    public void UpdateView()
     {
         playerNameText.text = playerName;        
         playerImage.sprite = Resources.Load<Sprite>(imgPath);
         goldText.text = gold.ToString();
-        resultText.text = "0分";
+        resultText.text = "0";
         playerBgImg.color = lineColor;
     }
 
     public void OnPointerUp(PointerEventData eventData)
     {
-        Debug.Log($"UI 元素被抬起，位置：{eventData.position}");
-
         if(CardShopManager.Instance != null)
-            CardShopManager.Instance.UpdateCards(0);
+            CardShopManager.Instance.QuickView(-1);
     }    
 
     public void OnPointerDown(PointerEventData eventData)
     {
-        Debug.Log($"UI 元素被按下，位置：{eventData.position}");
-
         if(CardShopManager.Instance != null)
-            CardShopManager.Instance.UpdateCards(pid);
+            CardShopManager.Instance.QuickView(pid);
 
         PanelManager.Instance.SendSignal("SelectPlayer", "", pid);
     }
@@ -340,7 +339,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 
     public List<Tuple<int, int>> GetBattleCardList(bool isTest = false)
     {
-        if(!isTest && pid == 0 && battleCards.Any(c => c > 0))
+        if(!isTest && !isAI && battleCards.Any(c => c > 0))
         {
             var saveCardIds = new List<Tuple<int, int>>();
             for(int i = 0; i < battleCards.Length; i++)
@@ -357,13 +356,13 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
             return saveCardIds;
         }
         var strongCardIds = GetStrong6CardList();        
-        if(pid > 0)
+        if(isAI)
             AutoCheckItem(strongCardIds);
         if(!isTest)
             UpdateFightMark(strongCardIds);
         var results = RearrangePos(strongCardIds);
 
-        if (pid > 0)
+        if (isAI)
         {
             //把results保存到battleCards
             battleCards = new int[6];
@@ -393,7 +392,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         }
 
         sortDataList.Sort((a, b) => b.Item2.CompareTo(a.Item2));
-        if(pid > 0)
+        if(isAI)
         {
             // 获取前5卡
             var top5Cards = sortDataList.Take(6).ToList();
@@ -689,7 +688,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         else
             loseCount++;
         mark += add;
-        resultText.text = mark.ToString() + "分";
+        resultText.text = mark.ToString();
     }
 
     public bool HasCard(int cardId)
@@ -921,8 +920,6 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         {
             Debug.LogError("反序列化PlayerInfo失败: " + e.Message);
         }
-
-        UpdateView();
     }
     
     // 用于JsonUtility序列化的辅助类

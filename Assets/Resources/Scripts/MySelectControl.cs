@@ -7,7 +7,9 @@ using CommonConfig;
 public class MySelectControl : MonoBehaviour
 {
     public GameObject nodePrefab; // 拖拽CardView预制体到此处
-    // Start is called before the first frame update
+    private List<int> playerCards;
+    private PlayerInfo playerInfo;
+
     void Start()
     {
         
@@ -19,12 +21,29 @@ public class MySelectControl : MonoBehaviour
         
     }
 
+    public void QuickView(PlayerInfo checkPlayer)
+    {
+        var tmpCards = new List<int>(checkPlayer.cards.Keys);
+        ShowCards(checkPlayer, tmpCards);
+    }
+
+    public void QuickViewFin()
+    {
+        ShowCards(playerInfo, playerCards);
+    }
+
     public void UpdateCards(PlayerInfo playerInfo)
     {
         // 假设 playerInfo 中有 cards 列表
-        List<int> cards = new List<int>(playerInfo.cards.Keys);
+        playerCards = new List<int>(playerInfo.cards.Keys);
+        this.playerInfo = playerInfo;
+        ShowCards(playerInfo, playerCards);
+        UnityEngine.Debug.Log($"UpdateCards {playerInfo.name} {playerCards.Count}");
+    }
 
-        // 获取当前已有的 TMP_Text 组件
+    private void ShowCards(PlayerInfo checkPlayer, List<int> cards)
+    {
+          // 获取当前已有的 TMP_Text 组件
         List<SelectCardNodeControl> existingTexts = new List<SelectCardNodeControl>(GetComponentsInChildren<SelectCardNodeControl>());
 
         // 遍历 cards 列表
@@ -71,7 +90,7 @@ public class MySelectControl : MonoBehaviour
                 skillIcon = SkillConfig.GetConfig(cardCfg.Skills[0]).Icon;
             }
             selectNode.cardId = cardId;
-            selectNode.UpdateExp(playerInfo.pid, cardCfg.Name, playerInfo.cards[cardId], skillIcon);
+            selectNode.UpdateExp(checkPlayer.pid, cardCfg.Name, checkPlayer.cards[cardId], skillIcon);
 
             i++;
         }

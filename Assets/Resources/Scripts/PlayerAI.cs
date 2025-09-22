@@ -387,8 +387,7 @@ public static class PlayerAI
         if (selectedCard.isHeroCard && heroCardCount >= playerConfig.Cardherolimit && !hasSameCard)
             playerInfo.SellCard(weakHeroCardId); //卖掉最弱的卡
 
-        // 购买选中的卡片
-        playerInfo.BuyCard(selectedCard, selectedCard.cardId, selectedCard.isHeroCard, selectedCard.priceI, selectedCard.count);
+        CardShopManager.Instance.OnPlayerBuyCard(selectedCard, playerInfo, selectedCard.cardId, selectedCard.isHeroCard, selectedCard.priceI, selectedCard.count);
 
         return true;
     }

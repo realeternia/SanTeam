@@ -56,7 +56,14 @@ public class CardViewControl : MonoBehaviour, IPointerDownHandler, IPointerUpHan
 
         buyButton.onClick.AddListener(() =>
         {
-            CardShopManager.Instance.OnPlayerBuyCard(this, 0, cardId, isHeroCard, priceI, count);
+            var nowPlayer = CardShopManager.Instance.GetCurrentPlayer();
+            if (!nowPlayer.isAI)
+            {
+                if (CardShopManager.Instance.OnPlayerBuyCard(this, nowPlayer, cardId, isHeroCard, priceI, count))
+                {
+                    CardShopManager.Instance.AfterAct();
+                }
+            }
         });
     }
 

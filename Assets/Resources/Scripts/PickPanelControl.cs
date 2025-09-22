@@ -65,11 +65,21 @@ public class PickPanelControl : MonoBehaviour
             loadGamePanel.SetActive(true);
             loadGameBtn.onClick.AddListener(() =>
             {
-                GameManager.Instance.LoadFromSave();
-                GameManager.Instance.InitFriend(true);
-                GameManager.Instance.InitHeros(true);
-                PanelManager.Instance.ShowShop();
-                PanelManager.Instance.HidePick();
+                var isSuccess = GameManager.Instance.LoadFromSave(false);
+                if(isSuccess)
+                {
+                    GameManager.Instance.InitFriend(true);
+                    GameManager.Instance.InitHeros(true);
+                    PanelManager.Instance.ShowShop();
+                    PanelManager.Instance.HidePick();
+                }
+                else
+                {
+                    loadGamePanel.SetActive(false);
+                    GameManager.Instance.InitHeros(false);
+                    GameManager.Instance.InitFriend(false);
+                    RefreshBtnClick();
+                }
             });
             newGameBtn.onClick.AddListener(() =>
             {
@@ -107,9 +117,9 @@ public class PickPanelControl : MonoBehaviour
         // 等待1秒
         yield return new WaitForSeconds(.3f);
 
-        for (int i = 1; i <= 11; i++)
+        for (int i = 1; i <= 14; i++)
         {
-            var pid = (i % 5) + 1;
+            var pid = (i % 7) + 1;
             var player = GameManager.Instance.GetPlayer(pid);
             if (player.banCount > 0)
             {

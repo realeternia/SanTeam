@@ -11,6 +11,7 @@ public class BagControl : MonoBehaviour, IPanelEvent
     public Button closeBtn;
 
     public Button fieldAutoBtn;
+    public Button aiSwitchBtn;
 
 
     // Start is called before the first frame update
@@ -40,11 +41,20 @@ public class BagControl : MonoBehaviour, IPanelEvent
         });
         fieldAutoBtn.onClick.AddListener(() =>
         {
-            var p1 = GameManager.Instance.GetPlayer(0);
+            var p1 = GameManager.Instance.GetPlayer(bindPlayer.pid);
             p1.AutoSetBattleCard();
             UpdateFieldView();
 
             GameManager.Instance.PlaySound("Sounds/equip");
+        });
+        aiSwitchBtn.onClick.AddListener(() =>
+        {
+            bindPlayer.isAI = !bindPlayer.isAI;
+            aiSwitchBtn.GetComponentInChildren<TMP_Text>().text = bindPlayer.isAI ? "AI模式" : "玩家模式";
+            if (bagRecycler != null)
+                bagRecycler.gameObject.SetActive(!bindPlayer.isAI);
+            if (fieldAutoBtn != null)
+                fieldAutoBtn.gameObject.SetActive(!bindPlayer.isAI);
         });
 
         for (int i = 0; i < 6; i++)
@@ -73,7 +83,11 @@ public class BagControl : MonoBehaviour, IPanelEvent
 
     public void OnShow()
     {
-        Bind(GameManager.Instance.GetPlayer(0));
+        var currentPlayer = CardShopManager.Instance.GetCurrentPlayer();
+        if (!currentPlayer.isAI)
+            Bind(currentPlayer);
+        else
+            Bind(GameManager.Instance.GetPlayer(0));
     }
 
     public void OnHide()
@@ -87,9 +101,9 @@ public class BagControl : MonoBehaviour, IPanelEvent
         UpdateView();
 
         if (bagRecycler != null)
-            bagRecycler.gameObject.SetActive(p.pid == 0);
+            bagRecycler.gameObject.SetActive(!p.isAI);
         if (fieldAutoBtn != null)
-            fieldAutoBtn.gameObject.SetActive(p.pid == 0);
+            fieldAutoBtn.gameObject.SetActive(!p.isAI);
 
         heroDetail.gameObject.SetActive(false);
         itemDetail.gameObject.SetActive(false);
@@ -100,6 +114,11 @@ public class BagControl : MonoBehaviour, IPanelEvent
         var textAtk = (soldierCfg.Atk + p.sodatk).ToString();
         var textHp = (soldierCfg.Hp + p.sodhp * 5).ToString();
         infoText.text = "<color=yellow>战斗力-</color>" + bindPlayer.lastFightMark + " <color=red>士兵攻击-</color>" + textAtk + " <color=green>士兵生命值-</color>" + textHp;
+
+
+        var humanCount = GameManager.Instance.players.Count(x => !x.isAI);
+        aiSwitchBtn.gameObject.SetActive(bindPlayer.pid != 0 && (!bindPlayer.isAI || humanCount < 2));
+        aiSwitchBtn.GetComponentInChildren<TMP_Text>().text = bindPlayer.isAI ? "AI模式" : "玩家模式";
     }
 
     public void SendSignal(string name, string parm1, int parm2)
@@ -228,7 +247,7 @@ public class BagControl : MonoBehaviour, IPanelEvent
         if(itemCardId == 0 || heroCardId == 0)
             return;
             
-        var p1 = GameManager.Instance.GetPlayer(0);
+        var p1 = GameManager.Instance.GetPlayer(bindPlayer.pid);
         p1.Equip(heroCardId, itemCardId);
 
         var itemCfg = ItemConfig.GetConfig(itemCardId);
@@ -259,7 +278,10 @@ public class BagControl : MonoBehaviour, IPanelEvent
 
     public void SetHeroForBattle(int heroId, int pos)
     {
-        var p1 = GameManager.Instance.GetPlayer(0);
+        var p1 = GameManager.Instance.GetPlayer(bindPlayer.pid);
+        if(p1.isAI)
+            return;
+
         p1.SetBattlePos(heroId, pos);
 
         GameManager.Instance.PlaySound("Sounds/equip");
@@ -268,7 +290,10 @@ public class BagControl : MonoBehaviour, IPanelEvent
 
     public void SellCard(int cardId)
     {
-        var p1 = GameManager.Instance.GetPlayer(0);
+        var p1 = GameManager.Instance.GetPlayer(bindPlayer.pid);
+        if(p1.isAI)
+            return;
+
         p1.SellCard(cardId);
         var cell = cellCache.Find(x => x.GetComponent<BagCell>().cardId == cardId);
         if(cell != null)
@@ -276,8 +301,6 @@ public class BagControl : MonoBehaviour, IPanelEvent
             cellCache.Remove(cell);
             Destroy(cell);
         }
-        if(CardShopManager.Instance != null)
-            CardShopManager.Instance.OnPlayerSellCard();
         heroDetail.Clear();
         itemDetail.Clear();
         heroDetail.gameObject.SetActive(false);

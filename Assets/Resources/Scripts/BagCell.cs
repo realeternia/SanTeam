@@ -44,7 +44,7 @@ public class BagCell : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragH
     // 开始拖动时调用
     public void OnBeginDrag(PointerEventData eventData)
     {
-        if(bagControl.bindPlayer.pid != 0)
+        if(bagControl.bindPlayer.isAI)
             return;
 
         // 保存原始位置和父对象

@@ -26,7 +26,7 @@ public class GameManager : MonoBehaviour
     }
 
     public static GameManager Instance;
-    public PlayerInfo[] players;
+    public PlayerInfo[] players; //不能new，都是配置好的
     public List<FriendRandomData> friendRdData;
     public List<int> heroIds;
     private StreamWriter logWriter;  // 日志写入器
@@ -51,8 +51,8 @@ public class GameManager : MonoBehaviour
         var p1 = PlayerBook.GetWang();
         players[0].Init(0, p1.Name, p1.Imgpath, p1.Colorstr, 0);
         players[0].playerConfig = p1;
-        var pls = PlayerBook.GetRandomN(5);
-        for (int i = 0; i < 5; i++)
+        var pls = PlayerBook.GetRandomN(7);
+        for (int i = 0; i < 7; i++)
         {
             players[i + 1].Init(i + 1, pls[i].Name, pls[i].Imgpath, pls[i].Colorstr, 0);
             players[i + 1].playerConfig = pls[i];
@@ -159,50 +159,45 @@ public class GameManager : MonoBehaviour
         
         if(!File.Exists(savePath))
             return false;
-        GameManager tmp = new GameManager();
-        return tmp.LoadFromSave();
+        return true;
     }
 
-    public bool LoadFromSave()
+    public bool LoadFromSave(bool tryMode)
     {
         string savePath = Application.persistentDataPath + "/game_save.json";
-        try
-        {
+       try
+       {
             string json = File.ReadAllText(savePath);
             SaveData saveData = JsonUtility.FromJson<SaveData>(json);
 
             // 确保players数组不为null且长度足够
-            if (players != null && players.Length >= saveData.players.Count)
+            if (saveData.players != null)
             {
                 for (int i = 0; i < saveData.players.Count; i++)
                 {
-                    // 直接使用PlayerInfo的Deserialize方法
                     players[i].Deserialize(saveData.players[i]);
+                    if(!tryMode)
+                        players[i].UpdateView();
                 }
-
-                // 加载friendRdData
-                if (saveData.friendRdData != null)
-                {
-                    friendRdData = new List<FriendRandomData>();
-                    friendRdData.AddRange(saveData.friendRdData);
-                }
-
-                // 加载heroIds
-                if (saveData.heroIds != null)
-                {
-                    heroIds = new List<int>();
-                    heroIds.AddRange(saveData.heroIds);
-                }
-
-                Debug.Log("游戏数据加载成功");
             }
-            else
+
+            // 加载friendRdData
+            if (saveData.friendRdData != null)
             {
-                Debug.LogError("players数组未初始化或长度不足");
-                return false;
+                friendRdData = new List<FriendRandomData>();
+                friendRdData.AddRange(saveData.friendRdData);
             }
+
+            // 加载heroIds
+            if (saveData.heroIds != null)
+            {
+                heroIds = new List<int>();
+                heroIds.AddRange(saveData.heroIds);
+            }
+
+            Debug.Log("游戏数据加载成功");
         }
-        catch (System.Exception e)
+       catch (System.Exception e)
         {
             Debug.LogError("加载游戏数据失败: " + e.Message);
             return false;

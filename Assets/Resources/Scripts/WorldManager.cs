@@ -23,8 +23,8 @@ public class WorldManager : MonoBehaviour
     private Dictionary<Vector2Int, GameObject> debugGridCubes = new Dictionary<Vector2Int, GameObject>(); // 格子与调试cube的映射
 
     private List<Chess> chessList = new List<Chess>(); // 所有棋子
-    private int[] killMark = new int[6];
-    private int[] deathOrder = new int[6]; // 记录各阵营的死亡顺序，0表示未死亡
+    private int[] killMark = new int[8];
+    private int[] deathOrder = new int[8]; // 记录各阵营的死亡顺序，0表示未死亡
     private int deathCount = 0; // 记录已死亡的阵营数量
 
     private bool gameFinish = false;
@@ -83,8 +83,8 @@ public class WorldManager : MonoBehaviour
         }
 
         battleIndex++;
-        killMark = new int[6];
-        deathOrder = new int[6];
+        killMark = new int[8];
+        deathOrder = new int[8];
         deathCount = 0;
 
         BattleResultPanel.gameObject.SetActive(false);
@@ -126,16 +126,20 @@ public class WorldManager : MonoBehaviour
     private int[] GetMatch()
     {
         // 两两组合搭配方案
-        if(battleIndex % 5 == 0)
-            return new int[] { 0, 1, 2, 3, 4, 5 };
-        else if(battleIndex % 5 == 1)
-            return new int[] { 0, 2, 1, 4, 5, 3 };
-        else if(battleIndex % 5 == 2)
-            return new int[] { 0, 3, 1, 5, 4, 2 };
-        else if(battleIndex % 5 == 3)
-            return new int[] { 0, 4, 1, 3, 5, 2 };
+        if (battleIndex % 7 == 0)
+            return new int[] { 0, 1, 2, 3, 4, 5, 6, 7 };  // 顺序排列
+        else if (battleIndex % 7 == 1)
+            return new int[] { 0, 2, 4, 6, 1, 3, 5, 7 };  // 偶数在前，奇数在后
+        else if (battleIndex % 7 == 2)
+            return new int[] { 0, 3, 6, 1, 4, 7, 2, 5 };  // 间隔3个位置
+        else if (battleIndex % 7 == 3)
+            return new int[] { 0, 4, 1, 5, 2, 6, 3, 7 };  // 间隔4个位置
+        else if (battleIndex % 7 == 4)
+            return new int[] { 0, 5, 2, 7, 4, 1, 6, 3 };  // 间隔5个位置
+        else if (battleIndex % 7 == 5)
+            return new int[] { 0, 6, 3, 7, 2, 5, 1, 4 };  // 间隔6个位置
         else
-            return new int[] { 0, 5, 1, 2, 3, 4 };
+            return new int[] { 0, 7, 6, 5, 4, 3, 2, 1 };  // 逆序排列
     }
 
     private void SpawnUnitsInRegions()
@@ -171,60 +175,76 @@ public class WorldManager : MonoBehaviour
             int[] match = GetMatch();
             // 在RegionSide1生成单位 (阵营1)
             var p = GameManager.Instance.GetPlayer(match[0]);
-            for(int i = 0; i < mapConfig.RegionSide1.Length; i++)
+            for (int i = 0; i < mapConfig.RegionSide1.Length; i++)
                 SpawnUnitsForRegion(p, i < 3 ? 500001 : 500002, mapConfig.RegionSide1[i].transform.position, 1, p.imgPath);
             // 在RegionSide2生成单位 (阵营2)
             p = GameManager.Instance.GetPlayer(match[1]);
-            for(int i = 0; i < mapConfig.RegionSide2.Length; i++)
+            for (int i = 0; i < mapConfig.RegionSide2.Length; i++)
                 SpawnUnitsForRegion(p, i < 3 ? 500001 : 500002, mapConfig.RegionSide2[i].transform.position, 2, p.imgPath);
             p = GameManager.Instance.GetPlayer(match[2]);
-            for(int i = 0; i < mapConfig.RegionSide3.Length; i++)
+            for (int i = 0; i < mapConfig.RegionSide3.Length; i++)
                 SpawnUnitsForRegion(p, i < 3 ? 500001 : 500002, mapConfig.RegionSide3[i].transform.position, 3, p.imgPath);
             p = GameManager.Instance.GetPlayer(match[3]);
-            for(int i = 0; i < mapConfig.RegionSide4.Length; i++)
+            for (int i = 0; i < mapConfig.RegionSide4.Length; i++)
                 SpawnUnitsForRegion(p, i < 3 ? 500001 : 500002, mapConfig.RegionSide4[i].transform.position, 4, p.imgPath);
             p = GameManager.Instance.GetPlayer(match[4]);
-            for(int i = 0; i < mapConfig.RegionSide5.Length; i++)
+            for (int i = 0; i < mapConfig.RegionSide5.Length; i++)
                 SpawnUnitsForRegion(p, i < 3 ? 500001 : 500002, mapConfig.RegionSide5[i].transform.position, 5, p.imgPath);
             p = GameManager.Instance.GetPlayer(match[5]);
-            for(int i = 0; i < mapConfig.RegionSide6.Length; i++)
+            for (int i = 0; i < mapConfig.RegionSide6.Length; i++)
                 SpawnUnitsForRegion(p, i < 3 ? 500001 : 500002, mapConfig.RegionSide6[i].transform.position, 6, p.imgPath);
+            p = GameManager.Instance.GetPlayer(match[6]);
+            for (int i = 0; i < mapConfig.RegionSide7.Length; i++)
+                SpawnUnitsForRegion(p, i < 3 ? 500001 : 500002, mapConfig.RegionSide7[i].transform.position, 7, p.imgPath);
+            p = GameManager.Instance.GetPlayer(match[7]);
+            for (int i = 0; i < mapConfig.RegionSide8.Length; i++)
+                SpawnUnitsForRegion(p, i < 3 ? 500001 : 500002, mapConfig.RegionSide8[i].transform.position, 8, p.imgPath);
 
             var cards = GameManager.Instance.GetPlayer(match[0]).GetBattleCardList();
             foreach (var card in cards)
             {
                 UnityEngine.Debug.Log("card: " + (card == null ? "null" : card.Item1));
             }
-            
+
             var cardsFriend = cards.Where(a => a != null).Select(a => a.Item1).ToList();
             for (int i = 0; i < cards.Count && i < mapConfig.RegionHeroSide1.Length; i++)
                 if (cards[i] != null)
                     SpawnHerosForRegion(GameManager.Instance.GetPlayer(match[0]), mapConfig.RegionHeroSide1[i], cards[i], cardsFriend, 1);
             cards = GameManager.Instance.GetPlayer(match[1]).GetBattleCardList();
-           cardsFriend = cards.Where(a => a != null).Select(a => a.Item1).ToList();
+            cardsFriend = cards.Where(a => a != null).Select(a => a.Item1).ToList();
             for (int i = 0; i < cards.Count && i < mapConfig.RegionHeroSide2.Length; i++)
                 if (cards[i] != null)
                     SpawnHerosForRegion(GameManager.Instance.GetPlayer(match[1]), mapConfig.RegionHeroSide2[i], cards[i], cardsFriend, 2);
             cards = GameManager.Instance.GetPlayer(match[2]).GetBattleCardList();
-           cardsFriend = cards.Where(a => a != null).Select(a => a.Item1).ToList();
+            cardsFriend = cards.Where(a => a != null).Select(a => a.Item1).ToList();
             for (int i = 0; i < cards.Count && i < mapConfig.RegionHeroSide3.Length; i++)
                 if (cards[i] != null)
                     SpawnHerosForRegion(GameManager.Instance.GetPlayer(match[2]), mapConfig.RegionHeroSide3[i], cards[i], cardsFriend, 3);
             cards = GameManager.Instance.GetPlayer(match[3]).GetBattleCardList();
-          cardsFriend = cards.Where(a => a != null).Select(a => a.Item1).ToList();
+            cardsFriend = cards.Where(a => a != null).Select(a => a.Item1).ToList();
             for (int i = 0; i < cards.Count && i < mapConfig.RegionHeroSide4.Length; i++)
                 if (cards[i] != null)
                     SpawnHerosForRegion(GameManager.Instance.GetPlayer(match[3]), mapConfig.RegionHeroSide4[i], cards[i], cardsFriend, 4);
             cards = GameManager.Instance.GetPlayer(match[4]).GetBattleCardList();
-         cardsFriend = cards.Where(a => a != null).Select(a => a.Item1).ToList();
+            cardsFriend = cards.Where(a => a != null).Select(a => a.Item1).ToList();
             for (int i = 0; i < cards.Count && i < mapConfig.RegionHeroSide5.Length; i++)
                 if (cards[i] != null)
                     SpawnHerosForRegion(GameManager.Instance.GetPlayer(match[4]), mapConfig.RegionHeroSide5[i], cards[i], cardsFriend, 5);
             cards = GameManager.Instance.GetPlayer(match[5]).GetBattleCardList();
-           cardsFriend = cards.Where(a => a != null).Select(a => a.Item1).ToList();
+            cardsFriend = cards.Where(a => a != null).Select(a => a.Item1).ToList();
             for (int i = 0; i < cards.Count && i < mapConfig.RegionHeroSide6.Length; i++)
                 if (cards[i] != null)
                     SpawnHerosForRegion(GameManager.Instance.GetPlayer(match[5]), mapConfig.RegionHeroSide6[i], cards[i], cardsFriend, 6);
+            cards = GameManager.Instance.GetPlayer(match[6]).GetBattleCardList();
+            cardsFriend = cards.Where(a => a != null).Select(a => a.Item1).ToList();
+            for (int i = 0; i < cards.Count && i < mapConfig.RegionHeroSide7.Length; i++)
+                if (cards[i] != null)
+                    SpawnHerosForRegion(GameManager.Instance.GetPlayer(match[6]), mapConfig.RegionHeroSide7[i], cards[i], cardsFriend, 7);
+            cards = GameManager.Instance.GetPlayer(match[7]).GetBattleCardList();
+            cardsFriend = cards.Where(a => a != null).Select(a => a.Item1).ToList();
+            for (int i = 0; i < cards.Count && i < mapConfig.RegionHeroSide8.Length; i++)
+                if (cards[i] != null)
+                    SpawnHerosForRegion(GameManager.Instance.GetPlayer(match[7]), mapConfig.RegionHeroSide8[i], cards[i], cardsFriend, 8);                    
 
             CreateCastleHUD(GameManager.Instance.GetPlayer(match[0]), mapConfig.RegionHeroSide1[4]);
             CreateCastleHUD(GameManager.Instance.GetPlayer(match[1]), mapConfig.RegionHeroSide2[4]);
@@ -232,16 +252,18 @@ public class WorldManager : MonoBehaviour
             CreateCastleHUD(GameManager.Instance.GetPlayer(match[3]), mapConfig.RegionHeroSide4[4]);
             CreateCastleHUD(GameManager.Instance.GetPlayer(match[4]), mapConfig.RegionHeroSide5[4]);
             CreateCastleHUD(GameManager.Instance.GetPlayer(match[5]), mapConfig.RegionHeroSide6[4]);
+            CreateCastleHUD(GameManager.Instance.GetPlayer(match[6]), mapConfig.RegionHeroSide7[4]);
+            CreateCastleHUD(GameManager.Instance.GetPlayer(match[7]), mapConfig.RegionHeroSide8[4]);
         }
         else
         {
 
             //   SpawnHerosForRegion(GameManager.Instance.GetPlayer(0), mapConfig.RegionHeroSide1[4], new System.Tuple<int, int>(101008, 1), 1);
-            var heroList = new List<int> {101011 };
+            var heroList = new List<int> { 101011 };
             for (int i = 0; i < heroList.Count; i++)
                 SpawnHerosForRegion(GameManager.Instance.GetPlayer(0), mapConfig.RegionHeroSide1[i], new System.Tuple<int, int>(heroList[i], 1), heroList, 1);
 
-            heroList = new List<int> { 103037,103037 };
+            heroList = new List<int> { 103037, 103037 };
             for (int i = 0; i < heroList.Count; i++)
                 SpawnHerosForRegion(GameManager.Instance.GetPlayer(1), mapConfig.RegionHeroSide2[i], new System.Tuple<int, int>(heroList[i], 1), heroList, 2);
 
@@ -714,7 +736,7 @@ public class WorldManager : MonoBehaviour
         {
             // 检查所有阵营是否还有存活单位
             // 创建一个数组来统计每个阵营是否有存活单位，数组索引对应阵营编号减1
-            bool[] sideHasUnits = new bool[6];
+            bool[] sideHasUnits = new bool[8];
             int aliveSideCount = 0;
 
             foreach (var chessComponent in chessList)
@@ -735,7 +757,7 @@ public class WorldManager : MonoBehaviour
 
             UnityEngine.Debug.Log($"id:{dieUnit.id} dieUnit.side:{dieUnit.side} 存活阵营数:{aliveSideCount}");
             // 如果只剩一个阵营有存活单位，显示重启按钮
-            if (aliveSideCount == 3)
+            if (aliveSideCount == 4)
             {
                 int[] match = GetMatch();
                 for (int i = 0; i < match.Length; i++)
@@ -761,11 +783,11 @@ public class WorldManager : MonoBehaviour
             {
                 if (chessComponent != null && chessComponent.hp > 0 && !chessComponent.isShadow)
                 {
-                    if (chessComponent.side == 1 || chessComponent.side == 3 || chessComponent.side == 5)
+                    if (chessComponent.side == 1 || chessComponent.side == 3 || chessComponent.side == 5 || chessComponent.side == 7)
                     {
                         team1HasUnits = true;
                     }
-                    else if (chessComponent.side == 2 || chessComponent.side == 4 || chessComponent.side == 6)
+                    else if (chessComponent.side == 2 || chessComponent.side == 4 || chessComponent.side == 6 || chessComponent.side == 8)
                     {
                         team2HasUnits = true;
                     }
@@ -781,7 +803,7 @@ public class WorldManager : MonoBehaviour
                 for (int i = 0; i < match.Length; i++)
                 {
                     int playerSide = i + 1; // 假设match索引对应阵营1-6
-                    bool isTeam1 = playerSide == 1 || playerSide == 3 || playerSide == 5;
+                    bool isTeam1 = playerSide == 1 || playerSide == 3 || playerSide == 5 || playerSide == 7;
                     bool isWinner = (isTeam1 && team1HasUnits) || (!isTeam1 && team2HasUnits);
 
                     if (isWinner)
@@ -820,7 +842,7 @@ public class WorldManager : MonoBehaviour
 
             // 记录死亡顺序
             int dieSideIndex = dieUnit.side - 1;
-            if (dieSideIndex >= 0 && dieSideIndex < 6)
+            if (dieSideIndex >= 0 && dieSideIndex < 8)
             {
                 // 检查该阵营是否刚刚被消灭
                 if (sideHasUnits[dieSideIndex] == false && deathOrder[dieSideIndex] == 0)
@@ -848,21 +870,23 @@ public class WorldManager : MonoBehaviour
                 }
 
                 // 计算分数：存活的阵营得1分，死亡顺序越晚分数越高
-                int[] scores = new int[6];
+                int[] scores = new int[8];
                 for (int i = 0; i < scores.Length; i++)
                 {
                     if (i + 1 == winnerSide)
-                        scores[i] = 10; // 胜利者得1分
+                        scores[i] = 10; // 胜利者得10分
+                    else if (deathOrder[i] == 7)
+                        scores[i] = 7;
+                    else if (deathOrder[i] == 6)
+                        scores[i] = 5;
                     else if (deathOrder[i] == 5)
-                        scores[i] = 8;
+                        scores[i] = 5;
                     else if (deathOrder[i] == 4)
-                        scores[i] = 6;
-                    else if (deathOrder[i] == 3)
-                        scores[i] = 4;
-                    else if (deathOrder[i] == 2)
                         scores[i] = 3;
-                    else if (deathOrder[i] == 1)
+                    else if (deathOrder[i] == 3)
                         scores[i] = 2;
+                    else if (deathOrder[i] == 2)
+                        scores[i] = 1;
                 }
 
                 // 通知玩家战斗结果

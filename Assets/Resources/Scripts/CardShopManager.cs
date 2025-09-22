@@ -15,8 +15,8 @@ public class CardShopManager : MonoBehaviour
     public GameObject cardItemViewPrefab; // 拖拽CardView预制体到此处
     public GameObject cardItemView;
 
-    private int round = 10002;
-    private bool[] playerPassed = new bool[6]; // 记录每个玩家是否pass过
+    private int round = 10000;
+    private bool[] playerPassed = new bool[8]; // 记录每个玩家是否pass过
     private int passedPlayers = 0; // 记录pass的玩家数量
 
     public Button passBtn;
@@ -72,13 +72,37 @@ public class CardShopManager : MonoBehaviour
         isShopEnd = false;
         while (!isShopEnd) // 模拟 Update 的循环
         {    
-            yield return new WaitForSeconds(UnityEngine.Random.Range(0.7f, 1.5f));
+            yield return new WaitForSeconds(UnityEngine.Random.Range(0.3f, 0.5f));
 
-            // 你的逻辑代码
-            doWork();
+            int currentPlayerId = (round % 8);
+                
+            // 如果当前玩家已经pass，则直接进入下一回合
+            if (playerPassed[currentPlayerId])
+            {
+                NextTurn();
+                continue;
+            }
+            
+            var playerInfo = GameManager.Instance.GetPlayer(currentPlayerId);
+            if (playerInfo.isAI)
+            {
+                var result = PlayerAI.AiCheckBuyCard(playerInfo, era);
+                
+                if (!result)
+                {
+                    // AI玩家放弃购买
+                    playerPassed[currentPlayerId] = true;
+                    passedPlayers++;
+                }
+            }
 
             // 等待 1 秒（不阻塞主线程）
-            yield return new WaitForSeconds(UnityEngine.Random.Range(0.3f, 0.6f));
+            yield return new WaitForSeconds(UnityEngine.Random.Range(0.5f, 0.8f));
+
+            if (playerInfo.isAI)
+            {
+                AfterAct();
+            }
         }
     }      
 
@@ -243,8 +267,9 @@ public class CardShopManager : MonoBehaviour
 
         if (nextFirstPicker >= 0)
         {
-            round = 6 * 100 + nextFirstPicker;
+            round = 8 * 100 + nextFirstPicker;
             GameManager.Instance.OnPlayerTurn(nextFirstPicker);
+            mySelect.UpdateCards(GameManager.Instance.GetPlayer(nextFirstPicker));
         }
         nextFirstPicker = -1;
 
@@ -287,38 +312,39 @@ public class CardShopManager : MonoBehaviour
         GameManager.Instance.PlaySound("Sounds/page");
     }
 
-    public void OnPlayerBuyCard(CardViewControl ctr, int pid, int cardId, bool isHero, int price, int count)
+    public bool OnPlayerBuyCard(CardViewControl ctr, PlayerInfo player, int cardId, bool isHero, int price, int count)
     {
-        if((round % 6) != 0)
-            return;
-        var player = GameManager.Instance.GetPlayer(pid);
         if (player.BuyCard(ctr, cardId, isHero, price, count))
         {
             mySelect.UpdateCards(player);
-
-            AfterAct();
+            return true;
         }
+        return false;
     }
 
-    public void OnPlayerSellCard()
+    public void QuickView(int pid)
     {
-        mySelect.UpdateCards(GameManager.Instance.GetPlayer(0));
+        if (pid >= 0)
+            mySelect.QuickView(GameManager.Instance.GetPlayer(pid));
+        else
+            mySelect.QuickViewFin();
     }
 
-    public void UpdateCards(int pid)
+    public PlayerInfo GetCurrentPlayer()
     {
-        mySelect.UpdateCards(GameManager.Instance.GetPlayer(pid));
+        return GameManager.Instance.GetPlayer(round % 8);
     }
 
     public void OnP1Pass()
     {
-        if((round % 6) != 0) 
-            return;        
-        if(playerPassed[0])
+        var nowPlayer = GameManager.Instance.GetPlayer(round % 8);
+        if(nowPlayer.isAI)
+            return;
+        if(playerPassed[nowPlayer.pid])
             return;
 
         passBtn.gameObject.SetActive(false);
-        playerPassed[0] = true;
+        playerPassed[nowPlayer.pid] = true;
         passedPlayers++;
 
         AfterAct();
@@ -327,45 +353,22 @@ public class CardShopManager : MonoBehaviour
     private void NextTurn()
     {
         UnityEngine.Debug.Log("NextTurn");
-        for(int i = 0; i < 6; i++)
+        for(int i = 0; i < 8; i++)
         {
             round++;
-            if (!playerPassed[round % 6])
+            if (!playerPassed[round % 8])
             {
-                GameManager.Instance.OnPlayerTurn(round % 6);
+                var nextPlayer = GameManager.Instance.GetPlayer(round % 8);
+                passBtn.gameObject.SetActive(!nextPlayer.isAI);
+                GameManager.Instance.OnPlayerTurn(round % 8);
+                mySelect.UpdateCards(nextPlayer);
                 return;
             }
         }
     }
 
-    private void doWork()
-    {
-        int currentPlayerId = (round % 6);
-               
-        // 如果当前玩家已经pass，则直接进入下一回合
-        if (playerPassed[currentPlayerId])
-        {
-            NextTurn();
-            return;
-        }
-        
-        if (currentPlayerId != 0)
-        {
-            var player = GameManager.Instance.GetPlayer(currentPlayerId);
-            var result = PlayerAI.AiCheckBuyCard(player, era);
-            
-            if (!result)
-            {
-                // AI玩家放弃购买
-                playerPassed[currentPlayerId] = true;
-                passedPlayers++;
-            }
 
-            AfterAct();
-        }
-    }    
-
-    private void AfterAct()
+    public void AfterAct()
     {
         // 检查是否所有卡牌都已售出
         bool allCardsSold = true;
@@ -380,8 +383,8 @@ public class CardShopManager : MonoBehaviour
 
         NextTurn();
 
-        // 检查是否6个玩家都放弃或所有卡牌都已售出
-        if (passedPlayers >= 6 || allCardsSold)
+        // 检查是否8个玩家都放弃或所有卡牌都已售出
+        if (passedPlayers >= 8 || allCardsSold)
         {
             if (era == 3)
             {
@@ -399,7 +402,7 @@ public class CardShopManager : MonoBehaviour
 
         var shopOpenIndex = GameManager.Instance.GetPlayer(0).GamePlayed(); //第几场比赛
         var roundGold = ShopConfig.GetConfig(shopOpenIndex + 1).RoundGold;
-        for(int i = 0; i < 6; i++)
+        for(int i = 0; i < 8; i++)
             GameManager.Instance.GetPlayer(i).AddGold(roundGold);
 
         era = 0;
