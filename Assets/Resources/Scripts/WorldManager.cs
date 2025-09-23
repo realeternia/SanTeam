@@ -127,19 +127,19 @@ public class WorldManager : MonoBehaviour
     {
         // 两两组合搭配方案
         if (battleIndex % 7 == 0)
-            return new int[] { 0, 1, 2, 3, 4, 5, 6, 7 };  // 顺序排列
+            return new int[] { 0, 7, 1, 6, 2, 5, 3, 4 }; 
         else if (battleIndex % 7 == 1)
-            return new int[] { 0, 2, 4, 6, 1, 3, 5, 7 };  // 偶数在前，奇数在后
+            return new int[] { 0, 1, 7, 4, 5, 3, 6, 2 }; 
         else if (battleIndex % 7 == 2)
-            return new int[] { 0, 3, 6, 1, 4, 7, 2, 5 };  // 间隔3个位置
+            return new int[] { 0, 2, 1, 7, 3, 6, 4, 5 };
         else if (battleIndex % 7 == 3)
-            return new int[] { 0, 4, 1, 5, 2, 6, 3, 7 };  // 间隔4个位置
+            return new int[] { 0, 3, 7, 5, 6, 4, 1, 2 };
         else if (battleIndex % 7 == 4)
-            return new int[] { 0, 5, 2, 7, 4, 1, 6, 3 };  // 间隔5个位置
+            return new int[] { 0, 4, 2, 7, 3, 1, 5, 6 }; 
         else if (battleIndex % 7 == 5)
-            return new int[] { 0, 6, 3, 7, 2, 5, 1, 4 };  // 间隔6个位置
+            return new int[] { 0, 5, 7, 6, 1, 4, 2, 3 }; 
         else
-            return new int[] { 0, 7, 6, 5, 4, 3, 2, 1 };  // 逆序排列
+            return new int[] { 0, 6, 3, 7, 4, 2, 5, 1 }; 
     }
 
     private void SpawnUnitsInRegions()
