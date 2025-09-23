@@ -218,7 +218,7 @@ public static class PlayerAI
                     if (find != null)
                         count = find.Item2;
                     if (count < needs.Find(x => x.Item1 == heroCfg.Group).Item2)
-                        score *= 1.8f;
+                        score *= 1.6f;
                 }
 
                 if (combatCount + rangeCount >= 3)
@@ -449,17 +449,38 @@ public static class PlayerAI
     {
         var cards = playerInfo.cards;
         List<Tuple<int, int>> sortDataList = new List<Tuple<int, int>>();
+        int rangeCount = 0, combatCount = 0;
         foreach (int cardId in cards.Keys)
         {
             if (!ConfigManager.IsHeroCard(cardId))
                 continue;
 
-            var price = HeroSelectionTool.GetPrice(HeroConfig.GetConfig(cardId));
+            var heroCfg = HeroConfig.GetConfig(cardId);
+            if(heroCfg.Pos == 1)
+                combatCount++;
+            else
+                rangeCount++;
+            var price = HeroSelectionTool.GetPrice(heroCfg);
             sortDataList.Add(new Tuple<int, int>(cardId, price * cards[cardId]));
         }
         sortDataList.Sort((a, b) => b.Item2.CompareTo(a.Item2));
 
-        var weakCard = sortDataList[sortDataList.Count - 1];
-        return weakCard;
+        var lastCard = sortDataList[sortDataList.Count - 1];
+        var last2Card = sortDataList[sortDataList.Count - 2];
+        var lastCardIsCombat = HeroConfig.GetConfig(lastCard.Item1).Pos == 1;
+        var last2CardIsCombat = HeroConfig.GetConfig(last2Card.Item1).Pos == 1;
+
+        var lastCardLevel = HeroSelectionTool.GetCardLevel(playerInfo.cards[lastCard.Item1]);
+        var last2CardLevel = HeroSelectionTool.GetCardLevel(playerInfo.cards[last2Card.Item1]);
+
+        if(last2CardLevel == lastCardLevel)
+        {
+            if(combatCount > rangeCount && !lastCardIsCombat && last2CardIsCombat)
+                return last2Card;
+            if(rangeCount > combatCount && lastCardIsCombat && !last2CardIsCombat)
+                return last2Card;
+        }
+
+        return lastCard;
     }
 }

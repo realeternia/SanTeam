@@ -198,7 +198,7 @@ namespace CommonConfig
         public static void Load()
         {
             config.Clear();
-            config[200001] = new SkillConfig(200001, "王", "帅", "给与我方同阵营单位20%生命值护盾", "职业", 1, 0, 0, 0, "", 0, 0, 0, false, "", 0, 0.2f, 0, 0, 0, 300001, 999f, 0, 0, 0, 0, 0, "MasterShield", "", "", 0, 4, "shuai");
+            config[200001] = new SkillConfig(200001, "王", "帅", "给与我方同阵营单位17%生命值护盾", "职业", 1, 0, 0, 0, "", 0, 0, 0, false, "", 0, 0.17f, 0, 0, 0, 300001, 999f, 0, 0, 0, 0, 0, "MasterShield", "", "", 0, 4, "shuai");
             config[200002] = new SkillConfig(200002, "羽扇", "扇", "远程攻击", "职业", 1, 1f, 99f, 0, "inte", 0, 0, 0, false, "", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "Dumb", "", "", 0, 2, "shan");
             config[200003] = new SkillConfig(200003, "刀兵", "刀", "攻击几率造成额外伤害", "职业", 1, 0.15f, 5f, 0, "leadShip", 0.1f, 0.01f, 0, false, "", 0, 0, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, "AttackAddDamage", "sway", "SwordHitRedCritical", 0, 1, "dao");
             config[200004] = new SkillConfig(200004, "坚韧", "士", "受击时几率发动减伤", "职业", 1, 0.4f, 4.5f, 0, "str", 0, 0, 0, false, "", 0, 0.5f, 0, 0, 0, 300002, 4f, 0, 0, 0, 0, 0, "AttackedBuff", "spin", "", 0, 2, "shi");
