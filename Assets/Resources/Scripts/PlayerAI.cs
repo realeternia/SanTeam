@@ -126,25 +126,19 @@ public static class PlayerAI
         if(shopCfg.Id <= 2 && affordableCards.Count < 6 - shopCfg.Id * 2 + (3 - era) * 4)
             return false;        
 
-        //把战力前五的卡放到一个队列里
-        var strongList = GetStrongCards(playerInfo, out var groupList);
+        //把战力前6的卡放到一个队列里
+        var strongList = GetStrongCards(playerInfo, out var groupList, out var rangeCount, out var combatCount);
         // 初始化 side 卡牌数量
         Dictionary<int, SideInfo> sideInfos = new Dictionary<int, SideInfo>();
         foreach (int cardId in strongList)
         {
             var heroConfig = HeroConfig.GetConfig(cardId);
             if (!sideInfos.TryGetValue(heroConfig.Side, out var info))
-            {
                 sideInfos[heroConfig.Side] = new SideInfo();
-            }
             if (heroConfig.Job == "shuai")
-            {
                 sideInfos[heroConfig.Side].HasShuai = true;
-            }
             else
-            {
                 sideInfos[heroConfig.Side].Count++;
-            }
         }
 
         CardViewControl checkFirst = null;            
@@ -225,6 +219,14 @@ public static class PlayerAI
                         count = find.Item2;
                     if (count < needs.Find(x => x.Item1 == heroCfg.Group).Item2)
                         score *= 1.8f;
+                }
+
+                if (combatCount + rangeCount >= 3)
+                {
+                    if (heroCfg.Pos == 1 && combatCount < rangeCount)
+                        score *= 1 + (rangeCount - combatCount) * .5f;
+                    else if (heroCfg.Pos > 1 && rangeCount < combatCount)
+                        score *= 1 + (combatCount - rangeCount) * .5f;
                 }
 
                 if (strongList.Count >= 3)
@@ -392,12 +394,14 @@ public static class PlayerAI
         return true;
     }
 
-    private static List<int> GetStrongCards(PlayerInfo playerInfo, out List<Tuple<string, int>> groupList)
+    private static List<int> GetStrongCards(PlayerInfo playerInfo, out List<Tuple<string, int>> groupList, out int rangeCount, out int combatCount)
     {  
         var cards = playerInfo.cards;        
         // 创建一个列表存储卡牌ID和对应的总战力
         List<(int cardId, int totalPrice)> sortDataList = new List<(int cardId, int totalPrice)>();
         groupList = new List<Tuple<string, int>>();
+        rangeCount = 0;
+        combatCount = 0;
         foreach (int cardId in cards.Keys)
         {
             if(!ConfigManager.IsHeroCard(cardId))
@@ -409,9 +413,9 @@ public static class PlayerAI
         // 按总战力降序排序
         sortDataList.Sort((a, b) => b.totalPrice.CompareTo(a.totalPrice));
 
-        // 将最强的前五张卡的ID加入队列
+        // 将最强的前6张卡的ID加入队列
         List<int> strongCardIds = new List<int>();
-        for (int i = 0; i < Math.Min(5, sortDataList.Count); i++)
+        for (int i = 0; i < Math.Min(6, sortDataList.Count); i++)
         {
             strongCardIds.Add(sortDataList[i].cardId);
 
@@ -432,6 +436,11 @@ public static class PlayerAI
                     groupList.Add(new Tuple<string, int>(group, 1));
                 }
             }
+
+            if(heroConfig.Pos == 1)
+                combatCount++;
+            else
+                rangeCount++;
         }
         return strongCardIds;
     }
