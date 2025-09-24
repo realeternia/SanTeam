@@ -27,7 +27,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     private float timer = 0f;
 
     [CustomSerializeField]
-    public int pid;
+    public int pid; 
     [CustomSerializeField]
     public int gold;
     public string playerName{ get { return playerConfig.Name; } }
@@ -60,7 +60,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     public Image roundOverImg;
 
     [CustomSerializeField]
-    public int playerId;
+    public int playerId;  //配置表id
     // 在 PlayerInfo 类中添加 AICardConfig 实例
     public PlayerConfig playerConfig;
 

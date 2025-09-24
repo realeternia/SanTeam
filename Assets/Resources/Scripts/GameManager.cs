@@ -176,8 +176,8 @@ public class GameManager : MonoBehaviour
                 for (int i = 0; i < saveData.players.Count; i++)
                 {
                     players[i].Deserialize(saveData.players[i]);
-                    players[i].UpdateView();
                     players[i].SetPlayerData();
+                    players[i].UpdateView();
                 }
             }
 
