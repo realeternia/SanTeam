@@ -65,7 +65,7 @@ public class PickPanelControl : MonoBehaviour
             loadGamePanel.SetActive(true);
             loadGameBtn.onClick.AddListener(() =>
             {
-                var isSuccess = GameManager.Instance.LoadFromSave(false);
+                var isSuccess = GameManager.Instance.LoadFromSave();
                 if(isSuccess)
                 {
                     GameManager.Instance.InitFriend(true);

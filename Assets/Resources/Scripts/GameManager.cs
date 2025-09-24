@@ -49,14 +49,12 @@ public class GameManager : MonoBehaviour
         Application.logMessageReceived += LogMessageReceived;
 
         var p1 = PlayerBook.GetWang();
-        players[0].Init(0, p1.Name, p1.Imgpath, p1.Colorstr, 0);
-        players[0].playerConfig = p1;
+        players[0].Init(0, p1);
         var pls = PlayerBook.GetRandomN(7);
         for (int i = 0; i < 7; i++)
-        {
-            players[i + 1].Init(i + 1, pls[i].Name, pls[i].Imgpath, pls[i].Colorstr, 0);
-            players[i + 1].playerConfig = pls[i];
-        }
+            players[i + 1].Init(i + 1, pls[i]);
+
+        UnityEngine.Debug.Log("GameManager Start");
     }
 
     // 日志处理函数
@@ -162,11 +160,13 @@ public class GameManager : MonoBehaviour
         return true;
     }
 
-    public bool LoadFromSave(bool tryMode)
+    public bool LoadFromSave()
     {
         string savePath = Application.persistentDataPath + "/game_save.json";
-       try
-       {
+        if (!File.Exists(savePath))
+            return false;
+        try
+        {
             string json = File.ReadAllText(savePath);
             SaveData saveData = JsonUtility.FromJson<SaveData>(json);
 
@@ -176,8 +176,8 @@ public class GameManager : MonoBehaviour
                 for (int i = 0; i < saveData.players.Count; i++)
                 {
                     players[i].Deserialize(saveData.players[i]);
-                    if(!tryMode)
-                        players[i].UpdateView();
+                    players[i].UpdateView();
+                    players[i].SetPlayerData();
                 }
             }
 
@@ -197,7 +197,7 @@ public class GameManager : MonoBehaviour
 
             Debug.Log("游戏数据加载成功");
         }
-       catch (System.Exception e)
+        catch (System.Exception e)
         {
             Debug.LogError("加载游戏数据失败: " + e.Message);
             return false;

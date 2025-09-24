@@ -7,6 +7,7 @@ public class ChessHUD : MonoBehaviour
 {
     public Chess chessUnit;
     public Image healthImg;
+    private int lastHp;
 
     void Start()
     {
@@ -46,6 +47,11 @@ public class ChessHUD : MonoBehaviour
             Debug.LogError("ChessUnit is null in UpdateHealthDisplay");
             return;
         }
+
+        //chessUnit.hp如果变化不大，就return，降低开销
+        if (Mathf.Abs(chessUnit.hp - lastHp) < 0.1f)
+            return;
+        lastHp = chessUnit.hp;
 
         if(chessUnit.hp < chessUnit.maxHp)
         {

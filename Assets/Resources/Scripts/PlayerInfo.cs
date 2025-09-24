@@ -30,8 +30,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     public int pid;
     [CustomSerializeField]
     public int gold;
-    [CustomSerializeField]
-    public string playerName;
+    public string playerName{ get { return playerConfig.Name; } }
     [CustomSerializeField]
     public int winCount;
     [CustomSerializeField]
@@ -47,6 +46,10 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     public int[] battleCards = new int[6];
     [CustomSerializeField]
     public bool isAI = false;
+    public int food;
+    [CustomSerializeField]
+    public int maxFood;
+    private float lastFoodDeductionTime = 0f;
 
     public bool isOnTurn;
     public TMP_Text playerNameText;
@@ -56,14 +59,15 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     public Image playerBgImg;
     public Image roundOverImg;
 
+    [CustomSerializeField]
+    public int playerId;
     // 在 PlayerInfo 类中添加 AICardConfig 实例
     public PlayerConfig playerConfig;
 
-    [CustomSerializeField]
-    public string imgPath;
-    [CustomSerializeField]
+    public string imgPath{ get { return playerConfig.Imgpath; } }
     public Color lineColor;
     public int banCount = 2; //最多两张
+    public int battleSide;
 
     public bool nextSkip = false; //下一轮skip
     [CustomSerializeField]
@@ -88,17 +92,25 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
   		targetImage = GetComponent<Image>();
     }
 
-    public void Init(int id, string name, string img, string colorStr, int g)
+    public void Init(int id, int pid)
     {
-        pid = id;
-        playerName = name;
+        this.pid = id;
+        playerId = pid;
         isAI = id > 0;
 
-        imgPath = img;
-        gold = g;
-        lineColor = ColorUtility.TryParseHtmlString(colorStr, out lineColor) ? lineColor : Color.white;        
+        gold = 0;
+        maxFood = 100;
+        food = maxFood;
 
+        SetPlayerData();
         UpdateView();
+    }
+
+    // init 和 load时候都会调用
+    public void SetPlayerData()
+    {
+        playerConfig = PlayerConfig.GetConfig(playerId);
+        lineColor = ColorUtility.TryParseHtmlString(playerConfig.Colorstr, out lineColor) ? lineColor : Color.white;
     }
 
     public void UpdateView()
@@ -144,6 +156,33 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     public void OnEra(int era)
     {
         nextSkip = false;
+    }
+
+    public void OnBattleBegin()
+    {
+        food = maxFood;
+        // 重置上次扣除粮食的时间为当前时间
+        lastFoodDeductionTime = Time.time;
+    }
+
+    public void RoundFoodCost()
+    {
+        // 粮食扣除逻辑
+        if (Time.time - lastFoodDeductionTime >= 5f) // 每5秒扣除一次粮食
+        {
+            // 计算时间差，每5s，扣10点粮食
+            if(food < 10)
+            {
+                var units = WorldManager.Instance.GetUnitsMySide(battleSide);
+                foreach(var unit in units)
+                    unit.LackFood((float)(10 - food) / 10);
+            }
+            food -= 10;
+            if (food < 0) food = 0;
+
+            // 更新上次扣除粮食的时间
+            lastFoodDeductionTime = Time.time;
+        }
     }
 
     public void SetRoundOver(bool isOver)
@@ -238,10 +277,11 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         return winCount + loseCount;
 
     }
-
+    
     // Update is called once per frame
     void Update()
     {
+        // 现有的闪烁逻辑
         if (isOnTurn)
         {
             if (targetImage != null)

@@ -6,29 +6,28 @@ using UnityEngine;
 
 public class PlayerBook
 {
-    public static PlayerConfig GetWang()
+    public static int GetWang()
     {
-        return PlayerConfig.GetConfig(1);
+        return 1;
     }
 
-    public static PlayerConfig[] GetRandomN(int n)
+    public static int[] GetRandomN(int n)
     {
         // 确保 n 不超过玩家配置数量，避免数组越界
         int count = PlayerConfig.ConfigList.Count;
         n = Mathf.Min(n, count);
-        PlayerConfig[] cfgs = new PlayerConfig[n];
-        List<int> ids = new List<int>();
+        var ids = new int[n];
+        List<int> idAlls = new List<int>();
         foreach (PlayerConfig cfg in PlayerConfig.ConfigList)
             if(cfg.Id > 1)
-                ids.Add(cfg.Id);
+                idAlls.Add(cfg.Id);
         for (int i = 0; i < n; i++)
         {
-            int index = UnityEngine.Random.Range(0, ids.Count);
-            int id = ids[index];
-            cfgs[i] = PlayerConfig.GetConfig(id);
-            ids.RemoveAt(index);
+            int index = UnityEngine.Random.Range(0, idAlls.Count);
+            ids[i] = idAlls[index];
+            idAlls.RemoveAt(index);
         }
-        return cfgs;
+        return ids;
     }
 
     public static List<Tuple<string, int>> GetCardNeeds(int id)

@@ -87,6 +87,10 @@ public class WorldManager : MonoBehaviour
         deathOrder = new int[8];
         deathCount = 0;
 
+        // 通知所有玩家开始战斗
+        foreach (var player in GameManager.Instance.players)
+            player.OnBattleBegin();
+
         BattleResultPanel.gameObject.SetActive(false);
         SpawnUnitsInRegions();
 
@@ -174,6 +178,10 @@ public class WorldManager : MonoBehaviour
         {
             int[] match = GetMatch();
             // 在RegionSide1生成单位 (阵营1)
+            for (int i = 0; i < 8; i++)
+            {
+                GameManager.Instance.GetPlayer(match[i]).battleSide = i + 1;
+            }
             var p = GameManager.Instance.GetPlayer(match[0]);
             for (int i = 0; i < mapConfig.RegionSide1.Length; i++)
                 SpawnUnitsForRegion(p, i < 3 ? 500001 : 500002, mapConfig.RegionSide1[i].transform.position, 1, p.imgPath);
@@ -201,11 +209,6 @@ public class WorldManager : MonoBehaviour
                 SpawnUnitsForRegion(p, i < 3 ? 500001 : 500002, mapConfig.RegionSide8[i].transform.position, 8, p.imgPath);
 
             var cards = GameManager.Instance.GetPlayer(match[0]).GetBattleCardList();
-            foreach (var card in cards)
-            {
-                UnityEngine.Debug.Log("card: " + (card == null ? "null" : card.Item1));
-            }
-
             var cardsFriend = cards.Where(a => a != null).Select(a => a.Item1).ToList();
             for (int i = 0; i < cards.Count && i < mapConfig.RegionHeroSide1.Length; i++)
                 if (cards[i] != null)
@@ -257,7 +260,8 @@ public class WorldManager : MonoBehaviour
         }
         else
         {
-
+            GameManager.Instance.GetPlayer(0).banCount = 1;
+            GameManager.Instance.GetPlayer(1).banCount = 2;
             //   SpawnHerosForRegion(GameManager.Instance.GetPlayer(0), mapConfig.RegionHeroSide1[4], new System.Tuple<int, int>(101008, 1), 1);
             var heroList = new List<int> { 101011 };
             for (int i = 0; i < heroList.Count; i++)
@@ -395,6 +399,11 @@ public class WorldManager : MonoBehaviour
             {
                 if (chess != null && chess.hp > 0)
                     chess.LogicUpdate(0.05f);
+            }
+            // 每个回合结束，玩家消耗食物
+            foreach (var player in GameManager.Instance.players)
+            {
+                player.RoundFoodCost();
             }
         }
 
@@ -979,6 +988,20 @@ public class WorldManager : MonoBehaviour
                     if(chessComponent.side == mySide)
                         unitsInRange.Add(chessComponent);
                 }
+            }
+        }
+        return unitsInRange;
+    }
+
+    public List<Chess> GetUnitsMySide(int mySide)
+    {
+        List<Chess> unitsInRange = new List<Chess>();
+        foreach (var chessComponent in chessList)
+        {
+            if (chessComponent != null && chessComponent.hp > 0 && !chessComponent.isShadow)
+            {
+                if (chessComponent.side == mySide)
+                    unitsInRange.Add(chessComponent);
             }
         }
         return unitsInRange;

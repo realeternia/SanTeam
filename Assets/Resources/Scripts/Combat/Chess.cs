@@ -19,7 +19,7 @@ public class Chess : MonoBehaviour
     public bool isHero;
     public int heroId;
     public string chessName = "0";
-    public Renderer rend;
+
 
     // 目标单位
     public Chess targetChess;
@@ -63,7 +63,10 @@ public class Chess : MonoBehaviour
     public int noMoveCount = 0;
     public int noActionCount = 0;
 
+    public Renderer rend;
     public Material material;
+    public Renderer rendFlag;
+    public Material materialFlag;    
     private Coroutine colorEffectCoroutine; // 协程引用，用于追踪颜色效果协程
 
     private bool DieAfterLifeTime;
@@ -111,6 +114,11 @@ public class Chess : MonoBehaviour
                     }
                 }
             }
+
+            materialFlag = new Material(rendFlag.sharedMaterial);
+            var playerInfo = GameManager.Instance.GetPlayer(playerId);
+            materialFlag.mainTexture = Resources.Load<Texture>(playerInfo.imgPath);
+            rendFlag.material = materialFlag;
         }
 
         if (!hasSKill)
@@ -271,6 +279,13 @@ public class Chess : MonoBehaviour
     {
         targetChess = target1;
         lastTargetUpdateTime = Time.time;
+    }
+
+    private int lackIndex;
+    public void LackFood(float lackRate)
+    {
+        hp = Math.Max(1, hp - (int)((10 + lackIndex * 2) * lackRate)); //饿不死人
+        lackIndex++;
     }
 
     void MoveAndFight(float deltaTime)
