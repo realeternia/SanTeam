@@ -149,9 +149,9 @@ namespace CommonConfig
             config[400014] = new ItemConfig(400014, "的卢马", "", 1, "attr", "shield", 40, "", 0, null, "", 0, 5, false, false, false, 25, 0, false, "dilu");
             config[400015] = new ItemConfig(400015, "大宛宝马", "", 1, "attr", "shield", 24, "", 0, null, "", 0, 0, false, false, false, 15, 0, false, "dawan");
             config[401001] = new ItemConfig(401001, "和氏璧", "先手选牌", 1, "first", "", 0, "", 0, null, "", 100, 0, true, true, false, 5, 0.6f, true, "heshi");
-            config[401002] = new ItemConfig(401002, "士兵剑", "士兵攻up", 1, "sodatk", "", 0, "", 0, null, "", 50, 3, true, true, false, 20, 0, true, "jian1");
-            config[401003] = new ItemConfig(401003, "士兵甲", "士兵命up", 1, "sodhp", "", 0, "", 0, null, "", 50, 3, true, true, false, 20, 0, true, "jia1");
-            config[401004] = new ItemConfig(401004, "粮食", "粮食up", 1, "food", "", 0, "", 0, null, "", 100, 0, true, true, false, 20, 0, true, "food");
+            config[401002] = new ItemConfig(401002, "士兵剑", "士兵攻up", 1, "sodatk", "", 0, "", 0, null, "", 40, 3, true, true, false, 20, 0, true, "jian1");
+            config[401003] = new ItemConfig(401003, "士兵甲", "士兵命up", 1, "sodhp", "", 0, "", 0, null, "", 40, 3, true, true, false, 20, 0, true, "jia1");
+            config[401004] = new ItemConfig(401004, "粮食", "粮食up", 1, "food", "", 0, "", 0, null, "", 45, 3, true, true, false, 20, 0, true, "food");
             config[401010] = new ItemConfig(401010, "豆腐", "武力+5", 1, "attr", "str", 5, "", 0, null, "", 0, 6, false, false, true, 15, 1f, true, "doufu");
             config[401011] = new ItemConfig(401011, "沙拉", "智力+5", 1, "attr", "inte", 5, "", 0, null, "", 0, 6, false, false, true, 15, 1f, true, "shala");
             config[401012] = new ItemConfig(401012, "烤鸭", "统帅+5", 1, "attr", "lead", 5, "", 0, null, "", 0, 6, false, false, true, 15, 1f, true, "kaoya");

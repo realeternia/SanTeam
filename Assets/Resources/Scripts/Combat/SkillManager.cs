@@ -29,6 +29,8 @@ public static class SkillManager
                 return new SkillHelpAidBuff(skillId, owner);
             case "Gold":
                 return new SkillGold(skillId, owner);
+            case "Food":
+                return new SkillFood(skillId, owner);
             case "Feedback":
                 return new SkillFeedback(skillId, owner);
             case "SpeedAttack":
@@ -75,6 +77,8 @@ public static class SkillManager
                 return new SkillModifySkillRateTime(skillId, owner);
             case "ModifyBuffExpand":
                 return new SkillModifyBuffExpand(skillId, owner);
+            case "HitFood":
+                return new SkillHitFood(skillId, owner);
 
             case "Dumb":
                 return new SkillDumb(skillId, owner);               

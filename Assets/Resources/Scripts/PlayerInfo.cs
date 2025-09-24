@@ -142,6 +142,11 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         goldText.text = gold.ToString();
     }
 
+    public void AddFood(int f)
+    {
+        food += f;
+    }
+
     public void SubGold(int g, bool isHero)
     {
         gold -= g;
@@ -151,6 +156,15 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
             goldCostHero += g;
         else
             goldCostItem += g;
+    }
+    
+    public int SubFood(int f)
+    {
+        if(food <= 0)
+            return 0;
+        var sub = Mathf.Min(f, food);
+        food -= sub;
+        return sub;
     }
 
     public void OnEra(int era)
