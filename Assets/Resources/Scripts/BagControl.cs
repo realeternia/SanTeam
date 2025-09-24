@@ -111,10 +111,9 @@ public class BagControl : MonoBehaviour, IPanelEvent
         UpdateFieldView();
 
         var soldierCfg = SoldierConfig.GetConfig(500001);
-        var textAtk = (soldierCfg.Atk + p.sodatk).ToString();
-        var textHp = (soldierCfg.Hp + p.sodhp * 5).ToString();
-        infoText.text = "<color=yellow>战斗力-</color>" + bindPlayer.lastFightMark + " <color=red>士兵攻击-</color>" + textAtk + " <color=green>士兵生命值-</color>" + textHp;
-
+        var textAtk = (soldierCfg.Atk + bindPlayer.sodatk).ToString();
+        var textHp = (soldierCfg.Hp + bindPlayer.sodhp * 5).ToString();
+        infoText.text = "<color=yellow>战斗力 </color>" + bindPlayer.lastFightMark + " <color=red>兵攻-</color>" + textAtk + " <color=green>兵血-</color>" + textHp + " <color=#FF7F00>粮食-</color>" + bindPlayer.maxFood;
 
         var humanCount = GameManager.Instance.players.Count(x => !x.isAI);
         aiSwitchBtn.gameObject.SetActive(bindPlayer.pid != 0 && (!bindPlayer.isAI || humanCount < 2));

@@ -329,6 +329,8 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
                     sodatk += 2;
                 else if (itemCfg.Effect == "sodhp")
                     sodhp += 2;
+                else if (itemCfg.Effect == "food")
+                    maxFood += 5; 
                 return true;
             }
 

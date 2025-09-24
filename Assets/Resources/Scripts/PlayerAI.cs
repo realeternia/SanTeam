@@ -303,6 +303,10 @@ public static class PlayerAI
                 {
                     score *= playerConfig.PickSoldierUp;
                 }
+                else if (itemCfg.Effect == "food")
+                {
+                    score *= playerConfig.PickFood;
+                }
             }
 
             // 加入分数列表

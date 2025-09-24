@@ -211,8 +211,6 @@ public class CardShopManager : MonoBehaviour
             cardViews.Add(cardView);            
         }
 
-        var total = shopCfg.ItemCount;
-        UnityEngine.Debug.Log("totalItem = " + total);
         // 先把ItemConfig里所有RateAbs非0的item随出来，放到一个列表
         var itemIds = new List<int>();
         foreach (var itemCfg in ItemConfig.ConfigList)
@@ -221,12 +219,18 @@ public class CardShopManager : MonoBehaviour
                 itemIds.Add(itemCfg.Id);
         }
 
-        for (int i = itemIds.Count; i < total; i++)
+        for (int i = 0; i < shopCfg.ItemCount; i++)
         {
             itemIds.Add(HeroSelectionTool.GetRandomItemId(shopCfg.Id));
         }
-        if(unsoldItems.Count > 0)
-            itemIds.InsertRange(0, unsoldItems);
+
+        if (itemIds.Count < 9)
+        {
+            if (itemIds.Count + unsoldItems.Count > 9)
+                unsoldItems.RemoveRange(0, itemIds.Count + itemIds.Count - 9);
+            if (unsoldItems.Count > 0)
+                itemIds.InsertRange(0, unsoldItems);
+        }
 
         int ids = 0;
         // item card
