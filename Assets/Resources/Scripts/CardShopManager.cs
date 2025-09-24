@@ -22,6 +22,7 @@ public class CardShopManager : MonoBehaviour
     public Button passBtn;
     public Button bagBtn;
     public Button rankBtn;
+    public Button rankPlayerBtn;
 
     private int era = 0;
     public TMP_Text eraText;
@@ -52,6 +53,12 @@ public class CardShopManager : MonoBehaviour
         rankBtn.onClick.AddListener(() =>
         {
             PanelManager.Instance.ShowRank();
+            for(int i = 0; i < cardViews.Count; i++)
+                cardViews[i].ShowEffectLayer(false);
+        });
+        rankPlayerBtn.onClick.AddListener(() =>
+        {
+            PanelManager.Instance.ShowRankPlayer();
             for(int i = 0; i < cardViews.Count; i++)
                 cardViews[i].ShowEffectLayer(false);
         });

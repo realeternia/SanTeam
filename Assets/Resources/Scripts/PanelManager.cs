@@ -12,6 +12,7 @@ public class PanelManager : MonoBehaviour
 
     public GameObject cardShopPanel;
     public GameObject rankPanel;
+    public GameObject rankPlayerPanel;
     public GameObject pickPanel;
 
 
@@ -75,6 +76,24 @@ public class PanelManager : MonoBehaviour
         rankPanel.GetComponent<RankPanelManager>().OnHide();
 
         ChangePanelCount(rankPanel, false);        
+    }
+    
+    public void ShowRankPlayer()
+    {
+        GameManager.Instance.PlaySound("Sounds/deck");
+        rankPlayerPanel.SetActive(true);
+        rankPlayerPanel.GetComponent<RankPlayerPanelManager>().OnShow();
+
+        ChangePanelCount(rankPlayerPanel, true);        
+    }
+
+    public void HideRankPlayer()
+    {
+        GameManager.Instance.PlaySound("Sounds/deck");
+        rankPlayerPanel.SetActive(false);
+        rankPlayerPanel.GetComponent<RankPlayerPanelManager>().OnHide();
+
+        ChangePanelCount(rankPlayerPanel, false);        
     }
 
     public void ShowPick()
