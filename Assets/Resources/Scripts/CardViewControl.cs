@@ -12,12 +12,16 @@ public class CardViewControl : MonoBehaviour, IPointerDownHandler, IPointerUpHan
     public int cardId;
     public int count;
     public bool isSold = false;
-    public int priceI; //总价
+    public int priceI; //单价
     public bool isHeroCard;
     public Image soldImage;    
     public TMP_Text cardName;    
     public TMP_Text price;    
-    public Button buyButton;    
+    public Button buyButton;
+    public Button addButton;
+    public Button reduceButton;
+
+    private string cardNameS;
 
     public GameObject isHeroCardNode;
     public GameObject isItemCardNode;
@@ -59,11 +63,41 @@ public class CardViewControl : MonoBehaviour, IPointerDownHandler, IPointerUpHan
             var nowPlayer = CardShopManager.Instance.GetCurrentPlayer();
             if (!nowPlayer.isAI)
             {
-                if (CardShopManager.Instance.OnPlayerBuyCard(this, nowPlayer, cardId, isHeroCard, priceI, count))
+                if (count == 1 || nowPlayer.gold < priceI * 2)
                 {
-                    CardShopManager.Instance.AfterAct();
+                    if (CardShopManager.Instance.OnPlayerBuyCard(this, nowPlayer, cardId, isHeroCard, priceI, 1))
+                        CardShopManager.Instance.AfterAct();
+                }
+                else
+                {
+                    if(!addButton.gameObject.activeSelf)
+                    {
+                        addButton.gameObject.SetActive(true);
+                        reduceButton.gameObject.SetActive(true);
+                    }
+                    else
+                    {
+                        var nowCount = int.Parse(price.text) / priceI;
+                        if (CardShopManager.Instance.OnPlayerBuyCard(this, nowPlayer, cardId, isHeroCard, priceI * nowCount, nowCount))
+                            CardShopManager.Instance.AfterAct();
+                    }
                 }
             }
+        });
+
+        addButton.gameObject.SetActive(false);
+        reduceButton.gameObject.SetActive(false);
+        addButton.onClick.AddListener(() =>
+        {
+            var nowCount = int.Parse(price.text) / priceI;
+            if(count > nowCount)
+                price.text = (priceI * (nowCount + 1)).ToString();
+        });
+        reduceButton.onClick.AddListener(() =>
+        {
+            var nowCount = int.Parse(price.text) / priceI;
+            if(nowCount > 1)
+                price.text = (priceI * (nowCount - 1)).ToString();
         });
     }
 
@@ -97,11 +131,11 @@ public class CardViewControl : MonoBehaviour, IPointerDownHandler, IPointerUpHan
         
     }
 
-    public void Init(int cid, bool isHero, int count, int shopOpenIndex)
+    public void Init(int cid, bool isHero, int count1, int shopOpenIndex)
     {
         cardId = cid;
         isHeroCard = isHero;
-        this.count = count;
+        this.count = count1;
 
         if (isHero)
         {
@@ -110,6 +144,7 @@ public class CardViewControl : MonoBehaviour, IPointerDownHandler, IPointerUpHan
 
             var heroCfg = HeroConfig.GetConfig(cid);
             heroImage.sprite = Resources.Load<Sprite>("SkinsBig/" + heroCfg.Icon);
+            cardNameS = heroCfg.Name;
             cardName.text = heroCfg.Name;
             if (count > 1)
                 cardName.text += "x" + count;
@@ -134,7 +169,7 @@ public class CardViewControl : MonoBehaviour, IPointerDownHandler, IPointerUpHan
             SetColoredText(hp, heroCfg.Hp);
 
             gameObject.GetComponent<Image>().color = HeroSelectionTool.GetSideColor(heroCfg.Side);
-            priceI = HeroSelectionTool.GetPrice(heroCfg) * count;
+            priceI = HeroSelectionTool.GetPrice(heroCfg);
 
             var playerInfo = GameManager.Instance.GetPlayer(0);
             if(playerInfo.HasCard(cardId))
@@ -159,6 +194,7 @@ public class CardViewControl : MonoBehaviour, IPointerDownHandler, IPointerUpHan
             isItemCardNode.SetActive(true);
 
             var itemCfg = ItemConfig.GetConfig(cid);
+            cardNameS = itemCfg.Name;
             cardName.text = itemCfg.Name;
             if (count > 1)
                 cardName.text += "x" + count;
@@ -196,7 +232,7 @@ public class CardViewControl : MonoBehaviour, IPointerDownHandler, IPointerUpHan
                 itemDes.gameObject.SetActive(false);
             }
 
-            priceI = itemCfg.Price * count + (int)Math.Floor(itemCfg.PriceRound * shopOpenIndex);
+            priceI = itemCfg.Price + (int)Math.Floor(itemCfg.PriceRound * shopOpenIndex);
 
             var playerInfo = GameManager.Instance.GetPlayer(0);
             if(playerInfo.HasCard(cardId))
@@ -227,23 +263,40 @@ public class CardViewControl : MonoBehaviour, IPointerDownHandler, IPointerUpHan
         text.text = value.ToString();
     }
 
-    public void OnSold(PlayerInfo playerInfo)
+    public void OnSold(PlayerInfo playerInfo, int sellCount)
     {
-        isSold = true;
-        buyButton.gameObject.SetActive(false);
-        soldImage.gameObject.SetActive(true);
+        if(sellCount > count || sellCount <= 0)
+        {
+            throw new ArgumentException("OnSold error, sellCount: " + sellCount + ", count: " + count);
+        }
 
-        if(effectGreen != null) //道具的情况
-            effectGreen.SetActive(false);
-        if(effectYellow != null) //道具的情况
-            effectYellow.SetActive(false);
+        count -= sellCount;
+        if (count == 0)
+        {
+            isSold = true;
+            buyButton.gameObject.SetActive(false);
+            soldImage.gameObject.SetActive(true);
 
-        //把heroImage变灰色 - 改为将整个panel变成灰度图
-        SetGrayscaleEffect();
-        soldImage.color = playerInfo.lineColor;
+            if (effectGreen != null) //道具的情况
+                effectGreen.SetActive(false);
+            if (effectYellow != null) //道具的情况
+                effectYellow.SetActive(false);
+
+            //把heroImage变灰色 - 改为将整个panel变成灰度图
+            SetGrayscaleEffect();
+            soldImage.color = playerInfo.lineColor;
+        }
+        else
+        {
+            cardName.text = cardNameS;
+            if (count > 1)
+                cardName.text += "x" + count;
+        }
+        addButton.gameObject.SetActive(false);
+        reduceButton.gameObject.SetActive(false);
 
         //创建一个Image，启动携程 飞到 PlayerInfo的位置 
-        StartCoroutine(MoveToPlayerInfo(playerInfo));
+        StartCoroutine(MoveToPlayerInfoCount(playerInfo, sellCount));
     }
 
     private void SetGrayscaleEffect()
@@ -268,6 +321,22 @@ public class CardViewControl : MonoBehaviour, IPointerDownHandler, IPointerUpHan
             {
                 // 设置TMP文本为灰色
                 tmpText.color = Color.gray;
+            }
+        }
+    }
+
+    private System.Collections.IEnumerator MoveToPlayerInfoCount(PlayerInfo playerInfo, int count)
+    {
+        if(count == 1)
+        {
+            StartCoroutine(MoveToPlayerInfo(playerInfo));
+        }
+        else
+        {
+            for(int i = 0; i < count; i++)
+            {
+                StartCoroutine(MoveToPlayerInfo(playerInfo));
+                yield return new WaitForSeconds(0.2f);
             }
         }
     }

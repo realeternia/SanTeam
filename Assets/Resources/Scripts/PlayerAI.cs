@@ -107,7 +107,7 @@ public static class PlayerAI
             return false;
 
         // 过滤掉买不起的卡片
-        var affordableCards = availableCards.Where(card => playerInfo.gold >= card.priceI).ToList();
+        var affordableCards = availableCards.Where(card => playerInfo.gold >= card.priceI).ToList(); //看一张卡的价格
         if (affordableCards.Count == 0)
             return false;
 
@@ -118,8 +118,11 @@ public static class PlayerAI
         if (heroCardCount >= playerConfig.Cardherolimit)
         {
             var weakCard = FindWeakCard(playerInfo);
-            weakHeroCardId = weakCard.Item1;
-            weakHeroCardPrice = weakCard.Item2;
+            if (weakCard != null)
+            {
+                weakHeroCardId = weakCard.Item1;
+                weakHeroCardPrice = weakCard.Item2;
+            }
         }
 
         var shopCfg = ShopConfig.GetConfig(playerInfo.GamePlayed() + 1);
@@ -193,14 +196,13 @@ public static class PlayerAI
                 }
 
                 // 根据价格区间调整分数
-                float priceS = pickCard.priceI / pickCard.count;
-                if (priceS < playerConfig.Pricelower || priceS > playerConfig.Priceupper)
+                if (pickCard.priceI < playerConfig.Pricelower || pickCard.priceI > playerConfig.Priceupper)
                 {
                     score *= playerConfig.Priceoutrate;
                 }
                 else
                 {
-                    var rate = priceS / (playerConfig.Pricelower / 2 + playerConfig.Priceupper / 2); //高分卡加成
+                    var rate = pickCard.priceI / (playerConfig.Pricelower / 2 + playerConfig.Priceupper / 2); //高分卡加成
                     if (rate > 1)
                         score *= rate * rate;
                 }
@@ -320,7 +322,7 @@ public static class PlayerAI
         //scoredCards的key的priceI前三3的卡分别（1.5，1.3，1.1）
         if (scoredCards.Count >= 5 && scoredCards.Max(x => x.score) < 1.6f)
         {
-            var top3Cards = scoredCards.OrderByDescending(x => x.card.priceI).Take(3).ToList();
+            var top3Cards = scoredCards.OrderByDescending(x => x.card.priceI * x.card.count).Take(3).ToList();
             for (int i = 0; i < top3Cards.Count; i++)
             {
                 var card = top3Cards[i];
@@ -393,7 +395,11 @@ public static class PlayerAI
         if (selectedCard.isHeroCard && heroCardCount >= playerConfig.Cardherolimit && !hasSameCard)
             playerInfo.SellCard(weakHeroCardId); //卖掉最弱的卡
 
-        CardShopManager.Instance.OnPlayerBuyCard(selectedCard, playerInfo, selectedCard.cardId, selectedCard.isHeroCard, selectedCard.priceI, selectedCard.count);
+        var finalBuyCount = 1;
+        if (selectedCard.count > 0)
+            finalBuyCount = Math.Clamp(playerInfo.gold * 2 / 3 / selectedCard.priceI, 1, selectedCard.count);
+
+        CardShopManager.Instance.OnPlayerBuyCard(selectedCard, playerInfo, selectedCard.cardId, selectedCard.isHeroCard, selectedCard.priceI * finalBuyCount, finalBuyCount);
 
         return true;
     }
@@ -464,9 +470,20 @@ public static class PlayerAI
                 combatCount++;
             else
                 rangeCount++;
+
+            if(HeroSelectionTool.GetCardLevel(playerInfo.cards[cardId]) >= 4) //4级以上卡不删了
+                continue;
+
             var price = HeroSelectionTool.GetPrice(heroCfg);
-            sortDataList.Add(new Tuple<int, int>(cardId, price * cards[cardId]));
+            sortDataList.Add(new Tuple<int, int>(cardId, price));
         }
+
+        if(sortDataList.Count == 0)
+            return null;
+        
+        if(sortDataList.Count <= 1)
+            return sortDataList[sortDataList.Count - 1];
+
         sortDataList.Sort((a, b) => b.Item2.CompareTo(a.Item2));
 
         var lastCard = sortDataList[sortDataList.Count - 1];

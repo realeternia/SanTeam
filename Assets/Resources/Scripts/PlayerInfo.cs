@@ -333,7 +333,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
             if (itemCfg.AutoUse)
             {
                 GameManager.Instance.PlaySound("Sounds/gold");
-                ctr.OnSold(this);
+                ctr.OnSold(this, count);
                 if (itemCfg.Effect == "first")
                 {
                     nextSkip = true;
@@ -358,7 +358,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
             cards[cardId] = count;
         }
         GameManager.Instance.PlaySound("Sounds/gold");
-        ctr.OnSold(this);
+        ctr.OnSold(this, count);
         return true;
     }
 
