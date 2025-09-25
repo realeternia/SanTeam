@@ -23,6 +23,7 @@ public class GameManager : MonoBehaviour
         public List<string> players = new List<string>();
         public List<FriendRandomData> friendRdData = new List<FriendRandomData>();
         public List<int> heroIds = new List<int>();
+        public int year;
     }
 
     public static GameManager Instance;
@@ -30,7 +31,8 @@ public class GameManager : MonoBehaviour
     public List<FriendRandomData> friendRdData;
     public List<int> heroIds;
     private StreamWriter logWriter;  // 日志写入器
-    
+    public int year;
+
     private int tempFriendIdIdx = 1000;
 
     private void Awake()
@@ -48,8 +50,7 @@ public class GameManager : MonoBehaviour
         // 注册日志事件
         Application.logMessageReceived += LogMessageReceived;
 
-        var p1 = PlayerBook.GetWang();
-        players[0].Init(0, p1);
+        players[0].Init(0, PlayerBook.GetWang());
         var pls = PlayerBook.GetRandomN(7);
         for (int i = 0; i < 7; i++)
             players[i + 1].Init(i + 1, pls[i]);
@@ -169,6 +170,7 @@ public class GameManager : MonoBehaviour
         {
             string json = File.ReadAllText(savePath);
             SaveData saveData = JsonUtility.FromJson<SaveData>(json);
+            saveData.year = year;
 
             // 确保players数组不为null且长度足够
             if (saveData.players != null)
@@ -211,7 +213,8 @@ public class GameManager : MonoBehaviour
         try
         {
             SaveData saveData = new SaveData();
-            
+
+            saveData.year = year;
             // 序列化每个PlayerInfo对象
             foreach (PlayerInfo player in players)
             {

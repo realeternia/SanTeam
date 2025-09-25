@@ -9,6 +9,8 @@ public class MySelectControl : MonoBehaviour
     public GameObject nodePrefab; // 拖拽CardView预制体到此处
     private List<int> playerCards;
     private PlayerInfo playerInfo;
+    
+    public TMP_Text playerNameText;
 
     void Start()
     {
@@ -25,11 +27,13 @@ public class MySelectControl : MonoBehaviour
     {
         var tmpCards = new List<int>(checkPlayer.cards.Keys);
         ShowCards(checkPlayer, tmpCards);
+        playerNameText.text = checkPlayer.playerConfig.Name;
     }
 
     public void QuickViewFin()
     {
         ShowCards(playerInfo, playerCards);
+        playerNameText.text = playerInfo.playerConfig.Name;
     }
 
     public void UpdateCards(PlayerInfo playerInfo)
@@ -38,6 +42,7 @@ public class MySelectControl : MonoBehaviour
         playerCards = new List<int>(playerInfo.cards.Keys);
         this.playerInfo = playerInfo;
         ShowCards(playerInfo, playerCards);
+        playerNameText.text = playerInfo.playerConfig.Name;
         UnityEngine.Debug.Log($"UpdateCards {playerInfo.name} {playerCards.Count}");
     }
 

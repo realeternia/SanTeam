@@ -92,10 +92,10 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
   		targetImage = GetComponent<Image>();
     }
 
-    public void Init(int id, int pid)
+    public void Init(int id, int pid1)
     {
-        this.pid = id;
-        playerId = pid;
+        pid = id;
+        playerId = pid1;
         isAI = id > 0;
 
         gold = 0;

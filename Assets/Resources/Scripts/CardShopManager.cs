@@ -139,7 +139,7 @@ public class CardShopManager : MonoBehaviour
         foreach(var player in GameManager.Instance.players)
             player.OnEra(era);
 
-        var shopOpenIndex = GameManager.Instance.GetPlayer(0).GamePlayed(); //第几场比赛
+        var shopOpenIndex = GameManager.Instance.year; //第几场比赛
         var shopCfg = ShopConfig.GetConfig(Math.Min(100, shopOpenIndex + 1));
         List<Tuple<int, int>> heroIds = new List<Tuple<int, int>>();
         int TOTAL_HERO_CARDS = 21;        
@@ -270,7 +270,8 @@ public class CardShopManager : MonoBehaviour
         era++;
         passBtn.gameObject.SetActive(true);
         mySelect.UpdateCards(GameManager.Instance.GetPlayer(0));
-        eraText.text = "第" + era + "轮";
+        var nowYear = GameManager.Instance.year + 179;
+        eraText.text = nowYear + "年\n" + era + "月";
 
         // 重置所有玩家的pass状态
         for (int i = 0; i < playerPassed.Length; i++)
@@ -416,11 +417,13 @@ public class CardShopManager : MonoBehaviour
         UnityEngine.Debug.Log("ShopBegin");
         GameManager.Instance.SaveToFile();        
 
-        var shopOpenIndex = GameManager.Instance.GetPlayer(0).GamePlayed(); //第几场比赛
-        var roundGold = ShopConfig.GetConfig(shopOpenIndex + 1).RoundGold;
+        var shopOpenIndex = GameManager.Instance.year; //第几场比赛
+        var shopCfg = ShopConfig.GetConfig(Math.Min(100, shopOpenIndex + 1));
+        var roundGold = shopCfg.RoundGold;
         for(int i = 0; i < 8; i++)
             GameManager.Instance.GetPlayer(i).AddGold(roundGold);
 
+        GameManager.Instance.year++;
         era = 0;
         NewEra();     
         shopCoroutine = StartCoroutine(DelayedUpdate()); 
