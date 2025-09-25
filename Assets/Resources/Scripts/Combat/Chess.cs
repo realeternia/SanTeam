@@ -108,7 +108,7 @@ public class Chess : MonoBehaviour
                 {
                     skills.Add(SkillManager.CreateSkill(skillId, this));
                     var skillCfg = SkillConfig.GetConfig(skillId);
-                    if (!string.IsNullOrEmpty(skillCfg.Icon))
+                    if (!string.IsNullOrEmpty(skillCfg.Icon) && !hasSKill)
                     {
                         material.SetTexture("_SecondTex", Resources.Load<Texture>("SkillPic/" + skillCfg.Icon));
                         hasSKill = true;
@@ -542,15 +542,21 @@ public class Chess : MonoBehaviour
         damage = (int)(damageBase * damageMulti);
         var minDamage = 10;
         var maxDamage = 60;
-        if(isHero && victim.isHero)
+        if (isHero && victim.isHero)
         {
             //等级压制
             var levelDiff = level - victim.level;
-            if(levelDiff != 0)
+            if (levelDiff != 0)
             {
                 minDamage = Math.Max(2, minDamage + levelDiff * 2);
                 maxDamage = Math.Max(10, maxDamage + levelDiff * 10);
             }
+            var attackJobCfg = ConfigManager.GetJobConfig(HeroConfig.GetConfig(heroId).Job);
+            var victimJob = ConfigManager.GetJobConfig(HeroConfig.GetConfig(victim.heroId).Job).NameS;
+            if (attackJobCfg.OvercomeStrong != null && attackJobCfg.OvercomeStrong.Contains(victimJob))
+                damage = Math.Max(damage + 15, minDamage / 2 + 7);
+            else if (attackJobCfg.OvercomeWeak != null && attackJobCfg.OvercomeWeak.Contains(victimJob))
+                damage = Math.Max(damage + 8, minDamage / 2 + 4);
         }
         damage = Math.Max(damageReal, Mathf.Clamp(damage, minDamage, maxDamage));
         //这里不改数值，只能伤害吸收

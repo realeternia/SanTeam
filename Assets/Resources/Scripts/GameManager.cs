@@ -325,7 +325,7 @@ public class GameManager : MonoBehaviour
             var heroes = highPair.Concat(lowPair).Select(x => x.Id).ToArray();
 
             var friendPair = new FriendRandomData();
-            friendPair.id = tempFriendIdIdx;
+            friendPair.id = tempFriendIdIdx++;
             friendPair.name = name;
             friendPair.friendIds = heroes;
             friendRdData.Add(friendPair);
