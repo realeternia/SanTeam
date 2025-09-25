@@ -17,7 +17,7 @@ public class SkillAttackedShadow : Skill
         {
             Vector2 randomDir = UnityEngine.Random.insideUnitCircle.normalized;
             Vector3 randomPosition = owner.transform.position + new Vector3(randomDir.x, 0, randomDir.y) * skillCfg.Range;
-            var shadowUnit = WorldManager.Instance.SpawnUnitsForRegion(owner.GetPlayerInfo(), 501002, randomPosition, owner.side, HeroConfig.GetConfig(owner.heroId).Icon);
+            var shadowUnit = WorldManager.Instance.SpawnUnitsForRegion(owner.GetPlayerInfo(), 501002, -1, randomPosition, owner.side, HeroConfig.GetConfig(owner.heroId).Icon);
             shadowUnit.attackDamage = (int)(owner.attackDamage * skillCfg.Strength);
             shadowUnit.maxHp = (int)(owner.maxHp * skillCfg.Strength);
             shadowUnit.hp = shadowUnit.maxHp;

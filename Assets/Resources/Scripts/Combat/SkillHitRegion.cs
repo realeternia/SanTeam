@@ -21,7 +21,7 @@ public class SkillHitRegion : Skill
                             
             targetPos = defender.transform.position;
 
-            var magicStub = WorldManager.Instance.SpawnUnitsForRegion(owner.GetPlayerInfo(), 501001, targetPos, owner.side, "");
+            var magicStub = WorldManager.Instance.SpawnUnitsForRegion(owner.GetPlayerInfo(), 501001, -1, targetPos, owner.side, "");
             magicStub.SetLifeTime(skillCfg.SummonTime);
 
             //创建一个hitEffect

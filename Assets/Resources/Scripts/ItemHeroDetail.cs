@@ -17,8 +17,7 @@ public class ItemHeroDetail : MonoBehaviour
     public TMP_Text inteText;
     public TMP_Text strText;
     public TMP_Text hpText;
-    public Image skillImg;
-    
+    public Image[] skillImg;
 
     public TMP_Text goldText;
     public TMP_Text equipText;
@@ -70,16 +69,19 @@ public class ItemHeroDetail : MonoBehaviour
             nameText.text = heroConfig.Name;
             goldText.text = (HeroSelectionTool.GetPrice(heroConfig) * player.cards[cardId] / 2).ToString();
 
-            if (heroConfig.Skills != null && heroConfig.Skills.Length > 0)
+            for (int i = 0; i < 3; i++)
             {
-                var skillConfig = SkillConfig.GetConfig(heroConfig.Skills[0]);
+                if (heroConfig.Skills != null && heroConfig.Skills.Length > i)
+                {
+                    var skillConfig = SkillConfig.GetConfig(heroConfig.Skills[i]);
 
-                skillImg.sprite = Resources.Load<Sprite>("SkillPic/" + skillConfig.Icon);
-                skillImg.gameObject.SetActive(true);
-            }
-            else
-            {
-                skillImg.gameObject.SetActive(false);
+                    skillImg[i].sprite = Resources.Load<Sprite>("SkillPic/" + skillConfig.Icon);
+                    skillImg[i].gameObject.SetActive(true);
+                }
+                else
+                {
+                    skillImg[i].gameObject.SetActive(false);
+                }
             }
 
             if (player.itemEquips.ContainsKey(cardId))
@@ -127,7 +129,8 @@ public class ItemHeroDetail : MonoBehaviour
         hpText.text = "";
         goldText.text = "";
         equipText.text = "";
-        skillImg.gameObject.SetActive(false);
+        for(int i=0; i<skillImg.Length; i++)
+            skillImg[i].gameObject.SetActive(false);
 
     }
 }

@@ -19,6 +19,7 @@ public class Chess : MonoBehaviour
     public bool isHero;
     public int heroId;
     public string chessName = "0";
+    public int pos;
 
 
     // 目标单位
@@ -80,9 +81,10 @@ public class Chess : MonoBehaviour
         CreateHUD();
     }
 
-    public void Init(int pid, Color c)
+    public void Init(int pid, int posId, Color c)
     {
         playerId = pid;
+        pos = posId;
         // 创建材质实例
         material = new Material(rend.sharedMaterial);
         if (!string.IsNullOrEmpty(chessName))
@@ -285,7 +287,7 @@ public class Chess : MonoBehaviour
     private int lackIndex;
     public void LackFood(float lackRate)
     {
-        hp = Math.Max(1, hp - (int)((10 + lackIndex * 2) * lackRate)); //饿不死人
+        hp = Math.Max(1, hp - (int)((15 + lackIndex * 5) * lackRate)); //饿不死人
         lackIndex++;
     }
 

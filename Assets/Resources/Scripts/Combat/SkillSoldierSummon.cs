@@ -13,7 +13,7 @@ public class SkillSoldierSummon : Skill
         // 在自己身边 Range 范围内随机选择一个位置
         Vector2 randomDir = UnityEngine.Random.insideUnitCircle.normalized;
         Vector3 randomPosition = owner.transform.position + new Vector3(randomDir.x, 0, randomDir.y) * skillCfg.Range;
-        WorldManager.Instance.SpawnUnitsForRegion(owner.GetPlayerInfo(), 500002, randomPosition, owner.side, owner.GetPlayerInfo().imgPath);
+        WorldManager.Instance.SpawnUnitsForRegion(owner.GetPlayerInfo(), 500002, -1, randomPosition, owner.side, owner.GetPlayerInfo().imgPath);
 
         var units = WorldManager.Instance.GetUnitsMySide(randomPosition, 0, owner.side);
         foreach(var unit in units)

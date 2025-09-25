@@ -158,7 +158,7 @@ namespace CommonConfig
         public static void Load()
         {
             config.Clear();
-            config[100001] = new HeroConfig(100001, "刘备", 1, 26, 80, 78, 77, 235, 330, 1, 10, 17, 0, 0, 0, 100, 1, "帅", null, "", "", "core", "SwordHitYellowCritical", "liubei", 6);
+            config[100001] = new HeroConfig(100001, "刘备", 1, 26, 80, 78, 77, 235, 330, 1, 10, 17, 0, 0, 0, 100, 1, "帅", null, "师", "", "core", "SwordHitYellowCritical", "liubei", 6);
             config[100002] = new HeroConfig(100002, "曹操", 1, 32, 98, 92, 81, 271, 265, 2, 10, 17, 0, 0, 0, 100, 1, "帅", null, "", "", "core", "SwordHitYellowCritical", "caocao", 6);
             config[100003] = new HeroConfig(100003, "孙权", 1, 26, 79, 80, 70, 229, 340, 3, 10, 17, 0, 0, 0, 100, 1, "帅", null, "", "", "core", "SwordHitYellowCritical", "sunquan", 3);
             config[100004] = new HeroConfig(100004, "董卓", 1, 28, 85, 75, 87, 247, 330, 4, 10, 17, 0, 0, 0, 0, 1, "帅", null, "", "", "core", "SwordHitYellowCritical", "dongzhuo", 2);

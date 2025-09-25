@@ -8,10 +8,12 @@ public class BagFieldUnitControl : MonoBehaviour, IDropHandler
     public int posId;
     public Image heroIcon;
     public Image jobIcon;
-    public BagControl bagControl;    
+    public BagControl bagControl;
+    public int myHeroId;
 
     public void SetInfo(int id, int heroId)
     {
+        myHeroId = heroId;
         posId = id;
         if (heroId == 0)
         {
