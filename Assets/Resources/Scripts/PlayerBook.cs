@@ -13,21 +13,57 @@ public class PlayerBook
 
     public static int[] GetRandomN(int n)
     {
-        // 确保 n 不超过玩家配置数量，避免数组越界
-        int count = PlayerConfig.ConfigList.Count;
-        n = Mathf.Min(n, count);
-        var ids = new int[n];
-        List<int> idAlls = new List<int>();
+        // 收集CanPlayer=true和CanPlayer=false的配置ID
+        List<int> trueIds = new List<int>();
+        List<int> falseIds = new List<int>();
+        
         foreach (PlayerConfig cfg in PlayerConfig.ConfigList)
-            if(cfg.Id > 1)
-                idAlls.Add(cfg.Id);
-        for (int i = 0; i < n; i++)
         {
-            int index = UnityEngine.Random.Range(0, idAlls.Count);
-            ids[i] = idAlls[index];
-            idAlls.RemoveAt(index);
+            if (cfg.Id > 1) // 保持原有条件
+            {
+                if (cfg.CanPlay)
+                    trueIds.Add(cfg.Id);
+                else
+                    falseIds.Add(cfg.Id);
+            }
         }
-        return ids;
+        
+        // 计算需要的数量，确保不超过实际可用数量
+        int trueCount = Mathf.Min(4, trueIds.Count);
+        int falseCount = Mathf.Max(0, Mathf.Min(n - 4, falseIds.Count));
+        
+        // 调整n，确保总数合理
+        n = trueCount + falseCount;
+        if (n <= 0) return new int[0];
+        
+        List<int> resultIds = new List<int>();
+        
+        // 从true列表中随机选择trueCount个
+        for (int i = 0; i < trueCount; i++)
+        {
+            int index = UnityEngine.Random.Range(0, trueIds.Count);
+            resultIds.Add(trueIds[index]);
+            trueIds.RemoveAt(index);
+        }
+        
+        // 从false列表中随机选择falseCount个
+        for (int i = 0; i < falseCount; i++)
+        {
+            int index = UnityEngine.Random.Range(0, falseIds.Count);
+            resultIds.Add(falseIds[index]);
+            falseIds.RemoveAt(index);
+        }
+        
+        // 对结果进行shuffle
+        for (int i = 0; i < resultIds.Count; i++)
+        {
+            int j = UnityEngine.Random.Range(i, resultIds.Count);
+            int temp = resultIds[i];
+            resultIds[i] = resultIds[j];
+            resultIds[j] = temp;
+        }
+        
+        return resultIds.ToArray();
     }
 
     public static List<Tuple<string, int>> GetCardNeeds(int id)

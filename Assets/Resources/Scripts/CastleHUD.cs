@@ -17,6 +17,9 @@ public class CastleHUD : MonoBehaviour
     private int lastFood;
     private bool isFlashing = false;
 
+    private int baseAtk;
+    private int baseHp;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -35,8 +38,10 @@ public class CastleHUD : MonoBehaviour
         castleName.text = p.playerNameText.text;
 
         var soldierCfg = SoldierConfig.GetConfig(500001);
-        textAtk.text = (soldierCfg.Atk + p.sodatk).ToString();
-        textHp.text = (soldierCfg.Hp + p.sodhp * 5).ToString();
+        baseAtk = soldierCfg.Atk + p.sodatk + p.GetItemPAttr("satk");
+        baseHp = soldierCfg.Hp + p.sodhp * 5 + p.GetItemPAttr("shp");
+        textAtk.text = baseAtk.ToString();
+        textHp.text = baseHp.ToString();
 
         // 更新血条位置，使其跟随单位
         UpdatePosition(castleSpawn);
@@ -55,8 +60,8 @@ public class CastleHUD : MonoBehaviour
     {
         soldierLevel += level;
         var soldierCfg = SoldierConfig.GetConfig(500001);
-        textAtk.text = (soldierCfg.Atk + owner.sodatk + soldierLevel * 4).ToString();
-        textHp.text = (soldierCfg.Hp + owner.sodhp * 5 + soldierLevel * 20).ToString();
+        textAtk.text = (baseAtk + soldierLevel * 4).ToString();
+        textHp.text = (baseHp + soldierLevel * 20).ToString();
         textAtk.color = Color.green;
         textHp.color = Color.green;
     }

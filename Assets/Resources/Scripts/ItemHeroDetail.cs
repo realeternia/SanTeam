@@ -67,7 +67,8 @@ public class ItemHeroDetail : MonoBehaviour
             leadShipBase = heroConfig.LeadShip;
 
             nameText.text = heroConfig.Name;
-            goldText.text = (HeroSelectionTool.GetPrice(heroConfig) * player.cards[cardId] / 2).ToString();
+            var sellRate = player.GetSellRate();
+            goldText.text = ((int)(HeroSelectionTool.GetPrice(heroConfig) * player.cards[cardId] * sellRate)).ToString();
 
             for (int i = 0; i < 3; i++)
             {

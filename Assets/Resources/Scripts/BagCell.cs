@@ -64,7 +64,11 @@ public class BagCell : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragH
             dragImage.sprite = Resources.Load<Sprite>("Skins/" + heroCfg.Icon);
         }
         else
+        {
+            if(ItemConfig.GetConfig(cardId).Effect != "attr") //无法装备
+                return;
             dragImage.sprite = itemImage.sprite;
+        }
         dragImage.rectTransform.sizeDelta = new Vector2(100, 100); // 适当放大图标以便于查看
         dragImage.raycastTarget = false; // 不阻挡射线检测
         

@@ -20,6 +20,7 @@ public class ItemDetail : MonoBehaviour
     public TMP_Text attr2Val;
     public TMP_Text goldText;
     public TMP_Text equipText;
+    public TMP_Text descText;
 
     // Start is called before the first frame update
     void Start()
@@ -55,7 +56,9 @@ public class ItemDetail : MonoBehaviour
         {
             var itemConfig = ItemConfig.GetConfig(id);
             nameText.text = itemConfig.Name;
-            goldText.text = (itemConfig.Price * player.cards[cardId] / 2).ToString();
+            var sellRate = player.GetSellRate();
+            goldText.text = ((int)(itemConfig.Price * player.cards[cardId] * sellRate)).ToString();
+            descText.text = itemConfig.Des;
 
             if(string.IsNullOrEmpty(itemConfig.Attr1))
             {

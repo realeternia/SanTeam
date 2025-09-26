@@ -111,8 +111,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 139.2, y: -19.7}
-  m_SizeDelta: {x: 130, y: 30}
+  m_AnchoredPosition: {x: 111.8, y: -19.7}
+  m_SizeDelta: {x: 80, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &8411457734111704172
 CanvasRenderer:
@@ -145,7 +145,7 @@ MonoBehaviour:
   m_text: "\u65FA\u4ED4"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 2cf81e00e11058e48bf63753305874df, type: 2}
-  m_sharedMaterial: {fileID: 6171601940972064184, guid: 2cf81e00e11058e48bf63753305874df, type: 2}
+  m_sharedMaterial: {fileID: -2551621216232197282, guid: 2cf81e00e11058e48bf63753305874df, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -277,7 +277,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 0}
+  m_Sprite: {fileID: 21300000, guid: b553e664c11711f4f9e86b3ad783797b, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -463,12 +463,13 @@ MonoBehaviour:
   endColor: {r: 0.6320754, g: 0.32498217, b: 0.32498217, a: 0.5}
   pid: 0
   gold: 0
-  playerName: 
   winCount: 0
   loseCount: 0
   mark: 0
   battleCards: 
   isAI: 0
+  food: 0
+  maxFood: 0
   isOnTurn: 0
   playerNameText: {fileID: 7220488733435201163}
   playerImage: {fileID: 7347440486663307163}
@@ -476,9 +477,10 @@ MonoBehaviour:
   resultText: {fileID: 835777684304780144}
   playerBgImg: {fileID: 4105999794555204127}
   roundOverImg: {fileID: 130785936171806241}
-  imgPath: 
+  playerId: 0
   lineColor: {r: 0, g: 0, b: 0, a: 0}
   banCount: 2
+  battleSide: 0
   nextSkip: 0
   sodatk: 0
   sodhp: 0
@@ -597,8 +599,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 4.8, y: -53.9}
-  m_SizeDelta: {x: 110, y: 30}
+  m_AnchoredPosition: {x: 174.6, y: -19.3}
+  m_SizeDelta: {x: 70, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &6085858474645854942
 CanvasRenderer:
@@ -631,14 +633,14 @@ MonoBehaviour:
   m_text: 5
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 2cf81e00e11058e48bf63753305874df, type: 2}
-  m_sharedMaterial: {fileID: 6171601940972064184, guid: 2cf81e00e11058e48bf63753305874df, type: 2}
+  m_sharedMaterial: {fileID: -2551621216232197282, guid: 2cf81e00e11058e48bf63753305874df, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4286947097
-  m_fontColor: {r: 0.09692062, g: 0.6226415, b: 0.5226806, a: 1}
+    rgba: 4291350819
+  m_fontColor: {r: 0.13550194, g: 0.8207547, b: 0.78541756, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -767,7 +769,7 @@ MonoBehaviour:
   m_text: 333
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 2cf81e00e11058e48bf63753305874df, type: 2}
-  m_sharedMaterial: {fileID: 6171601940972064184, guid: 2cf81e00e11058e48bf63753305874df, type: 2}
+  m_sharedMaterial: {fileID: -2551621216232197282, guid: 2cf81e00e11058e48bf63753305874df, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []

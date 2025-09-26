@@ -29,11 +29,11 @@ public class BagControl : MonoBehaviour, IPanelEvent
 
     void Start()
     {
-    //    bindPlayer = GameManager.Instance.GetPlayer(0);
-    //    bindPlayer.cards[100001] = 1;         
-    //    bindPlayer.cards[101002] = 1;         
-    //    bindPlayer.cards[101005] = 1;         
-    //    OnShow();
+    //     bindPlayer = GameManager.Instance.GetPlayer(0);
+    //     bindPlayer.cards[100001] = 1;         
+    //     bindPlayer.cards[409004] = 1;         
+    //     bindPlayer.cards[101005] = 1;         
+    //     OnShow();
 
         closeBtn.onClick.AddListener(() =>
         {      
@@ -113,12 +113,12 @@ public class BagControl : MonoBehaviour, IPanelEvent
         UpdateFieldView();
 
         var soldierCfg = SoldierConfig.GetConfig(500001);
-        var textAtk = (soldierCfg.Atk + bindPlayer.sodatk).ToString();
-        var textHp = (soldierCfg.Hp + bindPlayer.sodhp * 5).ToString();
+        var textAtk = (soldierCfg.Atk + bindPlayer.sodatk + bindPlayer.GetItemPAttr("satk")).ToString();
+        var textHp = (soldierCfg.Hp + bindPlayer.sodhp * 5 + bindPlayer.GetItemPAttr("shp")).ToString();
         infoText.text = bindPlayer.playerConfig.Name + "\n<color=yellow>战斗力 </color>" + bindPlayer.lastFightMark + " <color=red>兵攻-</color>" + textAtk + " <color=green>兵血-</color>" + textHp + " <color=#FF7F00>粮食-</color>" + bindPlayer.maxFood;
 
         var humanCount = GameManager.Instance.players.Count(x => !x.isAI);
-        aiSwitchBtn.gameObject.SetActive(bindPlayer.pid != 0 && (!bindPlayer.isAI || humanCount < 2));
+        aiSwitchBtn.gameObject.SetActive(bindPlayer.pid != 0 && bindPlayer.playerConfig.CanPlay && (!bindPlayer.isAI || humanCount < 2));
         aiSwitchBtn.GetComponentInChildren<TMP_Text>().text = bindPlayer.isAI ? "AI模式" : "玩家模式";
     }
 

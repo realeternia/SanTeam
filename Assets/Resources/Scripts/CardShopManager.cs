@@ -289,6 +289,16 @@ public class CardShopManager : MonoBehaviour
         }
         nextFirstPicker = -1;
 
+        CheckEraBonusGold();
+
+        GameManager.Instance.PlaySound("Sounds/page");
+    }
+
+    private void CheckEraBonusGold()
+    {
+        if(GameManager.Instance.year <= 2)
+            return;
+
         // 获取所有玩家
         var players = new List<(int id, int gold)>();
         foreach (var player in GameManager.Instance.players)
@@ -324,8 +334,6 @@ public class CardShopManager : MonoBehaviour
                 GameManager.Instance.GetPlayer(players[2].id).AddGold(1);
             }
         }
-
-        GameManager.Instance.PlaySound("Sounds/page");
     }
 
     public bool OnPlayerBuyCard(CardViewControl ctr, PlayerInfo player, int cardId, bool isHero, int price, int count)
@@ -418,16 +426,20 @@ public class CardShopManager : MonoBehaviour
         GameManager.Instance.SaveToFile();     
 
         var roll = UnityEngine.Random.Range(0, 3);
-        if(roll < 50)
-            BGMPlayer.Instance.PlaySound("BGMs/chun");   
-        else
-            BGMPlayer.Instance.PlaySound("BGMs/pozhu");   
+        BGMPlayer.Instance.PlaySound(roll == 0 ? "BGMs/chun" : (roll == 1 ? "BGMs/xia" : "BGMs/qiu"));
+
+        if (GameManager.Instance.year == 0)
+        {
+            UnityEngine.Debug.Log("FirstRound ck");
+            for(int i = 0; i < 8; i++)
+                GameManager.Instance.GetPlayer(i).FirstRound();
+        }
 
         var shopOpenIndex = GameManager.Instance.year; //第几场比赛
         var shopCfg = ShopConfig.GetConfig(Math.Min(100, shopOpenIndex + 1));
         var roundGold = shopCfg.RoundGold;
         for(int i = 0; i < 8; i++)
-            GameManager.Instance.GetPlayer(i).AddGold(roundGold);
+            GameManager.Instance.GetPlayer(i).RoundGold(roundGold);
 
         GameManager.Instance.year++;
         era = 0;

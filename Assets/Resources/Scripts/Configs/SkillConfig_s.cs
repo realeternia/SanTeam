@@ -249,9 +249,10 @@ namespace CommonConfig
             config[208003] = new SkillConfig(208003, "蔓延", "延", "法术负面状态概率扩散", "智技up", 1, 0.5f, 4f, 0, "inte", 0.2f, 0.01f, 30f, false, "", 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "ModifyBuffExpand", "", "", 0, 3, "yan2");
             config[209001] = new SkillConfig(209001, "富甲", "商", "参战获得5金币", "", 1, 0, 0, 0, "inte", 0, 0, 0, false, "", 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "Gold", "", "MagicChargeYellow", 0, 3, "gold");
             config[209002] = new SkillConfig(209002, "国士", "国", "增加一个远程士兵,提升射程", "", 1, 0, 0, 0, "inte", 0, 0, 15f, false, "", 0, 0, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "SoldierSummon", "", "MagicChargeGreen", 0, 4, "guo");
-            config[209003] = new SkillConfig(209003, "指导", "师", "提升队伍最低武将智力", "", 1, 0, 0, 0, "inte", 0, 0, 0, false, "", 0, 0.7f, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, "HelpTeach", "", "MagicChargeYellow", 0, 2, "shi2");
+            config[209003] = new SkillConfig(209003, "激励", "励", "提升一列队友智力", "", 1, 0, 0, 0, "inte", 0, 0, 0, false, "", 0, 0.7f, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, "HelpTeach", "", "MagicChargeYellow", 0, 2, "li");
             config[209004] = new SkillConfig(209004, "学习", "学", "攻击时几率提升自己的属性", "", 1, 0.3f, 0, 0, "inte", 0, 0, 0, false, "", 0, 0.05f, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "HitAttr", "", "MagicChargeYellow", 0, 3, "zhang");
             config[209005] = new SkillConfig(209005, "米道", "米", "参战提升10粮食", "", 1, 0, 0, 0, "inte", 0, 0, 0, false, "", 0, 0, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "Food", "", "MagicChargeYellow", 0, 2, "food");
+            config[209006] = new SkillConfig(209006, "奋进", "奋", "提升一列队友武力", "", 1, 0, 0, 0, "str", 0, 0, 0, false, "", 0, 0.7f, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, "HelpTeach", "", "MagicChargePink", 0, 2, "fen");
 
         }
 

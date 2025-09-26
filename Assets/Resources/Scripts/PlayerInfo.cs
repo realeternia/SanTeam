@@ -106,6 +106,17 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         UpdateView();
     }
 
+    public void FirstRound()
+    {
+        if(playerConfig.InitGold != 0)
+            AddGold(playerConfig.InitGold);
+        if(playerConfig.InitCards != null)
+        {
+            foreach(var card in playerConfig.InitCards)
+                cards[card] = 1;
+        }
+    }
+
     // init 和 load时候都会调用
     public void SetPlayerData()
     {
@@ -118,7 +129,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         playerNameText.text = playerName;        
         playerImage.sprite = Resources.Load<Sprite>(imgPath);
         goldText.text = gold.ToString();
-        resultText.text = "0";
+        resultText.text = mark.ToString();
         playerBgImg.color = lineColor;
     }
 
@@ -165,6 +176,12 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         var sub = Mathf.Min(f, food);
         food -= sub;
         return sub;
+    }
+
+    public void RoundGold(int g)
+    {
+        g += GetItemPAttr("roundgold");
+        AddGold(g);
     }
 
     public void OnEra(int era)
@@ -241,6 +258,13 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         battleCards[pos] = heroId;
     }
 
+    public float GetSellRate()
+    {
+        if(!HasItemByEffect("sellhigh"))
+            return 0.5f;
+        return .75f;
+    }
+
     public void SellCard(int cardId)
     {
         var isHeroCard = ConfigManager.IsHeroCard(cardId);
@@ -254,7 +278,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
             price = ItemConfig.GetConfig(cardId).Price;
         }
 
-        AddGold(price * cards[cardId] / 2);
+        AddGold((int)(price * cards[cardId] * GetSellRate()));
 
         GameManager.Instance.PlaySound("Sounds/gold");
         RemoveCard(cardId);
@@ -373,18 +397,50 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         return heroCardList;
     }
 
-    public List<int> GetItemCardList()
+    public List<int> GetAttrItemList()
     {
         List<int> itemCardList = new List<int>();
         foreach (int cardId in cards.Keys)
         {
             if(ConfigManager.IsHeroCard(cardId))
                 continue;
-
+            var itemCfg = ItemConfig.GetConfig(cardId);
+            if(itemCfg.Effect != "attr")
+                continue;
             itemCardList.Add(cardId);
         }
         return itemCardList;
+    }
 
+    public int GetItemPAttr(string attrName)
+    {
+        int attrVal = 0;
+        foreach (int cardId in cards.Keys)
+        {
+            if(ConfigManager.IsHeroCard(cardId))
+                continue;
+            var itemCfg = ItemConfig.GetConfig(cardId);
+            if(itemCfg.Effect != "pattr")
+                continue;
+            if(itemCfg.Attr1 == attrName)
+                attrVal += itemCfg.Attr1Val;
+            else if(itemCfg.Attr2 == attrName)
+                attrVal += itemCfg.Attr2Val;
+        }
+        return attrVal;
+    }
+
+    public bool HasItemByEffect(string effectName)
+    {
+        foreach (int cardId in cards.Keys)
+        {
+            if(ConfigManager.IsHeroCard(cardId))
+                continue;
+            var itemCfg = ItemConfig.GetConfig(cardId);
+            if(itemCfg.Effect == effectName)
+                return true;
+        }
+        return false;
     }
 
     public void AutoSetBattleCard()
@@ -611,7 +667,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     private void AutoCheckItem(List<Tuple<int, int>> results)
     {
         itemEquips.Clear();
-        var itemCardList = GetItemCardList();
+        var itemCardList = GetAttrItemList();
 
         if(itemCardList.Count == 0)
             return;
@@ -628,32 +684,44 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 
             int minAttr = heroAttributes.Min();
             int maxAttr = heroAttributes.Max();
+            var attrDiff = maxAttr - minAttr;
             
             foreach(var itemId in itemCardList)
             {
                 var itemCfg = ItemConfig.GetConfig(itemId);
-                int score = itemCfg.Price;
+                float score = itemCfg.Attr1Val * HeroSelectionTool.GetCardLevel(cards[itemId]); //乘上等级
 
                 if (!string.IsNullOrEmpty(itemCfg.Attr1))
                 {
+                    bool isMinAttr = false;
+                    bool isMaxAttr = false;
+
                     if (itemCfg.Attr1 == "str" && heroCfg.Str == minAttr)
-                        score += 25;
+                        isMinAttr = true;
                     else if (itemCfg.Attr1 == "inte" && heroCfg.Inte == minAttr)
-                        score += 25;
+                        isMinAttr = true;
                     else if (itemCfg.Attr1 == "lead" && heroCfg.LeadShip == minAttr)
-                        score += 25;
+                        isMinAttr = true;
                     else if (itemCfg.Attr1 == "str" && heroCfg.Str == maxAttr)
-                        score += 15;
+                        isMaxAttr = true;
                     else if (itemCfg.Attr1 == "inte" && heroCfg.Inte == maxAttr)
-                        score += 15;
+                        isMaxAttr = true;  
                     else if (itemCfg.Attr1 == "lead" && heroCfg.LeadShip == maxAttr)
-                        score += 15;
+                        isMaxAttr = true;
+                    
+                    if(heroCfg.Pos == 1)
+                    {
+                        if(isMinAttr && attrDiff > 15)
+                            score *= 1 + attrDiff * .015f;
+                    }
+                    if(isMaxAttr)
+                        score *= 1.2f;
                 }
                 
                 // 更新最高得分和对应装备ID
                 if (score > maxScore)
                 {
-                    maxScore = score;
+                    maxScore = (int)score;
                     bestItemId = itemId;
                 }
             }

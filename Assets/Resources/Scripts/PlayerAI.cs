@@ -272,7 +272,7 @@ public static class PlayerAI
                     continue;
 
                 var itemCfg = ItemConfig.GetConfig(pickCard.cardId);
-                var itemCount = playerInfo.GetItemCardList().Count;
+                var itemCount = playerInfo.GetAttrItemList().Count;
                 if (!hasSameCard)
                 {
                     if (itemCount >= playerConfig.Carditemlimit && itemCfg.Effect == "attr")

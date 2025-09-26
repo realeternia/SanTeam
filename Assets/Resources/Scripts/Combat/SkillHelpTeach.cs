@@ -14,15 +14,17 @@ public class SkillHelpTeach : Skill
         unitsInRange.Remove(owner);
         foreach (var unit in unitsInRange)
         {
-            if(unit.inte > owner.inte)
+            var targetAttr = unit.GetAttr(skillCfg.Attr);
+            var ownerAttr = owner.GetAttr(skillCfg.Attr);
+            if(targetAttr > ownerAttr)
                 continue;
 
-            var addon = (owner.inte - unit.inte) * skillCfg.Strength;
+            var addon = (ownerAttr - targetAttr) * skillCfg.Strength;
             if (addon < 10)
                 addon = 10;
-            var newInte = Math.Min(owner.inte, unit.inte + addon);
+            var newAttr = Math.Min(ownerAttr, targetAttr + addon);
 
-            unit.UpdateAttr((int)newInte, 0, 0);
+            unit.UpdateAttr((int)newAttr, 0, 0);
             EffectManager.PlaySkillEffect(unit, skillCfg.HitEffect);
         }
     }
