@@ -8,13 +8,13 @@ public static class EffectManager
 
     public static void PlayHitEffect(Chess sourceChess, Chess targetChess, string effectName)
     {
-        if (sourceChess.isHero)
-        {
-            var heroConfig = HeroConfig.GetConfig(sourceChess.heroId);
+        // if (sourceChess.isHero)
+        // {
+        //     var heroConfig = HeroConfig.GetConfig(sourceChess.heroId);
 
-            if ((sourceChess.side == 1 || sourceChess.side == 2) && effectName.StartsWith("Sword"))
-                GameManager.Instance.PlaySound("Sounds/sword");
-        }
+        //     if ((sourceChess.side == 1 || sourceChess.side == 2) && effectName.StartsWith("Sword"))
+        //         GameManager.Instance.PlaySound("Sounds/sword");
+        // }
         // 播放粒子特效
         var hitPrefab = Resources.Load<GameObject>("Prefabs/Effect/" + effectName);
         GameObject hitEffect = UnityEngine.Object.Instantiate(hitPrefab, targetChess.transform.position, Quaternion.identity);

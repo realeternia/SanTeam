@@ -19,7 +19,7 @@ public class SkillHitFood : Skill
             {
                 owner.GetPlayerInfo().AddFood(sub);
                 WorldManager.Instance.AddBattleText("粮-" + sub.ToString(), defender.transform.position, new UnityEngine.Vector2(0, -30), Color.red, 3);
-                WorldManager.Instance.AddBattleText("粮+" + damage.ToString(), owner.transform.position, new UnityEngine.Vector2(0, 60), Color.green, 3);
+                WorldManager.Instance.AddBattleText("粮+" + sub.ToString(), owner.transform.position, new UnityEngine.Vector2(0, 60), Color.green, 3);
             }
         }
     }

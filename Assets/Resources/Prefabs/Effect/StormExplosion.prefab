@@ -9697,7 +9697,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   life: 0.3
-  killAfterLife: 1
+  onLifeEnd: 2
 --- !u!82 &8258632
 AudioSource:
   m_ObjectHideFlags: 0
@@ -9710,7 +9710,7 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 8300000, guid: a7afb83373df6164d96478fc3ca41e4f, type: 3}
   m_PlayOnAwake: 1
-  m_Volume: 1
+  m_Volume: 0.627
   m_Pitch: 1
   Loop: 0
   Mute: 0

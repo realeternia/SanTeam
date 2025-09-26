@@ -415,7 +415,13 @@ public class CardShopManager : MonoBehaviour
     public void ShopBegin()
     {
         UnityEngine.Debug.Log("ShopBegin");
-        GameManager.Instance.SaveToFile();        
+        GameManager.Instance.SaveToFile();     
+
+        var roll = UnityEngine.Random.Range(0, 3);
+        if(roll < 50)
+            BGMPlayer.Instance.PlaySound("BGMs/chun");   
+        else
+            BGMPlayer.Instance.PlaySound("BGMs/pozhu");   
 
         var shopOpenIndex = GameManager.Instance.year; //第几场比赛
         var shopCfg = ShopConfig.GetConfig(Math.Min(100, shopOpenIndex + 1));

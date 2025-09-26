@@ -64,6 +64,9 @@ public class WorldManager : MonoBehaviour
 
     public void BattleBegin()
     {
+        var roll = UnityEngine.Random.Range(0, 2);
+        BGMPlayer.Instance.PlaySound(roll == 0 ? "BGMs/weifeng" : "BGMs/pozhu");
+
         var newMapId = 1;
         gameFinish = false;
         if (battleIndex >= 5)

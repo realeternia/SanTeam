@@ -170,7 +170,7 @@ public class GameManager : MonoBehaviour
         {
             string json = File.ReadAllText(savePath);
             SaveData saveData = JsonUtility.FromJson<SaveData>(json);
-            saveData.year = year;
+            year = saveData.year;
 
             // 确保players数组不为null且长度足够
             if (saveData.players != null)
@@ -197,7 +197,7 @@ public class GameManager : MonoBehaviour
                 heroIds.AddRange(saveData.heroIds);
             }
 
-            Debug.Log("游戏数据加载成功");
+            Debug.Log("游戏数据加载成功 year=" + year);
         }
         catch (System.Exception e)
         {
