@@ -194,4 +194,13 @@ public static class ConfigManager
         }
         return null;
     }
+
+    public static SkillConfig GetSkillConfig(string skillName)
+    {
+        if (skillDict.TryGetValue(skillName, out SkillConfig value))
+        {
+            return value;
+        }
+        return null;
+    }
 }

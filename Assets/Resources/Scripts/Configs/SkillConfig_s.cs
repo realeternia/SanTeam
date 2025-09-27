@@ -91,6 +91,10 @@ namespace CommonConfig
         /// </summary>
         public int UnitHelpType;
         /// <summary>
+        ///光环技能
+        /// </summary>
+        public string HelpSkill;
+        /// <summary>
         ///BuffId
         /// </summary>
         public int BuffId;
@@ -144,7 +148,7 @@ namespace CommonConfig
         public string Icon;
 
 
-        public SkillConfig(int Id, string Name, string Sname, string Descript, string Type, int Lv, float Rate, float CD, float ConditionParm, string Attr, float RateAttrH, float RateAttrHP, float Range, bool RangeOut, string TargetType, int TargetCount, float Strength, int StrengthInt, int DoCount, float TimeDelay, int UnitHelpType, int BuffId, float BuffTime, int SummonCount, float SummonArea, float SummonTime, float SummonHitInterval, float SummonSpeed, string ScriptName, string Action, string HitEffect, float EffectSize, int Price, string Icon)
+        public SkillConfig(int Id, string Name, string Sname, string Descript, string Type, int Lv, float Rate, float CD, float ConditionParm, string Attr, float RateAttrH, float RateAttrHP, float Range, bool RangeOut, string TargetType, int TargetCount, float Strength, int StrengthInt, int DoCount, float TimeDelay, int UnitHelpType, string HelpSkill, int BuffId, float BuffTime, int SummonCount, float SummonArea, float SummonTime, float SummonHitInterval, float SummonSpeed, string ScriptName, string Action, string HitEffect, float EffectSize, int Price, string Icon)
         {
             this.Id = Id;
             this.Name = Name;
@@ -167,6 +171,7 @@ namespace CommonConfig
             this.DoCount = DoCount;
             this.TimeDelay = TimeDelay;
             this.UnitHelpType = UnitHelpType;
+            this.HelpSkill = HelpSkill;
             this.BuffId = BuffId;
             this.BuffTime = BuffTime;
             this.SummonCount = SummonCount;
@@ -203,56 +208,59 @@ namespace CommonConfig
         public static void Load()
         {
             config.Clear();
-            config[200001] = new SkillConfig(200001, "王", "帅", "给与我方同阵营单位17%生命值护盾", "职业", 1, 0, 0, 0, "", 0, 0, 0, false, "", 0, 0.17f, 0, 0, 0, 0, 300001, 999f, 0, 0, 0, 0, 0, "MasterShield", "", "", 0, 4, "shuai");
-            config[200002] = new SkillConfig(200002, "羽扇", "扇", "远程攻击", "职业", 1, 1f, 99f, 0, "inte", 0, 0, 0, false, "", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "Dumb", "", "", 0, 2, "shan");
-            config[200003] = new SkillConfig(200003, "刀兵", "刀", "攻击几率造成额外伤害", "职业", 1, 0.15f, 5f, 0, "leadShip", 0.1f, 0.01f, 0, false, "", 0, 0, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "AttackAddDamage", "sway", "SwordHitRedCritical", 0, 1, "dao");
-            config[200004] = new SkillConfig(200004, "坚韧", "士", "受击时几率发动减伤", "职业", 1, 0.4f, 4.5f, 0, "str", 0, 0, 0, false, "", 0, 0.5f, 0, 0, 0, 0, 300002, 4f, 0, 0, 0, 0, 0, "AttackedBuff", "spin", "", 0, 2, "shi");
-            config[200005] = new SkillConfig(200005, "突破", "马", "移动时穿越敌人,造成额外伤害", "职业", 1, 1f, 7f, 0, "leadShip", 0, 0, 0, false, "", 0, 0.5f, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "RunCross", "", "LightningExplosionBlue", 0, 2, "ma");
-            config[200006] = new SkillConfig(200006, "运筹", "相", "提升士兵等级", "职业", 1, 0, 0, 0, "inte", 0, 0, 0, false, "", 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "SoldierUp", "", "MagicChargeYellow", 0, 2, "xiang");
-            config[200007] = new SkillConfig(200007, "弓手", "弓", "远程射击单位", "职业", 1, 1f, 99f, 0, "leadShip", 0, 0, 0, false, "", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "Dumb", "", "", 0, 2, "gong");
-            config[200008] = new SkillConfig(200008, "谋略", "谋", "一定几率晕眩目标单位2s", "职业", 1, 0.15f, 4f, 0, "inte", 0.2f, 0.01f, 0, false, "", 0, 0, 0, 0, 0, 0, 301001, 2f, 0, 0, 0, 0, 0, "HitBuff", "throw", "MagicChargeYellow", 0, 2, "mou");
-            config[200009] = new SkillConfig(200009, "炮车", "炮", "攻击目标发生爆炸", "职业", 1, 0.5f, 0, 0, "leadShip", 0, 0, 20f, false, "", 3, 0.6f, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "HitArea", "throw", "MagicNovaYellow", 0, 3, "pao");
-            config[200010] = new SkillConfig(200010, "弩手", "弩", "射程非常远", "职业", 1, 1f, 99f, 0, "leadShip", 0, 0, 0, false, "", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "Dumb", "", "", 0, 3, "nu");
-            config[200011] = new SkillConfig(200011, "冲锋", "车", "移动时穿越敌人,降低目标防御", "职业", 1, 1f, 7f, 0, "leadShip", 0, 0, 0, false, "", 0, 0, 0, 0, 0, 0, 301003, 3f, 0, 0, 0, 0, 0, "RunCrossPlus", "", "LightningExplosionRed", 0, 2, "che");
-            config[200012] = new SkillConfig(200012, "声乐", "乐", "给与友军攻速祝福", "职业", 1, 1f, 3f, 0, "inte", 0, 0, 50f, false, "", 0, 0.7f, 0, 0, 0, 0, 301005, 5f, 0, 0, 0, 0, 0, "HelpAidBuff", "sway", "MagicChargePink", 0, 2, "song");
-            config[200013] = new SkillConfig(200013, "治疗", "医", "给与友军治疗", "职业", 1, 1f, 3f, 0, "inte", 0, 0, 50f, false, "", 0, 0.5f, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "HelpHeal", "sway", "MagicBuffGreen", 0, 2, "heal");
-            config[200014] = new SkillConfig(200014, "枪阵", "枪", "一定几率晕眩目标单位2.5s", "职业", 1, 0.15f, 4f, 0, "leadShip", 0.23f, 0.01f, 0, false, "", 0, 0, 0, 0, 0, 0, 301001, 2.5f, 0, 0, 0, 0, 0, "HitBuff", "spin", "MagicChargeYellow", 0, 2, "qiang");
-            config[200015] = new SkillConfig(200015, "戟阵", "戟", "攻击目标时伤害周边敌人", "职业", 1, 0.5f, 4f, 0, "leadShip", 0, 0, 25f, false, "", 2, 0.6f, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "HitAround", "throw", "SwordSlashMiniWhite", 0, 2, "ji");
-            config[200016] = new SkillConfig(200016, "战鼓", "鼓", "给与友军攻击力祝福", "职业", 1, 1f, 3f, 0, "inte", 0, 0, 50f, false, "", 0, 0.35f, 0, 0, 0, 0, 301004, 5f, 0, 0, 0, 0, 0, "HelpAidBuff", "sway", "MagicChargeYellow", 0, 2, "gu");
-            config[201004] = new SkillConfig(201004, "穿透", "透", "攻击几率造成1.5倍伤害", "攻击up", 1, 0.2f, 4f, 0, "leadShip", 0, 0, 0, false, "", 0, 0.5f, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "AttackAddDamage", "jump", "SwordHitRedCritical", 0, 2, "tou");
-            config[201005] = new SkillConfig(201005, "瓦解", "解", "攻击几率造成2倍伤害", "攻击up", 1, 0.2f, 5f, 0, "leadShip", 0, 0, 0, false, "", 0, 1f, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "AttackAddDamage", "jumpspin", "SwordHitRedCritical", 0, 3, "jie");
-            config[201006] = new SkillConfig(201006, "连击", "连", "攻击时几率触发连续攻击", "攻击up", 1, 0.3f, 5f, 0, "leadShip", 0, 0, 0, false, "", 0, 0.8f, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "SpeedAttack", "flipspin", "", 0, 2, "lian");
-            config[201008] = new SkillConfig(201008, "箭雨", "雨", "攻击时30%发出2只箭", "", 1, 0.3f, 4f, 0, "leadShip", 0, 0, 25f, false, "", 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "MultiArrow", "flipspin", "", 0, 3, "duo");
-            config[201010] = new SkillConfig(201010, "旋风斩", "猛", "攻击时几率对附近敌人造成伤害", "技", 1, 0.4f, 5f, 0, "str", 0, 0, 25f, false, "", 99, 0.8f, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "SpinAttack", "spin", "SwordWhirlwindWhite", 0, 3, "meng");
-            config[201011] = new SkillConfig(201011, "落雷", "天", "攻击召唤出持续伤害的雷电阵", "术", 1, 0.3f, 10f, 0, "inte", 0, 0, 0, false, "", 1, 0.1f, 0, 0, 0, 0, 0, 0, 0, 25f, 5.2f, 0.5f, 0, "HitRegion", "spin", "SummonStorm", 5f, 4, "tian");
-            config[201012] = new SkillConfig(201012, "火墙", "炎", "攻击召唤出持续伤害的火墙", "术", 1, 0.3f, 8f, 0, "inte", 0, 0, 0, false, "", 99, 0.15f, 0, 0, 0, 0, 0, 0, 5, 8f, 3.2f, 1f, 0, "HitWall", "spin", "SoftFireBigRed", 1.6f, 4, "yan");
-            config[201013] = new SkillConfig(201013, "地震波", "波", "召唤出冲击波攻击前方敌人", "技", 1, 1f, 7f, 0, "str", 0, 0, 50f, false, "", 99, 0.3f, 0, 0, 0, 0, 0, 0, 0, 12f, 1.5f, 0, 40f, "ShockWave", "spin", "NukeMissileFires", 3f, 2, "bo");
-            config[201017] = new SkillConfig(201017, "鬼谋", "鬼", "攻击造成生命值比例伤害", "", 1, 0.25f, 2f, 1f, "inte", 0.25f, 0.01f, 0, false, "", 0, 0.2f, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "DamageReal", "sway", "", 0, 3, "gui");
-            config[201018] = new SkillConfig(201018, "斩", "斩", "直接杀死低生命值单位", "", 1, 0, 7f, 0.3f, "str", 0, 0, 0, false, "", 0, 1f, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "DamageReal", "spin", "SwordHitRedCritical", 0, 3, "zhan");
-            config[201019] = new SkillConfig(201019, "豪杰", "豪", "攻击时回复生命", "", 1, 0.35f, 6f, 0, "str", 0, 0, 0, false, "", 0, 0.5f, 0, 0, 0, 0, 300003, 5f, 0, 0, 0, 0, 0, "AttackedBuff", "", "MagicBuffGreen", 0, 2, "hao");
-            config[201022] = new SkillConfig(201022, "埋伏", "伏", "被攻击时,瞬移到远程攻击者附近", "", 1, 1f, 6f, 0, "leadShip", 0, 0, 30f, false, "", 0, 0, 0, 0, 0, 0, 301001, 1f, 0, 0, 0, 0, 0, "HitTeleport", "saw", "MagicNovaBlue", 0, 1, "fu");
-            config[201025] = new SkillConfig(201025, "火矢", "矢", "攻击时射出火箭", "技", 1, 0.35f, 3f, 0, "str", 0, 0, 0, false, "", 1, 0.2f, 0, 0, 0, 0, 0, 0, 1, 8f, 3.2f, 1f, 0, "HitWall", "throw", "SoftFireBigRed", 1.6f, 2, "shi3");
-            config[201027] = new SkillConfig(201027, "虎卫队", "虎", "攻击时几率对目标进行三连击", "技", 1, 0.15f, 6f, 0, "leadShip", 0.2f, 0.005f, 0, false, "", 0, 1f, 0, 2, 0.3f, 0, 0, 0, 0, 0, 0, 0, 0, "HitRepeat", "jumpspin", "SwordHitRedCritical", 0, 4, "hu");
-            config[201028] = new SkillConfig(201028, "青州兵", "青", "攻击时几率对目标进行2连击", "技", 1, 0.15f, 7f, 0, "leadShip", 0.2f, 0.01f, 0, false, "", 0, 1f, 0, 1, 0.4f, 0, 0, 0, 0, 0, 0, 0, 0, "HitRepeat", "jumpspin", "SwordHitGreenCritical", 0, 3, "qing");
-            config[202001] = new SkillConfig(202001, "刺甲", "刺", "反弹50%近战伤害", "", 1, 0, 0, 0, "str", 0, 0, 20f, false, "", 0, 0.5f, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "Feedback", "", "SwordHitBlue", 0, 2, "ci");
-            config[202002] = new SkillConfig(202002, "藤甲", "藤", "受非智力攻击时高几率发动70%减伤", "", 1, 0.7f, 0.5f, 0, "str", 0, 0, 0, false, "", 0, 0.7f, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "DefPlantSkin", "", "", 0, 3, "teng");
-            config[202003] = new SkillConfig(202003, "明镜", "镜", "反弹50%智力伤害", "", 1, 0, 0, 0, "inte", 0, 0, 20f, true, "", 0, 0.5f, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "Feedback", "", "SwordHitBlue", 0, 2, "jing");
-            config[202004] = new SkillConfig(202004, "护卫", "护", "给与友军护盾祝福", "", 1, 1f, 8f, 0, "str", 0, 0, 50f, false, "", 0, 0.18f, 0, 0, 0, 0, 300001, 10f, 0, 0, 0, 0, 0, "HelpAidBuff", "sway", "MagicChargeYellow", 0, 1, "hu1");
-            config[202005] = new SkillConfig(202005, "坚毅", "坚", "生命值低时降低50%伤害", "", 1, 1f, 0.5f, 0.35f, "str", 0, 0, 0, false, "", 0, 0.5f, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "DefHpLow", "", "", 0, 3, "jian");
-            config[203002] = new SkillConfig(203002, "连锁", "锁", "锁定敌人目标,传递一半受到伤害", "术", 1, 0.5f, 3f, 0, "inte", 0, 0, 25f, false, "targetUnit", 1, 0.5f, 0, 0, 0, 0, 301002, 8f, 0, 0, 0, 0, 0, "HitBuffArea", "throw", "MagicNovaYellow", 0, 4, "suo");
-            config[203003] = new SkillConfig(203003, "劫粮", "劫", "攻击几率获取对方粮食", "", 1, 0.2f, 4f, 0, "leadShip", 0, 0, 0, false, "", 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "HitFood", "sway", "", 0, 2, "jie2");
-            config[203004] = new SkillConfig(203004, "威震", "威", "攻击时晕眩周围目标", "", 1, 0.2f, 5f, 0, "str", 0, 0, 20f, false, "castUnit", 3, 0, 0, 0, 0, 0, 301001, 1.5f, 0, 0, 0, 0, 0, "HitBuffArea", "spin", "MagicNovaYellow", 0, 4, "wei");
-            config[203005] = new SkillConfig(203005, "击破", "破", "使目标增伤40%", "", 1, 0.4f, 2f, 0, "str", 0, 0, 0, false, "", 0, 0.4f, 0, 0, 0, 0, 301003, 3f, 0, 0, 0, 0, 0, "HitBuff", "jump", "SoftFireBigRed", 0, 2, "po");
-            config[203006] = new SkillConfig(203006, "影分队", "影", "产生一个幻影军队", "", 1, 0.35f, 15f, 0, "leadShip", 0, 0, 15f, false, "", 0, 0.4f, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "AttackedShadow", "sway", "MagicFieldGreen", 0, 3, "ying");
-            config[208001] = new SkillConfig(208001, "百出", "百", "降低法术CD时间", "智技up", 1, 0, 0, 0, "inte", 0, 0, 0, false, "", 0, 0.3f, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "ModifySkillRateTime", "", "", 0, 2, "bai");
-            config[208002] = new SkillConfig(208002, "神算", "神", "提升法术命中率和持续时间", "智技up", 1, 0.3f, 0, 0, "inte", 0, 0, 0, false, "", 0, 0.5f, 0, 0, 0, 0, 0, 0.5f, 0, 0, 0, 0, 0, "ModifySkillRateTime", "", "", 0, 3, "shen");
-            config[208003] = new SkillConfig(208003, "蔓延", "延", "法术负面状态概率扩散", "智技up", 1, 0.5f, 4f, 0, "inte", 0.2f, 0.01f, 30f, false, "", 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "ModifyBuffExpand", "", "", 0, 3, "yan2");
-            config[209001] = new SkillConfig(209001, "富甲", "商", "参战获得5金币", "", 1, 0, 0, 0, "inte", 0, 0, 0, false, "", 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "Gold", "", "MagicChargeYellow", 0, 3, "gold");
-            config[209002] = new SkillConfig(209002, "国士", "国", "增加一个远程士兵,提升射程", "", 1, 0, 0, 0, "inte", 0, 0, 15f, false, "", 0, 0, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "SoldierSummon", "", "MagicChargeGreen", 0, 4, "guo");
-            config[209003] = new SkillConfig(209003, "激励", "励", "提升一列队友智力", "", 1, 0, 0, 0, "inte", 0, 0, 0, false, "", 0, 0.7f, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, "HelpTeach", "", "MagicChargeYellow", 0, 2, "li");
-            config[209004] = new SkillConfig(209004, "学习", "学", "攻击时几率提升自己的属性", "", 1, 0.3f, 0, 0, "inte", 0, 0, 0, false, "", 0, 0.05f, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "HitAttr", "", "MagicChargeYellow", 0, 3, "zhang");
-            config[209005] = new SkillConfig(209005, "米道", "米", "参战提升10粮食", "", 1, 0, 0, 0, "inte", 0, 0, 0, false, "", 0, 0, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "Food", "", "MagicChargeYellow", 0, 2, "food");
-            config[209006] = new SkillConfig(209006, "奋进", "奋", "提升一列队友武力", "", 1, 0, 0, 0, "str", 0, 0, 0, false, "", 0, 0.7f, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, "HelpTeach", "", "MagicChargePink", 0, 2, "fen");
+            config[200001] = new SkillConfig(200001, "王", "帅", "给与我方同阵营单位17%生命值护盾", "职业", 1, 0, 0, 0, "", 0, 0, 0, false, "", 0, 0.17f, 0, 0, 0, 0, "", 300001, 999f, 0, 0, 0, 0, 0, "MasterShield", "", "", 0, 4, "shuai");
+            config[200002] = new SkillConfig(200002, "羽扇", "扇", "远程攻击", "职业", 1, 1f, 99f, 0, "inte", 0, 0, 0, false, "", 0, 0, 0, 0, 0, 0, "", 0, 0, 0, 0, 0, 0, 0, "Dumb", "", "", 0, 2, "shan");
+            config[200003] = new SkillConfig(200003, "刀兵", "刀", "攻击几率造成额外伤害", "职业", 1, 0.15f, 5f, 0, "leadShip", 0.1f, 0.01f, 0, false, "", 0, 0, 10, 0, 0, 0, "", 0, 0, 0, 0, 0, 0, 0, "AttackAddDamage", "sway", "SwordHitRedCritical", 0, 1, "dao");
+            config[200004] = new SkillConfig(200004, "坚韧", "士", "受击时几率发动减伤", "职业", 1, 0.4f, 4.5f, 0, "str", 0, 0, 0, false, "", 0, 0.5f, 0, 0, 0, 0, "", 300002, 4f, 0, 0, 0, 0, 0, "AttackedBuff", "spin", "", 0, 2, "shi");
+            config[200005] = new SkillConfig(200005, "突破", "马", "移动时穿越敌人,造成额外伤害", "职业", 1, 1f, 7f, 0, "leadShip", 0, 0, 0, false, "", 0, 0.5f, 0, 0, 0, 0, "", 0, 0, 0, 0, 0, 0, 0, "RunCross", "", "LightningExplosionBlue", 0, 2, "ma");
+            config[200006] = new SkillConfig(200006, "运筹", "相", "提升士兵等级", "职业", 1, 0, 0, 0, "inte", 0, 0, 0, false, "", 0, 0, 1, 0, 0, 0, "", 0, 0, 0, 0, 0, 0, 0, "SoldierUp", "", "MagicChargeYellow", 0, 2, "xiang");
+            config[200007] = new SkillConfig(200007, "弓手", "弓", "远程射击单位", "职业", 1, 1f, 99f, 0, "leadShip", 0, 0, 0, false, "", 0, 0, 0, 0, 0, 0, "", 0, 0, 0, 0, 0, 0, 0, "Dumb", "", "", 0, 2, "gong");
+            config[200008] = new SkillConfig(200008, "谋略", "谋", "一定几率晕眩目标单位2s", "职业", 1, 0.15f, 4f, 0, "inte", 0.2f, 0.01f, 0, false, "", 0, 0, 0, 0, 0, 0, "", 301001, 2f, 0, 0, 0, 0, 0, "HitBuff", "throw", "MagicChargeYellow", 0, 2, "mou");
+            config[200009] = new SkillConfig(200009, "炮车", "炮", "攻击目标发生爆炸", "职业", 1, 0.5f, 0, 0, "leadShip", 0, 0, 20f, false, "", 3, 0.6f, 0, 0, 0, 0, "", 0, 0, 0, 0, 0, 0, 0, "HitArea", "throw", "MagicNovaYellow", 0, 3, "pao");
+            config[200010] = new SkillConfig(200010, "弩手", "弩", "射程非常远", "职业", 1, 1f, 99f, 0, "leadShip", 0, 0, 0, false, "", 0, 0, 0, 0, 0, 0, "", 0, 0, 0, 0, 0, 0, 0, "Dumb", "", "", 0, 3, "nu");
+            config[200011] = new SkillConfig(200011, "冲锋", "车", "移动时穿越敌人,降低目标防御", "职业", 1, 1f, 7f, 0, "leadShip", 0, 0, 0, false, "", 0, 0, 0, 0, 0, 0, "", 301003, 3f, 0, 0, 0, 0, 0, "RunCrossPlus", "", "LightningExplosionRed", 0, 2, "che");
+            config[200012] = new SkillConfig(200012, "声乐", "乐", "给与友军攻速祝福", "职业", 1, 1f, 3f, 0, "inte", 0, 0, 50f, false, "", 0, 0.7f, 0, 0, 0, 0, "", 301005, 5f, 0, 0, 0, 0, 0, "HelpAidBuff", "sway", "MagicChargePink", 0, 2, "song");
+            config[200013] = new SkillConfig(200013, "治疗", "医", "给与友军治疗", "职业", 1, 1f, 3f, 0, "inte", 0, 0, 50f, false, "", 0, 0.5f, 0, 0, 0, 0, "", 0, 0, 0, 0, 0, 0, 0, "HelpHeal", "sway", "MagicBuffGreen", 0, 2, "heal");
+            config[200014] = new SkillConfig(200014, "枪阵", "枪", "一定几率晕眩目标单位2.5s", "职业", 1, 0.15f, 4f, 0, "leadShip", 0.23f, 0.01f, 0, false, "", 0, 0, 0, 0, 0, 0, "", 301001, 2.5f, 0, 0, 0, 0, 0, "HitBuff", "spin", "MagicChargeYellow", 0, 2, "qiang");
+            config[200015] = new SkillConfig(200015, "戟阵", "戟", "攻击目标时伤害周边敌人", "职业", 1, 0.5f, 4f, 0, "leadShip", 0, 0, 25f, false, "", 2, 0.6f, 0, 0, 0, 0, "", 0, 0, 0, 0, 0, 0, 0, "HitAround", "throw", "SwordSlashMiniWhite", 0, 2, "ji");
+            config[200016] = new SkillConfig(200016, "战鼓", "鼓", "给与友军攻击力祝福", "职业", 1, 1f, 3f, 0, "inte", 0, 0, 50f, false, "", 0, 0.35f, 0, 0, 0, 0, "", 301004, 5f, 0, 0, 0, 0, 0, "HelpAidBuff", "sway", "MagicChargeYellow", 0, 2, "gu");
+            config[201004] = new SkillConfig(201004, "穿透", "透", "攻击几率造成1.5倍伤害", "攻击up", 1, 0.2f, 4f, 0, "leadShip", 0, 0, 0, false, "", 0, 0.5f, 0, 0, 0, 0, "", 0, 0, 0, 0, 0, 0, 0, "AttackAddDamage", "jump", "SwordHitRedCritical", 0, 2, "tou");
+            config[201005] = new SkillConfig(201005, "瓦解", "解", "自己和同行队友攻击几率造成额外伤害", "攻击up", 1, 0.2f, 5f, 0, "leadShip", 0, 0, 0, false, "", 0, 1f, 0, 0, 0, 1, "透", 0, 0, 0, 0, 0, 0, 0, "AttackAddDamage", "jumpspin", "SwordHitRedCritical", 0, 4, "jie");
+            config[201006] = new SkillConfig(201006, "连击", "连", "攻击时几率触发连续攻击", "攻击up", 1, 0.3f, 5f, 0, "leadShip", 0, 0, 0, false, "", 0, 0.8f, 0, 0, 0, 0, "", 0, 0, 0, 0, 0, 0, 0, "SpeedAttack", "flipspin", "", 0, 2, "lian");
+            config[201008] = new SkillConfig(201008, "箭雨", "雨", "攻击时30%发出2只箭", "", 1, 0.3f, 4f, 0, "leadShip", 0, 0, 25f, false, "", 1, 0, 0, 0, 0, 0, "", 0, 0, 0, 0, 0, 0, 0, "MultiArrow", "flipspin", "", 0, 3, "duo");
+            config[201010] = new SkillConfig(201010, "旋风斩", "猛", "攻击时几率对附近敌人造成伤害", "技", 1, 0.4f, 5f, 0, "str", 0, 0, 25f, false, "", 99, 0.8f, 0, 0, 0, 0, "", 0, 0, 0, 0, 0, 0, 0, "SpinAttack", "spin", "SwordWhirlwindWhite", 0, 3, "meng");
+            config[201011] = new SkillConfig(201011, "落雷", "天", "攻击召唤出持续伤害的雷电阵", "术", 1, 0.3f, 10f, 0, "inte", 0, 0, 0, false, "", 1, 0.1f, 0, 0, 0, 0, "", 0, 0, 0, 25f, 5.2f, 0.5f, 0, "HitRegion", "spin", "SummonStorm", 5f, 4, "tian");
+            config[201012] = new SkillConfig(201012, "火墙", "炎", "攻击召唤出持续伤害的火墙", "术", 1, 0.3f, 8f, 0, "inte", 0, 0, 0, false, "", 99, 0.15f, 0, 0, 0, 0, "", 0, 0, 5, 8f, 3.2f, 1f, 0, "HitWall", "spin", "SoftFireBigRed", 1.6f, 4, "yan");
+            config[201013] = new SkillConfig(201013, "地震波", "波", "召唤出冲击波攻击前方敌人", "技", 1, 1f, 7f, 0, "str", 0, 0, 50f, false, "", 99, 0.3f, 0, 0, 0, 0, "", 0, 0, 0, 12f, 1.5f, 0, 40f, "ShockWave", "spin", "NukeMissileFires", 3f, 2, "bo");
+            config[201017] = new SkillConfig(201017, "鬼谋", "鬼", "攻击造成生命值比例伤害", "", 1, 0.25f, 2f, 1f, "inte", 0.25f, 0.01f, 0, false, "", 0, 0.2f, 0, 0, 0, 0, "", 0, 0, 0, 0, 0, 0, 0, "DamageReal", "sway", "", 0, 3, "gui");
+            config[201018] = new SkillConfig(201018, "斩", "斩", "直接杀死低生命值单位", "", 1, 0, 7f, 0.3f, "str", 0, 0, 0, false, "", 0, 1f, 0, 0, 0, 0, "", 0, 0, 0, 0, 0, 0, 0, "DamageReal", "spin", "SwordHitRedCritical", 0, 3, "zhan");
+            config[201019] = new SkillConfig(201019, "豪杰", "豪", "攻击时回复生命", "", 1, 0.35f, 6f, 0, "str", 0, 0, 0, false, "", 0, 0.5f, 0, 0, 0, 0, "", 300003, 5f, 0, 0, 0, 0, 0, "AttackedBuff", "", "MagicBuffGreen", 0, 2, "hao");
+            config[201022] = new SkillConfig(201022, "埋伏", "伏", "被攻击时,瞬移到远程攻击者附近", "", 1, 1f, 6f, 0, "leadShip", 0, 0, 30f, false, "", 0, 0, 0, 0, 0, 0, "", 301001, 1f, 0, 0, 0, 0, 0, "HitTeleport", "saw", "MagicNovaBlue", 0, 1, "fu");
+            config[201025] = new SkillConfig(201025, "火矢", "矢", "攻击时射出火箭", "技", 1, 0.35f, 3f, 0, "str", 0, 0, 0, false, "", 1, 0.2f, 0, 0, 0, 0, "", 0, 0, 1, 8f, 3.2f, 1f, 0, "HitWall", "throw", "SoftFireBigRed", 1.6f, 2, "shi3");
+            config[201027] = new SkillConfig(201027, "虎卫队", "虎", "攻击时几率对目标进行三连击", "技", 1, 0.15f, 6f, 0, "leadShip", 0.2f, 0.005f, 0, false, "", 0, 1f, 0, 2, 0.3f, 0, "", 0, 0, 0, 0, 0, 0, 0, "HitRepeat", "jumpspin", "SwordHitRedCritical", 0, 4, "hu");
+            config[201028] = new SkillConfig(201028, "青州兵", "青", "攻击时几率对目标进行2连击", "技", 1, 0.15f, 7f, 0, "leadShip", 0.2f, 0.01f, 0, false, "", 0, 1f, 0, 1, 0.4f, 0, "", 0, 0, 0, 0, 0, 0, 0, "HitRepeat", "jumpspin", "SwordHitGreenCritical", 0, 3, "qing");
+            config[202001] = new SkillConfig(202001, "刺甲", "刺", "反弹50%近战伤害", "防御up", 1, 0, 0, 0, "str", 0, 0, 20f, false, "", 0, 0.5f, 0, 0, 0, 0, "", 0, 0, 0, 0, 0, 0, 0, "Feedback", "", "SwordHitBlue", 0, 2, "ci");
+            config[202002] = new SkillConfig(202002, "藤甲", "藤", "受非智力攻击时高几率发动70%减伤", "", 1, 0.7f, 0.5f, 0, "str", 0, 0, 0, false, "", 0, 0.7f, 0, 0, 0, 0, "", 0, 0, 0, 0, 0, 0, 0, "DefPlantSkin", "", "", 0, 3, "teng");
+            config[202003] = new SkillConfig(202003, "明镜", "镜", "自己和同行队友反弹50%智力伤害", "防御up", 1, 0, 0, 0, "inte", 0, 0, 20f, true, "", 0, 0.5f, 0, 0, 0, 1, "心", 0, 0, 0, 0, 0, 0, 0, "Feedback", "", "SwordHitBlue", 0, 3, "jing");
+            config[202004] = new SkillConfig(202004, "心镜", "心", "反弹30%智力伤害", "防御up", 1, 0, 0, 0, "inte", 0, 0, 20f, true, "", 0, 0.3f, 0, 0, 0, 0, "", 0, 0, 0, 0, 0, 0, 0, "Feedback", "", "SwordHitBlue", 0, 0, "jing");
+            config[202005] = new SkillConfig(202005, "护卫", "护", "给与友军护盾祝福", "", 1, 1f, 8f, 0, "str", 0, 0, 50f, false, "", 0, 0.18f, 0, 0, 0, 0, "", 300001, 10f, 0, 0, 0, 0, 0, "HelpAidBuff", "sway", "MagicChargeYellow", 0, 1, "hu1");
+            config[202006] = new SkillConfig(202006, "坚毅", "坚", "生命值低时降低50%伤害", "", 1, 1f, 0.5f, 0.35f, "str", 0, 0, 0, false, "", 0, 0.5f, 0, 0, 0, 0, "", 0, 0, 0, 0, 0, 0, 0, "DefHpLow", "", "", 0, 3, "jian");
+            config[203002] = new SkillConfig(203002, "连锁", "锁", "锁定敌人目标,传递一半受到伤害", "术", 1, 0.5f, 3f, 0, "inte", 0, 0, 25f, false, "targetUnit", 1, 0.5f, 0, 0, 0, 0, "", 301002, 8f, 0, 0, 0, 0, 0, "HitBuffArea", "throw", "MagicNovaYellow", 0, 4, "suo");
+            config[203003] = new SkillConfig(203003, "劫粮", "劫", "攻击几率获取对方粮食", "", 1, 0.2f, 4f, 0, "leadShip", 0, 0, 0, false, "", 0, 0, 2, 0, 0, 0, "", 0, 0, 0, 0, 0, 0, 0, "HitFood", "sway", "", 0, 2, "jie2");
+            config[203004] = new SkillConfig(203004, "威震", "威", "攻击时晕眩周围目标", "", 1, 0.2f, 5f, 0, "str", 0, 0, 20f, false, "castUnit", 3, 0, 0, 0, 0, 0, "", 301001, 1.5f, 0, 0, 0, 0, 0, "HitBuffArea", "spin", "MagicNovaYellow", 0, 4, "wei");
+            config[203005] = new SkillConfig(203005, "击破", "破", "使目标增伤40%", "", 1, 0.4f, 2f, 0, "str", 0, 0, 0, false, "", 0, 0.4f, 0, 0, 0, 0, "", 301003, 3f, 0, 0, 0, 0, 0, "HitBuff", "jump", "SoftFireBigRed", 0, 2, "po");
+            config[203006] = new SkillConfig(203006, "影分队", "影", "产生一个幻影军队", "", 1, 0.35f, 15f, 0, "leadShip", 0, 0, 15f, false, "", 0, 0.4f, 0, 0, 0, 0, "", 0, 0, 0, 0, 0, 0, 0, "AttackedShadow", "sway", "MagicFieldGreen", 0, 3, "ying");
+            config[208001] = new SkillConfig(208001, "百出", "百", "降低自己和同行队友法术CD时间", "智技up", 1, 0, 0, 0, "inte", 0, 0, 0, false, "", 0, 0.3f, 0, 0, 0, 1, "敏", 0, 0, 0, 0, 0, 0, 0, "ModifySkillRateTime", "", "", 0, 4, "bai");
+            config[208002] = new SkillConfig(208002, "机敏", "敏", "降低法术CD时间", "智技up", 1, 0, 0, 0, "inte", 0, 0, 0, false, "", 0, 0.4f, 0, 0, 0, 0, "", 0, 0, 0, 0, 0, 0, 0, "ModifySkillRateTime", "", "", 0, 0, "bai");
+            config[208003] = new SkillConfig(208003, "神算", "神", "提升法术命中率和持续时间", "智技up", 1, 0.3f, 0, 0, "inte", 0, 0, 0, false, "", 0, 0.5f, 0, 0, 0, 0, "", 0, 0.5f, 0, 0, 0, 0, 0, "ModifySkillRateTime", "", "", 0, 3, "shen");
+            config[208004] = new SkillConfig(208004, "蔓延", "延", "自己和同行队友法术负面状态扩散", "智技up", 1, 0.5f, 4f, 0, "inte", 0.2f, 0.01f, 30f, false, "", 2, 0, 0, 0, 0, 1, "伸", 0, 0, 0, 0, 0, 0, 0, "ModifyBuffExpand", "", "", 0, 4, "yan2");
+            config[208005] = new SkillConfig(208005, "延伸", "伸", "法术负面状态概率扩散", "智技up", 1, 0.3f, 4f, 0, "inte", 0.2f, 0.01f, 30f, false, "", 2, 0, 0, 0, 0, 0, "", 0, 0, 0, 0, 0, 0, 0, "ModifyBuffExpand", "", "", 0, 0, "yan2");
+            config[209001] = new SkillConfig(209001, "富甲", "商", "参战获得5金币", "", 1, 0, 0, 0, "inte", 0, 0, 0, false, "", 0, 0, 5, 0, 0, 0, "", 0, 0, 0, 0, 0, 0, 0, "Gold", "", "MagicChargeYellow", 0, 3, "gold");
+            config[209002] = new SkillConfig(209002, "国士", "国", "增加一个远程士兵,提升射程", "", 1, 0, 0, 0, "inte", 0, 0, 15f, false, "", 0, 0, 10, 0, 0, 0, "", 0, 0, 0, 0, 0, 0, 0, "SoldierSummon", "", "MagicChargeGreen", 0, 4, "guo");
+            config[209003] = new SkillConfig(209003, "激励", "励", "提升一列队友智力", "", 1, 0, 0, 0, "inte", 0, 0, 0, false, "", 0, 0.7f, 0, 0, 0, 2, "", 0, 0, 0, 0, 0, 0, 0, "HelpTeach", "", "MagicChargeYellow", 0, 2, "li");
+            config[209004] = new SkillConfig(209004, "学习", "学", "攻击时几率提升自己的属性", "", 1, 0.3f, 0, 0, "inte", 0, 0, 0, false, "", 0, 0.05f, 0, 0, 0, 0, "", 0, 0, 0, 0, 0, 0, 0, "HitAttr", "", "MagicChargeYellow", 0, 3, "zhang");
+            config[209005] = new SkillConfig(209005, "米道", "米", "参战提升10粮食", "", 1, 0, 0, 0, "inte", 0, 0, 0, false, "", 0, 0, 10, 0, 0, 0, "", 0, 0, 0, 0, 0, 0, 0, "Food", "", "MagicChargeYellow", 0, 2, "food");
+            config[209006] = new SkillConfig(209006, "奋进", "奋", "提升一列队友武力", "", 1, 0, 0, 0, "str", 0, 0, 0, false, "", 0, 0.7f, 0, 0, 0, 2, "", 0, 0, 0, 0, 0, 0, 0, "HelpTeach", "", "MagicChargePink", 0, 2, "fen");
 
         }
 

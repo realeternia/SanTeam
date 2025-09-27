@@ -92,6 +92,14 @@ public static class SkillManager
         foreach (var skill in chess.skills)
         {
             skill.BattleBegin();
+            if (!string.IsNullOrEmpty(skill.skillCfg.HelpSkill) && !skill.isGivenSkill)
+            {
+                var unitsInRange = WorldManager.Instance.GetUnitsMySidePosType(chess.side, chess.pos, true, skill.skillCfg.UnitHelpType);
+                unitsInRange.Remove(chess);
+                var helpSkillId = ConfigManager.GetSkillConfig(skill.skillCfg.HelpSkill).Id;
+                foreach (var unit in unitsInRange)
+                    unit.AddSkill(helpSkillId);
+            }
         }
     }
 

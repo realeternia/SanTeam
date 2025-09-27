@@ -266,7 +266,7 @@ public class WorldManager : MonoBehaviour
             GameManager.Instance.GetPlayer(0).banCount = 1;
             GameManager.Instance.GetPlayer(1).banCount = 2;
             //   SpawnHerosForRegion(GameManager.Instance.GetPlayer(0), mapConfig.RegionHeroSide1[4], new System.Tuple<int, int>(101008, 1), 1);
-            var heroList = new List<int> { 104001 };
+            var heroList = new List<int> { 102010, 105005 };
             for (int i = 0; i < heroList.Count; i++)
                 SpawnHerosForRegion(GameManager.Instance.GetPlayer(0), i, mapConfig.RegionHeroSide1[i], new System.Tuple<int, int>(heroList[i], 1), heroList, 1);
 

@@ -850,5 +850,12 @@ public class Chess : MonoBehaviour
         jumpCoroutine = null;
     }
 
+    public void AddSkill(int skillId)
+    {
+        var skillAdd = SkillManager.CreateSkill(skillId, this);
+        skillAdd.isGivenSkill = true;
+        skills.Add(skillAdd);
+    }
+
 
 }
