@@ -22,6 +22,8 @@ public class SkillSoldierUp : Skill
             unit.AddSoldierLevel(skillCfg.StrengthInt);
             EffectManager.PlaySkillEffect(unit, skillCfg.HitEffect);
         }
-        owner.GetPlayerInfo().castleHUD.AddSoldierLevel(skillCfg.StrengthInt);
+        var castleHUD = owner.GetPlayerInfo().castleHUD;
+        if(castleHUD != null)
+            castleHUD.AddSoldierLevel(skillCfg.StrengthInt);
     }
 }
