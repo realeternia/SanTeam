@@ -93,6 +93,8 @@ public static class PlayerAI
     {
         if(playerInfo.nextSkip)
             return false;
+
+        var year = GameManager.Instance.year;
         
         var playerConfig = playerInfo.playerConfig;
         var cards = playerInfo.cards;
@@ -125,7 +127,7 @@ public static class PlayerAI
             }
         }
 
-        var shopCfg = ShopConfig.GetConfig(playerInfo.GamePlayed() + 1);
+        var shopCfg = ShopConfig.GetConfig(Math.Min(100, year + 1));
         if(shopCfg.Id <= 2 && affordableCards.Count < 6 - shopCfg.Id * 2 + (3 - era) * 4)
             return false;        
 
@@ -155,9 +157,19 @@ public static class PlayerAI
             if (cards.ContainsKey(pickCard.cardId))
             {
                 score *= playerConfig.sameCardRate;
-                score *= (1 + Math.Max(-.5f, 0.3f * (4 - cards[pickCard.cardId]))); // 优先拿低等级卡
-                if(pickCard.isHeroCard && !strongList.Contains(pickCard.cardId)) //非主力卡-权重
-                    score *= 0.7f;
+
+                if (year < 8)
+                {
+                    score *= (1 + Math.Max(0, 0.15f * (4 - cards[pickCard.cardId]))); // 优先拿低等级卡
+                    if (pickCard.isHeroCard && !strongList.Contains(pickCard.cardId)) //非主力卡-权重
+                        score *= 0.7f;
+                }
+                else
+                {
+                    if (pickCard.isHeroCard && !strongList.Contains(pickCard.cardId)) //非主力卡-权重
+                        score *= Math.Max(.5f - (year - 8) * 0.05f + cards[pickCard.cardId] * .1f, 0.1f); //card数多可以救一救
+                }
+
                 hasSameCard = true;
             }
 
@@ -181,10 +193,13 @@ public static class PlayerAI
 
             if (pickCard.isHeroCard)
             {
-                if (!cards.ContainsKey(pickCard.cardId) && heroCardCount >= playerConfig.Cardherolimit)
+                if (!hasSameCard && heroCardCount >= playerConfig.Cardherolimit)
                 {
                     if (pickCard.priceI < weakHeroCardPrice)
                         continue; //没必要换更弱的卡
+                    
+                    if(year > 8 && pickCard.priceI < weakHeroCardPrice + year - 8)
+                        continue; //新卡价格还不如旧卡，没必要换
                 }
                 var heroCfg = HeroConfig.GetConfig(pickCard.cardId);
                 if (playerConfig.Pickside != 0) //单阵营流
@@ -287,7 +302,7 @@ public static class PlayerAI
 
                 if (itemCfg.Effect == "attr" && !hasSameCard)
                 {
-                    if (playerInfo.gold > 60 && playerInfo.GamePlayed() >= 8)
+                    if (playerInfo.gold > 60 && year >= 8)
                         score *= 1.5f;
                     else if (heroCardCount >= 3)
                     {
