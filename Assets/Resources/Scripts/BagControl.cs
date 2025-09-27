@@ -154,11 +154,11 @@ public class BagControl : MonoBehaviour, IPanelEvent
             heroCell.transform.localPosition = new Vector3(100 + 164 * xOff, -131 - 226 * yOff, 0);
 
             BagCell bagCell = heroCell.GetComponent<BagCell>();
-            bagCell.cardId = item.Key;
-            bagCell.level = HeroSelectionTool.GetCardLevel(item.Value);
-            UpdateHeroInfo(bagCell);
-
             bagCell.bagControl = this;
+            bagCell.cardId = item.Key;
+            bagCell.count = item.Value;
+            bagCell.level = HeroSelectionTool.GetCardLevel(item.Value);
+            bagCell.UpdateHeroInfo();
 
             index++;
         }
@@ -173,12 +173,11 @@ public class BagControl : MonoBehaviour, IPanelEvent
             cell.transform.localPosition = new Vector3(95 + 104 * xOff, -71 - 104 * yOff, 0);
             
             BagCell bagCell = cell.GetComponent<BagCell>();
+            bagCell.bagControl = this;            
             bagCell.cardId = itemCell.Key;
+            bagCell.count = itemCell.Value;
             bagCell.level = HeroSelectionTool.GetCardLevel(itemCell.Value);            
-            UpdatItemInfo(bagCell); 
-
-            bagCell.bagControl = this;
-
+            bagCell.UpdateItemInfo(); 
             index++;
         }
         itemDetail.Clear();
@@ -190,12 +189,12 @@ public class BagControl : MonoBehaviour, IPanelEvent
         foreach (Transform child in bagHeroRegion.transform)
         {
             var bagCell = child.GetComponent<BagCell>();
-            UpdateHeroInfo(bagCell);
+            bagCell.UpdateHeroInfo();
         }
         foreach (Transform child in bagItemRegion.transform)
         {
             var bagCell = child.GetComponent<BagCell>();
-            UpdatItemInfo(bagCell);
+            bagCell.UpdateItemInfo();
         }
     }
 
@@ -336,40 +335,6 @@ public class BagControl : MonoBehaviour, IPanelEvent
             }
         }
         connectionLines.Clear();
-    }
-
-    private void UpdatItemInfo(BagCell bagCell)
-    {
-        bagCell.textItemCount.text = bagCell.level.ToString();
-        var itemCfg = ItemConfig.GetConfig(bagCell.cardId);
-        bagCell.itemImage.sprite = Resources.Load<Sprite>("ItemPic/" + itemCfg.Icon);
-
-        if (bindPlayer.itemEquips.ContainsValue(bagCell.cardId))
-        {
-            bagCell.shieldImage.gameObject.SetActive(true);
-        }
-        else
-        {
-            bagCell.shieldImage.gameObject.SetActive(false);
-        }
-
-    }
-
-    private void UpdateHeroInfo(BagCell bagCell)
-    {
-        var heroCfg = HeroConfig.GetConfig(bagCell.cardId);
-        bagCell.textItemCount.text = bagCell.level.ToString();
-        bagCell.textItemName.text = heroCfg.Name;
-        if (bindPlayer.itemEquips.ContainsKey(bagCell.cardId))
-        {
-            bagCell.equipImage.gameObject.SetActive(true);
-            bagCell.equipImage.sprite = Resources.Load<Sprite>("ItemPic/" + ItemConfig.GetConfig(bindPlayer.itemEquips[bagCell.cardId]).Icon);
-        }
-        else
-        {
-            bagCell.equipImage.gameObject.SetActive(false);
-        }
-        bagCell.itemImage.sprite = Resources.Load<Sprite>("SkinsBig/" + heroCfg.Icon);
     }
 
     // 将物品装备到英雄的方法，供拖拽功能使用

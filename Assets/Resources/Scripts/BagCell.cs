@@ -9,6 +9,7 @@ using CommonConfig;
 public class BagCell : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler, IDropHandler
 {
     public int cardId;
+    public int count;
     public int level;
     public TMP_Text textItemCount;
     public TMP_Text textItemName;
@@ -17,7 +18,9 @@ public class BagCell : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragH
     public Image shieldImage;
     public Button cellButton;
     public BagControl bagControl;
-    
+
+    public Image expBar;
+
     private GameObject dragInstance;
     private Transform originalParent;
     private Vector3 originalPosition;
@@ -27,6 +30,45 @@ public class BagCell : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragH
     {
         cellButton.onClick.AddListener(() => bagControl.OnCellClick(this));
     }
+    
+    public void UpdateHeroInfo()
+    {
+        var heroCfg = HeroConfig.GetConfig(cardId);
+        textItemCount.text = level.ToString();
+        textItemName.text = heroCfg.Name;
+        if (bagControl.bindPlayer.itemEquips.ContainsKey(cardId))
+        {
+            equipImage.gameObject.SetActive(true);
+            equipImage.sprite = Resources.Load<Sprite>("ItemPic/" + ItemConfig.GetConfig(bagControl.bindPlayer.itemEquips[cardId]).Icon);
+        }
+        else
+        {
+            equipImage.gameObject.SetActive(false);
+        }
+        itemImage.sprite = Resources.Load<Sprite>("SkinsBig/" + heroCfg.Icon);
+
+        expBar.rectTransform.sizeDelta = new Vector2(140 * HeroSelectionTool.GetExpRate(count), 20);
+    }
+
+
+    public void UpdateItemInfo()
+    {
+        textItemCount.text = level.ToString();
+        var itemCfg = ItemConfig.GetConfig(cardId);
+        itemImage.sprite = Resources.Load<Sprite>("ItemPic/" + itemCfg.Icon);
+
+        if (bagControl.bindPlayer.itemEquips.ContainsValue(cardId))
+        {
+            shieldImage.gameObject.SetActive(true);
+        }
+        else
+        {
+            shieldImage.gameObject.SetActive(false);
+        }
+
+        expBar.rectTransform.sizeDelta = new Vector2(90 * HeroSelectionTool.GetExpRate(count), 15);
+
+    }    
 
 
     public void OnSelect(bool isSelect)
