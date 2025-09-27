@@ -24,7 +24,7 @@ public class SkillHelpTeach : Skill
                 addon = 10;
             var newAttr = Math.Min(ownerAttr, targetAttr + addon);
 
-            unit.UpdateAttr((int)newAttr, 0, 0);
+            unit.AddAttr(skillCfg.Attr, (int)(newAttr - targetAttr));
             EffectManager.PlaySkillEffect(unit, skillCfg.HitEffect);
         }
     }

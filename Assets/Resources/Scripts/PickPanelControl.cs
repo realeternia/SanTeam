@@ -35,6 +35,8 @@ public class PickPanelControl : MonoBehaviour
         refreshBtn.onClick.AddListener(() =>
         {
             GameManager.Instance.PlaySound("Sounds/page");
+            GameManager.Instance.InitHeros(false);
+            GameManager.Instance.InitFriend(false);            
             RefreshBtnClick();
         });
         finBtn.onClick.AddListener(() =>

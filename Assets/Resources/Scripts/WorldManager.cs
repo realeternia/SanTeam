@@ -15,8 +15,6 @@ public class WorldManager : MonoBehaviour
     public GameObject Units;
     public int gridCellSize = 3; // 每个格子的实际大小(米)
 
-    public int battleIndex = 0; //第几场
-
     private Dictionary<int, List<Vector2Int>> occupiedGrids = new Dictionary<int, List<Vector2Int>>(); // 所有被占据的格子，键为chess.id
 
     public bool showDebugCube = false;
@@ -69,7 +67,7 @@ public class WorldManager : MonoBehaviour
 
         var newMapId = 1;
         gameFinish = false;
-        if (battleIndex >= 5)
+        if (GameManager.Instance.year >= 5)
             newMapId = UnityEngine.Random.Range(1, 5);
         if (mapConfig == null || newMapId != mapConfig.Mapid)
         {
@@ -85,7 +83,6 @@ public class WorldManager : MonoBehaviour
             Debug.Log("加载地图耗时：" + (endTime - startTime) + "秒");
         }
 
-        battleIndex++;
         killMark = new int[8];
         deathOrder = new int[8];
         deathCount = 0;
@@ -132,6 +129,7 @@ public class WorldManager : MonoBehaviour
 
     private int[] GetMatch()
     {
+        var battleIndex = GameManager.Instance.year;
         // 两两组合搭配方案
         if (battleIndex % 7 == 0)
             return new int[] { 0, 7, 1, 6, 2, 5, 3, 4 }; 
@@ -717,10 +715,10 @@ public class WorldManager : MonoBehaviour
         if (mapConfig.TeamMode == 1)
         {
             // 阵营1、3、4为一个阵营，阵营2、5、6为另一个阵营
-            bool isTeam1 = a == 1 || a == 3 || a == 5;
-            bool isTeam2 = a == 2 || a == 4 || a == 6;
-            bool targetIsTeam1 = b == 1 || b == 3 || b == 5;
-            bool targetIsTeam2 = b == 2 || b == 4 || b == 6;
+            bool isTeam1 = a == 1 || a == 3 || a == 5 || a == 7;
+            bool isTeam2 = a == 2 || a == 4 || a == 6 || a == 8;
+            bool targetIsTeam1 = b == 1 || b == 3 || b == 5 || b == 7;
+            bool targetIsTeam2 = b == 2 || b == 4 || b == 6 || b == 8;
 
             // 不同阵营之间是敌人
             return (isTeam1 && targetIsTeam2) || (isTeam2 && targetIsTeam1);
@@ -833,7 +831,7 @@ public class WorldManager : MonoBehaviour
         {
             // 检查所有阵营是否还有存活单位
             // 创建一个数组来统计每个阵营是否有存活单位，数组索引对应阵营编号减1
-            bool[] sideHasUnits = new bool[6];
+            bool[] sideHasUnits = new bool[8];
             int aliveSideCount = 0;
 
             foreach (var chessComponent in chessList)
