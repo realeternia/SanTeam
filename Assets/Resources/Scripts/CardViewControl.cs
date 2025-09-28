@@ -45,6 +45,7 @@ public class CardViewControl : MonoBehaviour, IPointerDownHandler, IPointerUpHan
     public GameObject effectGreen;
     public GameObject effectYellow;
     public GameObject effectLayer;
+    public Image imagePlayerHead;
 
     // Start is called before the first frame update
     void Start()
@@ -171,13 +172,13 @@ public class CardViewControl : MonoBehaviour, IPointerDownHandler, IPointerUpHan
             gameObject.GetComponent<Image>().color = HeroSelectionTool.GetSideColor(heroCfg.Side);
             priceI = HeroSelectionTool.GetPrice(heroCfg);
 
-            var playerInfo = GameManager.Instance.GetPlayer(0);
-            if(playerInfo.HasCard(cardId))
+            var player0 = GameManager.Instance.GetPlayer(0);
+            if (player0.HasCard(cardId))
             {
                 effectGreen.SetActive(true);
                 effectYellow.SetActive(false);
             }
-            else if(playerInfo.HasFriend(cardId))
+            else if (player0.HasFriend(cardId))
             {
                 effectGreen.SetActive(false);
                 effectYellow.SetActive(true);
@@ -186,6 +187,23 @@ public class CardViewControl : MonoBehaviour, IPointerDownHandler, IPointerUpHan
             {
                 effectGreen.SetActive(false);
                 effectYellow.SetActive(false);
+            }
+
+            var player1 = GameManager.Instance.GetFirstNoAiPlayer();
+            if (player1 != null && player1.HasCard(cardId))
+            {
+                imagePlayerHead.sprite = Resources.Load<Sprite>(player1.imgPath);
+                imagePlayerHead.gameObject.SetActive(true);
+            }
+            else if (player1 != null && player1.HasFriend(cardId))
+            {
+                imagePlayerHead.sprite = Resources.Load<Sprite>(player1.imgPath);
+                imagePlayerHead.color = Color.yellow;
+                imagePlayerHead.gameObject.SetActive(true);
+            }
+            else
+            {
+                imagePlayerHead.gameObject.SetActive(false);
             }
         }
         else
@@ -199,7 +217,7 @@ public class CardViewControl : MonoBehaviour, IPointerDownHandler, IPointerUpHan
             if (count > 1)
                 cardName.text += "x" + count;
             itemImage.sprite = Resources.Load<Sprite>("ItemPic/" + itemCfg.Icon);
-            if(!string.IsNullOrEmpty(itemCfg.Attr1))
+            if (!string.IsNullOrEmpty(itemCfg.Attr1))
             {
                 itemAttrImage1.sprite = Resources.Load<Sprite>("attr" + itemCfg.Attr1);
                 itemAttrName1.text = itemCfg.Attr1Val.ToString();
@@ -211,7 +229,7 @@ public class CardViewControl : MonoBehaviour, IPointerDownHandler, IPointerUpHan
 
             }
 
-            if(!string.IsNullOrEmpty(itemCfg.Attr2))
+            if (!string.IsNullOrEmpty(itemCfg.Attr2))
             {
                 itemAttrImage2.sprite = Resources.Load<Sprite>("attr" + itemCfg.Attr2);
                 itemAttrName2.text = itemCfg.Attr2Val.ToString();
@@ -234,15 +252,26 @@ public class CardViewControl : MonoBehaviour, IPointerDownHandler, IPointerUpHan
 
             priceI = itemCfg.Price + (int)Math.Floor(itemCfg.PriceRound * shopOpenIndex);
 
-            var playerInfo = GameManager.Instance.GetPlayer(0);
-            if(playerInfo.HasCard(cardId))
+            var player0 = GameManager.Instance.GetPlayer(0);
+            if (player0.HasCard(cardId))
             {
                 effectGreen.SetActive(true);
             }
             else
             {
                 effectGreen.SetActive(false);
-            }            
+            }
+
+            var player1 = GameManager.Instance.GetFirstNoAiPlayer();
+            if (player1 != null && player1.HasCard(cardId))
+            {
+                imagePlayerHead.sprite = Resources.Load<Sprite>(player1.imgPath);
+                imagePlayerHead.gameObject.SetActive(true);
+            }
+            else
+            {
+                imagePlayerHead.gameObject.SetActive(false);
+            }
         }
 
         price.text = priceI.ToString();
@@ -281,6 +310,7 @@ public class CardViewControl : MonoBehaviour, IPointerDownHandler, IPointerUpHan
                 effectGreen.SetActive(false);
             if (effectYellow != null) //道具的情况
                 effectYellow.SetActive(false);
+            imagePlayerHead.gameObject.SetActive(false);
 
             //把heroImage变灰色 - 改为将整个panel变成灰度图
             SetGrayscaleEffect();

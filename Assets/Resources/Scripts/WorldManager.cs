@@ -53,7 +53,7 @@ public class WorldManager : MonoBehaviour
     {      
         // 延迟2秒
         yield return new WaitForSeconds(2f);
-        ConfigManager.Init();             
+        ConfigManager.Init();
         if(isDebug)
         {
             BattleBegin();

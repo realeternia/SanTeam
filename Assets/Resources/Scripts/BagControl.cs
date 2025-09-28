@@ -29,11 +29,11 @@ public class BagControl : MonoBehaviour, IPanelEvent
 
     void Start()
     {
-    //     bindPlayer = GameManager.Instance.GetPlayer(0);
-    //     bindPlayer.cards[100001] = 1;         
-    //     bindPlayer.cards[409004] = 1;         
-    //     bindPlayer.cards[101005] = 1;         
-    //     OnShow();
+        // bindPlayer = GameManager.Instance.GetPlayer(0);
+        // bindPlayer.cards[ 102010 ] = 1;         
+        // bindPlayer.cards[  105005 ] = 1;         
+        // bindPlayer.cards[103003] = 1;         
+        // OnShow();
 
         closeBtn.onClick.AddListener(() =>
         {      
@@ -222,8 +222,6 @@ public class BagControl : MonoBehaviour, IPanelEvent
                 heroUnits[fieldUnit.posId] = fieldUnit;
         }
 
-        var s = ConfigManager.GetHelpSkillId(100001, 1, 4);
-
         // 遍历任意两个节点，检查是否是好友关系
         for (int i = 0; i < heroUnits.Length; i++)
         {
@@ -245,7 +243,7 @@ public class BagControl : MonoBehaviour, IPanelEvent
                     CreateConnectionLine(heroUnits[i].transform, heroUnits[j].transform, Color.white, Vector2.zero);
                 }
 
-                var helpSkillId = ConfigManager.GetHelpSkillId(heroId1, i, j);
+                var helpSkillId = ConfigManager.GetHelpSkillId(heroId1, heroId2, i, j);
                 if(helpSkillId > 0)
                 {
                     var skillCfg = SkillConfig.GetConfig(helpSkillId);
@@ -254,7 +252,7 @@ public class BagControl : MonoBehaviour, IPanelEvent
                     CreateConnectionLine(heroUnits[i].transform, heroUnits[j].transform, color, new Vector2(-25, -25), Resources.Load<Sprite>("SkillPic/" + skillCfg.Icon));
                 }
 
-                helpSkillId = ConfigManager.GetHelpSkillId(heroId2, j, i);
+                helpSkillId = ConfigManager.GetHelpSkillId(heroId2, heroId1, j, i);
                 if(helpSkillId > 0)
                 {
                     var skillCfg = SkillConfig.GetConfig(helpSkillId);

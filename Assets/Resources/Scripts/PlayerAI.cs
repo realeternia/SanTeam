@@ -114,17 +114,14 @@ public static class PlayerAI
             return false;
 
         bool hasSameCard = false;
-        int weakHeroCardId = 0;
-        int weakHeroCardPrice = 0;
+        Tuple<int, int> weakHeroCard = null;
         var heroCardCount = playerInfo.GetHeroCardList().Count;
         if (heroCardCount >= playerConfig.Cardherolimit)
         {
-            var weakCard = FindWeakCard(playerInfo);
-            if (weakCard != null)
-            {
-                weakHeroCardId = weakCard.Item1;
-                weakHeroCardPrice = weakCard.Item2;
-            }
+            weakHeroCard = FindWeakCard(playerInfo);
+            var cardCount = playerInfo.cards[weakHeroCard.Item1];
+            if(cardCount >= 2 && UnityEngine.Random.Range(0, 100) < 40 + cardCount * 20 - year * 10)
+                weakHeroCard = null;
         }
 
         var shopCfg = ShopConfig.GetConfig(Math.Min(100, year + 1));
@@ -195,10 +192,13 @@ public static class PlayerAI
             {
                 if (!hasSameCard && heroCardCount >= playerConfig.Cardherolimit)
                 {
-                    if (pickCard.priceI < weakHeroCardPrice)
+                    if (weakHeroCard == null) //没有可以换的卡
+                        continue;
+
+                    if (pickCard.priceI < weakHeroCard.Item2)
                         continue; //没必要换更弱的卡
-                    
-                    if(year > 8 && pickCard.priceI < weakHeroCardPrice + year - 8)
+
+                    if (year > 8 && pickCard.priceI < weakHeroCard.Item2 + year - 8)
                         continue; //新卡价格还不如旧卡，没必要换
                 }
                 var heroCfg = HeroConfig.GetConfig(pickCard.cardId);
@@ -407,8 +407,8 @@ public static class PlayerAI
         Debug.Log(sb.ToString());                
 
         hasSameCard = cards.ContainsKey(selectedCard.cardId);
-        if (selectedCard.isHeroCard && heroCardCount >= playerConfig.Cardherolimit && !hasSameCard)
-            playerInfo.SellCard(weakHeroCardId); //卖掉最弱的卡
+        if (selectedCard.isHeroCard && heroCardCount >= playerConfig.Cardherolimit && !hasSameCard && weakHeroCard != null)
+            playerInfo.SellCard(weakHeroCard.Item1); //卖掉最弱的卡
 
         var finalBuyCount = 1;
         if (selectedCard.count > 0)
@@ -488,6 +488,9 @@ public static class PlayerAI
 
             if(HeroSelectionTool.GetCardLevel(playerInfo.cards[cardId]) >= 4) //4级以上卡不删了
                 continue;
+
+            if(playerInfo != null && playerInfo.playerConfig.InitCards != null && playerInfo.playerConfig.InitCards.Contains(cardId))
+                continue; //初始卡不删
 
             var price = HeroSelectionTool.GetPrice(heroCfg);
             sortDataList.Add(new Tuple<int, int>(cardId, price));

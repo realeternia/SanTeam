@@ -114,6 +114,14 @@ public class GameManager : MonoBehaviour
         return players[pid];
     }
 
+    public PlayerInfo GetFirstNoAiPlayer()
+    {
+        foreach(var p in players)
+            if(p.pid > 0 && !p.isAI)
+                return p;
+        return null;
+    }
+
     // 静态变量记录上次播放路径和 clip
     string lastPath = "";
     AudioClip lastClip = null;

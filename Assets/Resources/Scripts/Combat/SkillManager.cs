@@ -98,7 +98,7 @@ public static class SkillManager
                 unitsInRange.Remove(chess);
                 var helpSkillId = ConfigManager.GetSkillConfig(skill.skillCfg.HelpSkill).Id;
                 foreach (var unit in unitsInRange)
-                    unit.AddSkill(helpSkillId);
+                    unit.AddSkill(helpSkillId, skill.skillId);
             }
         }
     }

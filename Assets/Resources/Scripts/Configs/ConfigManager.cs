@@ -155,18 +155,22 @@ public static class ConfigManager
         return 0;
     }
     
-    public static int GetHelpSkillId(int heroId, int srcPos, int targetPos)
+    public static int GetHelpSkillId(int heroId, int targetHeroId, int srcPos, int targetPos)
     {
         foreach(var skill in HeroConfig.GetConfig(heroId).Skills)
         {
             var skillCfg = SkillConfig.GetConfig(skill);
-            if(skillCfg.UnitHelpType > 0)
-            {
-                if(skillCfg.UnitHelpType == 1 && srcPos / 3 == targetPos / 3)
-                    return skill;
-                else if(skillCfg.UnitHelpType == 2 && ((srcPos % 3) == (targetPos % 3)))
-                    return skill;
-            }
+            if (skillCfg.UnitHelpType <= 0)
+                continue;
+
+            var targetHeroCfg = HeroConfig.GetConfig(targetHeroId);
+            if (targetHeroCfg.Skills.Contains(skill))
+                continue;
+
+            if (skillCfg.UnitHelpType == 1 && srcPos / 3 == targetPos / 3)
+                return skill;
+            else if (skillCfg.UnitHelpType == 2 && ((srcPos % 3) == (targetPos % 3)))
+                return skill;
         }
 
         return 0;
