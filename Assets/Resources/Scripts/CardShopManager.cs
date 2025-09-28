@@ -162,8 +162,16 @@ public class CardShopManager : MonoBehaviour
 
             var count = 1;
             var heroPrice = HeroSelectionTool.GetPrice(HeroConfig.GetConfig(heroId));
-            if (shopCfg.MultiPriceTotal > 2 * heroPrice && UnityEngine.Random.Range(0, 100) < shopCfg.MultiCardRate) //第3局后有多张卡
-                count = UnityEngine.Random.Range(1, shopCfg.MultiPriceTotal / heroPrice + 1);
+            if (shopCfg.MultiPriceTotal > 2 * heroPrice)
+            {
+                var roll = UnityEngine.Random.Range(0, 100);
+                if (roll < shopCfg.MultiCardRate)
+                {
+                    count = UnityEngine.Random.Range(1, shopCfg.MultiPriceTotal / heroPrice + 1);
+                    if(roll >= 97 && shopCfg.ItemAmazingCount > count)
+                        count = shopCfg.ItemAmazingCount;
+                }
+            }
 
             heroIds.Add(new Tuple<int, int>(heroId, count));
         }

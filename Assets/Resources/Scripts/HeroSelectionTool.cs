@@ -54,10 +54,10 @@ public static class HeroSelectionTool
         foreach (var heroId in heroIds)
         {
             var config = HeroConfig.GetConfig(heroId);
-            if (config != null)
-            {
-                heroPoolCache.Add(new Tuple<int, int>(heroId, GetPrice(config)));
-            }
+            var rate = 1000 / Math.Max(15, GetPrice(config));
+            if (config.Job == "shuai")
+                rate += 15;
+            heroPoolCache.Add(new Tuple<int, int>(heroId, rate));
         }
 
         heroPoolCache.Sort((a, b) =>
@@ -108,7 +108,7 @@ public static class HeroSelectionTool
         foreach (var hero in heroPoolCache)
         {
             // 防止价格为0的情况
-            float weight = hero.Item2 > 0 ? 1f / hero.Item2 : 1f;
+            float weight = hero.Item2 > 0 ? hero.Item2 : 1f;
             totalWeight += weight;
         }
         
@@ -117,7 +117,7 @@ public static class HeroSelectionTool
         
         foreach (var hero in heroPoolCache)
         {
-            float weight = hero.Item2 > 0 ? 1f / hero.Item2 : 1f;
+            float weight = hero.Item2 > 0 ? hero.Item2 : 1f;
             accumulatedWeight += weight;
             
             if (accumulatedWeight >= randomValue)
