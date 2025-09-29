@@ -30,7 +30,9 @@ public class SkillRunCross : Skill
             EffectManager.PlaySkillEffect(owner, skillCfg.HitEffect);
 
             owner.StartCoroutine(JumpToPosition(mirrorPos));
-            defender.OnSkillDamaged(owner, skillId, (int)(damage * skillCfg.Strength));            
+            defender.OnSkillDamaged(owner, skillId, (int)(damage * skillCfg.Strength));
+
+            BuffManager.AddBuff(defender, owner, id, skillCfg.BuffId, skillCfg.BuffTime); //加负面buff                    
         }
     }
 

@@ -4,10 +4,13 @@ public static class BuffManager
 {
     public static void AddBuff(Chess target, Chess caster, int skillId, int buffId, float time)
     {
-        var buffCfg = BuffConfig.GetConfig(buffId);
-        SkillManager.OnAddBuff(target, caster, buffCfg, skillId, ref time);
+        SkillManager.OnAddBuff(target, caster, ref buffId, skillId, ref time);
+
+        if(time == 0) //有的技能会先填0，等待buff
+            return;
 
         Buff buff = null;
+        var buffCfg = BuffConfig.GetConfig(buffId);
         switch (buffCfg.ScriptName)
         {
             case "BuffShield":

@@ -1,4 +1,5 @@
 using System;
+using UnityEngine;
 
 public class BuffShieldValue : Buff
 {
@@ -9,11 +10,15 @@ public class BuffShieldValue : Buff
 
     public override void DuringAttacked(Chess attacker, string damType, ref int damageBase, ref float damageMulti, ref string effect)
     {
-        var valChange = (owner.GetAttr(skillCfg.Attr) - attacker.GetAttr(skillCfg.Attr)) * skillCfg.Strength;
         if (damType == "inte")
-            valChange = valChange * 2 / 3;
-        valChange = Math.Clamp(valChange, 3, 40);
+            return;
 
-        damageBase -= (int)valChange;
+        var strength = skillCfg.Strength;
+        if((float)attacker.GetAttr(skillCfg.Attr) > owner.GetAttr(skillCfg.Attr) * 1.2f)
+            strength *= .75f;
+
+        if(damageBase > 0)
+            damageBase -= (int)(damageBase * strength);
+        WorldManager.Instance.AddBattleText("抵抗", owner.transform.position, new UnityEngine.Vector2(0, 60), Color.green, 3);
     }
 }

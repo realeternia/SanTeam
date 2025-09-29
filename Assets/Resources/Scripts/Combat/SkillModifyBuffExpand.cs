@@ -10,14 +10,16 @@ public class SkillModifyBuffExpand : Skill
     {
     }
 
-    public override void OnAddBuff(Chess target, BuffConfig buffCfg, int checkSkillId, ref float time)
+    public override void OnAddBuff(Chess target, ref int buffId, int checkSkillId, ref float time)
     {
-        UnityEngine.Debug.Log($"SkillModifyBuffExpand OnAddBuff {target.name} {buffCfg.Name} {checkSkillId} {time}");
+        UnityEngine.Debug.Log($"SkillModifyBuffExpand OnAddBuff {target.name} {buffId} {checkSkillId} {time}");
         if(checkSkillId == skillId)
             return; //自己挂的buff，不再连续触发
 
         if(SkillConfig.GetConfig(checkSkillId).Attr != skillCfg.Attr)
             return;
+
+        var buffCfg = BuffConfig.GetConfig(buffId); 
         if(buffCfg.IsPositive)
             return;
         

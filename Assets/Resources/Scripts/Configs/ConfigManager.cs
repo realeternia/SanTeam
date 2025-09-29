@@ -40,6 +40,7 @@ public static class ConfigManager
         foreach (var jobCfg in JobConfig.ConfigList)
         {
             jobDict.Add(jobCfg.Name, jobCfg);
+            jobDict.Add(jobCfg.NameS, jobCfg);
             jobNameConvDict[jobCfg.NameS] = jobCfg.Name;
         }      
         foreach (var skillCfg in SkillConfig.ConfigList)
@@ -157,14 +158,16 @@ public static class ConfigManager
     
     public static int GetHelpSkillId(int heroId, int targetHeroId, int srcPos, int targetPos)
     {
-        foreach(var skill in HeroConfig.GetConfig(heroId).Skills)
+        var heroCfg = HeroConfig.GetConfig(heroId);
+        foreach(var skill in heroCfg.Skills)
         {
             var skillCfg = SkillConfig.GetConfig(skill);
             if (skillCfg.UnitHelpType <= 0)
                 continue;
 
             var targetHeroCfg = HeroConfig.GetConfig(targetHeroId);
-            if (targetHeroCfg.Skills.Contains(skill))
+            var tarJobCfg = ConfigManager.GetJobConfig(targetHeroCfg.Job);
+            if (targetHeroCfg.Skills.Contains(skill) || (skillCfg.HelpSkillJob != "" && !skillCfg.HelpSkillJob.Contains(tarJobCfg.NameS)))
                 continue;
 
             if (skillCfg.UnitHelpType == 1 && srcPos / 3 == targetPos / 3)

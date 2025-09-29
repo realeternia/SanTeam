@@ -120,7 +120,7 @@ public class Skill
         
     }
 
-    public virtual void OnAddBuff(Chess target, BuffConfig buffCfg, int skillId, ref float time)
+    public virtual void OnAddBuff(Chess target, ref int buffId, int skillId, ref float time)
     {
         
     }
@@ -130,7 +130,7 @@ public class Skill
 
     }
 
-    public virtual void OnBeAddBuff(Chess caster, BuffConfig buffCfg, int checkSkillId, ref float time)
+    public virtual void OnBeAddBuff(Chess caster, ref int buffId, int checkSkillId, ref float time)
     {
         
     }

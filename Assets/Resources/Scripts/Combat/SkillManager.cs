@@ -77,6 +77,13 @@ public static class SkillManager
                 return new SkillModifySkillRateTime(skillId, owner);
             case "ModifyBuffExpand":
                 return new SkillModifyBuffExpand(skillId, owner);
+            case "ModifyBuffTime":
+                return new SkillModifyBuffTime(skillId, owner);
+            case "ModifyTieqi":
+                return new SkillModifyTieqi(skillId, owner);
+            case "ModifyShootSpeed":
+                return new SkillModifyShootSpeed(skillId, owner);
+
             case "HitFood":
                 return new SkillHitFood(skillId, owner);
 
@@ -87,19 +94,34 @@ public static class SkillManager
         throw new System.Exception("Skill not found " + skillCfg.ScriptName);
     }
 
-    public static void BattleBegin(Chess chess)
+    public static void CheckAddSkill(Chess chess)
     {
         foreach (var skill in chess.skills)
         {
-            skill.BattleBegin();
             if (!string.IsNullOrEmpty(skill.skillCfg.HelpSkill) && !skill.isGivenSkill)
             {
                 var unitsInRange = WorldManager.Instance.GetUnitsMySidePosType(chess.side, chess.pos, true, skill.skillCfg.UnitHelpType);
                 unitsInRange.Remove(chess);
                 var helpSkillId = ConfigManager.GetSkillConfig(skill.skillCfg.HelpSkill).Id;
                 foreach (var unit in unitsInRange)
+                {
+                    if (!unit.isHero)
+                        continue;
+                    var targetHeroCfg = HeroConfig.GetConfig(unit.heroId);
+                    var tarJobCfg = ConfigManager.GetJobConfig(targetHeroCfg.Job);
+                    if (skill.skillCfg.HelpSkillJob != "" && !skill.skillCfg.HelpSkillJob.Contains(tarJobCfg.NameS))
+                        continue;
                     unit.AddSkill(helpSkillId, skill.skillId);
+                }
             }
+        }
+    }    
+
+    public static void BattleBegin(Chess chess)
+    {
+        foreach (var skill in chess.skills)
+        {
+            skill.BattleBegin();
         }
     }
 
@@ -192,15 +214,15 @@ public static class SkillManager
         return false;
     }
 
-    public static void OnAddBuff(Chess target, Chess caster, BuffConfig buffCfg, int skillId, ref float time)
+    public static void OnAddBuff(Chess target, Chess caster, ref int buffId, int skillId, ref float time)
     {
         foreach (var skill in caster.skills)
         {
-            skill.OnAddBuff(target, buffCfg, skillId, ref time);
+            skill.OnAddBuff(target, ref buffId, skillId, ref time);
         }
         foreach (var skill in target.skills)
         {
-            skill.OnBeAddBuff(caster, buffCfg, skillId, ref time);
+            skill.OnBeAddBuff(caster, ref buffId, skillId, ref time);
         }
     }
 
