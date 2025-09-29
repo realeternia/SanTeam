@@ -30,6 +30,7 @@ public class SkillRunCross : Skill
             EffectManager.PlaySkillEffect(owner, skillCfg.HitEffect);
 
             owner.StartCoroutine(JumpToPosition(mirrorPos));
+            defender.OnSkillDamaged(owner, skillId, (int)(damage * skillCfg.Strength));            
         }
     }
 
@@ -62,6 +63,8 @@ public class SkillRunCross : Skill
             
         owner.MoveTo(targetPos, true);
         owner.noMoveCount --;
+
+        owner.FindTarget(); //重新锁定一次
     }
 
 }

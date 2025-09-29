@@ -242,7 +242,7 @@ public class CardShopManager : MonoBehaviour
         if (itemIds.Count < 9)
         {
             if (itemIds.Count + unsoldItems.Count > 9)
-                unsoldItems.RemoveRange(0, itemIds.Count + itemIds.Count - 9);
+                unsoldItems.RemoveRange(0, itemIds.Count + unsoldItems.Count - 9);
             if (unsoldItems.Count > 0)
                 itemIds.InsertRange(0, unsoldItems);
         }

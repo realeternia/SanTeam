@@ -177,19 +177,19 @@ public class Chess : MonoBehaviour
     }
 
     // 寻找side不等于自己的单位
-    private void FindTarget()
+    public void FindTarget()
     {
         if (attackRange == 0)
             return;
 
         // 获取所有Chess组件
-        Chess[] allChess = FindObjectsOfType<Chess>();
+        var allChess = WorldManager.Instance.GetUnitsInRange(transform.position, 0, side, true);
         List<(Chess chess, float distance)> validTargets = new List<(Chess, float)>();
 
         // 收集所有有效目标及其距离
         foreach (Chess chess in allChess)
         {
-            if (chess != this && !chess.isShadow && WorldManager.Instance.IsEnemy(this.side, chess.side))
+            if (chess != this)
             {
                 float distance = WorldManager.Instance.GetRange(transform.position, chess.transform.position);
                 validTargets.Add((chess, distance));
@@ -208,11 +208,11 @@ public class Chess : MonoBehaviour
 
         // 获取最近单位的距离
         float nearestDistance = validTargets[0].distance;
-
-        // 筛选出距离不超过最近单位10的单位
-        List<(Chess chess, float distance)> filteredTargets = validTargets
-            .Where(t => t.distance <= nearestDistance + 10f)
-            .ToList();
+        List<(Chess chess, float distance)> filteredTargets = null;
+        if(nearestDistance <= attackRange)
+            filteredTargets = validTargets.Where(t => t.distance <= attackRange).ToList(); //如果有射程内的，就继续找一个射程内的
+        else
+            filteredTargets = validTargets.Where(t => t.distance <= nearestDistance + 10f).ToList();
 
         // 如果筛选后不足3个，则取全部
         int takeCount = Mathf.Min(3, filteredTargets.Count);
@@ -236,22 +236,19 @@ public class Chess : MonoBehaviour
     // 计算目标分数
     private float CalculateTargetScore(Chess target, float distance)
     {
-        float score = 10;
-
-        if (!target.isHero)
-            score += 30;
+        float score = target.isHero ? 10 : 30;
 
         // 距离权重（距离越近分数越高）
-        score += 100f / (distance + 1f);  // 避免除以0
+    //    score += 100f / (distance + 1f);  // 避免除以0
 
         // 添加最大属性差作为积分项（权重可根据游戏平衡调整）
         score += calculateDamage(this, target, out var type) / 2;
+        score += (level - target.level) * 7f;
 
         // 生命值权重（生命值越低分数越高）
-        if (target.hp < (int)(target.maxHp * 0.5))
-            score *= 2;
-        else
-            score -= target.level * 5f;
+        var targetHpRate = (float)target.hp / target.maxHp;
+        if (targetHpRate < 0.5f)
+            score += (0.5f - targetHpRate) * 100f + 10;
 
         return score;
     }
