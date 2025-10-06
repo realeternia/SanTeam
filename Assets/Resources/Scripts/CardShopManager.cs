@@ -171,8 +171,13 @@ public class CardShopManager : MonoBehaviour
                 if (roll < shopCfg.MultiCardRate)
                 {
                     count = UnityEngine.Random.Range(1, shopCfg.MultiPriceTotal / heroPrice + 1);
-                    if(roll >= 97 && shopCfg.ItemAmazingCount > count)
+                    if(roll >= 95 && shopCfg.ItemAmazingCount > count)
                         count = shopCfg.ItemAmazingCount;
+                }
+
+                if (count == 1)
+                {
+                    count = Math.Max(1, shopCfg.MultiPriceTotal / 3 / heroPrice);
                 }
             }
 
@@ -272,10 +277,22 @@ public class CardShopManager : MonoBehaviour
             var count = 1;
             var itemCfg = ItemConfig.GetConfig(itemId);
             var cardPrice = itemCfg.Price;
-            if (!itemCfg.SellOne && shopCfg.MultiPriceTotal > 2 * cardPrice && UnityEngine.Random.Range(0, 100) < shopCfg.MultiCardRate) //第3局后有多张卡
+
+            if (!itemCfg.SellOne && shopCfg.MultiPriceTotal > 2 * cardPrice)
             {
-                count = UnityEngine.Random.Range(1, shopCfg.MultiPriceTotal / cardPrice + 1);
-            }
+                var roll = UnityEngine.Random.Range(0, 100);
+                if (roll < shopCfg.MultiCardRate)
+                {
+                    count = UnityEngine.Random.Range(1, shopCfg.MultiPriceTotal / cardPrice + 1);
+                    if(roll >= 95 && shopCfg.ItemAmazingCount > count)
+                        count = shopCfg.ItemAmazingCount;
+                }
+
+                if (count == 1)
+                {
+                    count = Math.Max(1, shopCfg.MultiPriceTotal / 3 / cardPrice);
+                }
+            }            
             CardViewControl cardView = card.GetComponent<CardViewControl>();
 
             cardView.Init(itemId, false, count, year);
