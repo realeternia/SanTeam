@@ -119,9 +119,12 @@ public static class PlayerAI
         if (heroCardCount >= playerConfig.Cardherolimit)
         {
             weakHeroCard = FindWeakCard(playerInfo);
-            var cardCount = playerInfo.cards[weakHeroCard.Item1];
-            if(cardCount >= 2 && UnityEngine.Random.Range(0, 100) < 40 + cardCount * 20 - year * 10)
-                weakHeroCard = null;
+            if (weakHeroCard != null)
+            {
+                var cardCount = playerInfo.cards[weakHeroCard.Item1];
+                if (cardCount >= 2 && UnityEngine.Random.Range(0, 100) < 40 + cardCount * 20 - year * 10)
+                    weakHeroCard = null;
+            }
         }
 
         var shopCfg = ShopConfig.GetConfig(Math.Min(100, year + 1));
@@ -287,7 +290,7 @@ public static class PlayerAI
                     continue;
 
                 var itemCfg = ItemConfig.GetConfig(pickCard.cardId);
-                var itemCount = playerInfo.GetAttrItemList().Count;
+                var itemCount = playerInfo.GetItemList("attr").Count;
                 if (!hasSameCard)
                 {
                     if (itemCount >= playerConfig.Carditemlimit && itemCfg.Effect == "attr")
@@ -324,6 +327,10 @@ public static class PlayerAI
                 {
                     score *= playerConfig.PickFood;
                 }
+                else if (itemCfg.Effect == "tpattr" && year <= 8)
+                {
+                    score *= .5f;
+                }                
             }
 
             // 加入分数列表
@@ -414,7 +421,10 @@ public static class PlayerAI
         if (selectedCard.count > 0)
             finalBuyCount = Math.Clamp(playerInfo.gold * 2 / 3 / selectedCard.priceI, 1, selectedCard.count);
 
-        CardShopManager.Instance.OnPlayerBuyCard(selectedCard, playerInfo, selectedCard.cardId, selectedCard.isHeroCard, selectedCard.priceI * finalBuyCount, finalBuyCount);
+        if (CardShopManager.Instance.OnPlayerBuyCard(selectedCard, playerInfo, selectedCard.cardId, selectedCard.isHeroCard, selectedCard.priceI * finalBuyCount, finalBuyCount))
+        {
+            AfterBuyCard(playerInfo, selectedCard.cardId, finalBuyCount, strongList);
+        }
 
         return true;
     }
@@ -433,7 +443,8 @@ public static class PlayerAI
                 continue;
 
             var price = HeroSelectionTool.GetPrice(HeroConfig.GetConfig(cardId));
-            sortDataList.Add((cardId, price * cards[cardId]));
+            var cardLevel = HeroSelectionTool.GetCardLevel(cards[cardId]);
+            sortDataList.Add((cardId, price * cardLevel));
         }
         // 按总战力降序排序
         sortDataList.Sort((a, b) => b.totalPrice.CompareTo(a.totalPrice));
@@ -521,5 +532,113 @@ public static class PlayerAI
         }
 
         return lastCard;
+    }
+
+    public static void AfterBuyCard(PlayerInfo playerInfo, int cardId, int count, List<int> strongList)
+    {
+        if(ConfigManager.IsHeroCard(cardId))
+            return;
+        
+        var itemCfg = ItemConfig.GetConfig(cardId);
+        if (itemCfg.Effect == "tpattr")
+        {
+            var itemAttr = itemCfg.Attr1;
+            List<Tuple<int, float>> needList = new List<Tuple<int, float>>();
+            float totalNeed = 0;
+            
+            foreach (var heroId in strongList)
+            {
+                var cardLevel = HeroSelectionTool.GetCardLevel(playerInfo.cards[heroId]);
+                var attr = HeroSelectionTool.GetCardAttr(playerInfo, heroId, cardLevel);
+                
+                var heroCfg = HeroConfig.GetConfig(heroId);
+                int pos = heroCfg.Pos;
+                
+                // 获取三个属性值
+                int str = attr.Str;
+                int inte = attr.Inte;
+                int lead = attr.Lead;
+                
+                // 计算总属性
+                int totalAttr = str + inte + lead;
+                
+                // 找出最弱和次弱属性，最强和次强属性
+                List<Tuple<string, int>> attrValues = new List<Tuple<string, int>>();
+                attrValues.Add(new Tuple<string, int>("str", str));
+                attrValues.Add(new Tuple<string, int>("inte", inte));
+                attrValues.Add(new Tuple<string, int>("lead", lead));
+                
+                // 按属性值排序
+                attrValues.Sort((a, b) => a.Item2.CompareTo(b.Item2));
+                
+                // 最弱和次弱属性
+                int weakest = attrValues[0].Item2;
+                int secondWeakest = attrValues[1].Item2;
+                string weakestAttr = attrValues[0].Item1;
+                
+                // 最强和次强属性
+                int strongest = attrValues[2].Item2;
+                int secondStrongest = attrValues[1].Item2;
+                string strongestAttr = attrValues[2].Item1;
+                
+                float needValue = 0;
+                
+                // 如果物品属性是最弱属性
+                if (itemAttr == weakestAttr)
+                {
+                    needValue = Math.Abs(weakest - secondWeakest);
+                }
+                // 如果物品属性是最强属性
+                else if (itemAttr == strongestAttr)
+                {
+                    if (pos == 3)
+                    {
+                        needValue = strongest - secondStrongest;
+                    }
+                    else if (pos == 1)
+                    {
+                        needValue = (strongest - secondStrongest) / 2f;
+                    }
+                }
+                
+                // 需求度乘以总属性/300
+                needValue *= (float)totalAttr / 300f;
+                
+                // 确保需求度不为负数
+                needValue = Math.Max(0.1f, needValue);
+                
+                needList.Add(new Tuple<int, float>(heroId, needValue));
+                totalNeed += needValue;
+            }
+            
+            // 如果所有英雄的需求度都是0，则随机选择一个
+            if (totalNeed <= 0 && needList.Count > 0)
+            {
+                int randomIndex = UnityEngine.Random.Range(0, needList.Count);
+                var targetHeroId = needList[randomIndex].Item1;
+                for (int i = 0; i < count; i++)
+                    playerInfo.UseItemToHero(targetHeroId, cardId);
+            }
+            // 否则进行加权随机选择
+            else if (needList.Count > 0)
+            {
+                float randomValue = UnityEngine.Random.Range(0, totalNeed);
+                float accumulatedNeed = 0;
+                int targetHeroId = 0;
+                
+                foreach (var item in needList)
+                {
+                    accumulatedNeed += item.Item2;
+                    if (accumulatedNeed >= randomValue)
+                    {
+                        targetHeroId = item.Item1;
+                        break;
+                    }
+                }
+                
+                for (int i = 0; i < count; i++)
+                    playerInfo.UseItemToHero(targetHeroId, cardId);
+            }
+        }
     }
 }

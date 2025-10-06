@@ -75,7 +75,6 @@ public class CardShopManager : MonoBehaviour
     private IEnumerator DelayedUpdate()
     { 
         yield return new WaitForSeconds(.7f);
-        GameManager.Instance.OnPlayerTurn(0);
         isShopEnd = false;
         while (!isShopEnd) // 模拟 Update 的循环
         {    
@@ -277,7 +276,7 @@ public class CardShopManager : MonoBehaviour
 
         era++;
         passBtn.gameObject.SetActive(true);
-        mySelect.UpdateCards(GameManager.Instance.GetPlayer(0));
+
         var nowYear = GameManager.Instance.year + 179;
         eraText.text = nowYear + "年\n" + era + "月";
 
@@ -294,8 +293,14 @@ public class CardShopManager : MonoBehaviour
             round = 8 * 100 + nextFirstPicker;
             GameManager.Instance.OnPlayerTurn(nextFirstPicker);
             mySelect.UpdateCards(GameManager.Instance.GetPlayer(nextFirstPicker));
+            nextFirstPicker = -1;
         }
-        nextFirstPicker = -1;
+        else
+        {
+            var playerId = round % GameManager.Instance.players.Length;
+            GameManager.Instance.OnPlayerTurn(playerId);
+            mySelect.UpdateCards(GameManager.Instance.GetPlayer(playerId));
+        }
 
         CheckEraBonusGold();
 

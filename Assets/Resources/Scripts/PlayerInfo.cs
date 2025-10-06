@@ -221,16 +221,15 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         roundOverImg.gameObject.SetActive(isOver);
     }
 
+    public void UseItemToHero(int heroId, int itemId)
+    {
+        UnityEngine.Debug.Log($"UseItemToHero {heroId} {itemId}");
+        AddAttrAddon(heroId, HeroSelectionTool.GetCardAttr(this, itemId, 1));
+        RemoveCard(itemId, 1);
+    }
+
     public void Equip(int heroId, int itemId)
     {
-        var itemCfg = ItemConfig.GetConfig(itemId);
-        if (itemCfg.RemoveWhenUse && itemCfg.Effect == "attr")
-        {
-            AddAttrAddon(heroId, HeroSelectionTool.GetCardAttr(this, itemId, 1));
-            RemoveCard(itemId);
-            return;
-        }
-
         foreach(var item in itemEquips)
         {
             if(item.Value == itemId)
@@ -278,16 +277,21 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
             price = ItemConfig.GetConfig(cardId).Price;
         }
 
-        AddGold((int)(price * cards[cardId] * GetSellRate()));
-
-        GameManager.Instance.PlaySound("Sounds/gold");
-        RemoveCard(cardId);
-
+        var count = cards[cardId];
+        AddGold((int)(price * count * GetSellRate()));
+        RemoveCard(cardId, count);
     }
 
-    private void RemoveCard(int cardId)
+    private void RemoveCard(int cardId, int count)
     {
-        cards.Remove(cardId);
+        if(cards.ContainsKey(cardId))
+        {
+            cards[cardId] -= count;
+            if(cards[cardId] <= 0)
+                cards.Remove(cardId);
+            else
+                return;
+        }
         for (int i = 0; i < battleCards.Length; i++)
         {
             if (battleCards[i] == cardId)
@@ -371,7 +375,6 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
                     maxFood += 5; 
                 return true;
             }
-
         }
         if (cards.TryGetValue(cardId, out int exp))
         {
@@ -383,6 +386,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         }
         GameManager.Instance.PlaySound("Sounds/gold");
         ctr.OnSold(this, count);
+
         return true;
     }
 
@@ -397,7 +401,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         return heroCardList;
     }
 
-    public List<int> GetAttrItemList()
+    public List<int> GetItemList(string effectName)
     {
         List<int> itemCardList = new List<int>();
         foreach (int cardId in cards.Keys)
@@ -405,7 +409,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
             if(ConfigManager.IsHeroCard(cardId))
                 continue;
             var itemCfg = ItemConfig.GetConfig(cardId);
-            if(itemCfg.Effect != "attr")
+            if(itemCfg.Effect != effectName)
                 continue;
             itemCardList.Add(cardId);
         }
@@ -667,9 +671,9 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     private void AutoCheckItem(List<Tuple<int, int>> results)
     {
         itemEquips.Clear();
-        var itemCardList = GetAttrItemList();
+        var attrItemList = GetItemList("attr");
 
-        if(itemCardList.Count == 0)
+        if(attrItemList.Count == 0)
             return;
 
         for(int i = 0; i < results.Count; i++)
@@ -686,7 +690,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
             int maxAttr = heroAttributes.Max();
             var attrDiff = maxAttr - minAttr;
             
-            foreach(var itemId in itemCardList)
+            foreach(var itemId in attrItemList)
             {
                 var itemCfg = ItemConfig.GetConfig(itemId);
                 float score = itemCfg.Attr1Val * HeroSelectionTool.GetCardLevel(cards[itemId]); //乘上等级
@@ -728,8 +732,8 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 
             Equip(results[i].Item1, bestItemId);
 
-            itemCardList.Remove(bestItemId);
-            if(itemCardList.Count == 0)
+            attrItemList.Remove(bestItemId);
+            if(attrItemList.Count == 0)
                 break;
         }
     }

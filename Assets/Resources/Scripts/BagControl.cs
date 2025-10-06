@@ -32,7 +32,9 @@ public class BagControl : MonoBehaviour, IPanelEvent
         // bindPlayer = GameManager.Instance.GetPlayer(0);
         // bindPlayer.cards[ 101003 ] = 1;         
         // bindPlayer.cards[  101011 ] = 1;         
-     //   bindPlayer.cards[103003] = 1;         
+        //   bindPlayer.cards[103003] = 1;      
+
+        infoText.raycastTarget = false;
         OnShow();
 
         closeBtn.onClick.AddListener(() =>
@@ -340,34 +342,41 @@ public class BagControl : MonoBehaviour, IPanelEvent
     {
         if(itemCardId == 0 || heroCardId == 0)
             return;
-            
-        var p1 = GameManager.Instance.GetPlayer(bindPlayer.pid);
-        p1.Equip(heroCardId, itemCardId);
 
+        var p1 = GameManager.Instance.GetPlayer(bindPlayer.pid);
         var itemCfg = ItemConfig.GetConfig(itemCardId);
         if(itemCfg.RemoveWhenUse)
         {
+            p1.UseItemToHero(heroCardId, itemCardId);
+
             itemDetail.gameObject.SetActive(false);
             GameManager.Instance.PlaySound("Sounds/eat");
-            
-            var cell = cellCache.Find(x => x.GetComponent<BagCell>().cardId == itemCardId);
-            if (cell != null)
-            {
-                cellCache.Remove(cell);
-                Destroy(cell);
-            }
+
+            RemoveCell(itemCardId);
         }
         else
         {
+            p1.Equip(heroCardId, itemCardId);
+
             itemDetail.gameObject.SetActive(true);
             itemDetail.UpdateInfo(itemCardId, HeroSelectionTool.GetCardLevel(p1.cards[itemCardId]));
             GameManager.Instance.PlaySound("Sounds/equip");
+
+            UpdateEquips();
         }
 
         heroDetail.gameObject.SetActive(true);
         heroDetail.UpdateInfo(heroCardId, HeroSelectionTool.GetCardLevel(p1.cards[heroCardId]));
-        
-        UpdateEquips();
+    }
+
+    private void RemoveCell(int itemCardId)
+    {
+        var cell = cellCache.Find(x => x.GetComponent<BagCell>().cardId == itemCardId);
+        if (cell != null)
+        {
+            cellCache.Remove(cell);
+            Destroy(cell);
+        }
     }
 
     public void SetHeroForBattle(int heroId, int pos)
@@ -389,16 +398,15 @@ public class BagControl : MonoBehaviour, IPanelEvent
             return;
 
         p1.SellCard(cardId);
-        var cell = cellCache.Find(x => x.GetComponent<BagCell>().cardId == cardId);
-        if(cell != null)
-        {
-            cellCache.Remove(cell);
-            Destroy(cell);
-        }
+        RemoveCell(cardId);
+        
         heroDetail.Clear();
         itemDetail.Clear();
         heroDetail.gameObject.SetActive(false);
         itemDetail.gameObject.SetActive(false);
+
+
+        GameManager.Instance.PlaySound("Sounds/gold");        
         UpdateFieldView();
     }
 
