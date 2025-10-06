@@ -759,7 +759,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
                 continue;
             mark += ItemConfig.GetConfig(item.Value).Price * cards[item.Value];
         }
-        lastFightMark = mark;
+        lastFightMark = mark / 10;
         
     }
 
