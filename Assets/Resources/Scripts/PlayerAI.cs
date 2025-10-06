@@ -443,7 +443,7 @@ public static class PlayerAI
                 continue;
 
             var price = HeroSelectionTool.GetPrice(HeroConfig.GetConfig(cardId));
-            var cardLevel = HeroSelectionTool.GetCardLevel(cards[cardId]);
+            var cardLevel = HeroSelectionTool.GetCardLevel(cards[cardId], true);
             sortDataList.Add((cardId, price * cardLevel));
         }
         // 按总战力降序排序
@@ -497,7 +497,7 @@ public static class PlayerAI
             else
                 rangeCount++;
 
-            if(HeroSelectionTool.GetCardLevel(playerInfo.cards[cardId]) >= 4) //4级以上卡不删了
+            if(HeroSelectionTool.GetCardLevel(playerInfo.cards[cardId], true) >= 4) //4级以上卡不删了
                 continue;
 
             if(playerInfo != null && playerInfo.playerConfig.InitCards != null && playerInfo.playerConfig.InitCards.Contains(cardId))
@@ -520,8 +520,8 @@ public static class PlayerAI
         var lastCardIsCombat = HeroConfig.GetConfig(lastCard.Item1).Pos == 1;
         var last2CardIsCombat = HeroConfig.GetConfig(last2Card.Item1).Pos == 1;
 
-        var lastCardLevel = HeroSelectionTool.GetCardLevel(playerInfo.cards[lastCard.Item1]);
-        var last2CardLevel = HeroSelectionTool.GetCardLevel(playerInfo.cards[last2Card.Item1]);
+        var lastCardLevel = HeroSelectionTool.GetCardLevel(playerInfo.cards[lastCard.Item1], true);
+        var last2CardLevel = HeroSelectionTool.GetCardLevel(playerInfo.cards[last2Card.Item1], true);
 
         if(last2CardLevel == lastCardLevel)
         {
@@ -548,7 +548,7 @@ public static class PlayerAI
             
             foreach (var heroId in strongList)
             {
-                var cardLevel = HeroSelectionTool.GetCardLevel(playerInfo.cards[heroId]);
+                var cardLevel = HeroSelectionTool.GetCardLevel(playerInfo.cards[heroId], true);
                 var attr = HeroSelectionTool.GetCardAttr(playerInfo, heroId, cardLevel);
                 
                 var heroCfg = HeroConfig.GetConfig(heroId);

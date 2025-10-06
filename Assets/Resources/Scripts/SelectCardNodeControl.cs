@@ -50,8 +50,8 @@ public class SelectCardNodeControl : MonoBehaviour
 
     public void UpdateExp(int pid, string name, int exp, string icon)
     {
-        expBar.rectTransform.sizeDelta = new Vector2(194 * HeroSelectionTool.GetExpRate(exp), 70);
-        cardName.text = HeroSelectionTool.GetCardLevel(exp) + name;
+        expBar.rectTransform.sizeDelta = new Vector2(194 * HeroSelectionTool.GetExpRate(exp, true), 70);
+        cardName.text = HeroSelectionTool.GetCardLevel(exp, true) + name;
         if (string.IsNullOrEmpty(icon))
         {
             jobImg.gameObject.SetActive(false);

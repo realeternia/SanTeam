@@ -445,9 +445,9 @@ public class Chess : MonoBehaviour
         if (player.itemEquips.ContainsKey(heroId))
         {
             var equipId = player.itemEquips[heroId];
-            var cardLevel = HeroSelectionTool.GetCardLevel(player.cards[equipId]);
+            var equipCardLevel = HeroSelectionTool.GetCardLevel(player.cards[equipId], false);
 
-            var equipAttr = HeroSelectionTool.GetCardAttr(player, equipId, cardLevel);
+            var equipAttr = HeroSelectionTool.GetCardAttr(player, equipId, equipCardLevel);
 
             inte += equipAttr.Inte;
             str += equipAttr.Str;

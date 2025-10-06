@@ -470,7 +470,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
                 {
                     var heroConfig = HeroConfig.GetConfig(battleCards[i]);
                     var heroPrice = HeroSelectionTool.GetPrice(heroConfig);
-                    saveCardIds.Add(new Tuple<int, int>(battleCards[i], HeroSelectionTool.GetCardLevel(cards[heroConfig.Id])));
+                    saveCardIds.Add(new Tuple<int, int>(battleCards[i], HeroSelectionTool.GetCardLevel(cards[heroConfig.Id], true)));
                 }
             }
 
@@ -510,7 +510,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
             var heroConfig = HeroConfig.GetConfig(cardId);
             var heroPrice = HeroSelectionTool.GetPrice(heroConfig);
 
-            sortDataList.Add(new Tuple<int, int>(cardId, heroPrice * HeroSelectionTool.GetCardLevel(cards[cardId])));
+            sortDataList.Add(new Tuple<int, int>(cardId, heroPrice * HeroSelectionTool.GetCardLevel(cards[cardId], true)));
         }
 
         sortDataList.Sort((a, b) => b.Item2.CompareTo(a.Item2));
@@ -598,7 +598,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 
         List<Tuple<int, int>> results = new List<Tuple<int, int>>();
         for (int i = 0; i < sortDataList.Count; i++)
-            results.Add(new Tuple<int, int>(sortDataList[i].Item1, HeroSelectionTool.GetCardLevel(cards[sortDataList[i].Item1])));
+            results.Add(new Tuple<int, int>(sortDataList[i].Item1, HeroSelectionTool.GetCardLevel(cards[sortDataList[i].Item1], true)));
 
         return results;
 
@@ -693,7 +693,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
             foreach(var itemId in attrItemList)
             {
                 var itemCfg = ItemConfig.GetConfig(itemId);
-                float score = itemCfg.Attr1Val * HeroSelectionTool.GetCardLevel(cards[itemId]); //乘上等级
+                float score = itemCfg.Attr1Val * HeroSelectionTool.GetCardLevel(cards[itemId], false); //乘上等级
 
                 if (!string.IsNullOrEmpty(itemCfg.Attr1))
                 {

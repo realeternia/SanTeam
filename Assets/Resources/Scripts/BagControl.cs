@@ -159,7 +159,7 @@ public class BagControl : MonoBehaviour, IPanelEvent
             bagCell.bagControl = this;
             bagCell.cardId = item.Key;
             bagCell.count = item.Value;
-            bagCell.level = HeroSelectionTool.GetCardLevel(item.Value);
+            bagCell.level = HeroSelectionTool.GetCardLevel(item.Value, true);
             bagCell.UpdateHeroInfo();
 
             index++;
@@ -178,7 +178,7 @@ public class BagControl : MonoBehaviour, IPanelEvent
             bagCell.bagControl = this;            
             bagCell.cardId = itemCell.Key;
             bagCell.count = itemCell.Value;
-            bagCell.level = HeroSelectionTool.GetCardLevel(itemCell.Value);            
+            bagCell.level = HeroSelectionTool.GetCardLevel(itemCell.Value, false);
             bagCell.UpdateItemInfo(); 
             index++;
         }
@@ -359,14 +359,14 @@ public class BagControl : MonoBehaviour, IPanelEvent
             p1.Equip(heroCardId, itemCardId);
 
             itemDetail.gameObject.SetActive(true);
-            itemDetail.UpdateInfo(itemCardId, HeroSelectionTool.GetCardLevel(p1.cards[itemCardId]));
+            itemDetail.UpdateInfo(itemCardId, HeroSelectionTool.GetCardLevel(p1.cards[itemCardId], false));
             GameManager.Instance.PlaySound("Sounds/equip");
 
             UpdateEquips();
         }
 
         heroDetail.gameObject.SetActive(true);
-        heroDetail.UpdateInfo(heroCardId, HeroSelectionTool.GetCardLevel(p1.cards[heroCardId]));
+        heroDetail.UpdateInfo(heroCardId, HeroSelectionTool.GetCardLevel(p1.cards[heroCardId], true));
     }
 
     private void RemoveCell(int itemCardId)

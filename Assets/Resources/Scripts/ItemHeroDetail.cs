@@ -91,7 +91,7 @@ public class ItemHeroDetail : MonoBehaviour
 
                 var equipName = ItemConfig.GetConfig(equipCardId).Name;
                 equipText.text = equipName;
-                var cardLevel = HeroSelectionTool.GetCardLevel(player.cards[equipCardId]);  
+                var cardLevel = HeroSelectionTool.GetCardLevel(player.cards[equipCardId], false);  
                 attrEquip = HeroSelectionTool.GetCardAttr(player, equipCardId, cardLevel);
             } 
             

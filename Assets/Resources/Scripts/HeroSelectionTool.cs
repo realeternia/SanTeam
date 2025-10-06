@@ -157,7 +157,6 @@ public static class HeroSelectionTool
         return itemList[randomIndex].Id;
     }
 
-
     public static int GetPrice(HeroConfig heroCfg)
     {
         var baseP = Mathf.Pow((float)heroCfg.Total, 1.4f) / 125;
@@ -189,25 +188,41 @@ public static class HeroSelectionTool
         return Mathf.RoundToInt(finalP);
     }
 
-    private static int[] cardExp = new int[] { 1, 2, 4, 7, 11, 16, 22, 29, 37, 46, 56, 67, 80, 94, 110, 127, 145, 164, 184, 205, };
-    public static int GetCardLevel(int exp)
+    private static int[] cardHeroExp = new int[] { 1, 2, 4, 7, 11, 16, 22, 29, 37, 46, 56, 66, 76, 86, 96, 106, 116, 126, 136, 146, 156, 166, 176, 186, 196, 206, 216, 226, 236, 246, 256, 266, 276, 999 };
+    private static int[] cardItemExp = new int[] { 1, 2, 4, 6, 9, 12, 15, 19, 23, 27, 31, 36, 41, 46, 51, 56, 62, 68, 74, 80, 86, 92, 98, 104, 110, 116, 122, 128, 136, 142, 148, 154, 160, 166, 172, 178, 184, 190, 196, 202, 999 }; //生成后续数据
+    public static int GetCardLevel(int exp, bool isHero)
     {
-        for(int i = 0; i < cardExp.Length; i++)
+        if(isHero)
         {
-            if(exp < cardExp[i])
-                return i;
+            for(int i = 0; i < cardHeroExp.Length; i++)
+            {
+                if(exp < cardHeroExp[i])
+                    return i;
+            }
+            return cardHeroExp.Length;
         }
-        return cardExp.Length;
+        else
+        {
+            for(int i = 0; i < cardItemExp.Length; i++)
+            {
+                if(exp < cardItemExp[i])
+                    return i;
+            }
+            return cardItemExp.Length;
+        }
     }
 
-    public static float GetExpRate(int exp)
+    public static float GetExpRate(int exp, bool isHero)
     {
-        int level = GetCardLevel(exp);
-        if(level >= cardExp.Length)
+        int level = GetCardLevel(exp, isHero);
+        if(level >= cardHeroExp.Length)
             return 1f;
         if(level <= 1)
             return 0;
-        return (float)(exp - cardExp[level - 1]) / (cardExp[level] - cardExp[level - 1]);
+        if(isHero)
+            return (float)(exp - cardHeroExp[level - 1]) / (cardHeroExp[level] - cardHeroExp[level - 1]);
+        else
+            return (float)(exp - cardItemExp[level - 1]) / (cardItemExp[level] - cardItemExp[level - 1]);
     }
 
     public static AttrInfo GetCardAttr(PlayerInfo player, int cardId, int lv)

@@ -47,7 +47,7 @@ public class BagCell : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragH
         }
         itemImage.sprite = Resources.Load<Sprite>("SkinsBig/" + heroCfg.Icon);
 
-        expBar.rectTransform.sizeDelta = new Vector2(140 * HeroSelectionTool.GetExpRate(count), 20);
+        expBar.rectTransform.sizeDelta = new Vector2(140 * HeroSelectionTool.GetExpRate(count, true), 20);
     }
 
 
@@ -66,7 +66,7 @@ public class BagCell : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragH
             shieldImage.gameObject.SetActive(false);
         }
 
-        expBar.rectTransform.sizeDelta = new Vector2(90 * HeroSelectionTool.GetExpRate(count), 15);
+        expBar.rectTransform.sizeDelta = new Vector2(90 * HeroSelectionTool.GetExpRate(count, false), 15);
 
     }    
 
