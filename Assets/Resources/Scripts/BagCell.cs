@@ -107,7 +107,8 @@ public class BagCell : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragH
         }
         else
         {
-            if(ItemConfig.GetConfig(cardId).Effect != "attr") //无法装备
+            var effect = ItemConfig.GetConfig(cardId).Effect;
+            if(effect != "attr" && effect != "tpattr") //无法装备
                 return;
             dragImage.sprite = itemImage.sprite;
         }

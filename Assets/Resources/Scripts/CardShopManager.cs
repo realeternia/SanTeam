@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using System;
+using System.Linq;
 
 public class CardShopManager : MonoBehaviour
 {
@@ -29,7 +30,8 @@ public class CardShopManager : MonoBehaviour
     public MySelectControl mySelect;
     private bool isShopEnd = false;
 
-    public int nextFirstPicker = -1;
+    public int jadePlayer = -1; //购买和氏璧买家
+    public int firstJumper = -1;
 
     private Coroutine shopCoroutine;
 
@@ -96,6 +98,8 @@ public class CardShopManager : MonoBehaviour
                 
                 if (!result)
                 {
+                    if(System.Linq.Enumerable.All(playerPassed, x => !x))
+                        firstJumper = currentPlayerId;
                     // AI玩家放弃购买
                     playerPassed[currentPlayerId] = true;
                     passedPlayers++;
@@ -138,8 +142,8 @@ public class CardShopManager : MonoBehaviour
         foreach(var player in GameManager.Instance.players)
             player.OnEra(era);
 
-        var shopOpenIndex = GameManager.Instance.year; //第几场比赛
-        var shopCfg = ShopConfig.GetConfig(Math.Min(100, shopOpenIndex + 1));
+        var year = GameManager.Instance.year; //第几场比赛
+        var shopCfg = ShopConfig.GetConfig(Math.Min(100, year + 1));
         List<Tuple<int, int>> heroIds = new List<Tuple<int, int>>();
         int TOTAL_HERO_CARDS = 21;        
         // hero card
@@ -221,7 +225,7 @@ public class CardShopManager : MonoBehaviour
 
             CardViewControl cardView = card.GetComponent<CardViewControl>();
 
-            cardView.Init(heroId, true, heroCount, shopOpenIndex);
+            cardView.Init(heroId, true, heroCount, year);
             cardViews.Add(cardView);            
         }
 
@@ -245,13 +249,17 @@ public class CardShopManager : MonoBehaviour
             if (unsoldItems.Count > 0)
                 itemIds.InsertRange(0, unsoldItems);
         }
+        else if (itemIds.Count > 9)
+        {
+            itemIds.RemoveRange(9, itemIds.Count - 9);
+        }
 
         int ids = 0;
         // item card
         foreach (var itemId in itemIds)
         {
             // 计算位置
-            float x = -500 + ids * (140 + 5);
+            float x = -560 + ids * (140 + 5);
             ids++;
             float y = 0;
 
@@ -270,7 +278,7 @@ public class CardShopManager : MonoBehaviour
             }
             CardViewControl cardView = card.GetComponent<CardViewControl>();
 
-            cardView.Init(itemId, false, count, shopOpenIndex);
+            cardView.Init(itemId, false, count, year);
             cardViews.Add(cardView);
         }
 
@@ -288,22 +296,29 @@ public class CardShopManager : MonoBehaviour
         }
         passedPlayers = 0;
 
-        if (nextFirstPicker >= 0)
+        if (jadePlayer >= 0)
         {
-            round = 8 * 100 + nextFirstPicker;
-            GameManager.Instance.OnPlayerTurn(nextFirstPicker);
-            mySelect.UpdateCards(GameManager.Instance.GetPlayer(nextFirstPicker));
-            nextFirstPicker = -1;
+            round = 8 * 100 + jadePlayer;
         }
         else
         {
-            var playerId = round % GameManager.Instance.players.Length;
-            GameManager.Instance.OnPlayerTurn(playerId);
-            mySelect.UpdateCards(GameManager.Instance.GetPlayer(playerId));
+            if (firstJumper >= 0)
+            {
+                round = 8 * 100 + firstJumper;
+            }
+            else
+            {
+                round = 1000;
+            }
         }
+        jadePlayer = -1;
+        firstJumper = -1;
+
+        var pid = round % GameManager.Instance.players.Length;
+        GameManager.Instance.OnPlayerTurn(pid);
+        mySelect.UpdateCards(GameManager.Instance.GetPlayer(pid));
 
         CheckEraBonusGold();
-
         GameManager.Instance.PlaySound("Sounds/page");
     }
 
@@ -381,6 +396,8 @@ public class CardShopManager : MonoBehaviour
             return;
 
         passBtn.gameObject.SetActive(false);
+        if(System.Linq.Enumerable.All(playerPassed, x => !x))
+            firstJumper = nowPlayer.pid;
         playerPassed[nowPlayer.pid] = true;
         passedPlayers++;
         nowPlayer.SetRoundOver(true);

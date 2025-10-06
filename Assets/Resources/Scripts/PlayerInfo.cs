@@ -365,7 +365,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
                 if (itemCfg.Effect == "first")
                 {
                     nextSkip = true;
-                    CardShopManager.Instance.nextFirstPicker = pid;
+                    CardShopManager.Instance.jadePlayer = pid;
                 }
                 else if (itemCfg.Effect == "sodatk")
                     sodatk += 2;
