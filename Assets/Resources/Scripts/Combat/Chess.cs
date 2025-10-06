@@ -133,10 +133,10 @@ public class Chess : MonoBehaviour
         {
             var soldierCfg = SoldierConfig.GetConfig(soldierId);
             var playerInfo = GameManager.Instance.GetPlayer(playerId);
-            if (playerInfo != null && soldierCfg.IsSoldier)
+            if (playerInfo != null && soldierCfg.SoldierAtkRate > 0)
             {
-                maxHp += playerInfo.sodhp * 5 + playerInfo.GetItemPAttr("shp");
-                attackDamage += playerInfo.sodatk + playerInfo.GetItemPAttr("satk");
+                maxHp += (int)((playerInfo.sodhp + playerInfo.GetItemPAttr("shp")) * soldierCfg.SoldierHpRate);
+                attackDamage += (int)((playerInfo.sodatk + playerInfo.GetItemPAttr("satk")) * soldierCfg.SoldierAtkRate);
             }
         }
         hp = maxHp;
@@ -437,7 +437,7 @@ public class Chess : MonoBehaviour
         maxHp = attr.Hp;
         moveSpeed = heroConfig.MoveSpeed;
         attackRange = heroConfig.Range;
-        attackDamage = heroConfig.Atk * (9 + lv) / 10;
+        attackDamage = attr.Lead / 3;
         inte = attr.Inte;
         str = attr.Str;
         leadShip = attr.Lead;
@@ -510,15 +510,15 @@ public class Chess : MonoBehaviour
             return;
 
         var soldierCfg = SoldierConfig.GetConfig(soldierId);
-        if (!soldierCfg.IsSoldier)
+        if (soldierCfg.SoldierAtkRate <= 0)
             return;
 
         //根据level变化模型scale
         soldierLevel += lv;
         transform.localScale = new Vector3(5 + soldierLevel * 0.75f, 3, 5 + soldierLevel * 0.75f);
 
-        attackDamage += lv * 4;
-        maxHp += lv * 20;
+        attackDamage += (int)(lv * 5 * soldierCfg.SoldierAtkRate);
+        maxHp += (int)(lv * 25 * soldierCfg.SoldierHpRate);
         hp = maxHp;
     }
 

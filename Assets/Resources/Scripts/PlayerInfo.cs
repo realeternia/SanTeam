@@ -368,11 +368,11 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
                     CardShopManager.Instance.jadePlayer = pid;
                 }
                 else if (itemCfg.Effect == "sodatk")
-                    sodatk += 2;
+                    sodatk += itemCfg.Attr1Val;
                 else if (itemCfg.Effect == "sodhp")
-                    sodhp += 2;
+                    sodhp += itemCfg.Attr1Val;
                 else if (itemCfg.Effect == "food")
-                    maxFood += 5; 
+                    maxFood += itemCfg.Attr1Val; 
                 return true;
             }
         }
