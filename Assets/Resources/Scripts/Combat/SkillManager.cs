@@ -31,8 +31,8 @@ public static class SkillManager
                 return new SkillGold(skillId, owner);
             case "Food":
                 return new SkillFood(skillId, owner);
-            case "Feedback":
-                return new SkillFeedback(skillId, owner);
+            case "DefFeedback":
+                return new SkillDefFeedback(skillId, owner);
             case "SpeedAttack":
                 return new SkillSpeedAttack(skillId, owner);
             case "MultiArrow":
@@ -226,19 +226,19 @@ public static class SkillManager
         }
     }
 
-    public static void OnDoSkillDamage(Chess target, Chess caster, SkillConfig skillCfg, ref int damage)
+    public static void OnDoSkillDamage(Chess target, Chess caster, SkillConfig skillCfg, ref int damage, bool isFeedback)
     {
         foreach (var skill in caster.skills)
         {
             if(skillCfg.Id == skill.skillId)
                 continue;
-            skill.OnDoSkillDamage(skillCfg, ref damage);
+            skill.OnDoSkillDamage(target, skillCfg, ref damage, isFeedback);
         }
         foreach (var skill in target.skills)
         {
             if (skillCfg.Id == skill.skillId)
                 continue;
-            skill.OnBeDoSkillDamage(skillCfg, ref damage);
+            skill.OnBeDoSkillDamage(caster, skillCfg, ref damage, isFeedback);
         }
     }
 

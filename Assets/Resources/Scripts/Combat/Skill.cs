@@ -135,12 +135,12 @@ public class Skill
         
     }
 
-    public virtual void OnDoSkillDamage(SkillConfig checkSkillCfg, ref int damage)
+    public virtual void OnDoSkillDamage(Chess target, SkillConfig checkSkillCfg, ref int damage, bool isFeedback)
     {
         
     }
 
-    public virtual void OnBeDoSkillDamage(SkillConfig checkSkillCfg, ref int damage)
+    public virtual void OnBeDoSkillDamage(Chess caster, SkillConfig checkSkillCfg, ref int damage, bool isFeedback)
     {
         
     }

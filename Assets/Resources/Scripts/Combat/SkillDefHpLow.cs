@@ -18,4 +18,15 @@ public class SkillDefHpLow : Skill
         }
     }
 
+    public override void OnBeDoSkillDamage(Chess caster, SkillConfig checkSkillCfg, ref int damage, bool isFeedback)
+    {
+        if(isFeedback)
+            return;
+        if (owner.HpRate < skillCfg.ConditionParm && CheckBurst())
+        {
+            WorldManager.Instance.AddBattleText("抵抗", owner.transform.position, new UnityEngine.Vector2(0, 60), Color.red, 3);
+            damage = (int)(damage * (1 - skillCfg.Strength));
+        }
+    }
+
 }

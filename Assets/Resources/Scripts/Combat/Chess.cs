@@ -575,9 +575,9 @@ public class Chess : MonoBehaviour
         victim.OnHpChanged();
     }
 
-    public void OnSkillDamaged(Chess caster, int skillId, int damage)
+    public void OnSkillDamaged(Chess caster, int skillId, int damage, bool isFeedback = false)
     {
-        SkillManager.OnDoSkillDamage(this, caster, SkillConfig.GetConfig(skillId), ref damage);
+        SkillManager.OnDoSkillDamage(this, caster, SkillConfig.GetConfig(skillId), ref damage, isFeedback);
 
         if(hp <= 0)
             return;

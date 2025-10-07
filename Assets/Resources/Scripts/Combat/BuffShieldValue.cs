@@ -10,15 +10,11 @@ public class BuffShieldValue : Buff
 
     public override void DuringAttacked(Chess attacker, string damType, ref int damageBase, ref float damageMulti, ref string effect)
     {
-        if (damType == "inte")
-            return;
-
         var strength = skillCfg.Strength;
         if((float)attacker.GetAttr(skillCfg.Attr) > owner.GetAttr(skillCfg.Attr) * 1.2f)
             strength *= .75f;
 
-        if(damageBase > 0)
-            damageBase -= (int)(damageBase * strength);
+        damageMulti -= strength;
         WorldManager.Instance.AddBattleText("抵抗", owner.transform.position, new UnityEngine.Vector2(0, 60), Color.green, 3);
     }
 }
