@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using CommonConfig;
@@ -12,7 +13,7 @@ public class SkillHelpAidBuff : Skill
     public override bool CheckAidSkill()
     {
         var unitsInRange = WorldManager.Instance.GetUnitsInRange(owner.transform.position, skillCfg.Range, owner.side, false);
-        unitsInRange = unitsInRange.FindAll(x => x != owner && !x.HasBuff(skillCfg.BuffId));
+        unitsInRange = unitsInRange.FindAll(x => x != owner && x.IsInFight() && !x.HasBuff(skillCfg.BuffId));
 
         if (unitsInRange.Count == 0)
             return false;
@@ -37,6 +38,8 @@ public class SkillHelpAidBuff : Skill
         BuffManager.AddBuff(targetUnit, owner, id, skillCfg.BuffId, skillCfg.BuffTime);
         EffectManager.PlaySkillEffect(targetUnit, skillCfg.HitEffect);
 
-        return false;
+        owner.attackPoint = Math.Max(owner.attackPoint - 1, -0.5f);
+
+        return true;
     }
 }

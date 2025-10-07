@@ -5,10 +5,10 @@ using System.Collections.Generic;
 using CommonConfig;
 using UnityEngine;
 
-public class SkillShockWave : Skill
+public class SkillHelpShockWave : Skill
 {
     private Vector3 targetPos;
-    public SkillShockWave(int id, Chess unit) : base(id, unit)
+    public SkillHelpShockWave(int id, Chess unit) : base(id, unit)
     {
     }
 
@@ -30,6 +30,7 @@ public class SkillShockWave : Skill
      //   var hitEffect = EffectManager.PlayPosSkillEffect(magicStub, owner.transform.position, skillCfg.EffectSize, skillCfg.HitEffect, skillCfg.SummonTime);
      //   owner.StartCoroutine(MoveHitEffectToTarget(hitEffect, skillCfg.SummonTime, skillCfg.SummonSpeed)); // 启动新协程让特效飞向目标
         WorldManager.Instance.CreateSpellMissile(owner, targetPos, skillCfg.SummonTime, skillCfg.SummonSpeed, skillCfg.EffectSize, skillCfg.Id, skillCfg.HitEffect);
+        owner.attackPoint = Math.Max(owner.attackPoint - 2, -1);
 
         return true;
     }

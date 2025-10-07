@@ -52,8 +52,8 @@ public class Chess : MonoBehaviour
 
 
     // 攻击冷却时间
-    private float attackPoint;
-    private float lastActionTime = 0f;
+    public float attackPoint;
+    private float lastAttackTime = 0f;
     private float lastTargetUpdateTime = 0f; // 上次更新目标的时间
 
     public HeroInfo heroInfo;
@@ -258,12 +258,8 @@ public class Chess : MonoBehaviour
         if (hp <= 0)
             return;
 
-        if (lastActionTime < 1)
-            lastActionTime = Time.time;
-
         if (hp > 0)
             MoveAndFight(deltaTime);
-        lastActionTime = Time.time;
 
         if (DieAfterLifeTime)
         {
@@ -318,7 +314,6 @@ public class Chess : MonoBehaviour
         if (WorldManager.Instance.CheckInRange(transform.position, targetChess.transform.position, attackRange))
         {
             attackPoint += deltaTime;
-
             // 检查攻击冷却
             if (attackPoint >= 2f) //集气2s
             {
@@ -332,8 +327,10 @@ public class Chess : MonoBehaviour
                 else
                 {
                     Attack(targetChess); // 普通攻击
+
                 }
             }
+            lastAttackTime = Time.time;
             return;
         }
 
@@ -692,6 +689,11 @@ public class Chess : MonoBehaviour
     public PlayerInfo GetPlayerInfo()
     {
         return GameManager.Instance.GetPlayer(playerId);
+    }
+
+    public bool IsInFight()
+    {
+        return Time.time < lastAttackTime + 0.3f;
     }
 
     public void AddBuff(Buff buff, Chess caster, float time)

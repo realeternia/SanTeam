@@ -1,7 +1,9 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using CommonConfig;
 using UnityEngine;
+
 
 public class SkillHelpHeal : Skill
 {
@@ -12,7 +14,7 @@ public class SkillHelpHeal : Skill
     public override bool CheckAidSkill()
     {
         var unitsInRange = WorldManager.Instance.GetUnitsInRange(owner.transform.position, skillCfg.Range, owner.side, false);
-        unitsInRange = unitsInRange.FindAll(x => x.hp < x.maxHp && x != owner);
+        unitsInRange = unitsInRange.FindAll(x => x.hp < x.maxHp * 4 / 5 && x != owner);
 
         if (unitsInRange.Count == 0)
             return false;
@@ -37,6 +39,8 @@ public class SkillHelpHeal : Skill
         targetUnit.AddHp((int)(owner.inte * skillCfg.Strength));
         EffectManager.PlaySkillEffect(targetUnit, skillCfg.HitEffect);
 
-        return false;
+        owner.attackPoint = Math.Max(owner.attackPoint - 1, -0.5f);
+
+        return true;
     }
 }
