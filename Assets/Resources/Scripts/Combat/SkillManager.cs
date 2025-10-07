@@ -41,6 +41,8 @@ public static class SkillManager
                 return new SkillDefPlantSkin(skillId, owner);
             case "DefHpLow":
                 return new SkillDefHpLow(skillId, owner);
+            case "DefSkillDamageReduce":
+                return new SkillDefSkillDamageReduce(skillId, owner);
             case "HelpTeach":
                 return new SkillHelpTeach(skillId, owner);
             case "SoldierUp":
@@ -79,6 +81,8 @@ public static class SkillManager
                 return new SkillModifyBuffExpand(skillId, owner);
             case "ModifyBuffTime":
                 return new SkillModifyBuffTime(skillId, owner);
+            case "ModifyBeBuffTime":
+                return new SkillModifyBeBuffTime(skillId, owner);
             case "ModifyTieqi":
                 return new SkillModifyTieqi(skillId, owner);
             case "ModifyShootSpeed":

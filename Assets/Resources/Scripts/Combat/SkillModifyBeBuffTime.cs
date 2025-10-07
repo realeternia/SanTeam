@@ -1,0 +1,30 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using CommonConfig;
+using UnityEngine;
+using System.Linq;
+
+public class SkillModifyBeBuffTime : Skill
+{
+    public SkillModifyBeBuffTime(int id, Chess unit) : base(id, unit)
+    {
+    }
+
+    public override void OnBeAddBuff(Chess caster, ref int buffId, int checkSkillId, ref float time)
+    {
+        if (checkSkillId == skillId)
+            return; //自己挂的buff，不再连续触发
+
+        if (skillCfg.CheckAttrs != null && !skillCfg.CheckAttrs.Contains(SkillConfig.GetConfig(checkSkillId).Attr))
+            return;
+
+        var buffCfg = BuffConfig.GetConfig(buffId);
+        if (buffCfg.IsPositive)
+            return;
+
+        time *= (1 - skillCfg.Strength);
+        WorldManager.Instance.AddBattleText(skillCfg.Name, owner.transform.position, new UnityEngine.Vector2(0, 60), new Color(1, 0.9f, 0.1f), 3);
+    }
+
+}

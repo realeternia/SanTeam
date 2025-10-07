@@ -152,6 +152,7 @@ public static class PlayerAI
         foreach (var pickCard in affordableCards)
         {
             float score = 1f;
+            hasSameCard = false;
 
             // 如果已经拥有该卡片，增加分数
             if (cards.ContainsKey(pickCard.cardId))
@@ -171,24 +172,6 @@ public static class PlayerAI
                 }
 
                 hasSameCard = true;
-            }
-
-            if (!hasSameCard)
-            {
-                //获取现在拥有这张卡牌的玩家人数
-                int playersWithThisCard = 0;
-                foreach (var player in GameManager.Instance.players)
-                {
-                    if (player.cards.ContainsKey(pickCard.cardId))
-                        playersWithThisCard++;
-                }
-
-                //根据拥有人数调整分数，人数越多分数越低
-                if (playersWithThisCard > 0)
-                {
-                    float rarityFactor = 1f / (playersWithThisCard + 1);
-                    score *= (float)Math.Pow(playerConfig.OwnTooMuchCardRate, playersWithThisCard);
-                }
             }
 
             if (pickCard.isHeroCard)
@@ -332,6 +315,24 @@ public static class PlayerAI
                     score *= .5f;
                 }                
             }
+
+            if (!hasSameCard)
+            {
+                //获取现在拥有这张卡牌的玩家人数
+                int playersWithThisCard = 0;
+                foreach (var ckPlayer in GameManager.Instance.players)
+                {
+                    if (ckPlayer.cards.ContainsKey(pickCard.cardId))
+                        playersWithThisCard++;
+                }
+
+                //根据拥有人数调整分数，人数越多分数越低
+                if (playersWithThisCard > 0)
+                {
+                    float rarityFactor = 1f / (playersWithThisCard + 1);
+                    score *= (float)Math.Pow(playerConfig.OwnTooMuchCardRate, playersWithThisCard);
+                }
+            }            
 
             // 加入分数列表
             scoredCards.Add((pickCard, score));
