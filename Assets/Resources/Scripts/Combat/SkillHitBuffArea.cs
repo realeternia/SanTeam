@@ -11,8 +11,7 @@ public class SkillHitBuffArea : Skill
 
     public override void OnAttack(Chess defender, string damType, int damage)
     {
-        var rate = GetRate(defender);
-        if (CheckBurst(rate))
+        if (CheckBurst(defender))
         {
             var targetUnit = skillCfg.TargetType == "targetUnit" ? defender : owner;
             EffectManager.PlaySkillEffect(targetUnit, skillCfg.HitEffect);

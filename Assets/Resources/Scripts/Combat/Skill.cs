@@ -58,31 +58,26 @@ public class Skill
         return Time.time < lastUpdateTime + skillCfg.CD;
     }
 
-    public bool CheckBurst(float rateReal = 0)
+    public bool CheckBurst(Chess target)
     {
-        var rate = Math.Max(rateReal, skillCfg.Rate);
-        SkillManager.OnCheckBurst(owner, skillCfg, ref rate);
+        var rate = skillCfg.Rate;
+        if (rate > 0 && rate < 1)
+        {
+            var myAttr = owner.GetAttr(skillCfg.Attr);
+            var defAttr = target.GetAttr(skillCfg.Attr);
+            if(myAttr > defAttr)
+                rate *= Math.Min(2, 1 + (myAttr - defAttr) * .02f);
+            else if(myAttr < defAttr)
+                rate /= Math.Min(2, 1 + (defAttr - myAttr) * .02f);
+            SkillManager.OnCheckBurst(owner, skillCfg, ref rate);
+        }
+
         isBurst = !IsInCD() && (skillCfg.Rate <= 0 || UnityEngine.Random.value < rate);
         UnityEngine.Debug.Log("CheckBurst isBurst=" + isBurst.ToString() + " skillId=" + id.ToString());
         if(isBurst)
             UpdateCD();
         return isBurst;
     }
-
-    protected float GetRate(Chess defender)
-    {
-        var myAttr = owner.GetAttr(skillCfg.Attr);
-        var defAttr = defender.GetAttr(skillCfg.Attr);
-        var rate = (myAttr - defAttr) * skillCfg.RateAttrHP;
-
-        if (rate > 0)
-            rate = skillCfg.RateAttrH + rate;
-        else
-            rate = skillCfg.Rate;
-
-        return rate;
-    }
-
 
     public virtual void BattleBegin()
     {

@@ -27,7 +27,7 @@ namespace CommonConfig
         /// </summary>
         public string ColorEnd;
         /// <summary>
-        ///是否证明
+        ///是否正面
         /// </summary>
         public bool IsPositive;
         /// <summary>
@@ -76,7 +76,7 @@ namespace CommonConfig
             config[300001] = new BuffConfig(300001, "护盾", "BuffShield", "", "", true, "ShieldSoftBlue", "");
             config[300002] = new BuffConfig(300002, "减伤盾", "BuffShieldValue", "#B25900", "#FFD24D", true, "", "");
             config[300003] = new BuffConfig(300003, "吸血", "BuffSuck", "#FF0000", "#993333", true, "", "");
-            config[301001] = new BuffConfig(301001, "晕眩", "BuffNoAction", "", "", false, "StunnedCirclingStarsSimple", "");
+            config[301001] = new BuffConfig(301001, "混乱", "BuffNoAction", "", "", false, "StunnedCirclingStarsSimple", "");
             config[301002] = new BuffConfig(301002, "连锁", "BuffLock", "", "", false, "StunnedLock", "");
             config[301003] = new BuffConfig(301003, "增伤", "BuffDamagedAddRate", "", "", false, "StunnedDamageUp", "");
             config[301004] = new BuffConfig(301004, "伤害提升", "BuffDamageAddRate", "", "", true, "SparkleAreaWhite", "");

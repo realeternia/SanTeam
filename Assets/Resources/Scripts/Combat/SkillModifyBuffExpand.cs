@@ -23,8 +23,7 @@ public class SkillModifyBuffExpand : Skill
         if(buffCfg.IsPositive)
             return;
         
-        var rate = GetRate(target);
-        if (CheckBurst(rate))
+        if (CheckBurst(target))
         {
             var unitsInRange = WorldManager.Instance.GetUnitsInRange(target.transform.position, skillCfg.Range, owner.side, true);
             if (unitsInRange.Count > 0)

@@ -19,7 +19,7 @@ public class SkillHelpHeal : Skill
         if (unitsInRange.Count == 0)
             return false;
 
-        if (!CheckBurst())
+        if (!CheckBurst(null))
             return false;
 
         if(!string.IsNullOrEmpty(skillCfg.Action))

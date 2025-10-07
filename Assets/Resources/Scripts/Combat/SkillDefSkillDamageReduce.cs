@@ -15,7 +15,7 @@ public class SkillDefSkillDamageReduce : Skill
         if (skillCfg.CheckAttrs != null && !skillCfg.CheckAttrs.Contains(checkSkillCfg.Attr))
             return;
 
-        if (CheckBurst())
+        if (CheckBurst(caster))
         {
             damage = (int)(damage * skillCfg.Strength);
         }

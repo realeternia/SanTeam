@@ -20,7 +20,7 @@ public class SkillHelpShockWave : Skill
         if(!WorldManager.Instance.CheckInRange(owner.transform.position, owner.targetChess.transform.position, skillCfg.Range))
             return false;
 
-        if(!CheckBurst())
+        if(!CheckBurst(null))
             return false;
 
         this.targetPos = owner.targetChess.transform.position; // 使用目标位置而不是自身位置

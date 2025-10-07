@@ -36,7 +36,7 @@ public class SkillDefFeedback : Skill
                 return;
         }
 
-        if (CheckBurst())
+        if (CheckBurst(attacker))
         {
             var damageBack = (int)(damage * skillCfg.Strength);
             attacker.OnSkillDamaged(owner, skillId, damageBack, true);

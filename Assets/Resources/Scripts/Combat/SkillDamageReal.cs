@@ -18,8 +18,7 @@ public class SkillDamageReal : Skill
         if(!string.IsNullOrEmpty(skillCfg.HitEffect))
             effect = skillCfg.HitEffect;
 
-        var rate = GetRate(defender);
-        if(CheckBurst(rate))
+        if(CheckBurst(defender))
         {
             damageReal = (int)(defender.maxHp * skillCfg.Strength);
         }

@@ -17,7 +17,7 @@ public class SkillDefPlantSkin : Skill
             WorldManager.Instance.AddBattleText("弱点", owner.transform.position, new UnityEngine.Vector2(0, 60), Color.red, 3);
             damageMulti += skillCfg.Strength;
         }
-        else if (CheckBurst())
+        else if (CheckBurst(attacker))
         {
             WorldManager.Instance.AddBattleText("抵抗", owner.transform.position, new UnityEngine.Vector2(0, 60), Color.green, 3);
             damageMulti -= skillCfg.Strength;
@@ -34,7 +34,7 @@ public class SkillDefPlantSkin : Skill
             WorldManager.Instance.AddBattleText("弱点", owner.transform.position, new UnityEngine.Vector2(0, 60), Color.red, 3);
             damage = (int)(damage * (1 + skillCfg.Strength));
         }
-        else if (CheckBurst())
+        else if (CheckBurst(caster))
         {
             WorldManager.Instance.AddBattleText("抵抗", owner.transform.position, new UnityEngine.Vector2(0, 60), Color.green, 3);
             damage = (int)(damage * (1 - skillCfg.Strength));

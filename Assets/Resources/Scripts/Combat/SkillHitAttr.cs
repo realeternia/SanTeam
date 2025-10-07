@@ -11,7 +11,7 @@ public class SkillHitAttr : Skill
 
     public override void OnAttack(Chess defender, string damType, int damage)
     {
-        if(CheckBurst())
+        if(CheckBurst(defender))
         {
             var roll = Random.Range(0, 3);
             var attr = roll == 0 ? "inte" : (roll == 1 ? "str" : "leadShip");

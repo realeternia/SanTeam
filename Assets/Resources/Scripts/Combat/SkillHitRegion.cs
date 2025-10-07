@@ -13,8 +13,7 @@ public class SkillHitRegion : Skill
 
     public override void OnAttack(Chess defender, string damType, int damage)
     {
-        var rate = GetRate(defender);
-        if (CheckBurst(rate))
+        if (CheckBurst(defender))
         {
             if(!string.IsNullOrEmpty(skillCfg.Action))
                 owner.PlayerAnim(skillCfg.Action);

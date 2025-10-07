@@ -13,7 +13,7 @@ public class SkillAttackedShadow : Skill
 
     public override void OnAttacked(Chess attacker, string damType, int damage)
     {
-        if (count > 0 && CheckBurst(Math.Min(skillCfg.Rate, count * 0.1f)))
+        if (count > 0 && CheckBurst(attacker))
         {
             Vector2 randomDir = UnityEngine.Random.insideUnitCircle.normalized;
             Vector3 randomPosition = owner.transform.position + new Vector3(randomDir.x, 0, randomDir.y) * skillCfg.Range;

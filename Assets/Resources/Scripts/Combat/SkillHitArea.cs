@@ -12,7 +12,7 @@ public class SkillHitArea : Skill
 
     public override void OnAttack(Chess defender, string damType, int damage)
     {
-        if (CheckBurst())
+        if (CheckBurst(defender))
         {        
             if(!string.IsNullOrEmpty(skillCfg.Action))
                 owner.PlayerAnim(skillCfg.Action);

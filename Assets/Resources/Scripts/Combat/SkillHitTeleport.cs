@@ -11,7 +11,7 @@ public class SkillHitTeleport : Skill
 
     public override void OnAttacked(Chess attacker, string damType, int damage)
     {
-        if(!WorldManager.Instance.CheckInRange(owner.transform.position, attacker.transform.position, skillCfg.Range) && CheckBurst())
+        if(!WorldManager.Instance.CheckInRange(owner.transform.position, attacker.transform.position, skillCfg.Range) && CheckBurst(attacker))
         {
             Vector3 direction = (attacker.transform.position - owner.transform.position).normalized;
             Vector3 randomPosition = attacker.transform.position - direction * 12;

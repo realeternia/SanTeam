@@ -12,8 +12,7 @@ public class SkillAttackAddDamage : Skill
 
     public override void DuringAttack(Chess defender, string damType, ref int damageBase, ref float damageMulti, ref int damageReal, ref string effect)
     {
-        var rate = GetRate(defender);
-        if(CheckBurst(rate))
+        if(CheckBurst(defender))
         {
             if(!string.IsNullOrEmpty(skillCfg.Action))
                 owner.PlayerAnim(skillCfg.Action);            

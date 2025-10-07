@@ -12,7 +12,7 @@ public class SkillHitFood : Skill
 
     public override void OnAttack(Chess defender, string damType, int damage)
     {
-        if (CheckBurst())
+        if (CheckBurst(defender))
         {
             var sub = defender.GetPlayerInfo().SubFood(skillCfg.StrengthInt);
             if (sub > 0)

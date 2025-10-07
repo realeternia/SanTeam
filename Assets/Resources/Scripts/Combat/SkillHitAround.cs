@@ -12,7 +12,7 @@ public class SkillHitAround : Skill
 
     public override void DuringAttack(Chess defender, string damType, ref int damageBase, ref float damageMulti,ref int damageReal,  ref string effect)
     {
-        if (CheckBurst())
+        if (CheckBurst(defender))
             effect = "";
     }
 
