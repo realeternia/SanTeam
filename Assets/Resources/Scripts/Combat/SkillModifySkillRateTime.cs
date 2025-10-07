@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using CommonConfig;
 using UnityEngine;
+using System.Linq;
 
 public class SkillModifySkillRateTime : Skill
 {
@@ -14,8 +15,8 @@ public class SkillModifySkillRateTime : Skill
     {
         if(checkSkillCfg.Rate == 0)
             return;
-        if(checkSkillCfg.Attr != skillCfg.Attr)
-            return;
+        if (skillCfg.CheckAttrs != null && !skillCfg.CheckAttrs.Contains(checkSkillCfg.Attr))
+            return;                 
         rate += Math.Min(rate, checkSkillCfg.Rate);
     }
 
@@ -23,8 +24,8 @@ public class SkillModifySkillRateTime : Skill
     {
         if(skillCfg.BuffTime == 0)
             return;
-        if(SkillConfig.GetConfig(checkSkillId).Attr != skillCfg.Attr)
-            return; 
+        if (skillCfg.CheckAttrs != null && !skillCfg.CheckAttrs.Contains(SkillConfig.GetConfig(checkSkillId).Attr))
+            return;              
         var buffCfg = BuffConfig.GetConfig(buffId);
         if(!buffCfg.IsPositive)
             time += Math.Max(1, time / 2) * skillCfg.BuffTime;
@@ -34,8 +35,8 @@ public class SkillModifySkillRateTime : Skill
     {
         if(skillCfg.Strength == 0)
             return;
-        if(checkSkillCfg.Attr != skillCfg.Attr)
-            return;
+        if (skillCfg.CheckAttrs != null && !skillCfg.CheckAttrs.Contains(checkSkillCfg.Attr))
+            return; 
         
         UnityEngine.Debug.Log(owner.id + " OnCheckCD " + cdTime + " skillId " + skillId);
         cdTime = Math.Max(1, cdTime * skillCfg.Strength);

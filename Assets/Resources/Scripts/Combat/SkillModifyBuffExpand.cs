@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using CommonConfig;
 using UnityEngine;
+using System.Linq;
 
 public class SkillModifyBuffExpand : Skill
 {
@@ -16,8 +17,8 @@ public class SkillModifyBuffExpand : Skill
         if(checkSkillId == skillId)
             return; //自己挂的buff，不再连续触发
 
-        if(SkillConfig.GetConfig(checkSkillId).Attr != skillCfg.Attr)
-            return;
+        if (skillCfg.CheckAttrs != null && !skillCfg.CheckAttrs.Contains(SkillConfig.GetConfig(checkSkillId).Attr))
+            return;            
 
         var buffCfg = BuffConfig.GetConfig(buffId); 
         if(buffCfg.IsPositive)
