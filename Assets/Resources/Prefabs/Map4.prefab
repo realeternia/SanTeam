@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 3911017495153753442}
   m_Layer: 0
   m_HasEditorInfo: 1
-  m_Name: R4 3
+  m_Name: R6 3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -674,7 +674,7 @@ GameObject:
   - component: {fileID: 2832199668918995492}
   m_Layer: 0
   m_HasEditorInfo: 1
-  m_Name: HR6 3
+  m_Name: HR4 3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -894,7 +894,7 @@ GameObject:
   - component: {fileID: 1536736022660291518}
   m_Layer: 0
   m_HasEditorInfo: 1
-  m_Name: R6 3
+  m_Name: R4 3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1004,7 +1004,7 @@ GameObject:
   - component: {fileID: 2281061263429334132}
   m_Layer: 0
   m_HasEditorInfo: 1
-  m_Name: HR4 2
+  m_Name: HR6 2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1774,7 +1774,7 @@ GameObject:
   - component: {fileID: 5811470758213987015}
   m_Layer: 0
   m_HasEditorInfo: 1
-  m_Name: HR6 6
+  m_Name: HR4 6
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2088,7 +2088,7 @@ GameObject:
   - component: {fileID: 241709027553068806}
   m_Layer: 0
   m_HasEditorInfo: 1
-  m_Name: HR4 6
+  m_Name: HR6 6
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2568,7 +2568,7 @@ GameObject:
   - component: {fileID: 7200066146296272614}
   m_Layer: 0
   m_HasEditorInfo: 1
-  m_Name: R4 2
+  m_Name: R6 2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3339,7 +3339,7 @@ GameObject:
   - component: {fileID: 5136488494951797822}
   m_Layer: 0
   m_HasEditorInfo: 1
-  m_Name: R4 4
+  m_Name: R6 4
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3779,7 +3779,7 @@ GameObject:
   - component: {fileID: 2440916856138894852}
   m_Layer: 0
   m_HasEditorInfo: 1
-  m_Name: R6 2
+  m_Name: R4 2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4549,7 +4549,7 @@ GameObject:
   - component: {fileID: 4694828781065293930}
   m_Layer: 0
   m_HasEditorInfo: 1
-  m_Name: HR6 1
+  m_Name: HR4 1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4879,7 +4879,7 @@ GameObject:
   - component: {fileID: 2367188241869173273}
   m_Layer: 0
   m_HasEditorInfo: 1
-  m_Name: R6 4
+  m_Name: R4 4
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5374,11 +5374,11 @@ MonoBehaviour:
   - {fileID: 7890718037839006929}
   - {fileID: 1232206913898762091}
   RegionSide4:
-  - {fileID: 6407597775394201454}
-  - {fileID: 2244311239003859312}
-  - {fileID: 22864349710007748}
-  - {fileID: 2935350839615418917}
-  - {fileID: 8641462789456134521}
+  - {fileID: 7240764137845750093}
+  - {fileID: 3309597612319331727}
+  - {fileID: 956188246846788910}
+  - {fileID: 4553505501150827498}
+  - {fileID: 8113887696431183479}
   RegionSide5:
   - {fileID: 3780215177654995802}
   - {fileID: 2664918907357252336}
@@ -5386,11 +5386,11 @@ MonoBehaviour:
   - {fileID: 1672406507107122642}
   - {fileID: 8557830383822472233}
   RegionSide6:
-  - {fileID: 7240764137845750093}
-  - {fileID: 3309597612319331727}
-  - {fileID: 956188246846788910}
-  - {fileID: 4553505501150827498}
-  - {fileID: 8113887696431183479}
+  - {fileID: 6407597775394201454}
+  - {fileID: 2244311239003859312}
+  - {fileID: 22864349710007748}
+  - {fileID: 2935350839615418917}
+  - {fileID: 8641462789456134521}
   RegionSide7:
   - {fileID: 1359837340573044803}
   - {fileID: 3799187474410309782}
@@ -5425,12 +5425,12 @@ MonoBehaviour:
   - {fileID: 4368489950980841922}
   - {fileID: 8222962233211725390}
   RegionHeroSide4:
-  - {fileID: 6114164175776088358}
-  - {fileID: 1099015794824280736}
-  - {fileID: 5938264708472464588}
-  - {fileID: 8937328781386645221}
-  - {fileID: 6301173274609788554}
-  - {fileID: 1618726445790825935}
+  - {fileID: 4321556987843884120}
+  - {fileID: 8208924676088716175}
+  - {fileID: 899833889045308084}
+  - {fileID: 8454791026259520018}
+  - {fileID: 5337210807085028436}
+  - {fileID: 1537388744095652519}
   RegionHeroSide5:
   - {fileID: 4913845595842455564}
   - {fileID: 5193445302414910047}
@@ -5439,12 +5439,12 @@ MonoBehaviour:
   - {fileID: 9113734184366873457}
   - {fileID: 2770290221492720323}
   RegionHeroSide6:
-  - {fileID: 4321556987843884120}
-  - {fileID: 8208924676088716175}
-  - {fileID: 899833889045308084}
-  - {fileID: 8454791026259520018}
-  - {fileID: 5337210807085028436}
-  - {fileID: 1537388744095652519}
+  - {fileID: 6114164175776088358}
+  - {fileID: 1099015794824280736}
+  - {fileID: 5938264708472464588}
+  - {fileID: 8937328781386645221}
+  - {fileID: 6301173274609788554}
+  - {fileID: 1618726445790825935}
   RegionHeroSide7:
   - {fileID: 8256721734047976267}
   - {fileID: 5791416740118812232}
@@ -5697,7 +5697,7 @@ GameObject:
   - component: {fileID: 848730268236894391}
   m_Layer: 0
   m_HasEditorInfo: 1
-  m_Name: HR6 5
+  m_Name: HR4 5
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6280,7 +6280,7 @@ GameObject:
   - component: {fileID: 7825521154788602339}
   m_Layer: 0
   m_HasEditorInfo: 1
-  m_Name: HR4 3
+  m_Name: HR6 3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6390,7 +6390,7 @@ GameObject:
   - component: {fileID: 4111717759521406271}
   m_Layer: 0
   m_HasEditorInfo: 1
-  m_Name: HR4 1
+  m_Name: HR6 1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6500,7 +6500,7 @@ GameObject:
   - component: {fileID: 2084985869806955446}
   m_Layer: 0
   m_HasEditorInfo: 1
-  m_Name: HR4 5
+  m_Name: HR6 5
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6720,7 +6720,7 @@ GameObject:
   - component: {fileID: 1058586782464147576}
   m_Layer: 0
   m_HasEditorInfo: 1
-  m_Name: R4
+  m_Name: R6
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6879,28 +6879,6 @@ Transform:
   - {fileID: 7404458699539534742}
   - {fileID: 209475523394358781}
   - {fileID: 6889840406854375028}
-  - {fileID: 7119090954915982629}
-  - {fileID: 6835858359050679190}
-  - {fileID: 9158685941334995061}
-  - {fileID: 6188872094359452818}
-  - {fileID: 7335911532388079176}
-  - {fileID: 4546261051149587036}
-  - {fileID: 2472340287019502807}
-  - {fileID: 2623580475817511786}
-  - {fileID: 1578282840609681687}
-  - {fileID: 7882360259038782824}
-  - {fileID: 8841818737638802486}
-  - {fileID: 6346715136979457880}
-  - {fileID: 1276979643176710085}
-  - {fileID: 7337172108105808620}
-  - {fileID: 1294140455986740107}
-  - {fileID: 3526840005135255811}
-  - {fileID: 8729207983571872062}
-  - {fileID: 685531700598249146}
-  - {fileID: 3236011886760461476}
-  - {fileID: 8977501502956444333}
-  - {fileID: 1981033857294375009}
-  - {fileID: 7679589577325278251}
   - {fileID: 2455610182062747516}
   - {fileID: 3227933542715853959}
   - {fileID: 3004573143658812486}
@@ -6912,6 +6890,28 @@ Transform:
   - {fileID: 3130099376387445117}
   - {fileID: 7625650409239272035}
   - {fileID: 3014780311207236024}
+  - {fileID: 6346715136979457880}
+  - {fileID: 1276979643176710085}
+  - {fileID: 7337172108105808620}
+  - {fileID: 1294140455986740107}
+  - {fileID: 3526840005135255811}
+  - {fileID: 8729207983571872062}
+  - {fileID: 685531700598249146}
+  - {fileID: 3236011886760461476}
+  - {fileID: 8977501502956444333}
+  - {fileID: 1981033857294375009}
+  - {fileID: 7679589577325278251}
+  - {fileID: 7119090954915982629}
+  - {fileID: 6835858359050679190}
+  - {fileID: 9158685941334995061}
+  - {fileID: 6188872094359452818}
+  - {fileID: 7335911532388079176}
+  - {fileID: 4546261051149587036}
+  - {fileID: 2472340287019502807}
+  - {fileID: 2623580475817511786}
+  - {fileID: 1578282840609681687}
+  - {fileID: 7882360259038782824}
+  - {fileID: 8841818737638802486}
   - {fileID: 789968884490306416}
   - {fileID: 4420698599967776571}
   - {fileID: 7190066266832808965}
@@ -7610,7 +7610,7 @@ GameObject:
   - component: {fileID: 458441774759138097}
   m_Layer: 0
   m_HasEditorInfo: 1
-  m_Name: R6
+  m_Name: R4
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -8490,7 +8490,7 @@ GameObject:
   - component: {fileID: 1259065705133193611}
   m_Layer: 0
   m_HasEditorInfo: 1
-  m_Name: R6 5
+  m_Name: R4 5
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -8600,7 +8600,7 @@ GameObject:
   - component: {fileID: 5635151644017856837}
   m_Layer: 0
   m_HasEditorInfo: 1
-  m_Name: HR6 2
+  m_Name: HR4 2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -8930,7 +8930,7 @@ GameObject:
   - component: {fileID: 6438987190081404048}
   m_Layer: 0
   m_HasEditorInfo: 1
-  m_Name: HR6 4
+  m_Name: HR4 4
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -9370,7 +9370,7 @@ GameObject:
   - component: {fileID: 3178425643838804963}
   m_Layer: 0
   m_HasEditorInfo: 1
-  m_Name: R4 5
+  m_Name: R6 5
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -9700,7 +9700,7 @@ GameObject:
   - component: {fileID: 4396201872711622704}
   m_Layer: 0
   m_HasEditorInfo: 1
-  m_Name: HR4 4
+  m_Name: HR6 4
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

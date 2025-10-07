@@ -78,11 +78,11 @@ namespace CommonConfig
             config[13] = new ShopConfig(13, 115, 45f, 80, 3, 10);
             config[14] = new ShopConfig(14, 120, 48f, 84, 3, 10);
             config[15] = new ShopConfig(15, 125, 51f, 87, 4, 10);
-            config[16] = new ShopConfig(16, 130, 54f, 91, 4, 10);
-            config[17] = new ShopConfig(17, 135, 57f, 94, 4, 10);
-            config[18] = new ShopConfig(18, 140, 60f, 98, 4, 10);
-            config[19] = new ShopConfig(19, 145, 60f, 101, 5, 10);
-            config[20] = new ShopConfig(20, 150, 60f, 105, 5, 50);
+            config[16] = new ShopConfig(16, 130, 54f, 91, 4, 20);
+            config[17] = new ShopConfig(17, 135, 57f, 94, 4, 20);
+            config[18] = new ShopConfig(18, 140, 60f, 98, 4, 20);
+            config[19] = new ShopConfig(19, 145, 60f, 101, 5, 20);
+            config[20] = new ShopConfig(20, 150, 60f, 105, 5, 20);
             config[21] = new ShopConfig(21, 155, 60f, 108, 5, 50);
             config[22] = new ShopConfig(22, 160, 60f, 112, 5, 50);
             config[23] = new ShopConfig(23, 165, 60f, 115, 5, 50);

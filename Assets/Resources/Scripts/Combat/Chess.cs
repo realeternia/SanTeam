@@ -61,6 +61,7 @@ public class Chess : MonoBehaviour
     public List<Skill> skills = new List<Skill>();
 
     public List<Buff> buffs = new List<Buff>();
+    public List<BuffTime> buffTimes = new List<BuffTime>(); //记录最近20s的buff记录
     public int noMoveCount = 0;
     public int noActionCount = 0;
 
@@ -693,6 +694,38 @@ public class Chess : MonoBehaviour
         return GameManager.Instance.GetPlayer(playerId);
     }
 
+    public void AddBuff(Buff buff, Chess caster, float time)
+    {
+        // 计算buffTimes中所有20秒以内且buffId等于当前buff.id的buff的时间和
+        float buffTimeSum = 0;
+        float buffCount = 0;
+        var nowTime = Time.time;
+        buffTimes.RemoveAll(buff => nowTime - buff.time > 30);
+        foreach (var existingBuffTime in buffTimes)
+        {
+            if (existingBuffTime.id == buff.id)
+                buffCount++;
+        }
+        if(buffCount >= 3)
+        {
+            time = Math.Max(.1f, time * (10 - buffCount) * .1f);
+            buff.SetTime(time);
+        }
+
+        // 保留原有的buff刷新逻辑
+        foreach(var item in buffs)
+        {
+            if(item.id == buff.id)
+            {
+                item.Refresh(caster, time);
+                return;
+            }
+        }
+
+        buffs.Add(buff);
+        buff.OnAdd(this, caster);
+        buffTimes.Add(new BuffTime{id = buff.id, time = Time.time});
+    }
 
     public void AddColorEffect(Color start, Color end)
     {

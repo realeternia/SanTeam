@@ -28,6 +28,11 @@ public class Buff
 
     }
 
+    public void SetTime(float time)
+    {
+        endTime = Time.time + time;
+    }
+
     public virtual void OnAdd(Chess chess, Chess caster)
     {
         UnityEngine.Debug.Log("Buff OnAdd " + id + " " + skillCfg.Id + " " + caster + " " + chess);

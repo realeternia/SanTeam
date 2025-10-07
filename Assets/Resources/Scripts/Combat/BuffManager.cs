@@ -46,18 +46,7 @@ public static class BuffManager
             return;
         }
 
-        foreach(var item in target.buffs)
-        {
-            if(item.id == buffId)
-            {
-                item.Refresh(caster, time);
-                return;
-            }
-        }
-
-        target.buffs.Add(buff);
-        buff.OnAdd(target, caster);
-
+        target.AddBuff(buff, caster, time);
     }
 
     public static void RemoveBuff(Chess chess, int buffId)
