@@ -81,7 +81,7 @@ public class HeroInfo : MonoBehaviour
             }
             else if (total >= 350)
             {
-                classImg.color = new Color(1, 0.5f, 1);
+                classImg.color = new Color(1, 0.5f, 0);
             }
             else if (total >= 290)
             {
@@ -111,7 +111,7 @@ public class HeroInfo : MonoBehaviour
         }
         else if (val >= 140)
         {
-            text.color = new Color(1, 0.5f, 1);
+            text.color = new Color(1, 0.5f, 0);
         }
         else if (val >= 110)
         {

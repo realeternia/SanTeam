@@ -595,6 +595,9 @@ public class Chess : MonoBehaviour
         victim.hp -= damage;
         if(victim != this)
             victim.lastDamagedPlayerId = playerId;
+        // 记录战斗统计
+        if(isHero)
+            BattleStatManager.AddBattleStat(playerId, heroId, damage, true, victim.isHero);
 
         SkillManager.OnAttack(this, victim, damType, damage);
         
@@ -623,6 +626,10 @@ public class Chess : MonoBehaviour
         hp -= damage;
         if(caster != this)
             lastDamagedPlayerId = caster.playerId;
+
+        // 记录战斗统计
+        if(caster.isHero)
+            BattleStatManager.AddBattleStat(caster.playerId, caster.heroId, damage, false, isHero);            
 
         OnHpChanged();
     }

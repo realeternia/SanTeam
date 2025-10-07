@@ -32,8 +32,10 @@ public class WorldManager : MonoBehaviour
     public HeroInfoGroup heroInfoGroup;
     public Button buttonRestart;
     public TMP_Text textRestart;
+    public Button buttonInfo;
     public GameObject BattleResultPanel;
     public GameObject BattleResultCellPrefab; // 用于显示玩家战斗结果的单元格预制体
+    public GameObject BattleResultHeroCellPrefab; // 用于显示玩家战斗结果的单元格预制体
     private List<GameObject> battleResultCells = new List<GameObject>(); // 维护创建的结果单元格列表
 
     public GameObject HudNode;
@@ -45,6 +47,7 @@ public class WorldManager : MonoBehaviour
         Instance = this;
 
         buttonRestart.onClick.AddListener(BattleEnd);
+        buttonInfo.onClick.AddListener(ShowBattleResult);
 
         StartCoroutine(DebugBattleBeginCheck());
     }
@@ -86,6 +89,7 @@ public class WorldManager : MonoBehaviour
         killMark = new int[8];
         deathOrder = new int[8];
         deathCount = 0;
+        BattleStatManager.Clear();
 
         // 通知所有玩家开始战斗
         foreach (var player in GameManager.Instance.players)
@@ -127,6 +131,33 @@ public class WorldManager : MonoBehaviour
 
         PanelManager.Instance.ShowShop();
         CardShopManager.Instance.ShopBegin();
+    }
+
+    public void ShowBattleResult()
+    {
+        var top10 = BattleStatManager.GetTop10();
+        buttonInfo.gameObject.SetActive(false);
+        // 获取RectTransform组件并设置宽度
+        RectTransform battleResultRect = BattleResultPanel.GetComponent<RectTransform>();
+        if (battleResultRect != null)
+        {
+            battleResultRect.sizeDelta = new Vector2(battleResultRect.sizeDelta.x + 800, battleResultRect.sizeDelta.y);
+        }
+        for (int i = 0; i < top10.Count; i++)
+        {
+            var battleStat = top10[i];
+            var cell = Instantiate(BattleResultHeroCellPrefab, BattleResultPanel.transform);
+            cell.GetComponent<BattleResultHeroCellControl>().SetData(battleStat, i + 1);
+
+            // 设置位置，每个单元格垂直偏移50
+            RectTransform rectTransform = cell.GetComponent<RectTransform>();
+            if (rectTransform != null)
+            {
+                rectTransform.anchoredPosition = new Vector2(302 + 700, -120 - i * 50); // 起始位置向下100，每个单元格间距50
+            }
+
+            battleResultCells.Add(cell);
+        }
     }
 
     private int[] GetMatch()
@@ -456,15 +487,7 @@ public class WorldManager : MonoBehaviour
                         var player = GameManager.Instance.GetPlayer(playerId);
                         if (player != null)
                         {
-                            // 设置玩家信息
-                            cellControl.playerName.text = player.playerNameText.text;
-
-                            cellControl.playerRank.text = (i + 1).ToString(); // 假设按match顺序排列
-                            cellControl.playerMark.text = $"<color=white>{player.mark}</color> (<color=green>+{killMark[playerId]}</color>)";
-
-
-                            cellControl.playerIcon.sprite = player.playerImage.sprite;
-
+                            cellControl.SetData(player, i + 1, killMark[playerId]);
                         }
                     }
 
