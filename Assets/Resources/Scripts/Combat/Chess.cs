@@ -125,9 +125,8 @@ public class Chess : MonoBehaviour
         }
 
         if (!hasSKill)
-        {
             material.SetFloat("_SecondTexSize", 0.1f);
-        }
+        rend.material = material; // 这会为这个渲染器创建一个独立的材质实例
 
         if (!isHero)
         {
@@ -140,10 +139,10 @@ public class Chess : MonoBehaviour
             }
         }
         hp = maxHp;
-
-        rend.material = material; // 这会为这个渲染器创建一个独立的材质实例
         if (heroInfo != null) // 英雄
             heroInfo.SetHpRate(hp, maxHp);
+        
+        attackPoint = UnityEngine.Random.Range(0f, 1f); // 随机获得初始气力
     }
 
     // 创建血条HUD
@@ -320,7 +319,7 @@ public class Chess : MonoBehaviour
             attackPoint += deltaTime;
 
             // 检查攻击冷却
-            if (attackPoint >= (attackRange > 20 ? 2 : 2f)) //集气2s
+            if (attackPoint >= 2f) //集气2s
             {
             //    PlayerAnim("jumpspin");
                 attackPoint = 0;
