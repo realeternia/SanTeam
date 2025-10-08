@@ -720,6 +720,12 @@ public class Chess : MonoBehaviour
         OnHpChanged();
     }
 
+    public void HealTarget(Chess target, int checkSkillId, int addon)
+    {
+        SkillManager.OnHealTarget(this, target, checkSkillId, ref addon);
+        target.AddHp(addon);
+    }
+
     public void Cooldown(float time)
     {
         attackPoint += time;

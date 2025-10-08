@@ -20,8 +20,11 @@ public class SkillModifyBeBuffTime : Skill
             return;
 
         var buffCfg = BuffConfig.GetConfig(buffId);
-        if (buffCfg.IsPositive)
+        if (buffCfg.IsPositive == skillCfg.NegBuff)
             return;
+
+        if (skillCfg.BuffId > 0 && buffId != skillCfg.BuffId) //为强化id
+            return;            
 
         time *= (1 - skillCfg.Strength);
         WorldManager.Instance.AddBattleText(skillCfg.Name, owner.transform.position, new UnityEngine.Vector2(0, 60), new Color(1, 0.9f, 0.1f), 3);

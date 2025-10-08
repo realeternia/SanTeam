@@ -36,7 +36,7 @@ public class SkillHelpHeal : Skill
         });
 
         var targetUnit = unitsInRange[0];
-        targetUnit.AddHp((int)(owner.inte * skillCfg.Strength));
+        owner.HealTarget(targetUnit, skillId, (int)(owner.inte * skillCfg.Strength));
         EffectManager.PlaySkillEffect(targetUnit, skillCfg.HitEffect);
 
         owner.attackPoint = Math.Max(owner.attackPoint - 1, -0.5f);

@@ -65,10 +65,14 @@ public class Skill
         {
             var myAttr = owner.GetAttr(skillCfg.Attr);
             var defAttr = target.GetAttr(skillCfg.Attr);
-            if(myAttr > defAttr)
-                rate *= Math.Min(2, 1 + (myAttr - defAttr) * .02f);
-            else if(myAttr < defAttr)
-                rate /= Math.Min(2, 1 + (defAttr - myAttr) * .02f);
+            if (owner.side != target.side)
+            {
+                if (myAttr > defAttr)
+                    rate *= Math.Min(2, 1 + (myAttr - defAttr) * .02f);
+                else if (myAttr < defAttr)
+                    rate /= Math.Min(2, 1 + (defAttr - myAttr) * .02f);
+            }
+
             SkillManager.OnCheckBurst(owner, skillCfg, ref rate);
         }
 
@@ -136,6 +140,11 @@ public class Skill
     }
 
     public virtual void OnBeDoSkillDamage(Chess caster, SkillConfig checkSkillCfg, ref int damage, bool isFeedback)
+    {
+        
+    }
+
+    public virtual void OnHealTarget(Chess target, int checkSkillId, ref int addon)
     {
         
     }

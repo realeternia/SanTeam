@@ -79,6 +79,8 @@ public static class SkillManager
                 return new SkillModifySkillRateTime(skillId, owner);
             case "BuffExpand":
                 return new SkillBuffExpand(skillId, owner);
+            case "BuffExpandPos":
+                return new SkillBuffExpandPos(skillId, owner);                
             case "ModifyBuffTime":
                 return new SkillModifyBuffTime(skillId, owner);
             case "ModifyBeBuffTime":
@@ -247,6 +249,15 @@ public static class SkillManager
             if (skillCfg.Id == skill.skillId)
                 continue;
             skill.OnBeDoSkillDamage(caster, skillCfg, ref damage, isFeedback);
+        }
+    }
+
+    
+    public static void OnHealTarget(Chess healer, Chess target, int checkSkillId, ref int addon)
+    {
+        foreach (var skill in healer.skills)
+        {
+            skill.OnHealTarget(target, checkSkillId, ref addon);
         }
     }
 
