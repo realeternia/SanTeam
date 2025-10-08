@@ -2,15 +2,15 @@ using System;
 using CommonConfig;
 using UnityEngine;
 
-public class SkillSoldierUp : Skill
+public class SkillInitSoldierUp : Skill
 {
-    public SkillSoldierUp(int id, Chess chess) : base(id, chess)
+    public SkillInitSoldierUp(int id, Chess chess) : base(id, chess)
     {
     }
 
     public override void BattleBegin()
     {
-        UnityEngine.Debug.Log("SkillHelp BattleBegin");
+        UnityEngine.Debug.Log("SkillInitSoldierUp BattleBegin");
 
         var unitsInRange = WorldManager.Instance.GetUnitsMySide(owner.transform.position, skillCfg.Range, owner.side);
 

@@ -2,9 +2,9 @@ using System;
 using CommonConfig;
 using UnityEngine;
 
-public class SkillSoldierSummon : Skill
+public class SkillInitSoldierSummon : Skill
 {
-    public SkillSoldierSummon(int id, Chess chess) : base(id, chess)
+    public SkillInitSoldierSummon(int id, Chess chess) : base(id, chess)
     {
     }
 

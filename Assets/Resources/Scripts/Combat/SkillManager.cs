@@ -27,10 +27,10 @@ public static class SkillManager
                 return new SkillHelpHeal(skillId, owner);
             case "HelpAidBuff":
                 return new SkillHelpAidBuff(skillId, owner);
-            case "Gold":
-                return new SkillGold(skillId, owner);
-            case "Food":
-                return new SkillFood(skillId, owner);
+            case "InitGold":
+                return new SkillInitGold(skillId, owner);
+            case "InitFood":
+                return new SkillInitFood(skillId, owner);
             case "DefFeedback":
                 return new SkillDefFeedback(skillId, owner);
             case "SpeedAttack":
@@ -45,8 +45,10 @@ public static class SkillManager
                 return new SkillDefSkillDamageReduce(skillId, owner);
             case "HelpTeach":
                 return new SkillHelpTeach(skillId, owner);
-            case "SoldierUp":
-                return new SkillSoldierUp(skillId, owner);
+            case "InitSoldierUp":
+                return new SkillInitSoldierUp(skillId, owner);
+            case "InitSoldierSummon":
+                return new SkillInitSoldierSummon(skillId, owner);                
             case "HitBuff":
                 return new SkillHitBuff(skillId, owner);
             case "HitBuffArea":
@@ -55,8 +57,6 @@ public static class SkillManager
                 return new SkillHitRegion(skillId, owner);
             case "HitWall":
                 return new SkillHitWall(skillId, owner);
-            case "SoldierSummon":
-                return new SkillSoldierSummon(skillId, owner);
             case "DamageReal":
                 return new SkillDamageReal(skillId, owner);
             case "AttackedShadow":
@@ -77,8 +77,8 @@ public static class SkillManager
                 return new SkillHelpShockWave(skillId, owner);
             case "ModifySkillRateTime":
                 return new SkillModifySkillRateTime(skillId, owner);
-            case "ModifyBuffExpand":
-                return new SkillModifyBuffExpand(skillId, owner);
+            case "BuffExpand":
+                return new SkillBuffExpand(skillId, owner);
             case "ModifyBuffTime":
                 return new SkillModifyBuffTime(skillId, owner);
             case "ModifyBeBuffTime":

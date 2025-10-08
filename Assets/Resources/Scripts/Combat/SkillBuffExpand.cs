@@ -5,15 +5,15 @@ using CommonConfig;
 using UnityEngine;
 using System.Linq;
 
-public class SkillModifyBuffExpand : Skill
+public class SkillBuffExpand : Skill
 {
-    public SkillModifyBuffExpand(int id, Chess unit) : base(id, unit)
+    public SkillBuffExpand(int id, Chess unit) : base(id, unit)
     {
     }
 
     public override void OnAddBuff(Chess target, ref int buffId, int checkSkillId, ref float time)
     {
-        UnityEngine.Debug.Log($"SkillModifyBuffExpand OnAddBuff {target.name} {buffId} {checkSkillId} {time}");
+        UnityEngine.Debug.Log($"SkillBuffExpand OnAddBuff {target.name} {buffId} {checkSkillId} {time}");
         if(checkSkillId == skillId)
             return; //自己挂的buff，不再连续触发
 
@@ -32,7 +32,7 @@ public class SkillModifyBuffExpand : Skill
                 WorldManager.Instance.RandomSelect(unitsInRange, skillCfg.TargetCount);
 
                 foreach (var unit in unitsInRange)
-                    BuffManager.AddBuff(unit, owner, id, buffCfg.Id, time);
+                    BuffManager.AddBuff(unit, owner, checkSkillId, buffId, time);
             }
         }
     }

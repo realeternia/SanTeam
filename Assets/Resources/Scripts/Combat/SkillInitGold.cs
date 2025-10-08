@@ -1,16 +1,14 @@
 using CommonConfig;
 using UnityEngine;
 
-public class SkillGold : Skill
+public class SkillInitGold : Skill
 {
-    public SkillGold(int id, Chess chess) : base(id, chess)
+    public SkillInitGold(int id, Chess chess) : base(id, chess)
     {
     }
 
     public override void BattleBegin()
     {
-        UnityEngine.Debug.Log("SkillGold BattleBegin");
-
         EffectManager.PlaySkillEffect(owner, skillCfg.HitEffect);
 
         var goldAdd = skillCfg.StrengthInt;

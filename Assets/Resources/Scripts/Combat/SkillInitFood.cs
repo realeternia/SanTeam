@@ -1,9 +1,9 @@
 using CommonConfig;
 using UnityEngine;
 
-public class SkillFood : Skill
+public class SkillInitFood : Skill
 {
-    public SkillFood(int id, Chess chess) : base(id, chess)
+    public SkillInitFood(int id, Chess chess) : base(id, chess)
     {
     }
 
