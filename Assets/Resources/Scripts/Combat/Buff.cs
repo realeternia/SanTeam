@@ -76,11 +76,6 @@ public class Buff
     }
 
 
-    public void Update()
-    {
-
-    }
-
     public void WaitForRemove()
     {
         endTime = Time.time - 1;

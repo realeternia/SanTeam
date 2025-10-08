@@ -107,23 +107,23 @@ namespace CommonConfig
         /// </summary>
         public float BuffTime;
         /// <summary>
-        ///法术场数
+        ///技能场数
         /// </summary>
         public int SummonCount;
         /// <summary>
-        ///法术场范围
+        ///技能场范围
         /// </summary>
         public float SummonArea;
         /// <summary>
-        ///法术场持续
+        ///技能场持续
         /// </summary>
         public float SummonTime;
         /// <summary>
-        ///法术场间隔
+        ///技能场间隔
         /// </summary>
         public float SummonHitInterval;
         /// <summary>
-        ///法术场速度
+        ///技能场速度
         /// </summary>
         public float SummonSpeed;
         /// <summary>
@@ -257,22 +257,24 @@ namespace CommonConfig
             config[202008] = new SkillConfig(202008, "识破小", "实", "降低智力类技能伤害", "防御up", 1, 0.3f, 0.5f, 0, "leadShip", new string[]{"inte"}, 0, false, "", 0, 0.5f, 0, 0, 0, 0, "", "", 0, false, 0, 0, 0, 0, 0, 0, "DefSkillDamageReduce", "", "", 0, 1, "shi4");
             config[202009] = new SkillConfig(202009, "冷静", "静", "降低同行智力类技能造成的负面状态时间", "防御up", 1, 0, 0, 0, "leadShip", new string[]{"inte"}, 0, false, "", 0, 0.5f, 0, 0, 0, 1, "境", "", 0, true, 0, 0, 0, 0, 0, 0, "ModifyBeBuffTime", "", "", 0, 3, "jing3");
             config[202010] = new SkillConfig(202010, "冷静小", "境", "降低智力类技能造成的负面状态时间", "防御up", 1, 0, 0, 0, "leadShip", new string[]{"inte"}, 0, false, "", 0, 0.5f, 0, 0, 0, 0, "", "", 0, true, 0, 0, 0, 0, 0, 0, "ModifyBeBuffTime", "", "", 0, 1, "jing4");
-            config[202011] = new SkillConfig(202011, "空城小", "城", "提升15%闪避率", "防御up", 1, 0, 0, 0, "inte", null, 0, false, "", 0, 0.2f, 0, 0, 0, 0, "", "", 0, false, 0, 0, 0, 0, 0, 0, "InitAddDodge", "", "", 0, 1, "kong2");
-            config[202012] = new SkillConfig(202012, "空城", "空", "自己和同列队友提升15%闪避率", "防御up", 1, 0, 0, 0, "inte", null, 0, false, "", 0, 0.2f, 0, 0, 0, 2, "城", "", 0, false, 0, 0, 0, 0, 0, 0, "InitAddDodge", "", "", 0, 2, "kong");
+            config[202011] = new SkillConfig(202011, "敏锐", "敏", "提升15%闪避率", "防御up", 1, 0, 0, 0, "str", null, 0, false, "", 0, 0.2f, 0, 0, 0, 0, "", "", 0, false, 0, 0, 0, 0, 0, 0, "InitAddDodge", "", "", 0, 1, "min2");
+            config[202012] = new SkillConfig(202012, "空城", "空", "自己和同列队友提升15%闪避率", "防御up", 1, 0, 0, 0, "inte", null, 0, false, "", 0, 0.2f, 0, 0, 0, 2, "敏", "", 0, false, 0, 0, 0, 0, 0, 0, "InitAddDodge", "", "", 0, 2, "kong");
+            config[202013] = new SkillConfig(202013, "复原", "复", "提升5点生命回复", "防御up", 1, 0, 0, 0, "leadShip", null, 0, false, "", 0, 0, 5, 0, 0, 0, "", "", 0, false, 0, 0, 0, 0, 0, 0, "InitAddRege", "", "", 0, 1, "fu2");
+            config[202014] = new SkillConfig(202014, "药仙", "药", "自己和所有队友提升5点生命回复", "防御up", 1, 0, 0, 0, "inte", null, 0, false, "", 0, 0, 5, 0, 0, 3, "复", "", 0, false, 0, 0, 0, 0, 0, 0, "InitAddRege", "", "", 0, 2, "yao");
             config[203002] = new SkillConfig(203002, "连锁", "锁", "锁定敌人目标,传递一半受到伤害", "术", 1, 0.5f, 3f, 0, "inte", null, 25f, false, "targetUnit", 1, 0.5f, 0, 0, 0, 0, "", "", 301002, false, 8f, 0, 0, 0, 0, 0, "HitBuffArea", "throw", "MagicNovaYellow", 0, 4, "suo");
             config[203003] = new SkillConfig(203003, "劫粮", "劫", "攻击几率获取对方粮食", "", 1, 0.2f, 4f, 0, "leadShip", null, 0, false, "", 0, 0, 2, 0, 0, 0, "", "", 0, false, 0, 0, 0, 0, 0, 0, "HitFood", "sway", "", 0, 2, "jie2");
             config[203004] = new SkillConfig(203004, "威震", "威", "攻击时混乱周围目标", "", 1, 0.2f, 5f, 0, "str", null, 20f, false, "castUnit", 3, 0, 0, 0, 0, 0, "", "", 301001, false, 1.5f, 0, 0, 0, 0, 0, "HitBuffArea", "spin", "MagicNovaYellow", 0, 4, "wei");
             config[203005] = new SkillConfig(203005, "击破", "破", "使目标增伤40%", "", 1, 0.4f, 2f, 0, "str", null, 0, false, "", 0, 0.4f, 0, 0, 0, 0, "", "", 301003, false, 3f, 0, 0, 0, 0, 0, "HitBuff", "jump", "SoftFireBigRed", 0, 2, "po");
             config[203006] = new SkillConfig(203006, "分兵", "分", "被攻击时产生一只有伤害部队", "", 1, 0.4f, 15f, 0, "leadShip", null, 15f, false, "", 0, 0.5f, 0, 4, 0, 0, "", "", 0, false, 0, 0, 0, 0, 0, 0, "AttackedShadow", "sway", "MagicFieldGreen", 0, 3, "fen2");
             config[203007] = new SkillConfig(203007, "分兵小", "纷", "被攻击时产生一只无伤害部队", "", 1, 0.4f, 15f, 0, "leadShip", null, 15f, false, "", 0, 0.4f, 1, 4, 0, 0, "", "", 0, false, 0, 0, 0, 0, 0, 0, "AttackedShadow", "sway", "MagicFieldGreen", 0, 2, "fen3");
-            config[208001] = new SkillConfig(208001, "百出", "百", "降低自己和同行[扇谋相]法术CD时间", "智技up", 1, 0, 0, 0, "inte", new string[]{"inte"}, 0, false, "", 0, 0.3f, 0, 0, 0, 1, "白", "扇谋相", 0, false, 0, 0, 0, 0, 0, 0, "ModifySkillRateTime", "", "", 0, 4, "bai");
-            config[208002] = new SkillConfig(208002, "百出小", "白", "降低法术CD时间", "智技up", 1, 0, 0, 0, "inte", new string[]{"inte"}, 0, false, "", 0, 0.4f, 0, 0, 0, 0, "", "", 0, false, 0, 0, 0, 0, 0, 0, "ModifySkillRateTime", "", "", 0, 2, "bai2");
-            config[208003] = new SkillConfig(208003, "神算", "神", "提升法术命中率和持续时间", "智技up", 1, 0.3f, 0, 0, "inte", new string[]{"inte"}, 0, false, "", 0, 0.5f, 0, 0, 0, 0, "", "", 0, false, 0.5f, 0, 0, 0, 0, 0, "ModifySkillRateTime", "", "", 0, 3, "shen");
-            config[208004] = new SkillConfig(208004, "蔓延", "延", "自己和同行[扇谋相]法术负面状态扩散", "智技up", 1, 0.5f, 3f, 0, "inte", new string[]{"inte"}, 30f, false, "", 2, 0, 0, 0, 0, 1, "筵", "扇谋相", 0, false, 0, 0, 0, 0, 0, 0, "BuffExpand", "", "", 0, 4, "yan2");
-            config[208005] = new SkillConfig(208005, "蔓延小", "筵", "法术负面状态概率扩散", "智技up", 1, 0.5f, 3f, 0, "inte", new string[]{"inte"}, 30f, false, "", 2, 0, 0, 0, 0, 0, "", "", 0, false, 0, 0, 0, 0, 0, 0, "BuffExpand", "", "", 0, 2, "yan3");
-            config[208006] = new SkillConfig(208006, "同调", "调", "自己和同行[鼓乐医]法术正面状态扩散", "智技up", 1, 0.5f, 3f, 0, "inte", new string[]{"inte"}, 30f, false, "", 2, 0, 0, 0, 0, 1, "碉", "鼓乐医", 0, false, 0, 0, 0, 0, 0, 0, "BuffExpandPos", "", "", 0, 3, "diao");
-            config[208007] = new SkillConfig(208007, "同调小", "碉", "法术正面状态扩散", "智技up", 1, 0.5f, 3f, 0, "inte", new string[]{"inte"}, 30f, false, "", 2, 0, 0, 0, 0, 0, "", "", 0, false, 0, 0, 0, 0, 0, 0, "BuffExpandPos", "", "", 0, 2, "diao2");
-            config[208008] = new SkillConfig(208008, "曲扬", "曲", "正面祝福效果时间增加50%", "智技up", 1, 0, 0, 0, "inte", new string[]{"inte"}, 0, false, "", 0, 0.5f, 0, 0, 0, 0, "", "", 0, false, 0, 0, 0, 0, 0, 0, "ModifyBuffTime", "", "", 0, 1, "qu");
+            config[208001] = new SkillConfig(208001, "百出", "百", "降低自己和同行[扇谋相]技能CD时间", "智技up", 1, 0, 0, 0, "inte", new string[]{"inte"}, 0, false, "", 0, 0.3f, 0, 0, 0, 1, "白", "扇谋相", 0, false, 0, 0, 0, 0, 0, 0, "ModifySkillRateTime", "", "", 0, 4, "bai");
+            config[208002] = new SkillConfig(208002, "百出小", "白", "降低技能CD时间", "智技up", 1, 0, 0, 0, "inte", new string[]{"inte"}, 0, false, "", 0, 0.4f, 0, 0, 0, 0, "", "", 0, false, 0, 0, 0, 0, 0, 0, "ModifySkillRateTime", "", "", 0, 2, "bai2");
+            config[208003] = new SkillConfig(208003, "神算", "神", "提升技能命中率和持续时间", "智技up", 1, 0.3f, 0, 0, "inte", new string[]{"inte"}, 0, false, "", 0, 0.5f, 0, 0, 0, 0, "", "", 0, false, 0.5f, 0, 0, 0, 0, 0, "ModifySkillRateTime", "", "", 0, 3, "shen");
+            config[208004] = new SkillConfig(208004, "蔓延", "延", "自己和同行[扇谋相]技能负面状态扩散", "智技up", 1, 0.5f, 3f, 0, "inte", new string[]{"inte"}, 30f, false, "", 2, 0, 0, 0, 0, 1, "筵", "扇谋相", 0, false, 0, 0, 0, 0, 0, 0, "BuffExpand", "", "", 0, 4, "yan2");
+            config[208005] = new SkillConfig(208005, "蔓延小", "筵", "技能负面状态概率扩散", "智技up", 1, 0.5f, 3f, 0, "inte", new string[]{"inte"}, 30f, false, "", 2, 0, 0, 0, 0, 0, "", "", 0, false, 0, 0, 0, 0, 0, 0, "BuffExpand", "", "", 0, 2, "yan3");
+            config[208006] = new SkillConfig(208006, "同调", "调", "自己和同行[鼓乐医]技能正面状态扩散", "智技up", 1, 0.5f, 3f, 0, "inte", new string[]{"inte"}, 30f, false, "", 2, 0, 0, 0, 0, 1, "碉", "鼓乐医", 0, false, 0, 0, 0, 0, 0, 0, "BuffExpandPos", "", "", 0, 3, "diao");
+            config[208007] = new SkillConfig(208007, "同调小", "碉", "技能正面状态扩散", "智技up", 1, 0.5f, 3f, 0, "inte", new string[]{"inte"}, 30f, false, "", 2, 0, 0, 0, 0, 0, "", "", 0, false, 0, 0, 0, 0, 0, 0, "BuffExpandPos", "", "", 0, 2, "diao2");
+            config[208008] = new SkillConfig(208008, "曲扬", "曲", "正面祝福状态时间增加50%", "智技up", 1, 0, 0, 0, "inte", new string[]{"inte"}, 0, false, "", 0, 0.5f, 0, 0, 0, 0, "", "", 0, false, 0, 0, 0, 0, 0, 0, "ModifyBuffTime", "", "", 0, 1, "qu");
             config[209001] = new SkillConfig(209001, "富甲", "商", "参战获得5金币", "", 1, 0, 0, 0, "inte", null, 0, false, "", 0, 0, 5, 0, 0, 0, "", "", 0, false, 0, 0, 0, 0, 0, 0, "InitGold", "", "MagicChargeYellow", 0, 3, "gold");
             config[209002] = new SkillConfig(209002, "国士", "国", "增加一个远程士兵,提升射程", "", 1, 0, 0, 0, "inte", null, 15f, false, "", 0, 0, 10, 0, 0, 0, "", "", 0, false, 0, 0, 0, 0, 0, 0, "InitSoldierSummon", "", "MagicChargeGreen", 0, 4, "guo");
             config[209003] = new SkillConfig(209003, "激励", "励", "提升同列队友智力", "", 1, 0, 0, 0, "inte", null, 0, false, "", 0, 0.7f, 0, 0, 0, 2, "", "", 0, false, 0, 0, 0, 0, 0, 0, "HelpTeach", "", "MagicChargeYellow", 0, 2, "li");

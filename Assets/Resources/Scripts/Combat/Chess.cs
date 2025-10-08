@@ -78,6 +78,9 @@ public class Chess : MonoBehaviour
     private float lifeTime;
     private Dictionary<int, AttrInfo> supportAttrs = new Dictionary<int, AttrInfo>(); //支援hero的属性加成
 
+    private float regeTimer; //1s回复一次
+    public int regeHp; //回复血量
+
     // Start is called before the first frame update
     void Start()
     {
@@ -185,8 +188,19 @@ public class Chess : MonoBehaviour
         if (hp <= 0)
             return;
 
-        if (hp > 0)
-            MoveAndFight(deltaTime);
+        buffs.Where(x => Time.time > x.endTime).ToList().ForEach(x => BuffManager.RemoveBuff(this, x.id));
+
+        if(regeHp > 0)
+        {
+            regeTimer += deltaTime;
+            if(regeTimer >= 1)
+            {
+                regeTimer -= 1;
+                AddHp(regeHp);
+            }
+        }
+
+        MoveAndFight(deltaTime);
 
         if (dieAfterLifeTime)
         {
@@ -201,12 +215,6 @@ public class Chess : MonoBehaviour
 
     void Update()
     {
-        buffs.Where(x => Time.time > x.endTime).ToList().ForEach(x => BuffManager.RemoveBuff(this, x.id));
-
-        foreach (var buff in buffs)
-        {
-            buff.Update();
-        }
 
     }
 

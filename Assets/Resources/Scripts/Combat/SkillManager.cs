@@ -93,6 +93,9 @@ public static class SkillManager
                 return new SkillInitAddCrit(skillId, owner);
             case "InitAddDodge":
                 return new SkillInitAddDodge(skillId, owner);
+            case "InitAddRege":
+                return new SkillInitAddRege(skillId, owner);
+
 
             case "HitFood":
                 return new SkillHitFood(skillId, owner);
