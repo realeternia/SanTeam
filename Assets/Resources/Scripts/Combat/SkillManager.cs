@@ -87,6 +87,10 @@ public static class SkillManager
                 return new SkillModifyTieqi(skillId, owner);
             case "ModifyShootSpeed":
                 return new SkillModifyShootSpeed(skillId, owner);
+            case "InitAddCrit":
+                return new SkillInitAddCrit(skillId, owner);
+            case "InitAddDodge":
+                return new SkillInitAddDodge(skillId, owner);
 
             case "HitFood":
                 return new SkillHitFood(skillId, owner);

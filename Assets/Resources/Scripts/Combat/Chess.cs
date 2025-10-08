@@ -587,22 +587,19 @@ public class Chess : MonoBehaviour
             }
         }
 
-        if(damage + damageReal <= 0)
-            return;
+        if (damage + damageReal > 0)
+        {
+            damage = Math.Max(damage, damageReal);
 
-        damage = Math.Max(damage, damageReal);
+            victim.hp -= damage;
+            if (victim != this)
+                victim.lastDamagedPlayerId = playerId;
+            // 记录战斗统计
+            if (isHero)
+                BattleStatManager.AddBattleStat(playerId, heroId, damage, true, victim.isHero);
 
-        victim.hp -= damage;
-        if(victim != this)
-            victim.lastDamagedPlayerId = playerId;
-        // 记录战斗统计
-        if(isHero)
-            BattleStatManager.AddBattleStat(playerId, heroId, damage, true, victim.isHero);
-
-        SkillManager.OnAttack(this, victim, damType, damage);
-        
-        // 记录日志
-        // Debug.Log($"{attacker.heroId}攻击{defender.heroId}，属性差值：Inte={inteDiff}, LeadShip={leadShipDiff}, Str={strDiff}，最大差值={maxDiff}，伤害：{damage}");
+            SkillManager.OnAttack(this, victim, damType, damage);
+        }
 
         if(!string.IsNullOrEmpty(effect))
             EffectManager.PlayHitEffect(this, victim, effect);
