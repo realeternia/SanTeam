@@ -69,7 +69,7 @@ public class HeroInfo : MonoBehaviour
             classImg.sprite = Resources.Load<Sprite>(highestAttr);
             if (total >= 600)
             {
-                classImg.color = new Color(0.3f, 1, .3f);
+                classImg.color = new Color(0.3f, 0, .6f);
             }
             else if (total >= 500)
             {
@@ -99,7 +99,7 @@ public class HeroInfo : MonoBehaviour
         text.text = val.ToString();
         if (val >= 250)
         {
-            text.color = new Color(0.3f, 1, .3f);
+            text.color = new Color(0.3f, 0, .6f);
         }
         else if (val >= 210)
         {

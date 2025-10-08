@@ -112,9 +112,7 @@ public class WorldManager : MonoBehaviour
         foreach (GameObject cell in battleResultCells)
         {
             if (cell != null)
-            {
                 Destroy(cell);
-            }
         }
         battleResultCells.Clear();
         
@@ -139,10 +137,7 @@ public class WorldManager : MonoBehaviour
         buttonInfo.gameObject.SetActive(false);
         // 获取RectTransform组件并设置宽度
         RectTransform battleResultRect = BattleResultPanel.GetComponent<RectTransform>();
-        if (battleResultRect != null)
-        {
-            battleResultRect.sizeDelta = new Vector2(battleResultRect.sizeDelta.x + 800, battleResultRect.sizeDelta.y);
-        }
+        battleResultRect.sizeDelta = new Vector2(battleResultRect.sizeDelta.x + 800, battleResultRect.sizeDelta.y);
         for (int i = 0; i < top10.Count; i++)
         {
             var battleStat = top10[i];
@@ -151,10 +146,7 @@ public class WorldManager : MonoBehaviour
 
             // 设置位置，每个单元格垂直偏移50
             RectTransform rectTransform = cell.GetComponent<RectTransform>();
-            if (rectTransform != null)
-            {
-                rectTransform.anchoredPosition = new Vector2(302 + 700, -120 - i * 50); // 起始位置向下100，每个单元格间距50
-            }
+            rectTransform.anchoredPosition = new Vector2(302 + 700, -120 - i * 50); // 起始位置向下100，每个单元格间距50
 
             battleResultCells.Add(cell);
         }
@@ -495,6 +487,10 @@ public class WorldManager : MonoBehaviour
                     battleResultCells.Add(cell);
                 }
             }
+            buttonInfo.gameObject.SetActive(true);
+            // 获取RectTransform组件并设置宽度
+            RectTransform battleResultRect = BattleResultPanel.GetComponent<RectTransform>();
+            battleResultRect.sizeDelta = new Vector2(650, battleResultRect.sizeDelta.y);
             BattleResultPanel.gameObject.SetActive(true);
         }
     }

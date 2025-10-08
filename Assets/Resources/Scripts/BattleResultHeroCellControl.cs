@@ -31,15 +31,17 @@ public class BattleResultHeroCellControl : MonoBehaviour
 
     public void SetData(BattleStatManager.BattleStat battleStat, int rank)
     {
+        var player = GameManager.Instance.GetPlayer(battleStat.playerId);
+        var heroLevel = HeroSelectionTool.GetCardLevel(player.cards[battleStat.heroId], true);
         var heroCfg = HeroConfig.GetConfig(battleStat.heroId);
-        playerName.text = heroCfg.Name;
+        playerName.text = heroLevel.ToString() + heroCfg.Name;
 
         playerRank.text = rank.ToString(); // 假设按match顺序排列
         playerMark1.text = "总:" + battleStat.damage.ToString();
         playerMark2.text = "技:" + battleStat.skillDamage.ToString();
         playerMark3.text = "英:" + battleStat.heroDamage.ToString();
 
-        playerIcon.sprite = GameManager.Instance.GetPlayer(battleStat.playerId).playerImage.sprite;
+        playerIcon.sprite = player.playerImage.sprite;
         heroIcon.sprite = Resources.Load<Sprite>("Skins/" + heroCfg.Icon);
     }
 }
