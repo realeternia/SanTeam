@@ -557,16 +557,16 @@ public class Chess : MonoBehaviour
         }
 
         damage = (int)(damageBase * damageMulti);
-        var minDamage = 10;
-        var maxDamage = 60;
+        var minDamage = 10 + level / 2;
+        var maxDamage = 50 + level;
         if (isHero && victim.isHero)
         {
             //等级压制
             var levelDiff = level - victim.level;
             if (levelDiff != 0)
             {
-                minDamage = Math.Max(2, minDamage + levelDiff * 2);
-                maxDamage = Math.Max(10, maxDamage + levelDiff * 10);
+                minDamage = Math.Clamp(minDamage + levelDiff, 8, minDamage * 2);
+                maxDamage = Math.Clamp(maxDamage + levelDiff * 4, 40, maxDamage * 2);
             }
             var attackJobCfg = ConfigManager.GetJobConfig(HeroConfig.GetConfig(heroId).Job);
             var victimJob = ConfigManager.GetJobConfig(HeroConfig.GetConfig(victim.heroId).Job).NameS;

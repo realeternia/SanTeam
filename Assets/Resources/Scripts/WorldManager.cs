@@ -289,7 +289,7 @@ public class WorldManager : MonoBehaviour
             GameManager.Instance.GetPlayer(0).banCount = 1;
             GameManager.Instance.GetPlayer(1).banCount = 2;
             //   SpawnHerosForRegion(GameManager.Instance.GetPlayer(0), mapConfig.RegionHeroSide1[4], new System.Tuple<int, int>(101008, 1), 1);
-            var heroList = new List<int> { 101004 };
+            var heroList = new List<int> { 101017 };
             for (int i = 0; i < heroList.Count; i++)
                 SpawnHerosForRegion(GameManager.Instance.GetPlayer(0), i, mapConfig.RegionHeroSide1[i], new System.Tuple<int, int>(heroList[i], 1), heroList, 1);
 
@@ -503,7 +503,8 @@ public class WorldManager : MonoBehaviour
         
         // 实例化导弹
         var missile = Instantiate<Missile>(missilePrefab, sourceChess.transform.position, Quaternion.identity, Units.transform);
-        missile.Init(sourceChess, targetChess, sourceChess.missileSpeed, sourceChess.missileHight, effectName);
+        missile.Init(sourceChess, 1, 0, effectName);
+        missile.MoveToTarget(targetChess, sourceChess.missileSpeed, sourceChess.missileHight);
     }
 
     public void CreateSpellMissile(Chess sourceChess, Vector3 targetPos, float time, float speed, float size, int skillId, string effectName)
@@ -513,7 +514,8 @@ public class WorldManager : MonoBehaviour
         
         // 实例化导弹
         var missile = Instantiate<Missile>(missilePrefab, sourceChess.transform.position, Quaternion.identity, Units.transform);
-        missile.Init(sourceChess, targetPos, time, speed, size, skillId, effectName);
+        missile.Init(sourceChess, size, skillId, effectName);
+        missile.MoveToDirection(targetPos, time, speed);
     }
 
 

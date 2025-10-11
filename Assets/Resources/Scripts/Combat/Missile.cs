@@ -11,47 +11,49 @@ public class Missile : MonoBehaviour
     public Chess owner;
     public string effectName;
     public int skillId;
-
-    public void Init(Chess sourceChess, Chess targetChess, float speed, float hight, string effectName)
+    private float size;
+    
+    public void Init(Chess sourceChess, float size, int skillId, string effectName)
     {
         this.effectName = effectName;
         owner = sourceChess;
+        this.skillId = skillId;        
+        this.size = size;
+    }
 
+    public void MoveToDirection(Vector3 targetPos, float time, float missileSpeed)
+    {
+        var hitPrefab = Resources.Load<GameObject>("Prefabs/Missile/" + effectName);
+        if (hitPrefab == null)
+            hitPrefab = Resources.Load<GameObject>("Prefabs/Effect/" + effectName);
+        GameObject missileEffect = Instantiate(hitPrefab, transform.position, hitPrefab.transform.rotation, transform);
+        transform.rotation = Quaternion.LookRotation(targetPos - transform.position);
+        transform.position = owner.transform.position + new Vector3(0f, 2f, 0f);
+        transform.localScale = size * hitPrefab.transform.localScale;
+
+        var detectArea = 10f;
+        var targetCount = 1;
+        if (skillId > 0)
+        {
+            var skillCfg = SkillConfig.GetConfig(skillId);
+            detectArea = skillCfg.SummonArea * 1.5f;
+            targetCount = skillCfg.TargetCount;
+        }
+
+        StartCoroutine(MoveMissileToDirection(gameObject, (targetPos - missileEffect.transform.position).normalized, time, missileSpeed, detectArea, targetCount));
+    }
+
+    public void MoveToTarget(Chess target, float missileSpeed, float missileHight)
+    {
         var hitPrefab = Resources.Load<GameObject>("Prefabs/Missile/" + effectName);
         if (hitPrefab == null)
             hitPrefab = Resources.Load<GameObject>("Prefabs/Effect/" + effectName);
 
-        transform.position = sourceChess.transform.position + new Vector3(0f, 5f, 0f);
         GameObject missileEffect = Instantiate(hitPrefab, transform.position, Quaternion.identity, transform);
-
+        transform.position = owner.transform.position + new Vector3(0f, 5f, 0f);
         missileEffect.transform.localScale = hitPrefab.transform.localScale;
 
-        // 启动协程让导弹飞向目标位置
-        StartCoroutine(MoveMissileToTarget(gameObject, targetChess, speed, hight));
-
-       // Destroy(missileEffect, 2f);
-    }
-    
-    public void Init(Chess sourceChess, Vector3 targetPos, float time, float speed, float size, int skillId, string effectName)
-    {
-        this.effectName = effectName;
-        owner = sourceChess;
-        this.skillId = skillId;
-
-        var hitPrefab = Resources.Load<GameObject>("Prefabs/Missile/" + effectName);
-        if (hitPrefab == null)
-            hitPrefab = Resources.Load<GameObject>("Prefabs/Effect/" + effectName);
-
-        transform.position = sourceChess.transform.position + new Vector3(0f, 2f, 0f);
-        GameObject missileEffect = Instantiate(hitPrefab, transform.position, hitPrefab.transform.rotation, transform);
-
-        transform.localScale = size * hitPrefab.transform.localScale;
-        transform.rotation = Quaternion.LookRotation(targetPos - transform.position);
-
-        // 启动协程让导弹飞向目标位置
-        StartCoroutine(MoveMissileToDirection(gameObject, (targetPos - missileEffect.transform.position).normalized, time, speed));
-
-       // Destroy(missileEffect, 2f);
+        StartCoroutine(MoveMissileToTarget(gameObject, target, missileSpeed, missileHight));
     }
 
 
@@ -108,21 +110,19 @@ public class Missile : MonoBehaviour
 
         if (missile != null)
         {
-            if (target != null && owner != null && owner.hp > 0)
-                owner.Attack(target);
+            OnCrash(target);
             Destroy(missile);
         }
     }
 
  // 让hitEffect飞向targetPos的协程
-    IEnumerator MoveMissileToDirection(GameObject missile, Vector3 direction, float time, float speed)
+    IEnumerator MoveMissileToDirection(GameObject missile, Vector3 direction, float time, float speed, float detectArea, int targetCount)
     {
         Vector3 currentPos = missile.transform.position;
         direction.y = 0;
         float timePast = 0;
         float lastCheckTime = 0.2f;
-        var unitList = new List<Chess>();
-        var skillCfg = SkillConfig.GetConfig(skillId);
+        var checkedList = new List<Chess>();
 
         while (missile != null)
         {
@@ -133,32 +133,29 @@ public class Missile : MonoBehaviour
             float moveDistance = speed * 0.025f;
 
             // 按方向和距离移动 
-            currentPos = missile.transform.position = currentPos + direction * moveDistance;  
+            currentPos = missile.transform.position = currentPos + direction * moveDistance;
 
             if (timePast - lastCheckTime >= 0.2f)
             {
-                var unitsInRange = WorldManager.Instance.GetUnitsInRange(currentPos, skillCfg.SummonArea * 1.5f, owner.side, true);
-                WorldManager.Instance.RandomSelect(unitsInRange, skillCfg.TargetCount);
+                var unitsInRange = WorldManager.Instance.GetUnitsInRange(currentPos, detectArea, owner.side, true);
+                unitsInRange.RemoveAll(x => checkedList.Contains(x) || x.hp <= 0); //每个单位结算一次
+                if (unitsInRange.Count > 0)
+                {
+                    if (unitsInRange.Count + checkedList.Count > targetCount)
+                        WorldManager.Instance.RandomSelect(unitsInRange, targetCount - unitsInRange.Count - checkedList.Count);
 
-                var damageUnitList = new List<Chess>();
-                foreach (var unit in unitsInRange)
-                {
-                    if (unitList.Contains(unit))
-                        continue;
-                    unitList.Add(unit);
-                    damageUnitList.Add(unit);
+                    foreach (var unit in unitsInRange)
+                    {
+                        checkedList.Add(unit);
+                        OnCrash(unit);
+                    }
                 }
-                var damage = (int)(owner.GetAttr(skillCfg.Attr) * skillCfg.Strength);
-                if (owner != null && owner.hp > 0)
-                {
-                    foreach (var unit in damageUnitList)
-                        unit.OnSkillDamaged(owner, skillId, damage);
-                }
+
                 lastCheckTime = timePast;
             }
 
             timePast += 0.025f;
-            if (timePast >= time)
+            if (timePast >= time || checkedList.Count >= targetCount)
             {
                 if (missile != null)
                 {
@@ -171,5 +168,23 @@ public class Missile : MonoBehaviour
         }
 
 
+    }
+
+    private void OnCrash(Chess target)
+    {
+        if (skillId == 0)
+        {
+            if (target != null && owner != null && owner.hp > 0)
+                owner.Attack(target);
+        }
+        else
+        {
+            var skillCfg = SkillConfig.GetConfig(skillId);
+            var damage = (int)(owner.GetAttr(skillCfg.Attr) * skillCfg.Strength);
+            if (owner != null && owner.hp > 0)
+            {
+                target.OnSkillDamaged(owner, skillId, damage);
+            }
+        }
     }
 }
