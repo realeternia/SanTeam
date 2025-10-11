@@ -4,9 +4,9 @@ using System.Collections.Generic;
 using CommonConfig;
 using UnityEngine;    
 
-public class SkillRunCrossPlus : Skill
+public class SkillAttackRunCrossPlus : Skill
 {
-    public SkillRunCrossPlus(int id, Chess unit) : base(id, unit)
+    public SkillAttackRunCrossPlus(int id, Chess unit) : base(id, unit)
     {
     }
 

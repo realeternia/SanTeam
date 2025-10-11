@@ -1,8 +1,8 @@
 using CommonConfig;
 
-public class SkillMasterShield : Skill
+public class SkillInitMasterShield : Skill
 {
-    public SkillMasterShield(int id, Chess chess) : base(id, chess)
+    public SkillInitMasterShield(int id, Chess chess) : base(id, chess)
     {
         // 初始化护盾
     }

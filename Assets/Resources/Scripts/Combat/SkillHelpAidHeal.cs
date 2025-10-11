@@ -5,9 +5,9 @@ using CommonConfig;
 using UnityEngine;
 
 
-public class SkillHelpHeal : Skill
+public class SkillHelpAidHeal : Skill
 {
-    public SkillHelpHeal(int id, Chess unit) : base(id, unit)
+    public SkillHelpAidHeal(int id, Chess unit) : base(id, unit)
     {
     }
 

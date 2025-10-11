@@ -5,9 +5,9 @@ using CommonConfig;
 using UnityEngine;    
 
 
-public class SkillRunCross : Skill
+public class SkillAttackRunCross : Skill
 {
-    public SkillRunCross(int id, Chess unit) : base(id, unit)
+    public SkillAttackRunCross(int id, Chess unit) : base(id, unit)
     {
     }
 

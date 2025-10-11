@@ -2,9 +2,9 @@ using System;
 using CommonConfig;
 using UnityEngine;
 
-public class SkillHelpTeach : Skill
+public class SkillHelpInitTeach : Skill
 {
-    public SkillHelpTeach(int id, Chess chess) : base(id, chess)
+    public SkillHelpInitTeach(int id, Chess chess) : base(id, chess)
     {
     }
 

@@ -616,6 +616,9 @@ public class Chess : MonoBehaviour
 
     public void OnSkillDamaged(Chess caster, int skillId, int damage, bool isFeedback = false)
     {
+        if(damage <= 0)
+            throw new Exception("伤害值不能小于等于0");
+
         if (isHero)
         {
             SkillManager.OnDoSkillDamage(this, caster, SkillConfig.GetConfig(skillId), ref damage, isFeedback);

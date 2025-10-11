@@ -4,9 +4,9 @@ using System.Collections.Generic;
 using CommonConfig;
 using UnityEngine;
 
-public class SkillModifyTieqi : Skill
+public class SkillBuffTieqi : Skill
 {
-    public SkillModifyTieqi(int id, Chess unit) : base(id, unit)
+    public SkillBuffTieqi(int id, Chess unit) : base(id, unit)
     {
     }
 

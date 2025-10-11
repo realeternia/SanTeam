@@ -13,42 +13,45 @@ public static class SkillManager
 
         switch (skillCfg.ScriptName)
         {
-            case "SpinAttack":
-                return new SkillSpinAttack(skillId, owner);
+            case "AttackSpinAttack":
+                return new SkillAttackSpinAttack(skillId, owner);
             case "AttackAddDamage":
                 return new SkillAttackAddDamage(skillId, owner);
-            case "MasterShield":
-                return new SkillMasterShield(skillId, owner);
+            case "InitMasterShield":
+                return new SkillInitMasterShield(skillId, owner);
             case "AttackedBuff":
                 return new SkillAttackedBuff(skillId, owner);
-            case "RunCross":
-                return new SkillRunCross(skillId, owner);
-            case "HelpHeal":
-                return new SkillHelpHeal(skillId, owner);
+            case "AttackRunCross":
+                return new SkillAttackRunCross(skillId, owner);
+            case "AttackRunCrossPlus":
+                return new SkillAttackRunCrossPlus(skillId, owner);                
+            case "HelpAidHeal":
+                return new SkillHelpAidHeal(skillId, owner);
             case "HelpAidBuff":
                 return new SkillHelpAidBuff(skillId, owner);
-            case "InitGold":
-                return new SkillInitGold(skillId, owner);
-            case "InitFood":
-                return new SkillInitFood(skillId, owner);
+
             case "DefFeedback":
                 return new SkillDefFeedback(skillId, owner);
-            case "SpeedAttack":
-                return new SkillSpeedAttack(skillId, owner);
-            case "MultiArrow":
-                return new SkillMultiArrow(skillId, owner);
+            case "AttackSpeedAttack":
+                return new SkillAttackSpeedAttack(skillId, owner);
+            case "AttackMultiArrow":
+                return new SkillAttackMultiArrow(skillId, owner);
             case "DefPlantSkin":
                 return new SkillDefPlantSkin(skillId, owner);
             case "DefHpLow":
                 return new SkillDefHpLow(skillId, owner);
             case "DefSkillDamageReduce":
                 return new SkillDefSkillDamageReduce(skillId, owner);
-            case "HelpTeach":
-                return new SkillHelpTeach(skillId, owner);
+            case "HelpInitTeach":
+                return new SkillHelpInitTeach(skillId, owner);
             case "InitSoldierUp":
                 return new SkillInitSoldierUp(skillId, owner);
             case "InitSoldierSummon":
-                return new SkillInitSoldierSummon(skillId, owner);                
+                return new SkillInitSoldierSummon(skillId, owner);      
+            case "InitGold":
+                return new SkillInitGold(skillId, owner);
+            case "InitFood":
+                return new SkillInitFood(skillId, owner);                          
             case "HitBuff":
                 return new SkillHitBuff(skillId, owner);
             case "HitBuffArea":
@@ -61,8 +64,7 @@ public static class SkillManager
                 return new SkillDamageReal(skillId, owner);
             case "AttackedShadow":
                 return new SkillAttackedShadow(skillId, owner);
-            case "RunCrossPlus":
-                return new SkillRunCrossPlus(skillId, owner);
+
             case "HitTeleport":
                 return new SkillHitTeleport(skillId, owner);
             case "HitRepeat":
@@ -85,8 +87,8 @@ public static class SkillManager
                 return new SkillModifyBuffTime(skillId, owner);
             case "ModifyBeBuffTime":
                 return new SkillModifyBeBuffTime(skillId, owner);
-            case "ModifyTieqi":
-                return new SkillModifyTieqi(skillId, owner);
+            case "BuffTieqi":
+                return new SkillBuffTieqi(skillId, owner);
             case "ModifyShootSpeed":
                 return new SkillModifyShootSpeed(skillId, owner);
             case "InitAddCrit":
@@ -95,8 +97,6 @@ public static class SkillManager
                 return new SkillInitAddDodge(skillId, owner);
             case "InitAddRege":
                 return new SkillInitAddRege(skillId, owner);
-
-
             case "HitFood":
                 return new SkillHitFood(skillId, owner);
 

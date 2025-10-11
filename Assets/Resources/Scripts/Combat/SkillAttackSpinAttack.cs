@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using CommonConfig;
 using UnityEngine;
 
-public class SkillSpinAttack : Skill
+public class SkillAttackSpinAttack : Skill
 {
-    public SkillSpinAttack(int id, Chess unit) : base(id, unit)
+    public SkillAttackSpinAttack(int id, Chess unit) : base(id, unit)
     {
     }
 

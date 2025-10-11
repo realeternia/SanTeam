@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using CommonConfig;
 using UnityEngine;
 
-public class SkillMultiArrow : Skill
+public class SkillAttackMultiArrow : Skill
 {
-    public SkillMultiArrow(int id, Chess unit) : base(id, unit)
+    public SkillAttackMultiArrow(int id, Chess unit) : base(id, unit)
     {
     }
 
