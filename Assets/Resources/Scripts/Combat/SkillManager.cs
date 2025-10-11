@@ -73,8 +73,8 @@ public static class SkillManager
                 return new SkillHitArea(skillId, owner);
             case "HitAround":
                 return new SkillHitAround(skillId, owner);
-            case "HelpShockWave":
-                return new SkillHelpShockWave(skillId, owner);
+            case "AidShockWave":
+                return new SkillAidShockWave(skillId, owner);
             case "ModifySkillRateTime":
                 return new SkillModifySkillRateTime(skillId, owner);
             case "BuffExpand":

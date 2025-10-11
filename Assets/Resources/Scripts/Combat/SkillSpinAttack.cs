@@ -20,7 +20,7 @@ public class SkillSpinAttack : Skill
             WorldManager.Instance.RandomSelect(unitsInRange, skillCfg.TargetCount);
             foreach(var unit in unitsInRange)
             {
-                unit.OnSkillDamaged(owner, skillId, (int)(damage * skillCfg.Strength));
+                unit.OnSkillDamaged(owner, skillId, (int)(damage * skillCfg.SkillDamageRate));
             }
 
             EffectManager.PlaySkillEffect(owner, skillCfg.HitEffect);

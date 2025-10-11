@@ -54,7 +54,7 @@ public class SkillHitAround : Skill
                 if (filteredUnits.Count > 0)
                 {
                     WorldManager.Instance.RandomSelect(filteredUnits, skillCfg.TargetCount);
-                    var damage2 = (int)(damage * skillCfg.Strength);
+                    var damage2 = (int)(damage * skillCfg.SkillDamageRate);
                     foreach(var unit in filteredUnits)
                         unit.OnSkillDamaged(owner, skillId, damage2);
                 }

@@ -25,7 +25,7 @@ public class SkillHitRepeat : Skill
             yield return new WaitForSeconds(skillCfg.TimeDelay);
             if (defender != null && defender.hp > 0)
             {
-                var d = (int)(damage * skillCfg.Strength);
+                var d = (int)(damage * skillCfg.SkillDamageRate);
                 defender.OnSkillDamaged(owner, skillId, d);
                 EffectManager.PlaySkillEffect(defender, skillCfg.HitEffect);
                 WorldManager.Instance.AddBattleText(d.ToString() + "!", defender.transform.position, new UnityEngine.Vector2(0, 60), Color.red, 3);

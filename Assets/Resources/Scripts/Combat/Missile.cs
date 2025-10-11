@@ -10,15 +10,23 @@ public class Missile : MonoBehaviour
 {
     public Chess owner;
     public string effectName;
-    public int skillId;
-    private float size;
     
-    public void Init(Chess sourceChess, float size, int skillId, string effectName)
+    private float size;
+
+    public int skillId;
+    public int skillDamage;
+
+    public void Init(Chess sourceChess, float size, string effectName)
     {
         this.effectName = effectName;
         owner = sourceChess;
-        this.skillId = skillId;        
         this.size = size;
+    }
+
+    public void SetSkillInfo(int skillId, int damage)
+    {
+        this.skillId = skillId;        
+        skillDamage = damage;
     }
 
     public void MoveToDirection(Vector3 targetPos, float time, float missileSpeed)
@@ -179,11 +187,9 @@ public class Missile : MonoBehaviour
         }
         else
         {
-            var skillCfg = SkillConfig.GetConfig(skillId);
-            var damage = (int)(owner.GetAttr(skillCfg.Attr) * skillCfg.Strength);
             if (owner != null && owner.hp > 0)
             {
-                target.OnSkillDamaged(owner, skillId, damage);
+                target.OnSkillDamaged(owner, skillId, skillDamage);
             }
         }
     }

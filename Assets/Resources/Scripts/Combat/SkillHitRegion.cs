@@ -42,7 +42,7 @@ public class SkillHitRegion : Skill
             if (unitsInRange.Count > 0)
             {
                 WorldManager.Instance.RandomSelect(unitsInRange, skillCfg.TargetCount);
-                var damage = (int)(owner.GetAttr(skillCfg.Attr) * skillCfg.Strength);
+                var damage = (int)(owner.GetAttr(skillCfg.Attr) * skillCfg.SkillDamageAttrRate);
                 foreach(var unit in unitsInRange)
                     unit.OnSkillDamaged(owner, skillId, damage);
             }
