@@ -8,7 +8,7 @@ public class BuffSuck : Buff
     public override void OnAttack(Chess defender, int damage)
     {
         UnityEngine.Debug.Log("Suck " + damage.ToString());
-        owner.AddHp((int)(damage * skillCfg.Strength));
+        owner.AddHp((int)(damage * skillCfg.SkillDamageRate));
         EffectManager.PlaySkillEffect(owner, skillCfg.HitEffect);
     }
 }

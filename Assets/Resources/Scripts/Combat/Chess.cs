@@ -727,6 +727,9 @@ public class Chess : MonoBehaviour
 
     public void AddHp(int addon)
     {
+        if(addon <= 0)
+            throw new Exception("添加的血量不能小于等于0");
+
         hp = Mathf.Clamp(hp + addon, 0, maxHp);
         OnHpChanged();
     }

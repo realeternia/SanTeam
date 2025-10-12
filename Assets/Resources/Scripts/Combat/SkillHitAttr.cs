@@ -15,7 +15,7 @@ public class SkillHitAttr : Skill
         {
             var roll = Random.Range(0, 3);
             var attr = roll == 0 ? "inte" : (roll == 1 ? "str" : "leadShip");
-            owner.AddAttr(attr, (int)(owner.GetAttr(attr) * skillCfg.Strength));
+            owner.AddAttr(attr, skillCfg.StrengthInt);
             EffectManager.PlaySkillEffect(owner, skillCfg.HitEffect);
         }
     }

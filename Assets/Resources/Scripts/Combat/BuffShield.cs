@@ -10,14 +10,14 @@ public class BuffShield : Buff
     public override void OnAdd(Chess chess, Chess caster)
     {
         base.OnAdd(chess, caster);
-        hp = (int)(skillCfg.Strength * caster.maxHp);
+        hp = (int)(skillCfg.SkillAttrRate * caster.maxHp);
 
     }
 
     public override void Refresh(Chess caster, float lastTime)
     {
         base.Refresh(caster, lastTime);
-        hp = (int)(skillCfg.Strength * caster.maxHp);
+        hp = (int)(skillCfg.SkillAttrRate * caster.maxHp);
     }
 
     public override void BeforeAttacked(Chess defender, ref int damage)

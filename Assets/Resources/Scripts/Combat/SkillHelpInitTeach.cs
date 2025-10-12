@@ -19,7 +19,7 @@ public class SkillHelpInitTeach : Skill
             if(targetAttr > ownerAttr)
                 continue;
 
-            var addon = (ownerAttr - targetAttr) * skillCfg.Strength;
+            var addon = (ownerAttr - targetAttr) * skillCfg.SkillAttrRate;
             if (addon < 10)
                 addon = 10;
             var newAttr = Math.Min(ownerAttr, targetAttr + addon);

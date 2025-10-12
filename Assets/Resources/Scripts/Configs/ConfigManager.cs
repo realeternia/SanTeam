@@ -174,7 +174,7 @@ public static class ConfigManager
                 return skill;
             else if (skillCfg.UnitHelpType == 2 && ((srcPos % 3) == (targetPos % 3)))
                 return skill;
-            else
+            else if (skillCfg.UnitHelpType == 3)
                 return skill;
         }
 

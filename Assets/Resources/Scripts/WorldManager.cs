@@ -1058,6 +1058,8 @@ public class WorldManager : MonoBehaviour
                         unitsInRange.Add(chessComponent);
                     else if(selectType == 2 && ((pos % 3) == (chessComponent.pos % 3)))
                         unitsInRange.Add(chessComponent);
+                    else if(selectType == 3)
+                        unitsInRange.Add(chessComponent);
                 }
             }
         }

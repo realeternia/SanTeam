@@ -19,10 +19,8 @@ public class SkillAttackedShadow : Skill
             Vector2 randomDir = UnityEngine.Random.insideUnitCircle.normalized;
             Vector3 randomPosition = owner.transform.position + new Vector3(randomDir.x, 0, randomDir.y) * skillCfg.Range;
             var shadowUnit = WorldManager.Instance.SpawnUnitsForRegion(owner.GetPlayerInfo(), 501002, -1, randomPosition, owner.side, HeroConfig.GetConfig(owner.heroId).Icon);
-            shadowUnit.attackDamage = (int)(owner.attackDamage * skillCfg.Strength);
-            if(skillCfg.StrengthInt > 0)
-                shadowUnit.attackDamage = skillCfg.StrengthInt;
-            shadowUnit.maxHp = (int)(owner.maxHp * skillCfg.Strength);
+            shadowUnit.attackDamage = (int)(owner.attackDamage * skillCfg.SkillDamageRate);
+            shadowUnit.maxHp = (int)(owner.maxHp * skillCfg.SkillAttrRate);
             shadowUnit.hp = (int)(shadowUnit.maxHp * owner.HpRate);
             shadowUnit.material.SetFloat("_SecondTexSize", 2f);
             shadowUnit.material.SetTexture("_SecondTex", Resources.Load<Texture>("SkillPic/" + skillCfg.Icon));
