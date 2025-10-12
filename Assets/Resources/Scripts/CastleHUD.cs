@@ -56,12 +56,12 @@ public class CastleHUD : MonoBehaviour
         rectTransform.anchoredPosition = screenPosition + new Vector2(-75, 0);
     }
 
-    public void AddSoldierLevel(int level)
+    public void AddSoldierLevel(int level, int atkAdd, int hpAdd)
     {
         soldierLevel += level;
         var soldierCfg = SoldierConfig.GetConfig(500001);
-        textAtk.text = (baseAtk + soldierLevel * 4).ToString();
-        textHp.text = (baseHp + soldierLevel * 20).ToString();
+        textAtk.text = (baseAtk + atkAdd).ToString();
+        textHp.text = (baseHp + hpAdd).ToString();
         textAtk.color = Color.green;
         textHp.color = Color.green;
     }

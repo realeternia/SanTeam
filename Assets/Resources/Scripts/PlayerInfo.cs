@@ -149,12 +149,18 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 
     public void AddGold(int g)
     {
+        if(g <= 0)
+         throw new ArgumentException("Gold must be greater than 0");
+
         gold += g;
         goldText.text = gold.ToString();
     }
 
     public void AddFood(int f)
     {
+        if(f <= 0)
+            throw new ArgumentException("Food must be greater than 0");
+
         food += f;
     }
 

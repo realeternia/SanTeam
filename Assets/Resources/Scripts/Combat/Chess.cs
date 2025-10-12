@@ -308,7 +308,7 @@ public class Chess : MonoBehaviour
     }
 
     // 只能开场用
-    public void AddSoldierLevel(int lv)
+    public void AddSoldierLevel(int lv, int atkAdd, int hpAdd)
     {
         if (isHero)
             return;
@@ -321,8 +321,8 @@ public class Chess : MonoBehaviour
         soldierLevel += lv;
         transform.localScale = new Vector3(5 + soldierLevel * 0.75f, 3, 5 + soldierLevel * 0.75f);
 
-        attackDamage += (int)(lv * 5 * soldierCfg.SoldierAtkRate);
-        maxHp += (int)(lv * 25 * soldierCfg.SoldierHpRate);
+        attackDamage += (int)(lv * atkAdd * soldierCfg.SoldierAtkRate);
+        maxHp += (int)(lv * hpAdd * soldierCfg.SoldierHpRate);
         hp = maxHp;
     }
 

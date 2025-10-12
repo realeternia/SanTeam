@@ -38,7 +38,7 @@ public class SkillDefFeedback : Skill
 
         if (CheckBurst(attacker))
         {
-            var damageBack = (int)(damage * skillCfg.SkillDamageRate);
+            var damageBack = (int)(damage * skillCfg.Strength);
             attacker.OnSkillDamaged(owner, skillId, damageBack, true);
             EffectManager.PlaySkillEffect(attacker, skillCfg.HitEffect);
 

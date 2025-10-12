@@ -13,17 +13,19 @@ public class SkillInitSoldierUp : Skill
         UnityEngine.Debug.Log("SkillInitSoldierUp BattleBegin");
 
         var unitsInRange = WorldManager.Instance.GetUnitsMySide(owner.transform.position, skillCfg.Range, owner.side);
+        var atkAdd = (int)(owner.GetAttr(skillCfg.Attr) * skillCfg.SkillDamageAttrRate);
+        var hpAdd = (int)(owner.GetAttr(skillCfg.Attr) * skillCfg.SkillAttrRate);
 
         foreach(var unit in unitsInRange)
         {
             if(unit.isHero)
                 continue;
 
-            unit.AddSoldierLevel(skillCfg.StrengthInt);
+            unit.AddSoldierLevel(1, atkAdd, hpAdd);
             EffectManager.PlaySkillEffect(unit, skillCfg.HitEffect);
         }
         var castleHUD = owner.GetPlayerInfo().castleHUD;
         if(castleHUD != null)
-            castleHUD.AddSoldierLevel(skillCfg.StrengthInt);
+            castleHUD.AddSoldierLevel(1, atkAdd, hpAdd);
     }
 }

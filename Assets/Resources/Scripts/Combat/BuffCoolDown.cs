@@ -9,6 +9,6 @@ public class BuffCoolDown : Buff
 
     public override void OnAttack(Chess defender, int damage)
     {
-        owner.Cooldown(skillCfg.Strength);
+        owner.Cooldown(2 * skillCfg.Strength);
     }
 }
