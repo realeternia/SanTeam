@@ -1,3 +1,4 @@
+using System;
 using CommonConfig;
 using UnityEngine;
 
@@ -12,7 +13,7 @@ public class SkillInitFood : Skill
         EffectManager.PlaySkillEffect(owner, skillCfg.HitEffect);
 
         var addon = Math.Max(owner.GetAttr(skillCfg.Attr) * skillCfg.SkillAttrRate, skillCfg.StrengthInt);        
-        owner.GetPlayerInfo().AddFood(addon);
+        owner.GetPlayerInfo().AddFood((int)addon);
 
         WorldManager.Instance.AddBattleText(addon.ToString() + "粮食", owner.transform.position, new UnityEngine.Vector2(0, 60), new Color(1, 0.8f, 0), 2);
     }

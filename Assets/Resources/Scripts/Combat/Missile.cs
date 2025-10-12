@@ -36,7 +36,7 @@ public class Missile : MonoBehaviour
             hitPrefab = Resources.Load<GameObject>("Prefabs/Effect/" + effectName);
         GameObject missileEffect = Instantiate(hitPrefab, transform.position, hitPrefab.transform.rotation, transform);
         transform.rotation = Quaternion.LookRotation(targetPos - transform.position);
-        transform.position = owner.transform.position + new Vector3(0f, 2f, 0f);
+        transform.position += new Vector3(0f, 2f, 0f); 
         transform.localScale = size * hitPrefab.transform.localScale;
 
         var detectArea = 10f;
@@ -58,7 +58,7 @@ public class Missile : MonoBehaviour
             hitPrefab = Resources.Load<GameObject>("Prefabs/Effect/" + effectName);
 
         GameObject missileEffect = Instantiate(hitPrefab, transform.position, Quaternion.identity, transform);
-        transform.position = owner.transform.position + new Vector3(0f, 5f, 0f);
+        transform.position += new Vector3(0f, 5f, 0f);
         missileEffect.transform.localScale = hitPrefab.transform.localScale;
 
         StartCoroutine(MoveMissileToTarget(gameObject, target, missileSpeed, missileHight));
@@ -79,14 +79,15 @@ public class Missile : MonoBehaviour
         float maxY = missileHight;
 
         var lastTime = Time.time;
-        while (missile != null && target != null && !WorldManager.Instance.CheckInRange(missile.transform.position, targetPos, 0.5f) && !ReferenceEquals(target, null))
+        while (missile != null && !WorldManager.Instance.CheckInRange(missile.transform.position, targetPos, 0.5f))
         {
             // if (owner == null || owner.hp <= 0)
             // {
             //     Destroy(missile);
             //     yield break;
             // }
-            targetPos = target.transform.position + new Vector3(0f, 5f, 0f); //修正目标点
+            if(target != null && target.hp > 0)
+                targetPos = target.transform.position + new Vector3(0f, 5f, 0f); //修正目标点
             float distCovered = (Time.time - lastTime) * speed;
             journeyLength = WorldManager.Instance.GetRange(missile.transform.position, targetPos);
             float fractionOfJourney = distCovered / journeyLength;
@@ -180,17 +181,17 @@ public class Missile : MonoBehaviour
 
     private void OnCrash(Chess target)
     {
+        if (target == null || target.hp <= 0 || owner == null || owner.hp <= 0)
+            return;
+
         if (skillId == 0)
         {
-            if (target != null && owner != null && owner.hp > 0)
-                owner.Attack(target);
+            owner.Attack(target);
         }
         else
         {
-            if (owner != null && owner.hp > 0)
-            {
-                target.OnSkillDamaged(owner, skillId, skillDamage);
-            }
+            target.OnSkillDamaged(owner, skillId, skillDamage);
+            EffectManager.PlaySkillEffect(target, effectName);
         }
     }
 }

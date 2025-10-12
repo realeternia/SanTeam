@@ -36,6 +36,8 @@ public static class SkillManager
                 return new SkillAttackSpeedAttack(skillId, owner);
             case "AttackMultiArrow":
                 return new SkillAttackMultiArrow(skillId, owner);
+            case "AttackReboundArrow":
+                return new SkillAttackReboundArrow(skillId, owner);
             case "DefPlantSkin":
                 return new SkillDefPlantSkin(skillId, owner);
             case "DefHpLow":
