@@ -69,7 +69,7 @@ public class ItemDetail : MonoBehaviour
             {
                 attr1Icon.gameObject.SetActive(true);
                 attr1Val.gameObject.SetActive(true);
-                attr1Icon.sprite = Resources.Load<Sprite>("attr" + itemConfig.Attr1);
+                attr1Icon.sprite = Resources.Load<Sprite>("Textures/attr" + itemConfig.Attr1);
                 attr1Val.text = (itemConfig.Attr1Val * lv).ToString();
             }
 
@@ -82,7 +82,7 @@ public class ItemDetail : MonoBehaviour
             {
                 attr2Icon.gameObject.SetActive(true);
                 attr2Val.gameObject.SetActive(true);
-                attr2Icon.sprite = Resources.Load<Sprite>("attr" + itemConfig.Attr2);
+                attr2Icon.sprite = Resources.Load<Sprite>("Textures/attr" + itemConfig.Attr2);
                 attr2Val.text = (itemConfig.Attr2Val * lv).ToString();
             }
 

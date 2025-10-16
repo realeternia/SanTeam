@@ -160,9 +160,9 @@ public class RankCellInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandle
     private void UpdateLoveBtn()
     {
         if (Profile.Instance.cardLoves.Contains(heroId))
-            loveBtn.GetComponent<Image>().sprite = Resources.Load<Sprite>("love");
+            loveBtn.GetComponent<Image>().sprite = Resources.Load<Sprite>("Textures/love");
         else
-            loveBtn.GetComponent<Image>().sprite = Resources.Load<Sprite>("loveoff");
+            loveBtn.GetComponent<Image>().sprite = Resources.Load<Sprite>("Textures/loveoff");
     }
 
     // Update is called once per frame

@@ -219,7 +219,7 @@ public class CardViewControl : MonoBehaviour, IPointerDownHandler, IPointerUpHan
             itemImage.sprite = Resources.Load<Sprite>("ItemPic/" + itemCfg.Icon);
             if (!string.IsNullOrEmpty(itemCfg.Attr1))
             {
-                itemAttrImage1.sprite = Resources.Load<Sprite>("attr" + itemCfg.Attr1);
+                itemAttrImage1.sprite = Resources.Load<Sprite>("Textures/attr" + itemCfg.Attr1);
                 itemAttrName1.text = itemCfg.Attr1Val.ToString();
             }
             else
@@ -231,7 +231,7 @@ public class CardViewControl : MonoBehaviour, IPointerDownHandler, IPointerUpHan
 
             if (!string.IsNullOrEmpty(itemCfg.Attr2))
             {
-                itemAttrImage2.sprite = Resources.Load<Sprite>("attr" + itemCfg.Attr2);
+                itemAttrImage2.sprite = Resources.Load<Sprite>("Textures/attr" + itemCfg.Attr2);
                 itemAttrName2.text = itemCfg.Attr2Val.ToString();
             }
             else
