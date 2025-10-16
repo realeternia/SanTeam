@@ -19,6 +19,8 @@ public static class SkillManager
                 return new SkillAttackAddDamage(skillId, owner);
             case "InitMasterShield":
                 return new SkillInitMasterShield(skillId, owner);
+            case "InitSoldierShield":
+                return new SkillInitSoldierShield(skillId, owner);
             case "AttackedBuff":
                 return new SkillAttackedBuff(skillId, owner);
             case "AttackRunCross":
@@ -52,6 +54,8 @@ public static class SkillManager
                 return new SkillInitSoldierSummon(skillId, owner);      
             case "InitGold":
                 return new SkillInitGold(skillId, owner);
+            case "InitAttrZhiheng":
+                return new SkillInitAttrZhiheng(skillId, owner);
             case "InitFood":
                 return new SkillInitFood(skillId, owner);                          
             case "HitBuff":

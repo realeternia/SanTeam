@@ -9,11 +9,10 @@ public class SkillInitMasterShield : Skill
 
     public override void BattleBegin()
     {
-        UnityEngine.Debug.Log("BattleBegin SkillMasterShield " + owner.heroId.ToString());
-
         var unitList = WorldManager.Instance.GetUnitsMySide(owner.transform.position, 0, owner.side);
 
         var mySide = HeroConfig.GetConfig(owner.heroId).Side;
+        var shieldHp = (int)(owner.maxHp * skillCfg.Strength);
 
         foreach (var unit in unitList)
         {
@@ -24,13 +23,9 @@ public class SkillInitMasterShield : Skill
             var heroCfg = HeroConfig.GetConfig(unit.heroId);
             if (heroCfg.Side == mySide)
             {
-                var shieldHp = (int)(owner.maxHp * skillCfg.Strength);
-                UnityEngine.Debug.Log("BattleBegin 护盾值 " + shieldHp);
-
+                UnityEngine.Debug.Log("SkillInitMasterShield BattleBegin 护盾值 " + shieldHp);
                 BuffManager.AddBuff(unit, owner, skillCfg.Id, skillCfg.BuffId, skillCfg.BuffTime);
-
             }
-
         }
     }
 }

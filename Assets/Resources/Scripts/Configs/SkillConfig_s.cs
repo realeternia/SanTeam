@@ -295,10 +295,12 @@ namespace CommonConfig
             config[208008] = new SkillConfig(208008, "曲扬", "曲", "正面祝福状态时间增加50%", "智技up", 1, 0, 0, 0, "inte", new string[]{"inte"}, 0, false, "", 0, 0.5f, 0, 0, 0, 0, 0, 0, 0, "", "", 0, false, 0, 0, 0, 0, 0, 0, "ModifyBuffTime", "", "", 0, 1, "qu");
             config[209001] = new SkillConfig(209001, "富甲", "商", "参战获得5金币", "", 1, 0, 0, 0, "inte", null, 0, false, "", 0, 0, 5, 0.05f, 0, 0, 0, 0, 0, "", "", 0, false, 0, 0, 0, 0, 0, 0, "InitGold", "", "MagicChargeYellow", 0, 3, "gold");
             config[209002] = new SkillConfig(209002, "国士", "国", "增加一个远程士兵并提升射程", "", 1, 0, 0, 0, "inte", null, 15f, false, "", 0, 0, 10, 0, 0, 0, 0, 0, 0, "", "", 0, false, 0, 0, 0, 0, 0, 0, "InitSoldierSummon", "", "MagicChargeGreen", 0, 4, "guo");
-            config[209003] = new SkillConfig(209003, "激励", "励", "提升同列队友智力", "", 1, 0, 0, 0, "inte", null, 0, false, "", 0, 0, 0, 0.7f, 0, 0, 0, 0, 2, "", "", 0, false, 0, 0, 0, 0, 0, 0, "HelpInitTeach", "", "MagicChargeYellow", 0, 2, "li");
-            config[209004] = new SkillConfig(209004, "学习", "学", "攻击时几率提升自己的属性", "", 1, 0.3f, 0, 0, "inte", null, 0, false, "", 0, 0, 5, 0, 0, 0, 0, 0, 0, "", "", 0, false, 0, 0, 0, 0, 0, 0, "HitAttr", "", "MagicChargeYellow", 0, 3, "zhang");
-            config[209005] = new SkillConfig(209005, "米道", "米", "参战获得10粮食", "", 1, 0, 0, 0, "inte", null, 0, false, "", 0, 0, 10, 0.1f, 0, 0, 0, 0, 0, "", "", 0, false, 0, 0, 0, 0, 0, 0, "InitFood", "", "MagicChargeYellow", 0, 2, "food");
-            config[209006] = new SkillConfig(209006, "奋进", "奋", "提升同列队友武力", "", 1, 0, 0, 0, "str", null, 0, false, "", 0, 0, 0, 0.7f, 0, 0, 0, 0, 2, "", "", 0, false, 0, 0, 0, 0, 0, 0, "HelpInitTeach", "", "MagicChargePink", 0, 2, "fen");
+            config[209003] = new SkillConfig(209003, "仁德", "仁", "给与我方前排士兵17%生命值护盾", "", 1, 0, 0, 0, "leadShip", null, 0, false, "", 0, 0, 0, 0.17f, 0, 0, 0, 0, 0, "", "", 300001, false, 999f, 0, 0, 0, 0, 0, "InitSoldierShield", "", "", 0, 3, "ren");
+            config[209004] = new SkillConfig(209004, "激励", "励", "提升同列队友智力", "", 1, 0, 0, 0, "inte", null, 0, false, "", 0, 0, 0, 0.7f, 0, 0, 0, 0, 2, "", "", 0, false, 0, 0, 0, 0, 0, 0, "HelpInitTeach", "", "MagicChargeYellow", 0, 2, "li");
+            config[209005] = new SkillConfig(209005, "学习", "学", "攻击时几率提升自己的属性", "", 1, 0.3f, 0, 0, "inte", null, 0, false, "", 0, 0, 5, 0, 0, 0, 0, 0, 0, "", "", 0, false, 0, 0, 0, 0, 0, 0, "HitAttr", "", "MagicChargeYellow", 0, 3, "zhang");
+            config[209006] = new SkillConfig(209006, "制衡", "衡", "初始获得我方兵种数为3,4,5时,提升属性10,20,30", "", 1, 0, 0, 0, "inte", null, 0, false, "", 0, 0, 5, 0, 0, 0, 0, 0, 0, "", "", 0, false, 0, 0, 0, 0, 0, 0, "InitAttrZhiheng", "", "MagicChargeYellow", 0, 2, "heng");
+            config[209007] = new SkillConfig(209007, "米道", "米", "参战获得10粮食", "", 1, 0, 0, 0, "inte", null, 0, false, "", 0, 0, 10, 0.1f, 0, 0, 0, 0, 0, "", "", 0, false, 0, 0, 0, 0, 0, 0, "InitFood", "", "MagicChargeYellow", 0, 2, "food");
+            config[209008] = new SkillConfig(209008, "奋进", "奋", "提升同列队友武力", "", 1, 0, 0, 0, "str", null, 0, false, "", 0, 0, 0, 0.7f, 0, 0, 0, 0, 2, "", "", 0, false, 0, 0, 0, 0, 0, 0, "HelpInitTeach", "", "MagicChargePink", 0, 2, "fen");
 
         }
 
