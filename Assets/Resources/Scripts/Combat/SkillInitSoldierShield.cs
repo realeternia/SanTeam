@@ -10,6 +10,7 @@ public class SkillInitSoldierShield : Skill
     public override void BattleBegin()
     {
         var unitList = WorldManager.Instance.GetUnitsMySide(owner.transform.position, 0, owner.side);
+        owner.PlayerAnim(skillCfg.Action);
 
         var shieldHp = (int)(owner.maxHp * skillCfg.Strength);
         foreach (var unit in unitList)

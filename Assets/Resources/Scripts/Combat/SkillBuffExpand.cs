@@ -29,6 +29,7 @@ public class SkillBuffExpand : Skill
             var unitsInRange = WorldManager.Instance.GetUnitsInRange(target.transform.position, skillCfg.Range, owner.side, true);
             if (unitsInRange.Count > 0)
             {
+                owner.PlayerAnim(skillCfg.Action);
                 WorldManager.Instance.RandomSelect(unitsInRange, skillCfg.TargetCount);
 
                 foreach (var unit in unitsInRange)

@@ -14,6 +14,7 @@ public class SkillInitSoldierSummon : Skill
         Vector2 randomDir = UnityEngine.Random.insideUnitCircle.normalized;
         Vector3 randomPosition = owner.transform.position + new Vector3(randomDir.x, 0, randomDir.y) * skillCfg.Range;
         WorldManager.Instance.SpawnUnitsForRegion(owner.GetPlayerInfo(), 500002, -1, randomPosition, owner.side, owner.GetPlayerInfo().imgPath);
+        owner.PlayerAnim(skillCfg.Action);
 
         var units = WorldManager.Instance.GetUnitsMySide(randomPosition, 0, owner.side);
         foreach(var unit in units)

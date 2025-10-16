@@ -13,6 +13,8 @@ public class SkillHitTeleport : Skill
     {
         if(!WorldManager.Instance.CheckInRange(owner.transform.position, attacker.transform.position, skillCfg.Range) && CheckBurst(attacker))
         {
+            owner.PlayerAnim(skillCfg.Action);
+
             Vector3 direction = (attacker.transform.position - owner.transform.position).normalized;
             Vector3 randomPosition = attacker.transform.position - direction * 12;
 

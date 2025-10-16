@@ -16,7 +16,7 @@ public class SkillHitWall : Skill
     {
         if (CheckBurst(defender))
         {
-                owner.PlayerAnim(skillCfg.Action);
+            owner.PlayerAnim(skillCfg.Action);
             // 在目标位置，以及owner和defender方向90度两侧，各创建一个effect
             var targetPos = defender.transform.position;
 

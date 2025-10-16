@@ -25,6 +25,7 @@ public class SkillAidShockWave : Skill
 
         this.targetPos = owner.targetChess.transform.position; // 使用目标位置而不是自身位置
 
+        owner.PlayerAnim(skillCfg.Action);
         var damage = (int)(owner.GetAttr(skillCfg.Attr) * skillCfg.SkillDamageAttrRate);
         WorldManager.Instance.CreateSpellMissile(owner, targetPos, skillCfg.SummonTime, skillCfg.SummonSpeed, skillCfg.EffectSize, skillCfg.Id, damage, skillCfg.HitEffect);
         owner.attackPoint = Math.Max(owner.attackPoint - 2, -1);

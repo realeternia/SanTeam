@@ -13,6 +13,7 @@ public class SkillInitMasterShield : Skill
 
         var mySide = HeroConfig.GetConfig(owner.heroId).Side;
         var shieldHp = (int)(owner.maxHp * skillCfg.Strength);
+        owner.PlayerAnim(skillCfg.Action);
 
         foreach (var unit in unitList)
         {

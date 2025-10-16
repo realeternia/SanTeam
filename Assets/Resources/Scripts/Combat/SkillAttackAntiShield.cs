@@ -19,7 +19,7 @@ public class SkillAttackAntiShield : Skill
             if (shield != null)
             {
                 owner.PlayerAnim(skillCfg.Action);
-                shield.SubHp((int)(damage * skillCfg.Strength));
+                shield.SubHp((int)(damageBase * skillCfg.Strength));
             }
         }
     }

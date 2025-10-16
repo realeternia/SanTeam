@@ -20,8 +20,8 @@ public class SkillHitAround : Skill
     {
         if (isBurst)
         {
-                owner.PlayerAnim(skillCfg.Action);
-            
+            owner.PlayerAnim(skillCfg.Action);
+
             var startPos = owner.transform.position;
             var targetPos = defender.transform.position;
 

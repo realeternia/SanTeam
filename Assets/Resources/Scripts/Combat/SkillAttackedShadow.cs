@@ -27,6 +27,8 @@ public class SkillAttackedShadow : Skill
             EffectManager.PlaySkillEffect(owner, skillCfg.HitEffect);
             EffectManager.PlaySkillEffect(shadowUnit, skillCfg.HitEffect);
 
+            owner.PlayerAnim(skillCfg.Action);
+
             count--;
         }
     }

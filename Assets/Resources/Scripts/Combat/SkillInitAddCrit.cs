@@ -13,6 +13,7 @@ public class SkillInitAddCrit : Skill
     public override void BattleBegin()
     {
         owner.critRate += skillCfg.Strength;
+        owner.PlayerAnim(skillCfg.Action);
     }
 
 

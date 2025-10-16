@@ -17,6 +17,7 @@ public class SkillHitFood : Skill
             var sub = defender.GetPlayerInfo().SubFood(skillCfg.StrengthInt);
             if (sub > 0)
             {
+                owner.PlayerAnim(skillCfg.Action);
                 owner.GetPlayerInfo().AddFood(sub);
                 WorldManager.Instance.AddBattleText("粮-" + sub.ToString(), defender.transform.position, new UnityEngine.Vector2(0, -30), Color.red, 3);
                 WorldManager.Instance.AddBattleText("粮+" + sub.ToString(), owner.transform.position, new UnityEngine.Vector2(0, 60), Color.green, 3);

@@ -12,6 +12,8 @@ public class SkillHelpInitTeach : Skill
     {
         var unitsInRange = WorldManager.Instance.GetUnitsMySidePosType(owner.side, owner.pos, true, skillCfg.UnitHelpType);
         unitsInRange.Remove(owner);
+        owner.PlayerAnim(skillCfg.Action);
+
         foreach (var unit in unitsInRange)
         {
             var targetAttr = unit.GetAttr(skillCfg.Attr);

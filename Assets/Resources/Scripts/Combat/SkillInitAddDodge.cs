@@ -13,6 +13,7 @@ public class SkillInitAddDodge : Skill
     public override void BattleBegin()
     {
         owner.dodgeRate += skillCfg.Strength;
+        owner.PlayerAnim(skillCfg.Action);
     }
 
 

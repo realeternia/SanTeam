@@ -14,6 +14,7 @@ public class SkillHitRepeat : Skill
         if(CheckBurst(defender))
         {
             WorldManager.Instance.AddBattleText(damage.ToString() + "!", defender.transform.position, new UnityEngine.Vector2(0, 60), Color.red, 3);
+            owner.PlayerAnim(skillCfg.Action);
             owner.StartCoroutine(DelayAttack(defender, damage));
         }
     }

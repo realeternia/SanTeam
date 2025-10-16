@@ -16,6 +16,7 @@ public class SkillAttackMultiArrow : Skill
 
         if (unitsInRange.Count > 0 && CheckBurst(defender))
         {
+            owner.PlayerAnim(skillCfg.Action);
             WorldManager.Instance.RandomSelect(unitsInRange, skillCfg.TargetCount);
             foreach (var unit in unitsInRange)
                 WorldManager.Instance.CreateAttackMissile(owner, unit, owner.hitEffect);

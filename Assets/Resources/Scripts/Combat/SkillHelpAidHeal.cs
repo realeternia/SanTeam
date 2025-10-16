@@ -22,7 +22,7 @@ public class SkillHelpAidHeal : Skill
         if (!CheckBurst(null))
             return false;
 
-            owner.PlayerAnim(skillCfg.Action);              
+        owner.PlayerAnim(skillCfg.Action);
 
         //排序，优先给hero，然后优先给生命值低的
         unitsInRange.Sort((a, b) =>

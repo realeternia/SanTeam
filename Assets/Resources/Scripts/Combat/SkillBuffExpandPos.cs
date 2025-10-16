@@ -51,6 +51,7 @@ public class SkillBuffExpandPos : Skill
             unitsInRange.RemoveAll(x => x.HpRate > 0.9f);
             if (unitsInRange.Count > 0)
             {
+                owner.PlayerAnim(skillCfg.Action);
                 WorldManager.Instance.RandomSelect(unitsInRange, skillCfg.TargetCount);
 
                 foreach (var unit in unitsInRange)

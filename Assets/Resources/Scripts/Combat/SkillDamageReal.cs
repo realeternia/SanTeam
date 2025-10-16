@@ -20,6 +20,7 @@ public class SkillDamageReal : Skill
 
         if(CheckBurst(defender))
         {
+            owner.PlayerAnim(skillCfg.Action);
             damageReal = (int)(defender.maxHp * skillCfg.Strength);
         }
     }

@@ -13,8 +13,8 @@ public class SkillHitArea : Skill
     public override void OnAttack(Chess defender, string damType, int damage)
     {
         if (CheckBurst(defender))
-        {        
-                owner.PlayerAnim(skillCfg.Action);
+        {
+            owner.PlayerAnim(skillCfg.Action);
 
             var targetPos = defender.transform.position;
             //创建一个hitEffect

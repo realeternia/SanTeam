@@ -13,7 +13,7 @@ public class SkillHitBuff : Skill
     {
         if(CheckBurst(defender))
         {
-                owner.PlayerAnim(skillCfg.Action);
+            owner.PlayerAnim(skillCfg.Action);
             BuffManager.AddBuff(defender, owner, id, skillCfg.BuffId, skillCfg.BuffTime);
         }
     }
