@@ -8,6 +8,8 @@ public static class BuffManager
 
         if(time == 0) //有的技能会先填0，等待buff
             return;
+        
+        UnityEngine.Debug.Log("AddBuff buffId=" + buffId.ToString() + " skillId=" + skillId.ToString() + " time=" + time.ToString());
 
         Buff buff = null;
         var buffCfg = BuffConfig.GetConfig(buffId);
@@ -34,8 +36,8 @@ public static class BuffManager
             case "BuffDamagedAddRate":
                 buff = new BuffDamagedAddRate(buffId, skillId, caster, target, time);
                 break;
-            case "BuffDamageAddRate":
-                buff = new BuffDamageAddRate(buffId, skillId, caster, target, time);
+            case "BuffSpeedDown":
+                buff = new BuffSpeedDown(buffId, skillId, caster, target, time);
                 break;
 
         }

@@ -56,6 +56,7 @@ public class Chess : MonoBehaviour
 
     // 攻击冷却时间
     public float attackPoint;
+    public float attackRate; //攻击频率
     private float lastAttackTime = 0f;
     private float lastTargetUpdateTime = 0f; // 上次更新目标的时间
 
@@ -150,6 +151,7 @@ public class Chess : MonoBehaviour
             heroInfo.SetHpRate(hp, maxHp);
         
         attackPoint = UnityEngine.Random.Range(0f, 1f); // 随机获得初始气力
+        attackRate = 1;
     }
 
     // 创建血条HUD
@@ -446,7 +448,7 @@ public class Chess : MonoBehaviour
         // 检查目标是否在攻击范围内
         if (WorldManager.Instance.CheckInRange(transform.position, targetChess.transform.position, attackRange))
         {
-            attackPoint += deltaTime;
+            attackPoint += deltaTime * attackRate;
             // 检查攻击冷却
             if (attackPoint >= 2f) //集气2s
             {
