@@ -20,7 +20,6 @@ public class SkillHitAround : Skill
     {
         if (isBurst)
         {
-            if(!string.IsNullOrEmpty(skillCfg.Action))
                 owner.PlayerAnim(skillCfg.Action);
             
             var startPos = owner.transform.position;

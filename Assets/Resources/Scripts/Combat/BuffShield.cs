@@ -1,3 +1,5 @@
+using System;
+
 public class BuffShield : Buff
 {
     private int hp;
@@ -18,6 +20,11 @@ public class BuffShield : Buff
     {
         base.Refresh(caster, lastTime);
         hp = (int)(skillCfg.SkillAttrRate * caster.maxHp);
+    }
+
+    public void SubHp(int damage)
+    {
+        hp = Math.Max(1, hp - damage);
     }
 
     public override void BeforeAttacked(Chess defender, ref int damage)

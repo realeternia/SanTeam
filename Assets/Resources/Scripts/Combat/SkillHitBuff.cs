@@ -13,7 +13,6 @@ public class SkillHitBuff : Skill
     {
         if(CheckBurst(defender))
         {
-            if(!string.IsNullOrEmpty(skillCfg.Action))
                 owner.PlayerAnim(skillCfg.Action);
             BuffManager.AddBuff(defender, owner, id, skillCfg.BuffId, skillCfg.BuffTime);
         }

@@ -31,6 +31,8 @@ public static class SkillManager
                 return new SkillHelpAidHeal(skillId, owner);
             case "HelpAidBuff":
                 return new SkillHelpAidBuff(skillId, owner);
+            case "AttackAntiShield":
+                return new SkillAttackAntiShield(skillId, owner);
 
             case "DefFeedback":
                 return new SkillDefFeedback(skillId, owner);

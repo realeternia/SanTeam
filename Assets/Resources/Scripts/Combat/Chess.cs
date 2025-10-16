@@ -879,6 +879,11 @@ public class Chess : MonoBehaviour
         return buffs.Exists(buff => buff.id == id);
     }
 
+    public Buff GetBuff(int id)
+    {
+        return buffs.Find(buff => buff.id == id);
+    }
+
     public bool MoveTo(Vector3 targetPosition, bool isForce = false)
     {
         return WorldManager.Instance.MoveTo(this, targetPosition, isForce);
@@ -888,6 +893,8 @@ public class Chess : MonoBehaviour
 
     public void PlayerAnim(string name)
     {
+        if(string.IsNullOrEmpty(name))
+            return;
         var animator = GetComponent<Animator>();
         if(animator == null)
             return;

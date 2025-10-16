@@ -14,8 +14,7 @@ public class SkillAttackAddDamage : Skill
     {
         if(CheckBurst(defender))
         {
-            if(!string.IsNullOrEmpty(skillCfg.Action))
-                owner.PlayerAnim(skillCfg.Action);            
+            owner.PlayerAnim(skillCfg.Action);
 
             damageBase += skillCfg.StrengthInt;
             if(skillCfg.Strength > 0)

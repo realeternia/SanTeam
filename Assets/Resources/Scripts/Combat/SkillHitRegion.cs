@@ -15,9 +15,8 @@ public class SkillHitRegion : Skill
     {
         if (CheckBurst(defender))
         {
-            if(!string.IsNullOrEmpty(skillCfg.Action))
-                owner.PlayerAnim(skillCfg.Action);
-                            
+            owner.PlayerAnim(skillCfg.Action);
+
             targetPos = defender.transform.position;
 
             var magicStub = WorldManager.Instance.SpawnUnitsForRegion(owner.GetPlayerInfo(), 501001, -1, targetPos, owner.side, "");

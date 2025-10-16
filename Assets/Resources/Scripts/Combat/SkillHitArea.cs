@@ -14,7 +14,6 @@ public class SkillHitArea : Skill
     {
         if (CheckBurst(defender))
         {        
-            if(!string.IsNullOrEmpty(skillCfg.Action))
                 owner.PlayerAnim(skillCfg.Action);
 
             var targetPos = defender.transform.position;

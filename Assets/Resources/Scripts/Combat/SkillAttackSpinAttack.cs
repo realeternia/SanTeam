@@ -13,7 +13,6 @@ public class SkillAttackSpinAttack : Skill
     {
         if(CheckBurst(defender))
         {
-            if(!string.IsNullOrEmpty(skillCfg.Action))
                 owner.PlayerAnim(skillCfg.Action);
             var unitsInRange = WorldManager.Instance.GetUnitsInRange(owner.transform.position, skillCfg.Range, owner.side, true);
             unitsInRange.Remove(defender);

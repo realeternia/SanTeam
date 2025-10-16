@@ -13,8 +13,7 @@ public class SkillAttackedBuff : Skill
     {
         if(damage > 10 && CheckBurst(attacker))
         {
-            if(!string.IsNullOrEmpty(skillCfg.Action))
-                owner.PlayerAnim(skillCfg.Action);
+            owner.PlayerAnim(skillCfg.Action);
 
             BuffManager.AddBuff(owner, owner, id, skillCfg.BuffId, skillCfg.BuffTime);
         }
