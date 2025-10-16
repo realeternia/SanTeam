@@ -17,6 +17,7 @@ public class SkillInitSoldierSummon : Skill
         owner.PlayerAnim(skillCfg.Action);
 
         var units = WorldManager.Instance.GetUnitsMySide(randomPosition, 0, owner.side);
+        var rangeAdd = Math.Min(20, owner.GetAttr(skillCfg.Attr) * skillCfg.Strength);
         foreach(var unit in units)
         {
             if(unit.isHero)
@@ -25,7 +26,7 @@ public class SkillInitSoldierSummon : Skill
             if(unit.attackRange < 20)
                 continue;
 
-            unit.attackRange += skillCfg.StrengthInt;
+            unit.attackRange += rangeAdd;
             EffectManager.PlaySkillEffect(unit, skillCfg.HitEffect);
         }
     }
