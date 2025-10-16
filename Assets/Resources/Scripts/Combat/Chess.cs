@@ -459,7 +459,7 @@ public class Chess : MonoBehaviour
                 }
                 else
                 {
-                    Attack(targetChess); // 普通攻击
+                    Attack(targetChess, hitEffect); // 普通攻击
 
                 }
             }
@@ -534,14 +534,14 @@ public class Chess : MonoBehaviour
     }
 
     // 攻击目标
-    public void Attack(Chess victim)
+    public void Attack(Chess victim, string hitEffectName)
     {
         if (victim == null)
             return;
 
         // 造成伤害
         var damage = calculateDamage(this, victim, out var damType);
-        var effect = hitEffect;
+        var effect = hitEffectName;
         var damageBase = damage;
         var damageMulti = 1f;
         var damageReal = 0; //真实伤害

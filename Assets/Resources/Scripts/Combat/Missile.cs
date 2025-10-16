@@ -10,7 +10,8 @@ public class Missile : MonoBehaviour
 {
     public Chess owner;
     public string effectName;
-    
+    private string hitEffectName;
+
     private float size;
 
     public int skillId;
@@ -19,6 +20,7 @@ public class Missile : MonoBehaviour
     public void Init(Chess sourceChess, float size, string effectName)
     {
         this.effectName = effectName;
+        hitEffectName = effectName;
         owner = sourceChess;
         this.size = size;
     }
@@ -31,13 +33,16 @@ public class Missile : MonoBehaviour
 
     public void MoveToDirection(Vector3 targetPos, float time, float missileSpeed)
     {
-        var hitPrefab = Resources.Load<GameObject>("Prefabs/Missile/" + effectName);
-        if (hitPrefab == null)
-            hitPrefab = Resources.Load<GameObject>("Prefabs/Effect/" + effectName);
-        GameObject missileEffect = Instantiate(hitPrefab, transform.position, hitPrefab.transform.rotation, transform);
+        var missilePrefab = Resources.Load<GameObject>("Prefabs/Missile/" + effectName);
+        if (missilePrefab == null)
+            missilePrefab = Resources.Load<GameObject>("Prefabs/Effect/" + effectName);
+        GameObject missileEffect = Instantiate(missilePrefab, transform.position, missilePrefab.transform.rotation, transform);
         transform.rotation = Quaternion.LookRotation(targetPos - transform.position);
         transform.position += new Vector3(0f, 2f, 0f); 
-        transform.localScale = size * hitPrefab.transform.localScale;
+        transform.localScale = size * missilePrefab.transform.localScale;
+
+        if(missileEffect.TryGetComponent(out MissileComp missileComp))
+            hitEffectName = missileComp.hitEffectName;
 
         var detectArea = 10f;
         var targetCount = 1;
@@ -53,13 +58,16 @@ public class Missile : MonoBehaviour
 
     public void MoveToTarget(Chess target, float missileSpeed, float missileHight)
     {
-        var hitPrefab = Resources.Load<GameObject>("Prefabs/Missile/" + effectName);
-        if (hitPrefab == null)
-            hitPrefab = Resources.Load<GameObject>("Prefabs/Effect/" + effectName);
+        var missilePrefab = Resources.Load<GameObject>("Prefabs/Missile/" + effectName);
+        if (missilePrefab == null)
+            missilePrefab = Resources.Load<GameObject>("Prefabs/Effect/" + effectName);
 
-        GameObject missileEffect = Instantiate(hitPrefab, transform.position, Quaternion.identity, transform);
+        GameObject missileEffect = Instantiate(missilePrefab, transform.position, Quaternion.identity, transform);
         transform.position += new Vector3(0f, 5f, 0f);
-        missileEffect.transform.localScale = hitPrefab.transform.localScale;
+        missileEffect.transform.localScale = missilePrefab.transform.localScale;
+
+        if(missileEffect.TryGetComponent(out MissileComp missileComp))
+            hitEffectName = missileComp.hitEffectName;        
 
         StartCoroutine(MoveMissileToTarget(gameObject, target, missileSpeed, missileHight));
     }
@@ -186,12 +194,12 @@ public class Missile : MonoBehaviour
 
         if (skillId == 0)
         {
-            owner.Attack(target);
+            owner.Attack(target, hitEffectName);
         }
         else
         {
             target.OnSkillDamaged(owner, skillId, skillDamage);
-            EffectManager.PlaySkillEffect(target, effectName);
+            EffectManager.PlaySkillEffect(target, hitEffectName);
         }
     }
 }
