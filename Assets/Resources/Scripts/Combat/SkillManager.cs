@@ -85,6 +85,8 @@ public static class SkillManager
                 return new SkillHitAround(skillId, owner);
             case "AidShockWave":
                 return new SkillAidShockWave(skillId, owner);
+            case "AidSuddenArrow":
+                return new SkillAidSuddenArrow(skillId, owner);
             case "ModifySkillRateTime":
                 return new SkillModifySkillRateTime(skillId, owner);
             case "BuffExpand":
@@ -229,8 +231,11 @@ public static class SkillManager
     {
         foreach (var skill in attacker.skills)
         {
-            if(skill.CheckAidSkill())
+            if (skill.CheckAidSkill())
+            {
+                attacker.attackPoint -= skill.skillCfg.AttackPointReduce;
                 return true;
+            }
         }
         return false;
     }

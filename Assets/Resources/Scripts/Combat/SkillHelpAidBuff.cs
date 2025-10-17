@@ -12,6 +12,9 @@ public class SkillHelpAidBuff : Skill
 
     public override bool CheckAidSkill()
     {
+        if(IsInCD())
+            return false;
+
         var unitsInRange = WorldManager.Instance.GetUnitsInRange(owner.transform.position, skillCfg.Range, owner.side, false);
         unitsInRange = unitsInRange.FindAll(x => x != owner && x.IsInFight() && !x.HasBuff(skillCfg.BuffId));
 
@@ -36,8 +39,6 @@ public class SkillHelpAidBuff : Skill
         var targetUnit = unitsInRange[0];
         BuffManager.AddBuff(targetUnit, owner, id, skillCfg.BuffId, skillCfg.BuffTime);
         EffectManager.PlaySkillEffect(targetUnit, skillCfg.HitEffect);
-
-        owner.attackPoint = Math.Max(owner.attackPoint - 1, -0.5f);
 
         return true;
     }

@@ -14,6 +14,9 @@ public class SkillAidShockWave : Skill
 
     public override bool CheckAidSkill()
     {
+        if(IsInCD())
+            return false;
+
         if (owner.targetChess == null)
             return false;
 
@@ -28,7 +31,6 @@ public class SkillAidShockWave : Skill
         owner.PlayerAnim(skillCfg.Action);
         var damage = (int)(owner.GetAttr(skillCfg.Attr) * skillCfg.SkillDamageAttrRate);
         WorldManager.Instance.CreateSpellMissile(owner, targetPos, skillCfg.SummonTime, skillCfg.SummonSpeed, skillCfg.EffectSize, skillCfg.Id, damage, skillCfg.HitEffect);
-        owner.attackPoint = Math.Max(owner.attackPoint - 2, -1);
 
         return true;
     }
