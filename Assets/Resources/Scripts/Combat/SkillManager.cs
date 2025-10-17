@@ -231,7 +231,7 @@ public static class SkillManager
     {
         foreach (var skill in attacker.skills)
         {
-            if (skill.CheckAidSkill())
+            if (!skill.IsInCD() && skill.CheckAidSkill())
             {
                 attacker.attackPoint -= skill.skillCfg.AttackPointReduce;
                 return true;

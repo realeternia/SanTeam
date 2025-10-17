@@ -12,9 +12,6 @@ public class SkillHelpAidBuff : Skill
 
     public override bool CheckAidSkill()
     {
-        if(IsInCD())
-            return false;
-
         var unitsInRange = WorldManager.Instance.GetUnitsInRange(owner.transform.position, skillCfg.Range, owner.side, false);
         unitsInRange = unitsInRange.FindAll(x => x != owner && x.IsInFight() && !x.HasBuff(skillCfg.BuffId));
 

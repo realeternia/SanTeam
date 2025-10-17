@@ -14,9 +14,6 @@ public class SkillAidShockWave : Skill
 
     public override bool CheckAidSkill()
     {
-        if(IsInCD())
-            return false;
-
         if (owner.targetChess == null)
             return false;
 

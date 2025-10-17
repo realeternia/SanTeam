@@ -13,9 +13,6 @@ public class SkillHelpAidHeal : Skill
 
     public override bool CheckAidSkill()
     {
-        if(IsInCD())
-            return false;
-
         var unitsInRange = WorldManager.Instance.GetUnitsInRange(owner.transform.position, skillCfg.Range, owner.side, false);
         unitsInRange = unitsInRange.FindAll(x => x.hp < x.maxHp * 4 / 5 && x != owner);
 

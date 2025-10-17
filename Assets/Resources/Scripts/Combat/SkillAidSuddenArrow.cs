@@ -13,9 +13,6 @@ public class SkillAidSuddenArrow : Skill
 
     public override bool CheckAidSkill()
     {
-        if(IsInCD())
-            return false;
-
         var unitsInRange = WorldManager.Instance.GetUnitsInRange(owner.transform.position, skillCfg.Range, owner.side, true);
         unitsInRange.Remove(owner);
 
