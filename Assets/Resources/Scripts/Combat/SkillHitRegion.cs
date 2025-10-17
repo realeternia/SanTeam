@@ -20,18 +20,19 @@ public class SkillHitRegion : Skill
             targetPos = defender.transform.position;
 
             var magicStub = WorldManager.Instance.SpawnUnitsForRegion(owner.GetPlayerInfo(), 501001, -1, targetPos, owner.side, "");
-            magicStub.SetLifeTime(skillCfg.SummonTime);
+            var summonTime = GetSummonTime();
+            magicStub.SetLifeTime(summonTime);
 
             //创建一个hitEffect
-            EffectManager.PlayPosSkillEffect(magicStub, targetPos, skillCfg.EffectSize, skillCfg.HitEffect, skillCfg.SummonTime);
+            EffectManager.PlayPosSkillEffect(magicStub, targetPos, skillCfg.EffectSize, skillCfg.HitEffect, summonTime);
 
-            owner.StartCoroutine(DelayDamage());
+            owner.StartCoroutine(DelayDamage(summonTime));
         }
     }
 
-    IEnumerator DelayDamage()
+    IEnumerator DelayDamage(float summonTime)
     {
-        var term = (int) System.Math.Floor(skillCfg.SummonTime / skillCfg.SummonHitInterval);
+        var term = (int) System.Math.Floor(summonTime / skillCfg.SummonHitInterval);
         for (int i = 0; i < term; i++)
         {
             if(owner == null || owner.hp <= 0)

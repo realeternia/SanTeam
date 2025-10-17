@@ -21,7 +21,8 @@ public class SkillHitWall : Skill
             var targetPos = defender.transform.position;
 
             var magicStub = WorldManager.Instance.SpawnUnitsForRegion(owner.GetPlayerInfo(), 501001, -1, targetPos, owner.side, "");
-            magicStub.SetLifeTime(skillCfg.SummonTime);
+            var summonTime = GetSummonTime();
+            magicStub.SetLifeTime(summonTime);
             
             // 计算owner到defender的方向
             Vector3 direction = (defender.transform.position - owner.transform.position).normalized;
@@ -46,15 +47,15 @@ public class SkillHitWall : Skill
             
             foreach(var pos in targetPosList)
             {
-                EffectManager.PlayPosSkillEffect(magicStub, pos, skillCfg.EffectSize, skillCfg.HitEffect, skillCfg.SummonTime);
+                EffectManager.PlayPosSkillEffect(magicStub, pos, skillCfg.EffectSize, skillCfg.HitEffect, summonTime);
             }
-            owner.StartCoroutine(DelayDamage());
+            owner.StartCoroutine(DelayDamage(summonTime));
         }
     }
 
-    IEnumerator DelayDamage()
+    IEnumerator DelayDamage(float summonTime)
     {
-        var term = (int)Math.Floor(skillCfg.SummonTime / skillCfg.SummonHitInterval);
+        var term = (int)Math.Floor(summonTime / skillCfg.SummonHitInterval);
         for (int i = 0; i < term; i++)
         {
             if (owner == null || owner.hp <= 0)

@@ -12,13 +12,16 @@ public class SkillAttackAddDamage : Skill
 
     public override void DuringAttack(Chess defender, string damType, ref int damageBase, ref float damageMulti, ref int damageReal, ref string effect)
     {
+        if(skillCfg.BuffId > 0 && !defender.HasBuff(skillCfg.BuffId))
+            return;
+
         if(CheckBurst(defender))
         {
             owner.PlayerAnim(skillCfg.Action);
 
             damageBase += skillCfg.StrengthInt;
-            if(skillCfg.Strength > 0)
-                damageMulti += skillCfg.Strength;
+            if(skillCfg.SkillDamageRate > 0)
+                damageMulti += skillCfg.SkillDamageRate;
             effect = skillCfg.HitEffect;
         }
     }

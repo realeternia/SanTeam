@@ -289,7 +289,7 @@ public class WorldManager : MonoBehaviour
             GameManager.Instance.GetPlayer(0).banCount = 1;
             GameManager.Instance.GetPlayer(1).banCount = 2;
             //   SpawnHerosForRegion(GameManager.Instance.GetPlayer(0), mapConfig.RegionHeroSide1[4], new System.Tuple<int, int>(101008, 1), 1);
-            var heroList = new List<int> { 103031 };
+            var heroList = new List<int> { 103008 };
             for (int i = 0; i < heroList.Count; i++)
                 SpawnHerosForRegion(GameManager.Instance.GetPlayer(0), i, mapConfig.RegionHeroSide1[i], new System.Tuple<int, int>(heroList[i], 1), heroList, 1);
 
@@ -516,7 +516,7 @@ public class WorldManager : MonoBehaviour
         var missile = Instantiate<Missile>(missilePrefab, startPos, Quaternion.identity, Units.transform);
         missile.Init(sourceChess, 1, effectName);
         missile.SetSkillInfo(skillId, damage);
-        missile.MoveToTarget(targetChess, sourceChess.missileSpeed, sourceChess.missileHight);
+        missile.MoveToTarget(targetChess, Mathf.Max(sourceChess.missileSpeed, 14), sourceChess.missileHight);
     }    
 
     public void CreateSpellMissile(Chess sourceChess, Vector3 targetPos, float time, float speed, float size, int skillId, int damage, string effectName)

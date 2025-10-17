@@ -156,7 +156,7 @@ public static class ConfigManager
         return 0;
     }
     
-    public static int GetHelpSkillId(int heroId, int targetHeroId, int srcPos, int targetPos)
+    public static int GetShowHelpSkillId(int heroId, int targetHeroId, int srcPos, int targetPos)
     {
         var heroCfg = HeroConfig.GetConfig(heroId);
         foreach(var skill in heroCfg.Skills)
@@ -174,8 +174,8 @@ public static class ConfigManager
                 return skill;
             else if (skillCfg.UnitHelpType == 2 && ((srcPos % 3) == (targetPos % 3)))
                 return skill;
-            else if (skillCfg.UnitHelpType == 3)
-                return skill;
+            // else if (skillCfg.UnitHelpType == 3)
+            //     return skill;
         }
 
         return 0;

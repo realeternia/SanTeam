@@ -101,6 +101,8 @@ public static class SkillManager
                 return new SkillBuffTieqi(skillId, owner);
             case "ModifyShootSpeed":
                 return new SkillModifyShootSpeed(skillId, owner);
+            case "ModifySummonTime":
+                return new SkillModifySummonTime(skillId, owner);
             case "InitAddCrit":
                 return new SkillInitAddCrit(skillId, owner);
             case "InitAddDodge":
@@ -173,6 +175,16 @@ public static class SkillManager
                 skill.OnCheckCD(skillCfg, ref cdTime);
         }
     }
+    public static void OnCheckSummonTime(Chess caster, SkillConfig skillCfg, ref float summonTime)
+    {
+        foreach (var skill in caster.skills)
+        {
+            if(skill.skillId != skillCfg.Id) //防止自己判定自己
+                skill.OnCheckSummonTime(skillCfg, ref summonTime);
+        }
+    }
+
+
 
     public static void DuringAttack(Chess attacker, Chess defender, string damType, ref int damageBase, ref float damageMulti, ref int damageReal, ref string effect)
     {       

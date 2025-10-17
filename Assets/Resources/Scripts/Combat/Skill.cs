@@ -149,4 +149,16 @@ public class Skill
         
     }
 
+    public virtual void OnCheckSummonTime(SkillConfig checkSkillCfg, ref float summonTime)
+    {
+
+    }
+
+    public float GetSummonTime()
+    {
+        var summonTime = skillCfg.SummonTime;
+        SkillManager.OnCheckSummonTime(owner, skillCfg, ref summonTime);
+        return summonTime;
+    }
+
 }

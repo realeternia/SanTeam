@@ -245,7 +245,7 @@ public class BagControl : MonoBehaviour, IPanelEvent
                     CreateConnectionLine(heroUnits[i].transform, heroUnits[j].transform, Color.white, Vector2.zero);
                 }
 
-                var helpSkillId = ConfigManager.GetHelpSkillId(heroId1, heroId2, i, j);
+                var helpSkillId = ConfigManager.GetShowHelpSkillId(heroId1, heroId2, i, j);
                 if(helpSkillId > 0)
                 {
                     var skillCfg = SkillConfig.GetConfig(helpSkillId);
@@ -254,7 +254,7 @@ public class BagControl : MonoBehaviour, IPanelEvent
                     CreateConnectionLine(heroUnits[i].transform, heroUnits[j].transform, color, new Vector2(-25, -25), Resources.Load<Sprite>("SkillPic/" + skillCfg.Icon));
                 }
 
-                helpSkillId = ConfigManager.GetHelpSkillId(heroId2, heroId1, j, i);
+                helpSkillId = ConfigManager.GetShowHelpSkillId(heroId2, heroId1, j, i);
                 if(helpSkillId > 0)
                 {
                     var skillCfg = SkillConfig.GetConfig(helpSkillId);
