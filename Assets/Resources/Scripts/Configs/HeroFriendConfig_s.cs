@@ -125,7 +125,6 @@ namespace CommonConfig
             config[70] = new HeroFriendConfig(70, "川蜀集团", 1, new int[]{101033,101020,101036,101018,110002});
             config[71] = new HeroFriendConfig(71, "孙家子弟", 2, new int[]{103036,103037});
             config[72] = new HeroFriendConfig(72, "东吴砥柱", 2, new int[]{103023,103018});
-            config[73] = new HeroFriendConfig(73, "江东铁壁", 2, new int[]{103009,103006});
             config[74] = new HeroFriendConfig(74, "合肥之盾", 2, new int[]{102028,102015});
             config[75] = new HeroFriendConfig(75, "陷阵之锋", 3, new int[]{104006,102004});
             config[76] = new HeroFriendConfig(76, "淮南骁将", 1, new int[]{102034,102025});

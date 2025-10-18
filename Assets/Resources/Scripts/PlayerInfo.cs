@@ -108,11 +108,13 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 
     public void FirstRound()
     {
-        if(playerConfig.InitGold != 0)
+        if (playerConfig.InitGold > 0)
             AddGold(playerConfig.InitGold);
-        if(playerConfig.InitCards != null)
+        else if (playerConfig.InitGold < 0)
+            SubGold(-playerConfig.InitGold, false);
+        if (playerConfig.InitCards != null)
         {
-            foreach(var card in playerConfig.InitCards)
+            foreach (var card in playerConfig.InitCards)
                 cards[card] = 1;
         }
     }

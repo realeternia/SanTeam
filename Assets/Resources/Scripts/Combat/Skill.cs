@@ -61,7 +61,7 @@ public class Skill
     public bool CheckBurst(Chess target)
     {
         var rate = skillCfg.Rate;
-        if (rate > 0 && rate < 1)
+        if (rate > 0 && rate < 1 && target != null && target != owner)
         {
             var myAttr = owner.GetAttr(skillCfg.Attr);
             var defAttr = target.GetAttr(skillCfg.Attr);

@@ -82,6 +82,8 @@ namespace CommonConfig
             config[301002] = new BuffConfig(301002, "连锁", "BuffLock", "", "", false, "StunnedLock", "");
             config[301003] = new BuffConfig(301003, "增伤", "BuffDamagedAddRate", "", "", false, "StunnedDamageUp", "");
             config[301004] = new BuffConfig(301004, "减速", "BuffSpeedDown", "", "", false, "SlowAuraYellow", "");
+            config[301005] = new BuffConfig(301005, "陷阵", "BuffNoMove", "", "", false, "AuraSoftPurple", "");
+            config[301006] = new BuffConfig(301006, "溃败", "BuffTimeDamage", "", "", false, "BloodExplosion", "");
 
         }
 
