@@ -31,7 +31,9 @@ public static class ConfigManager
         FormulaLearnAttrConfig.Load();
         JobConfig.Load();
 
-        PostModify();
+        ConfigManager.PostModify();      
+
+        UnityEngine.Debug.Log("ConfigManager Init fin");
     }
 
     public static void PostModify()

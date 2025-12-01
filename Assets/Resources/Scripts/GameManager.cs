@@ -46,6 +46,8 @@ public class GameManager : MonoBehaviour
         string logPath = Application.persistentDataPath + "/game_log.txt";
         logWriter = new StreamWriter(logPath, false, System.Text.Encoding.UTF8); 
         logWriter.WriteLine("Game started at: " + System.DateTime.Now);
+
+        ConfigManager.Init();
         
         // 注册日志事件
         Application.logMessageReceived += LogMessageReceived;

@@ -32,6 +32,7 @@ public class CardShopManager : MonoBehaviour
 
     public int jadePlayer = -1; //购买和氏璧买家
     public int firstJumper = -1;
+    private bool hasEnterBattle = false;
 
     private Coroutine shopCoroutine;
 
@@ -470,7 +471,8 @@ public class CardShopManager : MonoBehaviour
     public void ShopBegin()
     {
         UnityEngine.Debug.Log("ShopBegin");
-        GameManager.Instance.SaveToFile();     
+        if(hasEnterBattle) //存档拉起进入游戏，不会重复存储
+            GameManager.Instance.SaveToFile();
 
         var roll = UnityEngine.Random.Range(0, 3);
         BGMPlayer.Instance.PlaySound(roll == 0 ? "BGMs/chun" : (roll == 1 ? "BGMs/xia" : "BGMs/qiu"));
@@ -512,6 +514,7 @@ public class CardShopManager : MonoBehaviour
         Tooltip.Instance.HideTooltip();
         PanelManager.Instance.HideShop();
         WorldManager.Instance.BattleBegin(); 
+        hasEnterBattle = true;
 
         for(int i = 0; i < 8; i++)
             GameManager.Instance.GetPlayer(i).SetRoundOver(false);
