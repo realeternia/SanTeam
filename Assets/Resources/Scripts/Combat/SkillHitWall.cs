@@ -77,7 +77,8 @@ public class SkillHitWall : Skill
             var damage = (int)(owner.GetAttr(skillCfg.Attr) * skillCfg.SkillDamageAttrRate);
             foreach (var unit in unitList)
             {
-                unit.OnSkillDamaged(owner, skillId, damage);
+                if (damage > 0)
+                    unit.OnSkillDamaged(owner, skillId, damage);
             }
 
             yield return new WaitForSeconds(skillCfg.SummonHitInterval);

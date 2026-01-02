@@ -49,13 +49,14 @@ public class SkillHitAround : Skill
                         filteredUnits.Add(unit);
                     }
                 }
-                
+
                 if (filteredUnits.Count > 0)
                 {
                     WorldManager.Instance.RandomSelect(filteredUnits, skillCfg.TargetCount);
                     var damage2 = (int)(damage * skillCfg.SkillDamageRate);
-                    foreach(var unit in filteredUnits)
-                        unit.OnSkillDamaged(owner, skillId, damage2);
+                    foreach (var unit in filteredUnits)
+                        if (damage2 > 0)
+                            unit.OnSkillDamaged(owner, skillId, damage2);
                 }
             }
         }
