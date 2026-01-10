@@ -65,23 +65,16 @@
     <Compile Include="Export\Lua\LuaExportItemManager.cs" />
     <Compile Include="Global.cs" />
     <Compile Include="Load\DataLoader.cs" />
-    <Compile Include="Load\ReadCfg.cs" />
     <Compile Include="Load\ReadConfig.cs" />
     <Compile Include="Load\ReadExcel.cs" />
-    <Compile Include="Merge\CfgMerger.cs" />
-    <Compile Include="Merge\IMerger.cs" />
     <EmbeddedResource Include="Template\RecordTool.cs" />
     <EmbeddedResource Include="Template\ConfigBinaryReader.cs" />
     <EmbeddedResource Include="Template\CfgIndexCacheConfig.cs" />
     <EmbeddedResource Include="Template\CfgIndexCacheRecord.cs" />
     <EmbeddedResource Include="Template\AnyPrimaryKeyConfig.cs" />
     <EmbeddedResource Include="Template\AnyPrimaryKeyRecord.cs" />
-    <Compile Include="Tools\CfgTool.cs" />
     <Compile Include="Tools\EBinaryWriter.cs" />
     <Compile Include="Tools\ExcelTool.cs" />
-    <Compile Include="Merge\CommonMerger.cs" />
-    <Compile Include="Merge\ModelMerger.cs" />
-    <Compile Include="Merge\Merger.cs" />
     <Compile Include="ParseCommand.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Load\RegisterType.cs" />
@@ -119,13 +112,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-    <EmbeddedResource Include="Template\GameConfig.as" />
     <EmbeddedResource Include="Template\GameConfig.lua" />
     <EmbeddedResource Include="Template\XXAddRecord.lua" />
     <EmbeddedResource Include="Template\ConfigDataManager.lua" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Template\XXAddRecord.as" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

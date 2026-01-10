@@ -1,5 +1,4 @@
-﻿using Excel2dllCore.Merge;
-using Excel2dllCore.Tools;
+﻿using Excel2dllCore.Tools;
 using System.Collections.Generic;
 using System.IO;
 
@@ -12,7 +11,6 @@ namespace Excel2dllCore.Load
         static DataLoader()
         {
             AllFiles = Utils.GetAllConfigFiles(ParseCommand.ConfigPath, ".xls");
-            AllFiles.AddRange(Utils.GetAllConfigFiles(ParseCommand.ConfigPath, ".cfg"));
         }
 
         public static void ProcessConfigFiles(List<string> files)
@@ -24,10 +22,6 @@ namespace Excel2dllCore.Load
                 {
                     FileInfo fileInfo = new FileInfo(file);
                     var fileName = fileInfo.Name.Substring(0, fileInfo.Name.Length - fileInfo.Extension.Length);
-                    if (fileName == "config" || Merger.MergedFiles.Contains(fileName))
-                    {
-                        continue;
-                    }
                     LoadFromFile(fileInfo, fileName);
                 }
                 Logger.Debug(string.Format("数据读取完成，总数={0}", Global.CheckerDataList.Count));
@@ -45,10 +39,7 @@ namespace Excel2dllCore.Load
 
             FileInfo fileInfo = new FileInfo(filePath);
             ReadConfig readConfig;
-            if (fileInfo.Extension.StartsWith(".cfg"))
-                readConfig = new ReadCfg();
-            else
-                readConfig = new ReadExcel();
+            readConfig = new ReadExcel();
 
             if (readConfig.LoadIdCol(fileInfo, excelName))
             {
@@ -70,10 +61,7 @@ namespace Excel2dllCore.Load
         private static void LoadFromFile(FileInfo fileInfo, string fileName)
         {
             ReadConfig readConfig;
-            if (fileInfo.Extension.StartsWith(".xls"))
-                readConfig = new ReadExcel();
-            else
-                readConfig = new ReadCfg();
+            readConfig = new ReadExcel();
 
             if (readConfig.ProcessFile(fileInfo, fileName))
             {

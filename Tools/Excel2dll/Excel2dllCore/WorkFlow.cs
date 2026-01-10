@@ -2,7 +2,6 @@
 using Excel2dllCore.Export;
 using Excel2dllCore.Export.CSharp;
 using Excel2dllCore.Load;
-using Excel2dllCore.Merge;
 using Excel2dllCore.Tools;
 using System;
 using System.Collections.Generic;
@@ -43,7 +42,7 @@ namespace Excel2dllCore
                     excelList = DataLoader.AllFiles;
                 }
 
-                Merger.Process(); //合表
+
                 DataLoader.ProcessConfigFiles(excelList); //所有Excel表数据/内存数据读到内存
                 DataCheck.ProcessAll();//所有Excel表数据进行检查
                 if (!ParseCommand.IsNoOutput)
