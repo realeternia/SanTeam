@@ -15,10 +15,7 @@ namespace CommonConfig
         private static Dictionary<int, @fileName> config = new Dictionary<int, @fileName>();
         public static Dictionary<int, @fileName>.ValueCollection ConfigList
         {
-            get
-            {
-                return config.Values;
-            }
+            get { return config.Values; }
         }
 
         public static void Refresh(Dictionary<int, @fileName> dict)
@@ -31,6 +28,8 @@ namespace CommonConfig
         {
             config.Clear();
 @loadm
+
+@loadindex
         }
 
         public static @fileName GetConfig(int id)
@@ -42,6 +41,8 @@ namespace CommonConfig
             }
             throw new NullReferenceException(string.Format("配置表@fileName不存在id={0}", id));
         }
+
+@indexmethod
 
         public static bool HasConfig(int id)
         {

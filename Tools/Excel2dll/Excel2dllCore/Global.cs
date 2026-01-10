@@ -11,7 +11,6 @@ namespace Excel2dllCore
 
         public static Dictionary<string, List<CellType>> TypeDict  = new Dictionary<string, List<CellType>>(); //保存类型
         public static Dictionary<string, List<Record>> DataDict   = new Dictionary<string, List<Record>>();   //保存数据
-        public static Dictionary<string, List<ApiData>> ApiDict = new Dictionary<string, List<ApiData>>();      //保存cfgApi
 
         public static List<CheckerDataType> CheckerDataList = new List<CheckerDataType>();//保存所有函数检查数据
     }

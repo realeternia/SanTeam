@@ -27,10 +27,6 @@ namespace Excel2dllCore.Export.Lua.Item
             /**
              * xxxConfigTable 内容部分
              **/
-            List<ApiData> apiList;
-            if(!Global.ApiDict.TryGetValue(fileName, out apiList))
-                apiList = new List<ApiData>();
-
             StringBuilder keys = new StringBuilder();   //api key
 
             StringBuilder alias = new StringBuilder();  //别名
@@ -70,16 +66,6 @@ namespace Excel2dllCore.Export.Lua.Item
                 parms.Append(parms.Length > 0 ? ", " : "");
                 parms.Append(fieldNameArray[0]);
                 fields.AppendLine(string.Format("\trawset(self, \"{0}\", {0}); --{1}", fieldNameArray[0], type.Desc));
-            }
-
-            foreach (var api in apiList)
-            {
-                if (filter.IsIgnore(api.Cs))   //取包含c的部分
-                    continue;
-
-                keys.AppendLine("\trawset(self, \"DataBy" + api.ApiName + "\", {});");    //eg: rawset(self,"DataByIdAndChs",{});
-
-                CreateDataByXxx(fileName, types, api, ref dataByXxx, ref getDataByXxx);
             }
 
             //数据部分
@@ -148,59 +134,5 @@ namespace Excel2dllCore.Export.Lua.Item
             }
         }
 
-        /// <summary>
-        ///  生成索引部分
-        /// </summary>
-        /// <param name="fileName">文件名</param>
-        /// <param name="types">字段类型总表</param>
-        /// <param name="api">索引原始数据</param>
-        /// <param name="dataByXxx">索引初始化</param>
-        /// <param name="getDataByXxx">获取索引的接口</param>
-        private void CreateDataByXxx(string fileName, List<CellType> types, ApiData api, ref StringBuilder dataByXxx, ref StringBuilder getDataByXxx)
-        {
-            var keysCount = api.Keys.Count; //key 的个数
-
-            var dataByXx = "self.DataBy" + api.ApiName;
-            var parms = string.Join(",", api.Keys.ToArray());
-            getDataByXxx.AppendLine(string.Format("--根据{0}查找", parms));
-            getDataByXxx.AppendLine(string.Format("function {0}Table:GetDataBy{1}({2})", fileName, api.ApiName, parms));  //function TextConfigTable:GetDataByIdAndChs(Id,Chs)
-            getDataByXxx.AppendLine("\tself:Check();");                                                                   //    self:Check();
-
-            for (int i = 0; i < keysCount; i++)
-            {
-                if (types.Find(field => field.FieldName == api.Keys[i]) == null)
-                    throw new Exception(string.Format("ERROR: 不合法的api字段 fileName={0}, apiKey={1}", fileName, api.Keys[i]));
-                dataByXx += "[" + api.Keys[i] + "]";
-                if (i + 1 == keysCount)//最后一维
-                {
-                    if (api.ResultsOnly)
-                    {
-                        dataByXxx.AppendLine(string.Format("\t{0} = data;", dataByXx));     //self.DataByIdAndChs[Id][Chs] = data;
-                    }
-                    else
-                    {
-                        dataByXxx.AppendLine(string.Format("\tif({0} == nil) then", dataByXx));     //	if(self.DataByIdAndChs[Id][Chs] == nil) then
-                        dataByXxx.AppendLine(string.Format("\t\t{0} = {1};", dataByXx, "{}"));       //		self.DataByIdAndChs[Id][Chs] = {};
-                        dataByXxx.AppendLine("\tend");                                              //  end
-                        dataByXxx.AppendLine(string.Format("\ttable.insert({0}, data);", dataByXx));//  table.insert(self.DataByIdAndChs[Id][Chs],data);
-
-                    }
-                    dataByXxx.AppendLine(); //空行  
-                    getDataByXxx.AppendLine(string.Format("\treturn {0};", dataByXx));   //  return self.DataByIdAndChs[Id][Chs];         
-                }
-                else // 多维情况
-                {
-                    dataByXxx.AppendLine(string.Format("\tif({0} == nil) then", dataByXx));     //	if(self.DataByIdAndChs[Id] == nil) then
-                    dataByXxx.AppendLine(string.Format("\t\t{0} = {1};", dataByXx, "{}"));      //		self.DataByIdAndChs[Id] = {};
-                    dataByXxx.AppendLine("\tend");                                              //  end
-
-                    getDataByXxx.AppendLine(string.Format("\tif({0} == nil) then", dataByXx));  //	if(self.DataByIdAndChs[Id] == nil) then
-                    getDataByXxx.AppendLine("\t\treturn nil;");                                 //		return nil;
-                    getDataByXxx.AppendLine("\tend");                                           //  end
-                }
-            }
-            getDataByXxx.AppendLine("end");     //end
-            getDataByXxx.AppendLine();          //空行
-        }
     }
 }

@@ -131,6 +131,7 @@ namespace Excel2dllCore.Load
                     FieldName = val2.Trim(),
                     Type = val3.Trim(),
                     CS = val4.ToString().Contains("|") ? val4.ToString().Trim().Split('|')[0] : val4.ToString().Trim(),
+                    BuildIndex = val4.ToString().Contains("index")
                 };
 
                 if (CellType.IsIgnoreType(type)) //过滤与 ParseCommand.LocalLanguage 不一致的属性

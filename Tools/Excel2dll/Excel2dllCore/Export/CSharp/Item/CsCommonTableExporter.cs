@@ -16,6 +16,8 @@ namespace Excel2dllCore.Export.CSharp.Item
             StringBuilder ctrParms = new StringBuilder();
             StringBuilder ctrDef = new StringBuilder();
             StringBuilder ctrData = new StringBuilder();
+            StringBuilder ctrDataIndex = new StringBuilder(); //索引
+            StringBuilder ctrIndexMethod = new StringBuilder();
             StringBuilder ctrVars = new StringBuilder();
 
             List<string> validFieldNames = new List<string>(); // 用于记录有效的字段名
@@ -52,6 +54,12 @@ namespace Excel2dllCore.Export.CSharp.Item
                 ctrVars.AppendLine("        ///" + type.Desc.Replace("\n", "///"));
                 ctrVars.AppendLine("        /// </summary>");
                 ctrVars.AppendLine(string.Format("        public {0} {1};", vtype, fieldName));
+
+                if(type.BuildIndex)
+                {
+                    ctrIndexMethod.AppendLine($"        private static Dictionary<{vtype}, int> idx{fieldName} = new Dictionary<{vtype}, int>();");
+                    ctrIndexMethod.AppendLine($"        public static {fileName} GetConfigBy{fieldName}({vtype} val)        {{\r\n            return GetConfig(idx{fieldName}[val]);        }}");
+                }
             }
 
             // 生成对象构造代码
@@ -60,15 +68,27 @@ namespace Excel2dllCore.Export.CSharp.Item
                 StringBuilder args = new StringBuilder();
                 foreach (var fieldName in validFieldNames)
                 {
+                    string valStr = "";
                     if (record.TryGetValue(fieldName, out var value))
                     {
                         // 根据字段类型处理值（如字符串加引号）
-                        string formattedValue = FormatValueByType(value, GetFieldType(types, fieldName));
+                        string formattedValue = FormatValueByType(value, GetFieldType(types, fieldName).Type ?? "string");
                         args.Append(formattedValue).Append(", ");
+                        valStr= formattedValue;
                     }
                     else
                     {
                         args.Append("null, "); // 默认值处理
+                        valStr = "null";
+                    }
+
+                    if (valStr != "null")
+                    {
+                        var type = GetFieldType(types, fieldName);
+                        if (type.BuildIndex)
+                        {
+                            ctrDataIndex.AppendLine($"            idx{fieldName}[{valStr}] =  {record.Id};");
+                        }
                     }
                 }
 
@@ -88,20 +108,22 @@ namespace Excel2dllCore.Export.CSharp.Item
                 writer.SetVar("parms", ctrParms.ToString());
                 writer.SetVar("construct", ctrDef.ToString());
                 writer.SetVar("loadm", ctrData.ToString());
+                writer.SetVar("loadindex", ctrDataIndex.ToString());
+                writer.SetVar("indexmethod", ctrIndexMethod.ToString());
                 writer.SetVar("vars", ctrVars.ToString());
             }
         }
 
         // 辅助方法：根据字段名获取字段类型
-        private string GetFieldType(List<CellType> types, string fieldName)
+        private CellType GetFieldType(List<CellType> types, string fieldName)
         {
             foreach (var type in types)
             {
                 var fieldNameArray = type.FieldName.Split('_');
                 if (fieldNameArray[0] == fieldName)
-                    return type.Type;
+                    return type;
             }
-            return "string"; // 默认
+            return null; // 默认
         }
 
         // 辅助方法：格式化值（如字符串加引号）

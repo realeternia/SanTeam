@@ -24,6 +24,7 @@ namespace Excel2dllCore
         /// 中文描述
         /// </summary>
         public string Desc;
+        public bool BuildIndex;
 
         /// <summary>
         /// ~名字前缀的类型无视 string类型语言不和传入参数一样的无视

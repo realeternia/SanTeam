@@ -25,11 +25,6 @@ namespace Excel2dllCore.Export.CSharp
             {
                 tableExporter.ExportType(types, records, fullPath, fileName, filter);
             }
-            else if (Global.ApiDict.ContainsKey(fileName))
-            {
-                tableExporter = userExporterDict["Any"];
-                tableExporter.ExportType(types, records, fullPath, fileName, filter);
-            }
             else
             {
                 _trivialTableExporter.ExportType(types, records, fullPath, fileName, filter);
@@ -45,11 +40,6 @@ namespace Excel2dllCore.Export.CSharp
             ITableExporter tableExporter;
             if (userExporterDict.TryGetValue(fileName, out tableExporter))
             {
-                tableExporter.ExportRecord(types, records, fullPath, fileName, filter);
-            }
-            else if(Global.ApiDict.ContainsKey(fileName))
-            {
-                tableExporter = userExporterDict["Any"];
                 tableExporter.ExportRecord(types, records, fullPath, fileName, filter);
             }
             else if (fileName.ToLower().Substring(0, 2) == "bi" || fileName.ToLower().Substring(0, 2) == "ti")
