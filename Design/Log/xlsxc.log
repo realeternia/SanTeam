@@ -1,55 +1,46 @@
-﻿[2025-10-18 10:34:11:766][Debug]	Skip hidden file: ~$BuffConfig.xlsx
-[2025-10-18 10:34:11:767][Debug]	Skip hidden file: ~$HeroConfig.xlsx
-[2025-10-18 10:34:11:767][Debug]	Skip hidden file: ~$HeroFriendConfig.xlsx
-[2025-10-18 10:34:11:768][Debug]	Skip hidden file: ~$SkillConfig.xlsx
-[2025-10-18 10:34:11:768][Debug]	Skip hidden file: ~$BuffConfig.xlsx
-[2025-10-18 10:34:11:768][Debug]	Skip hidden file: ~$HeroConfig.xlsx
-[2025-10-18 10:34:11:769][Debug]	Skip hidden file: ~$HeroFriendConfig.xlsx
-[2025-10-18 10:34:11:769][Debug]	Skip hidden file: ~$SkillConfig.xlsx
-[2025-10-18 10:34:11:773][Warn]Merge Config Excel Not Found
-[2025-10-18 10:34:11:774][Debug]开始数据读取，总数=10
-[2025-10-18 10:34:11:782][Debug]	文件打开中，创建临时文件重试. BuffConfig.xlsx
-[2025-10-18 10:34:11:961][Debug]	数据预处理 BuffConfig
-[2025-10-18 10:34:11:970][Debug]	数据预处理 FormulaLearnAttrConfig
-[2025-10-18 10:34:11:972][Debug]	文件打开中，创建临时文件重试. HeroConfig.xlsx
-[2025-10-18 10:34:12:020][Debug]	数据预处理 HeroConfig
-[2025-10-18 10:34:12:025][Debug]	文件打开中，创建临时文件重试. HeroFriendConfig.xlsx
-[2025-10-18 10:34:12:040][Debug]	数据预处理 HeroFriendConfig
-[2025-10-18 10:34:12:045][Debug]	数据预处理 ItemConfig
-[2025-10-18 10:34:12:051][Debug]	数据预处理 JobConfig
-[2025-10-18 10:34:12:055][Debug]	数据预处理 PlayerConfig
-[2025-10-18 10:34:12:061][Debug]	数据预处理 ShopConfig
-[2025-10-18 10:34:12:062][Debug]	文件打开中，创建临时文件重试. SkillConfig.xlsx
-[2025-10-18 10:34:12:102][Debug]	数据预处理 SkillConfig
-[2025-10-18 10:34:12:110][Debug]	数据预处理 SoldierConfig
-[2025-10-18 10:34:12:110][Debug]数据读取完成，总数=10
-[2025-10-18 10:34:12:111][Debug]所用时间=00:00:00.3366283
-[2025-10-18 10:34:12:113][Debug]开始数据函数检查，总数=10
-[2025-10-18 10:34:12:122][Debug]数据函数检查完成，总数=10
-[2025-10-18 10:34:12:123][Debug]所用时间=00:00:00.0099470
-[2025-10-18 10:34:12:126][Debug]开始类型导出
-[2025-10-18 10:34:12:135][Debug]	导出类型文件out\Csharp_s\BuffConfig_s.cs
-[2025-10-18 10:34:12:135][Debug]	导出类型文件out\Csharp_s\FormulaLearnAttrConfig_s.cs
-[2025-10-18 10:34:12:143][Debug]	导出类型文件out\Csharp_s\HeroConfig_s.cs
-[2025-10-18 10:34:12:144][Debug]	导出类型文件out\Csharp_s\HeroFriendConfig_s.cs
-[2025-10-18 10:34:12:145][Debug]	导出类型文件out\Csharp_s\ItemConfig_s.cs
-[2025-10-18 10:34:12:145][Debug]	导出类型文件out\Csharp_s\JobConfig_s.cs
-[2025-10-18 10:34:12:148][Debug]	导出类型文件out\Csharp_s\PlayerConfig_s.cs
-[2025-10-18 10:34:12:149][Debug]	导出类型文件out\Csharp_s\ShopConfig_s.cs
-[2025-10-18 10:34:12:161][Debug]	导出类型文件out\Csharp_s\SkillConfig_s.cs
-[2025-10-18 10:34:12:163][Debug]	导出类型文件out\Csharp_s\SoldierConfig_s.cs
-[2025-10-18 10:34:12:163][Debug]开始类型完成
-[2025-10-18 10:34:12:164][Debug]开始数据导出
-[2025-10-18 10:34:12:167][Debug]	导出数据文件out\Csharp_s\BuffConfigRecordAdder_s.cs
-[2025-10-18 10:34:12:167][Debug]	导出数据文件out\Csharp_s\FormulaLearnAttrConfigRecordAdder_s.cs
-[2025-10-18 10:34:12:168][Debug]	导出数据文件out\Csharp_s\HeroConfigRecordAdder_s.cs
-[2025-10-18 10:34:12:168][Debug]	导出数据文件out\Csharp_s\HeroFriendConfigRecordAdder_s.cs
-[2025-10-18 10:34:12:168][Debug]	导出数据文件out\Csharp_s\ItemConfigRecordAdder_s.cs
-[2025-10-18 10:34:12:169][Debug]	导出数据文件out\Csharp_s\JobConfigRecordAdder_s.cs
-[2025-10-18 10:34:12:170][Debug]	导出数据文件out\Csharp_s\PlayerConfigRecordAdder_s.cs
-[2025-10-18 10:34:12:170][Debug]	导出数据文件out\Csharp_s\ShopConfigRecordAdder_s.cs
-[2025-10-18 10:34:12:170][Debug]	导出数据文件out\Csharp_s\SkillConfigRecordAdder_s.cs
-[2025-10-18 10:34:12:170][Debug]	导出数据文件out\Csharp_s\SoldierConfigRecordAdder_s.cs
-[2025-10-18 10:34:12:176][Debug]数据导出完成
-[2025-10-18 10:34:12:177][Debug]总打开文件次数 10
-[2025-10-18 10:34:12:178][Debug]错误数量 0
+﻿[2026-08-23 17:16:25:053][Debug]	Skip hidden file: ~$HeroFriendConfig.xlsx
+[2026-08-23 17:16:25:055][Debug]	Skip hidden file: ~$HeroFriendConfig.xlsx
+[2026-08-23 17:16:25:209][Warn]Merge Config Excel Not Found
+[2026-08-23 17:16:25:210][Debug]开始数据读取，总数=10
+[2026-08-23 17:16:25:527][Debug]	数据预处理 BuffConfig
+[2026-08-23 17:16:25:543][Debug]	数据预处理 FormulaLearnAttrConfig
+[2026-08-23 17:16:25:589][Debug]	数据预处理 HeroConfig
+[2026-08-23 17:16:25:604][Debug]	文件打开中，创建临时文件重试. HeroFriendConfig.xlsx
+[2026-08-23 17:16:25:617][Debug]	数据预处理 HeroFriendConfig
+[2026-08-23 17:16:25:657][Debug]	数据预处理 ItemConfig
+[2026-08-23 17:16:25:681][Debug]	数据预处理 JobConfig
+[2026-08-23 17:16:25:713][Debug]	数据预处理 PlayerConfig
+[2026-08-23 17:16:25:726][Debug]	数据预处理 ShopConfig
+[2026-08-23 17:16:25:759][Debug]	数据预处理 SkillConfig
+[2026-08-23 17:16:25:784][Debug]	数据预处理 SoldierConfig
+[2026-08-23 17:16:25:784][Debug]数据读取完成，总数=10
+[2026-08-23 17:16:25:785][Debug]所用时间=00:00:00.5748310
+[2026-08-23 17:16:25:790][Debug]开始数据函数检查，总数=10
+[2026-08-23 17:16:25:801][Debug]数据函数检查完成，总数=10
+[2026-08-23 17:16:25:801][Debug]所用时间=00:00:00.0122636
+[2026-08-23 17:16:25:803][Debug]开始类型导出
+[2026-08-23 17:16:25:847][Debug]	导出类型文件out\Csharp_s\BuffConfig_s.cs
+[2026-08-23 17:16:25:863][Debug]	导出类型文件out\Csharp_s\FormulaLearnAttrConfig_s.cs
+[2026-08-23 17:16:25:868][Debug]	导出类型文件out\Csharp_s\HeroConfig_s.cs
+[2026-08-23 17:16:25:872][Debug]	导出类型文件out\Csharp_s\HeroFriendConfig_s.cs
+[2026-08-23 17:16:25:875][Debug]	导出类型文件out\Csharp_s\ItemConfig_s.cs
+[2026-08-23 17:16:25:877][Debug]	导出类型文件out\Csharp_s\JobConfig_s.cs
+[2026-08-23 17:16:25:897][Debug]	导出类型文件out\Csharp_s\PlayerConfig_s.cs
+[2026-08-23 17:16:25:905][Debug]	导出类型文件out\Csharp_s\ShopConfig_s.cs
+[2026-08-23 17:16:25:917][Debug]	导出类型文件out\Csharp_s\SkillConfig_s.cs
+[2026-08-23 17:16:25:918][Debug]	导出类型文件out\Csharp_s\SoldierConfig_s.cs
+[2026-08-23 17:16:25:919][Debug]开始类型完成
+[2026-08-23 17:16:25:920][Debug]开始数据导出
+[2026-08-23 17:16:25:922][Debug]	导出数据文件out\Csharp_s\BuffConfigRecordAdder_s.cs
+[2026-08-23 17:16:25:922][Debug]	导出数据文件out\Csharp_s\FormulaLearnAttrConfigRecordAdder_s.cs
+[2026-08-23 17:16:25:923][Debug]	导出数据文件out\Csharp_s\HeroConfigRecordAdder_s.cs
+[2026-08-23 17:16:25:923][Debug]	导出数据文件out\Csharp_s\HeroFriendConfigRecordAdder_s.cs
+[2026-08-23 17:16:25:924][Debug]	导出数据文件out\Csharp_s\ItemConfigRecordAdder_s.cs
+[2026-08-23 17:16:25:924][Debug]	导出数据文件out\Csharp_s\JobConfigRecordAdder_s.cs
+[2026-08-23 17:16:25:925][Debug]	导出数据文件out\Csharp_s\PlayerConfigRecordAdder_s.cs
+[2026-08-23 17:16:25:925][Debug]	导出数据文件out\Csharp_s\ShopConfigRecordAdder_s.cs
+[2026-08-23 17:16:25:925][Debug]	导出数据文件out\Csharp_s\SkillConfigRecordAdder_s.cs
+[2026-08-23 17:16:25:926][Debug]	导出数据文件out\Csharp_s\SoldierConfigRecordAdder_s.cs
+[2026-08-23 17:16:25:936][Debug]数据导出完成
+[2026-08-23 17:16:25:942][Debug]总打开文件次数 10
+[2026-08-23 17:16:25:943][Debug]错误数量 0

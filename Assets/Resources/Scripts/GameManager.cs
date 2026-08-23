@@ -442,7 +442,7 @@ public class GameManager : MonoBehaviour
             }
         }
 
-        // 准备按阵营1-3选择卡牌，保证各阵营相差最多一张
+        // side 1/2/3 全部加入英雄池，不做随机筛选
         List<List<HeroConfig>> sideHeroes = new List<List<HeroConfig>>
         {
             allHeroes.FindAll(hero => hero.Side == 1),
@@ -450,80 +450,10 @@ public class GameManager : MonoBehaviour
             allHeroes.FindAll(hero => hero.Side == 3)
         };
 
-        int targetCount = Mathf.Min(91, allHeroes.Count);
-
-        while (heroIds.Count < targetCount)
+        foreach (var sideHeroList in sideHeroes)
         {
-            // 找出当前数量最少的阵营
-            int minIndex = 0;
-            for (int i = 1; i < 3; i++)
-            {
-                if (sideCounts[i] < sideCounts[minIndex])
-                {
-                    minIndex = i;
-                }
-            }
-
-            // 从最少的阵营中按权重选择一张卡牌
-            List<HeroConfig> currentSideHeroes = sideHeroes[minIndex];
-            if (currentSideHeroes.Count > 0)
-            {
-                // 计算当前阵营总权重
-                float totalRate = 0;
-                foreach (var hero in currentSideHeroes)
-                {
-                    totalRate += hero.RateWeight;
-                }
-
-                if (totalRate > 0)
-                {
-                    float randomValue = UnityEngine.Random.Range(0, totalRate);
-                    float accumulatedRate = 0;
-                    HeroConfig selectedHero = null;
-
-                    foreach (var hero in currentSideHeroes)
-                    {
-                        if (hero.RateWeight <= 0)
-                            continue;
-                        accumulatedRate += hero.RateWeight;
-                        if (accumulatedRate >= randomValue)
-                        {
-                            selectedHero = hero;
-                            break;
-                        }
-                    }
-
-                    if (selectedHero != null)
-                    {
-                        heroIds.Add((int)selectedHero.Id);
-                        allHeroes.Remove(selectedHero);
-                        sideHeroes[minIndex].Remove(selectedHero);
-                        sideCounts[minIndex]++;
-                    }
-                }
-                else
-                {
-                    // 如果总权重为0，随机选一张
-                    int randomIndex = UnityEngine.Random.Range(0, currentSideHeroes.Count);
-                    heroIds.Add((int)currentSideHeroes[randomIndex].Id);
-                    allHeroes.Remove(currentSideHeroes[randomIndex]);
-                    sideHeroes[minIndex].RemoveAt(randomIndex);
-                    sideCounts[minIndex]++;
-                }
-            }
-            else
-            {
-                // 如果当前阵营没有卡牌了，跳过该阵营
-                // 找到下一个还有卡牌的阵营
-                for (int i = 0; i < 3; i++)
-                {
-                    if (sideHeroes[i].Count > 0)
-                    {
-                        minIndex = i;
-                        break;
-                    }
-                }
-            }
+            foreach (var hero in sideHeroList)
+                heroIds.Add(hero.Id);
         }
     }
 }

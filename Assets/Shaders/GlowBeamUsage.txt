@@ -1,0 +1,49 @@
+GlowBeam Shader 使用说明
+==================
+
+## 功能特点
+- 支持自定义颜色和发光颜色
+- 支持贴图输入
+- 动态滚动效果
+- 边缘发光和内部发光
+- 透明度控制
+- 光束宽度调节
+- 噪声扰动效果
+
+## 使用方法
+
+### 1. 创建光束对象
+1. 在场景中创建一个Quad（GameObject > 3D Object > Quad）
+2. 将Quad旋转到面向相机（如果是UI光束，使用Canvas下的Image）
+3. 添加GlowBeamController脚本
+
+### 2. 设置材质
+- 将GlowBeamMaterial拖到Renderer组件的材质槽中
+- 或者在GlowBeamController中设置beamTexture
+
+### 3. 调整参数
+- **beamColor**: 基础光束颜色
+- **glowColor**: 发光颜色（建议使用亮色如青色、黄色）
+- **beamWidth**: 光束宽度
+- **glowIntensity**: 发光强度（建议值2-5）
+- **scrollSpeed**: 滚动速度
+- **opacity**: 透明度
+
+### 4. 代码控制示例
+```csharp
+GlowBeamController beam = GetComponent<GlowBeamController>();
+beam.SetBeamColor(Color.red);
+beam.SetGlowColor(Color.yellow);
+StartCoroutine(beam.FadeBeam(0f, 1f)); // 淡出
+```
+
+## 注意事项
+- 确保材质使用正确的Shader：Custom/GlowBeam
+- 发光效果在HDR渲染中效果更佳
+- 可以通过调整GlowIntensity获得更强的发光效果
+- 建议使用半透明贴图以获得更好的视觉效果
+
+## 性能优化
+- 使用低分辨率贴图
+- 减少同时使用的光束数量
+- 在移动设备上降低GlowIntensity值

@@ -1,0 +1,14 @@
+{
+    "friendlyName": "AHUAWEI MATE70 pro",
+    "version": 1,
+    "screens": [
+        {
+            "width": 2832,
+            "height": 1316,
+            "dpi": 450.0
+        }
+    ],
+    "systemInfo": {
+        "operatingSystem": "Android"
+    }
+}
