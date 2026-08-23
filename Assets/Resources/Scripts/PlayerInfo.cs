@@ -117,6 +117,35 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
             foreach (var card in playerConfig.InitCards)
                 cards[card] = 1;
         }
+
+        // 每局开局：随机发一张总属性240以下魏蜀吴(阵营1/2/3)的卡片
+        var starterCandidates = HeroConfig.ConfigList
+            .Where(x => x.Side >= 1 && x.Side <= 3 && x.Total < 240)
+            .ToList();
+        // 校验：列出被排除的240及以上强卡(仅魏蜀吴阵营)
+        var excludedStrongCards = HeroConfig.ConfigList
+            .Where(x => x.Side >= 1 && x.Side <= 3 && x.Total >= 240)
+            .OrderBy(x => x.Total)
+            .Select(x => string.Format("{0}({1})总={2}", x.Name, x.Id, x.Total))
+            .ToList();
+        UnityEngine.Debug.Log(string.Format(
+            "[开局发卡] pid={0} 候选弱卡数量={1}，被排除的240及以上强卡({2}张): {3}",
+            pid, starterCandidates.Count, excludedStrongCards.Count, string.Join("、", excludedStrongCards)));
+        if (starterCandidates.Count > 0)
+        {
+            var starterHero = starterCandidates[UnityEngine.Random.Range(0, starterCandidates.Count)];
+            if (cards.ContainsKey(starterHero.Id))
+                cards[starterHero.Id]++;
+            else
+                cards[starterHero.Id] = 1;
+            UnityEngine.Debug.Log(string.Format(
+                "[开局发卡] pid={0} 随机到：{1}(id={2}, 阵营={3}, 总属性={4})",
+                pid, starterHero.Name, starterHero.Id, starterHero.Side, starterHero.Total));
+        }
+        else
+        {
+            UnityEngine.Debug.LogWarning("[开局发卡] pid=" + pid + " 没有符合条件的弱卡可发");
+        }
     }
 
     // init 和 load时候都会调用
