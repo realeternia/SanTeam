@@ -223,10 +223,9 @@ public class PickPanelControl : MonoBehaviour
                 var icon = SkillConfig.GetConfig(heroCfg.Skills[0]).Icon;
                 cellControl.jobImg.sprite = Resources.Load<Sprite>("SkillPic/" + icon);
 
-                // 设置英雄名称
+                // 设置英雄名称，颜色按品质
                 cellControl.heroName.text = heroCfg.Name;
-                if(heroCfg.Str >= 90 || heroCfg.LeadShip >= 90 || heroCfg.Inte >= 90 || heroCfg.Total >= 240)
-                    cellControl.heroName.color = new Color(1, .7f, 0);
+                cellControl.heroName.color = HeroSelectionTool.GetQualityColor(heroCfg.Quality);
 
                 cellControl.bgImg.GetComponent<Image>().color = HeroSelectionTool.GetSideColor(heroCfg.Side);
 

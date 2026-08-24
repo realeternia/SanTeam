@@ -36,6 +36,7 @@ public class BagCell : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragH
         var heroCfg = HeroConfig.GetConfig(cardId);
         textItemCount.text = level.ToString();
         textItemName.text = heroCfg.Name;
+        textItemName.color = HeroSelectionTool.GetQualityColor(heroCfg.Quality);
         if (bagControl.bindPlayer.itemEquips.ContainsKey(cardId))
         {
             equipImage.gameObject.SetActive(true);

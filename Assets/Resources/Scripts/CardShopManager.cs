@@ -361,23 +361,23 @@ public class CardShopManager : MonoBehaviour
         {
             if (players[0].gold < players[1].gold)
             {
-                GameManager.Instance.GetPlayer(players[0].id).AddGold(5);
+                GameManager.Instance.GetPlayer(players[0].id).AddGold(2);
                 if (players[1].gold < players[2].gold)
                 {
-                    GameManager.Instance.GetPlayer(players[1].id).AddGold(3);
+                    GameManager.Instance.GetPlayer(players[1].id).AddGold(2);
                     GameManager.Instance.GetPlayer(players[2].id).AddGold(1);
                 }
                 else
                 {
-                    GameManager.Instance.GetPlayer(players[1].id).AddGold(2);
-                    GameManager.Instance.GetPlayer(players[2].id).AddGold(2);
+                    GameManager.Instance.GetPlayer(players[1].id).AddGold(1);
+                    GameManager.Instance.GetPlayer(players[2].id).AddGold(1);
                 }
             }
             else
             {
-                GameManager.Instance.GetPlayer(players[0].id).AddGold(4);
-                GameManager.Instance.GetPlayer(players[1].id).AddGold(4);
-                GameManager.Instance.GetPlayer(players[2].id).AddGold(1);
+                GameManager.Instance.GetPlayer(players[0].id).AddGold(2);
+                GameManager.Instance.GetPlayer(players[1].id).AddGold(2);
+                GameManager.Instance.GetPlayer(players[2].id).AddGold(0);
             }
         }
     }

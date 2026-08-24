@@ -54,7 +54,7 @@ public static class HeroSelectionTool
         foreach (var heroId in heroIds)
         {
             var config = HeroConfig.GetConfig(heroId);
-            var rate = 1000 / Math.Max(15, GetPrice(config));
+            var rate = 1000 / Math.Max(5, GetPrice(config));
             if (config.Job == "shuai")
                 rate += 15;
             heroPoolCache.Add(new Tuple<int, int>(heroId, rate));
@@ -159,33 +159,7 @@ public static class HeroSelectionTool
 
     public static int GetPrice(HeroConfig heroCfg)
     {
-        var baseP = Mathf.Pow((float)heroCfg.Total, 1.4f) / 125;
-        float bonus = 0;
-        if (heroCfg.Str >= 90) bonus += (heroCfg.Str - 89) * 0.01f;
-        if (heroCfg.Inte >= 90) bonus += (heroCfg.Inte - 89) * 0.01f;
-        if (heroCfg.LeadShip >= 90) bonus += (heroCfg.LeadShip - 89) * 0.01f;
-        var rangeMark = (float)heroCfg.Range / 17 * 40;
-        if(heroCfg.Range >= 20)
-            rangeMark += 20;
-        bonus += ((float)heroCfg.Hp + rangeMark - 340) / 340;
-
-        if (heroCfg.Total >= 210)
-        { //救一下偏科的人
-            if (heroCfg.Str < 60)
-                bonus -= (60 - heroCfg.Str) * 0.005f;
-            if (heroCfg.Inte < 60)
-                bonus -= (60 - heroCfg.Inte) * 0.005f;
-            if (heroCfg.LeadShip < 60)
-                bonus -= (60 - heroCfg.LeadShip) * 0.005f;
-        }
-
-        var skillP = 0;
-        if (heroCfg.Skills != null)
-            foreach (var skillId in heroCfg.Skills)
-                skillP += SkillConfig.GetConfig(skillId).Price; //加上技能价格
-
-        var finalP = baseP * (1 + bonus) + skillP;
-        return Mathf.RoundToInt(finalP);
+        return heroCfg.Price;
     }
 
     private static int[] cardHeroExp = new int[] { 1, 2, 4, 7, 11, 16, 22, 29, 37, 46, 56, 66, 76, 86, 96, 106, 116, 126, 136, 146, 156, 166, 176, 186, 196, 206, 216, 226, 236, 246, 256, 266, 276, 999 };
@@ -284,6 +258,18 @@ public static class HeroSelectionTool
 
         return attrInfo;
 
+    }
+
+    public static Color GetQualityColor(int quality)
+    {
+        if (quality == 1)
+            return new Color(255 / 255f, 255 / 255f, 255 / 255f); // 普通-白
+        else if (quality == 2)
+            return new Color(30 / 255f, 255 / 255f, 0 / 255f); // 优秀-绿
+        else if (quality == 3)
+            return new Color(0 / 255f, 112 / 255f, 221 / 255f); // 精良-蓝
+        else
+            return new Color(163 / 255f, 53 / 255f, 238 / 255f); // 史诗-紫
     }
 
     public static Color GetSideColor(int side)

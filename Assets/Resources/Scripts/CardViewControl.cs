@@ -147,6 +147,7 @@ public class CardViewControl : MonoBehaviour, IPointerDownHandler, IPointerUpHan
             heroImage.sprite = Resources.Load<Sprite>("SkinsBig/" + heroCfg.Icon);
             cardNameS = heroCfg.Name;
             cardName.text = heroCfg.Name;
+            cardName.color = HeroSelectionTool.GetQualityColor(heroCfg.Quality);
             if (count > 1)
                 cardName.text += "x" + count;
 

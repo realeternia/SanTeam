@@ -1,18 +1,17 @@
 %YAML 1.1
-%TAG !u! tag:yousandi.cn,2023:
+%TAG !u! tag:unity3d.com,2011:
 --- !u!1 &34118094171967979
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 4745532445807751727}
   - component: {fileID: 2303342883121906682}
   - component: {fileID: 1514705944255524546}
   m_Layer: 5
-  m_HasEditorInfo: 1
   m_Name: ItemPic
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -82,13 +81,12 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 2234574903015221636}
   - component: {fileID: 6951760395014530579}
   - component: {fileID: 4972980155544594359}
   m_Layer: 5
-  m_HasEditorInfo: 1
   m_Name: Image (2)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -158,13 +156,12 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 3830549770561435853}
   - component: {fileID: 3241751469223768017}
   - component: {fileID: 6246526582588425759}
   m_Layer: 5
-  m_HasEditorInfo: 1
   m_Name: ImgSold
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -234,13 +231,12 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 6775669718044124744}
   - component: {fileID: 1876018968904163314}
   - component: {fileID: 1686282232541663747}
   m_Layer: 5
-  m_HasEditorInfo: 1
   m_Name: ImageSkill (2)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -310,13 +306,12 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 5929722484917814833}
   - component: {fileID: 7632230884651028319}
   - component: {fileID: 7347266511051121847}
   m_Layer: 5
-  m_HasEditorInfo: 1
   m_Name: Image (4)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -387,13 +382,12 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 7931923935670734920}
   - component: {fileID: 3088342918850393587}
   - component: {fileID: 7935027460888968244}
   m_Layer: 5
-  m_HasEditorInfo: 1
   m_Name: ImageSkill
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -463,13 +457,12 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 2597058674618493557}
   - component: {fileID: 7063407705691864082}
   - component: {fileID: 8153685160114864608}
   m_Layer: 5
-  m_HasEditorInfo: 1
   m_Name: Image (4)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -540,11 +533,10 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 3384321843918466061}
   m_Layer: 5
-  m_HasEditorInfo: 1
   m_Name: IsItem
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -580,11 +572,10 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 4550956916056910938}
   m_Layer: 5
-  m_HasEditorInfo: 1
   m_Name: IsHero
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -628,13 +619,12 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 5478689532619690363}
   - component: {fileID: 1893733805275989890}
   - component: {fileID: 5161838947433525738}
   m_Layer: 5
-  m_HasEditorInfo: 1
   m_Name: HeroPic
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -704,13 +694,12 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 5746990907720874897}
   - component: {fileID: 6141865355032096070}
   - component: {fileID: 2070759425223009804}
   m_Layer: 5
-  m_HasEditorInfo: 1
   m_Name: Text (TMP)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -839,13 +828,12 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 2944240858238745312}
   - component: {fileID: 7699407283043500865}
   - component: {fileID: 4508720429665913247}
   m_Layer: 5
-  m_HasEditorInfo: 1
   m_Name: Text (TMP)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -974,13 +962,12 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 1100481553939786861}
   - component: {fileID: 2819498349589382062}
   - component: {fileID: 2802670097328903471}
   m_Layer: 5
-  m_HasEditorInfo: 1
   m_Name: ImageSkill (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1050,13 +1037,12 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 6009550133574524902}
   - component: {fileID: 6168644820980122472}
   - component: {fileID: 5090809020924308360}
   m_Layer: 5
-  m_HasEditorInfo: 1
   m_Name: Name
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1185,11 +1171,10 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 4889453099878034316}
   m_Layer: 5
-  m_HasEditorInfo: 1
   m_Name: EffLayer
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1223,13 +1208,12 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 4556996619962051020}
   - component: {fileID: 156580461172416318}
   - component: {fileID: 6647213389726320414}
   m_Layer: 5
-  m_HasEditorInfo: 1
   m_Name: Text (TMP)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1358,13 +1342,12 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 4578344700117656026}
   - component: {fileID: 2373227672878223133}
   - component: {fileID: 7967713230804429838}
   m_Layer: 5
-  m_HasEditorInfo: 1
   m_Name: Gold
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1434,13 +1417,12 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 4762338643645360901}
   - component: {fileID: 592247209737110120}
   - component: {fileID: 8086842021623313976}
   m_Layer: 5
-  m_HasEditorInfo: 1
   m_Name: Image
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1510,13 +1492,12 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 2400463678631765019}
   - component: {fileID: 137745273235160004}
   - component: {fileID: 7996742882846426}
   m_Layer: 5
-  m_HasEditorInfo: 1
   m_Name: Text (TMP)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1645,14 +1626,13 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 8929691090435034772}
   - component: {fileID: 1347346147061667611}
   - component: {fileID: 4286785034379721939}
   - component: {fileID: 5043322830107315727}
   m_Layer: 5
-  m_HasEditorInfo: 1
   m_Name: ButtonBuy
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1767,14 +1747,13 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 8083084728444211593}
   - component: {fileID: 3325979138957046368}
   - component: {fileID: 2651177220867429291}
   - component: {fileID: 229466003065506011}
   m_Layer: 5
-  m_HasEditorInfo: 1
   m_Name: CardView
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1897,13 +1876,12 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 321130410040970638}
   - component: {fileID: 5753183827589681217}
   - component: {fileID: 55593419332108608}
   m_Layer: 5
-  m_HasEditorInfo: 1
   m_Name: Text (TMP)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2032,13 +2010,12 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 5709021960287056477}
   - component: {fileID: 8739813609527956653}
   - component: {fileID: 324691524491493743}
   m_Layer: 5
-  m_HasEditorInfo: 1
   m_Name: Text (TMP)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2167,14 +2144,13 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 7927259234082085599}
   - component: {fileID: 217829080680199406}
   - component: {fileID: 8900331387588463280}
   - component: {fileID: 1748100961820246386}
   m_Layer: 5
-  m_HasEditorInfo: 1
   m_Name: ButtonSub
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2289,14 +2265,13 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 1351469331397319571}
   - component: {fileID: 6378524116616211186}
   - component: {fileID: 4279225001109471627}
   - component: {fileID: 3018477461989153526}
   m_Layer: 5
-  m_HasEditorInfo: 1
   m_Name: ButtonAdd
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2411,13 +2386,12 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 5010651458231819324}
   - component: {fileID: 6517107035016164724}
   - component: {fileID: 3969470495933008896}
   m_Layer: 5
-  m_HasEditorInfo: 1
   m_Name: Text (TMP)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2546,13 +2520,12 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 6625671492032392228}
   - component: {fileID: 247074157195191415}
   - component: {fileID: 5698341184540123671}
   m_Layer: 5
-  m_HasEditorInfo: 1
   m_Name: Image (3)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2622,13 +2595,12 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 4654983551637872792}
   - component: {fileID: 5577958336895086667}
   - component: {fileID: 6093290203717279873}
   m_Layer: 5
-  m_HasEditorInfo: 1
   m_Name: Text (TMP)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2757,13 +2729,12 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 7682379953789320719}
   - component: {fileID: 879708484026986962}
   - component: {fileID: 1193457914676975229}
   m_Layer: 5
-  m_HasEditorInfo: 1
   m_Name: Image (3)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2833,13 +2804,12 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 2906371818041909453}
   - component: {fileID: 4506863030038059420}
   - component: {fileID: 2350227445909913086}
   m_Layer: 5
-  m_HasEditorInfo: 1
   m_Name: ImagePlayer
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2909,13 +2879,12 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 6436447679695622054}
   - component: {fileID: 1425412125261385307}
   - component: {fileID: 6338970438895624545}
   m_Layer: 5
-  m_HasEditorInfo: 1
   m_Name: Text (TMP)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
