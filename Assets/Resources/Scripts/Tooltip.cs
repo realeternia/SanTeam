@@ -50,15 +50,8 @@ public class Tooltip : MonoBehaviour
             for(int i = 0; i < skillIds.Length; i++)
             {
                 var skillConfig = SkillConfig.GetConfig(skillIds[i]);
-                var jobAttrStr = "";
-                if(i == 0)
-                {
-                    var jobCfg = ConfigManager.GetJobConfig(HeroConfig.GetConfig(heroId).Job);
-                    if(!string.IsNullOrEmpty(jobCfg.OvercomeStrong) || !string.IsNullOrEmpty(jobCfg.OvercomeWeak))
-                        jobAttrStr = "克制:<color=red>" + jobCfg.OvercomeStrong + "</color><color=yellow>" + jobCfg.OvercomeWeak + "</color>\n";
-                }
                 var skillAttrStr = skillConfig.Attr == "might" ? "<color=red>[无双]</color>" : skillConfig.Attr == "atk" ? "<color=yellow>[攻]</color>" : skillConfig.Attr == "ap" ? "<color=blue>[法]</color>" : "";
-                textSkills[i].text = jobAttrStr + skillAttrStr + skillConfig.Name + skillConfig.Descript; //富文本
+                textSkills[i].text = skillAttrStr + skillConfig.Name + skillConfig.Descript; //富文本
                 imageSkills[i].sprite = Resources.Load<Sprite>("SkillPic/" + skillConfig.Icon);
             }
 

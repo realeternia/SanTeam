@@ -596,12 +596,6 @@ public class Chess : MonoBehaviour
                 minDamage = Math.Clamp(minDamage + levelDiff, 8, minDamage * 2);
                 maxDamage = Math.Clamp(maxDamage + levelDiff * 4, 40, maxDamage * 2);
             }
-            var attackJobCfg = ConfigManager.GetJobConfig(HeroConfig.GetConfig(heroId).Job);
-            var victimJob = ConfigManager.GetJobConfig(HeroConfig.GetConfig(victim.heroId).Job).NameS;
-            if (attackJobCfg.OvercomeStrong != null && attackJobCfg.OvercomeStrong.Contains(victimJob))
-                damage = Math.Max(damage + 15, minDamage / 2 + 7);
-            else if (attackJobCfg.OvercomeWeak != null && attackJobCfg.OvercomeWeak.Contains(victimJob))
-                damage = Math.Max(damage + 8, minDamage / 2 + 4);
         }
         if(isCrit)
         {
@@ -779,8 +773,6 @@ public class Chess : MonoBehaviour
 
     public void AddBuff(Buff buff, Chess caster, float time)
     {
-        // 计算buffTimes中所有20秒以内且buffId等于当前buff.id的buff的时间和
-        float buffTimeSum = 0;
         float buffCount = 0;
         var nowTime = Time.time;
         buffTimes.RemoveAll(buff => nowTime - buff.time > 30);

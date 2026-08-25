@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -6,6 +6,61 @@ namespace CommonConfig
 {
     public class JobConfig
     {
+
+        public class FieldMetaInfo
+        {
+            public string fieldName;
+            public string fieldType;
+            public int fieldWidth;
+            public string fieldRule;
+            public bool fieldIndex;
+            public FieldMetaInfo(string name, string type, int width = 0, string rule = "", bool index = false)
+            {
+                fieldName = name;
+                fieldType = type;
+                fieldWidth = width;
+                fieldRule = rule;
+                fieldIndex = index;
+            }
+        }
+
+        public class CellMeta
+        {
+            public int row;
+            public int col;
+            public int? foreColor;
+            public int? backColor;
+            public CellMeta(int row, int col, int? foreColor, int? backColor)
+            {
+                this.row = row;
+                this.col = col;
+                this.foreColor = foreColor;
+                this.backColor = backColor;
+            }
+        }
+
+        private static Dictionary<string, FieldMetaInfo> fieldMeta = new Dictionary<string, FieldMetaInfo>()
+        {
+            {"Id", new FieldMetaInfo("序列", "int", 0)},
+            {"Name", new FieldMetaInfo("名字", "string", 0)},
+            {"NameS", new FieldMetaInfo("名字", "string", 0)},
+            {"SkillId", new FieldMetaInfo("脚本名", "int", 0)},
+            {"SourceJob", new FieldMetaInfo("元职业", "int", 0)},
+            {"Range", new FieldMetaInfo("射程（近战17 弓50 弩70 炮50 扇/相/谋/鼓/乐/医35）", "int", 0)},
+            {"MoveSpeed", new FieldMetaInfo("移动速度（帅/士/盾/刀/枪/戟10 马/车12 弓/炮/扇/相/谋/鼓/乐/医8 弩7）", "int", 0)},
+            {"AtkSpeed", new FieldMetaInfo("攻击间隔秒数（职业基准，各职业统一1.5）", "float", 0)},
+            {"Armor", new FieldMetaInfo("护甲（职业基准值）", "int", 0)},
+            {"MagicRes", new FieldMetaInfo("魔抗（职业基准值）", "int", 0)},
+            {"Atk", new FieldMetaInfo("攻击（职业基准模板，参照金铲铲角色定位）", "int", 0)},
+            {"Ap", new FieldMetaInfo("法术强度（职业基准模板）", "int", 0)},
+            {"Might", new FieldMetaInfo("无双强度（职业基准模板）", "int", 0)},
+        };
+
+        public static Dictionary<string, FieldMetaInfo> FieldMeta { get { return fieldMeta; } }
+
+        private static List<CellMeta> cellMeta = new List<CellMeta>();
+        public static List<CellMeta> CellMetas { get { return cellMeta; } }
+
         /// <summary>
         ///序列
         /// </summary>
@@ -26,14 +81,6 @@ namespace CommonConfig
         ///元职业
         /// </summary>
         public int SourceJob;
-        /// <summary>
-        ///强克制
-        /// </summary>
-        public string OvercomeStrong;
-        /// <summary>
-        ///弱克制
-        /// </summary>
-        public string OvercomeWeak;
         /// <summary>
         ///射程（近战17 弓50 弩70 炮50 扇/相/谋/鼓/乐/医35）
         /// </summary>
@@ -68,15 +115,13 @@ namespace CommonConfig
         public int Might;
 
 
-        public JobConfig(int Id, string Name, string NameS, int SkillId, int SourceJob, string OvercomeStrong, string OvercomeWeak, int Range, int MoveSpeed, float AtkSpeed, int Armor, int MagicRes, int Atk, int Ap, int Might)
+        public JobConfig(int Id, string Name, string NameS, int SkillId, int SourceJob, int Range, int MoveSpeed, float AtkSpeed, int Armor, int MagicRes, int Atk, int Ap, int Might)
         {
             this.Id = Id;
             this.Name = Name;
             this.NameS = NameS;
             this.SkillId = SkillId;
             this.SourceJob = SourceJob;
-            this.OvercomeStrong = OvercomeStrong;
-            this.OvercomeWeak = OvercomeWeak;
             this.Range = Range;
             this.MoveSpeed = MoveSpeed;
             this.AtkSpeed = AtkSpeed;
@@ -85,7 +130,6 @@ namespace CommonConfig
             this.Atk = Atk;
             this.Ap = Ap;
             this.Might = Might;
-
         }
 
         public JobConfig() { }
@@ -93,39 +137,46 @@ namespace CommonConfig
         private static Dictionary<int, JobConfig> config = new Dictionary<int, JobConfig>();
         public static Dictionary<int, JobConfig>.ValueCollection ConfigList
         {
-            get
-            {
-                return config.Values;
-            }
+            get { return config.Values; }
         }
 
         public static void Refresh(Dictionary<int, JobConfig> dict)
         {
             config.Clear();
             config = dict;
+            RebuildIndex();
         }
 
         public static void Load()
         {
             config.Clear();
-            config[1] = new JobConfig(1, "shuai", "帅", 200001, 0, "", "", 17, 10, 1.5f, 40, 35, 75, 75, 70);
-            config[101] = new JobConfig(101, "ma", "马", 200005, 0, "戟弩炮车", "弓", 17, 12, 1.5f, 55, 45, 80, 55, 80);
-            config[102] = new JobConfig(102, "mache", "车", 200011, 101, "戟弩弓", "炮", 17, 12, 1.5f, 55, 45, 90, 50, 90);
-            config[201] = new JobConfig(201, "gong", "弓", 200007, 0, "枪戟", "刀", 50, 8, 1.5f, 25, 30, 70, 55, 70);
-            config[202] = new JobConfig(202, "gongnu", "弩", 200010, 201, "枪戟", "刀", 70, 7, 1.5f, 25, 30, 60, 50, 70);
-            config[203] = new JobConfig(203, "gongpao", "炮", 200009, 201, "枪戟", "刀", 50, 8, 1.5f, 25, 30, 60, 60, 60);
-            config[301] = new JobConfig(301, "shi", "士", 200004, 0, "", "弓弩炮", 17, 10, 1.5f, 45, 35, 70, 55, 85);
-            config[302] = new JobConfig(302, "shidun", "盾", 0, 301, "弓弩炮", "", 17, 10, 1.5f, 45, 35, 65, 50, 80);
-            config[401] = new JobConfig(401, "shan", "扇", 200002, 0, "", "", 35, 8, 1.5f, 25, 35, 60, 80, 45);
-            config[402] = new JobConfig(402, "shanxiang", "相", 200006, 401, "", "", 35, 8, 1.5f, 35, 45, 65, 85, 45);
-            config[403] = new JobConfig(403, "shanmou", "谋", 200008, 401, "", "", 35, 8, 1.5f, 35, 45, 70, 90, 45);
-            config[501] = new JobConfig(501, "gu", "鼓", 200016, 0, "", "", 35, 8, 1.5f, 25, 35, 45, 65, 55);
-            config[502] = new JobConfig(502, "gusong", "乐", 200012, 501, "", "", 35, 8, 1.5f, 15, 25, 45, 85, 40);
-            config[503] = new JobConfig(503, "guyi", "医", 200013, 501, "", "", 35, 8, 1.5f, 25, 35, 55, 85, 45);
-            config[601] = new JobConfig(601, "dao", "刀", 200003, 0, "盾", "士", 17, 10, 1.5f, 25, 15, 65, 55, 85);
-            config[602] = new JobConfig(602, "daoqiang", "枪", 200014, 601, "马车", "", 17, 10, 1.5f, 55, 45, 80, 55, 80);
-            config[603] = new JobConfig(603, "daoji", "戟", 200015, 601, "枪", "", 17, 10, 1.5f, 45, 35, 75, 55, 75);
+            config[1] = new JobConfig(1, "shuai", "帅", 200001, 0, 17, 10, 1.5f, 40, 35, 75, 75, 70);
+            config[101] = new JobConfig(101, "ma", "马", 200005, 0, 17, 12, 1.5f, 55, 45, 80, 55, 80);
+            config[102] = new JobConfig(102, "mache", "车", 200011, 101, 17, 12, 1.5f, 55, 45, 90, 50, 90);
+            config[201] = new JobConfig(201, "gong", "弓", 200007, 0, 50, 8, 1.5f, 25, 30, 70, 55, 70);
+            config[202] = new JobConfig(202, "gongnu", "弩", 200010, 201, 70, 7, 1.5f, 25, 30, 60, 50, 70);
+            config[203] = new JobConfig(203, "gongpao", "炮", 200009, 201, 50, 8, 1.5f, 25, 30, 60, 60, 60);
+            config[301] = new JobConfig(301, "shi", "士", 200004, 0, 17, 10, 1.5f, 45, 35, 70, 55, 85);
+            config[302] = new JobConfig(302, "shidun", "盾", 0, 301, 17, 10, 1.5f, 45, 35, 65, 50, 80);
+            config[401] = new JobConfig(401, "shan", "扇", 200002, 0, 35, 8, 1.5f, 25, 35, 60, 80, 45);
+            config[402] = new JobConfig(402, "shanxiang", "相", 200006, 401, 35, 8, 1.5f, 35, 45, 65, 85, 45);
+            config[403] = new JobConfig(403, "shanmou", "谋", 200008, 401, 35, 8, 1.5f, 35, 45, 70, 90, 45);
+            config[501] = new JobConfig(501, "gu", "鼓", 200016, 0, 35, 8, 1.5f, 25, 35, 45, 65, 55);
+            config[502] = new JobConfig(502, "gusong", "乐", 200012, 501, 35, 8, 1.5f, 15, 25, 45, 85, 40);
+            config[503] = new JobConfig(503, "guyi", "医", 200013, 501, 35, 8, 1.5f, 25, 35, 55, 85, 45);
+            config[601] = new JobConfig(601, "dao", "刀", 200003, 0, 17, 10, 1.5f, 25, 15, 65, 55, 85);
+            config[602] = new JobConfig(602, "daoqiang", "枪", 200014, 601, 17, 10, 1.5f, 55, 45, 80, 55, 80);
+            config[603] = new JobConfig(603, "daoji", "戟", 200015, 601, 17, 10, 1.5f, 45, 35, 75, 55, 75);
 
+            RebuildIndex();
+
+        }
+
+        private static void RebuildIndex()
+        {
+            foreach (var kv in config)
+            {
+            }
         }
 
         public static JobConfig GetConfig(int id)
@@ -137,6 +188,7 @@ namespace CommonConfig
             }
             throw new NullReferenceException(string.Format("配置表JobConfig不存在id={0}", id));
         }
+
 
         public static bool HasConfig(int id)
         {

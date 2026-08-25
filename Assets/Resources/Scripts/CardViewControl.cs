@@ -29,19 +29,9 @@ public class CardViewControl : MonoBehaviour, IPointerDownHandler, IPointerUpHan
     //英雄卡相关
     public Image heroImage;
     public Image[] heroJobImage;
-    public TMP_Text lead;
-    public TMP_Text inte;
-    public TMP_Text str;
-    public TMP_Text hp;
 
-    //物品卡相关
+
     public Image itemImage;
-    public Image itemAttrImage1;
-    public Image itemAttrImage2;
-    public TMP_Text itemAttrName1;
-    public TMP_Text itemAttrName2;
-    public TMP_Text itemDes;
-
     public GameObject effectGreen;
     public GameObject effectYellow;
     public GameObject effectLayer;
@@ -51,13 +41,6 @@ public class CardViewControl : MonoBehaviour, IPointerDownHandler, IPointerUpHan
     void Start()
     {
         cardName.raycastTarget = false;
-        if (isHeroCard)
-        {
-            lead.raycastTarget = false;
-            inte.raycastTarget = false;
-            str.raycastTarget = false;
-            hp.raycastTarget = false;
-        }
 
         buyButton.onClick.AddListener(() =>
         {
@@ -165,11 +148,6 @@ public class CardViewControl : MonoBehaviour, IPointerDownHandler, IPointerUpHan
 
             }
 
-            SetColoredText(lead, heroCfg.Atk);
-            SetColoredText(inte, heroCfg.Ap);
-            SetColoredText(str, heroCfg.Might);
-            SetColoredText(hp, heroCfg.Hp);
-
             gameObject.GetComponent<Image>().color = HeroSelectionTool.GetSideColor(heroCfg.Side);
             priceI = HeroSelectionTool.GetPrice(heroCfg);
 
@@ -218,38 +196,6 @@ public class CardViewControl : MonoBehaviour, IPointerDownHandler, IPointerUpHan
             if (count > 1)
                 cardName.text += "x" + count;
             itemImage.sprite = Resources.Load<Sprite>("ItemPic/" + itemCfg.Icon);
-            if (!string.IsNullOrEmpty(itemCfg.Attr1))
-            {
-                itemAttrImage1.sprite = Resources.Load<Sprite>("Textures/" + HeroSelectionTool.GetAttrIcon(itemCfg.Attr1));
-                itemAttrName1.text = itemCfg.Attr1Val.ToString();
-            }
-            else
-            {
-                itemAttrImage1.gameObject.SetActive(false);
-                itemAttrName1.gameObject.SetActive(false);
-
-            }
-
-            if (!string.IsNullOrEmpty(itemCfg.Attr2))
-            {
-                itemAttrImage2.sprite = Resources.Load<Sprite>("Textures/" + HeroSelectionTool.GetAttrIcon(itemCfg.Attr2));
-                itemAttrName2.text = itemCfg.Attr2Val.ToString();
-            }
-            else
-            {
-                itemAttrImage2.gameObject.SetActive(false);
-                itemAttrName2.gameObject.SetActive(false);
-            }
-
-            if (!string.IsNullOrEmpty(itemCfg.Des))
-            {
-                itemDes.gameObject.SetActive(true);
-                itemDes.text = itemCfg.Des;
-            }
-            else
-            {
-                itemDes.gameObject.SetActive(false);
-            }
 
             priceI = itemCfg.Price + (int)Math.Floor(itemCfg.PriceRound * shopOpenIndex);
 
@@ -380,7 +326,7 @@ public class CardViewControl : MonoBehaviour, IPointerDownHandler, IPointerUpHan
         Canvas canvas = FindObjectOfType<Canvas>();
         movingCardImage.transform.SetParent(canvas.transform, false);
         Image img = movingCardImage.GetComponent<Image>();
-        img.sprite = isHeroCard ? heroImage.sprite : itemImage.sprite;
+        img.sprite = heroImage.sprite;
 
         // 获取Canvas的RectTransform
         RectTransform canvasRect = canvas.transform as RectTransform;
