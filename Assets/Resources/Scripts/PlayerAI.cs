@@ -44,9 +44,9 @@ public static class PlayerAI
                     continue;
             }
 
-            if(playerConfig.Banstrongcard && heroConfig.Total < 240)
+            if(playerConfig.Banstrongcard && heroConfig.Atk + heroConfig.Ap + heroConfig.Might < 240)
                 continue;
-            if(playerConfig.Banweakcard && heroConfig.Total > 215)
+            if(playerConfig.Banweakcard && heroConfig.Atk + heroConfig.Ap + heroConfig.Might > 215)
                 continue;
             bool find = false;
             var cardsNeed = PlayerBook.GetCardNeeds(playerConfig.Id);
@@ -556,18 +556,18 @@ public static class PlayerAI
                 int pos = heroCfg.Pos;
                 
                 // 获取三个属性值
-                int str = attr.Str;
-                int inte = attr.Inte;
-                int lead = attr.Lead;
+                int might = attr.Might;
+                int ap = attr.Ap;
+                int atk = attr.Atk;
                 
                 // 计算总属性
-                int totalAttr = str + inte + lead;
+                int totalAttr = might + ap + atk;
                 
                 // 找出最弱和次弱属性，最强和次强属性
                 List<Tuple<string, int>> attrValues = new List<Tuple<string, int>>();
-                attrValues.Add(new Tuple<string, int>("str", str));
-                attrValues.Add(new Tuple<string, int>("inte", inte));
-                attrValues.Add(new Tuple<string, int>("lead", lead));
+                attrValues.Add(new Tuple<string, int>("might", might));
+                attrValues.Add(new Tuple<string, int>("ap", ap));
+                attrValues.Add(new Tuple<string, int>("atk", atk));
                 
                 // 按属性值排序
                 attrValues.Sort((a, b) => a.Item2.CompareTo(b.Item2));

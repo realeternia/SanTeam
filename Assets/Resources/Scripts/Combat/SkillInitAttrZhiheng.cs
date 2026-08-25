@@ -48,9 +48,9 @@ public class SkillInitAttrZhiheng : Skill
         {
             // 提升主要属性，可以根据游戏设计选择合适的属性类型
             // 这里参考SkillHitAttr的实现方式
-            owner.AddAttr("str", attrValue); // 力量属性
-            owner.AddAttr("leadShip", attrValue); // 力量属性
-            owner.AddAttr("inte", attrValue); // 智力属性
+            owner.AddAttr("might", attrValue); // 无双强度属性
+            owner.AddAttr("atk", attrValue); // 攻击属性
+            owner.AddAttr("ap", attrValue); // 法术强度属性
             UnityEngine.Debug.Log($"BattleBegin SkillInitAttrZhiheng: 我方有{uniqueJobCount}种不同兵种，提升属性{attrValue}点");
 
             EffectManager.PlaySkillEffect(owner, skillCfg.HitEffect);

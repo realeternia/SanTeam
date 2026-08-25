@@ -273,18 +273,18 @@ public class GameManager : MonoBehaviour
                 // 筛选side=i且FriendCount<4的英雄
                 var heroList2 = HeroConfig.ConfigList.Where(x => x.Side == i && heroIds.Contains(x.Id) && x.FriendCount < 4).ToList();
 
-                // 智力分组
-                var inteHighList = heroList2.Where(x => x.Inte > 80).ToList();
-                var inteLowList = heroList2.Where(x => x.Inte < 60).ToList();
+                // 法术强度分组
+                var inteHighList = heroList2.Where(x => x.Ap > 80).ToList();
+                var inteLowList = heroList2.Where(x => x.Ap < 60).ToList();
 
                 // 随机2v2匹配
-                CreateRandomFriendPairs(inteHighList, inteLowList, "智力辅佐");
+                CreateRandomFriendPairs(inteHighList, inteLowList, "法术辅佐");
 
-                // 武力分组和匹配
-                var strHighList = heroList2.Where(x => x.Str > 80).ToList();
-                var strLowList = heroList2.Where(x => x.Str < 60).ToList();
+                // 无双强度分组和匹配
+                var strHighList = heroList2.Where(x => x.Might > 80).ToList();
+                var strLowList = heroList2.Where(x => x.Might < 60).ToList();
 
-                CreateRandomFriendPairs(strHighList, strLowList, "武力指导");
+                CreateRandomFriendPairs(strHighList, strLowList, "无双指导");
 
                 heroList2 = HeroConfig.ConfigList.Where(x => x.Side == i && heroIds.Contains(x.Id) && x.FriendCount < 2).ToList();
                 if (heroList2.Count > 2)

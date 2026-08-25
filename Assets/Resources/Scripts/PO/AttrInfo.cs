@@ -3,21 +3,21 @@ using System;
 [System.Serializable]
 public class AttrInfo
 {
-    public int Str;
-    public int Inte;
-    public int Lead;
+    public int Might; // 无双强度（原武力 Str）
+    public int Ap;    // 法术强度（原智力 Inte）
+    public int Atk;   // 攻击（原统帅 Lead）
     public int Hp;
 
     public int Total
     {
-        get { return Str + Inte + Lead; }
+        get { return Might + Ap + Atk; }
     }
 
     public void AddAttr(AttrInfo attr)
     {
-        Str += attr.Str;
-        Inte += attr.Inte;
-        Lead += attr.Lead;
+        Might += attr.Might;
+        Ap += attr.Ap;
+        Atk += attr.Atk;
         Hp += attr.Hp;
     }
 

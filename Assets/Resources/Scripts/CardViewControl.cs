@@ -165,9 +165,9 @@ public class CardViewControl : MonoBehaviour, IPointerDownHandler, IPointerUpHan
 
             }
 
-            SetColoredText(lead, heroCfg.LeadShip);
-            SetColoredText(inte, heroCfg.Inte);
-            SetColoredText(str, heroCfg.Str);
+            SetColoredText(lead, heroCfg.Atk);
+            SetColoredText(inte, heroCfg.Ap);
+            SetColoredText(str, heroCfg.Might);
             SetColoredText(hp, heroCfg.Hp);
 
             gameObject.GetComponent<Image>().color = HeroSelectionTool.GetSideColor(heroCfg.Side);
@@ -220,7 +220,7 @@ public class CardViewControl : MonoBehaviour, IPointerDownHandler, IPointerUpHan
             itemImage.sprite = Resources.Load<Sprite>("ItemPic/" + itemCfg.Icon);
             if (!string.IsNullOrEmpty(itemCfg.Attr1))
             {
-                itemAttrImage1.sprite = Resources.Load<Sprite>("Textures/attr" + itemCfg.Attr1);
+                itemAttrImage1.sprite = Resources.Load<Sprite>("Textures/" + HeroSelectionTool.GetAttrIcon(itemCfg.Attr1));
                 itemAttrName1.text = itemCfg.Attr1Val.ToString();
             }
             else
@@ -232,7 +232,7 @@ public class CardViewControl : MonoBehaviour, IPointerDownHandler, IPointerUpHan
 
             if (!string.IsNullOrEmpty(itemCfg.Attr2))
             {
-                itemAttrImage2.sprite = Resources.Load<Sprite>("Textures/attr" + itemCfg.Attr2);
+                itemAttrImage2.sprite = Resources.Load<Sprite>("Textures/" + HeroSelectionTool.GetAttrIcon(itemCfg.Attr2));
                 itemAttrName2.text = itemCfg.Attr2Val.ToString();
             }
             else

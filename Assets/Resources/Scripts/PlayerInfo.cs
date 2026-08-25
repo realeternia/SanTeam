@@ -118,15 +118,15 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
                 cards[card] = 1;
         }
 
-        // 每局开局：随机发一张总属性240以下魏蜀吴(阵营1/2/3)的卡片
+        // 每局开局：随机发一张三攻总和240以下魏蜀吴(阵营1/2/3)的卡片
         var starterCandidates = HeroConfig.ConfigList
-            .Where(x => x.Side >= 1 && x.Side <= 3 && x.Total < 240)
+            .Where(x => x.Side >= 1 && x.Side <= 3 && x.Atk + x.Ap + x.Might < 240)
             .ToList();
         // 校验：列出被排除的240及以上强卡(仅魏蜀吴阵营)
         var excludedStrongCards = HeroConfig.ConfigList
-            .Where(x => x.Side >= 1 && x.Side <= 3 && x.Total >= 240)
-            .OrderBy(x => x.Total)
-            .Select(x => string.Format("{0}({1})总={2}", x.Name, x.Id, x.Total))
+            .Where(x => x.Side >= 1 && x.Side <= 3 && x.Atk + x.Ap + x.Might >= 240)
+            .OrderBy(x => x.Atk + x.Ap + x.Might)
+            .Select(x => string.Format("{0}({1})总={2}", x.Name, x.Id, x.Atk + x.Ap + x.Might))
             .ToList();
         UnityEngine.Debug.Log(string.Format(
             "[开局发卡] pid={0} 候选弱卡数量={1}，被排除的240及以上强卡({2}张): {3}",
@@ -140,7 +140,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
                 cards[starterHero.Id] = 1;
             UnityEngine.Debug.Log(string.Format(
                 "[开局发卡] pid={0} 随机到：{1}(id={2}, 阵营={3}, 总属性={4})",
-                pid, starterHero.Name, starterHero.Id, starterHero.Side, starterHero.Total));
+                pid, starterHero.Name, starterHero.Id, starterHero.Side, starterHero.Atk + starterHero.Ap + starterHero.Might));
         }
         else
         {
@@ -721,7 +721,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
             int bestItemId = -1;
             
             // 获取英雄的各项属性
-            int[] heroAttributes = { heroCfg.Str, heroCfg.Inte, heroCfg.LeadShip };
+            int[] heroAttributes = { heroCfg.Might, heroCfg.Ap, heroCfg.Atk };
 
             int minAttr = heroAttributes.Min();
             int maxAttr = heroAttributes.Max();
@@ -737,17 +737,17 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
                     bool isMinAttr = false;
                     bool isMaxAttr = false;
 
-                    if (itemCfg.Attr1 == "str" && heroCfg.Str == minAttr)
+                    if (itemCfg.Attr1 == "might" && heroCfg.Might == minAttr)
                         isMinAttr = true;
-                    else if (itemCfg.Attr1 == "inte" && heroCfg.Inte == minAttr)
+                    else if (itemCfg.Attr1 == "ap" && heroCfg.Ap == minAttr)
                         isMinAttr = true;
-                    else if (itemCfg.Attr1 == "lead" && heroCfg.LeadShip == minAttr)
+                    else if (itemCfg.Attr1 == "atk" && heroCfg.Atk == minAttr)
                         isMinAttr = true;
-                    else if (itemCfg.Attr1 == "str" && heroCfg.Str == maxAttr)
+                    else if (itemCfg.Attr1 == "might" && heroCfg.Might == maxAttr)
                         isMaxAttr = true;
-                    else if (itemCfg.Attr1 == "inte" && heroCfg.Inte == maxAttr)
+                    else if (itemCfg.Attr1 == "ap" && heroCfg.Ap == maxAttr)
                         isMaxAttr = true;  
-                    else if (itemCfg.Attr1 == "lead" && heroCfg.LeadShip == maxAttr)
+                    else if (itemCfg.Attr1 == "atk" && heroCfg.Atk == maxAttr)
                         isMaxAttr = true;
                     
                     if(heroCfg.Pos == 1)

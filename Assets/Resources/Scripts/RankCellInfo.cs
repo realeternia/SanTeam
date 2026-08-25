@@ -80,9 +80,9 @@ public class RankCellInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandle
 
         heroName.text = heroConfig.Name;
         heroId = (int)heroConfig.Id;
-        str = heroConfig.Str;
-        inte = heroConfig.Inte;
-        leadShip = heroConfig.LeadShip;
+        str = heroConfig.Might;
+        inte = heroConfig.Ap;
+        leadShip = heroConfig.Atk;
         hp = heroConfig.Hp;
         price = HeroSelectionTool.GetPrice(heroConfig);
         if (heroConfig.Job == "shuai")
@@ -91,23 +91,23 @@ public class RankCellInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandle
         var bg = GetComponent<Image>();
         bg.color = HeroSelectionTool.GetSideColor(heroConfig.Side);
 
-        heroStr.text = heroConfig.Str.ToString();
-        if (heroConfig.Str >= 95)
-            heroStr.text = "<color=red>" + heroConfig.Str.ToString() + "</color>";
-        else if (heroConfig.Str >= 90)
-            heroStr.text = "<color=yellow>" + heroConfig.Str.ToString() + "</color>";
+        heroStr.text = heroConfig.Might.ToString();
+        if (heroConfig.Might >= 95)
+            heroStr.text = "<color=red>" + heroConfig.Might.ToString() + "</color>";
+        else if (heroConfig.Might >= 90)
+            heroStr.text = "<color=yellow>" + heroConfig.Might.ToString() + "</color>";
 
-        heroInte.text = heroConfig.Inte.ToString();
-        if (heroConfig.Inte >= 95)
-            heroInte.text = "<color=red>" + heroConfig.Inte.ToString() + "</color>";
-        else if (heroConfig.Inte >= 90)
-            heroInte.text = "<color=yellow>" + heroConfig.Inte.ToString() + "</color>";
+        heroInte.text = heroConfig.Ap.ToString();
+        if (heroConfig.Ap >= 95)
+            heroInte.text = "<color=red>" + heroConfig.Ap.ToString() + "</color>";
+        else if (heroConfig.Ap >= 90)
+            heroInte.text = "<color=yellow>" + heroConfig.Ap.ToString() + "</color>";
 
-        heroLeadShip.text = heroConfig.LeadShip.ToString();
-        if (heroConfig.LeadShip >= 95)
-            heroLeadShip.text = "<color=red>" + heroConfig.LeadShip.ToString() + "</color>";
-        else if (heroConfig.LeadShip >= 90)
-            heroLeadShip.text = "<color=yellow>" + heroConfig.LeadShip.ToString() + "</color>";
+        heroLeadShip.text = heroConfig.Atk.ToString();
+        if (heroConfig.Atk >= 95)
+            heroLeadShip.text = "<color=red>" + heroConfig.Atk.ToString() + "</color>";
+        else if (heroConfig.Atk >= 90)
+            heroLeadShip.text = "<color=yellow>" + heroConfig.Atk.ToString() + "</color>";
 
 
         heroPrice.text = price.ToString();

@@ -35,7 +35,7 @@ public class SkillHelpAidHeal : Skill
         });
 
         var targetUnit = unitsInRange[0];
-        owner.HealTarget(targetUnit, skillId, (int)(owner.inte * skillCfg.SkillAttrRate));
+        owner.HealTarget(targetUnit, skillId, (int)(owner.ap * skillCfg.SkillAttrRate));
         EffectManager.PlaySkillEffect(targetUnit, skillCfg.HitEffect);
 
         return true;

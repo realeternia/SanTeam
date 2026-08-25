@@ -30,32 +30,32 @@ public class HeroInfo : MonoBehaviour
         
     }
 
-    public void SetAttr(int inte, int str, int leadShip)
+    public void SetAttr(int ap, int might, int atk)
     {
-        SetText(heroInteTxt, inte);
-        SetText(heroStrTxt, str);
-        SetText(heroLeadTxt, leadShip);
+        SetText(heroInteTxt, ap);
+        SetText(heroStrTxt, might);
+        SetText(heroLeadTxt, atk);
 
-        // 确定英雄的最高属性
+        // 确定英雄的最高属性（法术强度/攻击/无双强度）
         string highestAttr = "";
         var highestAttrValue = 0;
 
-        var total = inte + leadShip + str;
-        if (inte >= leadShip && inte >= str)
+        var total = ap + atk + might;
+        if (ap >= atk && ap >= might)
         {
             highestAttr = "attrinte";
-            highestAttrValue = inte;
+            highestAttrValue = ap;
         }
-        else if (leadShip >= inte && leadShip >= str)
+        else if (atk >= ap && atk >= might)
         {
             highestAttr = "attrlead";
-            highestAttrValue = leadShip;
+            highestAttrValue = atk;
 
         }
-        else if (str >= inte && str >= leadShip)
+        else if (might >= ap && might >= atk)
         {
             highestAttr = "attrstr";
-            highestAttrValue = str;
+            highestAttrValue = might;
 
         }
         else if (total >= 235)

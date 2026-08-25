@@ -27,9 +27,9 @@ public class Chess : MonoBehaviour
     // 移动速度
     public float moveSpeed = 5f;
     public float attackRange = 10f;
-    public int inte;
-    public int str;
-    public int leadShip;
+    public int ap;      // 法术强度（原智力）
+    public int might;   // 无双强度（原武力）
+    public int atk;     // 攻击（原统帅）
     public int level = 1;
     public bool isShadow;
     public bool isFakeHero;
@@ -47,6 +47,30 @@ public class Chess : MonoBehaviour
     // 是否正在使用偏移路径
     public int hp = 100;
     public int attackDamage = 30;
+
+    // 护甲：不随升星成长，由英雄品质/兵种/站位派生
+    public int Armor
+    {
+        get
+        {
+            var heroCfg = HeroConfig.GetConfig(heroId);
+            if (heroCfg == null)
+                return 0;
+            return heroCfg.Armor;
+        }
+    }
+
+    // 法术抗性：不随升星成长，由英雄品质/兵种/站位派生
+    public int MagicRes
+    {
+        get
+        {
+            var heroCfg = HeroConfig.GetConfig(heroId);
+            if (heroCfg == null)
+                return 0;
+            return heroCfg.MagicRes;
+        }
+    }
     public string hitEffect;
     public int missileSpeed = 10;
     public float missileHight;
@@ -57,6 +81,7 @@ public class Chess : MonoBehaviour
     // 攻击冷却时间
     public float attackPoint;
     public float attackRate; //攻击频率
+    public float atkSpeed = 1.5f; //攻击间隔秒数（来自 HeroConfig.AtkSpeed）
     private float lastAttackTime = 0f;
     private float lastTargetUpdateTime = 0f; // 上次更新目标的时间
 
@@ -243,10 +268,11 @@ public class Chess : MonoBehaviour
         maxHp = attr.Hp;
         moveSpeed = heroConfig.MoveSpeed;
         attackRange = heroConfig.Range;
-        attackDamage = attr.Lead / 3;
-        inte = attr.Inte;
-        str = attr.Str;
-        leadShip = attr.Lead;
+        atkSpeed = heroConfig.AtkSpeed;
+        attackDamage = attr.Atk;
+        ap = attr.Ap;
+        might = attr.Might;
+        atk = attr.Atk;
 
         if (player.itemEquips.ContainsKey(heroId))
         {
@@ -255,9 +281,9 @@ public class Chess : MonoBehaviour
 
             var equipAttr = HeroSelectionTool.GetCardAttr(player, equipId, equipCardLevel);
 
-            inte += equipAttr.Inte;
-            str += equipAttr.Str;
-            leadShip += equipAttr.Lead;
+            ap += equipAttr.Ap;
+            might += equipAttr.Might;
+            atk += equipAttr.Atk;
             maxHp += equipAttr.Hp;
         }
 
@@ -285,28 +311,28 @@ public class Chess : MonoBehaviour
 
             foreach (var friendAttr in supportAttrs.Values)
             {
-                inte += friendAttr.Inte;
-                str += friendAttr.Str;
-                leadShip += friendAttr.Lead;
+                ap += friendAttr.Ap;
+                might += friendAttr.Might;
+                atk += friendAttr.Atk;
             }
         }
 
         hp = maxHp;
 
         if (heroInfo != null)
-            heroInfo.SetAttr(inte, str, leadShip);
+            heroInfo.SetAttr(ap, might, atk);
     }
 
-    public void UpdateAttr(int inte, int str, int leadShip)
+    public void UpdateAttr(int ap, int might, int atk)
     {
-        if (inte > 0)
-            this.inte = inte;
-        if (str > 0)
-            this.str = str;
-        if (leadShip > 0)
-            this.leadShip = leadShip;
+        if (ap > 0)
+            this.ap = ap;
+        if (might > 0)
+            this.might = might;
+        if (atk > 0)
+            this.atk = atk;
         if (heroInfo != null)
-            heroInfo.SetAttr(this.inte, this.str, this.leadShip);
+            heroInfo.SetAttr(this.ap, this.might, this.atk);
     }
 
     // 只能开场用
@@ -449,8 +475,8 @@ public class Chess : MonoBehaviour
         if (WorldManager.Instance.CheckInRange(transform.position, targetChess.transform.position, attackRange))
         {
             attackPoint += deltaTime * attackRate;
-            // 检查攻击冷却
-            if (attackPoint >= 2f) //集气2s
+            // 检查攻击冷却（集气达到攻速间隔秒数）
+            if (attackPoint >= atkSpeed)
             {
             //    PlayerAnim("jumpspin");
                 attackPoint = 0;
@@ -621,6 +647,13 @@ public class Chess : MonoBehaviour
         if(damage <= 0)
             throw new Exception("伤害值不能小于等于0");
 
+        // 法术强度类技能伤害受法术抗性减免（无双/物理技能不受减免）
+        var skillCfg = SkillConfig.GetConfig(skillId);
+        if (skillCfg != null && skillCfg.Attr == "ap" && isHero)
+        {
+            damage = Math.Max(1, (int)(damage * (100f / (100f + MagicRes))));
+        }
+
         if (isHero)
         {
             SkillManager.OnDoSkillDamage(this, caster, SkillConfig.GetConfig(skillId), ref damage, isFeedback);
@@ -681,14 +714,14 @@ public class Chess : MonoBehaviour
         if (supportAttrs.ContainsKey(friendId))
         {
             var friendAttr = supportAttrs[friendId];
-            inte -= friendAttr.Inte;
-            str -= friendAttr.Str;
-            leadShip -= friendAttr.Lead;
+            ap -= friendAttr.Ap;
+            might -= friendAttr.Might;
+            atk -= friendAttr.Atk;
             supportAttrs.Remove(friendId);
 
 
             if (heroInfo != null)
-                heroInfo.SetAttr(inte, str, leadShip);
+                heroInfo.SetAttr(ap, might, atk);
         }
     }
 
@@ -697,34 +730,15 @@ public class Chess : MonoBehaviour
     {
         if (!attacker.isHero || !defender.isHero)
         {
-            type = "leadShip";
+            type = "atk";
             return attacker.attackDamage;
         }
 
-        // 计算攻击者三属性与防御者对应属性的差值
-        float inteDiff = attacker.inte - defender.inte;
-        float leadShipDiff = attacker.leadShip - defender.leadShip;
-        float strDiff = attacker.str - defender.str;
-
-        // 找出最大差值
-        float maxDiff = Mathf.Max(inteDiff, leadShipDiff, strDiff);
-        type = "";
-        if(maxDiff == inteDiff)
-        {
-            type = "inte";
-        }
-        else if(maxDiff == leadShipDiff)
-        {
-            type = "leadShip";
-        }
-        else
-        {
-            type = "str";
-        }
-
-        // 伤害 = 最大差值 * 2
-        int damage = Mathf.RoundToInt(maxDiff * 2);
-        return damage;
+        // 普通攻击以攻击(Atk)为基准，受目标护甲减免：实际伤害 = Atk × 100/(100+护甲)
+        int damage = attacker.atk;
+        damage = (int)(damage * (100f / (100f + defender.Armor)));
+        type = "atk";
+        return Mathf.Max(1, damage);
     }
 
     public void AddHp(int addon)
@@ -839,12 +853,14 @@ public class Chess : MonoBehaviour
     {
         switch (attr)
         {
-            case "inte":
-                return inte;
-            case "leadShip":
-                return leadShip;
-            case "str":
-                return str;
+            case "ap":
+                return ap;
+            case "atk":
+                return atk;
+            case "might":
+                return might;
+            case "hp":
+                return hp;
             default:
                 throw new ArgumentException("Invalid attribute name: " + attr);
         }
@@ -852,25 +868,25 @@ public class Chess : MonoBehaviour
 
     public int GetAttrTotal()
     {
-        return inte + leadShip + str;
+        return ap + atk + might;
     }
 
     public void AddAttr(string attr, int value)
     {
         switch (attr)
         {
-            case "inte":
-                inte += value;
+            case "ap":
+                ap += value;
                 break;
-            case "leadShip":
-                leadShip += value;
+            case "atk":
+                atk += value;
                 break;
-            case "str":
-                str += value;
+            case "might":
+                might += value;
                 break;
         }
         if(heroInfo != null)
-            heroInfo.SetAttr(inte, str, leadShip);
+            heroInfo.SetAttr(ap, might, atk);
     }
 
     public float HpRate{ get { return (float)hp / maxHp; } }

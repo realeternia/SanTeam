@@ -62,9 +62,9 @@ public class ItemHeroDetail : MonoBehaviour
             var heroConfig = HeroConfig.GetConfig(id);
 
             maxHpBase = heroConfig.Hp;
-            inteBase = heroConfig.Inte;
-            strBase = heroConfig.Str;
-            leadShipBase = heroConfig.LeadShip;
+            inteBase = heroConfig.Ap;
+            strBase = heroConfig.Might;
+            leadShipBase = heroConfig.Atk;
 
             nameText.text = heroConfig.Name;
             var sellRate = player.GetSellRate();
@@ -99,16 +99,16 @@ public class ItemHeroDetail : MonoBehaviour
 
         attrFinal = HeroSelectionTool.GetCardAttr(player, cardId, lv);
 
-        leadText.text = attrFinal.Lead.ToString();
-        if (attrEquip.Lead > 0)
-            leadText.text += "\n<color=#FFB6C1>+" + attrEquip.Lead.ToString() + "</color>";
+        leadText.text = attrFinal.Atk.ToString();
+        if (attrEquip.Atk > 0)
+            leadText.text += "\n<color=#FFB6C1>+" + attrEquip.Atk.ToString() + "</color>";
 
-        inteText.text = attrFinal.Inte.ToString();
-        if (attrEquip.Inte > 0)
-            inteText.text += "\n<color=#FFB6C1>+" + attrEquip.Inte.ToString() + "</color>";            
-        strText.text = attrFinal.Str.ToString();
-        if (attrEquip.Str > 0)
-            strText.text += "\n<color=#FFB6C1>+" + attrEquip.Str.ToString() + "</color>";            
+        inteText.text = attrFinal.Ap.ToString();
+        if (attrEquip.Ap > 0)
+            inteText.text += "\n<color=#FFB6C1>+" + attrEquip.Ap.ToString() + "</color>";            
+        strText.text = attrFinal.Might.ToString();
+        if (attrEquip.Might > 0)
+            strText.text += "\n<color=#FFB6C1>+" + attrEquip.Might.ToString() + "</color>";            
         hpText.text = attrFinal.Hp.ToString();
         if (attrEquip.Hp > 0)
             hpText.text += "\n<color=#FFB6C1>+" + attrEquip.Hp.ToString() + "</color>";

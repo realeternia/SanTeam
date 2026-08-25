@@ -78,8 +78,8 @@ public static class HeroSelectionTool
                 return isBelow100100A ? -1 : 1;
             }
 
-            // 按Total排序
-            return configB.Total.CompareTo(configA.Total);
+            // 按三攻总和排序
+            return (configB.Atk + configB.Ap + configB.Might).CompareTo(configA.Atk + configA.Ap + configA.Might);
         });
 
     }
@@ -162,7 +162,26 @@ public static class HeroSelectionTool
         return heroCfg.Price;
     }
 
-    private static int[] cardHeroExp = new int[] { 1, 2, 4, 7, 11, 16, 22, 29, 37, 46, 56, 66, 76, 86, 96, 106, 116, 126, 136, 146, 156, 166, 176, 186, 196, 206, 216, 226, 236, 246, 256, 266, 276, 999 };
+    // 属性字符串 → 图标贴图名（沿用旧贴图资源：atk→统帅图标、ap→智力图标、might→武力图标、hp→护盾图标）
+    public static string GetAttrIcon(string attr)
+    {
+        switch (attr)
+        {
+            case "atk":
+                return "attrlead";
+            case "ap":
+                return "attrinte";
+            case "might":
+                return "attrstr";
+            case "hp":
+                return "attrshield";
+            default:
+                return attr;
+        }
+    }
+
+    // 升星成本：1→2星需3张，2→3星需5张，3→4星需7张……（每级新增2N-1张，累计n²张）
+    private static int[] cardHeroExp = new int[] { 1, 4, 9, 16, 25, 36, 49, 64, 81, 100, 121, 144, 169, 196, 225, 256, 289, 324, 361, 400, 441, 484, 529, 576, 625, 676, 729, 784, 841, 900, 961, 1024, 1089, 999 };
     private static int[] cardItemExp = new int[] { 1, 2, 4, 6, 9, 12, 15, 19, 23, 27, 31, 36, 41, 46, 51, 56, 62, 68, 74, 80, 86, 92, 98, 104, 110, 116, 122, 128, 136, 142, 148, 154, 160, 166, 172, 178, 184, 190, 196, 202, 999 }; //生成后续数据
     public static int GetCardLevel(int exp, bool isHero)
     {
@@ -206,52 +225,53 @@ public static class HeroSelectionTool
         {
             var heroConfig = HeroConfig.GetConfig(cardId);
 
-            attrInfo.Hp = heroConfig.Hp + heroConfig.Hp * (lv - 1) / 10;
-            attrInfo.Inte = heroConfig.Inte + System.Math.Max(8 * (lv - 1), heroConfig.Inte * (lv - 1) / 10);
-            attrInfo.Str = heroConfig.Str + System.Math.Max(8 * (lv - 1), heroConfig.Str * (lv - 1) / 10);
-            attrInfo.Lead = heroConfig.LeadShip + System.Math.Max(8 * (lv - 1), heroConfig.LeadShip * (lv - 1) / 10);
+            // 线性成长：每星按配置的成长百分比提升（AtkP/ApP/MightP，默认80=每星+80%，2星≈1.8倍1星）
+            attrInfo.Hp = heroConfig.Hp * (100 + heroConfig.HpP * (lv - 1)) / 100; // Hp 独立成长字段（每星+80%）
+            attrInfo.Ap = heroConfig.Ap * (100 + heroConfig.ApP * (lv - 1)) / 100;
+            attrInfo.Might = heroConfig.Might * (100 + heroConfig.MightP * (lv - 1)) / 100;
+            attrInfo.Atk = heroConfig.Atk * (100 + heroConfig.AtkP * (lv - 1)) / 100;
         }
         else
         {
             var itemConfig = ItemConfig.GetConfig(cardId);
-            if (itemConfig.Attr1 == "str")
+            if (itemConfig.Attr1 == "might")
             {
-                attrInfo.Str = itemConfig.Attr1Val;
+                attrInfo.Might = itemConfig.Attr1Val;
             }
-            else if (itemConfig.Attr1 == "inte")
+            else if (itemConfig.Attr1 == "ap")
             {
-                attrInfo.Inte = itemConfig.Attr1Val;
+                attrInfo.Ap = itemConfig.Attr1Val;
             }
-            else if (itemConfig.Attr1 == "lead")
+            else if (itemConfig.Attr1 == "atk")
             {
-                attrInfo.Lead = itemConfig.Attr1Val;
+                attrInfo.Atk = itemConfig.Attr1Val;
             }
-            else if (itemConfig.Attr1 == "shield")
+            else if (itemConfig.Attr1 == "hp")
             {
                 attrInfo.Hp = itemConfig.Attr1Val;
             }
 
-            if (itemConfig.Attr2 == "str")
+            if (itemConfig.Attr2 == "might")
             {
-                attrInfo.Str = itemConfig.Attr2Val;
+                attrInfo.Might = itemConfig.Attr2Val;
             }
-            else if (itemConfig.Attr2 == "inte")
+            else if (itemConfig.Attr2 == "ap")
             {
-                attrInfo.Inte = itemConfig.Attr2Val;
+                attrInfo.Ap = itemConfig.Attr2Val;
             }
-            else if (itemConfig.Attr2 == "lead")
+            else if (itemConfig.Attr2 == "atk")
             {
-                attrInfo.Lead = itemConfig.Attr2Val;
+                attrInfo.Atk = itemConfig.Attr2Val;
             }
-            else if (itemConfig.Attr2 == "shield")
+            else if (itemConfig.Attr2 == "hp")
             {
                 attrInfo.Hp = itemConfig.Attr2Val;
             }
 
             attrInfo.Hp = attrInfo.Hp * lv;
-            attrInfo.Inte = attrInfo.Inte * lv;
-            attrInfo.Str = attrInfo.Str * lv;
-            attrInfo.Lead = attrInfo.Lead * lv;
+            attrInfo.Ap = attrInfo.Ap * lv;
+            attrInfo.Might = attrInfo.Might * lv;
+            attrInfo.Atk = attrInfo.Atk * lv;
         }
         if(player.attrAddons.ContainsKey(cardId))
             attrInfo.AddAttr(player.attrAddons[cardId]);
@@ -300,32 +320,32 @@ public static class HeroSelectionTool
         var myHeroCfg = HeroConfig.GetConfig(heroId);
         
         // 获取三个属性值
-        int friendStr = friendHeroCfg.Str;
-        int friendInte = friendHeroCfg.Inte;
-        int friendLead = friendHeroCfg.LeadShip;
+        int friendMight = friendHeroCfg.Might;
+        int friendAp = friendHeroCfg.Ap;
+        int friendAtk = friendHeroCfg.Atk;
         
-        int myStr = myHeroCfg.Str;
-        int myInte = myHeroCfg.Inte;
-        int myLead = myHeroCfg.LeadShip;
+        int myMight = myHeroCfg.Might;
+        int myAp = myHeroCfg.Ap;
+        int myAtk = myHeroCfg.Atk;
         
         // 计算差值
-        int strDiff = friendStr - myStr;
-        int inteDiff = friendInte - myInte;
-        int leadDiff = friendLead - myLead;
+        int mightDiff = friendMight - myMight;
+        int apDiff = friendAp - myAp;
+        int atkDiff = friendAtk - myAtk;
            
         int totalPoints;
         float[] weights = new float[3];
 
-        weights[0] = FormulaLearnAttrConfig.GetConfig(strDiff).Weight;
-        weights[1] = FormulaLearnAttrConfig.GetConfig(inteDiff).Weight;
-        weights[2] = FormulaLearnAttrConfig.GetConfig(leadDiff).Weight;
-        strDiff = Math.Clamp(strDiff, -6, 50);
-        inteDiff = Math.Clamp(inteDiff, -6, 50);
-        leadDiff = Math.Clamp(leadDiff, -6, 50);
+        weights[0] = FormulaLearnAttrConfig.GetConfig(mightDiff).Weight;
+        weights[1] = FormulaLearnAttrConfig.GetConfig(apDiff).Weight;
+        weights[2] = FormulaLearnAttrConfig.GetConfig(atkDiff).Weight;
+        mightDiff = Math.Clamp(mightDiff, -6, 50);
+        apDiff = Math.Clamp(apDiff, -6, 50);
+        atkDiff = Math.Clamp(atkDiff, -6, 50);
         var factor = 1f; //单属性老师，给1.5倍属性
-        if ( strDiff > 0 && inteDiff < 0 && leadDiff < 0 || strDiff < 0 && inteDiff > 0 && leadDiff < 0 || strDiff < 0 && inteDiff < 0 && leadDiff > 0)
+        if ( mightDiff > 0 && apDiff < 0 && atkDiff < 0 || mightDiff < 0 && apDiff > 0 && atkDiff < 0 || mightDiff < 0 && apDiff < 0 && atkDiff > 0)
             factor = 1.5f;
-        totalPoints = (int)Math.Clamp((strDiff + inteDiff + leadDiff) * factor / 2.2f, 10, 30);
+        totalPoints = (int)Math.Clamp((mightDiff + apDiff + atkDiff) * factor / 2.2f, 10, 30);
         if(friendLevel > 1)
             totalPoints = (int)Math.Clamp(totalPoints * (1 + 0.2f * (friendLevel - 1)), 10, 30);
 
@@ -339,7 +359,7 @@ public static class HeroSelectionTool
         int[] addValues = new int[3];
         
         // 找出三个差值中的排序索引（从小到大）
-        int[] indices = { 0, 1, 2 }; // 0=Str, 1=Inte, 2=Lead
+        int[] indices = { 0, 1, 2 }; // 0=Might, 1=Ap, 2=Atk
         Array.Sort(indices, (a, b) => diffs[a].CompareTo(diffs[b]));
         
         // 先计算最低差值的属性
@@ -348,9 +368,9 @@ public static class HeroSelectionTool
         addValues[indices[2]] = totalPoints - addValues[indices[0]] - addValues[indices[1]];
 
         var attr = new AttrInfo();
-        attr.Str = addValues[0] * (lv + 9) / 10;
-        attr.Inte = addValues[1] * (lv + 9) / 10;
-        attr.Lead = addValues[2] * (lv + 9) / 10;
+        attr.Might = addValues[0] * (lv + 9) / 10;
+        attr.Ap = addValues[1] * (lv + 9) / 10;
+        attr.Atk = addValues[2] * (lv + 9) / 10;
         
         return attr;
     }    
