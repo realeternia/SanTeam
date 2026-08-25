@@ -74,7 +74,7 @@ public static class ConfigManager
 
         foreach (var heroCfg in HeroConfig.ConfigList)
         {
-            // 移速/射程/攻速/护甲/魔抗：HeroConfig 为 0 时使用职业基准值，非 0 时与职业值相加
+            // 移速/射程/攻速/护甲/魔抗/攻击/法术/无双：HeroConfig 为 0 时使用职业基准值，非 0 时与职业值相加
             var jobCfg = GetJobConfig(heroCfg.Job);
             if (jobCfg != null)
             {
@@ -83,6 +83,9 @@ public static class ConfigManager
                 heroCfg.AtkSpeed = heroCfg.AtkSpeed == 0f ? jobCfg.AtkSpeed : heroCfg.AtkSpeed + jobCfg.AtkSpeed;
                 heroCfg.Armor = heroCfg.Armor == 0 ? jobCfg.Armor : heroCfg.Armor + jobCfg.Armor;
                 heroCfg.MagicRes = heroCfg.MagicRes == 0 ? jobCfg.MagicRes : heroCfg.MagicRes + jobCfg.MagicRes;
+                heroCfg.Atk = heroCfg.Atk == 0 ? jobCfg.Atk : heroCfg.Atk + jobCfg.Atk;
+                heroCfg.Ap = heroCfg.Ap == 0 ? jobCfg.Ap : heroCfg.Ap + jobCfg.Ap;
+                heroCfg.Might = heroCfg.Might == 0 ? jobCfg.Might : heroCfg.Might + jobCfg.Might;
             }
         }
 

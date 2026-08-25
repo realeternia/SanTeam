@@ -43,6 +43,9 @@ public class PickPanelControl : MonoBehaviour
         {
             HeroSelectionTool.SetBanList(GetBanList());
 
+            // 新游戏ban阶段结束进入，存档一次
+            GameManager.Instance.SaveToFile();
+
             PanelManager.Instance.ShowShop();
             PanelManager.Instance.HidePick();
         });

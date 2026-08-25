@@ -58,7 +58,7 @@ public class Tooltip : MonoBehaviour
                         jobAttrStr = "克制:<color=red>" + jobCfg.OvercomeStrong + "</color><color=yellow>" + jobCfg.OvercomeWeak + "</color>\n";
                 }
                 var skillAttrStr = skillConfig.Attr == "might" ? "<color=red>[无双]</color>" : skillConfig.Attr == "atk" ? "<color=yellow>[攻]</color>" : skillConfig.Attr == "ap" ? "<color=blue>[法]</color>" : "";
-                textSkills[i].text = jobAttrStr + skillAttrStr + skillConfig.Name + "[<color=yellow>" + skillConfig.Price.ToString() + "元</color>]" + skillConfig.Descript; //富文本
+                textSkills[i].text = jobAttrStr + skillAttrStr + skillConfig.Name + skillConfig.Descript; //富文本
                 imageSkills[i].sprite = Resources.Load<Sprite>("SkillPic/" + skillConfig.Icon);
             }
 

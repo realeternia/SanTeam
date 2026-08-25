@@ -54,9 +54,21 @@ namespace CommonConfig
         ///魔抗（职业基准值）
         /// </summary>
         public int MagicRes;
+        /// <summary>
+        ///攻击（职业基准模板，参照金铲铲角色定位）
+        /// </summary>
+        public int Atk;
+        /// <summary>
+        ///法术强度（职业基准模板）
+        /// </summary>
+        public int Ap;
+        /// <summary>
+        ///无双强度（职业基准模板）
+        /// </summary>
+        public int Might;
 
 
-        public JobConfig(int Id, string Name, string NameS, int SkillId, int SourceJob, string OvercomeStrong, string OvercomeWeak, int Range, int MoveSpeed, float AtkSpeed, int Armor, int MagicRes)
+        public JobConfig(int Id, string Name, string NameS, int SkillId, int SourceJob, string OvercomeStrong, string OvercomeWeak, int Range, int MoveSpeed, float AtkSpeed, int Armor, int MagicRes, int Atk, int Ap, int Might)
         {
             this.Id = Id;
             this.Name = Name;
@@ -70,6 +82,9 @@ namespace CommonConfig
             this.AtkSpeed = AtkSpeed;
             this.Armor = Armor;
             this.MagicRes = MagicRes;
+            this.Atk = Atk;
+            this.Ap = Ap;
+            this.Might = Might;
 
         }
 
@@ -93,23 +108,23 @@ namespace CommonConfig
         public static void Load()
         {
             config.Clear();
-            config[1] = new JobConfig(1, "shuai", "帅", 200001, 0, "", "", 17, 10, 1.5f, 40, 35);
-            config[101] = new JobConfig(101, "ma", "马", 200005, 0, "戟弩炮车", "弓", 17, 12, 1.5f, 55, 45);
-            config[102] = new JobConfig(102, "mache", "车", 200011, 101, "戟弩弓", "炮", 17, 12, 1.5f, 55, 45);
-            config[201] = new JobConfig(201, "gong", "弓", 200007, 0, "枪戟", "刀", 50, 8, 1.5f, 25, 30);
-            config[202] = new JobConfig(202, "gongnu", "弩", 200010, 201, "枪戟", "刀", 70, 7, 1.5f, 25, 30);
-            config[203] = new JobConfig(203, "gongpao", "炮", 200009, 201, "枪戟", "刀", 50, 8, 1.5f, 25, 30);
-            config[301] = new JobConfig(301, "shi", "士", 200004, 0, "", "弓弩炮", 17, 10, 1.5f, 45, 35);
-            config[302] = new JobConfig(302, "shidun", "盾", 0, 301, "弓弩炮", "", 17, 10, 1.5f, 45, 35);
-            config[401] = new JobConfig(401, "shan", "扇", 200002, 0, "", "", 35, 8, 1.5f, 25, 35);
-            config[402] = new JobConfig(402, "shanxiang", "相", 200006, 401, "", "", 35, 8, 1.5f, 35, 45);
-            config[403] = new JobConfig(403, "shanmou", "谋", 200008, 401, "", "", 35, 8, 1.5f, 35, 45);
-            config[501] = new JobConfig(501, "gu", "鼓", 200016, 0, "", "", 35, 8, 1.5f, 25, 35);
-            config[502] = new JobConfig(502, "gusong", "乐", 200012, 501, "", "", 35, 8, 1.5f, 15, 25);
-            config[503] = new JobConfig(503, "guyi", "医", 200013, 501, "", "", 35, 8, 1.5f, 25, 35);
-            config[601] = new JobConfig(601, "dao", "刀", 200003, 0, "盾", "士", 17, 10, 1.5f, 25, 15);
-            config[602] = new JobConfig(602, "daoqiang", "枪", 200014, 601, "马车", "", 17, 10, 1.5f, 55, 45);
-            config[603] = new JobConfig(603, "daoji", "戟", 200015, 601, "枪", "", 17, 10, 1.5f, 45, 35);
+            config[1] = new JobConfig(1, "shuai", "帅", 200001, 0, "", "", 17, 10, 1.5f, 40, 35, 75, 75, 70);
+            config[101] = new JobConfig(101, "ma", "马", 200005, 0, "戟弩炮车", "弓", 17, 12, 1.5f, 55, 45, 80, 55, 80);
+            config[102] = new JobConfig(102, "mache", "车", 200011, 101, "戟弩弓", "炮", 17, 12, 1.5f, 55, 45, 90, 50, 90);
+            config[201] = new JobConfig(201, "gong", "弓", 200007, 0, "枪戟", "刀", 50, 8, 1.5f, 25, 30, 70, 55, 70);
+            config[202] = new JobConfig(202, "gongnu", "弩", 200010, 201, "枪戟", "刀", 70, 7, 1.5f, 25, 30, 60, 50, 70);
+            config[203] = new JobConfig(203, "gongpao", "炮", 200009, 201, "枪戟", "刀", 50, 8, 1.5f, 25, 30, 60, 60, 60);
+            config[301] = new JobConfig(301, "shi", "士", 200004, 0, "", "弓弩炮", 17, 10, 1.5f, 45, 35, 70, 55, 85);
+            config[302] = new JobConfig(302, "shidun", "盾", 0, 301, "弓弩炮", "", 17, 10, 1.5f, 45, 35, 65, 50, 80);
+            config[401] = new JobConfig(401, "shan", "扇", 200002, 0, "", "", 35, 8, 1.5f, 25, 35, 60, 80, 45);
+            config[402] = new JobConfig(402, "shanxiang", "相", 200006, 401, "", "", 35, 8, 1.5f, 35, 45, 65, 85, 45);
+            config[403] = new JobConfig(403, "shanmou", "谋", 200008, 401, "", "", 35, 8, 1.5f, 35, 45, 70, 90, 45);
+            config[501] = new JobConfig(501, "gu", "鼓", 200016, 0, "", "", 35, 8, 1.5f, 25, 35, 45, 65, 55);
+            config[502] = new JobConfig(502, "gusong", "乐", 200012, 501, "", "", 35, 8, 1.5f, 15, 25, 45, 85, 40);
+            config[503] = new JobConfig(503, "guyi", "医", 200013, 501, "", "", 35, 8, 1.5f, 25, 35, 55, 85, 45);
+            config[601] = new JobConfig(601, "dao", "刀", 200003, 0, "盾", "士", 17, 10, 1.5f, 25, 15, 65, 55, 85);
+            config[602] = new JobConfig(602, "daoqiang", "枪", 200014, 601, "马车", "", 17, 10, 1.5f, 55, 45, 80, 55, 80);
+            config[603] = new JobConfig(603, "daoji", "戟", 200015, 601, "枪", "", 17, 10, 1.5f, 45, 35, 75, 55, 75);
 
         }
 

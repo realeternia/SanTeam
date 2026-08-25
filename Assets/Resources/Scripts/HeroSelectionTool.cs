@@ -225,11 +225,14 @@ public static class HeroSelectionTool
         {
             var heroConfig = HeroConfig.GetConfig(cardId);
 
+            // 品质系数：品质每高一档基础属性×1.15（普通1.0 优秀1.15 精良1.32 史诗1.52），参照金铲铲费用梯度
+            float qualityFactor = Mathf.Pow(1.15f, heroConfig.Quality - 1);
+
             // 线性成长：每星按配置的成长百分比提升（AtkP/ApP/MightP，默认80=每星+80%，2星≈1.8倍1星）
-            attrInfo.Hp = heroConfig.Hp * (100 + heroConfig.HpP * (lv - 1)) / 100; // Hp 独立成长字段（每星+80%）
-            attrInfo.Ap = heroConfig.Ap * (100 + heroConfig.ApP * (lv - 1)) / 100;
-            attrInfo.Might = heroConfig.Might * (100 + heroConfig.MightP * (lv - 1)) / 100;
-            attrInfo.Atk = heroConfig.Atk * (100 + heroConfig.AtkP * (lv - 1)) / 100;
+            attrInfo.Hp = (int)(heroConfig.Hp * qualityFactor * (100 + heroConfig.HpP * (lv - 1)) / 100); // Hp 独立成长字段（每星+80%）
+            attrInfo.Ap = (int)(heroConfig.Ap * qualityFactor * (100 + heroConfig.ApP * (lv - 1)) / 100);
+            attrInfo.Might = (int)(heroConfig.Might * qualityFactor * (100 + heroConfig.MightP * (lv - 1)) / 100);
+            attrInfo.Atk = (int)(heroConfig.Atk * qualityFactor * (100 + heroConfig.AtkP * (lv - 1)) / 100);
         }
         else
         {

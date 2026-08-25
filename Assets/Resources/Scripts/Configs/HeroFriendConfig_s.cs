@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -48,6 +48,7 @@ namespace CommonConfig
         {
             config.Clear();
             config = dict;
+            RebuildIndex();
         }
         public class FieldMetaInfo
         {
@@ -93,47 +94,6 @@ namespace CommonConfig
 
         private static List<CellMeta> cellMeta = new List<CellMeta>();
         public static List<CellMeta> CellMetas { get { return cellMeta; } }
-
-        /// <summary>
-        ///序列
-        /// </summary>
-        public int Id;
-        /// <summary>
-        ///名字
-        /// </summary>
-        public string Name;
-        /// <summary>
-        ///支援级别（3最高，1最低（比如共事））
-        /// </summary>
-        public int Level;
-        /// <summary>
-        ///英雄列表，最多5人，一般2-3人较多
-        /// </summary>
-        public int[] Heros;
-
-
-        public HeroFriendConfig(int Id, string Name, int Level, int[] Heros)
-        {
-            this.Id = Id;
-            this.Name = Name;
-            this.Level = Level;
-            this.Heros = Heros;
-        }
-
-        public HeroFriendConfig() { }
-
-        private static Dictionary<int, HeroFriendConfig> config = new Dictionary<int, HeroFriendConfig>();
-        public static Dictionary<int, HeroFriendConfig>.ValueCollection ConfigList
-        {
-            get { return config.Values; }
-        }
-
-        public static void Refresh(Dictionary<int, HeroFriendConfig> dict)
-        {
-            config.Clear();
-            config = dict;
-            RebuildIndex();
-        }
 
         public static void Load()
         {
