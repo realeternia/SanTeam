@@ -74,27 +74,15 @@ public static class ConfigManager
 
         foreach (var heroCfg in HeroConfig.ConfigList)
         {
-            if (heroCfg.Job.StartsWith("ma"))
-                heroCfg.MoveSpeed = 12;
-            else if (heroCfg.Job.StartsWith("gongnu"))
+            // 移速/射程/攻速/护甲/魔抗：HeroConfig 为 0 时使用职业基准值，非 0 时与职业值相加
+            var jobCfg = GetJobConfig(heroCfg.Job);
+            if (jobCfg != null)
             {
-                heroCfg.Range = 70;
-                heroCfg.MoveSpeed = 7;
-            }
-            else if (heroCfg.Job.StartsWith("gong"))
-            {
-                heroCfg.Range = 50;
-                heroCfg.MoveSpeed = 8;
-            }          
-            else if (heroCfg.Job.StartsWith("shan"))
-            {
-                heroCfg.Range = 35;
-                heroCfg.MoveSpeed = 8;
-            }     
-            else if (heroCfg.Job.StartsWith("gu"))
-            {
-                heroCfg.Range = 35;
-                heroCfg.MoveSpeed = 8;
+                heroCfg.MoveSpeed = heroCfg.MoveSpeed == 0 ? jobCfg.MoveSpeed : heroCfg.MoveSpeed + jobCfg.MoveSpeed;
+                heroCfg.Range = heroCfg.Range == 0 ? jobCfg.Range : heroCfg.Range + jobCfg.Range;
+                heroCfg.AtkSpeed = heroCfg.AtkSpeed == 0f ? jobCfg.AtkSpeed : heroCfg.AtkSpeed + jobCfg.AtkSpeed;
+                heroCfg.Armor = heroCfg.Armor == 0 ? jobCfg.Armor : heroCfg.Armor + jobCfg.Armor;
+                heroCfg.MagicRes = heroCfg.MagicRes == 0 ? jobCfg.MagicRes : heroCfg.MagicRes + jobCfg.MagicRes;
             }
         }
 
