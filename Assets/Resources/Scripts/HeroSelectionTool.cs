@@ -162,7 +162,7 @@ public static class HeroSelectionTool
         return heroCfg.Price;
     }
 
-    // 属性字符串 → 图标贴图名（沿用旧贴图资源：atk→统帅图标、ap→智力图标、might→武力图标、hp→护盾图标）
+    // 属性字符串 → 图标贴图名（atk→统帅图标、ap→智力图标、might→武力图标、hp→护盾图标、atkspeed→沙漏、armor→胸甲、magicres→法阵、movespeed→战靴、range→弓靶）
     public static string GetAttrIcon(string attr)
     {
         switch (attr)
@@ -175,8 +175,18 @@ public static class HeroSelectionTool
                 return "attrstr";
             case "hp":
                 return "attrshield";
+            case "atkspeed":
+                return "attrspeed";
+            case "armor":
+                return "attrarmor";
+            case "magicres":
+                return "attrmagic";
+            case "movespeed":
+                return "attrmove";
+            case "range":
+                return "attrrrange";
             default:
-                return attr;
+                return "attrshield";
         }
     }
 

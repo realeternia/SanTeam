@@ -48,29 +48,9 @@ public class Chess : MonoBehaviour
     public int hp = 100;
     public int attackDamage = 30;
 
-    // 护甲：不随升星成长，由英雄品质/兵种/站位派生
-    public int Armor
-    {
-        get
-        {
-            var heroCfg = HeroConfig.GetConfig(heroId);
-            if (heroCfg == null)
-                return 0;
-            return heroCfg.Armor;
-        }
-    }
-
-    // 法术抗性：不随升星成长，由英雄品质/兵种/站位派生
-    public int MagicRes
-    {
-        get
-        {
-            var heroCfg = HeroConfig.GetConfig(heroId);
-            if (heroCfg == null)
-                return 0;
-            return heroCfg.MagicRes;
-        }
-    }
+    // 护甲/魔抗：英雄与士兵初始化时从配置赋值
+    public int armor;
+    public int magicRes;
     public string hitEffect;
     public int missileSpeed = 10;
     public float missileHight;
@@ -80,8 +60,7 @@ public class Chess : MonoBehaviour
 
     // 攻击冷却时间
     public float attackPoint;
-    public float attackRate; //攻击频率
-    public float atkSpeed = 1.5f; //攻击间隔秒数（来自 HeroConfig.AtkSpeed）
+    public float attackRate; //攻击频率（每秒攻击次数，=攻速值/30；攻速20=1.5秒/次，15=2秒/次）
     private float lastAttackTime = 0f;
     private float lastTargetUpdateTime = 0f; // 上次更新目标的时间
 
@@ -176,7 +155,7 @@ public class Chess : MonoBehaviour
             heroInfo.SetHpRate(hp, maxHp);
         
         attackPoint = UnityEngine.Random.Range(0f, 1f); // 随机获得初始气力
-        attackRate = 1;
+        // attackRate 已在 SpawnUnitsForRegion/SpawnHerosForRegion 中按配置设置（攻速值/30），此处不能覆盖
     }
 
     // 创建血条HUD
@@ -268,11 +247,13 @@ public class Chess : MonoBehaviour
         maxHp = attr.Hp;
         moveSpeed = heroConfig.MoveSpeed;
         attackRange = heroConfig.Range;
-        atkSpeed = heroConfig.AtkSpeed;
+        attackRate = heroConfig.AtkSpeed / 30f; // 攻速值→每秒攻击次数（30=1次/秒；攻速20=1.5秒/次，15=2秒/次）
         attackDamage = attr.Atk;
         ap = attr.Ap;
         might = attr.Might;
         atk = attr.Atk;
+        armor = heroConfig.Armor;
+        magicRes = heroConfig.MagicRes;
 
         if (player.itemEquips.ContainsKey(heroId))
         {
@@ -475,8 +456,8 @@ public class Chess : MonoBehaviour
         if (WorldManager.Instance.CheckInRange(transform.position, targetChess.transform.position, attackRange))
         {
             attackPoint += deltaTime * attackRate;
-            // 检查攻击冷却（集气达到攻速间隔秒数）
-            if (attackPoint >= atkSpeed)
+            // 检查攻击冷却（攻击频率累积满1次即可出手，attackRate=攻速值/30）
+            if (attackPoint >= 1f)
             {
             //    PlayerAnim("jumpspin");
                 attackPoint = 0;
@@ -645,7 +626,7 @@ public class Chess : MonoBehaviour
         var skillCfg = SkillConfig.GetConfig(skillId);
         if (skillCfg != null && skillCfg.Attr == "ap" && isHero)
         {
-            damage = Math.Max(1, (int)(damage * (100f / (100f + MagicRes))));
+            damage = Math.Max(1, (int)(damage * (100f / (100f + magicRes))));
         }
 
         if (isHero)
@@ -730,7 +711,7 @@ public class Chess : MonoBehaviour
 
         // 普通攻击以攻击(Atk)为基准，受目标护甲减免：实际伤害 = Atk × 100/(100+护甲)
         int damage = attacker.atk;
-        damage = (int)(damage * (100f / (100f + defender.Armor)));
+        damage = (int)(damage * (100f / (100f + defender.armor)));
         type = "atk";
         return Mathf.Max(1, damage);
     }

@@ -128,7 +128,7 @@ public static class PlayerAI
         }
 
         var shopCfg = ShopConfig.GetConfig(Math.Min(100, year + 1));
-        if(shopCfg.Id <= 2 && affordableCards.Count < 6 - shopCfg.Id * 2 + (3 - era) * 4)
+        if(shopCfg.Id <= 2 && affordableCards.Count < 6 - shopCfg.Id * 2 + (2 - era) * 4)
             return false;        
 
         //把战力前6的卡放到一个队列里
@@ -361,7 +361,7 @@ public static class PlayerAI
             scoredCards[index] = (scoredCards[index].card, scoredCards[index].score * playerConfig.PickFirst);
         }
 
-        if (mostScore <= 1.6 && (era < 3 && UnityEngine.Random.value < playerConfig.Futurerate * (1 + (2 - era) * 0.3f)))
+        if (mostScore <= 1.6 && (era < 2 && UnityEngine.Random.value < playerConfig.Futurerate * (1 + (1 - era) * 0.3f)))
         {
             var cardRate = Math.Min(0.5f, Math.Max(0, (18 - availableCards.Count) * 0.05f));
             var scoreRate = Math.Min(0.4f, (1.6f - mostScore) / 1.6f / 2);

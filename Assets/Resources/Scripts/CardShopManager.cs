@@ -459,7 +459,7 @@ public class CardShopManager : MonoBehaviour
         // 检查是否8个玩家都放弃或所有卡牌都已售出
         if (passedPlayers >= 8 || allCardsSold)
         {
-            if (era == 3)
+            if (era == 2) // 2个选牌阶段（era=1、2），第2阶段结束进入战斗
             {
                 StartCoroutine(ShopEnd());
                 return;

@@ -97,16 +97,19 @@ public class CardViewControl : MonoBehaviour, IPointerDownHandler, IPointerUpHan
     {
         Debug.Log($"UI 元素被按下，位置：{eventData.position}");
 
+        // 属性取值在 Tooltip 内部统一走 GetCardAttr（与战斗一致），这里只需传当前玩家
+        var player = CardShopManager.Instance.GetCurrentPlayer();
+
         if (isHeroCard)
         {
             var heroCfg = HeroConfig.GetConfig(cardId);
             var friendInfo = ConfigManager.GetHeroFriendInfo(cardId);
-            if (heroCfg.Skills != null && heroCfg.Skills.Length > 0 || friendInfo != null)
-            { 
-                Tooltip.Instance.ShowTooltip(heroCfg.Skills, friendInfo, cardId);
-            }
+            Tooltip.Instance.ShowTooltip(heroCfg.Skills, friendInfo, cardId, player);
         }
-
+        else
+        {
+            Tooltip.Instance.ShowTooltip(null, null, cardId, player);
+        }
     }
 
     // Update is called once per frame
@@ -326,7 +329,7 @@ public class CardViewControl : MonoBehaviour, IPointerDownHandler, IPointerUpHan
         Canvas canvas = FindObjectOfType<Canvas>();
         movingCardImage.transform.SetParent(canvas.transform, false);
         Image img = movingCardImage.GetComponent<Image>();
-        img.sprite = heroImage.sprite;
+        img.sprite = isHeroCard ? heroImage.sprite : itemImage.sprite;
 
         // 获取Canvas的RectTransform
         RectTransform canvasRect = canvas.transform as RectTransform;

@@ -80,7 +80,7 @@ public static class ConfigManager
             {
                 heroCfg.MoveSpeed = heroCfg.MoveSpeed == 0 ? jobCfg.MoveSpeed : heroCfg.MoveSpeed + jobCfg.MoveSpeed;
                 heroCfg.Range = heroCfg.Range == 0 ? jobCfg.Range : heroCfg.Range + jobCfg.Range;
-                heroCfg.AtkSpeed = heroCfg.AtkSpeed == 0f ? jobCfg.AtkSpeed : heroCfg.AtkSpeed + jobCfg.AtkSpeed;
+                heroCfg.AtkSpeed = heroCfg.AtkSpeed == 0 ? jobCfg.AtkSpeed : heroCfg.AtkSpeed + jobCfg.AtkSpeed;
                 heroCfg.Armor = heroCfg.Armor == 0 ? jobCfg.Armor : heroCfg.Armor + jobCfg.Armor;
                 heroCfg.MagicRes = heroCfg.MagicRes == 0 ? jobCfg.MagicRes : heroCfg.MagicRes + jobCfg.MagicRes;
                 heroCfg.Atk = heroCfg.Atk == 0 ? jobCfg.Atk : heroCfg.Atk + jobCfg.Atk;
