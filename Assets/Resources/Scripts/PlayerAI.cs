@@ -127,7 +127,7 @@ public static class PlayerAI
             }
         }
 
-        var shopCfg = ShopConfig.GetConfig(Math.Min(100, year + 1));
+        var shopCfg = ShopConfig.GetConfig(Math.Min(100, year));
         if(shopCfg.Id <= 2 && affordableCards.Count < 6 - shopCfg.Id * 2 + (2 - era) * 4)
             return false;        
 

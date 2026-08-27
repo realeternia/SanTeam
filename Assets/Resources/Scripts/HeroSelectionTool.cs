@@ -100,34 +100,42 @@ public static class HeroSelectionTool
         heroPoolCache.RemoveAll(hero => banList.Contains(hero.Item1));
     }
 
-    public static int GetRandomHeroId()
+    // 刷牌：先按ShopConfig品质概率roll出品质，再从该品质的英雄池随机选一张（ban 已在池中剔除）
+    public static int GetRandomHeroIdByQuality(ShopConfig shopCfg)
     {
-        // 实现价格加权随机：价格越高，被选中的概率越低
-        // 使用价格的倒数作为权重
-        float totalWeight = 0;
+        int quality = RollQuality(shopCfg);
+        List<int> candidates = new List<int>();
         foreach (var hero in heroPoolCache)
         {
-            // 防止价格为0的情况
-            float weight = hero.Item2 > 0 ? hero.Item2 : 1f;
-            totalWeight += weight;
+            if (HeroConfig.GetConfig(hero.Item1).Quality == quality)
+                candidates.Add(hero.Item1);
         }
-        
-        float randomValue = UnityEngine.Random.Range(0, totalWeight);
-        float accumulatedWeight = 0;
-        
-        foreach (var hero in heroPoolCache)
-        {
-            float weight = hero.Item2 > 0 ? hero.Item2 : 1f;
-            accumulatedWeight += weight;
-            
-            if (accumulatedWeight >= randomValue)
-            {
-                return hero.Item1;
-            }
-        }
-        
-        // 如果出现问题，返回第一个英雄（保底）
-        return heroPoolCache[0].Item1;
+
+        // 该品质池为空（如早期品质4未解锁或全部被ban）时，回退到整个池随机
+        if (candidates.Count == 0)
+            candidates = GetHeroPoolCache();
+        if (candidates.Count == 0)
+            return 0;
+
+        return candidates[UnityEngine.Random.Range(0, candidates.Count)];
+    }
+
+    // 品质1=100-品质2-品质3-品质4
+    private static int RollQuality(ShopConfig shopCfg)
+    {
+        int q2 = Math.Max(0, shopCfg.Quality2Rate);
+        int q3 = Math.Max(0, shopCfg.Quality3Rate);
+        int q4 = Math.Max(0, shopCfg.Quality4Rate);
+        int q1 = Math.Max(0, 100 - q2 - q3 - q4);
+
+        int roll = UnityEngine.Random.Range(0, 100);
+        if (roll < q1)
+            return 1;
+        if (roll < q1 + q2)
+            return 2;
+        if (roll < q1 + q2 + q3)
+            return 3;
+        return 4;
     }
 
     public static bool HasHeroInPool(int heroId)

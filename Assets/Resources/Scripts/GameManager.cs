@@ -361,19 +361,16 @@ public class GameManager : MonoBehaviour
         heroIds = new List<int>();
 
         int[] sideCounts = new int[10];
-        // 先对allHeroes遍历，1-100随机，如果大于RateAbs，加入返回队列
+        // 核心英雄（Id<100100 的帅）始终进入英雄池
         List<HeroConfig> tempHeroes = new List<HeroConfig>(allHeroes);
         foreach (var hero in tempHeroes)
         {
-            if(hero.RateAbs <= 0)
-                continue;
-            int randomValue = UnityEngine.Random.Range(1, 101);
-            if (randomValue <= hero.RateAbs)
+            if (hero.Id < 100100)
             {
                 heroIds.Add(hero.Id);
                 sideCounts[hero.Side - 1]++;
+                allHeroes.Remove(hero);
             }
-            allHeroes.Remove(hero);
         }
 
         // 先随机选择5-7张Side=4的卡牌
@@ -401,39 +398,9 @@ public class GameManager : MonoBehaviour
                 List<HeroConfig> tempSide4Heroes = new List<HeroConfig>(side4Heroes);
                 for (int j = sideCounts[side - 1]; j < side4Count; j++)
                 {
-                    // 计算当前阵营总权重
-                    float totalRate = 0;
-                    foreach (var hero in tempSide4Heroes)
-                    {
-                        totalRate += hero.RateWeight;
-                    }
-
-                    HeroConfig heroCfg = null;
-                    if (totalRate > 0)
-                    {
-                        float randomValue = UnityEngine.Random.Range(0, totalRate);
-                        float accumulatedRate = 0;
-                        HeroConfig selectedHero = null;
-
-                        foreach (var hero in tempSide4Heroes)
-                        {
-                            if (hero.RateWeight <= 0)
-                                continue;
-                            accumulatedRate += hero.RateWeight;
-                            if (accumulatedRate >= randomValue)
-                            {
-                                selectedHero = hero;
-                                break;
-                            }
-                        }
-                        heroCfg = selectedHero;
-                    }
-                    else
-                    {
-                        // 如果总权重为0，随机选一张
-                        int randomIndex = UnityEngine.Random.Range(0, tempSide4Heroes.Count);
-                        heroCfg = tempSide4Heroes[randomIndex];
-                    }
+                    // 该阵营内随机选一张
+                    int randomIndex = UnityEngine.Random.Range(0, tempSide4Heroes.Count);
+                    HeroConfig heroCfg = tempSide4Heroes[randomIndex];
                     heroIds.Add((int)heroCfg.Id);
                     allHeroes.Remove(heroCfg);
                     tempSide4Heroes.Remove(heroCfg);
@@ -454,6 +421,16 @@ public class GameManager : MonoBehaviour
         {
             foreach (var hero in sideHeroList)
                 heroIds.Add(hero.Id);
+        }
+
+        // 心仪卡牌必定进入英雄池
+        if (Profile.Instance.cardLoves != null)
+        {
+            foreach (var loveId in Profile.Instance.cardLoves)
+            {
+                if (!heroIds.Contains(loveId) && HeroConfig.HasConfig(loveId))
+                    heroIds.Add(loveId);
+            }
         }
     }
 }

@@ -52,9 +52,6 @@ public static class ConfigManager
 
         foreach (var heroCfg in HeroConfig.ConfigList)
         {
-            if (Profile.Instance.cardLoves != null && Profile.Instance.cardLoves.Contains((int)heroCfg.Id))
-                heroCfg.RateAbs = 65;
-
             heroCfg.Job = jobNameConvDict.ContainsKey(heroCfg.Job) ? jobNameConvDict[heroCfg.Job] : heroCfg.Job;
 
             var jobCfg = GetJobConfig(heroCfg.Job);

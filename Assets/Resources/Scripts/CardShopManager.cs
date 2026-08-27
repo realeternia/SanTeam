@@ -143,14 +143,14 @@ public class CardShopManager : MonoBehaviour
         foreach(var player in GameManager.Instance.players)
             player.OnEra(era);
 
-        var year = GameManager.Instance.year; //第几场比赛
-        var shopCfg = ShopConfig.GetConfig(Math.Min(100, year + 1));
+        var year = GameManager.Instance.year; //第几场比赛（每场战斗后+1，即一个回合）
+        var shopCfg = ShopConfig.GetConfig(Math.Min(100, year));
         List<Tuple<int, int>> heroIds = new List<Tuple<int, int>>();
         int TOTAL_HERO_CARDS = 21;        
         // hero card
         for (int i = 0; i < TOTAL_HERO_CARDS; i++)
         {
-            var heroId = HeroSelectionTool.GetRandomHeroId();
+            var heroId = HeroSelectionTool.GetRandomHeroIdByQuality(shopCfg);
             var existingIndex = heroIds.FindIndex(x => x.Item1 == heroId);
             if (existingIndex >= 0)
             { //重复卡的处理
