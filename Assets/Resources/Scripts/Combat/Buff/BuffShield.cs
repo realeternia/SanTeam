@@ -22,6 +22,12 @@ public class BuffShield : Buff
         hp = (int)(skillCfg.SkillAttrRate * caster.maxHp);
     }
 
+    // 直接指定护盾值(默认同阵营护盾机制使用，覆盖按配置计算)
+    public void SetHp(int value)
+    {
+        hp = value;
+    }
+
     public void SubHp(int damage)
     {
         hp = Math.Max(1, hp - damage);

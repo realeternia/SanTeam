@@ -19,6 +19,8 @@ public class Skill
 
     public int skillId{ get{ return skillCfg.Id; } }
 
+    public float mp; // 当前技能MP，战斗开始为0，满值=MpCost
+
     public Skill(int id, Chess unit)
     {
         this.id = id;
@@ -58,8 +60,29 @@ public class Skill
         return Time.time < lastUpdateTime + skillCfg.CD;
     }
 
+    // 每次行动（攻击）为技能充能：增加MpCost/3，3次行动充满；达到MpCost后不再增加
+    public void AddActionMp()
+    {
+        if (skillCfg.MpCost <= 0)
+            return;
+        mp = Mathf.Min(mp + skillCfg.MpCost / 3f, skillCfg.MpCost);
+    }
+
+    // MP是否已满（未设置MpCost的技能不受MP限制）
+    public bool IsMpFull()
+    {
+        return skillCfg.MpCost <= 0 || mp >= skillCfg.MpCost;
+    }
+
     public bool CheckBurst(Chess target)
     {
+        // 设置了MpCost的技能：MP未满时无法发动
+        if (!IsMpFull())
+        {
+            isBurst = false;
+            return false;
+        }
+
         var rate = skillCfg.Rate;
         if (rate > 0 && rate < 1 && target != null && target != owner)
         {
@@ -79,7 +102,10 @@ public class Skill
         isBurst = !IsInCD() && (skillCfg.Rate <= 0 || UnityEngine.Random.value < rate);
         UnityEngine.Debug.Log("CheckBurst isBurst=" + isBurst.ToString() + " skillId=" + id.ToString());
         if(isBurst)
+        {
             UpdateCD();
+            mp = 0; // 发动技能后清空MP
+        }
         return isBurst;
     }
 

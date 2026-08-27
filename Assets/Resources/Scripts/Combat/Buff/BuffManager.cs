@@ -60,6 +60,16 @@ public static class BuffManager
         target.AddBuff(buff, caster, time);
     }
 
+    /// <summary>
+    /// 直接按指定护盾值添加护盾(默认同阵营护盾机制使用)
+    /// </summary>
+    public static void AddShield(Chess target, Chess caster, int hp, float time)
+    {
+        var buff = new BuffShield(CombatConst.ShieldBuffId, CombatConst.MasterShieldSkillId, caster, target, time);
+        target.AddBuff(buff, caster, time);
+        buff.SetHp(hp);
+    }
+
     public static void RemoveBuff(Chess chess, int buffId)
     {
         for(int i = 0; i < chess.buffs.Count; i++)

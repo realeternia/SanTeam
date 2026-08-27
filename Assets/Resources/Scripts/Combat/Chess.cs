@@ -81,7 +81,8 @@ public class Chess : MonoBehaviour
 
     private bool dieAfterLifeTime;
     private float lifeTime;
-    private Dictionary<int, AttrInfo> supportAttrs = new Dictionary<int, AttrInfo>(); //支援hero的属性加成
+    private HashSet<int> friendIds = new HashSet<int>(); //连线(武将关系)好友
+    private int friendAtkBonus; //连线好友带来的攻击加成值
 
     private float regeTimer; //1s回复一次
     public int regeHp; //回复血量
@@ -237,7 +238,7 @@ public class Chess : MonoBehaviour
         }
     }
 
-    public void CheckInitAttr(PlayerInfo player, int lv, List<int> friendIds)
+    public void CheckInitAttr(PlayerInfo player, int lv)
     {
         level = lv;
 
@@ -268,38 +269,30 @@ public class Chess : MonoBehaviour
             maxHp += equipAttr.Hp;
         }
 
-        if (friendIds != null)
-        {
-            foreach (var friendId in friendIds)
-            {
-                var friendAttr = HeroSelectionTool.GetSupportAttr(heroId, friendId, lv);
-                if (friendAttr != null)
-                {
-                    supportAttrs[friendId] = friendAttr;
-                    var friendChess = WorldManager.Instance.FindByHeroIdAndSide(friendId, side);
-                    if (friendChess != null)
-                    {
-                        GameObject heroPrefab = Resources.Load<GameObject>("Prefabs/LaserLine");
-                        GameObject heroInstance = Instantiate(heroPrefab, Vector3.zero, Quaternion.identity);
-                        heroInstance.transform.SetParent(transform);
-                        heroInstance.transform.localScale = new Vector3(1, 1, 1);
-                        var beam = heroInstance.transform.Find("Beam").GetComponent<GlowBeamController>();
-                        beam.SetSourceAndTarget(this, friendChess);
-                        beam.SetGlowColor(GetPlayerInfo().lineColor);
-                    }
-                }
-            }
-
-            foreach (var friendAttr in supportAttrs.Values)
-            {
-                ap += friendAttr.Ap;
-                might += friendAttr.Might;
-                atk += friendAttr.Atk;
-            }
-        }
-
         hp = maxHp;
 
+        if (heroInfo != null)
+            heroInfo.SetAttr(ap, might, atk);
+    }
+
+    // 记录连线(武将关系)好友
+    public void AddFriendId(int friendId)
+    {
+        friendIds.Add(friendId);
+    }
+
+    // 应用连线(武将关系)攻击强化
+    public void ApplyFriendAtkBonus(float rate)
+    {
+        if (rate <= 0)
+            return;
+        friendAtkBonus = (int)(atk * rate);
+        atk += friendAtkBonus;
+    }
+
+    // 刷新英雄属性显示(连线加成在战斗开始时应用后调用)
+    public void RefreshHeroAttr()
+    {
         if (heroInfo != null)
             heroInfo.SetAttr(ap, might, atk);
     }
@@ -461,6 +454,7 @@ public class Chess : MonoBehaviour
             {
             //    PlayerAnim("jumpspin");
                 attackPoint = 0;
+                AddActionMp(); // 每次攻击行动为技能充能
                 SkillManager.AimTarget(this, targetChess);
                 if (attackRange >= 20)
                 {
@@ -686,18 +680,17 @@ public class Chess : MonoBehaviour
 
     public void OnFriendDie(int friendId)
     {
-        if (supportAttrs.ContainsKey(friendId))
-        {
-            var friendAttr = supportAttrs[friendId];
-            ap -= friendAttr.Ap;
-            might -= friendAttr.Might;
-            atk -= friendAttr.Atk;
-            supportAttrs.Remove(friendId);
+        if (!friendIds.Contains(friendId))
+            return;
 
+        friendIds.Remove(friendId);
+        // 移除旧加成，并按剩余好友数量重算攻击强化
+        atk -= friendAtkBonus;
+        friendAtkBonus = (int)(atk * FriendLineManager.GetFriendLineAtkRate(friendIds.Count));
+        atk += friendAtkBonus;
 
-            if (heroInfo != null)
-                heroInfo.SetAttr(ap, might, atk);
-        }
+        if (heroInfo != null)
+            heroInfo.SetAttr(ap, might, atk);
     }
 
 
@@ -952,6 +945,15 @@ public class Chess : MonoBehaviour
         var skillAdd = SkillManager.CreateSkill(skillId, this);
         skillAdd.isGivenSkill = true;
         skills.Add(skillAdd);
+    }
+
+    // 每次攻击行动，为所有设置了MpCost的技能充能（3次攻击充满）
+    public void AddActionMp()
+    {
+        foreach (var skill in skills)
+        {
+            skill.AddActionMp();
+        }
     }
 
 

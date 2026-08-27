@@ -17,7 +17,7 @@ public class SkillInitSoldierShield : Skill
         {
             if (unit.hp <= 0 || unit == owner)
                 continue;
-            if (unit.isHero || unit.attackRange > 30)
+            if (unit.isHero || unit.attackRange > CombatConst.MeleeRange)
                 continue;
 
             UnityEngine.Debug.Log("BattleBegin SkillInitSoldierShield 护盾值 " + shieldHp);
