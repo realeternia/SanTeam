@@ -54,8 +54,8 @@ public class Tooltip : MonoBehaviour
             var iconRt = iconGo.GetComponent<RectTransform>();
             iconRt.anchorMin = new Vector2(0, 1);
             iconRt.anchorMax = new Vector2(0, 1);
-            iconRt.anchoredPosition = new Vector2(baseX, y);
-            iconRt.sizeDelta = new Vector2(30, 30);
+            iconRt.anchoredPosition = new Vector2(baseX +10, y);
+            iconRt.sizeDelta = new Vector2(38, 38);
             imageAttrs[i] = iconGo.GetComponent<Image>();
 
             var valGo = Instantiate(textSkills[0].gameObject, rect);
@@ -217,23 +217,8 @@ public class Tooltip : MonoBehaviour
                 foreach (var hid in friendCfg.Heros)
                 {
                     var heroConfig = HeroConfig.GetConfig(hid);
-                    var friendAttr = HeroSelectionTool.GetSupportAttr(heroId, hid, 1);
-                    if(friendAttr == null)
-                        textFriend.text += heroConfig.Name + " ";
-                    else if(!HeroSelectionTool.HasHeroInPool(hid))
-                        textFriend.text += "<color=#808080>" + heroConfig.Name + "</color> ";                    
-                    else if(friendAttr.Total <= 10)
-                        textFriend.text += "<color=blue>" + heroConfig.Name + "</color> ";
-                    else if(friendAttr.Total <= 15)
-                        textFriend.text += "<color=green>" + heroConfig.Name + "</color> ";
-                    else if(friendAttr.Total <= 20)
-                        textFriend.text += "<color=yellow>" + heroConfig.Name + "</color> ";
-                    else if(friendAttr.Total <= 25)
-                        textFriend.text += "<color=#d96d00>" + heroConfig.Name + "</color> ";
-                    else if(friendAttr.Total < 30)
-                        textFriend.text += "<color=red>" + heroConfig.Name + "</color> ";
-                    else if(friendAttr.Total == 30)
-                        textFriend.text += "<color=#d900d9>" + heroConfig.Name + "</color> ";                        
+                    if (!HeroSelectionTool.HasHeroInPool(hid))
+                        textFriend.text += "<color=#808080>" + heroConfig.Name + "</color> ";
                     else
                         textFriend.text += heroConfig.Name + " ";
                 }

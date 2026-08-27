@@ -162,31 +162,31 @@ public static class HeroSelectionTool
         return heroCfg.Price;
     }
 
-    // 属性字符串 → 图标贴图名（atk→统帅图标、ap→智力图标、might→武力图标、hp→护盾图标、atkspeed→沙漏、armor→胸甲、magicres→法阵、movespeed→战靴、range→弓靶）
+    // 属性字符串 → 图标贴图路径（指向 Textures/Icons 下的文件）
     public static string GetAttrIcon(string attr)
     {
         switch (attr)
         {
             case "atk":
-                return "attrlead";
+                return "Icons/atk";
             case "ap":
-                return "attrinte";
+                return "Icons/ap";
             case "might":
-                return "attrstr";
+                return "Icons/might";
             case "hp":
-                return "attrshield";
+                return "Icons/hp";
             case "atkspeed":
-                return "attrspeed";
+                return "Icons/attackspeed";
             case "armor":
-                return "attrarmor";
+                return "Icons/armor";
             case "magicres":
-                return "attrmagic";
+                return "Icons/magicshield";
             case "movespeed":
-                return "attrmove";
+                return "Icons/speed";
             case "range":
-                return "attrrrange";
+                return "Icons/range";
             default:
-                return "attrshield";
+                return "Icons/hp";
         }
     }
 
@@ -322,69 +322,4 @@ public static class HeroSelectionTool
         else
             return new Color(50 / 255f, 50 / 255f, 50 / 255f, 255 / 255f);
     }
-
-    public static AttrInfo GetSupportAttr(int heroId, int pid, int lv)
-    {
-        var friendLevel = ConfigManager.GetFriendLevel(heroId, pid);
-        if(friendLevel <= 0)
-            return null;
-        
-        var friendHeroCfg = HeroConfig.GetConfig(pid);
-        var myHeroCfg = HeroConfig.GetConfig(heroId);
-        
-        // 获取三个属性值
-        int friendMight = friendHeroCfg.Might;
-        int friendAp = friendHeroCfg.Ap;
-        int friendAtk = friendHeroCfg.Atk;
-        
-        int myMight = myHeroCfg.Might;
-        int myAp = myHeroCfg.Ap;
-        int myAtk = myHeroCfg.Atk;
-        
-        // 计算差值
-        int mightDiff = friendMight - myMight;
-        int apDiff = friendAp - myAp;
-        int atkDiff = friendAtk - myAtk;
-           
-        int totalPoints;
-        float[] weights = new float[3];
-
-        weights[0] = FormulaLearnAttrConfig.GetConfig(mightDiff).Weight;
-        weights[1] = FormulaLearnAttrConfig.GetConfig(apDiff).Weight;
-        weights[2] = FormulaLearnAttrConfig.GetConfig(atkDiff).Weight;
-        mightDiff = Math.Clamp(mightDiff, -6, 50);
-        apDiff = Math.Clamp(apDiff, -6, 50);
-        atkDiff = Math.Clamp(atkDiff, -6, 50);
-        var factor = 1f; //单属性老师，给1.5倍属性
-        if ( mightDiff > 0 && apDiff < 0 && atkDiff < 0 || mightDiff < 0 && apDiff > 0 && atkDiff < 0 || mightDiff < 0 && apDiff < 0 && atkDiff > 0)
-            factor = 1.5f;
-        totalPoints = (int)Math.Clamp((mightDiff + apDiff + atkDiff) * factor / 2.2f, 10, 30);
-        if(friendLevel > 1)
-            totalPoints = (int)Math.Clamp(totalPoints * (1 + 0.2f * (friendLevel - 1)), 10, 30);
-
-        // 计算总权重
-        float totalWeight = weights[0] + weights[1] + weights[2];
-        if (totalWeight <= 0)
-            return new AttrInfo();
-        
-        // 计算属性点分配，避免四舍五入导致总和不等的问题
-        float[] diffs = { weights[0], weights[1], weights[2] };
-        int[] addValues = new int[3];
-        
-        // 找出三个差值中的排序索引（从小到大）
-        int[] indices = { 0, 1, 2 }; // 0=Might, 1=Ap, 2=Atk
-        Array.Sort(indices, (a, b) => diffs[a].CompareTo(diffs[b]));
-        
-        // 先计算最低差值的属性
-        addValues[indices[0]] = Mathf.FloorToInt(totalPoints * weights[indices[0]] / totalWeight);
-        addValues[indices[1]] = Mathf.FloorToInt(totalPoints * weights[indices[1]] / totalWeight);
-        addValues[indices[2]] = totalPoints - addValues[indices[0]] - addValues[indices[1]];
-
-        var attr = new AttrInfo();
-        attr.Might = addValues[0] * (lv + 9) / 10;
-        attr.Ap = addValues[1] * (lv + 9) / 10;
-        attr.Atk = addValues[2] * (lv + 9) / 10;
-        
-        return attr;
-    }    
 }
