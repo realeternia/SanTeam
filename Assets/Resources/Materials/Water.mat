@@ -1,5 +1,5 @@
 %YAML 1.1
-%TAG !u! tag:yousandi.cn,2023:
+%TAG !u! tag:unity3d.com,2011:
 --- !u!114 &-1391054992942584966
 MonoBehaviour:
   m_ObjectHideFlags: 11
@@ -21,7 +21,7 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: Water
-  m_Shader: {fileID: 4800000, guid: ff73b165c66ec904882fe23f6140ea72, type: 3}
+  m_Shader: {fileID: 4800000, guid: e8b26eb072fc4d839ed4db73770dfa27, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
@@ -57,7 +57,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MainTex:
-        m_Texture: {fileID: 2800000, guid: 509c6e1c5932ac043bd8a618e60c91d2, type: 3}
+        m_Texture: {fileID: 2800000, guid: 3505fc38eef2442280a3adda55b8a895, type: 3}
         m_Scale: {x: 2, y: 2}
         m_Offset: {x: 0, y: 0}
     - _MetallicGlossMap:
@@ -65,7 +65,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _NoiseTex:
-        m_Texture: {fileID: 2800000, guid: 901791d7098648d48b6447eaf6fa4442, type: 3}
+        m_Texture: {fileID: 2800000, guid: 7b19be55df4b44e690c70803343f2a3f, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _OcclusionMap:

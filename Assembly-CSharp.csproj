@@ -23,7 +23,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>Temp\bin\Debug\</OutputPath>
-    <DefineConstants>UNITY_2022_3_62;UNITY_2022_3;UNITY_2022;UNITY_5_3_OR_NEWER;UNITY_5_4_OR_NEWER;UNITY_5_5_OR_NEWER;UNITY_5_6_OR_NEWER;UNITY_2017_1_OR_NEWER;UNITY_2017_2_OR_NEWER;UNITY_2017_3_OR_NEWER;UNITY_2017_4_OR_NEWER;UNITY_2018_1_OR_NEWER;UNITY_2018_2_OR_NEWER;UNITY_2018_3_OR_NEWER;UNITY_2018_4_OR_NEWER;UNITY_2019_1_OR_NEWER;UNITY_2019_2_OR_NEWER;UNITY_2019_3_OR_NEWER;UNITY_2019_4_OR_NEWER;UNITY_2020_1_OR_NEWER;UNITY_2020_2_OR_NEWER;UNITY_2020_3_OR_NEWER;UNITY_2021_1_OR_NEWER;UNITY_2021_2_OR_NEWER;UNITY_2021_3_OR_NEWER;UNITY_2022_1_OR_NEWER;UNITY_2022_2_OR_NEWER;UNITY_2022_3_OR_NEWER;UNITY_INCLUDE_TESTS;ENABLE_AR;ENABLE_AUDIO;ENABLE_CACHING;ENABLE_CLOTH;ENABLE_EVENT_QUEUE;ENABLE_MICROPHONE;ENABLE_MULTIPLE_DISPLAYS;ENABLE_PHYSICS;ENABLE_TEXTURE_STREAMING;ENABLE_LZMA;ENABLE_UNITYEVENTS;ENABLE_VR;ENABLE_WEBCAM;ENABLE_UNITYWEBREQUEST;ENABLE_WWW;ENABLE_CLOUD_SERVICES;ENABLE_CLOUD_SERVICES_ADS;ENABLE_CLOUD_SERVICES_USE_WEBREQUEST;ENABLE_CLOUD_SERVICES_CRASH_REPORTING;ENABLE_CLOUD_SERVICES_NATIVE_CRASH_REPORTING;ENABLE_CLOUD_SERVICES_PURCHASING;ENABLE_CLOUD_SERVICES_ANALYTICS;ENABLE_CLOUD_SERVICES_BUILD;ENABLE_EDITOR_GAME_SERVICES;ENABLE_UNITY_GAME_SERVICES_ANALYTICS_SUPPORT;ENABLE_CLOUD_LICENSE;ENABLE_EDITOR_HUB_LICENSE;ENABLE_WEBSOCKET_CLIENT;ENABLE_GENERATE_NATIVE_PLUGINS_FOR_ASSEMBLIES_API;ENABLE_DIRECTOR_AUDIO;ENABLE_DIRECTOR_TEXTURE;ENABLE_MANAGED_JOBS;ENABLE_MANAGED_TRANSFORM_JOBS;ENABLE_MANAGED_ANIMATION_JOBS;ENABLE_MANAGED_AUDIO_JOBS;ENABLE_RUNTIME_PERMISSIONS;ENABLE_ENGINE_CODE_STRIPPING;ENABLE_ONSCREEN_KEYBOARD;ENABLE_MANAGED_UNITYTLS;INCLUDE_DYNAMIC_GI;ENABLE_SCRIPTING_GC_WBARRIERS;PLATFORM_SUPPORTS_MONO;ENABLE_VIDEO;ENABLE_ACCELERATOR_CLIENT_DEBUGGING;ENABLE_NAVIGATION_PACKAGE_DEBUG_VISUALIZATION;ENABLE_NAVIGATION_HEIGHTMESH_RUNTIME_SUPPORT;ENABLE_NAVIGATION_UI_REQUIRES_PACKAGE;PLATFORM_ANDROID;TEXTCORE_1_0_OR_NEWER;UNITY_ANDROID;UNITY_ANDROID_API;ENABLE_EGL;ENABLE_NETWORK;ENABLE_RUNTIME_GI;ENABLE_CRUNCH_TEXTURE_COMPRESSION;UNITY_CAN_SHOW_SPLASH_SCREEN;UNITY_HAS_GOOGLEVR;UNITY_HAS_TANGO;ENABLE_SPATIALTRACKING;ENABLE_ETC_COMPRESSION;PLATFORM_EXTENDS_VULKAN_DEVICE;PLATFORM_HAS_MULTIPLE_SWAPCHAINS;UNITY_ANDROID_SUPPORTS_SHADOWFILES;PLATFORM_UPDATES_TIME_OUTSIDE_OF_PLAYER_LOOP;ENABLE_UNITYADS_RUNTIME;UNITY_UNITYADS_API;ENABLE_MONO;NET_STANDARD_2_0;NET_STANDARD;NET_STANDARD_2_1;NETSTANDARD;NETSTANDARD2_1;ENABLE_PROFILER;DEBUG;TRACE;UNITY_ASSERTIONS;UNITY_EDITOR;UNITY_EDITOR_64;UNITY_EDITOR_WIN;ENABLE_UNITY_COLLECTIONS_CHECKS;ENABLE_BURST_AOT;UNITY_TEAM_LICENSE;ENABLE_CUSTOM_RENDER_TEXTURE;ENABLE_DIRECTOR;ENABLE_LOCALIZATION;ENABLE_SPRITES;ENABLE_TERRAIN;ENABLE_TILEMAP;ENABLE_TIMELINE;ENABLE_LEGACY_INPUT_MANAGER;TEXTCORE_FONT_ENGINE_1_5_OR_NEWER;UNITY_POST_PROCESSING_STACK_V2;CSHARP_7_OR_LATER;CSHARP_7_3_OR_NEWER</DefineConstants>
+    <DefineConstants>UNITY_2022_3_62;UNITY_2022_3;UNITY_2022;UNITY_5_3_OR_NEWER;UNITY_5_4_OR_NEWER;UNITY_5_5_OR_NEWER;UNITY_5_6_OR_NEWER;UNITY_2017_1_OR_NEWER;UNITY_2017_2_OR_NEWER;UNITY_2017_3_OR_NEWER;UNITY_2017_4_OR_NEWER;UNITY_2018_1_OR_NEWER;UNITY_2018_2_OR_NEWER;UNITY_2018_3_OR_NEWER;UNITY_2018_4_OR_NEWER;UNITY_2019_1_OR_NEWER;UNITY_2019_2_OR_NEWER;UNITY_2019_3_OR_NEWER;UNITY_2019_4_OR_NEWER;UNITY_2020_1_OR_NEWER;UNITY_2020_2_OR_NEWER;UNITY_2020_3_OR_NEWER;UNITY_2021_1_OR_NEWER;UNITY_2021_2_OR_NEWER;UNITY_2021_3_OR_NEWER;UNITY_2022_1_OR_NEWER;UNITY_2022_2_OR_NEWER;UNITY_2022_3_OR_NEWER;PLATFORM_ARCH_64;UNITY_64;UNITY_INCLUDE_TESTS;ENABLE_AR;ENABLE_AUDIO;ENABLE_CACHING;ENABLE_CLOTH;ENABLE_EVENT_QUEUE;ENABLE_MICROPHONE;ENABLE_MULTIPLE_DISPLAYS;ENABLE_PHYSICS;ENABLE_TEXTURE_STREAMING;ENABLE_VIRTUALTEXTURING;ENABLE_LZMA;ENABLE_UNITYEVENTS;ENABLE_VR;ENABLE_WEBCAM;ENABLE_UNITYWEBREQUEST;ENABLE_WWW;ENABLE_CLOUD_SERVICES;ENABLE_CLOUD_SERVICES_ADS;ENABLE_CLOUD_SERVICES_USE_WEBREQUEST;ENABLE_CLOUD_SERVICES_CRASH_REPORTING;ENABLE_CLOUD_SERVICES_PURCHASING;ENABLE_CLOUD_SERVICES_ANALYTICS;ENABLE_CLOUD_SERVICES_BUILD;ENABLE_EDITOR_GAME_SERVICES;ENABLE_UNITY_GAME_SERVICES_ANALYTICS_SUPPORT;ENABLE_CLOUD_LICENSE;ENABLE_EDITOR_HUB_LICENSE;ENABLE_WEBSOCKET_CLIENT;ENABLE_GENERATE_NATIVE_PLUGINS_FOR_ASSEMBLIES_API;ENABLE_DIRECTOR_AUDIO;ENABLE_DIRECTOR_TEXTURE;ENABLE_MANAGED_JOBS;ENABLE_MANAGED_TRANSFORM_JOBS;ENABLE_MANAGED_ANIMATION_JOBS;ENABLE_MANAGED_AUDIO_JOBS;ENABLE_MANAGED_UNITYTLS;INCLUDE_DYNAMIC_GI;ENABLE_SCRIPTING_GC_WBARRIERS;PLATFORM_SUPPORTS_MONO;RENDER_SOFTWARE_CURSOR;ENABLE_VIDEO;ENABLE_ACCELERATOR_CLIENT_DEBUGGING;ENABLE_NAVIGATION_PACKAGE_DEBUG_VISUALIZATION;ENABLE_NAVIGATION_HEIGHTMESH_RUNTIME_SUPPORT;ENABLE_NAVIGATION_UI_REQUIRES_PACKAGE;PLATFORM_STANDALONE;TEXTCORE_1_0_OR_NEWER;PLATFORM_STANDALONE_WIN;UNITY_STANDALONE_WIN;UNITY_STANDALONE;ENABLE_RUNTIME_GI;ENABLE_MOVIES;ENABLE_NETWORK;ENABLE_NVIDIA;ENABLE_CRUNCH_TEXTURE_COMPRESSION;ENABLE_OUT_OF_PROCESS_CRASH_HANDLER;ENABLE_CLUSTER_SYNC;ENABLE_CLUSTERINPUT;PLATFORM_UPDATES_TIME_OUTSIDE_OF_PLAYER_LOOP;GFXDEVICE_WAITFOREVENT_MESSAGEPUMP;PLATFORM_INITIALIZES_MEMORY_MANAGER_EXPLICITLY;ENABLE_MONO;NET_STANDARD_2_0;NET_STANDARD;NET_STANDARD_2_1;NETSTANDARD;NETSTANDARD2_1;ENABLE_PROFILER;DEBUG;TRACE;UNITY_ASSERTIONS;UNITY_EDITOR;UNITY_EDITOR_64;UNITY_EDITOR_WIN;ENABLE_UNITY_COLLECTIONS_CHECKS;ENABLE_BURST_AOT;UNITY_TEAM_LICENSE;ENABLE_CUSTOM_RENDER_TEXTURE;ENABLE_DIRECTOR;ENABLE_LOCALIZATION;ENABLE_SPRITES;ENABLE_TERRAIN;ENABLE_TILEMAP;ENABLE_TIMELINE;ENABLE_LEGACY_INPUT_MANAGER;TEXTCORE_FONT_ENGINE_1_5_OR_NEWER;UNITY_POST_PROCESSING_STACK_V2;CSHARP_7_OR_LATER;CSHARP_7_3_OR_NEWER</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <NoWarn>0169;USG0001</NoWarn>
@@ -51,7 +51,7 @@
     <UnityProjectGeneratorVersion>2.0.22</UnityProjectGeneratorVersion>
     <UnityProjectGeneratorStyle>Legacy</UnityProjectGeneratorStyle>
     <UnityProjectType>Game:1</UnityProjectType>
-    <UnityBuildTarget>Android:13</UnityBuildTarget>
+    <UnityBuildTarget>StandaloneWindows64:19</UnityBuildTarget>
     <UnityVersion>2022.3.62f3</UnityVersion>
   </PropertyGroup>
   <ItemGroup>
@@ -62,128 +62,131 @@
   <ItemGroup>
     <Compile Include="Assets\Resources\Scripts\BGMPlayer.cs" />
     <Compile Include="Assets\Resources\Scripts\PickPanelControl.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\SkillHitAround.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\SkillManager.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\SkillInitAttrZhiheng.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\SkillHitTeleport.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillModifySkillRateTime.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillHitTeleport.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidSuddenArrow.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillDefHpLow.cs" />
     <Compile Include="Assets\Resources\Scripts\CardViewControl.cs" />
     <Compile Include="Assets\Resources\Scripts\PickPanelCellControl.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffShieldValue.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Missile.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\SkillHitRegion.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\SkillModifyBuffTime.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillHitBuffArea.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffNoMove.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillHitAround.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillModifyShootSpeed.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillHelpAidHeal.cs" />
     <Compile Include="Assets\Resources\Scripts\Configs\JobConfig_s.cs" />
     <Compile Include="Assets\Resources\Scripts\PlayerAI.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillHitBuff.cs" />
     <Compile Include="Assets\Resources\Scripts\WorldManager.cs" />
     <Compile Include="Assets\Resources\Scripts\GameManager.cs" />
     <Compile Include="Assets\Resources\Scripts\RankPanelManager.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\SkillInitAddDodge.cs" />
     <Compile Include="Assets\Resources\Scripts\Configs\FormulaLearnAttrConfig_s.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\SkillBuffExpandPos.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\SkillModifySkillRateTime.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\SkillAidShockWave.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\SkillDamageReal.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\SkillDefPlantSkin.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffTimeDamage.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillDamageReal.cs" />
     <Compile Include="Assets\Resources\Scripts\Configs\ShopConfig_s.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\SkillAttackReboundArrow.cs" />
     <Compile Include="Assets\Resources\Scripts\CardShopManager.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\SkillHitBuff.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\SkillInitAddRege.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillHitWall.cs" />
     <Compile Include="Assets\Resources\Scripts\PlayerInfo.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\BuffShield.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\BuffSpeedDown.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\BuffLock.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillInitAddRege.cs" />
     <Compile Include="Assets\Resources\Scripts\HeroSelectionTool.cs" />
     <Compile Include="Assets\Resources\Scripts\Configs\ConfigManager.cs" />
     <Compile Include="Assets\Resources\Scripts\BattleResultCellControl.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\BuffCoolDown.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\SkillInitGold.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffDamageAddRate.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillBuffExpandPos.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillHitRepeat.cs" />
     <Compile Include="Assets\Resources\Scripts\RankPlayerPanelManager.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\SkillInitSoldierUp.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillInitAddDodge.cs" />
     <Compile Include="Assets\SineVFX\TopDownEffects\Scripts\SineUIControllerTopDownEffects.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\SkillModifyShootSpeed.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\SkillInitAddCrit.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAttackReboundArrow.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillInitGold.cs" />
     <Compile Include="Assets\SineVFX\TopDownEffects\Scripts\RampGeneratorTDE.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\SkillInitFood.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\BuffDamagedAddRate.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillBuffTieqi.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffCoolDown.cs" />
     <Compile Include="Assets\Epic Toon FX\Scripts\ETFXRotation.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillDumb.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAttackRunCrossPlus.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\MissileComp.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\SkillHitArea.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\SkillAttackMultiArrow.cs" />
     <Compile Include="Assets\Resources\Scripts\Configs\HeroConfig_s.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\EffectManager.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffNoAction.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAttackedBuff.cs" />
     <Compile Include="Assets\Resources\Scripts\Configs\HeroFriendConfig_s.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\BuffDamageAddRate.cs" />
     <Compile Include="Assets\Resources\Scripts\Configs\BuffConfig_s.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\SkillHitRepeat.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\BuffSuck.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\SkillDefFeedback.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\BuffShieldValue.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\SkillHitBuffArea.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAttackRunCross.cs" />
     <Compile Include="Assets\Resources\Scripts\MySelectControl.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\BuffNoAction.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffShield.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillHelpAidBuff.cs" />
     <Compile Include="Assets\Resources\Scripts\BagCell.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\SkillAttackSpeedAttack.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\SkillBuffTieqi.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\BuffNoMove.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidShockWave.cs" />
     <Compile Include="Assets\Resources\Scripts\RankCellInfo.cs" />
     <Compile Include="Assets\Resources\Scripts\PO\PanelEvent.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\SkillDefSkillDamageReduce.cs" />
     <Compile Include="Assets\Resources\Scripts\BagControl.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\SkillInitSoldierShield.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\FriendLineManager.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAttackAntiShield.cs" />
     <Compile Include="Assets\Resources\Scripts\Configs\ItemConfig_s.cs" />
     <Compile Include="Assets\Resources\Scripts\PO\SideInfo.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\SkillModifySummonTime.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffLock.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillHelpInitTeach.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAttackMultiArrow.cs" />
     <Compile Include="Assets\Resources\Scripts\ItemDetail.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillInitSoldierUp.cs" />
     <Compile Include="Assets\SineVFX\TopDownEffects\Scripts\PrefabSpawner.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\SkillInitMasterShield.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillDefPlantSkin.cs" />
     <Compile Include="Assets\Resources\Scripts\PO\BuffTime.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\SkillHitAttr.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\SkillAttackAntiShield.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\SkillAttackAddDamage.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillHitFood.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\FactionShieldManager.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillDefFeedback.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Chess.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\SkillHitWall.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\SkillHitFood.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillHitArea.cs" />
     <Compile Include="Assets\Resources\Scripts\PanelManager.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAttackSpinAttack.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillHitRegion.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillModifyBuffTime.cs" />
     <Compile Include="Assets\SineVFX\TopDownEffects\Scripts\SineCameraControllerTopDownEffects.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffManager.cs" />
     <Compile Include="Assets\Resources\Scripts\ItemHeroDetail.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillInitSoldierSummon.cs" />
     <Compile Include="Assets\Resources\Scripts\CastleHUD.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\SkillAttackRunCrossPlus.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillBuffExpand.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillInitAttrZhiheng.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAttackSpeedAttack.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillModifySummonTime.cs" />
     <Compile Include="Assets\Epic Toon FX\Scripts\ETFXLightFade.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\Buff\Buff.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffSuck.cs" />
     <Compile Include="Assets\Resources\Scripts\SelectCardNodeControl.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\Skill.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\BattleStatManager.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\Skill\Skill.cs" />
     <Compile Include="Assets\Resources\Scripts\BagRecycler.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\BuffTimeDamage.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillDefSkillDamageReduce.cs" />
     <Compile Include="Assets\Resources\Scripts\BagFieldUnitControl.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\SkillDumb.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\SkillInitSoldierSummon.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\CombatConst.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillHitAttr.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillInitMasterShield.cs" />
     <Compile Include="Assets\Resources\Scripts\RankPlayerCellInfo.cs" />
     <Compile Include="Assets\Resources\Scripts\HeroInfoGroup.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\SkillDefHpLow.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\SkillModifyBeBuffTime.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\SkillBuffExpand.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\SkillAidSuddenArrow.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\SkillAttackedShadow.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillInitFood.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffSpeedDown.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAttackedShadow.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillInitAddCrit.cs" />
     <Compile Include="Assets\Resources\Scripts\Effect\GlowBeamController.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\SkillHelpAidHeal.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\SkillAttackedBuff.cs" />
     <Compile Include="Assets\Resources\Scripts\Configs\SkillConfig_s.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillInitSoldierShield.cs" />
     <Compile Include="Assets\Resources\Scripts\ChessHUD.cs" />
     <Compile Include="Assets\Resources\Scripts\Configs\PlayerConfig_s.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\Buff.cs" />
     <Compile Include="Assets\Resources\Scripts\MapConfig.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\SkillHelpAidBuff.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\SkillAttackRunCross.cs" />
     <Compile Include="Assets\Resources\Scripts\Configs\SoldierConfig_s.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\SkillAttackSpinAttack.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAttackAddDamage.cs" />
     <Compile Include="Assets\Resources\Scripts\PO\AttrInfo.cs" />
     <Compile Include="Assets\Resources\Scripts\BattleResultHeroCellControl.cs" />
     <Compile Include="Assets\Resources\Scripts\HeroInfo.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\BuffManager.cs" />
     <Compile Include="Assets\Resources\Scripts\PlayerBook.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffDamagedAddRate.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillModifyBeBuffTime.cs" />
     <Compile Include="Assets\Epic Toon FX\Scripts\ETFXPitchRandomizer.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillManager.cs" />
     <Compile Include="Assets\Resources\Scripts\Profile.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\SkillHelpInitTeach.cs" />
     <Compile Include="Assets\Resources\Scripts\Tooltip.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -197,11 +200,10 @@
     <None Include="Assets\TextMesh Pro\Shaders\TMP_Bitmap.shader" />
     <None Include="Assets\Epic Toon FX\Changelog.txt" />
     <None Include="Assets\SineVFX\TopDownEffects\Shaders\MaskedDoubleSidedAdvanced.shader" />
-    <None Include="Assets\Resources\Fonts\zh-cn.txt" />
+    <None Include="Assets\Shaders\TextureColor.shader" />
     <None Include="Assets\TextMesh Pro\Shaders\TMPro_Mobile.cginc" />
     <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF SSD.shader" />
     <None Include="Assets\SineVFX\TopDownEffects\Shaders\ShieldICO.shader" />
-    <None Include="Assets\Shaders\TextureColor.shader" />
     <None Include="Assets\SineVFX\TopDownEffects\Shaders\FakeTrailAndMeshFireParticle.shader" />
     <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF-Surface-Mobile.shader" />
     <None Include="Assets\SineVFX\TopDownEffects\Shaders\Props.shader" />
@@ -209,7 +211,6 @@
     <None Include="Assets\SineVFX\TopDownEffects\Environment\EnvShaders\PrototypeGridCenterMaskTDE.shader" />
     <None Include="Assets\SineVFX\TopDownEffects\Shaders\DissolveParticleDepth.shader" />
     <None Include="Assets\Epic Toon FX\Shaders\ETFX_PowerboxLit.shader" />
-    <None Include="Assets\Shaders\GlowBeamUsage.txt" />
     <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF-Surface.shader" />
     <None Include="Assets\SineVFX\TopDownEffects\_Packages\!!!_ReadBeforeImport_!!!.txt" />
     <None Include="Assets\Epic Toon FX\Prefabs\Interactive\Interactive FX.txt" />
@@ -218,6 +219,7 @@
     <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF.shader" />
     <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF-Mobile SSD.shader" />
     <None Include="Assets\TextMesh Pro\Resources\LineBreaking Leading Characters.txt" />
+    <None Include="Assets\Shaders\WaterUV.shader" />
     <None Include="Assets\SineVFX\TopDownEffects\Shaders\CenterCurve.shader" />
     <None Include="Assets\Epic Toon FX\Shaders\ETFX_PowerboxUnlit.shader" />
     <None Include="Assets\TextMesh Pro\Shaders\TMPro_Properties.cginc" />
@@ -225,10 +227,11 @@
     <None Include="Assets\TextMesh Pro\Shaders\TMPro_Surface.cginc" />
     <None Include="Assets\SineVFX\TopDownEffects\Environment\EnvShaders\SkyboxProceduralDesaturatedTDE.shader" />
     <None Include="Assets\ToonTastic - Vegetation &amp; Plants\Demo\Shaders\Skybox Gradient 1.shader" />
-    <None Include="Assets\TextMesh Pro\Resources\LineBreaking Following Characters.txt" />
     <None Include="Assets\Shaders\GlowBeamShader.shader" />
-    <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF-Mobile Masking.shader" />
+    <None Include="Assets\TextMesh Pro\Resources\LineBreaking Following Characters.txt" />
     <None Include="Assets\Shaders\DiffuseWithOutline.shader" />
+    <None Include="Assets\Shaders\GlowBeamUsage.txt" />
+    <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF-Mobile Masking.shader" />
     <None Include="Assets\SineVFX\TopDownEffects\Shaders\DissolveParticleMV.shader" />
     <None Include="Assets\ToonTastic - Vegetation &amp; Plants\Shaders\Standart(Double Sided).shader" />
     <None Include="Assets\SineVFX\TopDownEffects\Environment\EnvShaders\PrototypeGridQuadV2TDE.shader" />
@@ -239,7 +242,7 @@
     <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF-Mobile.shader" />
     <None Include="Assets\SineVFX\TopDownEffects\_Packages\DemoSceneNewControlFix\NewInputSystemPatchFix.txt" />
     <None Include="Assets\TextMesh Pro\Shaders\TMP_Sprite.shader" />
-    <None Include="Assets\Shaders\WaterUV.shader" />
+    <None Include="Assets\Resources\Fonts\zh-cn.txt" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">
@@ -276,6 +279,14 @@
     </Reference>
     <Reference Include="UnityEngine.ClothModule">
       <HintPath>D:\Unity\2022.3.62f3\Editor\Data\Managed\UnityEngine\UnityEngine.ClothModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEngine.ClusterInputModule">
+      <HintPath>D:\Unity\2022.3.62f3\Editor\Data\Managed\UnityEngine\UnityEngine.ClusterInputModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEngine.ClusterRendererModule">
+      <HintPath>D:\Unity\2022.3.62f3\Editor\Data\Managed\UnityEngine\UnityEngine.ClusterRendererModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.ContentLoadModule">
@@ -484,6 +495,10 @@
     </Reference>
     <Reference Include="UnityEngine.VideoModule">
       <HintPath>D:\Unity\2022.3.62f3\Editor\Data\Managed\UnityEngine\UnityEngine.VideoModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEngine.VirtualTexturingModule">
+      <HintPath>D:\Unity\2022.3.62f3\Editor\Data\Managed\UnityEngine\UnityEngine.VirtualTexturingModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.WindModule">

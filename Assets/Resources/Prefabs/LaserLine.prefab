@@ -1,12 +1,12 @@
 %YAML 1.1
-%TAG !u! tag:yousandi.cn,2023:
+%TAG !u! tag:unity3d.com,2011:
 --- !u!1 &6135053224585414806
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 4370718842239002460}
   - component: {fileID: 3576305114303544279}
@@ -14,7 +14,6 @@ GameObject:
   - component: {fileID: 5304250268779337315}
   - component: {fileID: 202107920955558203}
   m_Layer: 0
-  m_HasEditorInfo: 1
   m_Name: Beam
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -61,14 +60,10 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
-  m_virtualGeometry: 0
-  m_virtualGeometryShadow: 0
-  m_ShadingRate: 0
-  m_ForceDisableGRD: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 440f06951ba35ea4d94310629fad47e2, type: 2}
+  - {fileID: 2100000, guid: 2f424b062dd34f6f90a90b59797ae314, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -140,11 +135,10 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 4653717068974505268}
   m_Layer: 0
-  m_HasEditorInfo: 1
   m_Name: LaserLine
   m_TagString: Untagged
   m_Icon: {fileID: 0}

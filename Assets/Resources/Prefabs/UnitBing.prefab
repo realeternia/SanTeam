@@ -1,12 +1,12 @@
 %YAML 1.1
-%TAG !u! tag:yousandi.cn,2023:
+%TAG !u! tag:unity3d.com,2011:
 --- !u!1 &2738742376364995
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 8551430221571766540}
   - component: {fileID: 7764681137561758083}
@@ -14,7 +14,6 @@ GameObject:
   - component: {fileID: 5761635139686748078}
   - component: {fileID: 2330848983311081963}
   m_Layer: 0
-  m_HasEditorInfo: 1
   m_Name: UnitBing
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -61,14 +60,10 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
-  m_virtualGeometry: 0
-  m_virtualGeometryShadow: 0
-  m_ShadingRate: 0
-  m_ForceDisableGRD: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 7172de5b8132a234da5e951e8e7ddc79, type: 2}
+  - {fileID: 2100000, guid: e85daa878f1a44d484980f8cbdd3351a, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -126,19 +121,41 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   id: 3
+  playerId: 0
   maxHp: 100
   side: 1
   isHero: 0
   heroId: 0
   chessName: tree
-  rend: {fileID: 1654120894988046011}
+  pos: 0
+  targetChess: {fileID: 0}
   moveSpeed: 10
   attackRange: 15
-  inte: 0
-  str: 0
-  leadShip: 0
+  ap: 0
+  might: 0
+  atk: 0
   level: 1
+  isShadow: 0
+  isFakeHero: 0
+  dodgeRate: 0
+  critRate: 0
+  critDamageMulti: 0.5
+  lastDamagedPlayerId: -1
   hp: 50
   attackDamage: 30
+  armor: 0
+  magicRes: 0
+  hitEffect: 
+  missileSpeed: 10
+  missileHight: 0
+  soldierId: 0
+  attackPoint: 0
+  attackRate: 0
   heroInfo: {fileID: 0}
-  canMove: 1
+  noMoveCount: 0
+  noActionCount: 0
+  rend: {fileID: 1654120894988046011}
+  material: {fileID: 0}
+  rendFlag: {fileID: 0}
+  materialFlag: {fileID: 0}
+  regeHp: 0

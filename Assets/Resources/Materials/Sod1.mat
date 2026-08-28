@@ -1,5 +1,5 @@
 %YAML 1.1
-%TAG !u! tag:yousandi.cn,2023:
+%TAG !u! tag:unity3d.com,2011:
 --- !u!21 &2100000
 Material:
   serializedVersion: 8
@@ -8,7 +8,7 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: Sod1
-  m_Shader: {fileID: 4800000, guid: dcf5c129ddf4c2141ba1595faec56c74, type: 3}
+  m_Shader: {fileID: 4800000, guid: 2bf7f42ed1b6457099f8ac8d33fb484c, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []

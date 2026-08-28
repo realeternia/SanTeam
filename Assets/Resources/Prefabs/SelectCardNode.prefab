@@ -243,8 +243,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: "5\u5173\u7FBD\u7FBD"
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 2cf81e00e11058e48bf63753305874df, type: 2}
-  m_sharedMaterial: {fileID: -2551621216232197282, guid: 2cf81e00e11058e48bf63753305874df, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: f4f3d0136354411488afe052bf019aeb, type: 2}
+  m_sharedMaterial: {fileID: -2551621216232197282, guid: f4f3d0136354411488afe052bf019aeb, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
