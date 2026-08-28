@@ -1,5 +1,5 @@
 %YAML 1.1
-%TAG !u! tag:yousandi.cn,2023:
+%TAG !u! tag:unity3d.com,2011:
 --- !u!1953259897 &8574412962073106934
 TerrainLayer:
   m_ObjectHideFlags: 0
@@ -7,7 +7,7 @@ TerrainLayer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: snowL
-  m_DiffuseTexture: {fileID: 2800000, guid: 4362f036814827e489493ee88507883c, type: 3}
+  m_DiffuseTexture: {fileID: 2800000, guid: 104f130060e1432f997706472325a96b, type: 3}
   m_NormalMapTexture: {fileID: 0}
   m_MaskMapTexture: {fileID: 0}
   m_TileSize: {x: 2, y: 2}

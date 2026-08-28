@@ -1,19 +1,18 @@
 %YAML 1.1
-%TAG !u! tag:yousandi.cn,2023:
+%TAG !u! tag:unity3d.com,2011:
 --- !u!1 &22864349710007748
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 9158685941334995061}
   - component: {fileID: 3972840707572614318}
   - component: {fileID: 4226028993149509763}
   - component: {fileID: 3911017495153753442}
   m_Layer: 0
-  m_HasEditorInfo: 1
   m_Name: R6 3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -60,10 +59,6 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
-  m_virtualGeometry: 0
-  m_virtualGeometryShadow: 0
-  m_ShadingRate: 0
-  m_ForceDisableGRD: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -116,14 +111,13 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 5538181958095746925}
   - component: {fileID: 4988946968877295143}
   - component: {fileID: 8927122783676575633}
   - component: {fileID: 1453263873020480310}
   m_Layer: 0
-  m_HasEditorInfo: 1
   m_Name: HR7 6
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -170,10 +164,6 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
-  m_virtualGeometry: 0
-  m_virtualGeometryShadow: 0
-  m_ShadingRate: 0
-  m_ForceDisableGRD: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -226,14 +216,13 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 3376002392632950809}
   - component: {fileID: 2948927636628047496}
   - component: {fileID: 6410489634978410516}
   - component: {fileID: 1443295891076575673}
   m_Layer: 0
-  m_HasEditorInfo: 1
   m_Name: HR7 5
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -280,10 +269,6 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
-  m_virtualGeometry: 0
-  m_virtualGeometryShadow: 0
-  m_ShadingRate: 0
-  m_ForceDisableGRD: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -336,14 +321,13 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 5261600050807090731}
   - component: {fileID: 1013073791886450175}
   - component: {fileID: 7378857376283161761}
   - component: {fileID: 3319549280328520163}
   m_Layer: 0
-  m_HasEditorInfo: 1
   m_Name: HR8 4
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -390,10 +374,6 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
-  m_virtualGeometry: 0
-  m_virtualGeometryShadow: 0
-  m_ShadingRate: 0
-  m_ForceDisableGRD: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -446,14 +426,13 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 398465172469272893}
   - component: {fileID: 2981651687199694127}
   - component: {fileID: 4885222143188112986}
   - component: {fileID: 6013702141922204504}
   m_Layer: 0
-  m_HasEditorInfo: 1
   m_Name: HR2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -500,10 +479,6 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
-  m_virtualGeometry: 0
-  m_virtualGeometryShadow: 0
-  m_ShadingRate: 0
-  m_ForceDisableGRD: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -556,14 +531,13 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 3750281670673224474}
   - component: {fileID: 7877323767377044484}
   - component: {fileID: 7946760379992908966}
   - component: {fileID: 6778563066602992883}
   m_Layer: 0
-  m_HasEditorInfo: 1
   m_Name: R7 5
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -610,10 +584,6 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
-  m_virtualGeometry: 0
-  m_virtualGeometryShadow: 0
-  m_ShadingRate: 0
-  m_ForceDisableGRD: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -666,14 +636,13 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 1675081895257557840}
   - component: {fileID: 3622195394305079739}
   - component: {fileID: 8609892367402788745}
   - component: {fileID: 2832199668918995492}
   m_Layer: 0
-  m_HasEditorInfo: 1
   m_Name: HR4 3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -720,10 +689,6 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
-  m_virtualGeometry: 0
-  m_virtualGeometryShadow: 0
-  m_ShadingRate: 0
-  m_ForceDisableGRD: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -776,14 +741,13 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 3611234385661839634}
   - component: {fileID: 760731835942067243}
   - component: {fileID: 6746052537232317938}
   - component: {fileID: 2515020611964533912}
   m_Layer: 0
-  m_HasEditorInfo: 1
   m_Name: HR2 4
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -830,10 +794,6 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
-  m_virtualGeometry: 0
-  m_virtualGeometryShadow: 0
-  m_ShadingRate: 0
-  m_ForceDisableGRD: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -886,14 +846,13 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 3004573143658812486}
   - component: {fileID: 6095550062700207205}
   - component: {fileID: 4596230421785518316}
   - component: {fileID: 1536736022660291518}
   m_Layer: 0
-  m_HasEditorInfo: 1
   m_Name: R4 3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -940,10 +899,6 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
-  m_virtualGeometry: 0
-  m_virtualGeometryShadow: 0
-  m_ShadingRate: 0
-  m_ForceDisableGRD: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -996,14 +951,13 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 2472340287019502807}
   - component: {fileID: 6308349581325991086}
   - component: {fileID: 3988422713674928795}
   - component: {fileID: 2281061263429334132}
   m_Layer: 0
-  m_HasEditorInfo: 1
   m_Name: HR6 2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1050,10 +1004,6 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
-  m_virtualGeometry: 0
-  m_virtualGeometryShadow: 0
-  m_ShadingRate: 0
-  m_ForceDisableGRD: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -1106,14 +1056,13 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 9153574479582945464}
   - component: {fileID: 1909331215195683942}
   - component: {fileID: 8593283695240043789}
   - component: {fileID: 4331332245497372371}
   m_Layer: 0
-  m_HasEditorInfo: 1
   m_Name: HR2 6
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1160,10 +1109,6 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
-  m_virtualGeometry: 0
-  m_virtualGeometryShadow: 0
-  m_ShadingRate: 0
-  m_ForceDisableGRD: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -1216,14 +1161,13 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 6413772910080384129}
   - component: {fileID: 4320598215052428589}
   - component: {fileID: 3047235896538373243}
   - component: {fileID: 3626669881348830208}
   m_Layer: 0
-  m_HasEditorInfo: 1
   m_Name: R3 5
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1270,10 +1214,6 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
-  m_virtualGeometry: 0
-  m_virtualGeometryShadow: 0
-  m_ShadingRate: 0
-  m_ForceDisableGRD: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -1326,14 +1266,13 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 3516614771508325294}
   - component: {fileID: 2994963111898874694}
   - component: {fileID: 5513811415559722017}
   - component: {fileID: 8551966801570375262}
   m_Layer: 0
-  m_HasEditorInfo: 1
   m_Name: HR7 3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1380,10 +1319,6 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
-  m_virtualGeometry: 0
-  m_virtualGeometryShadow: 0
-  m_ShadingRate: 0
-  m_ForceDisableGRD: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -1436,14 +1371,13 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 557610157840375611}
   - component: {fileID: 2829622408327334142}
   - component: {fileID: 5710358997849529307}
   - component: {fileID: 8590427121262142483}
   m_Layer: 0
-  m_HasEditorInfo: 1
   m_Name: HR8 6
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1490,10 +1424,6 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
-  m_virtualGeometry: 0
-  m_virtualGeometryShadow: 0
-  m_ShadingRate: 0
-  m_ForceDisableGRD: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -1546,14 +1476,13 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 789968884490306416}
   - component: {fileID: 4430386009075565182}
   - component: {fileID: 2216725891141551967}
   - component: {fileID: 7735545671437803114}
   m_Layer: 0
-  m_HasEditorInfo: 1
   m_Name: R7 1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1600,10 +1529,6 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
-  m_virtualGeometry: 0
-  m_virtualGeometryShadow: 0
-  m_ShadingRate: 0
-  m_ForceDisableGRD: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -1656,14 +1581,13 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 6425675647708854044}
   - component: {fileID: 3081705686617610508}
   - component: {fileID: 3214019727400032241}
   - component: {fileID: 5898806825197214211}
   m_Layer: 0
-  m_HasEditorInfo: 1
   m_Name: R8 1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1710,10 +1634,6 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
-  m_virtualGeometry: 0
-  m_virtualGeometryShadow: 0
-  m_ShadingRate: 0
-  m_ForceDisableGRD: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -1766,14 +1686,13 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 3014780311207236024}
   - component: {fileID: 8034860780476867706}
   - component: {fileID: 3239539099601626898}
   - component: {fileID: 5811470758213987015}
   m_Layer: 0
-  m_HasEditorInfo: 1
   m_Name: HR4 6
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1820,10 +1739,6 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
-  m_virtualGeometry: 0
-  m_virtualGeometryShadow: 0
-  m_ShadingRate: 0
-  m_ForceDisableGRD: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -1876,14 +1791,13 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 6915232995260343857}
   - component: {fileID: 8661693813982821987}
   - component: {fileID: 3930607480288106083}
   - component: {fileID: 5358537590460576066}
   m_Layer: 0
-  m_HasEditorInfo: 1
   m_Name: HR2 5
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1930,10 +1844,6 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
-  m_virtualGeometry: 0
-  m_virtualGeometryShadow: 0
-  m_ShadingRate: 0
-  m_ForceDisableGRD: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -1986,13 +1896,12 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 588346039882861441}
   - component: {fileID: 3951024310180011030}
   - component: {fileID: 7064278688602973705}
   m_Layer: 0
-  m_HasEditorInfo: 1
   m_Name: Terrain
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2023,7 +1932,7 @@ Terrain:
   m_GameObject: {fileID: 1585564269118424735}
   m_Enabled: 1
   serializedVersion: 6
-  m_TerrainData: {fileID: 15600000, guid: a1767a26e470f124491a821e5cb3f0bb, type: 2}
+  m_TerrainData: {fileID: 15600000, guid: dd63a151016c4f0aa089ed545d85b4e4, type: 2}
   m_TreeDistance: 5000
   m_TreeBillboardDistance: 898
   m_TreeCrossFadeLength: 5
@@ -2080,14 +1989,13 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 8841818737638802486}
   - component: {fileID: 7058773264157290470}
   - component: {fileID: 6478914620626566842}
   - component: {fileID: 241709027553068806}
   m_Layer: 0
-  m_HasEditorInfo: 1
   m_Name: HR6 6
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2134,10 +2042,6 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
-  m_virtualGeometry: 0
-  m_virtualGeometryShadow: 0
-  m_ShadingRate: 0
-  m_ForceDisableGRD: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -2190,14 +2094,13 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 1294140455986740107}
   - component: {fileID: 7180408021044911046}
   - component: {fileID: 25239425532922364}
   - component: {fileID: 9018675208639201369}
   m_Layer: 0
-  m_HasEditorInfo: 1
   m_Name: R5 4
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2244,10 +2147,6 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
-  m_virtualGeometry: 0
-  m_virtualGeometryShadow: 0
-  m_ShadingRate: 0
-  m_ForceDisableGRD: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -2300,11 +2199,10 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 2210251912746298921}
   m_Layer: 0
-  m_HasEditorInfo: 1
   m_Name: Building
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2340,14 +2238,13 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 5671302617068414988}
   - component: {fileID: 6162346278150440688}
   - component: {fileID: 3952145267195298481}
   - component: {fileID: 2519899622861981170}
   m_Layer: 0
-  m_HasEditorInfo: 1
   m_Name: HR1 6
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2394,10 +2291,6 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
-  m_virtualGeometry: 0
-  m_virtualGeometryShadow: 0
-  m_ShadingRate: 0
-  m_ForceDisableGRD: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -2450,14 +2343,13 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 4638039470054075865}
   - component: {fileID: 7897744959367578978}
   - component: {fileID: 6975772078312651995}
   - component: {fileID: 5126483038051170106}
   m_Layer: 0
-  m_HasEditorInfo: 1
   m_Name: R8 2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2504,10 +2396,6 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
-  m_virtualGeometry: 0
-  m_virtualGeometryShadow: 0
-  m_ShadingRate: 0
-  m_ForceDisableGRD: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -2560,14 +2448,13 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 6835858359050679190}
   - component: {fileID: 2207256324120421155}
   - component: {fileID: 1676708279518382390}
   - component: {fileID: 7200066146296272614}
   m_Layer: 0
-  m_HasEditorInfo: 1
   m_Name: R6 2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2614,10 +2501,6 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
-  m_virtualGeometry: 0
-  m_virtualGeometryShadow: 0
-  m_ShadingRate: 0
-  m_ForceDisableGRD: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -2670,14 +2553,13 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 6028626734023037714}
   - component: {fileID: 6731090619169788268}
   - component: {fileID: 5062467373227729369}
   - component: {fileID: 7844609420460459378}
   m_Layer: 0
-  m_HasEditorInfo: 1
   m_Name: PlaneWater
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2724,14 +2606,10 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
-  m_virtualGeometry: 0
-  m_virtualGeometryShadow: 0
-  m_ShadingRate: 0
-  m_ForceDisableGRD: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: f69490154ef275b4e91ef42600c1327c, type: 2}
+  - {fileID: 2100000, guid: dca8e66c4b0e481c811d5c4a3e3a5b32, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -2781,14 +2659,13 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 6949336222366191223}
   - component: {fileID: 4712390121041126900}
   - component: {fileID: 8047334072621904839}
   - component: {fileID: 4333289002112562646}
   m_Layer: 0
-  m_HasEditorInfo: 1
   m_Name: HR7 4
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2835,10 +2712,6 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
-  m_virtualGeometry: 0
-  m_virtualGeometryShadow: 0
-  m_ShadingRate: 0
-  m_ForceDisableGRD: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -2891,14 +2764,13 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 1273682755171412761}
   - component: {fileID: 3481311288298013207}
   - component: {fileID: 8819927610546442648}
   - component: {fileID: 4320706479948990965}
   m_Layer: 0
-  m_HasEditorInfo: 1
   m_Name: R7 4
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2945,10 +2817,6 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
-  m_virtualGeometry: 0
-  m_virtualGeometryShadow: 0
-  m_ShadingRate: 0
-  m_ForceDisableGRD: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -3001,14 +2869,13 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 1276979643176710085}
   - component: {fileID: 4178250607449471695}
   - component: {fileID: 1371563219886972184}
   - component: {fileID: 1474962041500585451}
   m_Layer: 0
-  m_HasEditorInfo: 1
   m_Name: R5 2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3055,10 +2922,6 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
-  m_virtualGeometry: 0
-  m_virtualGeometryShadow: 0
-  m_ShadingRate: 0
-  m_ForceDisableGRD: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -3111,14 +2974,13 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 7679589577325278251}
   - component: {fileID: 9216011291328664965}
   - component: {fileID: 1211724053361239046}
   - component: {fileID: 1701195053951007464}
   m_Layer: 0
-  m_HasEditorInfo: 1
   m_Name: HR5 6
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3165,10 +3027,6 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
-  m_virtualGeometry: 0
-  m_virtualGeometryShadow: 0
-  m_ShadingRate: 0
-  m_ForceDisableGRD: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -3221,14 +3079,13 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 4177469806662163666}
   - component: {fileID: 3646900614489927750}
   - component: {fileID: 1912960814888050230}
   - component: {fileID: 130413932952962040}
   m_Layer: 0
-  m_HasEditorInfo: 1
   m_Name: R2 (5)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3275,10 +3132,6 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
-  m_virtualGeometry: 0
-  m_virtualGeometryShadow: 0
-  m_ShadingRate: 0
-  m_ForceDisableGRD: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -3331,14 +3184,13 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 6188872094359452818}
   - component: {fileID: 8347502957413754674}
   - component: {fileID: 3878894868775046032}
   - component: {fileID: 5136488494951797822}
   m_Layer: 0
-  m_HasEditorInfo: 1
   m_Name: R6 4
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3385,10 +3237,6 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
-  m_virtualGeometry: 0
-  m_virtualGeometryShadow: 0
-  m_ShadingRate: 0
-  m_ForceDisableGRD: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -3441,14 +3289,13 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 7337172108105808620}
   - component: {fileID: 130440898188861879}
   - component: {fileID: 4279083851350379021}
   - component: {fileID: 2393116898181965291}
   m_Layer: 0
-  m_HasEditorInfo: 1
   m_Name: R5 3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3495,10 +3342,6 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
-  m_virtualGeometry: 0
-  m_virtualGeometryShadow: 0
-  m_ShadingRate: 0
-  m_ForceDisableGRD: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -3551,14 +3394,13 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 9046011513882332977}
   - component: {fileID: 7232863812822029943}
   - component: {fileID: 3616382007807564917}
   - component: {fileID: 8477805881664924709}
   m_Layer: 0
-  m_HasEditorInfo: 1
   m_Name: R8 4
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3605,10 +3447,6 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
-  m_virtualGeometry: 0
-  m_virtualGeometryShadow: 0
-  m_ShadingRate: 0
-  m_ForceDisableGRD: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -3661,14 +3499,13 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 7072532841174159465}
   - component: {fileID: 1703351378667415951}
   - component: {fileID: 733077979834980541}
   - component: {fileID: 8014686369490749043}
   m_Layer: 0
-  m_HasEditorInfo: 1
   m_Name: R1 (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3715,10 +3552,6 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
-  m_virtualGeometry: 0
-  m_virtualGeometryShadow: 0
-  m_ShadingRate: 0
-  m_ForceDisableGRD: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -3771,14 +3604,13 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 3227933542715853959}
   - component: {fileID: 3566280811527972877}
   - component: {fileID: 4553514949144520557}
   - component: {fileID: 2440916856138894852}
   m_Layer: 0
-  m_HasEditorInfo: 1
   m_Name: R4 2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3825,10 +3657,6 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
-  m_virtualGeometry: 0
-  m_virtualGeometryShadow: 0
-  m_ShadingRate: 0
-  m_ForceDisableGRD: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -3881,14 +3709,13 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 8599594753008769155}
   - component: {fileID: 5420831330211329141}
   - component: {fileID: 593517152941358000}
   - component: {fileID: 2577621511196441418}
   m_Layer: 0
-  m_HasEditorInfo: 1
   m_Name: HR3 1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3935,10 +3762,6 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
-  m_virtualGeometry: 0
-  m_virtualGeometryShadow: 0
-  m_ShadingRate: 0
-  m_ForceDisableGRD: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -3991,14 +3814,13 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 6346715136979457880}
   - component: {fileID: 7646659554097021467}
   - component: {fileID: 3485485428788794435}
   - component: {fileID: 5576615425327124867}
   m_Layer: 0
-  m_HasEditorInfo: 1
   m_Name: R5
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4045,10 +3867,6 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
-  m_virtualGeometry: 0
-  m_virtualGeometryShadow: 0
-  m_ShadingRate: 0
-  m_ForceDisableGRD: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -4101,14 +3919,13 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 4420698599967776571}
   - component: {fileID: 1226360610018054516}
   - component: {fileID: 6397393561411672873}
   - component: {fileID: 3071797861540618288}
   m_Layer: 0
-  m_HasEditorInfo: 1
   m_Name: R7 2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4155,10 +3972,6 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
-  m_virtualGeometry: 0
-  m_virtualGeometryShadow: 0
-  m_ShadingRate: 0
-  m_ForceDisableGRD: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -4211,14 +4024,13 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 3265240146653429919}
   - component: {fileID: 2382178407629008125}
   - component: {fileID: 6674133111287672832}
   - component: {fileID: 8771820987928948152}
   m_Layer: 0
-  m_HasEditorInfo: 1
   m_Name: HR8 3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4265,10 +4077,6 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
-  m_virtualGeometry: 0
-  m_virtualGeometryShadow: 0
-  m_ShadingRate: 0
-  m_ForceDisableGRD: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -4321,14 +4129,13 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 8528410722387169063}
   - component: {fileID: 7399588393099660923}
   - component: {fileID: 8698901792915353872}
   - component: {fileID: 7213425925961636487}
   m_Layer: 0
-  m_HasEditorInfo: 1
   m_Name: HR8 1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4375,10 +4182,6 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
-  m_virtualGeometry: 0
-  m_virtualGeometryShadow: 0
-  m_ShadingRate: 0
-  m_ForceDisableGRD: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -4431,14 +4234,13 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 4611587397948728900}
   - component: {fileID: 3189498128576845763}
   - component: {fileID: 8617509144822613656}
   - component: {fileID: 6331440314360424668}
   m_Layer: 0
-  m_HasEditorInfo: 1
   m_Name: R3 3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4485,10 +4287,6 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
-  m_virtualGeometry: 0
-  m_virtualGeometryShadow: 0
-  m_ShadingRate: 0
-  m_ForceDisableGRD: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -4541,14 +4339,13 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 5217044440119724448}
   - component: {fileID: 523154705294971562}
   - component: {fileID: 4496813458012316710}
   - component: {fileID: 4694828781065293930}
   m_Layer: 0
-  m_HasEditorInfo: 1
   m_Name: HR4 1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4595,10 +4392,6 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
-  m_virtualGeometry: 0
-  m_virtualGeometryShadow: 0
-  m_ShadingRate: 0
-  m_ForceDisableGRD: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -4651,14 +4444,13 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 209475523394358781}
   - component: {fileID: 3648049760108401610}
   - component: {fileID: 8771252138024269111}
   - component: {fileID: 4831260147675506089}
   m_Layer: 0
-  m_HasEditorInfo: 1
   m_Name: HR3 5
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4705,10 +4497,6 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
-  m_virtualGeometry: 0
-  m_virtualGeometryShadow: 0
-  m_ShadingRate: 0
-  m_ForceDisableGRD: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -4761,14 +4549,13 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 6162622739362716152}
   - component: {fileID: 539391892941900759}
   - component: {fileID: 8692240905538103225}
   - component: {fileID: 3557342296445967287}
   m_Layer: 0
-  m_HasEditorInfo: 1
   m_Name: R2 (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4815,10 +4602,6 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
-  m_virtualGeometry: 0
-  m_virtualGeometryShadow: 0
-  m_ShadingRate: 0
-  m_ForceDisableGRD: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -4871,14 +4654,13 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 4580585021056091881}
   - component: {fileID: 8532927065050970192}
   - component: {fileID: 9043667558158532525}
   - component: {fileID: 2367188241869173273}
   m_Layer: 0
-  m_HasEditorInfo: 1
   m_Name: R4 4
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4925,10 +4707,6 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
-  m_virtualGeometry: 0
-  m_virtualGeometryShadow: 0
-  m_ShadingRate: 0
-  m_ForceDisableGRD: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -4981,14 +4759,13 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 8729207983571872062}
   - component: {fileID: 2906172386087411629}
   - component: {fileID: 7113180479446500676}
   - component: {fileID: 8835825417085544430}
   m_Layer: 0
-  m_HasEditorInfo: 1
   m_Name: HR5 1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5035,10 +4812,6 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
-  m_virtualGeometry: 0
-  m_virtualGeometryShadow: 0
-  m_ShadingRate: 0
-  m_ForceDisableGRD: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -5091,14 +4864,13 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 4522810248337640519}
   - component: {fileID: 4231326831757552068}
   - component: {fileID: 2366732079085381985}
   - component: {fileID: 3110519088401626825}
   m_Layer: 0
-  m_HasEditorInfo: 1
   m_Name: HR8 5
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5145,10 +4917,6 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
-  m_virtualGeometry: 0
-  m_virtualGeometryShadow: 0
-  m_ShadingRate: 0
-  m_ForceDisableGRD: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -5201,14 +4969,13 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 685531700598249146}
   - component: {fileID: 5095297932192104106}
   - component: {fileID: 4286622124343410063}
   - component: {fileID: 4072375454088421554}
   m_Layer: 0
-  m_HasEditorInfo: 1
   m_Name: HR5 2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5255,10 +5022,6 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
-  m_virtualGeometry: 0
-  m_virtualGeometryShadow: 0
-  m_ShadingRate: 0
-  m_ForceDisableGRD: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -5311,12 +5074,11 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 1861988832353961624}
   - component: {fileID: 1033948638763736627}
   m_Layer: 0
-  m_HasEditorInfo: 1
   m_Name: Map4
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5469,14 +5231,13 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 6444335553251204099}
   - component: {fileID: 1786998679215762818}
   - component: {fileID: 2231441458190151351}
   - component: {fileID: 89969610369469498}
   m_Layer: 0
-  m_HasEditorInfo: 1
   m_Name: R3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5523,10 +5284,6 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
-  m_virtualGeometry: 0
-  m_virtualGeometryShadow: 0
-  m_ShadingRate: 0
-  m_ForceDisableGRD: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -5579,14 +5336,13 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 2299811555073442152}
   - component: {fileID: 2857853929054768413}
   - component: {fileID: 1040646162258851852}
   - component: {fileID: 2886942532118393237}
   m_Layer: 0
-  m_HasEditorInfo: 1
   m_Name: R1 (3)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5633,10 +5389,6 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
-  m_virtualGeometry: 0
-  m_virtualGeometryShadow: 0
-  m_ShadingRate: 0
-  m_ForceDisableGRD: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -5689,14 +5441,13 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 7625650409239272035}
   - component: {fileID: 6265741406939255650}
   - component: {fileID: 5202566648813463146}
   - component: {fileID: 848730268236894391}
   m_Layer: 0
-  m_HasEditorInfo: 1
   m_Name: HR4 5
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5743,10 +5494,6 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
-  m_virtualGeometry: 0
-  m_virtualGeometryShadow: 0
-  m_ShadingRate: 0
-  m_ForceDisableGRD: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -5799,11 +5546,10 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 3230909692730848491}
   m_Layer: 0
-  m_HasEditorInfo: 1
   m_Name: Wall
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5832,14 +5578,13 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 7226289713680558160}
   - component: {fileID: 7709335174948896383}
   - component: {fileID: 5668398857134750871}
   - component: {fileID: 7366562436282888319}
   m_Layer: 0
-  m_HasEditorInfo: 1
   m_Name: HR7 2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5886,10 +5631,6 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
-  m_virtualGeometry: 0
-  m_virtualGeometryShadow: 0
-  m_ShadingRate: 0
-  m_ForceDisableGRD: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -5942,14 +5683,13 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 3105176848432233072}
   - component: {fileID: 813920627296781449}
   - component: {fileID: 2057793928278899511}
   - component: {fileID: 187727937704737350}
   m_Layer: 0
-  m_HasEditorInfo: 1
   m_Name: HR1 5
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5996,10 +5736,6 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
-  m_virtualGeometry: 0
-  m_virtualGeometryShadow: 0
-  m_ShadingRate: 0
-  m_ForceDisableGRD: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -6052,14 +5788,13 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 3236011886760461476}
   - component: {fileID: 93048041278025453}
   - component: {fileID: 4580722008658748567}
   - component: {fileID: 8746523412258399796}
   m_Layer: 0
-  m_HasEditorInfo: 1
   m_Name: HR5 3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -6106,10 +5841,6 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
-  m_virtualGeometry: 0
-  m_virtualGeometryShadow: 0
-  m_ShadingRate: 0
-  m_ForceDisableGRD: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -6162,14 +5893,13 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 7544220462444819265}
   - component: {fileID: 7355352720070152516}
   - component: {fileID: 7390723947578547309}
   - component: {fileID: 3834871036603790129}
   m_Layer: 0
-  m_HasEditorInfo: 1
   m_Name: R2 (4)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -6216,10 +5946,6 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
-  m_virtualGeometry: 0
-  m_virtualGeometryShadow: 0
-  m_ShadingRate: 0
-  m_ForceDisableGRD: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -6272,14 +5998,13 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 2623580475817511786}
   - component: {fileID: 5269139118128707831}
   - component: {fileID: 145097036260338765}
   - component: {fileID: 7825521154788602339}
   m_Layer: 0
-  m_HasEditorInfo: 1
   m_Name: HR6 3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -6326,10 +6051,6 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
-  m_virtualGeometry: 0
-  m_virtualGeometryShadow: 0
-  m_ShadingRate: 0
-  m_ForceDisableGRD: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -6382,14 +6103,13 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 4546261051149587036}
   - component: {fileID: 6614542319680011743}
   - component: {fileID: 5171838967793491829}
   - component: {fileID: 4111717759521406271}
   m_Layer: 0
-  m_HasEditorInfo: 1
   m_Name: HR6 1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -6436,10 +6156,6 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
-  m_virtualGeometry: 0
-  m_virtualGeometryShadow: 0
-  m_ShadingRate: 0
-  m_ForceDisableGRD: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -6492,14 +6208,13 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 7882360259038782824}
   - component: {fileID: 6486083703563761279}
   - component: {fileID: 966472597165965204}
   - component: {fileID: 2084985869806955446}
   m_Layer: 0
-  m_HasEditorInfo: 1
   m_Name: HR6 5
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -6546,10 +6261,6 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
-  m_virtualGeometry: 0
-  m_virtualGeometryShadow: 0
-  m_ShadingRate: 0
-  m_ForceDisableGRD: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -6602,14 +6313,13 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 3181278845884198897}
   - component: {fileID: 5349230448051238360}
   - component: {fileID: 6347081524553824784}
   - component: {fileID: 552708514312424111}
   m_Layer: 0
-  m_HasEditorInfo: 1
   m_Name: R2 (3)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -6656,10 +6366,6 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
-  m_virtualGeometry: 0
-  m_virtualGeometryShadow: 0
-  m_ShadingRate: 0
-  m_ForceDisableGRD: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -6712,14 +6418,13 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 7119090954915982629}
   - component: {fileID: 8773334218311539588}
   - component: {fileID: 598826322028326644}
   - component: {fileID: 1058586782464147576}
   m_Layer: 0
-  m_HasEditorInfo: 1
   m_Name: R6
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -6766,10 +6471,6 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
-  m_virtualGeometry: 0
-  m_virtualGeometryShadow: 0
-  m_ShadingRate: 0
-  m_ForceDisableGRD: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -6822,11 +6523,10 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 6276370741659908971}
   m_Layer: 0
-  m_HasEditorInfo: 1
   m_Name: Regions
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -6942,14 +6642,13 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 7190066266832808965}
   - component: {fileID: 1767305557295504528}
   - component: {fileID: 5962621761994265648}
   - component: {fileID: 1791649131681640563}
   m_Layer: 0
-  m_HasEditorInfo: 1
   m_Name: R7 3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -6996,10 +6695,6 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
-  m_virtualGeometry: 0
-  m_virtualGeometryShadow: 0
-  m_ShadingRate: 0
-  m_ForceDisableGRD: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -7052,14 +6747,13 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 1145324468287055508}
   - component: {fileID: 5562633951968553184}
   - component: {fileID: 6181856176025314779}
   - component: {fileID: 3348183862302283197}
   m_Layer: 0
-  m_HasEditorInfo: 1
   m_Name: HR3 2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -7106,10 +6800,6 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
-  m_virtualGeometry: 0
-  m_virtualGeometryShadow: 0
-  m_ShadingRate: 0
-  m_ForceDisableGRD: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -7162,14 +6852,13 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 1685920877635247413}
   - component: {fileID: 4303711653451213373}
   - component: {fileID: 7256922510661212549}
   - component: {fileID: 8026679465744026465}
   m_Layer: 0
-  m_HasEditorInfo: 1
   m_Name: Cube (2)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -7216,10 +6905,6 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
-  m_virtualGeometry: 0
-  m_virtualGeometryShadow: 0
-  m_ShadingRate: 0
-  m_ForceDisableGRD: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -7272,14 +6957,13 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 2440251905923703762}
   - component: {fileID: 3175568287626137481}
   - component: {fileID: 1315777553081136863}
   - component: {fileID: 3887665511974018527}
   m_Layer: 0
-  m_HasEditorInfo: 1
   m_Name: HR3 3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -7326,10 +7010,6 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
-  m_virtualGeometry: 0
-  m_virtualGeometryShadow: 0
-  m_ShadingRate: 0
-  m_ForceDisableGRD: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -7382,14 +7062,13 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 3469123648528990930}
   - component: {fileID: 6777397590085045075}
   - component: {fileID: 2613680948154925681}
   - component: {fileID: 6477165973736283486}
   m_Layer: 0
-  m_HasEditorInfo: 1
   m_Name: HR1 4
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -7436,10 +7115,6 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
-  m_virtualGeometry: 0
-  m_virtualGeometryShadow: 0
-  m_ShadingRate: 0
-  m_ForceDisableGRD: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -7492,14 +7167,13 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 6651836772804083940}
   - component: {fileID: 8028147972334091497}
   - component: {fileID: 7142800516966377177}
   - component: {fileID: 8735516890197895214}
   m_Layer: 0
-  m_HasEditorInfo: 1
   m_Name: HR1 3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -7546,10 +7220,6 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
-  m_virtualGeometry: 0
-  m_virtualGeometryShadow: 0
-  m_ShadingRate: 0
-  m_ForceDisableGRD: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -7602,14 +7272,13 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 2455610182062747516}
   - component: {fileID: 5093733199543107153}
   - component: {fileID: 8202264119088570315}
   - component: {fileID: 458441774759138097}
   m_Layer: 0
-  m_HasEditorInfo: 1
   m_Name: R4
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -7656,10 +7325,6 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
-  m_virtualGeometry: 0
-  m_virtualGeometryShadow: 0
-  m_ShadingRate: 0
-  m_ForceDisableGRD: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -7712,14 +7377,13 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 5722779565761392648}
   - component: {fileID: 8347812260376080371}
   - component: {fileID: 4255709529176007709}
   - component: {fileID: 6466731919271537880}
   m_Layer: 0
-  m_HasEditorInfo: 1
   m_Name: R2 (2)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -7766,10 +7430,6 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
-  m_virtualGeometry: 0
-  m_virtualGeometryShadow: 0
-  m_ShadingRate: 0
-  m_ForceDisableGRD: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -7822,14 +7482,13 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 7982746115130556019}
   - component: {fileID: 7487723455182974836}
   - component: {fileID: 4550102785551845393}
   - component: {fileID: 7705811864034633781}
   m_Layer: 0
-  m_HasEditorInfo: 1
   m_Name: R3 2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -7876,10 +7535,6 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
-  m_virtualGeometry: 0
-  m_virtualGeometryShadow: 0
-  m_ShadingRate: 0
-  m_ForceDisableGRD: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -7932,14 +7587,13 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 5887865156012285165}
   - component: {fileID: 6228282812182358206}
   - component: {fileID: 8806466619796604260}
   - component: {fileID: 5475630834710467042}
   m_Layer: 0
-  m_HasEditorInfo: 1
   m_Name: HR1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -7986,10 +7640,6 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
-  m_virtualGeometry: 0
-  m_virtualGeometryShadow: 0
-  m_ShadingRate: 0
-  m_ForceDisableGRD: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -8042,14 +7692,13 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 2095948081621076570}
   - component: {fileID: 1042910963383706404}
   - component: {fileID: 5696184634650740575}
   - component: {fileID: 2059467829059580449}
   m_Layer: 0
-  m_HasEditorInfo: 1
   m_Name: R3 4
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -8096,10 +7745,6 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
-  m_virtualGeometry: 0
-  m_virtualGeometryShadow: 0
-  m_ShadingRate: 0
-  m_ForceDisableGRD: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -8152,14 +7797,13 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 6788352372342560993}
   - component: {fileID: 7161709238745795259}
   - component: {fileID: 5675676891099228326}
   - component: {fileID: 5099412191852285039}
   m_Layer: 0
-  m_HasEditorInfo: 1
   m_Name: HR2 3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -8206,10 +7850,6 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
-  m_virtualGeometry: 0
-  m_virtualGeometryShadow: 0
-  m_ShadingRate: 0
-  m_ForceDisableGRD: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -8262,14 +7902,13 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 3055560755323767774}
   - component: {fileID: 7850576641528815547}
   - component: {fileID: 1620991178195627913}
   - component: {fileID: 1919208955678868104}
   m_Layer: 0
-  m_HasEditorInfo: 1
   m_Name: HR2 2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -8316,10 +7955,6 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
-  m_virtualGeometry: 0
-  m_virtualGeometryShadow: 0
-  m_ShadingRate: 0
-  m_ForceDisableGRD: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -8372,14 +8007,13 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 7404458699539534742}
   - component: {fileID: 7945075485427676340}
   - component: {fileID: 5720527936350554560}
   - component: {fileID: 1100999922208320976}
   m_Layer: 0
-  m_HasEditorInfo: 1
   m_Name: HR3 4
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -8426,10 +8060,6 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
-  m_virtualGeometry: 0
-  m_virtualGeometryShadow: 0
-  m_ShadingRate: 0
-  m_ForceDisableGRD: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -8482,14 +8112,13 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 724687401778624312}
   - component: {fileID: 1621723309461592744}
   - component: {fileID: 452430019051135923}
   - component: {fileID: 1259065705133193611}
   m_Layer: 0
-  m_HasEditorInfo: 1
   m_Name: R4 5
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -8536,10 +8165,6 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
-  m_virtualGeometry: 0
-  m_virtualGeometryShadow: 0
-  m_ShadingRate: 0
-  m_ForceDisableGRD: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -8592,14 +8217,13 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 8099340745373287192}
   - component: {fileID: 4916572036840517532}
   - component: {fileID: 3262678429722722381}
   - component: {fileID: 5635151644017856837}
   m_Layer: 0
-  m_HasEditorInfo: 1
   m_Name: HR4 2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -8646,10 +8270,6 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
-  m_virtualGeometry: 0
-  m_virtualGeometryShadow: 0
-  m_ShadingRate: 0
-  m_ForceDisableGRD: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -8702,14 +8322,13 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 6889840406854375028}
   - component: {fileID: 402439585753410945}
   - component: {fileID: 8846972600188692526}
   - component: {fileID: 5253304270450155486}
   m_Layer: 0
-  m_HasEditorInfo: 1
   m_Name: HR3 6
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -8756,10 +8375,6 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
-  m_virtualGeometry: 0
-  m_virtualGeometryShadow: 0
-  m_ShadingRate: 0
-  m_ForceDisableGRD: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -8812,14 +8427,13 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 228234824010216806}
   - component: {fileID: 2768735209841948308}
   - component: {fileID: 6238387655366115508}
   - component: {fileID: 7771338371643152042}
   m_Layer: 0
-  m_HasEditorInfo: 1
   m_Name: HR7 1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -8866,10 +8480,6 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
-  m_virtualGeometry: 0
-  m_virtualGeometryShadow: 0
-  m_ShadingRate: 0
-  m_ForceDisableGRD: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -8922,14 +8532,13 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 3130099376387445117}
   - component: {fileID: 6856830132190322720}
   - component: {fileID: 3709186639763552179}
   - component: {fileID: 6438987190081404048}
   m_Layer: 0
-  m_HasEditorInfo: 1
   m_Name: HR4 4
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -8976,10 +8585,6 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
-  m_virtualGeometry: 0
-  m_virtualGeometryShadow: 0
-  m_ShadingRate: 0
-  m_ForceDisableGRD: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -9032,14 +8637,13 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 3526840005135255811}
   - component: {fileID: 2286432734800591975}
   - component: {fileID: 7962557117591585280}
   - component: {fileID: 1612661324530465345}
   m_Layer: 0
-  m_HasEditorInfo: 1
   m_Name: R5 5
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -9086,10 +8690,6 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
-  m_virtualGeometry: 0
-  m_virtualGeometryShadow: 0
-  m_ShadingRate: 0
-  m_ForceDisableGRD: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -9142,14 +8742,13 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 2233800104490119513}
   - component: {fileID: 5393709611192242457}
   - component: {fileID: 7767821225051421670}
   - component: {fileID: 386622120787064558}
   m_Layer: 0
-  m_HasEditorInfo: 1
   m_Name: HR8 2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -9196,10 +8795,6 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
-  m_virtualGeometry: 0
-  m_virtualGeometryShadow: 0
-  m_ShadingRate: 0
-  m_ForceDisableGRD: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -9252,14 +8847,13 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 7295317490713806640}
   - component: {fileID: 6145764821133715870}
   - component: {fileID: 1768443960579066639}
   - component: {fileID: 2263633342757673058}
   m_Layer: 0
-  m_HasEditorInfo: 1
   m_Name: R1 (4)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -9306,10 +8900,6 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
-  m_virtualGeometry: 0
-  m_virtualGeometryShadow: 0
-  m_ShadingRate: 0
-  m_ForceDisableGRD: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -9362,14 +8952,13 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 7335911532388079176}
   - component: {fileID: 5617213035027683440}
   - component: {fileID: 7672163954588420070}
   - component: {fileID: 3178425643838804963}
   m_Layer: 0
-  m_HasEditorInfo: 1
   m_Name: R6 5
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -9416,10 +9005,6 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
-  m_virtualGeometry: 0
-  m_virtualGeometryShadow: 0
-  m_ShadingRate: 0
-  m_ForceDisableGRD: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -9472,14 +9057,13 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 3425735152688440852}
   - component: {fileID: 2023992037802568908}
   - component: {fileID: 1422895029265373080}
   - component: {fileID: 3307801546986566663}
   m_Layer: 0
-  m_HasEditorInfo: 1
   m_Name: R8 3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -9526,10 +9110,6 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
-  m_virtualGeometry: 0
-  m_virtualGeometryShadow: 0
-  m_ShadingRate: 0
-  m_ForceDisableGRD: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -9582,14 +9162,13 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 6720044177473300983}
   - component: {fileID: 4470175748394309273}
   - component: {fileID: 8084905973127115013}
   - component: {fileID: 7951355251189604149}
   m_Layer: 0
-  m_HasEditorInfo: 1
   m_Name: HR1 2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -9636,10 +9215,6 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
-  m_virtualGeometry: 0
-  m_virtualGeometryShadow: 0
-  m_ShadingRate: 0
-  m_ForceDisableGRD: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -9692,14 +9267,13 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 1578282840609681687}
   - component: {fileID: 7444149101316648944}
   - component: {fileID: 1995383626852595326}
   - component: {fileID: 4396201872711622704}
   m_Layer: 0
-  m_HasEditorInfo: 1
   m_Name: HR6 4
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -9746,10 +9320,6 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
-  m_virtualGeometry: 0
-  m_virtualGeometryShadow: 0
-  m_ShadingRate: 0
-  m_ForceDisableGRD: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -9802,14 +9372,13 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 8530814481719415027}
   - component: {fileID: 1536706983776770148}
   - component: {fileID: 5277499202787803916}
   - component: {fileID: 5339040277990098567}
   m_Layer: 0
-  m_HasEditorInfo: 1
   m_Name: R1 (2)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -9856,10 +9425,6 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
-  m_virtualGeometry: 0
-  m_virtualGeometryShadow: 0
-  m_ShadingRate: 0
-  m_ForceDisableGRD: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -9912,14 +9477,13 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 3028922859463308897}
   - component: {fileID: 6739451572314372445}
   - component: {fileID: 1833352306693333124}
   - component: {fileID: 8917937359466896115}
   m_Layer: 0
-  m_HasEditorInfo: 1
   m_Name: R1 (5)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -9966,10 +9530,6 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
-  m_virtualGeometry: 0
-  m_virtualGeometryShadow: 0
-  m_ShadingRate: 0
-  m_ForceDisableGRD: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -10022,14 +9582,13 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 1981033857294375009}
   - component: {fileID: 3872491258017714589}
   - component: {fileID: 5672528390163433890}
   - component: {fileID: 7040950515012755938}
   m_Layer: 0
-  m_HasEditorInfo: 1
   m_Name: HR5 5
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -10076,10 +9635,6 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
-  m_virtualGeometry: 0
-  m_virtualGeometryShadow: 0
-  m_ShadingRate: 0
-  m_ForceDisableGRD: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -10132,14 +9687,13 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 9221197770246301338}
   - component: {fileID: 3678155506231176146}
   - component: {fileID: 4935907816294228834}
   - component: {fileID: 747075527818616670}
   m_Layer: 0
-  m_HasEditorInfo: 1
   m_Name: R8 5
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -10186,10 +9740,6 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
-  m_virtualGeometry: 0
-  m_virtualGeometryShadow: 0
-  m_ShadingRate: 0
-  m_ForceDisableGRD: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -10242,14 +9792,13 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 8977501502956444333}
   - component: {fileID: 6416273154590329504}
   - component: {fileID: 4472695226176689537}
   - component: {fileID: 6962581812059383738}
   m_Layer: 0
-  m_HasEditorInfo: 1
   m_Name: HR5 4
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -10296,10 +9845,6 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
-  m_virtualGeometry: 0
-  m_virtualGeometryShadow: 0
-  m_ShadingRate: 0
-  m_ForceDisableGRD: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
