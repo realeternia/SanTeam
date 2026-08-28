@@ -1713,7 +1713,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 9e9c820e940cb1c4ab01f9cb9e8febcf, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 267a0ef47fa04722966a0fd8e07cab8f, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -4433,7 +4433,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 9212c823dfe0cbb43839a4ce3837b002, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 0a7811f48d834a0cac88abea37bfcc10, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -5038,7 +5038,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 9e9c820e940cb1c4ab01f9cb9e8febcf, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 267a0ef47fa04722966a0fd8e07cab8f, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -5518,7 +5518,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   scrollRect: {fileID: 318279317}
   rankParent: {fileID: 639111384}
-  rankCellPrefab: {fileID: 76827737818314668, guid: c2bece5fbcfba5c4d86f68d2bea92f52, type: 3}
+  rankCellPrefab: {fileID: 76827737818314668, guid: 2a5271cbdce1427fb65961e6b2067477, type: 3}
   btnSdAtk: {fileID: 1294896672}
   btnSdHp: {fileID: 128351830}
   btnFood: {fileID: 858069912}
@@ -8760,7 +8760,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 87a62645bd376f24ca448b57fec8fea4, type: 3}
+  m_Sprite: {fileID: 21300000, guid: dcc342ea06df4dc190c73c9e71ade4ce, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -9522,7 +9522,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 9e9c820e940cb1c4ab01f9cb9e8febcf, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 267a0ef47fa04722966a0fd8e07cab8f, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -10306,7 +10306,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: ff8abde4a6f37c448bec256b056c8571, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 23e47bdb371f4dacb8d6593edd559287, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -10445,7 +10445,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 84054dec26af73a4d9f6786b58b8f79b, type: 3}
+  m_Sprite: {fileID: 21300000, guid: dcc342ea06df4dc190c73c9e71ade4ce, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -11280,7 +11280,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1835018305
 RectTransform:
   m_ObjectHideFlags: 0
@@ -11782,7 +11782,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1891025975
 RectTransform:
   m_ObjectHideFlags: 0
@@ -11819,7 +11819,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   scrollRect: {fileID: 683363907}
   rankParent: {fileID: 490717916}
-  rankCellPrefab: {fileID: 76827737818314668, guid: e85246b8ba991e84986c33ab7517ca85, type: 3}
+  rankCellPrefab: {fileID: 76827737818314668, guid: 8a55894699d24fb9b7a346fb9f755b14, type: 3}
   btnLeadShip: {fileID: 1736960598}
   btnStr: {fileID: 1697231885}
   btnInte: {fileID: 105279228}

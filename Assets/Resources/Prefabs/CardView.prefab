@@ -65,7 +65,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 7f163bfb4425e3e43af1068cac27110d, type: 3}
+  m_Sprite: {fileID: 0}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -140,7 +140,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 52de908682d288f4e9cba4e542e06b88, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 7956c7e6b7344f19916a4a536327dd25, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -441,7 +441,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 05ea10bb880e5ee46bc8ce0c335eb1c9, type: 3}
+  m_Sprite: {fileID: 0}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -896,7 +896,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: b3b5694576c017144b1bf102059f1ec8, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 2ae623c6edac443db17337f364a332d7, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -1142,16 +1142,7 @@ MonoBehaviour:
   - {fileID: 7935027460888968244}
   - {fileID: 2802670097328903471}
   - {fileID: 1686282232541663747}
-  lead: {fileID: 0}
-  inte: {fileID: 0}
-  str: {fileID: 0}
-  hp: {fileID: 0}
   itemImage: {fileID: 1514705944255524546}
-  itemAttrImage1: {fileID: 0}
-  itemAttrImage2: {fileID: 0}
-  itemAttrName1: {fileID: 0}
-  itemAttrName2: {fileID: 0}
-  itemDes: {fileID: 0}
   effectGreen: {fileID: 3926510453526449}
   effectYellow: {fileID: 1223528818961248173}
   effectLayer: {fileID: 3863863620166204467}

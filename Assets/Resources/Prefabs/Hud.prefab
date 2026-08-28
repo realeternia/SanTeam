@@ -1,18 +1,17 @@
 %YAML 1.1
-%TAG !u! tag:yousandi.cn,2023:
+%TAG !u! tag:unity3d.com,2011:
 --- !u!1 &5604261553720039206
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 8611914853397195921}
   - component: {fileID: 1706512841108750359}
   - component: {fileID: 7063140389597284908}
   m_Layer: 5
-  m_HasEditorInfo: 1
   m_Name: Hud
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -67,13 +66,12 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 8791848140984706635}
   - component: {fileID: 9021315590437247564}
   - component: {fileID: 7710533460043022913}
   m_Layer: 5
-  m_HasEditorInfo: 1
   m_Name: Image
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -143,13 +141,12 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 1499484311565563882}
   - component: {fileID: 7527860473560099964}
   - component: {fileID: 579471938689796580}
   m_Layer: 5
-  m_HasEditorInfo: 1
   m_Name: Image
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -203,7 +200,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: ef6401ee80a043b4bac478913442590b, type: 3}
+  m_Sprite: {fileID: 21300000, guid: c268094fd10e4f8d84748d2b686e98a8, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -219,13 +216,12 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 3009347529322235052}
   - component: {fileID: 7206220077696768752}
   - component: {fileID: 3700302030962305332}
   m_Layer: 5
-  m_HasEditorInfo: 1
   m_Name: Image (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}

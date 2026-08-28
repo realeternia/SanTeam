@@ -1,19 +1,18 @@
 %YAML 1.1
-%TAG !u! tag:yousandi.cn,2023:
+%TAG !u! tag:unity3d.com,2011:
 --- !u!1 &2962172769459385106
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 886280077404510521}
   - component: {fileID: 1611405963326456405}
   - component: {fileID: 5239992655441527793}
   - component: {fileID: 8838558077511658181}
   m_Layer: 5
-  m_HasEditorInfo: 1
   m_Name: FieldUnit
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -68,7 +67,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 63c6bbf31f5efe74cb9a47180276d484, type: 3}
+  m_Sprite: {fileID: 21300000, guid: cb85ce5345c9406eb3197c1cb43273ff, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -90,21 +89,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e1d1b5ec757ca20459151e1601e4edbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  posId: 0
   heroIcon: {fileID: 9207742717177341263}
   jobIcon: {fileID: 8351132925745806393}
+  bagControl: {fileID: 0}
+  myHeroId: 0
 --- !u!1 &4877509071048610425
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 5486752812403046794}
   - component: {fileID: 2413107185049391295}
   - component: {fileID: 8351132925745806393}
   m_Layer: 5
-  m_HasEditorInfo: 1
   m_Name: Image
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -174,13 +175,12 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 4997127374596243342}
   - component: {fileID: 2158859957405510739}
   - component: {fileID: 9207742717177341263}
   m_Layer: 5
-  m_HasEditorInfo: 1
   m_Name: Image
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -235,7 +235,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: e969f08ac8e0c8b4d836e53fd48c79a7, type: 3}
+  m_Sprite: {fileID: 21300000, guid: cb85ce5345c9406eb3197c1cb43273ff, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1

@@ -1,19 +1,18 @@
 %YAML 1.1
-%TAG !u! tag:yousandi.cn,2023:
+%TAG !u! tag:unity3d.com,2011:
 --- !u!1 &1947894729978146774
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 7180468010735253559}
   - component: {fileID: 8484902037225627971}
   - component: {fileID: 8649791181019450358}
   - component: {fileID: 6027463124662379144}
   m_Layer: 5
-  m_HasEditorInfo: 1
   m_Name: Button
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -67,7 +66,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 9694b0cd672bef74392853fa1f2196e6, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 3723177aa5a645018b62eb6541ee17c5, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -127,7 +126,7 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 9219173714850659319}
   - component: {fileID: 2287803449999260934}
@@ -135,7 +134,6 @@ GameObject:
   - component: {fileID: 8042992919290496458}
   - component: {fileID: 5096776861279770503}
   m_Layer: 5
-  m_HasEditorInfo: 1
   m_Name: BagCellItem
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -194,7 +192,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 0}
+  m_Sprite: {fileID: 21300000, guid: 8d8123aa68ce457a9b6ea7d62291a45c, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -247,14 +245,13 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 8092962258848650262}
   - component: {fileID: 6644814894272305036}
   - component: {fileID: 4954365376595180581}
   m_Layer: 5
-  m_HasEditorInfo: 1
-  m_Name: Image
+  m_Name: ImageShield
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -307,7 +304,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 6ef4b4961f397ea408e85a402a58be40, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 7a893663c09d43a492c253c1988a7913, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -323,13 +320,12 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 2068029362347507574}
   - component: {fileID: 7348493732810806314}
   - component: {fileID: 3892791486186690498}
   m_Layer: 5
-  m_HasEditorInfo: 1
   m_Name: Text (TMP)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -458,13 +454,12 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 8342907119356263998}
   - component: {fileID: 2979563292235663399}
   - component: {fileID: 8008808474712796276}
   m_Layer: 5
-  m_HasEditorInfo: 1
   m_Name: Panel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -534,14 +529,13 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 3639598492185642630}
   - component: {fileID: 5266429886383261260}
   - component: {fileID: 1540008286836961467}
   m_Layer: 5
-  m_HasEditorInfo: 1
-  m_Name: Image (1)
+  m_Name: ImageItem
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -594,7 +588,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: be94f819afda99e4f8807ee367d8017b, type: 3}
+  m_Sprite: {fileID: 21300000, guid: ffd33336ddfa4737941d6cfe087b7cc4, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1

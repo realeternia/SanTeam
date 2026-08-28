@@ -1,18 +1,17 @@
 %YAML 1.1
-%TAG !u! tag:yousandi.cn,2023:
+%TAG !u! tag:unity3d.com,2011:
 --- !u!1 &945351662333822091
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 4474960267721115745}
   - component: {fileID: 929055118939289726}
   - component: {fileID: 4130105445650976846}
   m_Layer: 5
-  m_HasEditorInfo: 1
   m_Name: Image (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -66,7 +65,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 8723ff13689650d44867f0b74d5b5757, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 5b7f7afda98b480e937f90bcc45ac2db, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -82,13 +81,12 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 1564828030590734383}
   - component: {fileID: 3342666654391577930}
   - component: {fileID: 541016607372563787}
   m_Layer: 5
-  m_HasEditorInfo: 1
   m_Name: Panel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -158,14 +156,13 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 7180468010735253559}
   - component: {fileID: 8484902037225627971}
   - component: {fileID: 8649791181019450358}
   - component: {fileID: 6027463124662379144}
   m_Layer: 5
-  m_HasEditorInfo: 1
   m_Name: Button
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -219,7 +216,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 9694b0cd672bef74392853fa1f2196e6, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 3723177aa5a645018b62eb6541ee17c5, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -279,13 +276,12 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 2836126766640716435}
   - component: {fileID: 766545036012942920}
   - component: {fileID: 7481303763745504265}
   m_Layer: 5
-  m_HasEditorInfo: 1
   m_Name: TextName
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -414,7 +410,7 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 9219173714850659319}
   - component: {fileID: 2287803449999260934}
@@ -422,7 +418,6 @@ GameObject:
   - component: {fileID: 7465072734230344369}
   - component: {fileID: 1150600257209262383}
   m_Layer: 5
-  m_HasEditorInfo: 1
   m_Name: BagCellHero
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -535,13 +530,12 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 2068029362347507574}
   - component: {fileID: 7348493732810806314}
   - component: {fileID: 3892791486186690498}
   m_Layer: 5
-  m_HasEditorInfo: 1
   m_Name: TextCount
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -670,14 +664,13 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 3326013093056956220}
   - component: {fileID: 1179664993810933014}
   - component: {fileID: 2463110051947730516}
   m_Layer: 5
-  m_HasEditorInfo: 1
-  m_Name: Image
+  m_Name: ImageEqp
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -730,7 +723,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: be94f819afda99e4f8807ee367d8017b, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 629e3632431e4948aaab179989aaeeac, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1

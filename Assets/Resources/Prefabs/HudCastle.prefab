@@ -1,18 +1,17 @@
 %YAML 1.1
-%TAG !u! tag:yousandi.cn,2023:
+%TAG !u! tag:unity3d.com,2011:
 --- !u!1 &160834111956507839
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 7558159824348166263}
   - component: {fileID: 7253882018513667149}
   - component: {fileID: 3125362783956411640}
   m_Layer: 5
-  m_HasEditorInfo: 1
   m_Name: Image (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -83,13 +82,12 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 6149408960609037800}
   - component: {fileID: 8720823392811120024}
   - component: {fileID: 5791740229832235268}
   m_Layer: 5
-  m_HasEditorInfo: 1
   m_Name: Image
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -159,13 +157,12 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 4892339546741178573}
   - component: {fileID: 970637949839323205}
   - component: {fileID: 8504728114606778316}
   m_Layer: 5
-  m_HasEditorInfo: 1
   m_Name: IconShield
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -219,7 +216,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 6ef4b4961f397ea408e85a402a58be40, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 1b029b171e25422ab5a14f0655269603, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -235,13 +232,12 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 7107422050281643871}
   - component: {fileID: 3505211279378718439}
   - component: {fileID: 2724415154703571175}
   m_Layer: 5
-  m_HasEditorInfo: 1
   m_Name: Text (TMP)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -370,13 +366,12 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 5760178514610222353}
   - component: {fileID: 1538272609582627904}
   - component: {fileID: 54519079804160164}
   m_Layer: 5
-  m_HasEditorInfo: 1
   m_Name: Text (TMP) (2)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -505,13 +500,12 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 5979319612457438226}
   - component: {fileID: 8226475095878537223}
   - component: {fileID: 1725515476480483359}
   m_Layer: 5
-  m_HasEditorInfo: 1
   m_Name: IconFood
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -565,7 +559,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 704d0055ac1c27748af5a6fb82260b1b, type: 3}
+  m_Sprite: {fileID: 21300000, guid: e280a5752a974f91b14b55c60da40299, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -581,14 +575,13 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 8611914853397195921}
   - component: {fileID: 1706512841108750359}
   - component: {fileID: 452479081095500070}
   - component: {fileID: 2013984159644648079}
   m_Layer: 5
-  m_HasEditorInfo: 1
   m_Name: HudCastle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -682,13 +675,12 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 5270252104559646945}
   - component: {fileID: 7022177119508247923}
   - component: {fileID: 4778262793356532553}
   m_Layer: 5
-  m_HasEditorInfo: 1
   m_Name: Text (TMP) (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -817,13 +809,12 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 3009347529322235052}
   - component: {fileID: 7206220077696768752}
   - component: {fileID: 3700302030962305332}
   m_Layer: 5
-  m_HasEditorInfo: 1
   m_Name: IconSword
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -877,7 +868,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: bbb50e004f4e30244a17ef4016aa7ad2, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 89fde855d881494ea9955af31aaa5282, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
