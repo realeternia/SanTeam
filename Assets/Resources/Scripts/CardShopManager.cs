@@ -14,11 +14,12 @@ public class CardShopManager : MonoBehaviour
 
     public GameObject cardViewPrefab; // 拖拽CardView预制体到此处
     public GameObject cardItemViewPrefab; // 拖拽CardView预制体到此处
-    public GameObject cardItemView;
 
     private int round = 10000;
     private bool[] playerPassed = new bool[8]; // 记录每个玩家是否pass过
     private int passedPlayers = 0; // 记录pass的玩家数量
+    private const int SOLD_REMAIN_ROUNDS = 5; // 卡售出后维持的round数
+    public int[] playerStartGold = new int[8]; // 记录每个玩家开局金币（用于AI跳过判定）
 
     public Button passBtn;
     public Button bagBtn;
@@ -133,8 +134,8 @@ public class CardShopManager : MonoBehaviour
         //移除并销毁旧卡片
         foreach (Transform child in transform)
             Destroy(child.gameObject);
-        foreach (Transform child in cardItemView.transform)
-            Destroy(child.gameObject);
+        // foreach (Transform child in cardItemView.transform)
+        //     Destroy(child.gameObject);
         var unsoldItems = cardViews.FindAll(x => !x.isHeroCard && !x.isSold && !ItemConfig.GetConfig(x.cardId).AutoRemove).ConvertAll(a => a.cardId);
         cardViews.Clear();
         if(era == 0) //第一个回合不存装备
@@ -146,7 +147,7 @@ public class CardShopManager : MonoBehaviour
         var year = GameManager.Instance.year; //第几场比赛（每场战斗后+1，即一个回合）
         var shopCfg = ShopConfig.GetConfig(Math.Min(100, year));
         List<Tuple<int, int>> heroIds = new List<Tuple<int, int>>();
-        int TOTAL_HERO_CARDS = 21;        
+        int TOTAL_HERO_CARDS = 15;        
         // hero card
         for (int i = 0; i < TOTAL_HERO_CARDS; i++)
         {
@@ -184,31 +185,16 @@ public class CardShopManager : MonoBehaviour
 
             heroIds.Add(new Tuple<int, int>(heroId, count));
         }
-        heroIds.Sort((a, b) =>
-        {
-            // 先按卡单价排序
-            int priceCompare = HeroSelectionTool.GetPrice(HeroConfig.GetConfig(b.Item1)).CompareTo(HeroSelectionTool.GetPrice(HeroConfig.GetConfig(a.Item1)));
-            if (priceCompare != 0)
-                return priceCompare;
-
-            // 单价相同，按id排序
-            int idCompare = b.Item1.CompareTo(a.Item1);
-            if (idCompare != 0)
-                return idCompare;
-
-            // id相同按item2排序
-            return b.Item2.CompareTo(a.Item2);
-        });
 
 
-        int CARDS_PER_ROW = 7;
-        float cardWidth = 176f;
-        float cardHeight = 245f;
+        int CARDS_PER_ROW = 5; // 3列x5行，共15张
+        float cardWidth = 228f;
+        float cardHeight = 318f;
         float spacing = 5f;
 
         // 计算起始位置，使其居中显示
-        float startX = -((CARDS_PER_ROW * cardWidth) + (CARDS_PER_ROW - 1) * spacing) / 2f + cardWidth / 2f;
-        float startY = 250f;        
+        float startX = -((CARDS_PER_ROW * cardWidth) + (CARDS_PER_ROW - 1) * spacing) / 2f + cardWidth / 2f - 50;
+        float startY = (5 - 1) / 2f * (cardHeight + spacing) - 320; // 5行垂直居中
 
         for(int i = 0; i < heroIds.Count; i++)
         {
@@ -262,43 +248,43 @@ public class CardShopManager : MonoBehaviour
 
         int ids = 0;
         // item card
-        foreach (var itemId in itemIds)
-        {
-            // 计算位置
-            float x = -560 + ids * (140 + 5);
-            ids++;
-            float y = 0;
+        // foreach (var itemId in itemIds)
+        // {
+        //     // 计算位置
+        //     float x = -560 + ids * (140 + 5);
+        //     ids++;
+        //     float y = 0;
 
-            // 创建CardView实例
-            GameObject card = Instantiate(cardItemViewPrefab, cardItemView.transform);
-            RectTransform rectTransform = card.GetComponent<RectTransform>();
-            if (rectTransform != null)
-                rectTransform.anchoredPosition = new Vector2(x, y);
+        //     // 创建CardView实例
+        //     GameObject card = Instantiate(cardItemViewPrefab, cardItemView.transform);
+        //     RectTransform rectTransform = card.GetComponent<RectTransform>();
+        //     if (rectTransform != null)
+        //         rectTransform.anchoredPosition = new Vector2(x, y);
 
-            var count = 1;
-            var itemCfg = ItemConfig.GetConfig(itemId);
-            var cardPrice = itemCfg.Price;
+        //     var count = 1;
+        //     var itemCfg = ItemConfig.GetConfig(itemId);
+        //     var cardPrice = itemCfg.Price;
 
-            if (!itemCfg.SellOne && shopCfg.MultiPriceTotal > 2 * cardPrice)
-            {
-                var roll = UnityEngine.Random.Range(0, 100);
-                if (roll < shopCfg.MultiCardRate)
-                {
-                    count = UnityEngine.Random.Range(1, shopCfg.MultiPriceTotal / cardPrice + 1);
-                    if(roll >= 95 && shopCfg.ItemAmazingCount > count)
-                        count = shopCfg.ItemAmazingCount;
-                }
+        //     if (!itemCfg.SellOne && shopCfg.MultiPriceTotal > 2 * cardPrice)
+        //     {
+        //         var roll = UnityEngine.Random.Range(0, 100);
+        //         if (roll < shopCfg.MultiCardRate)
+        //         {
+        //             count = UnityEngine.Random.Range(1, shopCfg.MultiPriceTotal / cardPrice + 1);
+        //             if(roll >= 95 && shopCfg.ItemAmazingCount > count)
+        //                 count = shopCfg.ItemAmazingCount;
+        //         }
 
-                if (count == 1)
-                {
-                    count = Math.Max(1, shopCfg.MultiPriceTotal / 3 / cardPrice);
-                }
-            }            
-            CardViewControl cardView = card.GetComponent<CardViewControl>();
+        //         if (count == 1)
+        //         {
+        //             count = Math.Max(1, shopCfg.MultiPriceTotal / 3 / cardPrice);
+        //         }
+        //     }            
+        //     CardViewControl cardView = card.GetComponent<CardViewControl>();
 
-            cardView.Init(itemId, false, count, year);
-            cardViews.Add(cardView);
-        }
+        //     cardView.Init(itemId, false, count, year);
+        //     cardViews.Add(cardView);
+        // }
 
         era++;
         passBtn.gameObject.SetActive(true);
@@ -313,6 +299,8 @@ public class CardShopManager : MonoBehaviour
             GameManager.Instance.GetPlayer(i).SetRoundOver(false);
         }
         passedPlayers = 0;
+        for (int i = 0; i < 8; i++)
+            playerStartGold[i] = GameManager.Instance.GetPlayer(i).gold; // 记录开局金币
 
         if (jadePlayer >= 0)
         {
@@ -387,6 +375,7 @@ public class CardShopManager : MonoBehaviour
         if (player.BuyCard(ctr, cardId, isHero, price, count))
         {
             mySelect.UpdateCards(player);
+            OnCardSelected(ctr);
             return true;
         }
         return false;
@@ -443,29 +432,144 @@ public class CardShopManager : MonoBehaviour
 
     public void AfterAct()
     {
-        // 检查是否所有卡牌都已售出
-        bool allCardsSold = true;
-        foreach (var card in cardViews)
-        {
-            if (!card.isSold)
-            {
-                allCardsSold = false;
-                break;
-            }
-        }
-
         NextTurn();
 
-        // 检查是否8个玩家都放弃或所有卡牌都已售出
-        if (passedPlayers >= 8 || allCardsSold)
+        // 只有一轮选牌：所有玩家都跳过时，选牌阶段结束进入战斗
+        if (passedPlayers >= 8)
         {
-            if (era == 2) // 2个选牌阶段（era=1、2），第2阶段结束进入战斗
-            {
-                StartCoroutine(ShopEnd());
-                return;
-            }
-            NewEra();
+            StartCoroutine(ShopEnd());
         }
+    }
+
+    // 玩家选中（购买）一张卡：该卡保持售出状态并设置售出倒计时；相邻卡 round-1，归0立即刷新；每次有其他卡售出，所有已售出卡的倒计时-1，归0刷新
+    private void OnCardSelected(CardViewControl ctr)
+    {
+        // 需要刷新（roundLeft归0）的卡先收集，遍历结束后再统一刷新，避免遍历中修改cardViews
+        var toRefresh = new List<CardViewControl>();
+
+        // 相邻未售出卡 round-1，归0立即刷新
+        foreach (var adj in GetAdjacentCards(ctr))
+        {
+            if (adj.isSold)
+                continue;
+            adj.roundLeft--;
+            if (adj.roundLeft <= 0)
+                toRefresh.Add(adj);
+            else
+                adj.UpdateRoundLeft();
+        }
+
+        // 刚售出的卡设置售出倒计时
+        ctr.roundLeft = SOLD_REMAIN_ROUNDS;
+        ctr.UpdateRoundLeft();
+
+        // 每次有其他卡售出，所有已售出卡的倒计时-1，归0刷新
+        foreach (var card in cardViews)
+        {
+            if (!card.isSold || card == ctr)
+                continue;
+            card.roundLeft--;
+            if (card.roundLeft <= 0)
+                toRefresh.Add(card);
+            else
+                card.UpdateRoundLeft();
+        }
+
+        foreach (var card in toRefresh)
+            RefreshCard(card);
+    }
+
+    // 刷新卡位：重新加载prefab生成一张随机新卡（防止复用旧对象导致样式/尺寸残留），roundLeft 重置为3
+    private void RefreshCard(CardViewControl ctr)
+    {
+        int index = cardViews.IndexOf(ctr);
+        if (index < 0)
+            return;
+
+        var year = GameManager.Instance.year;
+        var shopCfg = ShopConfig.GetConfig(Math.Min(100, year));
+
+        // 重新加载prefab，避免旧卡对象残留刷新前的样式/尺寸
+        GameObject card = Instantiate(cardViewPrefab, transform);
+        CardViewControl newCtr = card.GetComponent<CardViewControl>();
+
+        if (ctr.isHeroCard)
+        {
+            // 按当前品质概率随机刷新，允许重复
+            var heroId = HeroSelectionTool.GetRandomHeroIdByQuality(shopCfg);
+            var heroPrice = HeroSelectionTool.GetPrice(HeroConfig.GetConfig(heroId));
+            newCtr.Init(heroId, true, GetMultiCount(heroPrice, shopCfg), year);
+        }
+        else
+        {
+            var itemId = HeroSelectionTool.GetRandomItemId(shopCfg.Id);
+            var itemCfg = ItemConfig.GetConfig(itemId);
+            var count = itemCfg.SellOne ? 1 : GetMultiCount(itemCfg.Price, shopCfg);
+            newCtr.Init(itemId, false, count, year);
+        }
+
+        // 保持原卡位的位置并替换列表引用，销毁旧卡
+        newCtr.GetComponent<RectTransform>().anchoredPosition = ctr.GetComponent<RectTransform>().anchoredPosition;
+        cardViews[index] = newCtr;
+
+        Destroy(ctr.gameObject);
+    }
+
+    // 与初始刷牌一致的卡牌数量计算逻辑
+    private int GetMultiCount(int cardPrice, ShopConfig shopCfg)
+    {
+        var count = 1;
+        if (shopCfg.MultiPriceTotal > 2 * cardPrice)
+        {
+            var roll = UnityEngine.Random.Range(0, 100);
+            if (roll < shopCfg.MultiCardRate)
+            {
+                count = UnityEngine.Random.Range(1, shopCfg.MultiPriceTotal / cardPrice + 1);
+                if (roll >= 95 && shopCfg.ItemAmazingCount > count)
+                    count = shopCfg.ItemAmazingCount;
+            }
+
+            if (count == 1)
+                count = Math.Max(1, shopCfg.MultiPriceTotal / 3 / cardPrice);
+        }
+        return count;
+    }
+
+    // 获取一张卡的相邻卡：英雄卡在3列网格中算上下左右，道具卡在一行中算左右
+    private List<CardViewControl> GetAdjacentCards(CardViewControl ctr)
+    {
+        var result = new List<CardViewControl>();
+        int index = cardViews.IndexOf(ctr);
+        if (index < 0)
+            return result;
+
+        if (ctr.isHeroCard)
+        {
+            const int CARDS_PER_ROW = 3;
+            int row = index / CARDS_PER_ROW;
+            int col = index % CARDS_PER_ROW;
+            TryAddAdjacent(result, row - 1, col);
+            TryAddAdjacent(result, row + 1, col);
+            TryAddAdjacent(result, row, col - 1);
+            TryAddAdjacent(result, row, col + 1);
+        }
+        else
+        {
+            if (index - 1 >= 0 && !cardViews[index - 1].isHeroCard)
+                result.Add(cardViews[index - 1]);
+            if (index + 1 < cardViews.Count && !cardViews[index + 1].isHeroCard)
+                result.Add(cardViews[index + 1]);
+        }
+        return result;
+    }
+
+    private void TryAddAdjacent(List<CardViewControl> result, int row, int col)
+    {
+        if (row < 0 || col < 0 || row > 4 || col > 2)
+            return;
+        int i = row * 3 + col;
+        if (i < cardViews.Count && cardViews[i].isHeroCard)
+            result.Add(cardViews[i]);
     }
 
     public void ShopBegin()

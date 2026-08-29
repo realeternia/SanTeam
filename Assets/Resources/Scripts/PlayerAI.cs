@@ -127,10 +127,6 @@ public static class PlayerAI
             }
         }
 
-        var shopCfg = ShopConfig.GetConfig(Math.Min(100, year));
-        if(shopCfg.Id <= 2 && affordableCards.Count < 6 - shopCfg.Id * 2 + (2 - era) * 4)
-            return false;        
-
         //把战力前6的卡放到一个队列里
         var strongList = GetStrongCards(playerInfo, out var groupList, out var rangeCount, out var combatCount);
         // 初始化 side 卡牌数量
@@ -338,9 +334,15 @@ public static class PlayerAI
             scoredCards.Add((pickCard, score));
         }
 
-        // 如果没有有分数的卡片，直接返回
+        // 如果没有有分数的卡片：只有金币低于开局20%时才允许跳过，否则随便选一张买掉
         if (scoredCards.Count == 0)
-            return false;
+        {
+            if (playerInfo.gold < CardShopManager.Instance.playerStartGold[playerInfo.pid] * 0.2f)
+                return false;
+
+            foreach (var c in affordableCards)
+                scoredCards.Add((c, 1f));
+        }
 
         //scoredCards的key的priceI前三3的卡分别（1.5，1.3，1.1）
         if (scoredCards.Count >= 5 && scoredCards.Max(x => x.score) < 1.6f)
@@ -359,14 +361,6 @@ public static class PlayerAI
         {
             var index = scoredCards.FindIndex(x => x.card == checkFirst);
             scoredCards[index] = (scoredCards[index].card, scoredCards[index].score * playerConfig.PickFirst);
-        }
-
-        if (mostScore <= 1.6 && (era < 2 && UnityEngine.Random.value < playerConfig.Futurerate * (1 + (1 - era) * 0.3f)))
-        {
-            var cardRate = Math.Min(0.5f, Math.Max(0, (18 - availableCards.Count) * 0.05f));
-            var scoreRate = Math.Min(0.4f, (1.6f - mostScore) / 1.6f / 2);
-            if (UnityEngine.Random.value < cardRate + scoreRate)
-                return false;
         }
 
         scoredCards = scoredCards.OrderByDescending(x => x.score).ToList();

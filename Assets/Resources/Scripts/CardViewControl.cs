@@ -13,10 +13,12 @@ public class CardViewControl : MonoBehaviour, IPointerDownHandler, IPointerUpHan
     public int count;
     public bool isSold = false;
     public int priceI; //单价
+    public int roundLeft;
     public bool isHeroCard;
     public Image soldImage;    
     public TMP_Text cardName;    
     public TMP_Text price;    
+    public TMP_Text roundLeftText;    
     public Button buyButton;
     public Button addButton;
     public Button reduceButton;
@@ -35,7 +37,6 @@ public class CardViewControl : MonoBehaviour, IPointerDownHandler, IPointerUpHan
     public GameObject effectGreen;
     public GameObject effectYellow;
     public GameObject effectLayer;
-    public Image imagePlayerHead;
 
     // Start is called before the first frame update
     void Start()
@@ -154,39 +155,7 @@ public class CardViewControl : MonoBehaviour, IPointerDownHandler, IPointerUpHan
             gameObject.GetComponent<Image>().color = HeroSelectionTool.GetSideColor(heroCfg.Side);
             priceI = HeroSelectionTool.GetPrice(heroCfg);
 
-            var player0 = GameManager.Instance.GetPlayer(0);
-            if (player0.HasCard(cardId))
-            {
-                effectGreen.SetActive(true);
-                effectYellow.SetActive(false);
-            }
-            else if (player0.HasFriend(cardId))
-            {
-                effectGreen.SetActive(false);
-                effectYellow.SetActive(true);
-            }
-            else
-            {
-                effectGreen.SetActive(false);
-                effectYellow.SetActive(false);
-            }
-
-            var player1 = GameManager.Instance.GetFirstNoAiPlayer();
-            if (player1 != null && player1.HasCard(cardId))
-            {
-                imagePlayerHead.sprite = Resources.Load<Sprite>(player1.imgPath);
-                imagePlayerHead.gameObject.SetActive(true);
-            }
-            else if (player1 != null && player1.HasFriend(cardId))
-            {
-                imagePlayerHead.sprite = Resources.Load<Sprite>(player1.imgPath);
-                imagePlayerHead.color = Color.yellow;
-                imagePlayerHead.gameObject.SetActive(true);
-            }
-            else
-            {
-                imagePlayerHead.gameObject.SetActive(false);
-            }
+            UpdateEffects();
         }
         else
         {
@@ -202,30 +171,52 @@ public class CardViewControl : MonoBehaviour, IPointerDownHandler, IPointerUpHan
 
             priceI = itemCfg.Price + (int)Math.Floor(itemCfg.PriceRound * shopOpenIndex);
 
-            var player0 = GameManager.Instance.GetPlayer(0);
-            if (player0.HasCard(cardId))
-            {
-                effectGreen.SetActive(true);
-            }
-            else
-            {
-                effectGreen.SetActive(false);
-            }
-
-            var player1 = GameManager.Instance.GetFirstNoAiPlayer();
-            if (player1 != null && player1.HasCard(cardId))
-            {
-                imagePlayerHead.sprite = Resources.Load<Sprite>(player1.imgPath);
-                imagePlayerHead.gameObject.SetActive(true);
-            }
-            else
-            {
-                imagePlayerHead.gameObject.SetActive(false);
-            }
+            UpdateEffects();
         }
 
         price.text = priceI.ToString();
 
+        roundLeft = 3;
+        UpdateRoundLeft();
+    }
+
+    // 刷新剩余轮数显示
+    public void UpdateRoundLeft()
+    {
+        if (roundLeftText != null)
+            roundLeftText.text = roundLeft.ToString();
+    }
+
+    // 根据玩家0的卡牌/好友情况重算效果标记（卡片刷新后也会重新计算）
+    private void UpdateEffects()
+    {
+        var player0 = GameManager.Instance.GetPlayer(0);
+
+        if (isHeroCard)
+        {
+            if (player0.HasCard(cardId))
+            {
+                effectGreen.SetActive(true);
+                effectYellow.SetActive(false);
+            }
+            else if (player0.HasFriend(cardId))
+            {
+                effectGreen.SetActive(false);
+                effectYellow.SetActive(true);
+            }
+            else
+            {
+                effectGreen.SetActive(false);
+                effectYellow.SetActive(false);
+            }
+        }
+        else
+        {
+            if (player0.HasCard(cardId))
+                effectGreen.SetActive(true);
+            else
+                effectGreen.SetActive(false);
+        }
     }
 
     private void SetColoredText(TMP_Text text, int value)
@@ -260,7 +251,6 @@ public class CardViewControl : MonoBehaviour, IPointerDownHandler, IPointerUpHan
                 effectGreen.SetActive(false);
             if (effectYellow != null) //道具的情况
                 effectYellow.SetActive(false);
-            imagePlayerHead.gameObject.SetActive(false);
 
             //把heroImage变灰色 - 改为将整个panel变成灰度图
             SetGrayscaleEffect();
@@ -281,16 +271,15 @@ public class CardViewControl : MonoBehaviour, IPointerDownHandler, IPointerUpHan
 
     private void SetGrayscaleEffect()
     {
-        // 获取所有Image组件并应用灰度效果
+        // 获取所有Image组件并应用灰度效果（特效节点除外，售出时隐藏、刷新后由Init重新显示）
         Image[] allImages = GetComponentsInChildren<Image>(true);
         
         foreach (Image img in allImages)
         {
-            if (img != null)
-            {
-                // 设置灰度颜色
-                img.color = new Color(0.3f, 0.3f, 0.3f, img.color.a);
-            }
+            if (img == null || IsEffectNode(img))
+                continue;
+            // 设置灰度颜色
+            img.color = new Color(0.3f, 0.3f, 0.3f, img.color.a);
         }
         
         // 获取所有TextMeshProUGUI组件并应用灰度效果
@@ -303,6 +292,48 @@ public class CardViewControl : MonoBehaviour, IPointerDownHandler, IPointerUpHan
                 tmpText.color = Color.gray;
             }
         }
+    }
+
+    // 特效节点（effectGreen/effectYellow/effectLayer）不做灰度处理
+    private bool IsEffectNode(Image img)
+    {
+        var go = img.gameObject;
+        return (effectGreen != null && go.transform.IsChildOf(effectGreen.transform))
+            || (effectYellow != null && go.transform.IsChildOf(effectYellow.transform))
+            || (effectLayer != null && go.transform.IsChildOf(effectLayer.transform));
+    }
+
+    // 恢复灰度前的颜色：直接代码重新赋值，不缓存
+    public void RestoreColor()
+    {
+        var panel = gameObject.GetComponent<Image>();
+        if (isHeroCard)
+            panel.color = Color.white; // Init 会重新赋阵营色
+        else
+            panel.color = new Color(0.6037736f, 0.46531343f, 0.13955145f); // 道具卡面板默认色
+
+        foreach (Image img in GetComponentsInChildren<Image>(true))
+        {
+            if (img == null || img == panel || IsEffectNode(img))
+                continue;
+            img.color = Color.white;
+        }
+        foreach (TMP_Text t in GetComponentsInChildren<TMP_Text>(true))
+        {
+            if (t != null)
+                t.color = Color.white;
+        }
+    }
+
+    // 卡位被刷新前，重置售出状态
+    public void ResetSold()
+    {
+        isSold = false;
+        RestoreColor();
+        soldImage.gameObject.SetActive(false);
+        buyButton.gameObject.SetActive(true);
+        addButton.gameObject.SetActive(false);
+        reduceButton.gameObject.SetActive(false);
     }
 
     private System.Collections.IEnumerator MoveToPlayerInfoCount(PlayerInfo playerInfo, int count)
