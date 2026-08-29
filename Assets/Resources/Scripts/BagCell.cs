@@ -29,6 +29,12 @@ public class BagCell : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragH
     void Start()
     {
         cellButton.onClick.AddListener(() => bagControl.OnCellClick(this));
+
+        // PointerDown 会被 cellButton（子物体）拦截，需挂转发组件把按下/抬起事件转发过来
+        var forwarder = cellButton.gameObject.GetComponent<BagCellPointerForwarder>();
+        if (forwarder == null)
+            forwarder = cellButton.gameObject.AddComponent<BagCellPointerForwarder>();
+        forwarder.bagCell = this;
     }
     
     public void UpdateHeroInfo()
@@ -87,6 +93,10 @@ public class BagCell : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragH
     // 开始拖动时调用
     public void OnBeginDrag(PointerEventData eventData)
     {
+        // 拖拽开始时隐藏 tooltip
+        if (Tooltip.Instance != null)
+            Tooltip.Instance.HideTooltip();
+
         if(bagControl.bindPlayer.isAI)
             return;
 
@@ -206,6 +216,35 @@ public class BagCell : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragH
 
         bagControl.OnCellClick(draggedCell);
         
+    }
+
+    // 按住卡片显示 tooltip（由 cellButton 上的 BagCellPointerForwarder 转发调用）
+    public void ShowTooltip()
+    {
+        if (Tooltip.Instance == null || bagControl == null || bagControl.bindPlayer == null)
+            return;
+
+        var player = bagControl.bindPlayer;
+
+        if (ConfigManager.IsHeroCard(cardId))
+        {
+            var heroCfg = HeroConfig.GetConfig(cardId);
+            var friendInfo = ConfigManager.GetHeroFriendInfo(cardId);
+            Tooltip.Instance.ShowTooltip(ConfigManager.GetHeroSkillConfigs(heroCfg), friendInfo, cardId, player);
+        }
+        else
+        {
+            Tooltip.Instance.ShowTooltip(null, null, cardId, player);
+        }
+    }
+
+    // 松开卡片隐藏 tooltip
+    public void HideTooltip()
+    {
+        if (Tooltip.Instance != null)
+        {
+            Tooltip.Instance.HideTooltip();
+        }
     }
 
     // Update is called once per frame

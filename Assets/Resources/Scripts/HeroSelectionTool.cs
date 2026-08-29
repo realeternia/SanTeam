@@ -170,31 +170,35 @@ public static class HeroSelectionTool
         return heroCfg.Price;
     }
 
-    // 属性字符串 → 图标贴图路径（指向 Textures/Icons 下的文件）
+    // 属性字符串 → 图标贴图路径（指向 Textures 下的文件）
     public static string GetAttrIcon(string attr)
     {
         switch (attr)
         {
             case "atk":
-                return "Icons/atk";
+                return "Icons/attratk";
             case "ap":
-                return "Icons/ap";
+                return "Icons/attrap";
             case "might":
-                return "Icons/might";
+                return "Icons/attrmight";
             case "hp":
-                return "Icons/hp";
+                return "Icons/attrhp";
             case "atkspeed":
                 return "Icons/attackspeed";
             case "armor":
-                return "Icons/armor";
+                return "Icons/attrarmor";
             case "magicres":
-                return "Icons/magicshield";
+                return "Icons/attrmagicshield";
             case "movespeed":
-                return "Icons/speed";
+                return "Icons/attrspeed";
             case "range":
-                return "Icons/range";
+                return "Icons/attrrange";
+            case "satk": // 士兵攻（图标在 Textures 根目录）
+                return "attrsatk";
+            case "shp": // 士兵命（图标在 Textures 根目录）
+                return "attrshp";
             default:
-                return "Icons/hp";
+                return "Icons/attrhp";
         }
     }
 

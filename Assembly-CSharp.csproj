@@ -173,6 +173,7 @@
     <Compile Include="Assets\Resources\Scripts\HeroInfoGroup.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffSpeedDown.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAttackedShadow.cs" />
+    <Compile Include="Assets\Resources\Scripts\BagCellPointerForwarder.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillInitAddCrit.cs" />
     <Compile Include="Assets\Resources\Scripts\Effect\GlowBeamController.cs" />
     <Compile Include="Assets\Resources\Scripts\Configs\SkillConfig_s.cs" />

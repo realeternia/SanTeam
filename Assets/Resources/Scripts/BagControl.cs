@@ -44,6 +44,8 @@ public class BagControl : MonoBehaviour, IPanelEvent
 
         closeBtn.onClick.AddListener(() =>
         {      
+            if (Tooltip.Instance != null)
+                Tooltip.Instance.HideTooltip();
             DestroyAllCells();
             PanelManager.Instance.HideBag();
             CardShopManager.Instance.OnShow();
@@ -132,7 +134,8 @@ public class BagControl : MonoBehaviour, IPanelEvent
 
     public void OnHide()
     {
-        
+        if (Tooltip.Instance != null)
+            Tooltip.Instance.HideTooltip();
     }
 
     public void Bind(PlayerInfo p)
