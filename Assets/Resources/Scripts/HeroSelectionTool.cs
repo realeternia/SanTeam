@@ -226,14 +226,22 @@ public static class HeroSelectionTool
     public static float GetExpRate(int exp, bool isHero)
     {
         int level = GetCardLevel(exp, isHero);
-        if(level >= cardHeroExp.Length)
-            return 1f;
-        if(level <= 1)
-            return 0;
         if(isHero)
+        {
+            if(level >= cardHeroExp.Length)
+                return 1f;
+            if(level == 0)
+                return 0;
             return (float)(exp - cardHeroExp[level - 1]) / (cardHeroExp[level] - cardHeroExp[level - 1]);
+        }
         else
+        {
+            if(level >= cardItemExp.Length)
+                return 1f;
+            if(level == 0)
+                return 0;
             return (float)(exp - cardItemExp[level - 1]) / (cardItemExp[level] - cardItemExp[level - 1]);
+        }
     }
 
     public static AttrInfo GetCardAttr(PlayerInfo player, int cardId, int lv)

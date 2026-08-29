@@ -218,7 +218,7 @@ namespace CommonConfig
             {"Skill2", new FieldMetaInfo("技能2", "string", 0)},
             {"Group", new FieldMetaInfo("团队", "string", 0)},
             {"FriendCount", new FieldMetaInfo("关系数量", "int", 0)},
-            {"Quality", new FieldMetaInfo("品质：1普通 2优秀 3精良 4史诗", "int", 0, "4:#FF9900,3:#995500,2:#33CC33,1:#3333CC")},
+            {"Quality", new FieldMetaInfo("品质：1普通 2优秀 3精良 4史诗", "int", 0, "4:#FF00FF,3:#3333FF,2:#33CC33,1:#666666")},
             {"Price", new FieldMetaInfo("价格（配表数据，2-10）", "int", 0, "9-10:#FF9900,7-8:#995500,5-6:#33CC33,3-4:#3333CC")},
             {"HitEffect", new FieldMetaInfo("hit", "string", 0)},
             {"Icon", new FieldMetaInfo("背景图", "string", 0)},

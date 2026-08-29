@@ -21,7 +21,7 @@ public class CastleHUD : MonoBehaviour
         
     }
 
-    public void Init(PlayerInfo p, GameObject castleSpawn)
+    public void Init(PlayerInfo p, Transform center)
     {
         owner = p;
         castleName.text = p.playerNameText.text;
@@ -33,12 +33,12 @@ public class CastleHUD : MonoBehaviour
         textHp.text = baseHp.ToString();
 
         // 更新血条位置，使其跟随单位
-        UpdatePosition(castleSpawn);
+        UpdatePosition(center);
     }
 
-    private void UpdatePosition(GameObject castleSpawn)
+    private void UpdatePosition(Transform center)
     {
-        Vector3 worldPosition = new Vector3(castleSpawn.transform.position.x + 5, castleSpawn.transform.position.y + 3f, castleSpawn.transform.position.z + 5);
+        Vector3 worldPosition = center.position + new Vector3(5, 3f, 5);
         RectTransform rectTransform = GetComponent<RectTransform>();
         RectTransform parentCanvas = rectTransform.parent as RectTransform;
         var screenPosition = WorldManager.Instance.TransformWorldToScreen(worldPosition, parentCanvas);

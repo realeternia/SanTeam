@@ -4,32 +4,12 @@ using UnityEngine;
 
 public class MapConfig : MonoBehaviour
 {
-    
-    public GameObject[] RegionSide1; // 阵营1的出生点数组
-    public GameObject[] RegionSide2; // 阵营2的出生点数组
+    // 每个势力的布阵中心点（长度8，对应阵营1~8）：
+    // 位置 = 5x5布阵图的中心；Y旋转 = 布阵图正上方(最上面一排)在地图中朝向的方向
+    public Transform[] SideCenters;
 
-    public GameObject[] RegionSide3; // 阵营3的出生点数组
-    public GameObject[] RegionSide4; // 阵营4的出生点数组    
-
-    public GameObject[] RegionSide5; // 阵营5的出生点数组
-    public GameObject[] RegionSide6; // 阵营6的出生点数组   
-
-    public GameObject[] RegionSide7; // 阵营7的出生点数组
-    public GameObject[] RegionSide8; // 阵营8的出生点数组       
-
-
-    
-    public GameObject[] RegionHeroSide1; // 阵营1的出生点数组
-    public GameObject[] RegionHeroSide2; // 阵营2的出生点数组
-      
-    public GameObject[] RegionHeroSide3; // 阵营3的出生点数组
-    public GameObject[] RegionHeroSide4; // 阵营4的出生点数组
-
-    public GameObject[] RegionHeroSide5; // 阵营5的出生点数组
-    public GameObject[] RegionHeroSide6; // 阵营6的出生点数组 
-
-    public GameObject[] RegionHeroSide7; // 阵营7的出生点数组
-    public GameObject[] RegionHeroSide8; // 阵营8的出生点数组
+    // 布阵格子间距(米)，按地图大小调整
+    public float FormationCellSize = 13f;
 
     public GameObject WallNode;
     public GameObject RegionNode;

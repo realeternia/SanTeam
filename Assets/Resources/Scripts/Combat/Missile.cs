@@ -159,7 +159,7 @@ public class Missile : MonoBehaviour
                 if (unitsInRange.Count > 0)
                 {
                     if (unitsInRange.Count + checkedList.Count > targetCount)
-                        WorldManager.Instance.RandomSelect(unitsInRange, targetCount - unitsInRange.Count - checkedList.Count);
+                        WorldManager.Instance.RandomSelect(unitsInRange, targetCount - checkedList.Count);
 
                     foreach (var unit in unitsInRange)
                     {

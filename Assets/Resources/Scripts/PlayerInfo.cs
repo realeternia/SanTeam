@@ -43,7 +43,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     [CustomSerializeField]
     public Dictionary<int, int> itemEquips = new Dictionary<int, int>(); // heroId -> itemid
     [CustomSerializeField]
-    public int[] battleCards = new int[9];
+    public int[] battleCards = new int[CombatConst.PlayerMaxSlot];
     [CustomSerializeField]
     public bool isAI = false;
     // 玩家等级体系：等级(1~10)与经验（参考金铲铲，节奏放慢一倍；10级后9个格子全解锁）
@@ -102,6 +102,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         gold = 0;
 
         SetPlayerData();
+        EnsureSoldierCells();
         UpdateView();
     }
 
@@ -117,9 +118,9 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
                 cards[card] = 1;
         }
 
-        // 每局开局：随机发一张三攻总和240以下魏蜀吴(阵营1/2/3)的卡片
+        // 每局开局：随机发一张品质1且三攻总和240以下魏蜀吴(阵营1/2/3)的卡片
         var starterCandidates = HeroConfig.ConfigList
-            .Where(x => x.Side >= 1 && x.Side <= 3 && x.Atk + x.Ap + x.Might < 240)
+            .Where(x => x.Side >= 1 && x.Side <= 3 && x.Quality == 1)
             .ToList();
         // 校验：列出被排除的240及以上强卡(仅魏蜀吴阵营)
         var excludedStrongCards = HeroConfig.ConfigList
@@ -240,8 +241,36 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 
     public void SetBattlePos(int heroId, int pos)
     {
-        if(pos < 0 || pos >= GetSlotCount())
+        // 可在5x5布阵图的任意格子自由摆放
+        if(pos < 0 || pos >= CombatConst.FormationCellCount)
             return;
+        // 目标格已被小兵占用则不可布阵英雄
+        if(battleCards[pos] == 500001 || battleCards[pos] == 500002)
+            return;
+
+        // 目标格已有英雄 = 替换操作（旧英雄回背包），不受上限限制
+        bool isReplace = battleCards[pos] > 0 && ConfigManager.IsHeroCard(battleCards[pos]);
+        bool isMoving = false;
+        for(int i = 0; i < battleCards.Length; i++)
+        {
+            if(battleCards[i] == heroId)
+            {
+                isMoving = true;
+                break;
+            }
+        }
+        // 替换或移动已上阵英雄不受上限限制；新英雄上空格才检查上限
+        if(!isReplace && !isMoving)
+        {
+            int heroCount = 0;
+            for(int i = 0; i < battleCards.Length; i++)
+            {
+                if(battleCards[i] > 0 && ConfigManager.IsHeroCard(battleCards[i]))
+                    heroCount++;
+            }
+            if(heroCount >= GetSlotCount())
+                return;
+        }
         for(int i = 0; i < battleCards.Length; i++)
         {
             if(battleCards[i] == heroId)
@@ -251,6 +280,18 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
             }
         }
         battleCards[pos] = heroId;
+    }
+
+    // 布阵格之间交换单位（英雄/小兵自由交换，数量守恒）
+    public void SwapBattleUnits(int fromPos, int toPos)
+    {
+        if(fromPos < 0 || fromPos >= CombatConst.FormationCellCount || toPos < 0 || toPos >= CombatConst.FormationCellCount)
+            return;
+        if(fromPos == toPos)
+            return;
+        var tmp = battleCards[fromPos];
+        battleCards[fromPos] = battleCards[toPos];
+        battleCards[toPos] = tmp;
     }
 
     public float GetSellRate()
@@ -444,48 +485,46 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     public void AutoSetBattleCard()
     {
         var strongCardIds = GetBattleCardList(true);
-        var slotCount = GetSlotCount();
-        for(int i = 0; i < slotCount; i++)
+        battleCards = new int[CombatConst.FormationCellCount];
+        for(int i = 0; i < strongCardIds.Count && i < CombatConst.FormationCellCount; i++)
         {
-            if (strongCardIds[i] != null)
-                battleCards[i] = strongCardIds[i].Item1;
-            else
-                battleCards[i] = 0;
+            battleCards[i] = strongCardIds[i] == null ? 0 : strongCardIds[i].Item1;
         }
+        EnsureSoldierCells();
     }
 
     public List<Tuple<int, int>> GetBattleCardList(bool isTest = false)
     {
-        if(!isTest && !isAI && battleCards.Any(c => c > 0))
+        if(!isTest && !isAI && battleCards.Any(c => c > 0 && ConfigManager.IsHeroCard(c)))
         {
-            var saveCardIds = new List<Tuple<int, int>>();
-            var slotCount = GetSlotCount();
-            for(int i = 0; i < slotCount; i++)
+            // 返回长度25的列表，索引=布阵格位置(null=空位)，供战斗按格子坐标生成
+            var cardList = new List<Tuple<int, int>>(new Tuple<int, int>[CombatConst.FormationCellCount]);
+            for(int i = 0; i < battleCards.Length; i++)
             {
-                if (battleCards[i] > 0)
+                if (battleCards[i] > 0 && ConfigManager.IsHeroCard(battleCards[i]))
                 {
                     var heroConfig = HeroConfig.GetConfig(battleCards[i]);
-                    var heroPrice = HeroSelectionTool.GetPrice(heroConfig);
-                    saveCardIds.Add(new Tuple<int, int>(battleCards[i], HeroSelectionTool.GetCardLevel(cards[heroConfig.Id], true)));
+                    cardList[i] = new Tuple<int, int>(battleCards[i], HeroSelectionTool.GetCardLevel(cards[heroConfig.Id], true));
                 }
             }
 
-            UpdateFightMark(saveCardIds);
-            return saveCardIds;
+            UpdateFightMark(cardList.Where(x => x != null).ToList());
+            return cardList;
         }
         var strongCardIds = GetStrongCardList(GetSlotCount());        
         if(isAI)
             AutoCheckItem(strongCardIds);
         if(!isTest)
             UpdateFightMark(strongCardIds);
-        var results = RearrangePos(strongCardIds, GetSlotCount());
+        var results = RearrangePos(strongCardIds, CombatConst.FormationCellCount);
 
         if (isAI)
         {
-            //把results保存到battleCards
-            battleCards = new int[9];
+            //把results保存到battleCards（随后补默认小兵）
+            battleCards = new int[CombatConst.FormationCellCount];
             for (int i = 0; i < results.Count; i++)
                 battleCards[i] = results[i] == null ? 0 : results[i].Item1;
+            EnsureSoldierCells();
         }
 
         return results;
@@ -759,7 +798,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 
     private List<Tuple<int, int>> RearrangePos(List<Tuple<int, int>> results, int count)
     {
-        // 根据 Pos 属性重新调整卡牌位置
+        // 根据 Pos 属性重新调整卡牌位置（跳过小兵占用的布阵格）
         List<Tuple<int, int>> newResult = new List<Tuple<int, int>>(count);
         for (int i = 0; i < count; i++)
             newResult.Add(null);
@@ -776,22 +815,28 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
                 pos123.Add(item);
         }
 
-        // 填充前半位置（前排）
+        // 前排英雄从第一个可布阵格开始放（布阵图上方）
         int index = 0;
-        while (index < count / 2 && pos123.Count > 0)
+        while (index < count && pos123.Count > 0)
         {
-            newResult[index] = pos123[0];
-            pos123.RemoveAt(0);
+            if (!CombatConst.IsSoldierCell(index))
+            {
+                newResult[index] = pos123[0];
+                pos123.RemoveAt(0);
+            }
             index++;
         }
 
-        // 填充后半位置（后排）
-        index = count / 2;
-        while (index < count && pos456.Count > 0)
+        // 后排英雄从最后一个可布阵格开始放（布阵图下方）
+        index = count - 1;
+        while (index >= 0 && pos456.Count > 0)
         {
-            newResult[index] = pos456[0];
-            pos456.RemoveAt(0);
-            index++;
+            if (!CombatConst.IsSoldierCell(index))
+            {
+                newResult[index] = pos456[0];
+                pos456.RemoveAt(0);
+            }
+            index--;
         }
 
         // 处理剩余卡牌，放到相邻位置
@@ -801,7 +846,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 
         for(int i = 0; i < newResult.Count; i++)
         {
-            if(newResult[i] == null && remainingCards.Count > 0)
+            if(newResult[i] == null && !CombatConst.IsSoldierCell(i) && remainingCards.Count > 0)
             {
                 newResult[i] = remainingCards[0];
                 remainingCards.RemoveAt(0);
@@ -1127,6 +1172,76 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
             for (int i = 0; i < Math.Min(battleCards.Length, CombatConst.PlayerMaxSlot); i++)
                 cards[i] = battleCards[i];
             battleCards = cards;
+        }
+        // 补齐默认小兵（近战前3格、远程后2格）
+        EnsureSoldierCells();
+    }
+
+    // 确保布阵格包含5个小兵：battleCards 记录格子上的单位id（英雄 或 小兵500001/500002）
+    // 小兵数量不足5个时补到默认小兵格（旧存档/新玩家），英雄占据默认格时先移到空位
+    public void EnsureSoldierCells()
+    {
+        if (battleCards == null)
+        {
+            battleCards = new int[CombatConst.PlayerMaxSlot];
+        }
+        else if (battleCards.Length != CombatConst.PlayerMaxSlot)
+        {
+            // 兼容旧长度(场景序列化的旧存档可能为9格)
+            var cards = new int[CombatConst.PlayerMaxSlot];
+            for (int i = 0; i < Math.Min(battleCards.Length, CombatConst.PlayerMaxSlot); i++)
+                cards[i] = battleCards[i];
+            battleCards = cards;
+        }
+
+        int meleeCount = 0;
+        int rangedCount = 0;
+        for (int i = 0; i < battleCards.Length; i++)
+        {
+            if (battleCards[i] == 500001)
+                meleeCount++;
+            else if (battleCards[i] == 500002)
+                rangedCount++;
+        }
+        if (meleeCount + rangedCount >= 5)
+            return;
+
+        for (int i = 0; i < CombatConst.SoldierMeleeCells.Length && meleeCount < CombatConst.SoldierMeleeCells.Length; i++)
+        {
+            int pos = CombatConst.SoldierMeleeCells[i];
+            if (battleCards[pos] == 500001 || battleCards[pos] == 500002)
+                continue;
+            if (battleCards[pos] > 0)
+                MoveHeroToEmpty(pos);
+            battleCards[pos] = 500001;
+            meleeCount++;
+        }
+        for (int i = 0; i < CombatConst.SoldierRangedCells.Length && rangedCount < CombatConst.SoldierRangedCells.Length; i++)
+        {
+            int pos = CombatConst.SoldierRangedCells[i];
+            if (battleCards[pos] == 500001 || battleCards[pos] == 500002)
+                continue;
+            if (battleCards[pos] > 0)
+                MoveHeroToEmpty(pos);
+            battleCards[pos] = 500002;
+            rangedCount++;
+        }
+    }
+
+    // 将格子上英雄移到第一个空位（用于小兵占用默认格时）
+    private void MoveHeroToEmpty(int fromPos)
+    {
+        int heroId = battleCards[fromPos];
+        if (heroId == 0)
+            return;
+        battleCards[fromPos] = 0;
+        for (int i = 0; i < battleCards.Length; i++)
+        {
+            if (battleCards[i] == 0)
+            {
+                battleCards[i] = heroId;
+                break;
+            }
         }
     }
     

@@ -991,7 +991,7 @@ MonoBehaviour:
   m_margin: {x: 0, y: 0, z: 0, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
-  m_hasFontAssetChanged: 1
+  m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
 --- !u!222 &87942516
@@ -3508,7 +3508,7 @@ MonoBehaviour:
   m_margin: {x: 0, y: 0, z: 0, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
-  m_hasFontAssetChanged: 1
+  m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
 --- !u!222 &448757233
@@ -3904,7 +3904,7 @@ MonoBehaviour:
   m_margin: {x: 0, y: 0, z: 0, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
-  m_hasFontAssetChanged: 1
+  m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
 --- !u!222 &490590305
@@ -10263,8 +10263,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -806, y: 203}
-  m_SizeDelta: {x: 500, y: 500}
+  m_AnchoredPosition: {x: -816, y: 252}
+  m_SizeDelta: {x: 530, y: 530}
   m_Pivot: {x: 0, y: 1}
 --- !u!1 &1736960596
 GameObject:
@@ -10905,8 +10905,8 @@ MonoBehaviour:
   textRestart: {fileID: 448757232}
   buttonInfo: {fileID: 2848263}
   BattleResultPanel: {fileID: 1098886114}
-  BattleResultCellPrefab: {fileID: 9216014009272878505, guid: 64c48ec9dc2b8fe4f9be24a42347e91f, type: 3}
-  BattleResultHeroCellPrefab: {fileID: 9216014009272878505, guid: c5288656ae748f245a0db500e65412c0, type: 3}
+  BattleResultCellPrefab: {fileID: 9216014009272878505, guid: 079934a31ff2486bacf863ba5c43ca19, type: 3}
+  BattleResultHeroCellPrefab: {fileID: 9216014009272878505, guid: d655e26bcc1a43aebaaf58aa5e90c7c1, type: 3}
   HudNode: {fileID: 14063260}
   BattleTextNode: {fileID: 721668305}
 --- !u!81 &1788356930

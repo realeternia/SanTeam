@@ -47,11 +47,27 @@ public static class CombatConst
     /// <summary>好友特殊(关联助益)技能起始等级（默认没有该技能=0级，每多一个好友+1级）</summary>
     public const int FriendSpecialBaseLevel = 0;
 
+    // ---- 布阵图(5x5) ----
+    /// <summary>布阵图边长(5x5)</summary>
+    public const int FormationGridSize = 5;
+    /// <summary>布阵图总格数</summary>
+    public const int FormationCellCount = FormationGridSize * FormationGridSize; // 25
+    /// <summary>近战小兵占用的布阵格(布阵图最上面一行前3格)</summary>
+    public static readonly int[] SoldierMeleeCells = { 0, 1, 2 };
+    /// <summary>远程小兵占用的布阵格(布阵图最后面一行后2格)</summary>
+    public static readonly int[] SoldierRangedCells = { 23, 24 };
+
+    /// <summary>判断布阵格是否被小兵占用(小兵格不可布阵英雄)</summary>
+    public static bool IsSoldierCell(int pos)
+    {
+        return System.Array.IndexOf(SoldierMeleeCells, pos) >= 0 || System.Array.IndexOf(SoldierRangedCells, pos) >= 0;
+    }
+
     // ---- 玩家等级体系（参考金铲铲，节奏放慢一倍） ----
-    /// <summary>玩家最高等级（10级后9个格子全解锁）</summary>
+    /// <summary>玩家最高等级（10级后9个上阵格全解锁）</summary>
     public const int PlayerMaxLevel = 10;
-    /// <summary>上阵格子数上限</summary>
-    public const int PlayerMaxSlot = 9;
+    /// <summary>布阵图总格数(5x5)，上阵上限由 PlayerLevelConfig.SlotCount 控制(最多9)</summary>
+    public const int PlayerMaxSlot = FormationCellCount;
     /// <summary>战斗获胜获得经验（参考金铲铲每回合2经验，节奏放慢一倍后胜利才给满）</summary>
     public const int BattleWinExp = 2;
     /// <summary>战斗失败获得经验（失败给一点）</summary>

@@ -61,17 +61,27 @@ public class BagControl : MonoBehaviour, IPanelEvent
                 fieldAutoBtn.gameObject.SetActive(!bindPlayer.isAI);
         });
 
-        for (int i = 0; i < 9; i++)
+        // 5x5布阵图：最上面一行前3格、最后面一行后2格为小兵格，其余可布阵英雄
+        // FieldUnit 缩小为 80x80，格子间距调小为原来的 2/3
+        float cellGap = 160f * 2f / 3f;
+        float half = (CombatConst.FormationGridSize - 1) * cellGap * 0.5f;
+        for (int i = 0; i < CombatConst.FormationCellCount; i++)
         {
             GameObject fieldUnit = Instantiate(Resources.Load<GameObject>("Prefabs/FieldUnit"), fieldRegion.transform);
             var fieldUnitControl = fieldUnit.GetComponent<BagFieldUnitControl>();
             fieldUnitControl.SetInfo(i, 0);
             fieldUnitControl.bagControl = this;
 
-            int xOff = 160 * (i % 3);
-            int yOff = 160 * (i / 3);
-            fieldUnit.transform.localPosition = new Vector3(90 + xOff, -171 - yOff, 0);
+            fieldUnit.GetComponent<RectTransform>().sizeDelta = new Vector2(80, 80);
+            // 以原3x3网格中心(250,-331)为基准，向两侧扩展为5x5
+            float xOff = cellGap * (i % CombatConst.FormationGridSize);
+            float yOff = cellGap * (i / CombatConst.FormationGridSize);
+            fieldUnit.transform.localPosition = new Vector3(260 - half + xOff, -261 + half - yOff, 0);
         }
+
+        // 格子创建完成后刷新一次（OnShow 在格子创建前执行，需补刷）
+        if (bindPlayer != null)
+            UpdateFieldView();
     }
 
     // Update is called once per frame
@@ -232,7 +242,7 @@ public class BagControl : MonoBehaviour, IPanelEvent
                 int heroId1 = heroUnits[i].myHeroId;
                 int heroId2 = heroUnits[j].myHeroId;
 
-                if(heroId1 == 0 || heroId2 == 0)
+                if(heroId1 == 0 || heroId2 == 0 || !ConfigManager.IsHeroCard(heroId1) || !ConfigManager.IsHeroCard(heroId2))
                     continue;
                 
                 // 检查是否是好友关系
@@ -383,6 +393,19 @@ public class BagControl : MonoBehaviour, IPanelEvent
             return;
 
         p1.SetBattlePos(heroId, pos);
+
+        GameManager.Instance.PlaySound("Sounds/equip");
+        UpdateFieldView();
+    }
+
+    // 布阵格之间交换单位（英雄/小兵自由交换位置）
+    public void SwapFieldUnit(int fromPos, int toPos)
+    {
+        var p1 = GameManager.Instance.GetPlayer(bindPlayer.pid);
+        if(p1.isAI)
+            return;
+
+        p1.SwapBattleUnits(fromPos, toPos);
 
         GameManager.Instance.PlaySound("Sounds/equip");
         UpdateFieldView();
