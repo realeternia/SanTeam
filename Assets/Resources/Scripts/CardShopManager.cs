@@ -16,6 +16,7 @@ public class CardShopManager : MonoBehaviour
     public GameObject cardItemViewPrefab; // 拖拽CardView预制体到此处
 
     private int round = 10000;
+    private int[] turnOrder = new int[8]; // 商店回合顺序：turnOrder[回合序号] = pid（按积分低到高排序）
     private bool[] playerPassed = new bool[8]; // 记录每个玩家是否pass过
     private int passedPlayers = 0; // 记录pass的玩家数量
     private const int SOLD_REMAIN_ROUNDS = 5; // 卡售出后维持的round数
@@ -84,7 +85,7 @@ public class CardShopManager : MonoBehaviour
         {    
             yield return new WaitForSeconds(UnityEngine.Random.Range(0.3f, 0.5f));
 
-            int currentPlayerId = (round % 8);
+            int currentPlayerId = GetTurnPid();
                 
             // 如果当前玩家已经pass，则直接进入下一回合
             if (playerPassed[currentPlayerId])
@@ -302,30 +303,56 @@ public class CardShopManager : MonoBehaviour
         for (int i = 0; i < 8; i++)
             playerStartGold[i] = GameManager.Instance.GetPlayer(i).gold; // 记录开局金币
 
+        int firstPid = -1;
         if (jadePlayer >= 0)
-        {
-            round = 8 * 100 + jadePlayer;
-        }
+            firstPid = jadePlayer;
+        else if (firstJumper >= 0)
+            firstPid = firstJumper;
+
+        if (firstPid >= 0)
+            round = 8 * 100 + System.Array.IndexOf(turnOrder, firstPid); // 让该玩家排到回合最前
         else
-        {
-            if (firstJumper >= 0)
-            {
-                round = 8 * 100 + firstJumper;
-            }
-            else
-            {
-                round = 1000;
-            }
-        }
+            round = 1000;
         jadePlayer = -1;
         firstJumper = -1;
 
-        var pid = round % GameManager.Instance.players.Length;
+        var pid = GetTurnPid();
         GameManager.Instance.OnPlayerTurn(pid);
         mySelect.UpdateCards(GameManager.Instance.GetPlayer(pid));
 
         CheckEraBonusGold();
         GameManager.Instance.PlaySound("Sounds/page");
+    }
+
+    // 当前回合序号对应的玩家pid（回合顺序按积分低到高）
+    private int GetTurnPid()
+    {
+        return turnOrder[round % turnOrder.Length];
+    }
+
+    // 商店开始时：按积分(mark)从低到高排序玩家，积分相同金币少的排前，再相同按pid排
+    // 同时调整玩家位置（第1名排在最左边），回合顺序也按该排序
+    private void SortPlayersByScore()
+    {
+        var players = GameManager.Instance.players;
+
+        // 槽位位置：按当前X坐标从左到右排列，即第1名位置在最左
+        var slotPos = players
+            .Select(p => p.GetComponent<RectTransform>().anchoredPosition)
+            .OrderBy(pos => pos.x)
+            .ToArray();
+
+        turnOrder = players
+            .OrderBy(p => p.mark)
+            .ThenBy(p => p.gold)
+            .ThenBy(p => p.pid)
+            .Select(p => p.pid)
+            .ToArray();
+
+        for (int i = 0; i < turnOrder.Length; i++)
+        {
+            players[turnOrder[i]].GetComponent<RectTransform>().anchoredPosition = slotPos[i];
+        }
     }
 
     private void CheckEraBonusGold()
@@ -391,12 +418,12 @@ public class CardShopManager : MonoBehaviour
 
     public PlayerInfo GetCurrentPlayer()
     {
-        return GameManager.Instance.GetPlayer(round % 8);
+        return GameManager.Instance.GetPlayer(GetTurnPid());
     }
 
     public void OnP1Pass()
     {
-        var nowPlayer = GameManager.Instance.GetPlayer(round % 8);
+        var nowPlayer = GameManager.Instance.GetPlayer(GetTurnPid());
         if(nowPlayer.isAI)
             return;
         if(playerPassed[nowPlayer.pid])
@@ -418,11 +445,12 @@ public class CardShopManager : MonoBehaviour
         for(int i = 0; i < 8; i++)
         {
             round++;
-            if (!playerPassed[round % 8])
+            var pid = GetTurnPid();
+            if (!playerPassed[pid])
             {
-                var nextPlayer = GameManager.Instance.GetPlayer(round % 8);
+                var nextPlayer = GameManager.Instance.GetPlayer(pid);
                 passBtn.gameObject.SetActive(!nextPlayer.isAI);
-                GameManager.Instance.OnPlayerTurn(round % 8);
+                GameManager.Instance.OnPlayerTurn(pid);
                 mySelect.UpdateCards(nextPlayer);
                 return;
             }
@@ -593,6 +621,8 @@ public class CardShopManager : MonoBehaviour
         var roundGold = shopCfg.RoundGold;
         for(int i = 0; i < 8; i++)
             GameManager.Instance.GetPlayer(i).RoundGold(roundGold);
+
+        SortPlayersByScore();
 
         GameManager.Instance.year++;
         era = 0;

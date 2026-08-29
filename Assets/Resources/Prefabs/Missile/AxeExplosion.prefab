@@ -1,18 +1,17 @@
 %YAML 1.1
-%TAG !u! tag:yousandi.cn,2023:
+%TAG !u! tag:unity3d.com,2011:
 --- !u!1 &1281520509882789763
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 1768690311757023929}
   - component: {fileID: 7164413447181794059}
   - component: {fileID: 770349230303572326}
   m_Layer: 0
-  m_HasEditorInfo: 1
   m_Name: DropletTrail
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4751,10 +4750,6 @@ ParticleSystemRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 0
   m_RayTraceProcedural: 0
-  m_virtualGeometry: 0
-  m_virtualGeometryShadow: 0
-  m_ShadingRate: 0
-  m_ForceDisableGRD: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -4817,12 +4812,11 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 4232195988090636199}
   - component: {fileID: 2927991068235716222}
   m_Layer: 0
-  m_HasEditorInfo: 1
   m_Name: AxeExplosion
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4865,13 +4859,12 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 626761351602590472}
   - component: {fileID: 478309127660986588}
   - component: {fileID: 1297536597918316786}
   m_Layer: 0
-  m_HasEditorInfo: 1
   m_Name: SparkleTrail
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -9740,10 +9733,6 @@ ParticleSystemRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 0
   m_RayTraceProcedural: 0
-  m_virtualGeometry: 0
-  m_virtualGeometryShadow: 0
-  m_ShadingRate: 0
-  m_ForceDisableGRD: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -9806,13 +9795,12 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 149285533199018243}
   - component: {fileID: 4144052029572896394}
   - component: {fileID: 8150483637025365054}
   m_Layer: 0
-  m_HasEditorInfo: 1
   m_Name: GlowTrail
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -14515,10 +14503,6 @@ ParticleSystemRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 0
   m_RayTraceProcedural: 0
-  m_virtualGeometry: 0
-  m_virtualGeometryShadow: 0
-  m_ShadingRate: 0
-  m_ForceDisableGRD: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -14581,13 +14565,12 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 3876201920672288191}
   - component: {fileID: 3697037241402116152}
   - component: {fileID: 7658285579115740394}
   m_Layer: 0
-  m_HasEditorInfo: 1
   m_Name: DropletTrail
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -19326,10 +19309,6 @@ ParticleSystemRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 0
   m_RayTraceProcedural: 0
-  m_virtualGeometry: 0
-  m_virtualGeometryShadow: 0
-  m_ShadingRate: 0
-  m_ForceDisableGRD: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -19392,14 +19371,13 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 6155629127649858022}
   - component: {fileID: 7189716432676513882}
   - component: {fileID: 660264764524104364}
   - component: {fileID: 4665245189176446397}
   m_Layer: 0
-  m_HasEditorInfo: 1
   m_Name: AxeExplosion
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -24114,14 +24092,10 @@ ParticleSystemRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 0
   m_RayTraceProcedural: 0
-  m_virtualGeometry: 0
-  m_virtualGeometryShadow: 0
-  m_ShadingRate: 0
-  m_ForceDisableGRD: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 3cae8fb933721bd4c900e051be784472, type: 2}
+  - {fileID: 2100000, guid: d7546d3e0c454522bd46355f9ce534d4, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -24276,14 +24250,13 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 8995894963342639942}
   - component: {fileID: 8520054993924968898}
   - component: {fileID: 8183903488763786267}
   - component: {fileID: 9222952920162857516}
   m_Layer: 0
-  m_HasEditorInfo: 1
   m_Name: AxeExplosion (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -28998,14 +28971,10 @@ ParticleSystemRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 0
   m_RayTraceProcedural: 0
-  m_virtualGeometry: 0
-  m_virtualGeometryShadow: 0
-  m_ShadingRate: 0
-  m_ForceDisableGRD: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 3cae8fb933721bd4c900e051be784472, type: 2}
+  - {fileID: 2100000, guid: d7546d3e0c454522bd46355f9ce534d4, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -29160,13 +29129,12 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 8252678406970200607}
   - component: {fileID: 673332767365323090}
   - component: {fileID: 6306263211091953215}
   m_Layer: 0
-  m_HasEditorInfo: 1
   m_Name: GlowTrail
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -33869,10 +33837,6 @@ ParticleSystemRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 0
   m_RayTraceProcedural: 0
-  m_virtualGeometry: 0
-  m_virtualGeometryShadow: 0
-  m_ShadingRate: 0
-  m_ForceDisableGRD: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -33935,13 +33899,12 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 811606745911150457}
   - component: {fileID: 8574817646082477992}
   - component: {fileID: 5831163773343666789}
   m_Layer: 0
-  m_HasEditorInfo: 1
   m_Name: SparkleTrail
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -38810,10 +38773,6 @@ ParticleSystemRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 0
   m_RayTraceProcedural: 0
-  m_virtualGeometry: 0
-  m_virtualGeometryShadow: 0
-  m_ShadingRate: 0
-  m_ForceDisableGRD: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
