@@ -23,6 +23,7 @@ public class CardShopManager : MonoBehaviour
     public int[] playerStartGold = new int[8]; // 记录每个玩家开局金币（用于AI跳过判定）
 
     public Button passBtn;
+    public Button refreshBtn;
     public Button bagBtn;
     public Button rankBtn;
     public Button rankPlayerBtn;
@@ -47,6 +48,11 @@ public class CardShopManager : MonoBehaviour
         passBtn.onClick.AddListener(() =>
         {
             OnP1Pass();
+        });
+
+        refreshBtn.onClick.AddListener(() =>
+        {
+            OnRefresh();
         });
 
         bagBtn.onClick.AddListener(() =>
@@ -437,6 +443,37 @@ public class CardShopManager : MonoBehaviour
         nowPlayer.SetRoundOver(true);
 
         AfterAct();
+    }
+
+    // 玩家支付2gold立刻刷新6张牌，可多次进行，不结束自己的回合
+    private void OnRefresh()
+    {
+        var nowPlayer = GameManager.Instance.GetPlayer(GetTurnPid());
+        if (nowPlayer.isAI)
+            return;
+        if (playerPassed[nowPlayer.pid])
+            return;
+        if (nowPlayer.gold < 2)
+            return;
+
+        nowPlayer.gold -= 2;
+        nowPlayer.goldText.text = nowPlayer.gold.ToString();
+
+        // 从未售出的卡牌中随机选取6张进行刷新（不足6张则全部刷新）
+        var unsoldCards = cardViews.FindAll(x => !x.isSold);
+        for (int i = 0; i < unsoldCards.Count; i++)
+        {
+            int j = UnityEngine.Random.Range(i, unsoldCards.Count);
+            var tmp = unsoldCards[i];
+            unsoldCards[i] = unsoldCards[j];
+            unsoldCards[j] = tmp;
+        }
+
+        int refreshCount = Math.Min(6, unsoldCards.Count);
+        for (int i = 0; i < refreshCount; i++)
+            RefreshCard(unsoldCards[i]);
+
+        GameManager.Instance.PlaySound("Sounds/page");
     }
 
     private void NextTurn()

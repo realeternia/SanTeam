@@ -122,7 +122,7 @@ public class PickPanelControl : MonoBehaviour
         // 等待1秒
         yield return new WaitForSeconds(.3f);
 
-        for (int i = 1; i <= 14; i++)
+        for (int i = 1; i <= 7; i++)
         {
             var pid = (i % 7) + 1;
             var player = GameManager.Instance.GetPlayer(pid);

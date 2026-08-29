@@ -67,7 +67,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 
     public string imgPath{ get { return playerConfig.Imgpath; } }
     public Color lineColor;
-    public int banCount = 2; //最多两张
+    public int banCount = 1; //最多一张
     public int battleSide;
 
     public bool nextSkip = false; //下一轮skip
