@@ -61,6 +61,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\SineVFX\TopDownEffects\Scripts\Editor\CustomRampGeneratorEditor.cs" />
+    <Compile Include="Assets\Editor\IconLoaderEditor.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">

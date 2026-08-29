@@ -30,6 +30,8 @@ public static class ConfigManager
         HeroFriendConfig.Load();
         FormulaLearnAttrConfig.Load();
         JobConfig.Load();
+        HeroAttrConfig.Load();
+        SystemAttrConfig.Load();
 
         ConfigManager.PostModify();      
 

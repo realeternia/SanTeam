@@ -65,6 +65,7 @@
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillModifySkillRateTime.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillHitTeleport.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidSuddenArrow.cs" />
+    <Compile Include="Assets\Resources\Scripts\Configs\SystemAttrConfig_s.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillDefHpLow.cs" />
     <Compile Include="Assets\Resources\Scripts\CardViewControl.cs" />
     <Compile Include="Assets\Resources\Scripts\PickPanelCellControl.cs" />
@@ -130,6 +131,7 @@
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillHelpInitTeach.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAttackMultiArrow.cs" />
     <Compile Include="Assets\Resources\Scripts\ItemDetail.cs" />
+    <Compile Include="Assets\Resources\Scripts\IconLoader.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillInitSoldierUp.cs" />
     <Compile Include="Assets\SineVFX\TopDownEffects\Scripts\PrefabSpawner.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillDefPlantSkin.cs" />
@@ -145,6 +147,7 @@
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillModifyBuffTime.cs" />
     <Compile Include="Assets\SineVFX\TopDownEffects\Scripts\SineCameraControllerTopDownEffects.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffManager.cs" />
+    <Compile Include="Assets\Resources\Scripts\Configs\HeroAttrConfig_s.cs" />
     <Compile Include="Assets\Resources\Scripts\ItemHeroDetail.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillInitSoldierSummon.cs" />
     <Compile Include="Assets\Resources\Scripts\CastleHUD.cs" />
