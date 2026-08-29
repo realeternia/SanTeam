@@ -49,19 +49,19 @@ public static class CombatConst
 
     // ---- 布阵图(5x5) ----
     // 布阵图坐标(索引 0~24, 行优先)：
-    //   行0: 0  1  2  3  4      x  兵 兵 兵 x
+    //   行0: 0  1  2  3  4      兵  兵  兵  兵  兵
     //   行1: 5  6  7  8  9      x  H  H  H  x
     //   行2: 10 11 12 13 14     x  H  H  H  x
     //   行3: 15 16 17 18 19     x  H  H  H  x
-    //   行4: 20 21 22 23 24     x  弓 x  弓 x
+    //   行4: 20 21 22 23 24     弓  x  弓  x  弓
     /// <summary>布阵图边长(5x5)</summary>
     public const int FormationGridSize = 5;
     /// <summary>布阵图总格数</summary>
     public const int FormationCellCount = FormationGridSize * FormationGridSize; // 25
-    /// <summary>近战小兵占用的布阵格(布阵图第0行中间3格)</summary>
-    public static readonly int[] SoldierMeleeCells = { 1, 2, 3 };
-    /// <summary>远程小兵占用的布阵格(布阵图第4行第2、4格)</summary>
-    public static readonly int[] SoldierRangedCells = { 21, 23 };
+    /// <summary>近战小兵占用的布阵格(布阵图第0行全部5格)</summary>
+    public static readonly int[] SoldierMeleeCells = { 0, 1, 2, 3, 4 };
+    /// <summary>远程小兵占用的布阵格(布阵图第4行第1、3、5格)</summary>
+    public static readonly int[] SoldierRangedCells = { 20, 22, 24 };
     /// <summary>英雄自动布阵占用的格(中间3x3区域，最多9格)</summary>
     public static readonly int[] HeroCells = { 6, 7, 8, 11, 12, 13, 16, 17, 18 };
 
@@ -85,4 +85,13 @@ public static class CombatConst
     public const int ExpBuyGoldCost = 4;
     /// <summary>购买一次获得的经验</summary>
     public const int ExpBuyAmount = 4;
+
+    // ---- 士兵等级体系 ----
+    /// <summary>士兵最高等级(30级，20级达到最大士兵数)</summary>
+    public const int SoldierMaxLevel = 30;
+    /// <summary>士兵升级所需金币</summary>
+    public const int SodLvupGoldCost = 5;
+    /// <summary>士兵最大数量(20级达成)：步兵5、弓兵3</summary>
+    public const int SoldierMaxMeleeCount = 5;
+    public const int SoldierMaxRangedCount = 3;
 }

@@ -123,6 +123,7 @@
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidShockWave.cs" />
     <Compile Include="Assets\Resources\Scripts\RankCellInfo.cs" />
     <Compile Include="Assets\Resources\Scripts\PO\PanelEvent.cs" />
+    <Compile Include="Assets\Resources\Scripts\Configs\SoldierLevelConfig_s.cs" />
     <Compile Include="Assets\Resources\Scripts\BagControl.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\FriendLineManager.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAttackAntiShield.cs" />

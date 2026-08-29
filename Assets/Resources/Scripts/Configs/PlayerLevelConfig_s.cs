@@ -43,6 +43,7 @@ namespace CommonConfig
         {
             config.Clear();
             config = dict;
+            RebuildIndex();
         }
         public class FieldMetaInfo
         {
@@ -92,7 +93,7 @@ namespace CommonConfig
         {
             config.Clear();
             config[1] = new PlayerLevelConfig(1, 4, 2);
-            config[2] = new PlayerLevelConfig(2, 4, 3);
+            config[2] = new PlayerLevelConfig(2, 8, 3);
             config[3] = new PlayerLevelConfig(3, 12, 4);
             config[4] = new PlayerLevelConfig(4, 20, 5);
             config[5] = new PlayerLevelConfig(5, 40, 6);
@@ -101,6 +102,16 @@ namespace CommonConfig
             config[8] = new PlayerLevelConfig(8, 160, 9);
             config[9] = new PlayerLevelConfig(9, 200, 9);
             config[10] = new PlayerLevelConfig(10, 0, 9);
+
+            RebuildIndex();
+
+        }
+
+        private static void RebuildIndex()
+        {
+            foreach (var kv in config)
+            {
+            }
         }
 
         public static PlayerLevelConfig GetConfig(int id)
@@ -113,6 +124,7 @@ namespace CommonConfig
             throw new NullReferenceException(string.Format("配置表PlayerLevelConfig不存在id={0}", id));
         }
 
+
         public static bool HasConfig(int id)
         {
             if (config.ContainsKey(id))
@@ -124,7 +136,7 @@ namespace CommonConfig
 
         public static void Assign(int id, PlayerLevelConfig configData)
         {
-            config[id] = configData;
+            config[id] = configData; 
         }
 
         public static void Add(int id, PlayerLevelConfig configData)

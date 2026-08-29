@@ -150,8 +150,8 @@ public class Chess : MonoBehaviour
             var playerInfo = GameManager.Instance.GetPlayer(playerId);
             if (playerInfo != null && soldierCfg.SoldierAtkRate > 0)
             {
-                maxHp += (int)((playerInfo.sodhp + playerInfo.GetItemPAttr("shp")) * soldierCfg.SoldierHpRate);
-                attackDamage += (int)((playerInfo.sodatk + playerInfo.GetItemPAttr("satk")) * soldierCfg.SoldierAtkRate);
+                maxHp += (int)((playerInfo.sodhp + playerInfo.GetItemPAttr("shp") + playerInfo.GetSoldierHpAdd()) * soldierCfg.SoldierHpRate);
+                attackDamage += (int)((playerInfo.sodatk + playerInfo.GetItemPAttr("satk") + playerInfo.GetSoldierAtkAdd()) * soldierCfg.SoldierAtkRate);
             }
         }
         hp = maxHp;

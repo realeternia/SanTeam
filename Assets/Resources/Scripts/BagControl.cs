@@ -24,6 +24,11 @@ public class BagControl : MonoBehaviour, IPanelEvent
     public GameObject fieldRegion;
     public BagRecycler bagRecycler;
     public TMP_Text infoText;
+    public TMP_Text expText;
+    public Image expBar;
+    public Button buyExpBtn;
+    public TMP_Text sodInfoText;
+    public Button sodLvupBtn;
 
     public PlayerInfo bindPlayer;
 
@@ -48,6 +53,7 @@ public class BagControl : MonoBehaviour, IPanelEvent
             var p1 = GameManager.Instance.GetPlayer(bindPlayer.pid);
             p1.AutoSetBattleCard();
             UpdateFieldView();
+            UpdateExpView();
 
             GameManager.Instance.PlaySound("Sounds/equip");
         });
@@ -59,6 +65,31 @@ public class BagControl : MonoBehaviour, IPanelEvent
                 bagRecycler.gameObject.SetActive(!bindPlayer.isAI);
             if (fieldAutoBtn != null)
                 fieldAutoBtn.gameObject.SetActive(!bindPlayer.isAI);
+            if (buyExpBtn != null)
+                buyExpBtn.gameObject.SetActive(!bindPlayer.isAI);
+            if (sodLvupBtn != null)
+                sodLvupBtn.gameObject.SetActive(!bindPlayer.isAI);
+        });
+        buyExpBtn.onClick.AddListener(() =>
+        {
+            if (bindPlayer == null || bindPlayer.isAI)
+                return;
+            if (bindPlayer.BuyExp())
+            {
+                UpdateExpView();
+                GameManager.Instance.PlaySound("Sounds/equip");
+            }
+        });
+        sodLvupBtn.onClick.AddListener(() =>
+        {
+            if (bindPlayer == null || bindPlayer.isAI)
+                return;
+            if (bindPlayer.SodLvup())
+            {
+                UpdateSodView();
+                UpdateFieldView(); // 升级后补足新解锁的士兵
+                GameManager.Instance.PlaySound("Sounds/equip");
+            }
         });
 
         // 5x5布阵图：最上面一行前3格、最后面一行后2格为小兵格，其余可布阵英雄
@@ -113,6 +144,10 @@ public class BagControl : MonoBehaviour, IPanelEvent
             bagRecycler.gameObject.SetActive(!p.isAI);
         if (fieldAutoBtn != null)
             fieldAutoBtn.gameObject.SetActive(!p.isAI);
+        if (buyExpBtn != null)
+            buyExpBtn.gameObject.SetActive(!p.isAI);
+        if (sodLvupBtn != null)
+            sodLvupBtn.gameObject.SetActive(!p.isAI);
 
         heroDetail.gameObject.SetActive(false);
         itemDetail.gameObject.SetActive(false);
@@ -120,11 +155,10 @@ public class BagControl : MonoBehaviour, IPanelEvent
         UpdateFieldView();
 
         var soldierCfg = SoldierConfig.GetConfig(500001);
-        var textAtk = (soldierCfg.Atk + bindPlayer.sodatk + bindPlayer.GetItemPAttr("satk")).ToString();
-        var textHp = (soldierCfg.Hp + bindPlayer.sodhp + bindPlayer.GetItemPAttr("shp")).ToString();
-        var expNext = bindPlayer.GetExpToNext();
-        var expText = bindPlayer.level >= CombatConst.PlayerMaxLevel ? "满级" : bindPlayer.exp + "/" + expNext;
-        infoText.text = bindPlayer.playerConfig.Name + " <color=cyan>Lv." + bindPlayer.level + "</color> 经验(" + expText + ") 格子" + bindPlayer.GetSlotCount() + "/9\n<color=yellow>战斗力 </color>" + bindPlayer.lastFightMark + " <color=red>兵攻-</color>" + textAtk + " <color=green>兵血-</color>" + textHp;
+        var textAtk = (soldierCfg.Atk + bindPlayer.sodatk + bindPlayer.GetItemPAttr("satk") + bindPlayer.GetSoldierAtkAdd()).ToString();
+        var textHp = (soldierCfg.Hp + bindPlayer.sodhp + bindPlayer.GetItemPAttr("shp") + bindPlayer.GetSoldierHpAdd()).ToString();
+        UpdateExpView();
+        UpdateSodView();
 
         var humanCount = GameManager.Instance.players.Count(x => !x.isAI);
         aiSwitchBtn.gameObject.SetActive(bindPlayer.pid != 0 && bindPlayer.playerConfig.CanPlay && (!bindPlayer.isAI || humanCount < 2));
@@ -135,6 +169,33 @@ public class BagControl : MonoBehaviour, IPanelEvent
     {
         if(name == "SelectPlayer")
             Bind(GameManager.Instance.GetPlayer(parm2));
+    }
+
+    // 刷新经验文本、经验条宽度、玩家名+等级文本
+    private void UpdateExpView()
+    {
+        var expNext = bindPlayer.GetExpToNext();
+        if (bindPlayer.level >= CombatConst.PlayerMaxLevel)
+        {
+            expText.text = "满级";
+            expBar.rectTransform.sizeDelta = new Vector2(250, expBar.rectTransform.sizeDelta.y);
+        }
+        else
+        {
+            expText.text = bindPlayer.exp + "/" + expNext;
+            var rate = expNext > 0 ? (float)bindPlayer.exp / expNext : 0f;
+            expBar.rectTransform.sizeDelta = new Vector2(250 * rate, expBar.rectTransform.sizeDelta.y);
+        }
+        var heroOnField = bindPlayer.battleCards.Count(c => c > 0 && ConfigManager.IsHeroCard(c));
+        infoText.text = bindPlayer.playerConfig.Name + " Lv." + bindPlayer.level + " 上阵" + heroOnField + "/" + bindPlayer.GetSlotCount() + "英雄";
+    }
+
+    // 刷新士兵等级显示：等级 + 当前/最大步兵/弓兵数量 + 攻防加成
+    private void UpdateSodView()
+    {
+        sodInfoText.text = string.Format("士兵等级 {0} 攻+{1} 命+{2}",
+            bindPlayer.soldierLevel,
+            bindPlayer.GetSoldierAtkAdd(), bindPlayer.GetSoldierHpAdd());
     }
 
     public void UpdateView()
@@ -396,6 +457,7 @@ public class BagControl : MonoBehaviour, IPanelEvent
 
         GameManager.Instance.PlaySound("Sounds/equip");
         UpdateFieldView();
+        UpdateExpView();
     }
 
     // 布阵格之间交换单位（英雄/小兵自由交换位置）
@@ -409,6 +471,7 @@ public class BagControl : MonoBehaviour, IPanelEvent
 
         GameManager.Instance.PlaySound("Sounds/equip");
         UpdateFieldView();
+        UpdateExpView();
     }
 
     public void SellCard(int cardId)
@@ -428,6 +491,7 @@ public class BagControl : MonoBehaviour, IPanelEvent
 
         GameManager.Instance.PlaySound("Sounds/gold");        
         UpdateFieldView();
+        UpdateExpView();
     }
 
     public void OnCellClick(BagCell cell)

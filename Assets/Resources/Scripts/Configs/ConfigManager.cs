@@ -32,6 +32,7 @@ public static class ConfigManager
         PlayerConfig.Load();
         HeroFriendConfig.Load();
         PlayerLevelConfig.Load();
+        SoldierLevelConfig.Load();
         FormulaLearnAttrConfig.Load();
         JobConfig.Load();
         HeroAttrConfig.Load();
