@@ -80,6 +80,7 @@ public class RankCellInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandle
         }
 
         heroName.text = heroConfig.Name;
+        heroName.color = HeroSelectionTool.GetQualityColor(heroConfig.Quality);
         heroId = (int)heroConfig.Id;
         str = heroConfig.Might;
         inte = heroConfig.Ap;

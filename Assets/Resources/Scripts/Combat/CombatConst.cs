@@ -48,14 +48,22 @@ public static class CombatConst
     public const int FriendSpecialBaseLevel = 0;
 
     // ---- 布阵图(5x5) ----
+    // 布阵图坐标(索引 0~24, 行优先)：
+    //   行0: 0  1  2  3  4      x  兵 兵 兵 x
+    //   行1: 5  6  7  8  9      x  H  H  H  x
+    //   行2: 10 11 12 13 14     x  H  H  H  x
+    //   行3: 15 16 17 18 19     x  H  H  H  x
+    //   行4: 20 21 22 23 24     x  弓 x  弓 x
     /// <summary>布阵图边长(5x5)</summary>
     public const int FormationGridSize = 5;
     /// <summary>布阵图总格数</summary>
     public const int FormationCellCount = FormationGridSize * FormationGridSize; // 25
-    /// <summary>近战小兵占用的布阵格(布阵图最上面一行前3格)</summary>
-    public static readonly int[] SoldierMeleeCells = { 0, 1, 2 };
-    /// <summary>远程小兵占用的布阵格(布阵图最后面一行后2格)</summary>
-    public static readonly int[] SoldierRangedCells = { 23, 24 };
+    /// <summary>近战小兵占用的布阵格(布阵图第0行中间3格)</summary>
+    public static readonly int[] SoldierMeleeCells = { 1, 2, 3 };
+    /// <summary>远程小兵占用的布阵格(布阵图第4行第2、4格)</summary>
+    public static readonly int[] SoldierRangedCells = { 21, 23 };
+    /// <summary>英雄自动布阵占用的格(中间3x3区域，最多9格)</summary>
+    public static readonly int[] HeroCells = { 6, 7, 8, 11, 12, 13, 16, 17, 18 };
 
     /// <summary>判断布阵格是否被小兵占用(小兵格不可布阵英雄)</summary>
     public static bool IsSoldierCell(int pos)

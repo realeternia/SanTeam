@@ -484,6 +484,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 
     public void AutoSetBattleCard()
     {
+        // 复用 GetBattleCardList(true) 的 RearrangePos 逻辑：英雄填到中间9格(HeroCells)
         var strongCardIds = GetBattleCardList(true);
         battleCards = new int[CombatConst.FormationCellCount];
         for(int i = 0; i < strongCardIds.Count && i < CombatConst.FormationCellCount; i++)
@@ -798,10 +799,12 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 
     private List<Tuple<int, int>> RearrangePos(List<Tuple<int, int>> results, int count)
     {
-        // 根据 Pos 属性重新调整卡牌位置（跳过小兵占用的布阵格）
+        // 根据 Pos 属性把英雄填到中间9格(HeroCells)，其他位置留 null
+        // 前排近战(pos123)从 HeroCells 顶部往下填；后排远程(pos456)从 HeroCells 底部往上填
         List<Tuple<int, int>> newResult = new List<Tuple<int, int>>(count);
         for (int i = 0; i < count; i++)
             newResult.Add(null);
+        var heroCells = CombatConst.HeroCells;
         List<Tuple<int, int>> pos123 = new List<Tuple<int, int>>();
         List<Tuple<int, int>> pos456 = new List<Tuple<int, int>>();
 
@@ -815,40 +818,37 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
                 pos123.Add(item);
         }
 
-        // 前排英雄从第一个可布阵格开始放（布阵图上方）
-        int index = 0;
-        while (index < count && pos123.Count > 0)
+        // 前排近战英雄从 HeroCells 顶部往下填
+        int idx = 0;
+        while (idx < heroCells.Length && pos123.Count > 0)
         {
-            if (!CombatConst.IsSoldierCell(index))
-            {
-                newResult[index] = pos123[0];
-                pos123.RemoveAt(0);
-            }
-            index++;
+            newResult[heroCells[idx]] = pos123[0];
+            pos123.RemoveAt(0);
+            idx++;
         }
 
-        // 后排英雄从最后一个可布阵格开始放（布阵图下方）
-        index = count - 1;
-        while (index >= 0 && pos456.Count > 0)
+        // 后排远程英雄从 HeroCells 底部往上填
+        idx = heroCells.Length - 1;
+        while (idx >= 0 && pos456.Count > 0)
         {
-            if (!CombatConst.IsSoldierCell(index))
+            if (newResult[heroCells[idx]] == null)
             {
-                newResult[index] = pos456[0];
+                newResult[heroCells[idx]] = pos456[0];
                 pos456.RemoveAt(0);
             }
-            index--;
+            idx--;
         }
 
-        // 处理剩余卡牌，放到相邻位置
+        // 处理剩余卡牌，填到 HeroCells 空位
         List<Tuple<int, int>> remainingCards = new List<Tuple<int, int>>();
         remainingCards.AddRange(pos123);
         remainingCards.AddRange(pos456);
 
-        for(int i = 0; i < newResult.Count; i++)
+        for(int i = 0; i < heroCells.Length; i++)
         {
-            if(newResult[i] == null && !CombatConst.IsSoldierCell(i) && remainingCards.Count > 0)
+            if(newResult[heroCells[i]] == null && remainingCards.Count > 0)
             {
-                newResult[i] = remainingCards[0];
+                newResult[heroCells[i]] = remainingCards[0];
                 remainingCards.RemoveAt(0);
             }
         }
