@@ -70,11 +70,12 @@ public class ItemHeroDetail : MonoBehaviour
             var sellRate = player.GetSellRate();
             goldText.text = ((int)(HeroSelectionTool.GetPrice(heroConfig) * player.cards[cardId] * sellRate)).ToString();
 
+            var skillCfgs = ConfigManager.GetHeroSkillConfigs(heroConfig);
             for (int i = 0; i < 3; i++)
             {
-                if (heroConfig.Skills != null && heroConfig.Skills.Length > i)
+                if (skillCfgs.Count > i)
                 {
-                    var skillConfig = SkillConfig.GetConfig(heroConfig.Skills[i]);
+                    var skillConfig = skillCfgs[i];
 
                     skillImg[i].sprite = Resources.Load<Sprite>("SkillPic/" + skillConfig.Icon);
                     skillImg[i].gameObject.SetActive(true);

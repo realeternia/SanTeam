@@ -101,14 +101,12 @@ MonoBehaviour:
   playerName: {fileID: 4939478911074581863}
   textSoldierAtk: {fileID: 2721485446357246574}
   textSoldierDef: {fileID: 1415345999452329535}
-  textFood: {fileID: 1555415514819213229}
   textGold: {fileID: 7728140091595030493}
   textPower: {fileID: 8320629459188383262}
   textMark: {fileID: 2800070433918640589}
   playerId: 0
   soldierAtk: 0
   soldierHp: 0
-  food: 0
   gold: 0
   power: 0
   mark: 0

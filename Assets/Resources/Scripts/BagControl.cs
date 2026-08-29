@@ -61,7 +61,7 @@ public class BagControl : MonoBehaviour, IPanelEvent
                 fieldAutoBtn.gameObject.SetActive(!bindPlayer.isAI);
         });
 
-        for (int i = 0; i < 6; i++)
+        for (int i = 0; i < 9; i++)
         {
             GameObject fieldUnit = Instantiate(Resources.Load<GameObject>("Prefabs/FieldUnit"), fieldRegion.transform);
             var fieldUnitControl = fieldUnit.GetComponent<BagFieldUnitControl>();
@@ -70,11 +70,6 @@ public class BagControl : MonoBehaviour, IPanelEvent
 
             int xOff = 160 * (i % 3);
             int yOff = 160 * (i / 3);
-            if (i == 1)
-                yOff -= 60;
-            else if (i == 4)
-                yOff += 60;
-
             fieldUnit.transform.localPosition = new Vector3(90 + xOff, -171 - yOff, 0);
         }
     }
@@ -117,7 +112,9 @@ public class BagControl : MonoBehaviour, IPanelEvent
         var soldierCfg = SoldierConfig.GetConfig(500001);
         var textAtk = (soldierCfg.Atk + bindPlayer.sodatk + bindPlayer.GetItemPAttr("satk")).ToString();
         var textHp = (soldierCfg.Hp + bindPlayer.sodhp + bindPlayer.GetItemPAttr("shp")).ToString();
-        infoText.text = bindPlayer.playerConfig.Name + "\n<color=yellow>战斗力 </color>" + bindPlayer.lastFightMark + " <color=red>兵攻-</color>" + textAtk + " <color=green>兵血-</color>" + textHp + " <color=#FF7F00>粮食-</color>" + bindPlayer.maxFood;
+        var expNext = bindPlayer.GetExpToNext();
+        var expText = bindPlayer.level >= CombatConst.PlayerMaxLevel ? "满级" : bindPlayer.exp + "/" + expNext;
+        infoText.text = bindPlayer.playerConfig.Name + " <color=cyan>Lv." + bindPlayer.level + "</color> 经验(" + expText + ") 格子" + bindPlayer.GetSlotCount() + "/9\n<color=yellow>战斗力 </color>" + bindPlayer.lastFightMark + " <color=red>兵攻-</color>" + textAtk + " <color=green>兵血-</color>" + textHp;
 
         var humanCount = GameManager.Instance.players.Count(x => !x.isAI);
         aiSwitchBtn.gameObject.SetActive(bindPlayer.pid != 0 && bindPlayer.playerConfig.CanPlay && (!bindPlayer.isAI || humanCount < 2));

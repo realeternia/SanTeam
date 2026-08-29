@@ -90,6 +90,7 @@
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillHitWall.cs" />
     <Compile Include="Assets\Resources\Scripts\PlayerInfo.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillInitAddRege.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\JobLinkManager.cs" />
     <Compile Include="Assets\Resources\Scripts\HeroSelectionTool.cs" />
     <Compile Include="Assets\Resources\Scripts\Configs\ConfigManager.cs" />
     <Compile Include="Assets\Resources\Scripts\BattleResultCellControl.cs" />
@@ -136,7 +137,6 @@
     <Compile Include="Assets\SineVFX\TopDownEffects\Scripts\PrefabSpawner.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillDefPlantSkin.cs" />
     <Compile Include="Assets\Resources\Scripts\PO\BuffTime.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillHitFood.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\FactionShieldManager.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillDefFeedback.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Chess.cs" />
@@ -153,6 +153,7 @@
     <Compile Include="Assets\Resources\Scripts\CastleHUD.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillBuffExpand.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillInitAttrZhiheng.cs" />
+    <Compile Include="Assets\Resources\Scripts\Configs\PlayerLevelConfig_s.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAttackSpeedAttack.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillModifySummonTime.cs" />
     <Compile Include="Assets\Epic Toon FX\Scripts\ETFXLightFade.cs" />
@@ -169,7 +170,6 @@
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillInitMasterShield.cs" />
     <Compile Include="Assets\Resources\Scripts\RankPlayerCellInfo.cs" />
     <Compile Include="Assets\Resources\Scripts\HeroInfoGroup.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillInitFood.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffSpeedDown.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAttackedShadow.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillInitAddCrit.cs" />

@@ -5445,7 +5445,6 @@ MonoBehaviour:
   rankCellPrefab: {fileID: 76827737818314668, guid: 2a5271cbdce1427fb65961e6b2067477, type: 3}
   btnSdAtk: {fileID: 1294896672}
   btnSdHp: {fileID: 128351830}
-  btnFood: {fileID: 858069912}
   btnGold: {fileID: 1917869705}
   btnPower: {fileID: 2094449310}
   btnMark: {fileID: 839959796}

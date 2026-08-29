@@ -110,6 +110,12 @@ public class WorldManager : MonoBehaviour
         // 连线(武将关系)：计算好友属性加成并创建连线特效
         FriendLineManager.ApplyFriendLines();
 
+        // 兵种连锁：同兵种英雄数量提升该兵种默认技能等级（默认1级，每多一个+1级）
+        JobLinkManager.ApplyJobLinks();
+
+        // 好友连锁·特殊：在场好友数量提升关联(助益)技能等级（默认无技能，每多一个+1级）
+        FriendLineManager.ApplyFriendSpecialSkills();
+
         StartCoroutine(GameUpdate());
     }
 
@@ -429,11 +435,6 @@ public class WorldManager : MonoBehaviour
             {
                 if (chess != null && chess.hp > 0)
                     chess.LogicUpdate(0.05f);
-            }
-            // 每个回合结束，玩家消耗食物
-            foreach (var player in GameManager.Instance.players)
-            {
-                player.RoundFoodCost();
             }
         }
 

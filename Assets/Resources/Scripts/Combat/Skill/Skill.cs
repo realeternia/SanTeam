@@ -17,6 +17,11 @@ public class Skill
     private float lastUpdateTime; // 上次更新CD的时间
     public bool isBurst;
 
+    /// <summary>
+    /// 有效技能等级：默认取配置等级(skillCfg.Lv=5)，由连锁机制(兵种连锁/好友连锁·特殊)修正
+    /// </summary>
+    public int Level;
+
     public int skillId{ get{ return skillCfg.Id; } }
 
     public float mp; // 当前技能MP，战斗开始为0，满值=MpCost
@@ -27,6 +32,19 @@ public class Skill
         this.owner = unit;
 
         skillCfg = SkillConfig.GetConfig(id);
+        Level = skillCfg.Lv;
+    }
+
+    /// <summary>
+    /// 设置技能等级（连锁机制：兵种连锁/好友连锁·特殊）
+    /// 实际起效的配置 = 同一Sname组内 level 匹配的那一行（未命中时回退组内配置）
+    /// </summary>
+    public void SetLevel(int lv)
+    {
+        Level = lv;
+        var newCfg = SkillConfig.GetConfig(skillCfg.Sname, lv);
+        if (newCfg != null)
+            skillCfg = newCfg;
     }
 
     /// <summary>

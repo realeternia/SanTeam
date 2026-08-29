@@ -668,7 +668,6 @@ MonoBehaviour:
   textAtk: {fileID: 4778262793356532553}
   textHp: {fileID: 54519079804160164}
   healthImg: {fileID: 5791740229832235268}
-  foodImg: {fileID: 1725515476480483359}
 --- !u!1 &7243921832608616304
 GameObject:
   m_ObjectHideFlags: 0

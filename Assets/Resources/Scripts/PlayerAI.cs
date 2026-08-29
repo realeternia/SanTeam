@@ -302,10 +302,6 @@ public static class PlayerAI
                 {
                     score *= playerConfig.PickSoldierUp;
                 }
-                else if (itemCfg.Effect == "food")
-                {
-                    score *= playerConfig.PickFood;
-                }
                 else if (itemCfg.Effect == "tpattr" && year <= 8)
                 {
                     score *= .5f;

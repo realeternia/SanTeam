@@ -463,8 +463,6 @@ MonoBehaviour:
   mark: 0
   battleCards: 
   isAI: 0
-  food: 0
-  maxFood: 0
   isOnTurn: 0
   playerNameText: {fileID: 7220488733435201163}
   playerImage: {fileID: 7347440486663307163}

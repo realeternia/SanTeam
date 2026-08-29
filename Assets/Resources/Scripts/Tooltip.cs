@@ -85,9 +85,9 @@ public class Tooltip : MonoBehaviour
 
     }
 
-    public void ShowTooltip(int[] skillIds, HashSet<int> friendInfo, int heroId, PlayerInfo player = null)
+    public void ShowTooltip(List<SkillConfig> skillCfgs, HashSet<int> friendInfo, int heroId, PlayerInfo player = null)
     {
-        bool hasSkill = skillIds != null && skillIds.Length > 0;
+        bool hasSkill = skillCfgs != null && skillCfgs.Count > 0;
         bool hasFriend = friendInfo != null && friendInfo.Count > 0;
 
         // 属性取值与战斗统一走 GetCardAttr（JobConfig 基础值 + 英雄覆盖 + 等级成长），无需外部传入
@@ -167,8 +167,8 @@ public class Tooltip : MonoBehaviour
         // 重置所有控件位置
         for(int i = 0; i < textSkills.Length; i++)
         {
-            textSkills[i].gameObject.SetActive(skillIds!=null && skillIds.Length > i);
-            imageSkills[i].gameObject.SetActive(skillIds!=null && skillIds.Length > i);
+            textSkills[i].gameObject.SetActive(skillCfgs!=null && skillCfgs.Count > i);
+            imageSkills[i].gameObject.SetActive(skillCfgs!=null && skillCfgs.Count > i);
         }
         textFriend.gameObject.SetActive(hasFriend);
         
@@ -190,15 +190,15 @@ public class Tooltip : MonoBehaviour
         
         if (hasSkill)
         {
-            for(int i = 0; i < skillIds.Length; i++)
+            for(int i = 0; i < skillCfgs.Count; i++)
             {
-                var skillConfig = SkillConfig.GetConfig(skillIds[i]);
+                var skillConfig = skillCfgs[i];
                 var skillAttrStr = skillConfig.Attr == "might" ? "<color=red>[无双]</color>" : skillConfig.Attr == "atk" ? "<color=yellow>[攻]</color>" : skillConfig.Attr == "ap" ? "<color=blue>[法]</color>" : "";
                 textSkills[i].text = skillAttrStr + skillConfig.Name + skillConfig.Descript; //富文本
                 imageSkills[i].sprite = Resources.Load<Sprite>("SkillPic/" + skillConfig.Icon);
             }
 
-            for (int i = 0; i < skillIds.Length; i++)
+            for (int i = 0; i < skillCfgs.Count; i++)
             {
                 textSkills[i].rectTransform.anchoredPosition = new Vector2(textSkills[i].rectTransform.anchoredPosition.x, -currentY);
                 imageSkills[i].rectTransform.anchoredPosition = new Vector2(imageSkills[i].rectTransform.anchoredPosition.x, -currentY - 27);

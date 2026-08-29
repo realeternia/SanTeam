@@ -90,9 +90,10 @@ public class MySelectControl : MonoBehaviour
             // 更新文本内容，这里假设 CardInfo 有一个 GetDisplayText 方法
             var cardCfg = HeroConfig.GetConfig(cardId);
             var skillIcon = "";
-            if(cardCfg.Skills != null && cardCfg.Skills.Length > 0)
+            var skillCfgs = ConfigManager.GetHeroSkillConfigs(cardCfg);
+            if (skillCfgs.Count > 0)
             {
-                skillIcon = SkillConfig.GetConfig(cardCfg.Skills[0]).Icon;
+                skillIcon = skillCfgs[0].Icon;
             }
             selectNode.cardId = cardId;
             selectNode.UpdateExp(checkPlayer.pid, cardCfg.Name, checkPlayer.cards[cardId], skillIcon);

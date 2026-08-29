@@ -43,13 +43,14 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     [CustomSerializeField]
     public Dictionary<int, int> itemEquips = new Dictionary<int, int>(); // heroId -> itemid
     [CustomSerializeField]
-    public int[] battleCards = new int[6];
+    public int[] battleCards = new int[9];
     [CustomSerializeField]
     public bool isAI = false;
-    public int food;
+    // 玩家等级体系：等级(1~10)与经验（参考金铲铲，节奏放慢一倍；10级后9个格子全解锁）
     [CustomSerializeField]
-    public int maxFood;
-    private float lastFoodDeductionTime = 0f;
+    public int level = 1;
+    [CustomSerializeField]
+    public int exp = 0;
 
     public bool isOnTurn;
     public TMP_Text playerNameText;
@@ -99,8 +100,6 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         isAI = id > 0;
 
         gold = 0;
-        maxFood = 100;
-        food = maxFood;
 
         SetPlayerData();
         UpdateView();
@@ -187,14 +186,6 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         goldText.text = gold.ToString();
     }
 
-    public void AddFood(int f)
-    {
-        if(f <= 0)
-            throw new ArgumentException("Food must be greater than 0");
-
-        food += f;
-    }
-
     public void SubGold(int g, bool isHero)
     {
         gold -= g;
@@ -206,15 +197,6 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
             goldCostItem += g;
     }
     
-    public int SubFood(int f)
-    {
-        if(food <= 0)
-            return 0;
-        var sub = Mathf.Min(f, food);
-        food -= sub;
-        return sub;
-    }
-
     public void RoundGold(int g)
     {
         g += GetItemPAttr("roundgold");
@@ -228,29 +210,6 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 
     public void OnBattleBegin()
     {
-        food = maxFood;
-        // 重置上次扣除粮食的时间为当前时间
-        lastFoodDeductionTime = Time.time;
-    }
-
-    public void RoundFoodCost()
-    {
-        // 粮食扣除逻辑
-        if (Time.time - lastFoodDeductionTime >= 5f) // 每5秒扣除一次粮食
-        {
-            // 计算时间差，每5s，扣10点粮食
-            if(food < 10)
-            {
-                var units = WorldManager.Instance.GetUnitsMySide(battleSide);
-                foreach(var unit in units)
-                    unit.LackFood((float)(10 - food) / 10);
-            }
-            food -= 10;
-            if (food < 0) food = 0;
-
-            // 更新上次扣除粮食的时间
-            lastFoodDeductionTime = Time.time;
-        }
     }
 
     public void SetRoundOver(bool isOver)
@@ -281,7 +240,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 
     public void SetBattlePos(int heroId, int pos)
     {
-        if(pos < 0 || pos >= battleCards.Length)
+        if(pos < 0 || pos >= GetSlotCount())
             return;
         for(int i = 0; i < battleCards.Length; i++)
         {
@@ -408,8 +367,6 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
                     sodatk += itemCfg.Attr1Val;
                 else if (itemCfg.Effect == "sodhp")
                     sodhp += itemCfg.Attr1Val;
-                else if (itemCfg.Effect == "food")
-                    maxFood += itemCfg.Attr1Val; 
                 return true;
             }
         }
@@ -487,7 +444,8 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     public void AutoSetBattleCard()
     {
         var strongCardIds = GetBattleCardList(true);
-        for(int i = 0; i < battleCards.Length; i++)
+        var slotCount = GetSlotCount();
+        for(int i = 0; i < slotCount; i++)
         {
             if (strongCardIds[i] != null)
                 battleCards[i] = strongCardIds[i].Item1;
@@ -501,7 +459,8 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         if(!isTest && !isAI && battleCards.Any(c => c > 0))
         {
             var saveCardIds = new List<Tuple<int, int>>();
-            for(int i = 0; i < battleCards.Length; i++)
+            var slotCount = GetSlotCount();
+            for(int i = 0; i < slotCount; i++)
             {
                 if (battleCards[i] > 0)
                 {
@@ -514,19 +473,17 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
             UpdateFightMark(saveCardIds);
             return saveCardIds;
         }
-        var strongCardIds = GetStrong6CardList();        
+        var strongCardIds = GetStrongCardList(GetSlotCount());        
         if(isAI)
             AutoCheckItem(strongCardIds);
         if(!isTest)
             UpdateFightMark(strongCardIds);
-        var results = RearrangePos(strongCardIds);
+        var results = RearrangePos(strongCardIds, GetSlotCount());
 
         if (isAI)
         {
             //把results保存到battleCards
-            battleCards = new int[6];
-            for (int i = 0; i < 6; i++)
-                battleCards[i] = 0;
+            battleCards = new int[9];
             for (int i = 0; i < results.Count; i++)
                 battleCards[i] = results[i] == null ? 0 : results[i].Item1;
         }
@@ -535,7 +492,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     }
 
 
-    private List<Tuple<int, int>> GetStrong6CardList()
+    private List<Tuple<int, int>> GetStrongCardList(int count)
     {
         List<Tuple<int, int>> sortDataList = new List<Tuple<int, int>>();
 
@@ -553,10 +510,10 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         sortDataList.Sort((a, b) => b.Item2.CompareTo(a.Item2));
         if(isAI)
         {
-            // 获取前5卡
-            var top5Cards = sortDataList.Take(6).ToList();
+            // 获取前count张卡
+            var top5Cards = sortDataList.Take(count).ToList();
             
-            // 计算所有卡对前5卡的friend数量，如果没有friend则item2*1.1
+            // 计算所有卡对前count张卡的friend数量，如果没有friend则item2*1.1
             for (int i = 0; i < sortDataList.Count; i++)
             {
                 var currentCardId = sortDataList[i].Item1;
@@ -564,7 +521,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
                 
                 float friendCountMark = 0;
 
-                // 检查当前卡是否与前5卡中的任何一个有friend关系
+                // 检查当前卡是否与前count张卡中的任何一个有friend关系
                 for (int j = 0; j < top5Cards.Count; j++)
                 {
                     if (currentCardId == top5Cards[j].Item1)
@@ -583,27 +540,27 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
             sortDataList.Sort((a, b) => b.Item2.CompareTo(a.Item2));
         }
 
-        if(sortDataList.Count > 6)
+        if(sortDataList.Count > count)
         {
             int combatCount = 0;
             int rangeCount = 0;
-            CountCard(sortDataList, ref combatCount, ref rangeCount);
-            while (combatCount > 3)
+            CountCard(sortDataList, ref combatCount, ref rangeCount, count);
+            while (combatCount > count / 2)
             {
-                if (!SwapCard(sortDataList, true))
+                if (!SwapCard(sortDataList, true, count))
                     break;
 
-                CountCard(sortDataList, ref combatCount, ref rangeCount);
+                CountCard(sortDataList, ref combatCount, ref rangeCount, count);
             }
-            CountCard(sortDataList, ref combatCount, ref rangeCount);
-            while (rangeCount > 3)
+            CountCard(sortDataList, ref combatCount, ref rangeCount, count);
+            while (rangeCount > count / 2)
             {
-                if (!SwapCard(sortDataList, false))
+                if (!SwapCard(sortDataList, false, count))
                     break;
 
-                CountCard(sortDataList, ref combatCount, ref rangeCount);
+                CountCard(sortDataList, ref combatCount, ref rangeCount, count);
             }
-            sortDataList = sortDataList.Take(6).ToList(); //按战力排出前6   
+            sortDataList = sortDataList.Take(count).ToList(); //按战力排出前count   
         }
 
         Dictionary<int, SideInfo> sideInfos = new Dictionary<int, SideInfo>();
@@ -641,11 +598,11 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 
     }
 
-    private static bool SwapCard(List<Tuple<int, int>> sortDataList, bool checkCombat)
+    private static bool SwapCard(List<Tuple<int, int>> sortDataList, bool checkCombat, int count)
     {
-        // 找到6以内最后一张combat卡
+        // 找到count以内最后一张combat卡
         int lastCombatIndex = -1;
-        for (int i = 5; i >= 3; i--)
+        for (int i = count - 1; i >= count / 2; i--)
         {
             var cardId = sortDataList[i].Item1;
             var heroConfig = HeroConfig.GetConfig(cardId);
@@ -659,9 +616,9 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         if (lastCombatIndex >= 0)
         {
             UnityEngine.Debug.Log("SwapCard lastCombatIndex: " + lastCombatIndex);
-            // 在6以外且index+3内（即前9名内）寻找range卡
+            // 在count以外且index+3内（即前count+3名内）寻找range卡
             int rangeCardIndex = -1;
-            for (int i = 6; i < Math.Min(sortDataList.Count, lastCombatIndex + 3); i++)
+            for (int i = count; i < Math.Min(sortDataList.Count, lastCombatIndex + 3); i++)
             {
                 var cardId = sortDataList[i].Item1;
                 var heroConfig = HeroConfig.GetConfig(cardId);
@@ -690,11 +647,11 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         return true;
     }
 
-    private static void CountCard(List<Tuple<int, int>> sortDataList, ref int combatCount, ref int rangeCount)
+    private static void CountCard(List<Tuple<int, int>> sortDataList, ref int combatCount, ref int rangeCount, int count)
     {
         combatCount = 0;
         rangeCount = 0;
-        for (int i = 0; i < 6; i++)
+        for (int i = 0; i < count; i++)
         {
             var cardId = sortDataList[i].Item1;
             var heroConfig = HeroConfig.GetConfig(cardId);
@@ -800,10 +757,12 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         
     }
 
-    private List<Tuple<int, int>> RearrangePos(List<Tuple<int, int>> results)
+    private List<Tuple<int, int>> RearrangePos(List<Tuple<int, int>> results, int count)
     {
         // 根据 Pos 属性重新调整卡牌位置
-        List<Tuple<int, int>> newResult = new List<Tuple<int, int>>() { null, null, null, null, null, null };
+        List<Tuple<int, int>> newResult = new List<Tuple<int, int>>(count);
+        for (int i = 0; i < count; i++)
+            newResult.Add(null);
         List<Tuple<int, int>> pos123 = new List<Tuple<int, int>>();
         List<Tuple<int, int>> pos456 = new List<Tuple<int, int>>();
 
@@ -817,18 +776,18 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
                 pos123.Add(item);
         }
 
-        // 填充 1-2 位置
+        // 填充前半位置（前排）
         int index = 0;
-        while (index < 3 && pos123.Count > 0)
+        while (index < count / 2 && pos123.Count > 0)
         {
             newResult[index] = pos123[0];
             pos123.RemoveAt(0);
             index++;
         }
 
-        // 填充 4-5 位置
-        index = 3;
-        while (index < 6 && pos456.Count > 0)
+        // 填充后半位置（后排）
+        index = count / 2;
+        while (index < count && pos456.Count > 0)
         {
             newResult[index] = pos456[0];
             pos456.RemoveAt(0);
@@ -860,6 +819,65 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
             loseCount++;
         mark += add;
         resultText.text = mark.ToString();
+        // 玩家等级体系：战斗获胜/失败获得经验（参考金铲铲，节奏放慢一倍：胜利+2，失败+1）
+        AddExp(isWin ? CombatConst.BattleWinExp : CombatConst.BattleLoseExp);
+    }
+
+    // ---- 玩家等级体系 ----
+
+    // 当前等级可用的上阵格子数（10级后9个格子全解锁）
+    public int GetSlotCount()
+    {
+        var lv = Mathf.Clamp(level, 1, CombatConst.PlayerMaxLevel);
+        if (PlayerLevelConfig.HasConfig(lv))
+            return Mathf.Min(PlayerLevelConfig.GetConfig(lv).SlotCount, CombatConst.PlayerMaxSlot);
+        return Mathf.Min(lv, CombatConst.PlayerMaxSlot);
+    }
+
+    // 升到下一级所需经验（满级返回0）
+    public int GetExpToNext()
+    {
+        if (level >= CombatConst.PlayerMaxLevel)
+            return 0;
+        if (PlayerLevelConfig.HasConfig(level))
+            return PlayerLevelConfig.GetConfig(level).ExpToNext;
+        return 0;
+    }
+
+    // 增加经验并处理升级（经验溢出顺延到下一级）
+    public void AddExp(int add)
+    {
+        if (add <= 0 || level >= CombatConst.PlayerMaxLevel)
+            return;
+        exp += add;
+        var lv = level;
+        while (lv < CombatConst.PlayerMaxLevel)
+        {
+            if (!PlayerLevelConfig.HasConfig(lv))
+                break;
+            var need = PlayerLevelConfig.GetConfig(lv).ExpToNext;
+            if (exp < need)
+                break;
+            exp -= need;
+            lv++;
+        }
+        if (lv != level)
+        {
+            level = lv;
+            UnityEngine.Debug.Log($"玩家{pid} 升级到 {level} 级，上阵格子 {GetSlotCount()}，剩余经验 {exp}");
+        }
+    }
+
+    // 用金币购买经验（参考金铲铲：4金币=4经验；UI后续接入）
+    public bool BuyExp()
+    {
+        var cost = CombatConst.ExpBuyGoldCost;
+        var amount = CombatConst.ExpBuyAmount;
+        if (gold < cost)
+            return false;
+        SubGold(cost, false);
+        AddExp(amount);
+        return true;
     }
 
     public bool HasCard(int cardId)
@@ -1090,6 +1108,25 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         catch (Exception e)
         {
             Debug.LogError("反序列化PlayerInfo失败: " + e.Message);
+        }
+        // 兼容旧存档：battleCards 统一为9格长度
+        EnsureBattleCardsSize();
+    }
+
+    // 兼容旧存档：battleCards 固定为9格长度
+    private void EnsureBattleCardsSize()
+    {
+        if (battleCards == null)
+        {
+            battleCards = new int[CombatConst.PlayerMaxSlot];
+            return;
+        }
+        if (battleCards.Length != CombatConst.PlayerMaxSlot)
+        {
+            var cards = new int[CombatConst.PlayerMaxSlot];
+            for (int i = 0; i < Math.Min(battleCards.Length, CombatConst.PlayerMaxSlot); i++)
+                cards[i] = battleCards[i];
+            battleCards = cards;
         }
     }
     

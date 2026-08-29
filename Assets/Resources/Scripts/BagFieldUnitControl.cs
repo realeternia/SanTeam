@@ -26,10 +26,10 @@ public class BagFieldUnitControl : MonoBehaviour, IDropHandler
             jobIcon.gameObject.SetActive(true);
             var heroCfg = HeroConfig.GetConfig(heroId);
             heroIcon.sprite = Resources.Load<Sprite>("Skins/" + heroCfg.Icon);
-            if (heroCfg.Skills != null && heroCfg.Skills.Length > 0)
+            var skillCfgs = ConfigManager.GetHeroSkillConfigs(heroCfg);
+            if (skillCfgs.Count > 0)
             {
-                var skillConfig = SkillConfig.GetConfig(heroCfg.Skills[0]);
-                jobIcon.sprite = Resources.Load<Sprite>("SkillPic/" + skillConfig.Icon);
+                jobIcon.sprite = Resources.Load<Sprite>("SkillPic/" + skillCfgs[0].Icon);
             }
         }
     }

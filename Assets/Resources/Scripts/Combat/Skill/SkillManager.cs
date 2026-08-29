@@ -58,8 +58,6 @@ public static class SkillManager
                 return new SkillInitGold(skillId, owner);
             case "InitAttrZhiheng":
                 return new SkillInitAttrZhiheng(skillId, owner);
-            case "InitFood":
-                return new SkillInitFood(skillId, owner);                          
             case "HitBuff":
                 return new SkillHitBuff(skillId, owner);
             case "HitBuffArea":
@@ -109,8 +107,6 @@ public static class SkillManager
                 return new SkillInitAddDodge(skillId, owner);
             case "InitAddRege":
                 return new SkillInitAddRege(skillId, owner);
-            case "HitFood":
-                return new SkillHitFood(skillId, owner);
 
             case "Dumb":
                 return new SkillDumb(skillId, owner);               
@@ -136,7 +132,7 @@ public static class SkillManager
                     var tarJobCfg = ConfigManager.GetJobConfig(targetHeroCfg.Job);
                     if (skill.skillCfg.HelpSkillJob != "" && !skill.skillCfg.HelpSkillJob.Contains(tarJobCfg.NameS))
                         continue;
-                    unit.AddSkill(helpSkillId, skill.skillId);
+                    unit.AddSkill(helpSkillId, skill.id);
                 }
             }
         }

@@ -12,7 +12,6 @@ public class RankPlayerCellInfo : MonoBehaviour
     public TMP_Text playerName;
     public TMP_Text textSoldierAtk;
     public TMP_Text textSoldierDef;
-    public TMP_Text textFood;
     public TMP_Text textGold;
     public TMP_Text textPower;
     public TMP_Text textMark;
@@ -20,7 +19,6 @@ public class RankPlayerCellInfo : MonoBehaviour
     public int playerId;
     public int soldierAtk;
     public int soldierHp;
-    public int food;
     public int gold;
     public int power;
     public int mark;
@@ -31,7 +29,6 @@ public class RankPlayerCellInfo : MonoBehaviour
         playerName.raycastTarget = false;
         textSoldierAtk.raycastTarget = false;
         textSoldierDef.raycastTarget = false;
-        textFood.raycastTarget = false;
         textGold.raycastTarget = false;
         textPower.raycastTarget = false;
         textMark.raycastTarget = false;
@@ -48,13 +45,11 @@ public class RankPlayerCellInfo : MonoBehaviour
         var soldierCfg = SoldierConfig.GetConfig(500001);
         soldierAtk = playerInfo.sodatk + soldierCfg.Atk + playerInfo.GetItemPAttr("satk");
         soldierHp = playerInfo.sodhp + soldierCfg.Hp + playerInfo.GetItemPAttr("shp");
-        food = playerInfo.maxFood;
         gold = playerInfo.gold;
         power = playerInfo.lastFightMark;
         mark = playerInfo.mark;
         textSoldierAtk.text = soldierAtk.ToString();
         textSoldierDef.text = soldierHp.ToString();
-        textFood.text = food.ToString();
         textGold.text = gold.ToString();
         textPower.text = power.ToString();
         textMark.text = mark.ToString();

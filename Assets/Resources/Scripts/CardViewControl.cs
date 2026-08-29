@@ -105,7 +105,7 @@ public class CardViewControl : MonoBehaviour, IPointerDownHandler, IPointerUpHan
         {
             var heroCfg = HeroConfig.GetConfig(cardId);
             var friendInfo = ConfigManager.GetHeroFriendInfo(cardId);
-            Tooltip.Instance.ShowTooltip(heroCfg.Skills, friendInfo, cardId, player);
+            Tooltip.Instance.ShowTooltip(ConfigManager.GetHeroSkillConfigs(heroCfg), friendInfo, cardId, player);
         }
         else
         {
@@ -138,12 +138,13 @@ public class CardViewControl : MonoBehaviour, IPointerDownHandler, IPointerUpHan
             if (count > 1)
                 cardName.text += "x" + count;
 
+            var heroSkillCfgs = ConfigManager.GetHeroSkillConfigs(heroCfg);
             for (int i = 0; i < heroJobImage.Length; i++)
             {
-                if (i < heroCfg.Skills.Length)
+                if (i < heroSkillCfgs.Count)
                 {
                     heroJobImage[i].gameObject.SetActive(true);
-                    heroJobImage[i].sprite = Resources.Load<Sprite>("SkillPic/" + SkillConfig.GetConfig(heroCfg.Skills[i]).Icon);
+                    heroJobImage[i].sprite = Resources.Load<Sprite>("SkillPic/" + heroSkillCfgs[i].Icon);
                 }
                 else
                 {

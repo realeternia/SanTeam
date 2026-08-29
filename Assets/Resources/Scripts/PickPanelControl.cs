@@ -222,8 +222,9 @@ public class PickPanelControl : MonoBehaviour
             {
                 // 设置英雄图片
                 cellControl.heroImg.sprite = Resources.Load<Sprite>("Skins/" + heroCfg.Icon);
-                // 设置job图片
-                var icon = SkillConfig.GetConfig(heroCfg.Skills[0]).Icon;
+                // 设置job图片（英雄第一个技能图标，与战斗一致按缩写解析）
+                var skillCfgs = ConfigManager.GetHeroSkillConfigs(heroCfg);
+                var icon = skillCfgs.Count > 0 ? skillCfgs[0].Icon : "";
                 cellControl.jobImg.sprite = Resources.Load<Sprite>("SkillPic/" + icon);
 
                 // 设置英雄名称，颜色按品质

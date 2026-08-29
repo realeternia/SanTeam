@@ -116,23 +116,26 @@ public class Chess : MonoBehaviour
             UnityEngine.Debug.Log("Init Hero" + heroId);
 
             var heroCfg = HeroConfig.GetConfig(heroId);
-            // 初始化技能
-            if (heroCfg.Skills != null)
+            var jobCfg = ConfigManager.GetJobConfig(heroCfg.Job);
+            var jobSkillSname = jobCfg != null ? jobCfg.SkillId : "";
+            var playerInfo = GameManager.Instance.GetPlayer(playerId);
+            // 初始化技能：默认取1级行创建，随后按来源修正等级——
+            // 个人技能(Skill1/Skill2)等级 = 卡片等级；兵种技能由 JobLinkManager 按同兵种数量计算；
+            // 好友特殊技能由 FriendLineManager 按在场好友数计算。
+            foreach (var skillCfg in ConfigManager.GetHeroSkillConfigs(heroCfg))
             {
-                foreach (var skillId in heroCfg.Skills)
+                var skill = SkillManager.CreateSkill(skillCfg.Id, this);
+                if (skillCfg.Sname != jobSkillSname && playerInfo != null && playerInfo.cards.TryGetValue(heroId, out int heroExp))
+                    skill.SetLevel(HeroSelectionTool.GetCardLevel(heroExp, true));
+                skills.Add(skill);
+                if (!string.IsNullOrEmpty(skillCfg.Icon) && !hasSKill)
                 {
-                    skills.Add(SkillManager.CreateSkill(skillId, this));
-                    var skillCfg = SkillConfig.GetConfig(skillId);
-                    if (!string.IsNullOrEmpty(skillCfg.Icon) && !hasSKill)
-                    {
-                        material.SetTexture("_SecondTex", Resources.Load<Texture>("SkillPic/" + skillCfg.Icon));
-                        hasSKill = true;
-                    }
+                    material.SetTexture("_SecondTex", Resources.Load<Texture>("SkillPic/" + skillCfg.Icon));
+                    hasSKill = true;
                 }
             }
 
             materialFlag = new Material(rendFlag.sharedMaterial);
-            var playerInfo = GameManager.Instance.GetPlayer(playerId);
             materialFlag.mainTexture = Resources.Load<Texture>(playerInfo.imgPath);
             rendFlag.material = materialFlag;
         }
@@ -333,14 +336,6 @@ public class Chess : MonoBehaviour
         targetChess = target1;
         lastTargetUpdateTime = Time.time;
     }
-
-    private int lackIndex;
-    public void LackFood(float lackRate)
-    {
-        hp = Math.Max(1, hp - (int)((15 + lackIndex * 5) * lackRate)); //饿不死人
-        lackIndex++;
-    }
-
 
     // 寻找side不等于自己的单位
     public void FindTarget()

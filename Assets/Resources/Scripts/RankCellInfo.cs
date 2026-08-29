@@ -63,11 +63,12 @@ public class RankCellInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandle
         // 设置英雄信息
         heroPic.sprite = Resources.Load<Sprite>("Skins/" + heroConfig.Icon);
 
+        var skillCfgs = ConfigManager.GetHeroSkillConfigs(heroConfig);
         for (int i = 0; i < heroSkill.Length; i++)
         {
-            if (i < heroConfig.Skills.Length)
+            if (i < skillCfgs.Count)
             {
-                var skillIcon = SkillConfig.GetConfig(heroConfig.Skills[i]).Icon;
+                var skillIcon = skillCfgs[i].Icon;
                 heroSkill[i].sprite = Resources.Load<Sprite>("SkillPic/" + skillIcon);
             }
             else
@@ -151,9 +152,10 @@ public class RankCellInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandle
 
         var heroCfg = HeroConfig.GetConfig(heroId);
         var friendInfo = ConfigManager.GetHeroFriendInfo(heroId);
-        if (heroCfg.Skills != null && heroCfg.Skills.Length > 0 || friendInfo != null)
+        var skillCfgs = ConfigManager.GetHeroSkillConfigs(heroCfg);
+        if (skillCfgs.Count > 0 || friendInfo != null)
         {
-            Tooltip.Instance.ShowTooltip(heroCfg.Skills, friendInfo, heroId);
+            Tooltip.Instance.ShowTooltip(skillCfgs, friendInfo, heroId);
         }
     }
 

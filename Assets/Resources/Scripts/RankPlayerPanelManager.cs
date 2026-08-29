@@ -13,7 +13,6 @@ public class RankPlayerPanelManager : MonoBehaviour
 
     public Button btnSdAtk;
     public Button btnSdHp;
-    public Button btnFood;
     public Button btnGold;
     public Button btnPower;
     public Button btnMark;
@@ -35,11 +34,6 @@ public class RankPlayerPanelManager : MonoBehaviour
         {
             UnityEngine.Debug.Log("点击了btnSdHp，开始按生命值排序");
             SortItems("sdhp");
-        });
-        btnFood.onClick.AddListener(() =>
-        {
-            UnityEngine.Debug.Log("点击了btnFood，开始按食物排序");
-            SortItems("food");
         });
         btnGold.onClick.AddListener(() =>
         {
@@ -78,8 +72,6 @@ public class RankPlayerPanelManager : MonoBehaviour
                 return b.soldierAtk.CompareTo(a.soldierAtk);
             else if(rankType == "sdhp")
                 return b.soldierHp.CompareTo(a.soldierHp);
-            else if(rankType == "food")
-                return b.food.CompareTo(a.food);
             else if(rankType == "gold")
                 return b.gold.CompareTo(a.gold);
             else if(rankType == "power")
