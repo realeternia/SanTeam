@@ -112,7 +112,7 @@ public static class JobLinkManager
 
             // 战报提示（显示在该职业第一个英雄头顶）
             var first = kv.Value[0];
-            WorldManager.Instance.AddBattleText(BuildJobText(kv.Key, kv.Value.Count, bonus), first.transform.position, new Vector2(0, 60), new Color(0.4f, 1f, 0.4f), 3);
+            WorldManager.Instance.AddBattleText(BuildJobText(kv.Key, kv.Value.Count, bonus), first.transform.position, new Vector2(0, 60), SysColor.BattleText.JobLink, 3);
         }
     }
 

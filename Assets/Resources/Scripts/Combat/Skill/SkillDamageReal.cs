@@ -28,6 +28,6 @@ public class SkillDamageReal : Skill
     public override void OnAttack(Chess defender, string damType, int damage)
     {
         if(isBurst)
-            WorldManager.Instance.AddBattleText(damage.ToString() + "!", defender.transform.position, new UnityEngine.Vector2(0, 60), new Color(.6f, 0, .8f), 3);
+            WorldManager.Instance.AddBattleText(damage.ToString() + "!", defender.transform.position, new UnityEngine.Vector2(0, 60), SysColor.BattleText.RealDamage, 3);
     }    
 }

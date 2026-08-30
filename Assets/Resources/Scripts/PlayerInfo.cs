@@ -23,7 +23,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     private Image targetImage;
     public float blinkDuration = 1f;
     public Color startColor = Color.white;
-    public Color endColor = new Color(0.1f, 0.1f, 0.1f, 0.8f);
+    public Color endColor = SysColor.Player.DeadBg;
     private float timer = 0f;
 
     [CustomSerializeField]
@@ -431,9 +431,9 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         {
             if(targetImage != null)
             {
-                if(targetImage.color != new Color(0.1f, 0.1f, 0.1f, 0.8f))
+                if(targetImage.color != SysColor.Player.DeadBg)
                 {
-                    targetImage.color = new Color(0.1f, 0.1f, 0.1f, 0.8f);
+                    targetImage.color = SysColor.Player.DeadBg;
                 }
             }
         }

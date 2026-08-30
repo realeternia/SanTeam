@@ -27,7 +27,7 @@ public class SkillModifyBeBuffTime : Skill
             return;            
 
         time *= (1 - skillCfg.Strength);
-        WorldManager.Instance.AddBattleText(skillCfg.Name, owner.transform.position, new UnityEngine.Vector2(0, 60), new Color(1, 0.9f, 0.1f), 3);
+        WorldManager.Instance.AddBattleText(skillCfg.Name, owner.transform.position, new UnityEngine.Vector2(0, 60), SysColor.BattleText.SkillName, 3);
     }
 
 }
