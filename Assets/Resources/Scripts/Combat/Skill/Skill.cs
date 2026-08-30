@@ -126,8 +126,8 @@ public class Skill
             SkillManager.OnCheckBurst(owner, skillCfg, ref rate);
         }
 
-        isBurst = !IsInCD() && (skillCfg.Rate <= 0 || UnityEngine.Random.value < rate);
-        UnityEngine.Debug.Log("CheckBurst isBurst=" + isBurst.ToString() + " skillId=" + id.ToString());
+        isBurst = !IsInCD() && (skillCfg.Rate <= 0 || SysRandom.Value < rate);
+        GameLog.Debug("CheckBurst isBurst=" + isBurst.ToString() + " skillId=" + id.ToString());
         if(isBurst)
         {
             UpdateCD();

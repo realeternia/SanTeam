@@ -67,7 +67,7 @@ public static class PlayerAI
         // 从目标列表中随机选择一个进行ban
         if (availableBans.Count > 0)
         {
-            int randomIndex = UnityEngine.Random.Range(0, availableBans.Count);
+            int randomIndex = SysRandom.Range(0, availableBans.Count);
             availableBans[randomIndex].SetBan(pid);
         }
         else
@@ -82,7 +82,7 @@ public static class PlayerAI
             
             if (basicAvailableCells.Count > 0)
             {
-                int randomIndex = UnityEngine.Random.Range(0, basicAvailableCells.Count);
+                int randomIndex = SysRandom.Range(0, basicAvailableCells.Count);
                 basicAvailableCells[randomIndex].SetBan(pid);
             }
         }
@@ -122,7 +122,7 @@ public static class PlayerAI
             if (weakHeroCard != null)
             {
                 var cardCount = playerInfo.cards[weakHeroCard.Item1];
-                if (cardCount >= 2 && UnityEngine.Random.Range(0, 100) < 40 + cardCount * 20 - year * 10)
+                if (cardCount >= 2 && SysRandom.Range(0, 100) < 40 + cardCount * 20 - year * 10)
                     weakHeroCard = null;
             }
         }
@@ -371,7 +371,7 @@ public static class PlayerAI
 
         // 根据分数计算总权重
         float totalWeight = scoredCards.Sum(item => item.score);
-        float randomValue = UnityEngine.Random.Range(0f, totalWeight);
+        float randomValue = SysRandom.Range(0f, totalWeight);
 
         // 根据随机值和权重选择卡片
         float cumulativeWeight = 0f;
@@ -398,7 +398,7 @@ public static class PlayerAI
         {
             sb.AppendLine("未选中任何卡片");
         }      
-        Debug.Log(sb.ToString());                
+        GameLog.Debug(sb.ToString());                
 
         hasSameCard = cards.ContainsKey(selectedCard.cardId);
         if (selectedCard.isHeroCard && heroCardCount >= playerConfig.Cardherolimit && !hasSameCard && weakHeroCard != null)
@@ -601,7 +601,7 @@ public static class PlayerAI
             // 如果所有英雄的需求度都是0，则随机选择一个
             if (totalNeed <= 0 && needList.Count > 0)
             {
-                int randomIndex = UnityEngine.Random.Range(0, needList.Count);
+                int randomIndex = SysRandom.Range(0, needList.Count);
                 var targetHeroId = needList[randomIndex].Item1;
                 for (int i = 0; i < count; i++)
                     playerInfo.UseItemToHero(targetHeroId, cardId);
@@ -609,7 +609,7 @@ public static class PlayerAI
             // 否则进行加权随机选择
             else if (needList.Count > 0)
             {
-                float randomValue = UnityEngine.Random.Range(0, totalNeed);
+                float randomValue = SysRandom.Range(0, totalNeed);
                 float accumulatedNeed = 0;
                 int targetHeroId = 0;
                 

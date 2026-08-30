@@ -14,7 +14,7 @@ public class SkillAttackSpeedAttack : Skill
         if (CheckBurst(defender))
         {
             owner.PlayerAnim(skillCfg.Action);
-            Debug.Log("SkillSpeedAttack");
+            GameLog.Debug("SkillSpeedAttack");
 
             owner.Cooldown(2 * skillCfg.Strength);
         }

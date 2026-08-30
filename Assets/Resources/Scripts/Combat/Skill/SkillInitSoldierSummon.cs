@@ -11,7 +11,7 @@ public class SkillInitSoldierSummon : Skill
     public override void BattleBegin()
     {
         // 在自己身边 Range 范围内随机选择一个位置
-        Vector2 randomDir = UnityEngine.Random.insideUnitCircle.normalized;
+        Vector2 randomDir = SysRandom.InsideUnitCircle.normalized;
         Vector3 randomPosition = owner.transform.position + new Vector3(randomDir.x, 0, randomDir.y) * skillCfg.Range;
         WorldManager.Instance.SpawnUnitsForRegion(owner.GetPlayerInfo(), 500002, -1, randomPosition, owner.side, owner.GetPlayerInfo().imgPath);
         owner.PlayerAnim(skillCfg.Action);

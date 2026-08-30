@@ -30,7 +30,6 @@ public class GameManager : MonoBehaviour
     public PlayerInfo[] players; //不能new，都是配置好的
     public List<FriendRandomData> friendRdData;
     public List<int> heroIds;
-    private StreamWriter logWriter;  // 日志写入器
     public int year;
 
     private int tempFriendIdIdx = 1000;
@@ -42,53 +41,20 @@ public class GameManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        // 初始化日志文件
-        string logPath = Application.persistentDataPath + "/game_log.txt";
-        logWriter = new StreamWriter(logPath, false, System.Text.Encoding.UTF8); 
-        logWriter.WriteLine("Game started at: " + System.DateTime.Now);
-
         ConfigManager.Init();
-        
-        // 注册日志事件
-        Application.logMessageReceived += LogMessageReceived;
 
         players[0].Init(0, PlayerBook.GetWang());
         var pls = PlayerBook.GetRandomN(7);
         for (int i = 0; i < 7; i++)
             players[i + 1].Init(i + 1, pls[i]);
 
-        UnityEngine.Debug.Log("GameManager Start");
-    }
-
-    // 日志处理函数
-    private void LogMessageReceived(string logString, string stackTrace, LogType type)
-    {
-        if (logWriter != null)
-        {
-            if(logString.Contains("font asset"))
-                return;
-            string logType = type.ToString();
-            logWriter.WriteLine($"[{System.DateTime.Now}] [{logType}] {logString}");
-            if (!string.IsNullOrEmpty(stackTrace))
-            {
-                logWriter.WriteLine($"Stack Trace: {stackTrace}");
-            }
-            logWriter.Flush();  // 立即写入文件
-        }
+        GameLog.Debug("GameManager Start");
     }
 
     private void OnDestroy()
     {
-        // 取消注册日志事件
-        Application.logMessageReceived -= LogMessageReceived;
-        
-        // 关闭日志文件
-        if (logWriter != null)
-        {
-            logWriter.WriteLine("Game ended at: " + System.DateTime.Now);
-            logWriter.Close();
-            logWriter = null;
-        }
+        // 关闭统一日志系统
+        GameLog.Shutdown();
     }
   
 
@@ -207,11 +173,11 @@ public class GameManager : MonoBehaviour
                 heroIds.AddRange(saveData.heroIds);
             }
 
-            Debug.Log("游戏数据加载成功 year=" + year);
+            GameLog.Debug("游戏数据加载成功 year=" + year);
         }
         catch (System.Exception e)
         {
-            Debug.LogError("加载游戏数据失败: " + e.Message);
+            GameLog.Error("加载游戏数据失败: " + e.Message);
             return false;
         }
         return true;
@@ -254,11 +220,11 @@ public class GameManager : MonoBehaviour
             string json = JsonUtility.ToJson(saveData);
             File.WriteAllText(savePath, json);
             
-            Debug.Log("游戏数据保存成功: " + savePath);
+            GameLog.Debug("游戏数据保存成功: " + savePath);
         }
         catch (System.Exception e)
         {
-            Debug.LogError("保存游戏数据失败: " + e.Message);
+            GameLog.Error("保存游戏数据失败: " + e.Message);
         }
     }
 
@@ -330,8 +296,8 @@ public class GameManager : MonoBehaviour
         while (shuffledHigh.Count > 0 && shuffledLow.Count > 0)
         {
             // 每次取2个高智力和2个低智力
-            var highPair = shuffledHigh.Take(UnityEngine.Random.Range(1, 3)).ToList();
-            var lowPair = shuffledLow.Take(UnityEngine.Random.Range(1, 3)).ToList();
+            var highPair = shuffledHigh.Take(SysRandom.Range(1, 3)).ToList();
+            var lowPair = shuffledLow.Take(SysRandom.Range(1, 3)).ToList();
             
             var heroes = highPair.Concat(lowPair).Select(x => x.Id).ToArray();
 
@@ -377,7 +343,7 @@ public class GameManager : MonoBehaviour
         int[] sides = {4, 5, 6, 10};
         for (int i = 0; i < 2; i++)
         {
-            var side = sides[UnityEngine.Random.Range(0, sides.Length)];
+            var side = sides[SysRandom.Range(0, sides.Length)];
             sides = sides.Where(s => s != side).ToArray();
 
             List<HeroConfig> side4Heroes = allHeroes.FindAll(hero => hero.Side == side);
@@ -399,7 +365,7 @@ public class GameManager : MonoBehaviour
                 for (int j = sideCounts[side - 1]; j < side4Count; j++)
                 {
                     // 该阵营内随机选一张
-                    int randomIndex = UnityEngine.Random.Range(0, tempSide4Heroes.Count);
+                    int randomIndex = SysRandom.Range(0, tempSide4Heroes.Count);
                     HeroConfig heroCfg = tempSide4Heroes[randomIndex];
                     heroIds.Add((int)heroCfg.Id);
                     allHeroes.Remove(heroCfg);

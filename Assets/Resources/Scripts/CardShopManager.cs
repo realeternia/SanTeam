@@ -89,7 +89,7 @@ public class CardShopManager : MonoBehaviour
         isShopEnd = false;
         while (!isShopEnd) // 模拟 Update 的循环
         {    
-            yield return new WaitForSeconds(UnityEngine.Random.Range(0.3f, 0.5f));
+            yield return new WaitForSeconds(SysRandom.Range(0.3f, 0.5f));
 
             int currentPlayerId = GetTurnPid();
                 
@@ -117,7 +117,7 @@ public class CardShopManager : MonoBehaviour
             }
 
             // 等待 1 秒（不阻塞主线程）
-            yield return new WaitForSeconds(UnityEngine.Random.Range(0.5f, 0.8f));
+            yield return new WaitForSeconds(SysRandom.Range(0.5f, 0.8f));
 
             if (playerInfo.isAI)
             {
@@ -176,10 +176,10 @@ public class CardShopManager : MonoBehaviour
             var heroPrice = HeroSelectionTool.GetPrice(HeroConfig.GetConfig(heroId));
             if (shopCfg.MultiPriceTotal > 2 * heroPrice)
             {
-                var roll = UnityEngine.Random.Range(0, 100);
+                var roll = SysRandom.Range(0, 100);
                 if (roll < shopCfg.MultiCardRate)
                 {
-                    count = UnityEngine.Random.Range(1, shopCfg.MultiPriceTotal / heroPrice + 1);
+                    count = SysRandom.Range(1, shopCfg.MultiPriceTotal / heroPrice + 1);
                     if(roll >= 95 && shopCfg.ItemAmazingCount > count)
                         count = shopCfg.ItemAmazingCount;
                 }
@@ -232,7 +232,7 @@ public class CardShopManager : MonoBehaviour
         var itemIds = new List<int>();
         foreach (var itemCfg in ItemConfig.ConfigList)
         {
-            if (itemCfg.RateAbs > 0 && itemCfg.ShopIdx <= shopCfg.Id && UnityEngine.Random.Range(0, 100) < itemCfg.RateAbs)
+            if (itemCfg.RateAbs > 0 && itemCfg.ShopIdx <= shopCfg.Id && SysRandom.Range(0, 100) < itemCfg.RateAbs)
                 itemIds.Add(itemCfg.Id);
         }
 
@@ -274,10 +274,10 @@ public class CardShopManager : MonoBehaviour
 
         //     if (!itemCfg.SellOne && shopCfg.MultiPriceTotal > 2 * cardPrice)
         //     {
-        //         var roll = UnityEngine.Random.Range(0, 100);
+        //         var roll = SysRandom.Range(0, 100);
         //         if (roll < shopCfg.MultiCardRate)
         //         {
-        //             count = UnityEngine.Random.Range(1, shopCfg.MultiPriceTotal / cardPrice + 1);
+        //             count = SysRandom.Range(1, shopCfg.MultiPriceTotal / cardPrice + 1);
         //             if(roll >= 95 && shopCfg.ItemAmazingCount > count)
         //                 count = shopCfg.ItemAmazingCount;
         //         }
@@ -462,7 +462,7 @@ public class CardShopManager : MonoBehaviour
         var unsoldCards = cardViews.FindAll(x => !x.isSold);
         for (int i = 0; i < unsoldCards.Count; i++)
         {
-            int j = UnityEngine.Random.Range(i, unsoldCards.Count);
+            int j = SysRandom.Range(i, unsoldCards.Count);
             var tmp = unsoldCards[i];
             unsoldCards[i] = unsoldCards[j];
             unsoldCards[j] = tmp;
@@ -477,7 +477,7 @@ public class CardShopManager : MonoBehaviour
 
     private void NextTurn()
     {
-        UnityEngine.Debug.Log("NextTurn");
+        GameLog.Debug("NextTurn");
         for(int i = 0; i < 8; i++)
         {
             round++;
@@ -585,10 +585,10 @@ public class CardShopManager : MonoBehaviour
         var count = 1;
         if (shopCfg.MultiPriceTotal > 2 * cardPrice)
         {
-            var roll = UnityEngine.Random.Range(0, 100);
+            var roll = SysRandom.Range(0, 100);
             if (roll < shopCfg.MultiCardRate)
             {
-                count = UnityEngine.Random.Range(1, shopCfg.MultiPriceTotal / cardPrice + 1);
+                count = SysRandom.Range(1, shopCfg.MultiPriceTotal / cardPrice + 1);
                 if (roll >= 95 && shopCfg.ItemAmazingCount > count)
                     count = shopCfg.ItemAmazingCount;
             }
@@ -638,16 +638,16 @@ public class CardShopManager : MonoBehaviour
 
     public void ShopBegin()
     {
-        UnityEngine.Debug.Log("ShopBegin");
+        GameLog.Debug("ShopBegin");
         if(hasEnterBattle) //存档拉起进入游戏，不会重复存储
             GameManager.Instance.SaveToFile();
 
-        var roll = UnityEngine.Random.Range(0, 3);
+        var roll = SysRandom.Range(0, 3);
         BGMPlayer.Instance.PlaySound(roll == 0 ? "BGMs/chun" : (roll == 1 ? "BGMs/xia" : "BGMs/qiu"));
 
         if (GameManager.Instance.year == 0)
         {
-            UnityEngine.Debug.Log("FirstRound ck");
+            GameLog.Debug("FirstRound ck");
             for(int i = 0; i < 8; i++)
                 GameManager.Instance.GetPlayer(i).FirstRound();
         }

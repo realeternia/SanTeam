@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using CommonConfig;
+using System.Linq;
 using TMPro;
 
 public class RankPanelManager : MonoBehaviour
@@ -19,39 +20,42 @@ public class RankPanelManager : MonoBehaviour
 
     public Button closeBtn;
 
+    private LoopScrollRect loopScroll; // 循环列表，只实例化可见单元格，避免一次性创建全部条目导致卡顿
+
 
     // Start is called before the first frame update
     void Start()
     {
         ConfigManager.Init();
 
+        loopScroll = new LoopScrollRect(scrollRect);
 
         // 加载所有英雄配置
         LoadHeroRankings();
 
         btnLeadShip.onClick.AddListener(() =>
         {
-            UnityEngine.Debug.Log("点击了btnLeadShip，开始按领导力排序");
+            GameLog.Debug("点击了btnLeadShip，开始按领导力排序");
             SortItems("LeadShip");
         });
         btnStr.onClick.AddListener(() =>
         {
-            UnityEngine.Debug.Log("点击了btnStr，开始按力量排序");
+            GameLog.Debug("点击了btnStr，开始按力量排序");
             SortItems("Str");
         });
         btnInte.onClick.AddListener(() =>
         {
-            UnityEngine.Debug.Log("点击了btnInte，开始按智力排序");
+            GameLog.Debug("点击了btnInte，开始按智力排序");
             SortItems("Inte");
         });
         btnHp.onClick.AddListener(() =>
         {
-            UnityEngine.Debug.Log("点击了btnHp，开始按生命值排序");
+            GameLog.Debug("点击了btnHp，开始按生命值排序");
             SortItems("Hp");
         });
         btnPrice.onClick.AddListener(() =>
         {
-            UnityEngine.Debug.Log("点击了btnPrice，开始按价格排序");
+            GameLog.Debug("点击了btnPrice，开始按价格排序");
             SortItems("Price");
         });
         closeBtn.onClick.AddListener(() =>
@@ -64,6 +68,15 @@ public class RankPanelManager : MonoBehaviour
 
     private void SortItems(string rankType)
     {
+        // 循环列表模式：直接对数据源排序并刷新可见单元格
+        if (loopScroll != null && loopScroll.IsInitialized)
+        {
+            loopScroll.SortItems((a, b) =>
+                GetHeroVal(b as HeroConfig, rankType).CompareTo(GetHeroVal(a as HeroConfig, rankType)));
+            scrollRect.normalizedPosition = new Vector2(0, 1);
+            return;
+        }
+
         List<RankCellInfo> cellInfos = new List<RankCellInfo>();
         foreach (Transform child in rankParent.transform)
         {
@@ -92,6 +105,20 @@ public class RankPanelManager : MonoBehaviour
         scrollRect.normalizedPosition = new Vector2(0, 1);
     }
 
+    private int GetHeroVal(HeroConfig h, string rankType)
+    {
+        if (h == null) return 0;
+        switch (rankType)
+        {
+            case "LeadShip": return h.Atk;
+            case "Str": return h.Might;
+            case "Inte": return h.Ap;
+            case "Hp": return h.Hp;
+            case "Price": return HeroSelectionTool.GetPrice(h);
+            default: return 0;
+        }
+    }
+
     // 加载英雄排名
     private void LoadHeroRankings()
     {
@@ -101,32 +128,20 @@ public class RankPanelManager : MonoBehaviour
             Destroy(child.gameObject);
         }
 
+        // 切换前清理循环列表（若已启用）
+        if (loopScroll != null && loopScroll.IsInitialized)
+        {
+            loopScroll.Clear();
+        }
+
         // 获取所有英雄配置
         var heroConfigs = HeroConfig.ConfigList;
+        float cellHeight = rankCellPrefab.GetComponent<RectTransform>().sizeDelta.y;
 
-        // 为每个英雄配置创建一个RankCell
-        foreach (var heroConfig in heroConfigs)
-        {
-            // 实例化RankCell
-            GameObject cell = Instantiate(rankCellPrefab, rankParent.transform);
-            cell.transform.localScale = Vector3.one;
+        // 使用循环列表加载：只实例化视口内可见的单元格
+        List<object> dataSource = heroConfigs.Cast<object>().ToList();
+        loopScroll.Initialize(dataSource, rankCellPrefab, cellHeight);
 
-            // 获取RankCellInfo组件
-            RankCellInfo cellInfo = cell.GetComponent<RankCellInfo>();
-            if (cellInfo != null)
-            {
-                cellInfo.Init(heroConfig);
-            }
-        }
-        // Get the RectTransform components
-         RectTransform rankParentRect = rankParent.GetComponent<RectTransform>();
-         RectTransform cellRect = rankCellPrefab.GetComponent<RectTransform>();
-          
-         if (rankParentRect != null && cellRect != null)
-         {
-             // Set the height of rankParent based on the number of cells
-             rankParentRect.sizeDelta = new Vector2(rankParentRect.sizeDelta.x, cellRect.sizeDelta.y * heroConfigs.Count);
-         }
         // 确保scrollRect不为空，然后滚动到最前面
         if (scrollRect != null)
         {
@@ -136,7 +151,11 @@ public class RankPanelManager : MonoBehaviour
 
     public void OnShow()
     {
-
+        // 重新显示时刷新可见单元格（卡池、收藏状态可能已变化）
+        if (loopScroll != null && loopScroll.IsInitialized)
+        {
+            loopScroll.ForceRefresh();
+        }
     }
 
     public void OnHide()

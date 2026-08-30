@@ -130,23 +130,23 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
             .OrderBy(x => x.Atk + x.Ap + x.Might)
             .Select(x => string.Format("{0}({1})总={2}", x.Name, x.Id, x.Atk + x.Ap + x.Might))
             .ToList();
-        UnityEngine.Debug.Log(string.Format(
+        GameLog.Debug(string.Format(
             "[开局发卡] pid={0} 候选弱卡数量={1}，被排除的240及以上强卡({2}张): {3}",
             pid, starterCandidates.Count, excludedStrongCards.Count, string.Join("、", excludedStrongCards)));
         if (starterCandidates.Count > 0)
         {
-            var starterHero = starterCandidates[UnityEngine.Random.Range(0, starterCandidates.Count)];
+            var starterHero = starterCandidates[SysRandom.Range(0, starterCandidates.Count)];
             if (cards.ContainsKey(starterHero.Id))
                 cards[starterHero.Id]++;
             else
                 cards[starterHero.Id] = 1;
-            UnityEngine.Debug.Log(string.Format(
+            GameLog.Debug(string.Format(
                 "[开局发卡] pid={0} 随机到：{1}(id={2}, 阵营={3}, 总属性={4})",
                 pid, starterHero.Name, starterHero.Id, starterHero.Side, starterHero.Atk + starterHero.Ap + starterHero.Might));
         }
         else
         {
-            UnityEngine.Debug.LogWarning("[开局发卡] pid=" + pid + " 没有符合条件的弱卡可发");
+            GameLog.Warn("[开局发卡] pid=" + pid + " 没有符合条件的弱卡可发");
         }
     }
 
@@ -223,7 +223,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 
     public void UseItemToHero(int heroId, int itemId)
     {
-        UnityEngine.Debug.Log($"UseItemToHero {heroId} {itemId}");
+        GameLog.Debug($"UseItemToHero {heroId} {itemId}");
         AddAttrAddon(heroId, HeroSelectionTool.GetCardAttr(this, itemId, 1));
         RemoveCard(itemId, 1);
     }
@@ -704,7 +704,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 
         if (lastCombatIndex >= 0)
         {
-            UnityEngine.Debug.Log("SwapCard lastCombatIndex: " + lastCombatIndex);
+            GameLog.Debug("SwapCard lastCombatIndex: " + lastCombatIndex);
             // 在count以外且index+3内（即前count+3名内）寻找range卡
             int rangeCardIndex = -1;
             for (int i = count; i < Math.Min(sortDataList.Count, lastCombatIndex + 3); i++)
@@ -719,7 +719,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
             }
 
             // 如果找到合适的range卡，则进行交换
-            UnityEngine.Debug.Log("SwapCard lastCombatIndex: " + lastCombatIndex + " rangeCardIndex: " + rangeCardIndex);
+            GameLog.Debug("SwapCard lastCombatIndex: " + lastCombatIndex + " rangeCardIndex: " + rangeCardIndex);
             if (rangeCardIndex >= 0)
             {
                 var temp = sortDataList[lastCombatIndex];
@@ -975,7 +975,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         {
             level = lv;
             EnsureSoldierCells(); // 玩家等级提升可能解锁更多士兵，补齐布阵格
-            UnityEngine.Debug.Log($"玩家{pid} 升级到 {level} 级，上阵格子 {GetSlotCount()}，士兵 {GetSoldierMeleeCount()}步+{GetSoldierRangedCount()}弓，剩余经验 {exp}");
+            GameLog.Debug($"玩家{pid} 升级到 {level} 级，上阵格子 {GetSlotCount()}，士兵 {GetSoldierMeleeCount()}步+{GetSoldierRangedCount()}弓，剩余经验 {exp}");
         }
     }
 
@@ -1147,7 +1147,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         }
         catch (Exception e)
         {
-            Debug.LogError("序列化PlayerInfo失败: " + e.Message);
+            GameLog.Error("序列化PlayerInfo失败: " + e.Message);
             return null;
         }
     }
@@ -1302,7 +1302,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         }
         catch (Exception e)
         {
-            Debug.LogError("反序列化PlayerInfo失败: " + e.Message);
+            GameLog.Error("反序列化PlayerInfo失败: " + e.Message);
         }
         // 兼容旧存档：battleCards 统一为9格长度
         EnsureBattleCardsSize();
@@ -1327,7 +1327,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
             foreach (var id in invalid)
             {
                 cards.Remove(id);
-                Debug.Log($"旧存档清理：移除已下架道具 {id}");
+                GameLog.Debug($"旧存档清理：移除已下架道具 {id}");
             }
             // 装备槽位里指向已删道具的记录一并清除
             foreach (var kv in itemEquips)

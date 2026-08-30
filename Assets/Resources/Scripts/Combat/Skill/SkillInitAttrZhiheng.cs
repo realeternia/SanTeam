@@ -51,7 +51,7 @@ public class SkillInitAttrZhiheng : Skill
             owner.AddAttr("might", attrValue); // 无双强度属性
             owner.AddAttr("atk", attrValue); // 攻击属性
             owner.AddAttr("ap", attrValue); // 法术强度属性
-            UnityEngine.Debug.Log($"BattleBegin SkillInitAttrZhiheng: 我方有{uniqueJobCount}种不同兵种，提升属性{attrValue}点");
+            GameLog.Debug($"BattleBegin SkillInitAttrZhiheng: 我方有{uniqueJobCount}种不同兵种，提升属性{attrValue}点");
 
             EffectManager.PlaySkillEffect(owner, skillCfg.HitEffect);
             owner.PlayerAnim(skillCfg.Action);

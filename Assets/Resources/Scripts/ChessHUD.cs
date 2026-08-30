@@ -44,7 +44,7 @@ public class ChessHUD : MonoBehaviour
     {
         if (chessUnit == null)
         {
-            Debug.LogError("ChessUnit is null in UpdateHealthDisplay");
+            GameLog.Error("ChessUnit is null in UpdateHealthDisplay");
             return;
         }
 

@@ -104,7 +104,7 @@ public class Missile : MonoBehaviour
             {
                 Vector3 horizontalPos = Vector3.Lerp(missile.transform.position, targetPos, fractionOfJourney);
 
-                // UnityEngine.Debug.Log("fractionOfJourney: " + fractionOfJourney);
+                // GameLog.Debug("fractionOfJourney: " + fractionOfJourney);
                 realLen += distCovered * 1.1f;
                 if(realLen > totalLen)
                     realLen = totalLen;

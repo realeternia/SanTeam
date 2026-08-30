@@ -42,7 +42,7 @@ public class BagCell : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragH
     {
         var heroCfg = HeroConfig.GetConfig(cardId);
         textItemName.text = heroCfg.Name + level;
-        textItemName.color = HeroSelectionTool.GetQualityColor(heroCfg.Quality);
+        textItemName.color = SysColor.GetQualityColor(heroCfg.Quality);
 
         // 显示已装备的装备（最多3个槽位）
         bagControl.bindPlayer.itemEquips.TryGetValue(cardId, out var slots);
@@ -170,7 +170,7 @@ public class BagCell : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragH
 
     public void RemoveTagImg()
     {
-       // UnityEngine.Debug.Log("RemoveTagImg");
+       // GameLog.Debug("RemoveTagImg");
             // 恢复对象的透明度和射线检测
         CanvasGroup canvasGroup = GetComponent<CanvasGroup>();
         if (canvasGroup != null)

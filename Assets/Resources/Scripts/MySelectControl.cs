@@ -43,7 +43,7 @@ public class MySelectControl : MonoBehaviour
         this.playerInfo = playerInfo;
         ShowCards(playerInfo, playerCards);
         playerNameText.text = playerInfo.playerConfig.Name;
-        UnityEngine.Debug.Log($"UpdateCards {playerInfo.name} {playerCards.Count}");
+        GameLog.Debug($"UpdateCards {playerInfo.name} {playerCards.Count}");
     }
 
     private void ShowCards(PlayerInfo checkPlayer, List<int> cards)
@@ -72,7 +72,7 @@ public class MySelectControl : MonoBehaviour
                 selectNode = textObject.GetComponent<SelectCardNodeControl>();
                 if (selectNode == null)
                 {
-                    Debug.LogError("Failed to get SelectCardNodeControl component from the instantiated prefab.");
+                    GameLog.Error("Failed to get SelectCardNodeControl component from the instantiated prefab.");
                 }
 
                 // 设置基本布局，纵向排列

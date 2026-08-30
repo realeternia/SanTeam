@@ -114,10 +114,10 @@ public class PanelManager : MonoBehaviour
 
     public void SendSignal(string name, string parm1, int parm2)
     {
-        UnityEngine.Debug.Log($"PanelManager SendSignal {name} {parm1} {parm2}");
+        GameLog.Debug($"PanelManager SendSignal {name} {parm1} {parm2}");
         foreach (var panel in openPanelList)
         {
-            UnityEngine.Debug.Log($"PanelManager SendSignal {panel.name} {name} {parm1} {parm2}");
+            GameLog.Debug($"PanelManager SendSignal {panel.name} {name} {parm1} {parm2}");
             if (panel.TryGetComponent<IPanelEvent>(out IPanelEvent p))
                 p.SendSignal(name, parm1, parm2);
         }

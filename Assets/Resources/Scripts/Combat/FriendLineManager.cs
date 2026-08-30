@@ -136,7 +136,7 @@ public static class FriendLineManager
             foreach (var memberId in presentMembers)
                 CreateFriendLine(chess, memberId, lineColor);
 
-            UnityEngine.Debug.Log($"FriendSpecial 关系{relCfg.Name} 武将{chess.heroId} 好友数{presentCount} 技能{relCfg.SkillId} 等级{skillLevel}");
+            GameLog.Debug($"FriendSpecial 关系{relCfg.Name} 武将{chess.heroId} 好友数{presentCount} 技能{relCfg.SkillId} 等级{skillLevel}");
         }
     }
 
@@ -146,7 +146,7 @@ public static class FriendLineManager
         var skillCfg = ConfigManager.GetSkillConfig(skillSname);
         if (skillCfg == null)
         {
-            UnityEngine.Debug.LogWarning($"FriendSpecial 技能{skillSname}未在SkillConfig中配置，暂不激活");
+            GameLog.Warn($"FriendSpecial 技能{skillSname}未在SkillConfig中配置，暂不激活");
             return;
         }
         var skillId = skillCfg.Id;

@@ -40,7 +40,7 @@ public static class ConfigManager
 
         ConfigManager.PostModify();      
 
-        UnityEngine.Debug.Log("ConfigManager Init fin");
+        GameLog.Debug("ConfigManager Init fin");
     }
 
     public static void PostModify()
@@ -101,7 +101,7 @@ public static class ConfigManager
 
         foreach(var f in GameManager.Instance.friendRdData)
         {
-            Debug.Log($"创建{f.id} / {f.name} 配对: {string.Join(",", f.friendIds.Select(id => HeroConfig.GetConfig(id).Name))}");
+            GameLog.Debug($"创建{f.id} / {f.name} 配对: {string.Join(",", f.friendIds.Select(id => HeroConfig.GetConfig(id).Name))}");
             var config = new HeroFriendConfig(f.id, f.name, 2, f.friendIds, "", "");
             HeroFriendConfig.Add(f.id, config);
         }
@@ -259,7 +259,7 @@ public static class ConfigManager
         var cfg = SkillConfig.GetConfig(sname, 1);
         if (cfg == null)
         {
-            UnityEngine.Debug.LogWarning($"技能缩写[{sname}]未在SkillConfig中配置，暂不加入英雄技能");
+            GameLog.Warn($"技能缩写[{sname}]未在SkillConfig中配置，暂不加入英雄技能");
             return;
         }
         list.Add(cfg);

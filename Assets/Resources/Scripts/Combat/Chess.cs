@@ -114,7 +114,7 @@ public class Chess : MonoBehaviour
 
         if (isHero)
         {
-            UnityEngine.Debug.Log("Init Hero" + heroId);
+            GameLog.Debug("Init Hero" + heroId);
 
             var heroCfg = HeroConfig.GetConfig(heroId);
             var jobCfg = ConfigManager.GetJobConfig(heroCfg.Job);
@@ -160,7 +160,7 @@ public class Chess : MonoBehaviour
         if (heroInfo != null) // 英雄
             heroInfo.SetHpRate(hp, maxHp);
         
-        attackPoint = UnityEngine.Random.Range(0f, 1f); // 随机获得初始气力
+        attackPoint = SysRandom.Range(0f, 1f); // 随机获得初始气力
         // attackRate 已在 SpawnUnitsForRegion/SpawnHerosForRegion 中按配置设置（攻速值/30），此处不能覆盖
     }
 
@@ -181,7 +181,7 @@ public class Chess : MonoBehaviour
         hud = hudObj.GetComponent<ChessHUD>();
         if (hud == null)
         {
-            Debug.LogError("ChessHUD component not found on Hud.prefab");
+            GameLog.Error("ChessHUD component not found on Hud.prefab");
             return;
         }
 
@@ -515,7 +515,7 @@ public class Chess : MonoBehaviour
                     angleOffset = 135f;
 
                 // 随机选择向上或向下偏移
-                angleOffset *= UnityEngine.Random.value > 0.5f ? 1 : -1;
+                angleOffset *= SysRandom.Value > 0.5f ? 1 : -1;
 
                 // 计算旋转后的方向
                 Quaternion rotation = Quaternion.Euler(0, angleOffset, 0);
@@ -552,7 +552,7 @@ public class Chess : MonoBehaviour
 
         SkillManager.DuringAttack(this, victim, damType, ref damageBase, ref damageMulti, ref damageReal, ref effect);
         // 暴击
-        if (critRate > 0 && UnityEngine.Random.value < critRate)
+        if (critRate > 0 && SysRandom.Value < critRate)
         {
             damageMulti += critDamageMulti;
             WorldManager.Instance.AddBattleText("暴!", transform.position, new UnityEngine.Vector2(0, 40), Color.red, 3);
@@ -580,7 +580,7 @@ public class Chess : MonoBehaviour
         damage = Mathf.Clamp(damage, minDamage, maxDamage);
         if (damage > 0)
         {
-            if (victim.dodgeRate > 0 && UnityEngine.Random.value < victim.dodgeRate)
+            if (victim.dodgeRate > 0 && SysRandom.Value < victim.dodgeRate)
             {
                 damage = 0;
                 WorldManager.Instance.AddBattleText("闪!", victim.transform.position, new UnityEngine.Vector2(0, 40), Color.red, 3);
@@ -810,7 +810,7 @@ public class Chess : MonoBehaviour
             // 使用正弦函数实现颜色平滑过渡
             float t = Mathf.Sin(time*20) * 0.5f + 0.5f;
             var color = Color.Lerp(start, end, t);
-            UnityEngine.Debug.Log("ColorLerpCoroutine " + color + " start=" + start + " end=" + end);
+            GameLog.Debug("ColorLerpCoroutine " + color + " start=" + start + " end=" + end);
 
             material.SetColor("_Color", color);
             time += Time.deltaTime;
@@ -892,7 +892,7 @@ public class Chess : MonoBehaviour
     public void StartJump(float time)
     {
         var height = 15;
-        UnityEngine.Debug.Log("StartJump " + height + " " + id + " " + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff"));
+        GameLog.Debug("StartJump " + height + " " + id + " " + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff"));
 
         // 如果已经在跳跃，先打断当前跳跃
         if (jumpCoroutine != null)

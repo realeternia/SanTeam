@@ -55,7 +55,7 @@ public class IconLoader : MonoBehaviour
             {
                 if (!HeroAttrConfig.HasConfig(configId))
                 {
-                    Debug.LogError(string.Format("IconLoader HeroAttrConfig不存在id={0}", configId));
+                    GameLog.Error(string.Format("IconLoader HeroAttrConfig不存在id={0}", configId));
                     return null;
                 }
                 HeroAttrConfig cfg = HeroAttrConfig.GetConfig(configId);
@@ -69,7 +69,7 @@ public class IconLoader : MonoBehaviour
             {
                 if (!SystemAttrConfig.HasConfig(configId))
                 {
-                    Debug.LogError(string.Format("IconLoader SystemAttrConfig不存在id={0}", configId));
+                    GameLog.Error(string.Format("IconLoader SystemAttrConfig不存在id={0}", configId));
                     return null;
                 }
                 SystemAttrConfig cfg = SystemAttrConfig.GetConfig(configId);

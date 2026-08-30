@@ -20,7 +20,7 @@ public class Profile : MonoBehaviour
     {
         // 读取文本文件
         string content = LoadTextFile();
-        UnityEngine.Debug.Log("Profile Start Load " + content);        
+        GameLog.Debug("Profile Start Load " + content);        
         if (content != "")
         {
             // 解析文本文件到数据类

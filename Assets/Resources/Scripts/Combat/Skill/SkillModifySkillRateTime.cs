@@ -38,7 +38,7 @@ public class SkillModifySkillRateTime : Skill
         if (skillCfg.CheckAttrs != null && !skillCfg.CheckAttrs.Contains(checkSkillCfg.Attr))
             return; 
         
-        UnityEngine.Debug.Log(owner.id + " OnCheckCD " + cdTime + " skillId " + skillId);
+        GameLog.Debug(owner.id + " OnCheckCD " + cdTime + " skillId " + skillId);
         cdTime = Math.Max(1, cdTime * skillCfg.Strength);
     }    
 }

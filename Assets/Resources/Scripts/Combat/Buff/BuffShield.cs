@@ -35,13 +35,13 @@ public class BuffShield : Buff
 
     public override void BeforeAttacked(Chess defender, ref int damage)
     {
-        UnityEngine.Debug.Log("护盾吸收前 " + damage + " 剩余" + hp);
+        GameLog.Debug("护盾吸收前 " + damage + " 剩余" + hp);
         if (hp > 0)
         {
             if (hp > damage)
             {
                 hp -= damage;
-                UnityEngine.Debug.Log("护盾吸收" + damage + " 剩余" + hp);
+                GameLog.Debug("护盾吸收" + damage + " 剩余" + hp);
 
                 damage = 0;
 
@@ -49,7 +49,7 @@ public class BuffShield : Buff
             else
             {
                 damage -= hp;
-                UnityEngine.Debug.Log("护盾吸收后死亡 " + hp);
+                GameLog.Debug("护盾吸收后死亡 " + hp);
                 hp = 0;
             }
         }

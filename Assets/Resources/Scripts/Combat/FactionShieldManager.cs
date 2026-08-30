@@ -55,7 +55,7 @@ public static class FactionShieldManager
 
                 var shieldHp = (int)(unit.maxHp * rate);
                 BuffManager.AddShield(unit, unit, shieldHp, CombatConst.FactionShieldTime);
-                UnityEngine.Debug.Log($"FactionShield 阵营{kv.Key} 英雄数{kv.Value} 护盾{shieldHp}({rate * 100:0}%)");
+                GameLog.Debug($"FactionShield 阵营{kv.Key} 英雄数{kv.Value} 护盾{shieldHp}({rate * 100:0}%)");
             }
         }
     }

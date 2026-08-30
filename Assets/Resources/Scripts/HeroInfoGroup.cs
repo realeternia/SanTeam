@@ -36,7 +36,7 @@ public class HeroInfoGroup : MonoBehaviour
         {
             Destroy(child.gameObject);
         }
-        Debug.Log("Reset " + heroInfoRectSide1.transform.childCount + " " + heroInfoRectSide2.transform.childCount);
+        GameLog.Debug("Reset " + heroInfoRectSide1.transform.childCount + " " + heroInfoRectSide2.transform.childCount);
     }
 
     public HeroInfo AddHero(int side, int heroId, int level)

@@ -35,7 +35,7 @@ public class Buff
 
     public virtual void OnAdd(Chess chess, Chess caster)
     {
-        UnityEngine.Debug.Log("Buff OnAdd " + id + " " + skillCfg.Id + " " + caster + " " + chess);
+        GameLog.Debug("Buff OnAdd " + id + " " + skillCfg.Id + " " + caster + " " + chess);
         owner = chess;
 
         if (!string.IsNullOrEmpty(buffCfg.BuffEffect))
@@ -54,7 +54,7 @@ public class Buff
 
     public virtual void OnRemove(Chess chess)
     {
-        UnityEngine.Debug.Log("Buff OnRemove " + id + " " + skillCfg.Id + " " + caster + " " + chess);
+        GameLog.Debug("Buff OnRemove " + id + " " + skillCfg.Id + " " + caster + " " + chess);
         if (effect != null)
         {
             GameObject.Destroy(effect);

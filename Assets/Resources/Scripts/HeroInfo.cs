@@ -69,11 +69,11 @@ public class HeroInfo : MonoBehaviour
             classImg.sprite = Resources.Load<Sprite>("Textures/" + highestAttr);
             if (total >= 600)
             {
-                classImg.color = new Color(0.3f, 0, .6f);
+                classImg.color = SysColor.Tier.Purple;
             }
             else if (total >= 500)
             {
-                classImg.color = new Color(0.8f, 0, 1);
+                classImg.color = SysColor.Tier.Magenta;
             }
             else if (total >= 420)
             {
@@ -81,7 +81,7 @@ public class HeroInfo : MonoBehaviour
             }
             else if (total >= 350)
             {
-                classImg.color = new Color(1, 0.5f, 0);
+                classImg.color = SysColor.Tier.Orange;
             }
             else if (total >= 290)
             {
@@ -99,19 +99,19 @@ public class HeroInfo : MonoBehaviour
         text.text = val.ToString();
         if (val >= 250)
         {
-            text.color = new Color(0.3f, 0, .6f);
+            text.color = SysColor.Tier.Purple;
         }
         else if (val >= 210)
         {
-            text.color = new Color(0.8f, 0, 1);
-        }        
+            text.color = SysColor.Tier.Magenta;
+        }
         else if (val >= 170)
         {
             text.color = Color.red;
         }
         else if (val >= 140)
         {
-            text.color = new Color(1, 0.5f, 0);
+            text.color = SysColor.Tier.Orange;
         }
         else if (val >= 110)
         {

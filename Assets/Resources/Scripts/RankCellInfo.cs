@@ -7,7 +7,7 @@ using UnityEngine.EventSystems;
 using CommonConfig;
 
 
-public class RankCellInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
+public class RankCellInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, ILoopScrollItem
 {
     public Image heroPic;
     public Image[] heroSkill;
@@ -50,12 +50,6 @@ public class RankCellInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandle
             Profile.Instance.SaveTextFile();
             UpdateLoveBtn();
         });
-        UpdateLoveBtn();
-
-        if(!HeroSelectionTool.HasHeroInPool(heroId))
-        {
-            heroName.color = Color.gray;
-        }
     }
 
     public void Init(HeroConfig heroConfig)
@@ -68,6 +62,7 @@ public class RankCellInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandle
         {
             if (i < skillCfgs.Count)
             {
+                heroSkill[i].gameObject.SetActive(true); // 复用池中单元格时恢复之前被隐藏的图标
                 var skillIcon = skillCfgs[i].Icon;
                 heroSkill[i].sprite = Resources.Load<Sprite>("SkillPic/" + skillIcon);
             }
@@ -80,7 +75,7 @@ public class RankCellInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandle
         }
 
         heroName.text = heroConfig.Name;
-        heroName.color = HeroSelectionTool.GetQualityColor(heroConfig.Quality);
+        heroName.color = SysColor.GetQualityColor(heroConfig.Quality);
         heroId = (int)heroConfig.Id;
         str = heroConfig.Might;
         inte = heroConfig.Ap;
@@ -89,9 +84,15 @@ public class RankCellInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandle
         price = HeroSelectionTool.GetPrice(heroConfig);
         if (heroConfig.Job == "shuai")
             loveBtn.gameObject.SetActive(false);
+        else
+            loveBtn.gameObject.SetActive(true); // 复用池中单元格时恢复被隐藏的按钮
 
         var bg = GetComponent<Image>();
-        bg.color = HeroSelectionTool.GetSideColor(heroConfig.Side);
+        bg.color = SysColor.GetSideColor(heroConfig.Side);
+
+        // 不在卡池中的英雄名字置灰（池中单元格每次绑定都要刷新）
+        if (!HeroSelectionTool.HasHeroInPool(heroId))
+            heroName.color = Color.gray;
 
         heroStr.text = heroConfig.Might.ToString();
         if (heroConfig.Might >= 95)
@@ -119,6 +120,24 @@ public class RankCellInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandle
             heroPrice.text = "<color=yellow>" + price.ToString() + "</color>";
 
         heroHp.text = heroConfig.Hp.ToString();
+
+        UpdateLoveBtn(); // 复用池中单元格时刷新收藏图标
+    }
+
+    public void BindData(object data)
+    {
+        if (data is HeroConfig heroConfig)
+        {
+            Init(heroConfig);
+        }
+        else
+        {
+            GameLog.Warn($"RankCellInfo.BindData: 数据类型不匹配 data={data?.GetType().Name ?? "null"}");
+        }
+    }
+
+    public void OnReturnToPool()
+    {
     }
 
 
@@ -132,7 +151,7 @@ public class RankCellInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandle
 
     public void OnPointerDown(PointerEventData eventData)
     {
-        Debug.Log($"UI 元素被按下，位置：{eventData.position}");
+        GameLog.Debug($"UI 元素被按下，位置：{eventData.position}");
 
         // 判断点击是否在heroSkill区域内
         bool isClickOnHeroSkill = false;

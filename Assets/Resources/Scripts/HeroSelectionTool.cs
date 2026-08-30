@@ -39,7 +39,7 @@ public static class HeroSelectionTool
 
         for (int i = 0; i < actualCount; i++)
         {
-            int randomIndex = UnityEngine.Random.Range(0, tempIds.Count);
+            int randomIndex = SysRandom.Range(0, tempIds.Count);
             result.Add(tempIds[randomIndex]);
             tempIds.RemoveAt(randomIndex);
         }
@@ -117,7 +117,7 @@ public static class HeroSelectionTool
         if (candidates.Count == 0)
             return 0;
 
-        return candidates[UnityEngine.Random.Range(0, candidates.Count)];
+        return candidates[SysRandom.Range(0, candidates.Count)];
     }
 
     // 品质1=100-品质2-品质3-品质4
@@ -128,7 +128,7 @@ public static class HeroSelectionTool
         int q4 = Math.Max(0, shopCfg.Quality4Rate);
         int q1 = Math.Max(0, 100 - q2 - q3 - q4);
 
-        int roll = UnityEngine.Random.Range(0, 100);
+        int roll = SysRandom.Range(0, 100);
         if (roll < q1)
             return 1;
         if (roll < q1 + q2)
@@ -161,7 +161,7 @@ public static class HeroSelectionTool
         itemList.RemoveAll(item => item.RateAbs > 0);
         // 剔除所有ShopId非0的item
         itemList.RemoveAll(item => item.ShopIdx > shopIdx);
-        int randomIndex = UnityEngine.Random.Range(0, itemList.Count);
+        int randomIndex = SysRandom.Range(0, itemList.Count);
         return itemList[randomIndex].Id;
     }
 
@@ -290,33 +290,5 @@ public static class HeroSelectionTool
 
     }
 
-    public static Color GetQualityColor(int quality)
-    {
-        if (quality == 1)
-            return new Color(255 / 255f, 255 / 255f, 255 / 255f); // 普通-白
-        else if (quality == 2)
-            return new Color(30 / 255f, 255 / 255f, 0 / 255f); // 优秀-绿
-        else if (quality == 3)
-            return new Color(0 / 255f, 112 / 255f, 221 / 255f); // 精良-蓝
-        else
-            return new Color(163 / 255f, 53 / 255f, 238 / 255f); // 史诗-紫
-    }
-
-    public static Color GetSideColor(int side)
-    {
-        if (side == 1)
-            return new Color(40 / 255f, 70 / 255f, 0 / 255f, 255 / 255f);
-        else if (side == 2)
-            return new Color(0 / 255f, 35 / 255f, 100 / 255f, 255 / 255f);
-        else if (side == 3)
-            return new Color(100 / 255f, 0 / 255f, 0 / 255f, 255 / 255f);
-        else if (side == 4)
-            return new Color(30 / 255f, 100 / 255f, 110 / 255f, 255 / 255f);
-        else if (side == 5)
-            return new Color(90 / 255f, 50 / 255f, 110 / 255f, 255 / 255f);
-        else if (side == 6)
-            return new Color(120 / 255f, 90 / 255f, 30 / 255f, 255 / 255f);                                    
-        else
-            return new Color(50 / 255f, 50 / 255f, 50 / 255f, 255 / 255f);
-    }
+    // 品质色/阵营色定义已迁至 SysColor.GetQualityColor / SysColor.GetSideColor
 }

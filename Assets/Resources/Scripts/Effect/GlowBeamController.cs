@@ -90,7 +90,7 @@ public class GlowBeamController : MonoBehaviour
     // 动态改变发光颜色
     public void SetGlowColor(Color newColor)
     {
-        UnityEngine.Debug.Log("SetGlowColor " + newColor);
+        GameLog.Debug("SetGlowColor " + newColor);
         glowColor = newColor;
         UpdateBeamProperties();
     }

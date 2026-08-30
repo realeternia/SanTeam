@@ -20,7 +20,7 @@ public class SkillInitSoldierShield : Skill
             if (unit.isHero || unit.attackRange > CombatConst.MeleeRange)
                 continue;
 
-            UnityEngine.Debug.Log("BattleBegin SkillInitSoldierShield 护盾值 " + shieldHp);
+            GameLog.Debug("BattleBegin SkillInitSoldierShield 护盾值 " + shieldHp);
             BuffManager.AddBuff(unit, owner, skillCfg.Id, skillCfg.BuffId, skillCfg.BuffTime);
         }
     }

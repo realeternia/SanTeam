@@ -129,7 +129,7 @@ public class PickPanelControl : MonoBehaviour
             if (player.banCount > 0)
             {
                 PlayerAI.CheckBan(player, cellControls);
-                yield return new WaitForSeconds(UnityEngine.Random.Range(0.1f, 0.3f));
+                yield return new WaitForSeconds(SysRandom.Range(0.1f, 0.3f));
             }
         }
         
@@ -229,9 +229,9 @@ public class PickPanelControl : MonoBehaviour
 
                 // 设置英雄名称，颜色按品质
                 cellControl.heroName.text = heroCfg.Name;
-                cellControl.heroName.color = HeroSelectionTool.GetQualityColor(heroCfg.Quality);
+                cellControl.heroName.color = SysColor.GetQualityColor(heroCfg.Quality);
 
-                cellControl.bgImg.GetComponent<Image>().color = HeroSelectionTool.GetSideColor(heroCfg.Side);
+                cellControl.bgImg.GetComponent<Image>().color = SysColor.GetSideColor(heroCfg.Side);
 
                 // 默认隐藏禁止图标
                 cellControl.forbidImg.gameObject.SetActive(false);

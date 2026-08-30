@@ -9,7 +9,7 @@ public static class BuffManager
         if(time == 0) //有的技能会先填0，等待buff
             return;
         
-        UnityEngine.Debug.Log("AddBuff buffId=" + buffId.ToString() + " skillId=" + skillId.ToString() + " time=" + time.ToString());
+        GameLog.Debug("AddBuff buffId=" + buffId.ToString() + " skillId=" + skillId.ToString() + " time=" + time.ToString());
 
         Buff buff = null;
         var buffCfg = BuffConfig.GetConfig(buffId);
@@ -53,7 +53,7 @@ public static class BuffManager
 
         if (buff == null)
         {
-            UnityEngine.Debug.LogError("Buff not found");
+            GameLog.Error("Buff not found");
             return;
         }
 

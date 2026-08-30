@@ -12,7 +12,7 @@ public class SkillBuffTieqi : Skill
 
     public override void OnAddBuff(Chess target, ref int buffId, int checkSkillId, ref float time)
     {
-        UnityEngine.Debug.Log($"SkillModifyTieqi OnAddBuff {target.name} {buffId} {checkSkillId} {time}");
+        GameLog.Debug($"SkillModifyTieqi OnAddBuff {target.name} {buffId} {checkSkillId} {time}");
         if(checkSkillId == skillId)
             return; //自己挂的buff，不再连续触发
 

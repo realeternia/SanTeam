@@ -10,7 +10,7 @@ public class SkillInitSoldierUp : Skill
 
     public override void BattleBegin()
     {
-        UnityEngine.Debug.Log("SkillInitSoldierUp BattleBegin");
+        GameLog.Debug("SkillInitSoldierUp BattleBegin");
 
         var unitsInRange = WorldManager.Instance.GetUnitsMySide(owner.transform.position, skillCfg.Range, owner.side);
         var atkAdd = (int)(owner.GetAttr(skillCfg.Attr) * skillCfg.SkillDamageAttrRate);

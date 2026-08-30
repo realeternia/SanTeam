@@ -44,7 +44,7 @@ public class PlayerBook
         // 从true列表中随机选择trueCount个
         for (int i = 0; i < trueCount; i++)
         {
-            int index = UnityEngine.Random.Range(0, trueIds.Count);
+            int index = SysRandom.Range(0, trueIds.Count);
             resultIds.Add(trueIds[index]);
             trueIds.RemoveAt(index);
         }
@@ -52,7 +52,7 @@ public class PlayerBook
         // 从false列表中随机选择falseCount个
         for (int i = 0; i < falseCount; i++)
         {
-            int index = UnityEngine.Random.Range(0, falseIds.Count);
+            int index = SysRandom.Range(0, falseIds.Count);
             resultIds.Add(falseIds[index]);
             falseIds.RemoveAt(index);
         }
@@ -60,7 +60,7 @@ public class PlayerBook
         // 对结果进行shuffle
         for (int i = 0; i < resultIds.Count; i++)
         {
-            int j = UnityEngine.Random.Range(i, resultIds.Count);
+            int j = SysRandom.Range(i, resultIds.Count);
             int temp = resultIds[i];
             resultIds[i] = resultIds[j];
             resultIds[j] = temp;

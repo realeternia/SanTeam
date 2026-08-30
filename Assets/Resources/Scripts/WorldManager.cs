@@ -70,7 +70,7 @@ public class WorldManager : MonoBehaviour
 
     public void BattleBegin()
     {
-        var roll = UnityEngine.Random.Range(0, 2);
+        var roll = SysRandom.Range(0, 2);
         BGMPlayer.Instance.PlaySound(roll == 0 ? "BGMs/weifeng" : "BGMs/pozhu");
 
         // 从回合配置表读取本回合可能刷的地图，随机选一张
@@ -80,9 +80,9 @@ public class WorldManager : MonoBehaviour
         isPveRound = roundCfg.RoundType == 1;
         pveMonsterSpawns = ParsePveMonsterSpawns(roundCfg.SoldierList);
         if (isPveRound)
-            Debug.Log($"[PVE] 回合{GameManager.Instance.year} {roundCfg.Name} 怪物布阵: {(string.IsNullOrEmpty(roundCfg.SoldierList) ? "(空!请在GameRoundConfig填SoldierList)" : roundCfg.SoldierList)} 解析到{pveMonsterSpawns.Count}只");
+            GameLog.Debug($"[PVE] 回合{GameManager.Instance.year} {roundCfg.Name} 怪物布阵: {(string.IsNullOrEmpty(roundCfg.SoldierList) ? "(空!请在GameRoundConfig填SoldierList)" : roundCfg.SoldierList)} 解析到{pveMonsterSpawns.Count}只");
         var mapIds = roundCfg.MapIds;
-        var newMapId = mapIds[UnityEngine.Random.Range(0, mapIds.Length)];
+        var newMapId = mapIds[SysRandom.Range(0, mapIds.Length)];
         if (mapConfig == null || newMapId != mapConfig.Mapid)
         {
             // 打印加载耗时
@@ -94,7 +94,7 @@ public class WorldManager : MonoBehaviour
             GameObject cell = Instantiate(mapNode, gameObject.transform.parent);
             mapConfig = cell.GetComponent<MapConfig>();
             var endTime = Time.realtimeSinceStartup;
-            Debug.Log("加载地图耗时：" + (endTime - startTime) + "秒");
+            GameLog.Debug("加载地图耗时：" + (endTime - startTime) + "秒");
         }
 
         killMark = new int[8];
@@ -191,7 +191,7 @@ public class WorldManager : MonoBehaviour
             currentMatch = new int[] { 0, 1, 2, 3, 4, 5, 6, 7 };
             for (int i = currentMatch.Length - 1; i > 0; i--)
             {
-                int j = UnityEngine.Random.Range(0, i + 1);
+                int j = SysRandom.Range(0, i + 1);
                 int temp = currentMatch[i];
                 currentMatch[i] = currentMatch[j];
                 currentMatch[j] = temp;
@@ -223,7 +223,7 @@ public class WorldManager : MonoBehaviour
             {
                 unitGrids.Add(gridPos);
                 CreateDebugCube(300001, gridPos);
-              //  UnityEngine.Debug.Log("Lock " + gridPos + " for wall");
+              //  GameLog.Debug("Lock " + gridPos + " for wall");
             }
         }
         occupiedGrids[300001] = unitGrids;
@@ -369,7 +369,7 @@ public class WorldManager : MonoBehaviour
         }
         else
         {
-            Debug.LogError("Chess component not found on UnitBing prefab");
+            GameLog.Error("Chess component not found on UnitBing prefab");
         }
         chessList.Add(chessComponent);
 
@@ -443,7 +443,7 @@ public class WorldManager : MonoBehaviour
         }
         else
         {
-            Debug.LogError("Chess component not found on monster prefab");
+            GameLog.Error("Chess component not found on monster prefab");
         }
         chessList.Add(chessComponent);
 
@@ -487,7 +487,7 @@ public class WorldManager : MonoBehaviour
         }
         else
         {
-            Debug.LogError("Chess component not found on UnitBing prefab");
+            GameLog.Error("Chess component not found on UnitBing prefab");
         }
         chessList.Add(chessComponent);
         idCounter++;
@@ -513,7 +513,7 @@ public class WorldManager : MonoBehaviour
         var hud = hudObj.GetComponent<CastleHUD>();
         if (hud == null)
         {
-            Debug.LogError("CastleHUD component not found on Hud.prefab");
+            GameLog.Error("CastleHUD component not found on Hud.prefab");
             return;
         }
 
@@ -736,9 +736,9 @@ public class WorldManager : MonoBehaviour
 
         // 使用GetOccupiedGrids方法获取需要锁定的格子列表
         requiredGrids = GetOccupiedGrids(targetPosition, collider);
-        // UnityEngine.Debug.Log($"id:{unit.id} requiredGrids: Target Position = {targetPosition}, Collider Size = {collider.bounds.size}");
+        // GameLog.Debug($"id:{unit.id} requiredGrids: Target Position = {targetPosition}, Collider Size = {collider.bounds.size}");
         // string gridPositions = string.Join(", ", requiredGrids);
-        // UnityEngine.Debug.Log($"Grids: {gridPositions}");
+        // GameLog.Debug($"Grids: {gridPositions}");
 
         // 检查所有格子是否可用
         foreach (var gridPos in requiredGrids)
@@ -751,7 +751,7 @@ public class WorldManager : MonoBehaviour
                     {
                         if (occupiedGrid.x == gridPos.x && occupiedGrid.y == gridPos.y)
                         {
-                         //   UnityEngine.Debug.Log("Grid " + gridPos + " is already occupied by unit: " + entry.Key);
+                         //   GameLog.Debug("Grid " + gridPos + " is already occupied by unit: " + entry.Key);
                             return false; // 格子不可用
                         }
                     }
@@ -770,7 +770,7 @@ public class WorldManager : MonoBehaviour
         {
             unitGrids.Add(gridPos);
             CreateDebugCube(unit.id, gridPos);
-         //   UnityEngine.Debug.Log("Lock " + gridPos + " for unit: " + unit.id);
+         //   GameLog.Debug("Lock " + gridPos + " for unit: " + unit.id);
         }
 
         // 存储单位占据的格子
@@ -810,7 +810,7 @@ public class WorldManager : MonoBehaviour
         {
             unitGrids.Add(gridPos);
             CreateDebugCube(unit.id, gridPos);
-         //   UnityEngine.Debug.Log("Lock " + gridPos + " for unit: " + unit.id);
+         //   GameLog.Debug("Lock " + gridPos + " for unit: " + unit.id);
         }
 
         // 存储单位占据的格子
@@ -882,7 +882,7 @@ public class WorldManager : MonoBehaviour
                 DestroyDebugCube(gridPos);
             }
             occupiedGrids[unit.id].Clear();
-          //  UnityEngine.Debug.Log("Released all grids for unit: " + unit.id);
+          //  GameLog.Debug("Released all grids for unit: " + unit.id);
         }
     }
 
@@ -970,7 +970,7 @@ public class WorldManager : MonoBehaviour
                     p.AddItemCard(itemId);
                     var itemName = ItemConfig.HasConfig(itemId) ? ItemConfig.GetConfig(itemId).Name : itemId.ToString();
                     AddBattleText("掉落:" + itemName, dieUnit.transform.position, new UnityEngine.Vector2(0, 40), Color.yellow, 3);
-                    UnityEngine.Debug.Log($"[PVE] 玩家{p.pid} 击杀怪物{dieUnit.soldierId} 掉落 {itemName}({itemId})");
+                    GameLog.Debug($"[PVE] 玩家{p.pid} 击杀怪物{dieUnit.soldierId} 掉落 {itemName}({itemId})");
                 }
 
                 // 有掉落时在怪物位置创建掉落包模型，战斗结束时变成卡牌飞向玩家头像
@@ -1029,7 +1029,7 @@ public class WorldManager : MonoBehaviour
                 {
                     p.AddItemCard(itemId);
                     var itemName = ItemConfig.HasConfig(itemId) ? ItemConfig.GetConfig(itemId).Name : itemId.ToString();
-                    UnityEngine.Debug.Log($"[PVE] 未参战玩家{p.pid} 随机获得 {itemName}({itemId})");
+                    GameLog.Debug($"[PVE] 未参战玩家{p.pid} 随机获得 {itemName}({itemId})");
                 }
             }
         }
@@ -1072,7 +1072,7 @@ public class WorldManager : MonoBehaviour
                 }
             }
 
-            UnityEngine.Debug.Log($"id:{dieUnit.id} dieUnit.side:{dieUnit.side} 存活阵营数:{aliveSideCount}");
+            GameLog.Debug($"id:{dieUnit.id} dieUnit.side:{dieUnit.side} 存活阵营数:{aliveSideCount}");
             // 如果只剩一个阵营有存活单位，显示重启按钮
             if (aliveSideCount == 4)
             {
@@ -1111,7 +1111,7 @@ public class WorldManager : MonoBehaviour
                 }
             }
 
-            UnityEngine.Debug.Log($"id:{dieUnit.id} dieUnit.side:{dieUnit.side} 团队1存活:{team1HasUnits} 团队2存活:{team2HasUnits}");
+            GameLog.Debug($"id:{dieUnit.id} dieUnit.side:{dieUnit.side} 团队1存活:{team1HasUnits} 团队2存活:{team2HasUnits}");
             // 如果一个阵营被全灭，另一个阵营获胜
             if (!team1HasUnits || !team2HasUnits)
             {
@@ -1167,11 +1167,11 @@ public class WorldManager : MonoBehaviour
                     deathCount++;
 
                     deathOrder[dieSideIndex] = deathCount;
-                    UnityEngine.Debug.Log($"阵营 {dieUnit.side} 被消灭，死亡顺序: {deathCount}");
+                    GameLog.Debug($"阵营 {dieUnit.side} 被消灭，死亡顺序: {deathCount}");
                 }
             }
 
-            UnityEngine.Debug.Log($"id:{dieUnit.id} dieUnit.side:{dieUnit.side} 存活阵营数:{aliveSideCount}");
+            GameLog.Debug($"id:{dieUnit.id} dieUnit.side:{dieUnit.side} 存活阵营数:{aliveSideCount}");
 
             // 如果只剩一个阵营有存活单位，计算分数并结束游戏
             if (aliveSideCount == 1)
@@ -1382,7 +1382,7 @@ public class WorldManager : MonoBehaviour
         int screenWidth = Screen.width;
         int screenHeight = Screen.height;
 
-        UnityEngine.Debug.Log($"screenWidth:{screenWidth} screenHeight:{screenHeight}");
+        GameLog.Debug($"screenWidth:{screenWidth} screenHeight:{screenHeight}");
 
         // 假设设计分辨率为 1920x1080，可根据实际项目修改
         const float designWidth = 2048f;

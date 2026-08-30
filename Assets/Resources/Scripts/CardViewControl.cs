@@ -96,7 +96,7 @@ public class CardViewControl : MonoBehaviour, IPointerDownHandler, IPointerUpHan
 
     public void OnPointerDown(PointerEventData eventData)
     {
-        Debug.Log($"UI 元素被按下，位置：{eventData.position}");
+        GameLog.Debug($"UI 元素被按下，位置：{eventData.position}");
 
         // 属性取值在 Tooltip 内部统一走 GetCardAttr（与战斗一致），这里只需传当前玩家
         var player = CardShopManager.Instance.GetCurrentPlayer();
@@ -134,7 +134,7 @@ public class CardViewControl : MonoBehaviour, IPointerDownHandler, IPointerUpHan
             heroImage.sprite = Resources.Load<Sprite>("SkinsBig/" + heroCfg.Icon);
             cardNameS = heroCfg.Name;
             cardName.text = heroCfg.Name;
-            cardName.color = HeroSelectionTool.GetQualityColor(heroCfg.Quality);
+            cardName.color = SysColor.GetQualityColor(heroCfg.Quality);
             if (count > 1)
                 cardName.text += "x" + count;
 
@@ -153,7 +153,7 @@ public class CardViewControl : MonoBehaviour, IPointerDownHandler, IPointerUpHan
 
             }
 
-            gameObject.GetComponent<Image>().color = HeroSelectionTool.GetSideColor(heroCfg.Side);
+            gameObject.GetComponent<Image>().color = SysColor.GetSideColor(heroCfg.Side);
             priceI = HeroSelectionTool.GetPrice(heroCfg);
 
             UpdateEffects();
@@ -280,7 +280,7 @@ public class CardViewControl : MonoBehaviour, IPointerDownHandler, IPointerUpHan
             if (img == null || IsEffectNode(img))
                 continue;
             // 设置灰度颜色
-            img.color = new Color(0.3f, 0.3f, 0.3f, img.color.a);
+            img.color = new Color(SysColor.Card.SoldGray.r, SysColor.Card.SoldGray.g, SysColor.Card.SoldGray.b, img.color.a);
         }
         
         // 获取所有TextMeshProUGUI组件并应用灰度效果
@@ -311,7 +311,7 @@ public class CardViewControl : MonoBehaviour, IPointerDownHandler, IPointerUpHan
         if (isHeroCard)
             panel.color = Color.white; // Init 会重新赋阵营色
         else
-            panel.color = new Color(0.6037736f, 0.46531343f, 0.13955145f); // 道具卡面板默认色
+            panel.color = SysColor.Card.ItemPanel; // 道具卡面板默认色
 
         foreach (Image img in GetComponentsInChildren<Image>(true))
         {
