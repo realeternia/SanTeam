@@ -6,6 +6,9 @@ using UnityEngine;
 
 public class PlayerBook
 {
+    // PVE怪物专用虚拟玩家id（PlayerConfig 999）：不参与PVP匹配，无PlayerInfo实体
+    public const int MonsterPlayerId = 999;
+
     public static int GetWang()
     {
         return 1;
@@ -16,10 +19,10 @@ public class PlayerBook
         // 收集CanPlayer=true和CanPlayer=false的配置ID
         List<int> trueIds = new List<int>();
         List<int> falseIds = new List<int>();
-        
+
         foreach (PlayerConfig cfg in PlayerConfig.ConfigList)
         {
-            if (cfg.Id > 1) // 保持原有条件
+            if (cfg.Id > 1 && cfg.Id != MonsterPlayerId) // 排除怪物虚拟玩家，不参与正常PVP匹配
             {
                 if (cfg.CanPlay)
                     trueIds.Add(cfg.Id);

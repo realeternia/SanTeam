@@ -100,8 +100,8 @@ public static class HeroSelectionTool
         heroPoolCache.RemoveAll(hero => banList.Contains(hero.Item1));
     }
 
-    // 刷牌：先按ShopConfig品质概率roll出品质，再从该品质的英雄池随机选一张（ban 已在池中剔除）
-    public static int GetRandomHeroIdByQuality(ShopConfig shopCfg)
+    // 刷牌：先按GameRoundConfig品质概率roll出品质，再从该品质的英雄池随机选一张（ban 已在池中剔除）
+    public static int GetRandomHeroIdByQuality(GameRoundConfig shopCfg)
     {
         int quality = RollQuality(shopCfg);
         List<int> candidates = new List<int>();
@@ -121,7 +121,7 @@ public static class HeroSelectionTool
     }
 
     // 品质1=100-品质2-品质3-品质4
-    private static int RollQuality(ShopConfig shopCfg)
+    private static int RollQuality(GameRoundConfig shopCfg)
     {
         int q2 = Math.Max(0, shopCfg.Quality2Rate);
         int q3 = Math.Max(0, shopCfg.Quality3Rate);

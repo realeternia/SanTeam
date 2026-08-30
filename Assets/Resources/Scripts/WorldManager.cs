@@ -28,6 +28,10 @@ public class WorldManager : MonoBehaviour
     private bool gameFinish = false;
     private bool hasWin;
     private MapConfig mapConfig;
+    private int[] currentMatch = null; // 本场战斗的1-8号位随机分配结果
+    private bool isPveRound = false; // 本场是否为PVE（打怪物拿掉落）
+    private List<System.Tuple<int, int>> pveMonsterSpawns = null; // PVE怪物布阵（怪物id, 布阵格0~24：0=左上，24=右下）
+    private int pveFightCount = 1; // PVE仅玩家0参战（1号位打2号位怪物），AI不打怪
    
     public HeroInfoGroup heroInfoGroup;
     public Button buttonRestart;
@@ -68,10 +72,16 @@ public class WorldManager : MonoBehaviour
         var roll = UnityEngine.Random.Range(0, 2);
         BGMPlayer.Instance.PlaySound(roll == 0 ? "BGMs/weifeng" : "BGMs/pozhu");
 
-        var newMapId = 1;
+        // 从回合配置表读取本回合可能刷的地图，随机选一张
         gameFinish = false;
-        if (GameManager.Instance.year >= 5)
-            newMapId = UnityEngine.Random.Range(1, 5);
+        currentMatch = null; // 重置号位分配，本场重新随机
+        var roundCfg = GameRoundConfig.GetConfig(Math.Min(100, GameManager.Instance.year));
+        isPveRound = roundCfg.RoundType == 1;
+        pveMonsterSpawns = ParsePveMonsterSpawns(roundCfg.SoldierList);
+        if (isPveRound)
+            Debug.Log($"[PVE] 回合{GameManager.Instance.year} {roundCfg.Name} 怪物布阵: {(string.IsNullOrEmpty(roundCfg.SoldierList) ? "(空!请在GameRoundConfig填SoldierList)" : roundCfg.SoldierList)} 解析到{pveMonsterSpawns.Count}只");
+        var mapIds = roundCfg.MapIds;
+        var newMapId = mapIds[UnityEngine.Random.Range(0, mapIds.Length)];
         if (mapConfig == null || newMapId != mapConfig.Mapid)
         {
             // 打印加载耗时
@@ -167,22 +177,19 @@ public class WorldManager : MonoBehaviour
 
     private int[] GetMatch()
     {
-        var battleIndex = GameManager.Instance.year;
-        // 两两组合搭配方案
-        if (battleIndex % 7 == 0)
-            return new int[] { 0, 7, 1, 6, 2, 5, 3, 4 }; 
-        else if (battleIndex % 7 == 1)
-            return new int[] { 0, 1, 7, 4, 5, 3, 6, 2 }; 
-        else if (battleIndex % 7 == 2)
-            return new int[] { 0, 2, 1, 7, 3, 6, 4, 5 };
-        else if (battleIndex % 7 == 3)
-            return new int[] { 0, 3, 7, 5, 6, 4, 1, 2 };
-        else if (battleIndex % 7 == 4)
-            return new int[] { 0, 4, 2, 7, 3, 1, 5, 6 }; 
-        else if (battleIndex % 7 == 5)
-            return new int[] { 0, 5, 7, 6, 1, 4, 2, 3 }; 
-        else
-            return new int[] { 0, 6, 3, 7, 4, 2, 5, 1 }; 
+        // 每场战斗随机生成一次1-8号位分配，战斗期间（结算/结果显示）复用同一结果
+        if (currentMatch == null)
+        {
+            currentMatch = new int[] { 0, 1, 2, 3, 4, 5, 6, 7 };
+            for (int i = currentMatch.Length - 1; i > 0; i--)
+            {
+                int j = UnityEngine.Random.Range(0, i + 1);
+                int temp = currentMatch[i];
+                currentMatch[i] = currentMatch[j];
+                currentMatch[j] = temp;
+            }
+        }
+        return currentMatch;
     }
 
     private void SpawnUnitsInRegions()
@@ -216,19 +223,54 @@ public class WorldManager : MonoBehaviour
         if (!isDebug)
         {
             int[] match = GetMatch();
-            for (int i = 0; i < 8; i++)
+            if (isPveRound)
             {
-                GameManager.Instance.GetPlayer(match[i]).battleSide = i + 1;
+                // PVE：仅显示玩家0打怪局，AI不打怪
+                // 玩家0固定占1号位，怪物刷2号位；其余玩家无战斗单位
+                // 其他玩家（AI）战斗结束一起随机获得装备
+                for (int i = 0; i < match.Length; i++)
+                {
+                    if (match[i] == 0)
+                    {
+                        int tmp = match[0];
+                        match[0] = match[i];
+                        match[i] = tmp;
+                        break;
+                    }
+                }
+                for (int i = 0; i < 8; i++)
+                    GameManager.Instance.GetPlayer(match[i]).battleSide = i == 0 ? 1 : 0;
+
+                if (mapConfig.SideCenters != null && mapConfig.SideCenters.Length >= 2 && mapConfig.SideCenters[0] != null)
+                {
+                    var playerCenter = mapConfig.SideCenters[0];
+                    var monsterCenter = mapConfig.SideCenters[1];
+                    var p = GameManager.Instance.GetPlayer(match[0]);
+
+                    SpawnSoldiersForSide(p, playerCenter, 1);
+                    SpawnHerosForSide(p, playerCenter, p.GetBattleCardList(), 1);
+                    CreateCastleHUD(p, playerCenter);
+
+                    if (monsterCenter != null)
+                        SpawnMonstersForSide(monsterCenter, 2);
+                }
             }
-            for (int side = 1; side <= 8; side++)
+            else
             {
-                var p = GameManager.Instance.GetPlayer(match[side - 1]);
-                if (mapConfig.SideCenters == null || side - 1 >= mapConfig.SideCenters.Length || mapConfig.SideCenters[side - 1] == null)
-                    continue;
-                var center = mapConfig.SideCenters[side - 1];
-                SpawnSoldiersForSide(p, center, side);
-                SpawnHerosForSide(p, center, p.GetBattleCardList(), side);
-                CreateCastleHUD(p, center);
+                for (int i = 0; i < 8; i++)
+                {
+                    GameManager.Instance.GetPlayer(match[i]).battleSide = i + 1;
+                }
+                for (int side = 1; side <= 8; side++)
+                {
+                    var p = GameManager.Instance.GetPlayer(match[side - 1]);
+                    if (mapConfig.SideCenters == null || side - 1 >= mapConfig.SideCenters.Length || mapConfig.SideCenters[side - 1] == null)
+                        continue;
+                    var center = mapConfig.SideCenters[side - 1];
+                    SpawnSoldiersForSide(p, center, side);
+                    SpawnHerosForSide(p, center, p.GetBattleCardList(), side);
+                    CreateCastleHUD(p, center);
+                }
             }
         }
         else
@@ -328,6 +370,80 @@ public class WorldManager : MonoBehaviour
         return chessComponent;
     }
 
+    // 解析PVE怪物布阵配置"怪物id;布阵格|怪物id;布阵格"（布阵格0~24：0=左上，24=右下）
+    private List<System.Tuple<int, int>> ParsePveMonsterSpawns(string cfg)
+    {
+        var result = new List<System.Tuple<int, int>>();
+        if (string.IsNullOrEmpty(cfg))
+            return result;
+        foreach (var seg in cfg.Split('|'))
+        {
+            var parts = seg.Split(';');
+            if (parts.Length != 2)
+                continue;
+            int id, pos;
+            if (!int.TryParse(parts[0].Trim(), out id) || !int.TryParse(parts[1].Trim(), out pos))
+                continue;
+            if (pos < 0 || pos >= CombatConst.FormationCellCount)
+                continue;
+            result.Add(System.Tuple.Create(id, pos));
+        }
+        return result;
+    }
+
+    // PVE：按回合配置的怪物布阵在怪物号位生成（每只在配置指定的5x5布阵格上）
+    private void SpawnMonstersForSide(Transform center, int side)
+    {
+        if (pveMonsterSpawns == null)
+            return;
+        foreach (var spawn in pveMonsterSpawns)
+            SpawnMonsterForRegion(spawn.Item1, spawn.Item2, GetFormationCellPos(center, spawn.Item2), side);
+    }
+
+    // 生成一只PVE怪物：归属虚拟玩家999(PlayerConfig"怪物"，无PlayerInfo实体，不参与PVP匹配)，贴图用SoldierConfig.Img，死亡时按Drops掉落给配对玩家
+    private Chess SpawnMonsterForRegion(int soldierId, int posId, UnityEngine.Vector3 spawnPos, int side)
+    {
+        var soldierConfig = SoldierConfig.GetConfig(soldierId);
+        GameObject unitPrefab = Resources.Load<GameObject>("Prefabs/" + soldierConfig.Model);
+
+        GameObject unitInstance = Instantiate(unitPrefab, spawnPos, Quaternion.identity, Units.transform);
+        unitInstance.name = $"UnitMonster_{side}_{idCounter}";
+        unitInstance.transform.localRotation = Quaternion.Euler(0f, 180f, 0f);
+
+        Chess chessComponent = unitInstance.GetComponent<Chess>();
+        if (chessComponent != null)
+        {
+            chessComponent.id = idCounter;
+            chessComponent.isHero = false;
+            chessComponent.side = side;
+            // 怪物模型不显示玩家头像，显示SoldierConfig.Img配置的贴图
+            chessComponent.chessName = soldierConfig.Img != null ? soldierConfig.Img : "";
+            chessComponent.maxHp = soldierConfig.Hp;
+            chessComponent.moveSpeed = soldierConfig.MoveSpeed;
+            chessComponent.attackRange = soldierConfig.Range;
+            chessComponent.attackDamage = soldierConfig.Atk;
+            chessComponent.attackRate = soldierConfig.AtkSpeed / 30f;
+            chessComponent.missileSpeed = soldierConfig.MissileSpeed;
+            chessComponent.missileHight = soldierConfig.MissileHight;
+            chessComponent.armor = soldierConfig.Armor;
+            chessComponent.magicRes = soldierConfig.MagicRes;
+            chessComponent.isFakeHero = soldierConfig.Model == "UnitHero";
+            chessComponent.hitEffect = soldierConfig.HitEffect;
+            chessComponent.soldierId = soldierId;
+            chessComponent.playerId = PlayerBook.MonsterPlayerId;
+            chessComponent.Init(PlayerBook.MonsterPlayerId, posId, Color.red);
+        }
+        else
+        {
+            Debug.LogError("Chess component not found on monster prefab");
+        }
+        chessList.Add(chessComponent);
+
+        idCounter++;
+
+        return chessComponent;
+    }
+
     private Chess SpawnHerosForRegion(PlayerInfo p, int posId, UnityEngine.Vector3 spawnPos, System.Tuple<int, int> heroData, int side)
     {
         var heroConfig = HeroConfig.GetConfig(heroData.Item1);
@@ -412,6 +528,10 @@ public class WorldManager : MonoBehaviour
         }
 
         {
+            // PVE：未参战玩家没有战斗过程，战斗结束一起随机获得装备
+            if (isPveRound)
+                GivePveIdleDrops();
+
             if (hasWin)
                 textRestart.text = "你获胜了!!!";
             else
@@ -726,6 +846,11 @@ public class WorldManager : MonoBehaviour
 
     public bool IsEnemy(int a, int b)
     {
+        if (isPveRound)
+        {
+            // PVE：只有配对的(玩家奇数号位,怪物偶数号位)互为敌人，各对之间互不干扰
+            return a != b && (a + 1) / 2 == (b + 1) / 2;
+        }
         if (mapConfig.TeamMode == 1)
         {
             // 阵营1、3、4为一个阵营，阵营2、5、6为另一个阵营
@@ -747,15 +872,94 @@ public class WorldManager : MonoBehaviour
         }
     }
 
+    // PVE战斗结算：怪物死亡按配置掉落给配对玩家；所有(玩家,怪物)配对分出胜负后结束战斗
+    private void HandlePveUnitDying(Chess dieUnit, int killerPlayerId)
+    {
+        int[] match = GetMatch();
+
+        // 怪物死亡（归属虚拟玩家999且偶数号位）：掉落给配对的奇数号位玩家（2号怪→1号玩家）
+        if (dieUnit.playerId == PlayerBook.MonsterPlayerId && dieUnit.side % 2 == 0)
+        {
+            int pairIdx = dieUnit.side / 2 - 1;
+            if (pairIdx >= 0 && pairIdx < pveFightCount)
+            {
+                var p = GameManager.Instance.GetPlayer(match[pairIdx]);
+                foreach (var itemId in SoldierConfig.GetConfig(dieUnit.soldierId).RollDrops())
+                {
+                    p.AddItemCard(itemId);
+                    var itemName = ItemConfig.HasConfig(itemId) ? ItemConfig.GetConfig(itemId).Name : itemId.ToString();
+                    AddBattleText("掉落:" + itemName, dieUnit.transform.position, new UnityEngine.Vector2(0, 40), Color.yellow, 3);
+                    UnityEngine.Debug.Log($"[PVE] 玩家{p.pid} 击杀怪物{dieUnit.soldierId} 掉落 {itemName}({itemId})");
+                }
+            }
+        }
+
+        // 统计各阵营存活情况
+        bool[] sideHasUnits = new bool[8];
+        foreach (var chessComponent in chessList)
+        {
+            if (chessComponent != null && chessComponent.hp > 0 && !chessComponent.isShadow)
+            {
+                int sideIndex = chessComponent.side - 1;
+                if (sideIndex >= 0 && sideIndex < 8)
+                    sideHasUnits[sideIndex] = true;
+            }
+        }
+
+        // 每组(玩家=奇数位,怪物=偶数位)需分出胜负：一方全灭
+        for (int i = 0; i < pveFightCount; i++)
+        {
+            if (sideHasUnits[i * 2] && sideHasUnits[i * 2 + 1])
+                return; // 还有配对未分出胜负，战斗继续
+        }
+
+        // 全部配对结束：结算参战玩家（玩家存活=击杀全部怪物=胜利），PVE不加分都是0分
+        for (int i = 0; i < pveFightCount; i++)
+        {
+            bool isWin = sideHasUnits[i * 2];
+            GameManager.Instance.GetPlayer(match[i]).onBattleResult(isWin, 0);
+        }
+
+        gameFinish = true;
+        int player0Idx = Array.IndexOf(match, 0);
+        hasWin = player0Idx >= pveFightCount || sideHasUnits[player0Idx * 2];
+    }
+
+    // PVE：未参战玩家没有战斗过程，战斗结束一起随机获得装备（模拟一轮怪物掉落）
+    private void GivePveIdleDrops()
+    {
+        if (pveMonsterSpawns == null || pveMonsterSpawns.Count == 0)
+            return;
+        int[] match = GetMatch();
+        for (int i = pveFightCount; i < match.Length; i++)
+        {
+            var p = GameManager.Instance.GetPlayer(match[i]);
+            foreach (var spawn in pveMonsterSpawns)
+            {
+                foreach (var itemId in SoldierConfig.GetConfig(spawn.Item1).RollDrops())
+                {
+                    p.AddItemCard(itemId);
+                    var itemName = ItemConfig.HasConfig(itemId) ? ItemConfig.GetConfig(itemId).Name : itemId.ToString();
+                    UnityEngine.Debug.Log($"[PVE] 未参战玩家{p.pid} 随机获得 {itemName}({itemId})");
+                }
+            }
+        }
+    }
+
     public void OnUnitDying(Chess dieUnit, int killerPlayerId)
     {
-        if(killerPlayerId >= 0 && dieUnit.isHero)
+        if(killerPlayerId >= 0 && killerPlayerId < killMark.Length && dieUnit.isHero)
             killMark[killerPlayerId]++;
         // 从chessList中移除死亡单位
         chessList.Remove(dieUnit);
 
         gameFinish = false;
         hasWin = false;
+        if (isPveRound)
+        {
+            HandlePveUnitDying(dieUnit, killerPlayerId);
+            return;
+        }
         if (mapConfig.TeamMode == 0)
         {
             // 检查所有阵营是否还有存活单位

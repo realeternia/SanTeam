@@ -102,7 +102,7 @@ public class Chess : MonoBehaviour
         material = new Material(rend.sharedMaterial);
         if (!string.IsNullOrEmpty(chessName))
         {
-            if (chessName.StartsWith("PlayerPic"))
+            if (chessName.StartsWith("PlayerPic") || chessName.StartsWith("MonsterPic"))
                 material.mainTexture = Resources.Load<Texture>(chessName);
             else
                 material.mainTexture = Resources.Load<Texture>("Skins/" + chessName);
@@ -147,7 +147,8 @@ public class Chess : MonoBehaviour
         if (!isHero)
         {
             var soldierCfg = SoldierConfig.GetConfig(soldierId);
-            var playerInfo = GameManager.Instance.GetPlayer(playerId);
+            // playerId=999为PVE怪物(虚拟玩家，无PlayerInfo实体)，不享受任何玩家加成
+            var playerInfo = (playerId >= 0 && playerId < GameManager.Instance.players.Length) ? GameManager.Instance.GetPlayer(playerId) : null;
             if (playerInfo != null && soldierCfg.SoldierAtkRate > 0)
             {
                 maxHp += (int)((playerInfo.sodhp + playerInfo.GetItemPAttr("shp") + playerInfo.GetSoldierHpAdd()) * soldierCfg.SoldierHpRate);
@@ -732,6 +733,9 @@ public class Chess : MonoBehaviour
 
     public PlayerInfo GetPlayerInfo()
     {
+        // playerId=999为PVE怪物(虚拟玩家，无PlayerInfo实体)
+        if (playerId < 0 || playerId >= GameManager.Instance.players.Length)
+            return null;
         return GameManager.Instance.GetPlayer(playerId);
     }
 

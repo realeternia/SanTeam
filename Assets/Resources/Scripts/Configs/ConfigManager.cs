@@ -28,7 +28,7 @@ public static class ConfigManager
         BuffConfig.Load();
         ItemConfig.Load();
         SoldierConfig.Load();
-        ShopConfig.Load();
+        GameRoundConfig.Load();
         PlayerConfig.Load();
         HeroFriendConfig.Load();
         PlayerLevelConfig.Load();

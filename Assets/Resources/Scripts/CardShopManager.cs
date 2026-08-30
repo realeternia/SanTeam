@@ -152,7 +152,7 @@ public class CardShopManager : MonoBehaviour
             player.OnEra(era);
 
         var year = GameManager.Instance.year; //第几场比赛（每场战斗后+1，即一个回合）
-        var shopCfg = ShopConfig.GetConfig(Math.Min(100, year));
+        var shopCfg = GameRoundConfig.GetConfig(Math.Min(100, year));
         List<Tuple<int, int>> heroIds = new List<Tuple<int, int>>();
         int TOTAL_HERO_CARDS = 15;        
         // hero card
@@ -296,8 +296,7 @@ public class CardShopManager : MonoBehaviour
         era++;
         passBtn.gameObject.SetActive(true);
 
-        var nowYear = GameManager.Instance.year + 179;
-        eraText.text = nowYear + "年\n" + era + "月";
+        eraText.text = shopCfg.Name;
 
         // 重置所有玩家的pass状态
         for (int i = 0; i < playerPassed.Length; i++)
@@ -398,7 +397,7 @@ public class CardShopManager : MonoBehaviour
             {
                 GameManager.Instance.GetPlayer(players[0].id).AddGold(2);
                 GameManager.Instance.GetPlayer(players[1].id).AddGold(2);
-                GameManager.Instance.GetPlayer(players[2].id).AddGold(0);
+                // 第三名(players[2])不加金币，原来AddGold(0)会触发异常
             }
         }
     }
@@ -552,7 +551,7 @@ public class CardShopManager : MonoBehaviour
             return;
 
         var year = GameManager.Instance.year;
-        var shopCfg = ShopConfig.GetConfig(Math.Min(100, year));
+        var shopCfg = GameRoundConfig.GetConfig(Math.Min(100, year));
 
         // 重新加载prefab，避免旧卡对象残留刷新前的样式/尺寸
         GameObject card = Instantiate(cardViewPrefab, transform);
@@ -581,7 +580,7 @@ public class CardShopManager : MonoBehaviour
     }
 
     // 与初始刷牌一致的卡牌数量计算逻辑
-    private int GetMultiCount(int cardPrice, ShopConfig shopCfg)
+    private int GetMultiCount(int cardPrice, GameRoundConfig shopCfg)
     {
         var count = 1;
         if (shopCfg.MultiPriceTotal > 2 * cardPrice)
@@ -654,7 +653,7 @@ public class CardShopManager : MonoBehaviour
         }
 
         var shopOpenIndex = GameManager.Instance.year; //第几场比赛
-        var shopCfg = ShopConfig.GetConfig(Math.Min(100, shopOpenIndex + 1));
+        var shopCfg = GameRoundConfig.GetConfig(Math.Min(100, shopOpenIndex + 1));
         var roundGold = shopCfg.RoundGold;
         for(int i = 0; i < 8; i++)
             GameManager.Instance.GetPlayer(i).RoundGold(roundGold);

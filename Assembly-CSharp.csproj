@@ -85,7 +85,6 @@
     <Compile Include="Assets\Resources\Scripts\Configs\FormulaLearnAttrConfig_s.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffTimeDamage.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillDamageReal.cs" />
-    <Compile Include="Assets\Resources\Scripts\Configs\ShopConfig_s.cs" />
     <Compile Include="Assets\Resources\Scripts\CardShopManager.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillHitWall.cs" />
     <Compile Include="Assets\Resources\Scripts\PlayerInfo.cs" />
@@ -143,6 +142,7 @@
     <Compile Include="Assets\Resources\Scripts\Combat\Chess.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillHitArea.cs" />
     <Compile Include="Assets\Resources\Scripts\PanelManager.cs" />
+    <Compile Include="Assets\Resources\Scripts\Configs\GameRoundConfig_s.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAttackSpinAttack.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillHitRegion.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillModifyBuffTime.cs" />

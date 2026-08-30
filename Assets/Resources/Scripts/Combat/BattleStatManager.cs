@@ -17,6 +17,10 @@ public static class BattleStatManager
 
     public static void AddBattleStat(int playerId, int heroId, float damage, bool isAttack, bool isToHero)
     {
+        // PVE怪物(虚拟玩家999)的输出不计入战绩统计（结算面板按playerId取PlayerInfo会越界）
+        if (playerId == PlayerBook.MonsterPlayerId)
+            return;
+
         var uid = playerId * 1000000 + heroId;
         if (battleStats.TryGetValue(uid, out var battleStat))
         {

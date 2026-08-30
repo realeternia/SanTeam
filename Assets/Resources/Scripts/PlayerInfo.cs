@@ -177,7 +177,8 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         if(CardShopManager.Instance != null)
             CardShopManager.Instance.QuickView(pid);
 
-        PanelManager.Instance.SendSignal("SelectPlayer", "", pid);
+        if(PanelManager.Instance != null)
+            PanelManager.Instance.SendSignal("SelectPlayer", "", pid);
     }
 
     public void AddGold(int g)
@@ -962,6 +963,15 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     public bool HasCard(int cardId)
     {
         return cards.ContainsKey(cardId);
+    }
+
+    // 直接获得一张道具卡（PVE怪物掉落等来源，不走商店购买流程）
+    public void AddItemCard(int itemId)
+    {
+        if (cards.TryGetValue(itemId, out int count))
+            cards[itemId] = count + 1;
+        else
+            cards[itemId] = 1;
     }
 
     public bool HasFriend(int cardId)
