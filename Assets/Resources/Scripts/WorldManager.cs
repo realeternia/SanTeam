@@ -119,6 +119,9 @@ public class WorldManager : MonoBehaviour
         foreach (var chess in chessList.ToArray()) //防止召唤
             SkillManager.CheckAddSkill(chess);
 
+        // 兵种连锁：按同职业英雄数量施加职业被动属性加成（自身加成+全队加成，不走技能系统）
+        JobLinkManager.ApplyJobLinks();
+
         foreach (var chess in chessList.ToArray()) //防止召唤
             SkillManager.BattleBegin(chess);
 
@@ -127,9 +130,6 @@ public class WorldManager : MonoBehaviour
 
         // 连线(武将关系)：计算好友属性加成并创建连线特效
         FriendLineManager.ApplyFriendLines();
-
-        // 兵种连锁：同兵种英雄数量提升该兵种默认技能等级（默认1级，每多一个+1级）
-        JobLinkManager.ApplyJobLinks();
 
         // 好友连锁·特殊：在场好友数量提升关联(助益)技能等级（默认无技能，每多一个+1级）
         FriendLineManager.ApplyFriendSpecialSkills();

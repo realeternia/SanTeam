@@ -87,11 +87,11 @@ public static class CombatConst
     public const int ExpBuyAmount = 4;
 
     // ---- 士兵等级体系 ----
-    /// <summary>士兵最高等级(30级，20级达到最大士兵数)</summary>
+    /// <summary>士兵最高等级(30级，只提升士兵攻防加成；数量由玩家等级决定)</summary>
     public const int SoldierMaxLevel = 30;
     /// <summary>士兵升级所需金币</summary>
     public const int SodLvupGoldCost = 5;
-    /// <summary>士兵最大数量(20级达成)：步兵5、弓兵3</summary>
+    /// <summary>士兵最大数量：步兵5、弓兵3（10级玩家达成）</summary>
     public const int SoldierMaxMeleeCount = 5;
     public const int SoldierMaxRangedCount = 3;
 }

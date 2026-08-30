@@ -18,13 +18,23 @@ namespace CommonConfig
         ///上阵格子数（10级后9个格子全解锁）
         /// </summary>
         public int SlotCount;
+        /// <summary>
+        ///步兵数量（10级达到最大5）
+        /// </summary>
+        public int MeleeCount;
+        /// <summary>
+        ///弓兵数量（10级达到最大3）
+        /// </summary>
+        public int RangedCount;
 
 
-        public PlayerLevelConfig(int Id, int ExpToNext, int SlotCount)
+        public PlayerLevelConfig(int Id, int ExpToNext, int SlotCount, int MeleeCount, int RangedCount)
         {
             this.Id = Id;
             this.ExpToNext = ExpToNext;
             this.SlotCount = SlotCount;
+            this.MeleeCount = MeleeCount;
+            this.RangedCount = RangedCount;
 
         }
 
@@ -82,6 +92,8 @@ namespace CommonConfig
             {"Id", new FieldMetaInfo("序列", "int", 60)},
             {"ExpToNext", new FieldMetaInfo("升级所需经验", "int", 60)},
             {"SlotCount", new FieldMetaInfo("上阵格子数", "int", 60)},
+            {"MeleeCount", new FieldMetaInfo("步兵数量", "int", 60)},
+            {"RangedCount", new FieldMetaInfo("弓兵数量", "int", 60)},
         };
 
         public static Dictionary<string, FieldMetaInfo> FieldMeta { get { return fieldMeta; } }
@@ -92,16 +104,17 @@ namespace CommonConfig
         public static void Load()
         {
             config.Clear();
-            config[1] = new PlayerLevelConfig(1, 4, 2);
-            config[2] = new PlayerLevelConfig(2, 8, 3);
-            config[3] = new PlayerLevelConfig(3, 12, 4);
-            config[4] = new PlayerLevelConfig(4, 20, 5);
-            config[5] = new PlayerLevelConfig(5, 40, 6);
-            config[6] = new PlayerLevelConfig(6, 72, 7);
-            config[7] = new PlayerLevelConfig(7, 112, 8);
-            config[8] = new PlayerLevelConfig(8, 160, 9);
-            config[9] = new PlayerLevelConfig(9, 200, 9);
-            config[10] = new PlayerLevelConfig(10, 0, 9);
+            // 士兵数量与玩家等级挂钩：步兵1→5、弓兵0→3（10级达最大）；士兵攻防加成由士兵等级(SoldierLevelConfig)决定
+            config[1] = new PlayerLevelConfig(1, 4, 2, 1, 0);
+            config[2] = new PlayerLevelConfig(2, 8, 3, 1, 0);
+            config[3] = new PlayerLevelConfig(3, 12, 4, 2, 0);
+            config[4] = new PlayerLevelConfig(4, 20, 5, 2, 1);
+            config[5] = new PlayerLevelConfig(5, 40, 6, 3, 1);
+            config[6] = new PlayerLevelConfig(6, 72, 7, 3, 2);
+            config[7] = new PlayerLevelConfig(7, 112, 8, 4, 2);
+            config[8] = new PlayerLevelConfig(8, 160, 9, 4, 3);
+            config[9] = new PlayerLevelConfig(9, 200, 9, 5, 3);
+            config[10] = new PlayerLevelConfig(10, 0, 9, 5, 3);
 
             RebuildIndex();
 

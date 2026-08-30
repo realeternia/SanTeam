@@ -15,7 +15,7 @@ public class BuffTimeDamage : Buff
     public override void OnAdd(Chess chess, Chess caster)
     {
         base.OnAdd(chess, caster);
-        damage = caster.GetAttr(skillCfg.Attr) * skillCfg.SkillDamageAttrRate;
+        damage = skillCfg.Strength + caster.GetAttr(skillCfg.Attr) * skillCfg.SkillDamageAttrRate; // 固定系数 + 比例系数×关联属性
         
         // 启动伤害协程
         damageCoroutine = chess.StartCoroutine(DamageOverTime(chess, caster));

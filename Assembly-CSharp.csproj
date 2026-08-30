@@ -131,7 +131,6 @@
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffLock.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillHelpInitTeach.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAttackMultiArrow.cs" />
-    <Compile Include="Assets\Resources\Scripts\ItemDetail.cs" />
     <Compile Include="Assets\Resources\Scripts\IconLoader.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillInitSoldierUp.cs" />
     <Compile Include="Assets\SineVFX\TopDownEffects\Scripts\PrefabSpawner.cs" />
@@ -149,7 +148,6 @@
     <Compile Include="Assets\SineVFX\TopDownEffects\Scripts\SineCameraControllerTopDownEffects.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffManager.cs" />
     <Compile Include="Assets\Resources\Scripts\Configs\HeroAttrConfig_s.cs" />
-    <Compile Include="Assets\Resources\Scripts\ItemHeroDetail.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillInitSoldierSummon.cs" />
     <Compile Include="Assets\Resources\Scripts\CastleHUD.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillBuffExpand.cs" />

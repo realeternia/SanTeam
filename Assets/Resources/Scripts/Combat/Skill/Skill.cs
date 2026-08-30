@@ -26,6 +26,15 @@ public class Skill
 
     public float mp; // 当前技能MP，战斗开始为0，满值=MpCost
 
+    /// <summary>
+    /// 统一技能伤害公式：固定系数(Strength) + 比例系数(SkillDamageAttrRate) × 关联属性(Attr)
+    /// Attr 取值：ap=法强 / might=无双 / atk=武力（在配置表里按技能配置）
+    /// </summary>
+    public int GetSkillDamage()
+    {
+        return (int)(skillCfg.Strength + owner.GetAttr(skillCfg.Attr) * skillCfg.SkillDamageAttrRate);
+    }
+
     public Skill(int id, Chess unit)
     {
         this.id = id;

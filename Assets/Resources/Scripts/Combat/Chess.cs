@@ -47,6 +47,7 @@ public class Chess : MonoBehaviour
     // 是否正在使用偏移路径
     public int hp = 100;
     public int attackDamage = 30;
+    public float soldierAtkRate = 1f; // 士兵攻击加成系数（相的职业羁绊：全军士兵攻击+%）
 
     // 护甲/魔抗：英雄与士兵初始化时从配置赋值
     public int armor;
@@ -120,7 +121,7 @@ public class Chess : MonoBehaviour
             var jobSkillSname = jobCfg != null ? jobCfg.SkillId : "";
             var playerInfo = GameManager.Instance.GetPlayer(playerId);
             // 初始化技能：默认取1级行创建，随后按来源修正等级——
-            // 个人技能(Skill1/Skill2)等级 = 卡片等级；兵种技能由 JobLinkManager 按同兵种数量计算；
+            // 个人技能(Skill1/Skill2)等级 = 卡片等级；兵种技能为占位技能(Dumb)，职业被动加成由 JobLinkManager 按同职业英雄数直接施加；
             // 好友特殊技能由 FriendLineManager 按在场好友数计算。
             foreach (var skillCfg in ConfigManager.GetHeroSkillConfigs(heroCfg))
             {
@@ -698,7 +699,8 @@ public class Chess : MonoBehaviour
         if (!attacker.isHero || !defender.isHero)
         {
             type = "atk";
-            return attacker.attackDamage;
+            // 士兵攻击受加成系数影响（相的职业羁绊：全军士兵攻击+%）
+            return (int)(attacker.attackDamage * attacker.soldierAtkRate);
         }
 
         // 普通攻击以攻击(Atk)为基准，受目标护甲减免：实际伤害 = Atk × 100/(100+护甲)

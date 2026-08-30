@@ -74,7 +74,7 @@ public class SkillHitWall : Skill
                     unitList.Add(unit);
                 }
             }
-            var damage = (int)(owner.GetAttr(skillCfg.Attr) * skillCfg.SkillDamageAttrRate);
+            var damage = GetSkillDamage(); // 固定系数 + 比例系数×关联属性
             foreach (var unit in unitList)
             {
                 if (damage > 0)

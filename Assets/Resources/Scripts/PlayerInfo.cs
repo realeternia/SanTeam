@@ -76,7 +76,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     [CustomSerializeField]
     public int sodhp = 0; //士兵def强化
     [CustomSerializeField]
-    public int soldierLevel = 1; //士兵等级(1~30)，决定士兵攻防加成与数量
+    public int soldierLevel = 1; //士兵等级(1~30)，决定士兵攻防加成（数量由玩家等级决定）
     [CustomSerializeField]
     public int goldCostHero = 0;
     [CustomSerializeField]
@@ -974,7 +974,8 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         if (lv != level)
         {
             level = lv;
-            UnityEngine.Debug.Log($"玩家{pid} 升级到 {level} 级，上阵格子 {GetSlotCount()}，剩余经验 {exp}");
+            EnsureSoldierCells(); // 玩家等级提升可能解锁更多士兵，补齐布阵格
+            UnityEngine.Debug.Log($"玩家{pid} 升级到 {level} 级，上阵格子 {GetSlotCount()}，士兵 {GetSoldierMeleeCount()}步+{GetSoldierRangedCount()}弓，剩余经验 {exp}");
         }
     }
 
@@ -1002,14 +1003,16 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     }
     public int GetSoldierMeleeCount()
     {
-        return SoldierLevelConfig.HasConfig(soldierLevel) ? SoldierLevelConfig.GetConfig(soldierLevel).MeleeCount : 0;
+        var lv = Mathf.Clamp(level, 1, CombatConst.PlayerMaxLevel);
+        return PlayerLevelConfig.HasConfig(lv) ? PlayerLevelConfig.GetConfig(lv).MeleeCount : 0;
     }
     public int GetSoldierRangedCount()
     {
-        return SoldierLevelConfig.HasConfig(soldierLevel) ? SoldierLevelConfig.GetConfig(soldierLevel).RangedCount : 0;
+        var lv = Mathf.Clamp(level, 1, CombatConst.PlayerMaxLevel);
+        return PlayerLevelConfig.HasConfig(lv) ? PlayerLevelConfig.GetConfig(lv).RangedCount : 0;
     }
 
-    // 花金币提升士兵等级（最高30级），升级后补足新解锁的士兵
+    // 花金币提升士兵等级（最高30级），只提升士兵攻防加成（数量由玩家等级决定）
     public bool SodLvup()
     {
         if (soldierLevel >= CombatConst.SoldierMaxLevel)
@@ -1018,7 +1021,6 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
             return false;
         SubGold(CombatConst.SodLvupGoldCost, false);
         soldierLevel++;
-        EnsureSoldierCells();
         return true;
     }
 
@@ -1361,7 +1363,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     }
 
     // 确保布阵格包含足够的小兵：battleCards 记录格子上的单位id（英雄 或 小兵500001/500002）
-    // 小兵数量由士兵等级(SoldierLevelConfig)决定，不足时补到默认小兵格（旧存档/新玩家），英雄占据默认格时先移到空位
+    // 小兵数量由玩家等级(PlayerLevelConfig)决定，不足时补到默认小兵格（旧存档/新玩家），英雄占据默认格时先移到空位
     public void EnsureSoldierCells()
     {
         if (battleCards == null)
@@ -1377,7 +1379,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
             battleCards = cards;
         }
 
-        var cfg = SoldierLevelConfig.GetConfig(Mathf.Clamp(soldierLevel, 1, CombatConst.SoldierMaxLevel));
+        var cfg = PlayerLevelConfig.GetConfig(Mathf.Clamp(level, 1, CombatConst.PlayerMaxLevel));
         int meleeCount = 0;
         int rangedCount = 0;
         for (int i = 0; i < battleCards.Length; i++)

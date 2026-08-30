@@ -17,8 +17,6 @@ public class BagControl : MonoBehaviour, IPanelEvent
     // Start is called before the first frame update
     // 声明一个列表用于缓存 cell 对象
     private List<GameObject> cellCache = new List<GameObject>();
-    public ItemHeroDetail heroDetail;
-    public ItemDetail itemDetail;
     public GameObject bagHeroRegion;
     public GameObject bagItemRegion;
     public GameObject fieldRegion;
@@ -157,9 +155,6 @@ public class BagControl : MonoBehaviour, IPanelEvent
         if (sodLvupBtn != null)
             sodLvupBtn.gameObject.SetActive(!p.isAI);
 
-        heroDetail.gameObject.SetActive(false);
-        itemDetail.gameObject.SetActive(false);
-
         UpdateFieldView();
 
         var soldierCfg = SoldierConfig.GetConfig(500001);
@@ -266,8 +261,6 @@ public class BagControl : MonoBehaviour, IPanelEvent
                 index++;
             }
         }
-        itemDetail.Clear();
-        heroDetail.Clear();
     }
 
     public void UpdateEquips()
@@ -433,7 +426,6 @@ public class BagControl : MonoBehaviour, IPanelEvent
         {
             p1.UseItemToHero(heroCardId, itemCardId);
 
-            itemDetail.gameObject.SetActive(false);
             GameManager.Instance.PlaySound("Sounds/eat");
 
             RemoveCell(itemCardId);
@@ -451,13 +443,7 @@ public class BagControl : MonoBehaviour, IPanelEvent
             GameManager.Instance.PlaySound("Sounds/equip");
 
             UpdateView(); // 装备后背包不再显示该装备，需整体刷新（内部会重建格子）
-
-            itemDetail.gameObject.SetActive(true);
-            itemDetail.UpdateInfo(itemCardId, HeroSelectionTool.GetCardLevel(p1.cards[itemCardId], false));
         }
-
-        heroDetail.gameObject.SetActive(true);
-        heroDetail.UpdateInfo(heroCardId, HeroSelectionTool.GetCardLevel(p1.cards[heroCardId], true));
     }
 
     // 卸装区：拖英雄过来脱下其所有装备进背包
@@ -476,9 +462,6 @@ public class BagControl : MonoBehaviour, IPanelEvent
 
         GameManager.Instance.PlaySound("Sounds/equip");
         UpdateView(); // 卸下的装备回到背包，整体刷新
-
-        heroDetail.gameObject.SetActive(true);
-        heroDetail.UpdateInfo(heroCardId, HeroSelectionTool.GetCardLevel(p1.cards[heroCardId], true));
     }
 
     private void RemoveCell(int itemCardId)
@@ -545,12 +528,6 @@ public class BagControl : MonoBehaviour, IPanelEvent
         // 物品每格一件只卖一件；英雄整组卖出
         p1.SellCard(cardId, ConfigManager.IsHeroCard(cardId) ? 0 : 1);
         RemoveCell(cardId);
-        
-        heroDetail.Clear();
-        itemDetail.Clear();
-        heroDetail.gameObject.SetActive(false);
-        itemDetail.gameObject.SetActive(false);
-
 
         GameManager.Instance.PlaySound("Sounds/gold");        
         UpdateFieldView();
@@ -561,26 +538,6 @@ public class BagControl : MonoBehaviour, IPanelEvent
     {
         if(!bindPlayer.cards.ContainsKey(cell.cardId))
             return;
-
-        if (ConfigManager.IsHeroCard(cell.cardId))
-        {
-            heroDetail.UpdateInfo(cell.cardId, cell.level);
-            heroDetail.gameObject.SetActive(true);
-        }
-        else
-        {
-            itemDetail.UpdateInfo(cell.cardId, cell.level);
-            itemDetail.gameObject.SetActive(true);
-        }
-        foreach (var bagCell in cellCache)
-        {
-            var bagCellInfo = bagCell.GetComponent<BagCell>();
-            if (bagCellInfo.cardId == heroDetail.cardId || bagCellInfo.cardId == itemDetail.cardId)
-                bagCellInfo.OnSelect(true);
-            else
-                bagCellInfo.OnSelect(false);
-
-        }
     }
 
     // 一次性销毁所有缓存的 cell 对象的函数

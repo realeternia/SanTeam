@@ -19,11 +19,11 @@ namespace CommonConfig
         /// </summary>
         public int HpAdd;
         /// <summary>
-        ///步兵数量（20级达到最大5）
+        ///步兵数量（已废弃：数量改由玩家等级PlayerLevelConfig决定）
         /// </summary>
         public int MeleeCount;
         /// <summary>
-        ///弓兵数量（20级达到最大3）
+        ///弓兵数量（已废弃：数量改由玩家等级PlayerLevelConfig决定）
         /// </summary>
         public int RangedCount;
 
@@ -104,9 +104,8 @@ namespace CommonConfig
         public static void Load()
         {
             config.Clear();
-            // 步兵数量：1~4级1个，5~8级2个，9~12级3个，13~16级4个，17级起5个（20级达最大）
-            // 弓兵数量：1~6级0个，7~11级1个，12~16级2个，17级起3个（20级达最大）
-            // 攻防加成：每级 Atk+2、Hp+10（30级 Atk+58、Hp+290）
+            // 本表只决定士兵攻防加成：每级 Atk+2、Hp+10（30级 Atk+58、Hp+290）
+            // 士兵数量已改由玩家等级(PlayerLevelConfig)决定，MeleeCount/RangedCount字段保留但不再使用
             config[1] = new SoldierLevelConfig(1, 0, 0, 1, 0);
             config[2] = new SoldierLevelConfig(2, 2, 10, 1, 0);
             config[3] = new SoldierLevelConfig(3, 4, 20, 1, 0);
