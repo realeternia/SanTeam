@@ -260,17 +260,20 @@ public class Chess : MonoBehaviour
         armor = heroConfig.Armor;
         magicRes = heroConfig.MagicRes;
 
-        if (player.itemEquips.ContainsKey(heroId))
+        // 装备升级机制已移除：装备属性固定，不再按持有数量计算等级；最多3件装备属性累加
+        if (player.itemEquips.TryGetValue(heroId, out var equipIds) && equipIds != null)
         {
-            var equipId = player.itemEquips[heroId];
-            var equipCardLevel = HeroSelectionTool.GetCardLevel(player.cards[equipId], false);
+            foreach (var equipId in equipIds)
+            {
+                if (equipId == 0)
+                    continue;
+                var equipAttr = HeroSelectionTool.GetCardAttr(player, equipId, 1);
 
-            var equipAttr = HeroSelectionTool.GetCardAttr(player, equipId, equipCardLevel);
-
-            ap += equipAttr.Ap;
-            might += equipAttr.Might;
-            atk += equipAttr.Atk;
-            maxHp += equipAttr.Hp;
+                ap += equipAttr.Ap;
+                might += equipAttr.Might;
+                atk += equipAttr.Atk;
+                maxHp += equipAttr.Hp;
+            }
         }
 
         hp = maxHp;

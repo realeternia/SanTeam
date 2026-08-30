@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -87,15 +88,15 @@ public class ItemDetail : MonoBehaviour
             }
 
 
+            // 显示所有装备了该道具副本的英雄
+            var equipHeroes = new List<string>();
             foreach (var item in player.itemEquips)
             {
-                if (item.Value == cardId)
-                {
-                    var equipName = HeroConfig.GetConfig(item.Key).Name;
-                    equipText.text = equipName;
-                    break;
-                }
-            }            
+                if (item.Value != null && item.Value.Contains(cardId))
+                    equipHeroes.Add(HeroConfig.GetConfig(item.Key).Name);
+            }
+            if (equipHeroes.Count > 0)
+                equipText.text = string.Join(",", equipHeroes);
         }
     }
 

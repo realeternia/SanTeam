@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -139,7 +139,6 @@ namespace CommonConfig
         }
 
         public PlayerConfig() { }
-
         public class FieldMetaInfo
         {
             public string fieldName;
@@ -206,7 +205,6 @@ namespace CommonConfig
         private static List<CellMeta> cellMeta = new List<CellMeta>();
         public static List<CellMeta> CellMetas { get { return cellMeta; } }
 
-
         private static Dictionary<int, PlayerConfig> config = new Dictionary<int, PlayerConfig>();
         public static Dictionary<int, PlayerConfig>.ValueCollection ConfigList
         {
@@ -231,11 +229,11 @@ namespace CommonConfig
             config[6] = new PlayerConfig(6, "艾沙", "PlayerPic/aisha", "#2BD9F9", true, 0, new int[0], false, true, 8, 12, 0.3f, 3f, 9, 6, 0.2f, 1f, 0, 0.5f, 0.65f, 0.3f, 0.8f, 0.3f, 0.7f, new string[]{"\"inte\"，\"3\""});
             config[8] = new PlayerConfig(8, "巴爸", "PlayerPic/baba", "#FF73FF", true, 0, new int[0], false, false, 7, 9, 0.3f, 3f, 8, 6, 0.28f, 1f, 0, 0.5f, 1f, 0.5f, 0.85f, 0.25f, 0.85f, new string[]{"\"atk\"，\"1\"，\"def\"，\"1\"，\"inte\"，\"1\"，\"shoot\"，\"1\""});
             config[9] = new PlayerConfig(9, "巴妈", "PlayerPic/bama", "#333333", true, 0, new int[0], false, false, 8, 10, 0.3f, 3f, 9, 6, 0.35f, 1f, 0, 3f, 1.2f, 1f, 0.8f, 0.35f, 0.5f, new string[]{"\"shoot\"，\"2\"，\"def\"，\"2\""});
-            config[100] = new PlayerConfig(100, "魔童", "PlayerPic/nezha", "#8C0000", false, -8, new int[]{409001}, false, true, 8, 12, 0.3f, 3f, 7, 6, 0.5f, 1f, 0, 2f, 0.5f, 0.5f, 0.84f, 0.23f, 0.9f, new string[]{"\"atk\"，\"1\"，\"def\"，\"1\"，\"inte\"，\"1\""});
-            config[101] = new PlayerConfig(101, "钱多", "PlayerPic/qian", "#FFFFFF", false, 10, new int[]{409002}, false, true, 9, 12, 0.1f, 5f, 8, 7, 0.525f, 1f, 0, 1f, 1.5f, 2f, 0.95f, 0.13f, 0.7f, new string[]{"\"shoot\"，\"1\"，\"help\"，\"2\"，\"def\"，\"1\""});
-            config[102] = new PlayerConfig(102, "黄眉", "PlayerPic/huangmei", "#5555FF", false, -8, new int[]{100002,409004}, false, true, 8, 12, 0.2f, 3f, 7, 6, 0.5f, 2.5f, 2, 1f, 1.2f, 1.5f, 0.95f, 0.12f, 0.85f, new string[]{"\"inte\"，\"1\"，\"help\"，\"1\"，\"def\"，\"2\""});
-            config[103] = new PlayerConfig(103, "无量", "PlayerPic/wuliang", "#FF3333", false, -8, new int[]{100003,409005}, false, true, 9, 12, 0.2f, 3f, 8, 7, 0.5f, 2.5f, 3, 2f, 0.5f, 0.5f, 0.85f, 0.2f, 0.9f, new string[]{"\"atk\"，\"1\"，\"def\"，\"1\"，\"inte\"，\"1\"，\"shoot\"，\"1\""});
-            config[104] = new PlayerConfig(104, "大虎", "PlayerPic/dahu", "#006633", false, -8, new int[]{100001,409003}, false, true, 8, 12, 0.3f, 3f, 7, 6, 0.5f, 3f, 1, 2f, 0.5f, 0.5f, 0.85f, 0.2f, 0.9f, new string[]{"\"atk\"，\"1\"，\"def\"，\"1\"，\"inte\"，\"2\""});
+            config[100] = new PlayerConfig(100, "魔童", "PlayerPic/nezha", "#8C0000", false, -5, new int[]{409001}, false, true, 8, 12, 0.3f, 3f, 7, 6, 0.5f, 1f, 0, 2f, 0.5f, 0.5f, 0.84f, 0.23f, 0.9f, new string[]{"\"atk\"，\"1\"，\"def\"，\"1\"，\"inte\"，\"1\""});
+            config[101] = new PlayerConfig(101, "钱多", "PlayerPic/qian", "#FFFFFF", false, 5, new int[]{409002}, false, true, 9, 12, 0.1f, 5f, 8, 7, 0.525f, 1f, 0, 1f, 1.5f, 2f, 0.95f, 0.13f, 0.7f, new string[]{"\"shoot\"，\"1\"，\"help\"，\"2\"，\"def\"，\"1\""});
+            config[102] = new PlayerConfig(102, "黄眉", "PlayerPic/huangmei", "#5555FF", false, -5, new int[]{100002,409004}, false, true, 8, 12, 0.2f, 3f, 7, 6, 0.5f, 2.5f, 2, 1f, 1.2f, 1.5f, 0.95f, 0.12f, 0.85f, new string[]{"\"inte\"，\"1\"，\"help\"，\"1\"，\"def\"，\"2\""});
+            config[103] = new PlayerConfig(103, "无量", "PlayerPic/wuliang", "#FF3333", false, -5, new int[]{100003,409005}, false, true, 9, 12, 0.2f, 3f, 8, 7, 0.5f, 2.5f, 3, 2f, 0.5f, 0.5f, 0.85f, 0.2f, 0.9f, new string[]{"\"atk\"，\"1\"，\"def\"，\"1\"，\"inte\"，\"1\"，\"shoot\"，\"1\""});
+            config[104] = new PlayerConfig(104, "大虎", "PlayerPic/dahu", "#006633", false, -5, new int[]{100001,409003}, false, true, 8, 12, 0.3f, 3f, 7, 6, 0.5f, 3f, 1, 2f, 0.5f, 0.5f, 0.85f, 0.2f, 0.9f, new string[]{"\"atk\"，\"1\"，\"def\"，\"1\"，\"inte\"，\"2\""});
             config[999] = new PlayerConfig(999, "怪物", "PlayerPic/tower", "#FF0000", false, 0, new int[0], false, false, 0, 0, 0f, 0f, 0, 0, 0f, 0f, 0, 0f, 0f, 0f, 0f, 0f, 0f, null);
 
             RebuildIndex();

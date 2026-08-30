@@ -69,7 +69,7 @@ public static class FriendLineManager
         if (friendChess == null)
             return;
 
-        GameObject linePrefab = Resources.Load<GameObject>("Prefabs/LaserLine");
+        GameObject linePrefab = Resources.Load<GameObject>("Prefabs/Battles/LaserLine");
         GameObject lineInstance = Object.Instantiate(linePrefab, Vector3.zero, Quaternion.identity);
         lineInstance.transform.SetParent(chess.transform);
         lineInstance.transform.localScale = new Vector3(1, 1, 1);

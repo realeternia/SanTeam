@@ -23,6 +23,7 @@ public class BagControl : MonoBehaviour, IPanelEvent
     public GameObject bagItemRegion;
     public GameObject fieldRegion;
     public BagRecycler bagRecycler;
+    public BagRecycler bagUnwear; // 卸装区：拖英雄过来脱下所有装备
     public TMP_Text infoText;
     public TMP_Text expText;
     public Image expBar;
@@ -65,6 +66,8 @@ public class BagControl : MonoBehaviour, IPanelEvent
             aiSwitchBtn.GetComponentInChildren<TMP_Text>().text = bindPlayer.isAI ? "AI模式" : "玩家模式";
             if (bagRecycler != null)
                 bagRecycler.gameObject.SetActive(!bindPlayer.isAI);
+            if (bagUnwear != null)
+                bagUnwear.gameObject.SetActive(!bindPlayer.isAI);
             if (fieldAutoBtn != null)
                 fieldAutoBtn.gameObject.SetActive(!bindPlayer.isAI);
             if (buyExpBtn != null)
@@ -145,6 +148,8 @@ public class BagControl : MonoBehaviour, IPanelEvent
 
         if (bagRecycler != null)
             bagRecycler.gameObject.SetActive(!p.isAI);
+        if (bagUnwear != null)
+            bagUnwear.gameObject.SetActive(!p.isAI);
         if (fieldAutoBtn != null)
             fieldAutoBtn.gameObject.SetActive(!p.isAI);
         if (buyExpBtn != null)
@@ -205,7 +210,12 @@ public class BagControl : MonoBehaviour, IPanelEvent
     {
         int index = 0;
 
-        var itemCards = bindPlayer.cards.Where(x => !ConfigManager.IsHeroCard(x.Key)).ToList();
+        // 装备中的装备不在背包显示：持有数减去已装备数，没有多余副本则不显示（等级仍按持有总数计算）
+        var itemCards = bindPlayer.cards
+            .Where(x => !ConfigManager.IsHeroCard(x.Key))
+            .Select(x => new { Key = x.Key, Owned = x.Value, Value = x.Value - bindPlayer.GetEquippedCount(x.Key) })
+            .Where(x => x.Value > 0)
+            .ToList();
         var heroCards = bindPlayer.cards.Where(x => ConfigManager.IsHeroCard(x.Key)).ToList();
 
         // Destroy all child objects in hero region
@@ -238,20 +248,23 @@ public class BagControl : MonoBehaviour, IPanelEvent
         index = 0;
         foreach (var itemCell in itemCards)
         {
-            // 修改原代码，将新创建的 cell 加入缓存
-            GameObject cell = Instantiate(Resources.Load<GameObject>("Prefabs/BagCellItem"), bagItemRegion.transform);
-            cellCache.Add(cell);
-            int xOff = index % 9;
-            int yOff = index / 9;
-            cell.transform.localPosition = new Vector3(95 + 104 * xOff, -71 - 104 * yOff, 0);
-            
-            BagCell bagCell = cell.GetComponent<BagCell>();
-            bagCell.bagControl = this;            
-            bagCell.cardId = itemCell.Key;
-            bagCell.count = itemCell.Value;
-            bagCell.level = HeroSelectionTool.GetCardLevel(itemCell.Value, false);
-            bagCell.UpdateItemInfo(); 
-            index++;
+            // 装备不叠加：每个未装备副本单独占一格
+            for (int n = 0; n < itemCell.Value; n++)
+            {
+                // 修改原代码，将新创建的 cell 加入缓存
+                GameObject cell = Instantiate(Resources.Load<GameObject>("Prefabs/BagCellItem"), bagItemRegion.transform);
+                cellCache.Add(cell);
+                int xOff = index % 9;
+                int yOff = index / 9;
+                cell.transform.localPosition = new Vector3(95 + 104 * xOff, -71 - 104 * yOff, 0);
+
+                BagCell bagCell = cell.GetComponent<BagCell>();
+                bagCell.bagControl = this;
+                bagCell.cardId = itemCell.Key;
+                bagCell.level = HeroSelectionTool.GetCardLevel(itemCell.Owned, false);
+                bagCell.UpdateItemInfo();
+                index++;
+            }
         }
         itemDetail.Clear();
         heroDetail.Clear();
@@ -427,14 +440,42 @@ public class BagControl : MonoBehaviour, IPanelEvent
         }
         else
         {
-            p1.Equip(heroCardId, itemCardId);
+            // 装备到空槽：没有空槽或没有多余副本时失败
+            if (!p1.Equip(heroCardId, itemCardId))
+            {
+                ShowTipText(p1.GetEquippedCount(itemCardId) >= (p1.cards.TryGetValue(itemCardId, out var owned) ? owned : 0)
+                    ? "没有多余副本可装备" : "装备槽已满，无法装备");
+                return;
+            }
+
+            GameManager.Instance.PlaySound("Sounds/equip");
+
+            UpdateView(); // 装备后背包不再显示该装备，需整体刷新（内部会重建格子）
 
             itemDetail.gameObject.SetActive(true);
             itemDetail.UpdateInfo(itemCardId, HeroSelectionTool.GetCardLevel(p1.cards[itemCardId], false));
-            GameManager.Instance.PlaySound("Sounds/equip");
-
-            UpdateEquips();
         }
+
+        heroDetail.gameObject.SetActive(true);
+        heroDetail.UpdateInfo(heroCardId, HeroSelectionTool.GetCardLevel(p1.cards[heroCardId], true));
+    }
+
+    // 卸装区：拖英雄过来脱下其所有装备进背包
+    public void UnwearHeroEquips(int heroCardId)
+    {
+        if (heroCardId == 0 || !ConfigManager.IsHeroCard(heroCardId))
+            return;
+
+        var p1 = GameManager.Instance.GetPlayer(bindPlayer.pid);
+        int count = p1.UnwearAllEquips(heroCardId);
+        if (count == 0)
+        {
+            ShowTipText("该英雄没有装备");
+            return;
+        }
+
+        GameManager.Instance.PlaySound("Sounds/equip");
+        UpdateView(); // 卸下的装备回到背包，整体刷新
 
         heroDetail.gameObject.SetActive(true);
         heroDetail.UpdateInfo(heroCardId, HeroSelectionTool.GetCardLevel(p1.cards[heroCardId], true));
@@ -448,6 +489,24 @@ public class BagControl : MonoBehaviour, IPanelEvent
             cellCache.Remove(cell);
             Destroy(cell);
         }
+    }
+
+    // 在信息栏短暂显示提示文字（2秒后恢复原信息）
+    private Coroutine tipCoroutine;
+    private void ShowTipText(string msg)
+    {
+        if (tipCoroutine != null)
+            StopCoroutine(tipCoroutine);
+        tipCoroutine = StartCoroutine(ShowTipTextCo(msg));
+    }
+
+    private IEnumerator ShowTipTextCo(string msg)
+    {
+        infoText.text = msg;
+        infoText.color = Color.red;
+        yield return new WaitForSeconds(2f);
+        infoText.color = Color.white;
+        UpdateExpView(); // 恢复原来的信息文本
     }
 
     public void SetHeroForBattle(int heroId, int pos)
@@ -483,7 +542,8 @@ public class BagControl : MonoBehaviour, IPanelEvent
         if(p1.isAI)
             return;
 
-        p1.SellCard(cardId);
+        // 物品每格一件只卖一件；英雄整组卖出
+        p1.SellCard(cardId, ConfigManager.IsHeroCard(cardId) ? 0 : 1);
         RemoveCell(cardId);
         
         heroDetail.Clear();

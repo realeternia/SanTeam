@@ -52,7 +52,7 @@ namespace CommonConfig
             {"Quality3Rate", new FieldMetaInfo("品质3概率", "int", 60)},
             {"Quality4Rate", new FieldMetaInfo("品质4概率", "int", 60)},
             {"RoundType", new FieldMetaInfo("类型（0=PVP，1=PVE）", "int", 132)},
-            {"SoldierList", new FieldMetaInfo("PVE怪物布阵（怪物id;布阵格|怪物id;布阵格，布阵格0~24：0=左上，24=右下）", "string", 0)},
+            {"SoldierList", new FieldMetaInfo("PVE怪物布阵（怪物id;布阵格|怪物id;布阵格，布阵格0~24：0=左上，24=右下）", "string", 586)},
         };
 
         public static Dictionary<string, FieldMetaInfo> FieldMeta { get { return fieldMeta; } }
@@ -149,8 +149,8 @@ namespace CommonConfig
         public static void Load()
         {
             config.Clear();
-            config[1] = new GameRoundConfig(1, "180年", new int[] { 1 }, 2, 0f, 2, 0, 0, 20, 0, 0, 1, "590001;0|590001;23");
-            config[2] = new GameRoundConfig(2, "181年", new int[] { 1 }, 3, 0f, 3, 0, 0, 20, 0, 0, 1, "590001;0|590001;12|590001;23");
+            config[1] = new GameRoundConfig(1, "180年", new int[]{1}, 2, 0f, 2, 0, 0, 20, 0, 0, 1, "590001;0|590001;23");
+            config[2] = new GameRoundConfig(2, "181年", new int[]{1}, 3, 0f, 3, 0, 0, 20, 0, 0, 1, "590001;0|590001;12|590001;23");
             config[3] = new GameRoundConfig(3, "182年", new int[]{1}, 4, 0f, 4, 0, 0, 20, 5, 0, 0, "");
             config[4] = new GameRoundConfig(4, "183年", new int[]{1}, 5, 0f, 5, 1, 0, 20, 5, 0, 0, "");
             config[5] = new GameRoundConfig(5, "184年", new int[]{1,2,3,4}, 6, 0f, 6, 1, 0, 20, 5, 0, 0, "");

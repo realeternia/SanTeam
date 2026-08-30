@@ -86,16 +86,24 @@ public class ItemHeroDetail : MonoBehaviour
                 }
             }
 
-            if (player.itemEquips.ContainsKey(cardId))
+            // 显示所有已装备的装备（最多3件），属性累加
+            if (player.itemEquips.TryGetValue(cardId, out var equipSlots) && equipSlots != null)
             {
-                var equipCardId = player.itemEquips[cardId];
-
-                var equipName = ItemConfig.GetConfig(equipCardId).Name;
-                equipText.text = equipName;
-                var cardLevel = HeroSelectionTool.GetCardLevel(player.cards[equipCardId], false);  
-                attrEquip = HeroSelectionTool.GetCardAttr(player, equipCardId, cardLevel);
-            } 
-            
+                var equipNames = new List<string>();
+                foreach (var equipCardId in equipSlots)
+                {
+                    if (equipCardId == 0)
+                        continue;
+                    equipNames.Add(ItemConfig.GetConfig(equipCardId).Name);
+                    var cardLevel = HeroSelectionTool.GetCardLevel(player.cards[equipCardId], false);
+                    var attr = HeroSelectionTool.GetCardAttr(player, equipCardId, cardLevel);
+                    attrEquip.Atk += attr.Atk;
+                    attrEquip.Ap += attr.Ap;
+                    attrEquip.Might += attr.Might;
+                    attrEquip.Hp += attr.Hp;
+                }
+                equipText.text = string.Join(",", equipNames);
+            }
         }
 
         attrFinal = HeroSelectionTool.GetCardAttr(player, cardId, lv);

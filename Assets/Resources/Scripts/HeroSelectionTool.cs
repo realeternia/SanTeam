@@ -204,48 +204,29 @@ public static class HeroSelectionTool
 
     // 升星成本：1→2星需3张，2→3星需5张，3→4星需7张……（每级新增2N-1张，累计n²张）
     private static int[] cardHeroExp = new int[] { 1, 4, 9, 16, 25, 36, 49, 64, 81, 100, 121, 144, 169, 196, 225, 256, 289, 324, 361, 400, 441, 484, 529, 576, 625, 676, 729, 784, 841, 900, 961, 1024, 1089, 999 };
-    private static int[] cardItemExp = new int[] { 1, 2, 4, 6, 9, 12, 15, 19, 23, 27, 31, 36, 41, 46, 51, 56, 62, 68, 74, 80, 86, 92, 98, 104, 110, 116, 122, 128, 136, 142, 148, 154, 160, 166, 172, 178, 184, 190, 196, 202, 999 }; //生成后续数据
+    // 装备升级机制已移除：背包可存同id装备多件，每件独立生效，等级恒为1
     public static int GetCardLevel(int exp, bool isHero)
     {
-        if(isHero)
+        if(!isHero)
+            return 1; // 装备不升级，多件同id装备各自生效
+        for(int i = 0; i < cardHeroExp.Length; i++)
         {
-            for(int i = 0; i < cardHeroExp.Length; i++)
-            {
-                if(exp < cardHeroExp[i])
-                    return i;
-            }
-            return cardHeroExp.Length;
+            if(exp < cardHeroExp[i])
+                return i;
         }
-        else
-        {
-            for(int i = 0; i < cardItemExp.Length; i++)
-            {
-                if(exp < cardItemExp[i])
-                    return i;
-            }
-            return cardItemExp.Length;
-        }
+        return cardHeroExp.Length;
     }
 
     public static float GetExpRate(int exp, bool isHero)
     {
+        if(!isHero)
+            return 0; // 装备无升级进度条
         int level = GetCardLevel(exp, isHero);
-        if(isHero)
-        {
-            if(level >= cardHeroExp.Length)
-                return 1f;
-            if(level == 0)
-                return 0;
-            return (float)(exp - cardHeroExp[level - 1]) / (cardHeroExp[level] - cardHeroExp[level - 1]);
-        }
-        else
-        {
-            if(level >= cardItemExp.Length)
-                return 1f;
-            if(level == 0)
-                return 0;
-            return (float)(exp - cardItemExp[level - 1]) / (cardItemExp[level] - cardItemExp[level - 1]);
-        }
+        if(level >= cardHeroExp.Length)
+            return 1f;
+        if(level == 0)
+            return 0;
+        return (float)(exp - cardHeroExp[level - 1]) / (cardHeroExp[level] - cardHeroExp[level - 1]);
     }
 
     public static AttrInfo GetCardAttr(PlayerInfo player, int cardId, int lv)
@@ -300,11 +281,7 @@ public static class HeroSelectionTool
             {
                 attrInfo.Hp = itemConfig.Attr2Val;
             }
-
-            attrInfo.Hp = attrInfo.Hp * lv;
-            attrInfo.Ap = attrInfo.Ap * lv;
-            attrInfo.Might = attrInfo.Might * lv;
-            attrInfo.Atk = attrInfo.Atk * lv;
+            // 装备升级机制已移除：属性不再乘等级，每件装备固定属性
         }
         if(player.attrAddons.ContainsKey(cardId))
             attrInfo.AddAttr(player.attrAddons[cardId]);

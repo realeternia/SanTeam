@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -11,10 +12,10 @@ public class BagCell : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragH
     public int cardId;
     public int count;
     public int level;
-    public TMP_Text textItemCount;
     public TMP_Text textItemName;
     public Image itemImage;
-    public Image equipImage;
+    public Image[] equipImages; // 最多3件装备槽，需在预制体上按槽位顺序拖入引用
+    
     public Image shieldImage;
     public Button cellButton;
     public BagControl bagControl;
@@ -40,18 +41,22 @@ public class BagCell : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragH
     public void UpdateHeroInfo()
     {
         var heroCfg = HeroConfig.GetConfig(cardId);
-        textItemCount.text = level.ToString();
-        textItemName.text = heroCfg.Name;
+        textItemName.text = heroCfg.Name + level;
         textItemName.color = HeroSelectionTool.GetQualityColor(heroCfg.Quality);
-        if (bagControl.bindPlayer.itemEquips.ContainsKey(cardId))
+
+        // 显示已装备的装备（最多3个槽位）
+        bagControl.bindPlayer.itemEquips.TryGetValue(cardId, out var slots);
+        if (equipImages != null)
         {
-            equipImage.gameObject.SetActive(true);
-            equipImage.sprite = Resources.Load<Sprite>("ItemPic/" + ItemConfig.GetConfig(bagControl.bindPlayer.itemEquips[cardId]).Icon);
+            for (int i = 0; i < equipImages.Length; i++)
+            {
+                bool has = slots != null && i < slots.Length && slots[i] != 0;
+                equipImages[i].gameObject.SetActive(has);
+                if (has)
+                    equipImages[i].sprite = Resources.Load<Sprite>("ItemPic/" + ItemConfig.GetConfig(slots[i]).Icon);
+            }
         }
-        else
-        {
-            equipImage.gameObject.SetActive(false);
-        }
+
         itemImage.sprite = Resources.Load<Sprite>("SkinsBig/" + heroCfg.Icon);
 
         expBar.rectTransform.sizeDelta = new Vector2(140 * HeroSelectionTool.GetExpRate(count, true), 20);
@@ -60,22 +65,17 @@ public class BagCell : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragH
 
     public void UpdateItemInfo()
     {
-        textItemCount.text = level.ToString();
+        // 装备升级机制已移除：物品不叠加格子，每格一个，无升级进度条
         var itemCfg = ItemConfig.GetConfig(cardId);
         itemImage.sprite = Resources.Load<Sprite>("ItemPic/" + itemCfg.Icon);
 
-        if (bagControl.bindPlayer.itemEquips.ContainsValue(cardId))
-        {
-            shieldImage.gameObject.SetActive(true);
-        }
-        else
-        {
-            shieldImage.gameObject.SetActive(false);
-        }
+        // 有副本处于装备中时显示角标
+        bool equipped = bagControl.bindPlayer.itemEquips.Values.Any(v => v != null && v.Contains(cardId));
+        shieldImage.gameObject.SetActive(equipped);
 
-        expBar.rectTransform.sizeDelta = new Vector2(90 * HeroSelectionTool.GetExpRate(count, false), 15);
+        expBar.rectTransform.sizeDelta = new Vector2(0, 15);
 
-    }    
+    }
 
 
     public void OnSelect(bool isSelect)

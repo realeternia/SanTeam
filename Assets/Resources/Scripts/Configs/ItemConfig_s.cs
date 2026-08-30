@@ -209,8 +209,7 @@ namespace CommonConfig
             config[400014] = new ItemConfig(400014, "的卢马", "", 1, "attr", "hp", 50, "", 0, new int[0], "", 0, 5, false, false, false, 10, 0f, false, "dilu");
             config[400015] = new ItemConfig(400015, "大宛宝马", "", 1, "attr", "hp", 30, "", 0, new int[0], "", 0, 0, false, false, false, 5, 0f, false, "dawan");
             config[401001] = new ItemConfig(401001, "和氏璧", "先手选牌", 1, "first", "", 0, "", 0, new int[0], "", 100, 0, true, true, false, 2, 0.24f, true, "heshi");
-            config[401002] = new ItemConfig(401002, "士兵剑", "士兵攻up", 1, "sodatk", "", 3, "", 0, new int[0], "", 40, 3, true, true, false, 10, 0f, true, "jian1");
-            config[401003] = new ItemConfig(401003, "士兵甲", "士兵命up", 1, "sodhp", "", 15, "", 0, new int[0], "", 40, 3, true, true, false, 10, 0f, true, "jia1");
+            // 401002士兵剑/401003士兵甲已移除：士兵升级改为背包"升级士兵"按钮(金币)
             config[401010] = new ItemConfig(401010, "豆腐", "无双强度+5", 1, "tpattr", "might", 5, "", 0, new int[0], "", 0, 6, false, false, true, 6, 0.4f, true, "doufu");
             config[401011] = new ItemConfig(401011, "沙拉", "法术强度+5", 1, "tpattr", "ap", 5, "", 0, new int[0], "", 0, 6, false, false, true, 6, 0.4f, true, "shala");
             config[401012] = new ItemConfig(401012, "烤鸭", "攻击+5", 1, "tpattr", "atk", 5, "", 0, new int[0], "", 0, 6, false, false, true, 6, 0.4f, true, "kaoya");

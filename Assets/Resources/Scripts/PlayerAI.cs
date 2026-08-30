@@ -298,10 +298,6 @@ public static class PlayerAI
                 {
                     checkFirst = pickCard;
                 }
-                else if (itemCfg.Effect == "sodatk" || itemCfg.Effect == "sodhp")
-                {
-                    score *= playerConfig.PickSoldierUp;
-                }
                 else if (itemCfg.Effect == "tpattr" && year <= 8)
                 {
                     score *= .5f;

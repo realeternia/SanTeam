@@ -41,7 +41,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     public Dictionary<int, int> cards = new Dictionary<int, int>(); // cardid - > exp
 
     [CustomSerializeField]
-    public Dictionary<int, int> itemEquips = new Dictionary<int, int>(); // heroId -> itemid
+    public Dictionary<int, int[]> itemEquips = new Dictionary<int, int[]>(); // heroId -> 装备的3个槽位（0=空槽）
     [CustomSerializeField]
     public int[] battleCards = new int[CombatConst.PlayerMaxSlot];
     [CustomSerializeField]
@@ -228,18 +228,62 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         RemoveCard(itemId, 1);
     }
 
-    public void Equip(int heroId, int itemId)
+    // 装备到英雄的空槽：没有空槽或没有多余副本时返回false（不替换已有装备）
+    public bool Equip(int heroId, int itemId)
     {
-        foreach(var item in itemEquips)
+        // 已装备数量不能超过持有数量（同id装备多件可分别装备）
+        int owned = cards.TryGetValue(itemId, out int c) ? c : 0;
+        if (GetEquippedCount(itemId) >= owned)
+            return false;
+
+        if (!itemEquips.TryGetValue(heroId, out var slots) || slots == null)
         {
-            if(item.Value == itemId)
+            slots = new int[3];
+            itemEquips[heroId] = slots;
+        }
+        for (int i = 0; i < slots.Length; i++)
+        {
+            if (slots[i] == 0)
             {
-                itemEquips.Remove(item.Key);
-                break;
+                slots[i] = itemId;
+                return true;
             }
         }
+        return false; // 没有空槽
+    }
 
-        itemEquips[heroId] = itemId;
+    // 脱下英雄身上所有装备：返回脱下的装备数量，0表示没有装备
+    public int UnwearAllEquips(int heroId)
+    {
+        if (!itemEquips.TryGetValue(heroId, out var slots) || slots == null)
+            return 0;
+        int count = 0;
+        for (int i = 0; i < slots.Length; i++)
+        {
+            if (slots[i] != 0)
+            {
+                count++;
+                slots[i] = 0;
+            }
+        }
+        return count;
+    }
+
+    // 该装备已被装备的数量（跨所有英雄统计）
+    public int GetEquippedCount(int itemId)
+    {
+        int count = 0;
+        foreach (var item in itemEquips)
+        {
+            if (item.Value == null)
+                continue;
+            foreach (var v in item.Value)
+            {
+                if (v == itemId)
+                    count++;
+            }
+        }
+        return count;
     }
 
     public void SetBattlePos(int heroId, int pos)
@@ -304,7 +348,8 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         return .75f;
     }
 
-    public void SellCard(int cardId)
+    // sellCount<=0 表示全部卖出（英雄整组）；物品每格一件，传入1只卖一件
+    public void SellCard(int cardId, int sellCount = 0)
     {
         var isHeroCard = ConfigManager.IsHeroCard(cardId);
         var price = 0;
@@ -317,7 +362,9 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
             price = ItemConfig.GetConfig(cardId).Price;
         }
 
-        var count = cards[cardId];
+        var count = cards.TryGetValue(cardId, out var owned) ? owned : 0;
+        if (sellCount > 0)
+            count = Math.Min(sellCount, count);
         AddGold((int)(price * count * GetSellRate()));
         RemoveCard(cardId, count);
     }
@@ -344,12 +391,15 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         {
             itemEquips.Remove(cardId);
         }
+        // 清空指向该装备的槽位
         foreach (var item in itemEquips)
         {
-            if (item.Value == cardId)
+            if (item.Value == null)
+                continue;
+            for (int i = 0; i < item.Value.Length; i++)
             {
-                itemEquips.Remove(item.Key);
-                break;
+                if (item.Value[i] == cardId)
+                    item.Value[i] = 0;
             }
         }
     }
@@ -407,10 +457,6 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
                     nextSkip = true;
                     CardShopManager.Instance.jadePlayer = pid;
                 }
-                else if (itemCfg.Effect == "sodatk")
-                    sodatk += itemCfg.Attr1Val;
-                else if (itemCfg.Effect == "sodhp")
-                    sodhp += itemCfg.Attr1Val;
                 return true;
             }
         }
@@ -716,60 +762,69 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         for(int i = 0; i < results.Count; i++)
         {
             var heroCfg = HeroConfig.GetConfig(results[i].Item1);
-            // 初始化最高得分和对应装备ID
-            int maxScore = int.MinValue;
-            int bestItemId = -1;
-            
+
             // 获取英雄的各项属性
             int[] heroAttributes = { heroCfg.Might, heroCfg.Ap, heroCfg.Atk };
 
             int minAttr = heroAttributes.Min();
             int maxAttr = heroAttributes.Max();
             var attrDiff = maxAttr - minAttr;
-            
-            foreach(var itemId in attrItemList)
+
+            // 每个英雄最多装备3件，逐槽选择最优装备
+            for(int slot = 0; slot < 3 && attrItemList.Count > 0; slot++)
             {
-                var itemCfg = ItemConfig.GetConfig(itemId);
-                float score = itemCfg.Attr1Val * HeroSelectionTool.GetCardLevel(cards[itemId], false); //乘上等级
+                // 初始化最高得分和对应装备ID
+                int maxScore = int.MinValue;
+                int bestItemId = -1;
 
-                if (!string.IsNullOrEmpty(itemCfg.Attr1))
+                foreach(var itemId in attrItemList)
                 {
-                    bool isMinAttr = false;
-                    bool isMaxAttr = false;
+                    var itemCfg = ItemConfig.GetConfig(itemId);
+                    float score = itemCfg.Attr1Val * HeroSelectionTool.GetCardLevel(cards[itemId], false); //乘上等级
 
-                    if (itemCfg.Attr1 == "might" && heroCfg.Might == minAttr)
-                        isMinAttr = true;
-                    else if (itemCfg.Attr1 == "ap" && heroCfg.Ap == minAttr)
-                        isMinAttr = true;
-                    else if (itemCfg.Attr1 == "atk" && heroCfg.Atk == minAttr)
-                        isMinAttr = true;
-                    else if (itemCfg.Attr1 == "might" && heroCfg.Might == maxAttr)
-                        isMaxAttr = true;
-                    else if (itemCfg.Attr1 == "ap" && heroCfg.Ap == maxAttr)
-                        isMaxAttr = true;  
-                    else if (itemCfg.Attr1 == "atk" && heroCfg.Atk == maxAttr)
-                        isMaxAttr = true;
-                    
-                    if(heroCfg.Pos == 1)
+                    if (!string.IsNullOrEmpty(itemCfg.Attr1))
                     {
-                        if(isMinAttr && attrDiff > 15)
-                            score *= 1 + attrDiff * .015f;
+                        bool isMinAttr = false;
+                        bool isMaxAttr = false;
+
+                        if (itemCfg.Attr1 == "might" && heroCfg.Might == minAttr)
+                            isMinAttr = true;
+                        else if (itemCfg.Attr1 == "ap" && heroCfg.Ap == minAttr)
+                            isMinAttr = true;
+                        else if (itemCfg.Attr1 == "atk" && heroCfg.Atk == minAttr)
+                            isMinAttr = true;
+                        else if (itemCfg.Attr1 == "might" && heroCfg.Might == maxAttr)
+                            isMaxAttr = true;
+                        else if (itemCfg.Attr1 == "ap" && heroCfg.Ap == maxAttr)
+                            isMaxAttr = true;
+                        else if (itemCfg.Attr1 == "atk" && heroCfg.Atk == maxAttr)
+                            isMaxAttr = true;
+
+                        if(heroCfg.Pos == 1)
+                        {
+                            if(isMinAttr && attrDiff > 15)
+                                score *= 1 + attrDiff * .015f;
+                        }
+                        if(isMaxAttr)
+                            score *= 1.2f;
                     }
-                    if(isMaxAttr)
-                        score *= 1.2f;
+
+                    // 更新最高得分和对应装备ID
+                    if (score > maxScore)
+                    {
+                        maxScore = (int)score;
+                        bestItemId = itemId;
+                    }
                 }
-                
-                // 更新最高得分和对应装备ID
-                if (score > maxScore)
-                {
-                    maxScore = (int)score;
-                    bestItemId = itemId;
-                }
+
+                if (bestItemId < 0)
+                    break;
+
+                Equip(results[i].Item1, bestItemId);
+
+                attrItemList.Remove(bestItemId);
             }
 
-            Equip(results[i].Item1, bestItemId);
-
-            attrItemList.Remove(bestItemId);
             if(attrItemList.Count == 0)
                 break;
         }
@@ -794,7 +849,14 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
             }
             if(!heroExists)
                 continue;
-            mark += ItemConfig.GetConfig(item.Value).Price * cards[item.Value];
+            if (item.Value == null)
+                continue;
+            foreach (var equipId in item.Value)
+            {
+                if (equipId == 0)
+                    continue;
+                mark += ItemConfig.GetConfig(equipId).Price * cards[equipId];
+            }
         }
         lastFightMark = mark / 10;
         
@@ -1020,6 +1082,17 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
                             stringValue = string.Format("{0},{1},{2},{3}", color.r, color.g, color.b, color.a);
                         }
                         // 对于字典类型，将其转换为JSON字符串
+                        else if (fieldValue is Dictionary<int, int[]>)
+                        {
+                            Dictionary<int, int[]> dict = (Dictionary<int, int[]>)fieldValue;
+                            List<string> dictEntries = new List<string>();
+                            foreach (var kvp in dict)
+                            {
+                                // 槽位用|分隔：heroId:v0|v1|v2
+                                dictEntries.Add(kvp.Key + ":" + string.Join("|", kvp.Value ?? new int[0]));
+                            }
+                            stringValue = string.Join(",", dictEntries);
+                        }
                         else if (fieldValue is Dictionary<int, int>)
                         {
                             Dictionary<int, int> dict = (Dictionary<int, int>)fieldValue;
@@ -1118,6 +1191,37 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
                             field.SetValue(this, new Color(r, g, b, a));
                         }
                     }
+                    else if (field.FieldType == typeof(Dictionary<int,int[]>))
+                    {
+                        var dict = new Dictionary<int, int[]>();
+                        string[] entries = stringValue.Split(',');
+                        foreach (string entry in entries)
+                        {
+                            if (string.IsNullOrEmpty(entry))
+                                continue;
+                            int colonIndex = entry.IndexOf(':');
+                            if (colonIndex <= 0 || !int.TryParse(entry.Substring(0, colonIndex), out int key))
+                                continue;
+
+                            string valStr = entry.Substring(colonIndex + 1);
+                            int[] slots = new int[3];
+                            if (valStr.Contains("|"))
+                            {
+                                // 新格式：v0|v1|v2
+                                string[] parts = valStr.Split('|');
+                                for (int i = 0; i < parts.Length && i < slots.Length; i++)
+                                    int.TryParse(parts[i], out slots[i]);
+                            }
+                            else
+                            {
+                                // 兼容旧存档：单装备放在第1个槽位
+                                if (int.TryParse(valStr, out int oldItemId))
+                                    slots[0] = oldItemId;
+                            }
+                            dict[key] = slots;
+                        }
+                        field.SetValue(this, dict);
+                    }
                     else if (field.FieldType == typeof(Dictionary<int,int>))
                     {
                         var dict = new Dictionary<int, int>();
@@ -1200,6 +1304,41 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         }
         // 兼容旧存档：battleCards 统一为9格长度
         EnsureBattleCardsSize();
+        // 兼容旧存档：剔除已下架的道具（401002士兵剑/401003士兵甲已移除），避免UI空引用
+        RemoveObsoleteItemCards();
+    }
+
+    // 剔除背包中配置表里已不存在的道具（保留英雄卡和有效道具）
+    private void RemoveObsoleteItemCards()
+    {
+        List<int> invalid = null;
+        foreach (var cardId in cards.Keys)
+        {
+            if (ConfigManager.IsHeroCard(cardId) || ItemConfig.HasConfig(cardId))
+                continue;
+            if (invalid == null)
+                invalid = new List<int>();
+            invalid.Add(cardId);
+        }
+        if (invalid != null)
+        {
+            foreach (var id in invalid)
+            {
+                cards.Remove(id);
+                Debug.Log($"旧存档清理：移除已下架道具 {id}");
+            }
+            // 装备槽位里指向已删道具的记录一并清除
+            foreach (var kv in itemEquips)
+            {
+                if (kv.Value == null)
+                    continue;
+                for (int i = 0; i < kv.Value.Length; i++)
+                {
+                    if (kv.Value[i] != 0 && !ItemConfig.HasConfig(kv.Value[i]))
+                        kv.Value[i] = 0;
+                }
+            }
+        }
     }
 
     // 兼容旧存档：battleCards 固定为9格长度

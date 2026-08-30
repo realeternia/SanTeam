@@ -32,6 +32,7 @@ public class WorldManager : MonoBehaviour
     private bool isPveRound = false; // 本场是否为PVE（打怪物拿掉落）
     private List<System.Tuple<int, int>> pveMonsterSpawns = null; // PVE怪物布阵（怪物id, 布阵格0~24：0=左上，24=右下）
     private int pveFightCount = 1; // PVE仅玩家0参战（1号位打2号位怪物），AI不打怪
+    private List<Tuple<GameObject, PlayerInfo, int>> bagDrops = new List<Tuple<GameObject, PlayerInfo, int>>(); // 怪物掉落包（BagDrop模型，获得玩家，首个掉落物id用于显示图标）
    
     public HeroInfoGroup heroInfoGroup;
     public Button buttonRestart;
@@ -99,6 +100,13 @@ public class WorldManager : MonoBehaviour
         killMark = new int[8];
         deathOrder = new int[8];
         deathCount = 0;
+        // 清理上一场残留的掉落包
+        foreach (var drop in bagDrops)
+        {
+            if (drop.Item1 != null)
+                Destroy(drop.Item1);
+        }
+        bagDrops.Clear();
         BattleStatManager.Clear();
 
         // 通知所有玩家开始战斗
@@ -327,7 +335,7 @@ public class WorldManager : MonoBehaviour
     public Chess SpawnUnitsForRegion(PlayerInfo p, int soldierId, int posId, UnityEngine.Vector3 spawnPos, int side, string imgPath)
     {
         var soldierConfig = SoldierConfig.GetConfig(soldierId);
-        GameObject unitPrefab = Resources.Load<GameObject>("Prefabs/" + soldierConfig.Model);
+        GameObject unitPrefab = Resources.Load<GameObject>("Prefabs/Battles/" + soldierConfig.Model);
 
         // 实例化单位
         GameObject unitInstance = Instantiate(unitPrefab, spawnPos, Quaternion.identity, Units.transform);
@@ -404,7 +412,7 @@ public class WorldManager : MonoBehaviour
     private Chess SpawnMonsterForRegion(int soldierId, int posId, UnityEngine.Vector3 spawnPos, int side)
     {
         var soldierConfig = SoldierConfig.GetConfig(soldierId);
-        GameObject unitPrefab = Resources.Load<GameObject>("Prefabs/" + soldierConfig.Model);
+        GameObject unitPrefab = Resources.Load<GameObject>("Prefabs/Battles/" + soldierConfig.Model);
 
         GameObject unitInstance = Instantiate(unitPrefab, spawnPos, Quaternion.identity, Units.transform);
         unitInstance.name = $"UnitMonster_{side}_{idCounter}";
@@ -447,7 +455,7 @@ public class WorldManager : MonoBehaviour
     private Chess SpawnHerosForRegion(PlayerInfo p, int posId, UnityEngine.Vector3 spawnPos, System.Tuple<int, int> heroData, int side)
     {
         var heroConfig = HeroConfig.GetConfig(heroData.Item1);
-        GameObject heroPrefab = Resources.Load<GameObject>("Prefabs/UnitHero");
+        GameObject heroPrefab = Resources.Load<GameObject>("Prefabs/Battles/UnitHero");
 
         // 实例化单位
         GameObject unitInstance = Instantiate(heroPrefab, spawnPos, Quaternion.identity, Units.transform);
@@ -528,6 +536,13 @@ public class WorldManager : MonoBehaviour
         }
 
         {
+            // 怪物掉落包变成卡牌飞向玩家头像，全部到达后等2秒再出结算界面
+            if (bagDrops.Count > 0)
+            {
+                yield return MoveBagDropsToPlayers();
+                yield return new WaitForSeconds(2f);
+            }
+
             // PVE：未参战玩家没有战斗过程，战斗结束一起随机获得装备
             if (isPveRound)
                 GivePveIdleDrops();
@@ -590,6 +605,71 @@ public class WorldManager : MonoBehaviour
             RectTransform battleResultRect = BattleResultPanel.GetComponent<RectTransform>();
             battleResultRect.sizeDelta = new Vector2(650, battleResultRect.sizeDelta.y);
             BattleResultPanel.gameObject.SetActive(true);
+        }
+    }
+
+    // 战斗结束：怪物掉落包变成卡牌飞向获得玩家的头像
+    private IEnumerator MoveBagDropsToPlayers()
+    {
+        Canvas canvas = FindObjectOfType<Canvas>();
+        RectTransform canvasRect = canvas.transform as RectTransform;
+        var movingCardPrefab = Resources.Load<GameObject>("Prefabs/MovingCard");
+
+        var cards = new List<GameObject>();
+        var starts = new List<Vector2>();
+        var targets = new List<Vector2>();
+
+        foreach (var drop in bagDrops)
+        {
+            var bag = drop.Item1;
+            var player = drop.Item2;
+            if (bag == null || player == null)
+                continue;
+
+            // 起点：掉落包世界坐标 → Canvas局部坐标
+            Vector2 startLocalPos = TransformWorldToScreen(bag.transform.position, canvasRect);
+
+            // 终点：玩家头像屏幕坐标 → Canvas局部坐标
+            Vector2 targetScreenPoint = RectTransformUtility.WorldToScreenPoint(uiCamera, player.playerImage.transform.position);
+            RectTransformUtility.ScreenPointToLocalPointInRectangle(canvasRect, targetScreenPoint, uiCamera, out Vector2 targetLocalPos);
+
+            // 在掉落包位置生成飞行卡牌，贴图用首个掉落物图标
+            var card = Instantiate(movingCardPrefab, canvas.transform, false);
+            var img = card.GetComponent<Image>();
+            if (ItemConfig.HasConfig(drop.Item3))
+                img.sprite = Resources.Load<Sprite>("ItemPic/" + ItemConfig.GetConfig(drop.Item3).Icon);
+            card.GetComponent<RectTransform>().anchoredPosition = startLocalPos;
+
+            cards.Add(card);
+            starts.Add(startLocalPos);
+            targets.Add(targetLocalPos);
+
+            // 销毁3D掉落包模型
+            Destroy(bag);
+        }
+        bagDrops.Clear();
+
+        // 卡牌飞向玩家头像（逐渐缩小到50%）
+        float duration = 0.8f;
+        float elapsedTime = 0;
+        while (elapsedTime < duration && cards.Count > 0)
+        {
+            elapsedTime += Time.deltaTime;
+            float t = Mathf.Clamp01(elapsedTime / duration);
+            for (int i = 0; i < cards.Count; i++)
+            {
+                if (cards[i] == null)
+                    continue;
+                cards[i].GetComponent<RectTransform>().anchoredPosition = Vector2.Lerp(starts[i], targets[i], t);
+                cards[i].GetComponent<Image>().rectTransform.sizeDelta = new Vector2(100, 140) * (1f - 0.5f * t);
+            }
+            yield return null;
+        }
+
+        foreach (var card in cards)
+        {
+            if (card != null)
+                Destroy(card);
         }
     }
 
@@ -884,12 +964,21 @@ public class WorldManager : MonoBehaviour
             if (pairIdx >= 0 && pairIdx < pveFightCount)
             {
                 var p = GameManager.Instance.GetPlayer(match[pairIdx]);
-                foreach (var itemId in SoldierConfig.GetConfig(dieUnit.soldierId).RollDrops())
+                var drops = SoldierConfig.GetConfig(dieUnit.soldierId).RollDrops();
+                foreach (var itemId in drops)
                 {
                     p.AddItemCard(itemId);
                     var itemName = ItemConfig.HasConfig(itemId) ? ItemConfig.GetConfig(itemId).Name : itemId.ToString();
                     AddBattleText("掉落:" + itemName, dieUnit.transform.position, new UnityEngine.Vector2(0, 40), Color.yellow, 3);
                     UnityEngine.Debug.Log($"[PVE] 玩家{p.pid} 击杀怪物{dieUnit.soldierId} 掉落 {itemName}({itemId})");
+                }
+
+                // 有掉落时在怪物位置创建掉落包模型，战斗结束时变成卡牌飞向玩家头像
+                if (drops.Count > 0)
+                {
+                    var bagPrefab = Resources.Load<GameObject>("Prefabs/Battles/BagDrop");
+                    var bag = Instantiate(bagPrefab, dieUnit.transform.position, Quaternion.identity, Units.transform);
+                    bagDrops.Add(Tuple.Create(bag, p, drops[0]));
                 }
             }
         }

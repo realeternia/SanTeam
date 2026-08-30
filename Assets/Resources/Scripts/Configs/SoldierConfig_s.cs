@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -141,7 +141,6 @@ namespace CommonConfig
             }
             return result;
         }
-
         public class FieldMetaInfo
         {
             public string fieldName;
@@ -203,7 +202,6 @@ namespace CommonConfig
         private static List<CellMeta> cellMeta = new List<CellMeta>();
         public static List<CellMeta> CellMetas { get { return cellMeta; } }
 
-
         private static Dictionary<int, SoldierConfig> config = new Dictionary<int, SoldierConfig>();
         public static Dictionary<int, SoldierConfig>.ValueCollection ConfigList
         {
@@ -224,7 +222,8 @@ namespace CommonConfig
             config[500002] = new SoldierConfig(500002, "远程小兵", 1, 17, 90, 15, 0, 0, 7, 35, 15, 1.5f, false, .8f, .65f, new int[0], "UnitBing2", "BulletExplosionFire", "", "");
             config[501001] = new SoldierConfig(501001, "法术场", 1, 0, 9999, 15, 0, 0, 0, 0, 0, 0f, true, 0f, 0f, new int[0], "UnitSpell", "", "", "");
             config[501002] = new SoldierConfig(501002, "关羽影子", 1, 2, 2, 15, 0, 0, 10, 17, 0, 0f, false, 0f, 0f, new int[0], "UnitHero", "SwordHitYellowCritical", "", "");
-            config[590001] = new SoldierConfig(590001, "野怪", 1, 25, 200, 15, 2, 2, 9, 12, 0, 0f, false, 0f, 0f, new int[0], "UnitBing", "SwordHitYellowCritical", "400001;20|400002;30", "MonsterPic/wolf");
+            config[590001] = new SoldierConfig(590001, "野怪", 1, 25, 200, 15, 2, 2, 9, 12, 0, 0f, false, 0f, 0f, new int[0], "UnitBing", "SwordHitYellowCritical", "400001;40|400002;50", "MonsterPic/wolf");
+            config[0] = new SoldierConfig(0, "", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0f, false, 0f, 0f, new int[0], "", "", "", "");
 
             RebuildIndex();
 
