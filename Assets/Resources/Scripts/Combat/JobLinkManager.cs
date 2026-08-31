@@ -5,62 +5,22 @@ using UnityEngine;
 
 /// <summary>
 /// 兵种连锁（金铲铲式职业羁绊）：战斗开始时统计本侧同职业英雄数量，
-/// 直接施加被动属性加成，不走技能系统。
-/// 每个职业定义两组加成：
-/// - Self：该职业每个英雄自身获得的属性
-/// - Team：该职业每个英雄给全队（含自身、士兵）提供的属性，多个同职业英雄时叠加
-/// 例：戟（防御单位）——每个戟英雄自身+10护甲，且每个戟英雄使全队+3护甲
+/// 按 SkillConfig 职业技能行（Sname=JobConfig.SkillId）的 LinkSelf/LinkTeam 施加被动属性加成，不走技能系统。
+/// 档位：上阵该职业 1/2/3/4/5 人时对应职业技能 Lv1~5 行。
+/// - LinkSelf：连接英雄（该职业每个英雄自身）获得的属性
+/// - LinkTeam：我方其他英雄（全队含士兵）获得的总量，配置即该档位总量，不再乘人数
+/// 数值统一由 SkillConfig 表配置，本类不再硬编码。
 /// </summary>
 public static class JobLinkManager
 {
-    private class AttrBonus
+    // 职业羁绊档位：上阵该职业英雄数达到 1/2/3/4/5 人时对应职业技能 Lv1~5
+    private static readonly int[] linkTiers = { 1, 2, 3, 4, 5 };
+
+    private struct AttrBonus
     {
         public string Attr;
         public float Value;
-
-        public AttrBonus(string attr, float value)
-        {
-            Attr = attr;
-            Value = value;
-        }
     }
-
-    private class JobBonus
-    {
-        public AttrBonus[] Self; // 该职业每个英雄自身的加成
-        public AttrBonus[] Team; // 该职业每个英雄给全队提供的加成（叠加）
-
-        public JobBonus(AttrBonus[] self, AttrBonus[] team)
-        {
-            Self = self;
-            Team = team;
-        }
-    }
-
-    // 属性名：atk攻击 / ap法强 / might武力 / armor护甲 / magicRes魔抗 / maxHp生命 / critRate暴击率 / attackRate攻速
-    private static readonly Dictionary<string, JobBonus> jobBonuses = new Dictionary<string, JobBonus>
-    {
-        // 近战
-        { "帅", new JobBonus(new[] { new AttrBonus("atk", 12) }, new[] { new AttrBonus("atk", 3) }) },
-        { "枪", new JobBonus(new[] { new AttrBonus("atk", 10) }, new[] { new AttrBonus("atk", 2) }) },
-        { "戟", new JobBonus(new[] { new AttrBonus("armor", 10) }, new[] { new AttrBonus("armor", 3) }) },
-        { "士", new JobBonus(new[] { new AttrBonus("armor", 6), new AttrBonus("magicRes", 6) }, new[] { new AttrBonus("armor", 2), new AttrBonus("magicRes", 2) }) },
-        { "车", new JobBonus(new[] { new AttrBonus("maxHp", 90) }, new[] { new AttrBonus("maxHp", 30) }) },
-        { "马", new JobBonus(new[] { new AttrBonus("might", 10) }, new[] { new AttrBonus("might", 3) }) },
-        { "刀", new JobBonus(new[] { new AttrBonus("critRate", 0.06f) }, new[] { new AttrBonus("atk", 2) }) },
-        { "盾", new JobBonus(new[] { new AttrBonus("armor", 10), new AttrBonus("magicRes", 5) }, new[] { new AttrBonus("armor", 3), new AttrBonus("magicRes", 2) }) },
-        // 远程物理
-        { "弓", new JobBonus(new[] { new AttrBonus("attackRate", 0.06f) }, new[] { new AttrBonus("attackRate", 0.02f) }) },
-        { "弩", new JobBonus(new[] { new AttrBonus("atk", 12) }, new[] { new AttrBonus("range", 5) }) },
-        { "炮", new JobBonus(new[] { new AttrBonus("atk", 10) }, new[] { new AttrBonus("atk", 2) }) },
-        // 法系
-        { "谋", new JobBonus(new[] { new AttrBonus("ap", 10) }, new[] { new AttrBonus("ap", 2) }) },
-        { "扇", new JobBonus(new[] { new AttrBonus("ap", 8) }, new[] { new AttrBonus("ap", 2) }) },
-        { "相", new JobBonus(new[] { new AttrBonus("ap", 6) }, new[] { new AttrBonus("soldierAtk", 0.08f), new AttrBonus("soldierHp", 0.08f) }) },
-        { "鼓", new JobBonus(new[] { new AttrBonus("atk", 4) }, new[] { new AttrBonus("atk", 4) }) },
-        { "乐", new JobBonus(new[] { new AttrBonus("attackRate", 0.03f) }, new[] { new AttrBonus("attackRate", 0.03f) }) },
-        { "医", new JobBonus(new[] { new AttrBonus("maxHp", 50) }, new[] { new AttrBonus("maxHp", 40) }) },
-    };
 
     public static void ApplyJobLinks()
     {
@@ -96,44 +56,124 @@ public static class JobLinkManager
 
         foreach (var kv in jobHeroes)
         {
-            if (!jobBonuses.TryGetValue(kv.Key, out var bonus))
+            var cfg = GetTierConfig(kv.Key, kv.Value.Count);
+            if (cfg == null)
                 continue;
 
-            // Self：该职业每个英雄自身获得加成
+            var self = ParseBonuses(cfg.LinkSelf);
+            var team = ParseBonuses(cfg.LinkTeam);
+
+            // LinkSelf：该职业每个连接英雄自身获得加成
             foreach (var hero in kv.Value)
-                foreach (var b in bonus.Self)
+                foreach (var b in self)
                     ApplyAttr(hero, b.Attr, b.Value);
 
-            // Team：该职业每个英雄给全队提供加成（叠加），全队含英雄与士兵
-            foreach (var hero in kv.Value)
-                foreach (var unit in units)
-                    foreach (var b in bonus.Team)
-                        ApplyAttr(unit, b.Attr, b.Value);
-
-            // 战报提示（显示在该职业第一个英雄头顶）
-            var first = kv.Value[0];
-            WorldManager.Instance.AddBattleText(BuildJobText(kv.Key, kv.Value.Count, bonus), first.transform.position, new Vector2(0, 60), SysColor.BattleText.JobLink, 3);
+            // LinkTeam：该档位全队（含英雄与士兵）获得的总量
+            foreach (var unit in units)
+                foreach (var b in team)
+                    ApplyAttr(unit, b.Attr, b.Value);
         }
     }
 
-    private static string BuildJobText(string job, int count, JobBonus bonus)
+    /// <summary>
+    /// 当前档位对应的职业技能配置行：上阵该职业英雄数即为档位等级（1~5人=Lv1~5）。
+    /// </summary>
+    public static SkillConfig GetTierConfig(string job, int fieldCount)
     {
+        var jobCfg = ConfigManager.GetJobConfig(job);
+        var sname = jobCfg != null ? jobCfg.SkillId : null;
+        if (string.IsNullOrEmpty(sname))
+            return null;
+
+        var lv = GetTierLevel(fieldCount);
+        if (lv <= 0)
+            return null;
+        return SkillConfig.GetConfig(sname, lv);
+    }
+
+    // 当前生效档位等级（Lv1~5），上阵0人返回0
+    private static int GetTierLevel(int fieldCount)
+    {
+        var lv = 0;
+        for (var i = 0; i < linkTiers.Length; i++)
+        {
+            if (fieldCount >= linkTiers[i])
+                lv = i + 1;
+        }
+        return lv;
+    }
+
+    /// <summary>
+    /// 生成职业羁绊的 tooltip 富文本：只显示当前档与下一档两行，
+    /// 格式"(N人) 连接英雄加成 | 我方其他英雄加成"，当前档绿色、下一档灰色。
+    /// 商店/排行榜等无上阵上下文（上阵0人）时默认显示1级档。
+    /// </summary>
+    public static string GetJobLinkTipText(string job, int fieldCount)
+    {
+        var jobCfg = ConfigManager.GetJobConfig(job);
+        var sname = jobCfg != null ? jobCfg.SkillId : null;
+        if (string.IsNullOrEmpty(sname))
+            return "";
+
+        // 当前档：上阵0人（商店卡等）默认取1级
+        var activeLv = GetTierLevel(fieldCount);
+        if (activeLv <= 0)
+            activeLv = 1;
+
         var sb = new StringBuilder();
-        sb.Append(job).Append('×').Append(count).Append(" 自身").Append(AttrText(bonus.Self, 1));
-        sb.Append(" 全队").Append(AttrText(bonus.Team, count));
+        AppendTierLine(sb, sname, activeLv, true);
+        AppendTierLine(sb, sname, activeLv + 1, false);
         return sb.ToString();
     }
 
-    private static string AttrText(AttrBonus[] list, int mult)
+    // 追加一行档位文本（isCurrent=true 绿色，否则灰色）；等级超出配置时不追加
+    private static void AppendTierLine(StringBuilder sb, string sname, int lv, bool isCurrent)
+    {
+        if (lv < 1 || lv > linkTiers.Length)
+            return;
+        var cfg = SkillConfig.GetConfig(sname, lv);
+        if (cfg == null)
+            return;
+
+        sb.Append('\n');
+        sb.Append(isCurrent ? "<color=green>" : "<color=#808080>");
+        sb.Append('(').Append(linkTiers[lv - 1]).Append("人) ");
+        sb.Append(AttrText(ParseBonuses(cfg.LinkSelf)));
+        sb.Append(" | ");
+        sb.Append(AttrText(ParseBonuses(cfg.LinkTeam)));
+        sb.Append("</color>");
+    }
+
+    // 解析 "attr+value,attr+value" 格式的加成串
+    private static List<AttrBonus> ParseBonuses(string str)
+    {
+        var list = new List<AttrBonus>();
+        if (string.IsNullOrEmpty(str))
+            return list;
+
+        foreach (var seg in str.Split(','))
+        {
+            var idx = seg.LastIndexOf('+');
+            if (idx <= 0)
+                continue;
+            float v;
+            if (!float.TryParse(seg.Substring(idx + 1), out v))
+                continue;
+            list.Add(new AttrBonus { Attr = seg.Substring(0, idx), Value = v });
+        }
+        return list;
+    }
+
+    private static string AttrText(List<AttrBonus> list)
     {
         var sb = new StringBuilder();
-        for (var i = 0; i < list.Length; i++)
+        for (var i = 0; i < list.Count; i++)
         {
             if (i > 0)
                 sb.Append("、");
-            sb.Append(AttrName(list[i].Attr)).Append("+").Append(FormatValue(list[i].Attr, list[i].Value * mult));
+            sb.Append(AttrName(list[i].Attr)).Append("+").Append(FormatValue(list[i].Attr, list[i].Value));
         }
-        return sb.ToString();
+        return sb.Length > 0 ? sb.ToString() : "无";
     }
 
     private static string AttrName(string attr)

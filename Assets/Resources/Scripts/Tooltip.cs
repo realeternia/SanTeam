@@ -201,11 +201,35 @@ public class Tooltip : MonoBehaviour
         
         if (hasSkill)
         {
+            // 职业技能行：统计当前玩家上阵同职业英雄数，用于羁绊档位高亮
+            int jobFieldCount = 0;
+            string heroJob = null;
+            if (isHero)
+            {
+                heroJob = HeroConfig.GetConfig(heroId).Job;
+                if (player != null)
+                {
+                    foreach (var cardId in player.battleCards)
+                    {
+                        if (cardId > 0 && ConfigManager.IsHeroCard(cardId) && HeroConfig.GetConfig(cardId).Job == heroJob)
+                            jobFieldCount++;
+                    }
+                }
+            }
+
             for(int i = 0; i < skillCfgs.Count; i++)
             {
                 var skillConfig = skillCfgs[i];
                 var skillAttrStr = skillConfig.Attr == "might" ? "<color=red>[无双]</color>" : skillConfig.Attr == "atk" ? "<color=yellow>[攻]</color>" : skillConfig.Attr == "ap" ? "<color=blue>[法]</color>" : "";
-                textSkills[i].text = skillAttrStr + skillConfig.Name + skillConfig.Descript; //富文本
+                if (skillConfig.Type == "职业")
+                {
+                    // 职业技能（兵种连锁）：显示各档位两列数值并按上阵数高亮当前档位
+                    textSkills[i].text = skillConfig.Name + JobLinkManager.GetJobLinkTipText(heroJob, jobFieldCount);
+                }
+                else
+                {
+                    textSkills[i].text = skillAttrStr + skillConfig.Name + skillConfig.Descript; //富文本
+                }
                 imageSkills[i].sprite = Resources.Load<Sprite>("SkillPic/" + skillConfig.Icon);
             }
 
