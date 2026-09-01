@@ -29,6 +29,9 @@ public static class CombatConst
     /// <summary>主公技：护盾加倍倍率</summary>
     public const float MasterShieldDouble = 2f;
 
+    /// <summary>主公(帅/王)在场：全队护盾额外加成（百分比）</summary>
+    public const float KingShieldBonusRate = 0.1f;
+
     // ---- 其他 ----
     /// <summary>近战/远程士兵射程判定阈值</summary>
     public const float MeleeRange = 30f;

@@ -16,6 +16,9 @@ public class Buff
     public float endTime;
     public GameObject effect;
 
+    /// <summary>效果值乘算系数（琴·祝福等：由施法者 buffEffectRate 决定，默认1=无加成）</summary>
+    public float effectMulti = 1f;
+
 
     public Buff(int id, int skillId, Chess caster, Chess unit, float lastTime)
     {

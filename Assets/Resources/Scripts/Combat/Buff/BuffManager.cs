@@ -8,11 +8,15 @@ public static class BuffManager
 
         if(time == 0) //有的技能会先填0，等待buff
             return;
-        
+
+        // 负面buff时长延长（扇·debuffDur）：目标自身属性，延长比例可叠加
+        var buffCfg = BuffConfig.GetConfig(buffId);
+        if (!buffCfg.IsPositive && target.debuffDur != 0f)
+            time *= 1f + target.debuffDur;
+
         GameLog.Debug("AddBuff buffId=" + buffId.ToString() + " skillId=" + skillId.ToString() + " time=" + time.ToString());
 
         Buff buff = null;
-        var buffCfg = BuffConfig.GetConfig(buffId);
         switch (buffCfg.ScriptName)
         {
             case "BuffShield":
@@ -56,6 +60,10 @@ public static class BuffManager
             GameLog.Error("Buff not found");
             return;
         }
+
+        // 正面buff效果值乘算：施法者 buffEffectRate（琴·祝福等，1=无加成；鼓光环走 auroEffectRate/AuroAttrs）
+        if (buffCfg.IsPositive && caster != null)
+            buff.effectMulti = caster.buffEffectRate;
 
         target.AddBuff(buff, caster, time);
     }

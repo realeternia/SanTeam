@@ -3,7 +3,7 @@ using CommonConfig;
 
 /// <summary>
 /// 默认护盾机制：战斗开始时统计同阵营英雄数量，达到档位(3/5/7/9)后该阵营英雄直接获得护盾(类似连线)。
-/// 主公技(王/帅)：所在同阵营护盾效果加倍。
+/// 主公技(王/帅)：所在同阵营护盾效果加倍；有王(帅)在场时，全队护盾额外+10%。
 /// </summary>
 public static class FactionShieldManager
 {
@@ -46,6 +46,10 @@ public static class FactionShieldManager
             if (HasMasterShieldSkill(units, kv.Key))
                 rate *= CombatConst.MasterShieldDouble;
 
+            // 主公(帅/王)在场：本侧有王时，全队护盾额外+10%
+            if (CountKings(units) > 0)
+                rate += CombatConst.KingShieldBonusRate;
+
             foreach (var unit in units)
             {
                 if (unit.hp <= 0 || !unit.isHero)
@@ -69,6 +73,20 @@ public static class FactionShieldManager
                 return CombatConst.FactionShieldRates[i];
         }
         return 0;
+    }
+
+    // 本侧上阵的王(帅/主公)英雄数：按英雄职业的职业技能缩写(JobConfig.SkillId)是否为 帅 判定
+    private static int CountKings(List<Chess> units)
+    {
+        var count = 0;
+        foreach (var unit in units)
+        {
+            if (unit.hp <= 0 || !unit.isHero)
+                continue;
+            if (HeroConfig.GetConfig(unit.heroId).Job == "帅")
+                count++;
+        }
+        return count;
     }
 
     // 该阵营是否存在携带主公技的英雄

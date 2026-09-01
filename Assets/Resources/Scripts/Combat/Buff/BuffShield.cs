@@ -12,14 +12,14 @@ public class BuffShield : Buff
     public override void OnAdd(Chess chess, Chess caster)
     {
         base.OnAdd(chess, caster);
-        hp = (int)(skillCfg.SkillAttrRate * caster.maxHp);
+        hp = (int)(skillCfg.SkillAttrRate * caster.maxHp * effectMulti);
 
     }
 
     public override void Refresh(Chess caster, float lastTime)
     {
         base.Refresh(caster, lastTime);
-        hp = (int)(skillCfg.SkillAttrRate * caster.maxHp);
+        hp = (int)(skillCfg.SkillAttrRate * caster.maxHp * effectMulti);
     }
 
     // 直接指定护盾值(默认同阵营护盾机制使用，覆盖按配置计算)

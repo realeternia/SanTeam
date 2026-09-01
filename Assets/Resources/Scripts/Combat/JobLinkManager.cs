@@ -8,7 +8,8 @@ using UnityEngine;
 /// 按 SkillConfig 职业技能行（Sname=JobConfig.SkillId）的 LinkSelf/LinkTeam 施加被动属性加成，不走技能系统。
 /// 档位：上阵该职业 1/2/3/4/5 人时对应职业技能 Lv1~5 行。
 /// - LinkSelf：连接英雄（该职业每个英雄自身）获得的属性
-/// - LinkTeam：我方其他英雄（全队含士兵）获得的总量，配置即该档位总量，不再乘人数
+/// - LinkTeam：我方其他英雄（除该职业英雄外的全体英雄）获得的总量，配置即该档位总量，不再乘人数
+/// - AuroAttrs：光环技能效果，我方全体英雄（含提供者，不用排除）获得，效果受来源英雄 auroEffectRate 修正
 /// 数值统一由 SkillConfig 表配置，本类不再硬编码。
 /// </summary>
 public static class JobLinkManager
@@ -35,43 +36,92 @@ public static class JobLinkManager
 
     private static void ApplyJobLinks(int side)
     {
-        var units = WorldManager.Instance.GetUnitsMySide(side);
-        if (units.Count == 0)
+        var allMySideUnits = WorldManager.Instance.GetUnitsMySide(side);
+        if (allMySideUnits.Count == 0)
             return;
 
         // 按职业归组英雄
-        var jobHeroes = new Dictionary<string, List<Chess>>();
-        foreach (var unit in units)
+        var heroesByJob = new Dictionary<string, List<Chess>>();
+        foreach (var unit in allMySideUnits)
         {
             if (!unit.isHero || unit.hp <= 0)
                 continue;
             var job = HeroConfig.GetConfig(unit.heroId).Job;
-            if (!jobHeroes.TryGetValue(job, out var list))
+            if (!heroesByJob.TryGetValue(job, out var jobHeroes))
             {
-                list = new List<Chess>();
-                jobHeroes[job] = list;
+                jobHeroes = new List<Chess>();
+                heroesByJob[job] = jobHeroes;
             }
-            list.Add(unit);
+            jobHeroes.Add(unit);
         }
 
-        foreach (var kv in jobHeroes)
+        foreach (var jobGroup in heroesByJob)
         {
-            var cfg = GetTierConfig(kv.Key, kv.Value.Count);
+            var tierLv = GetTierLevel(jobGroup.Value.Count);
+            if (tierLv <= 0)
+                continue;
+
+            // 兵种技能按同职业英雄数 SetLevel 匹配对应档位的技能行：
+            // 机械类技能（枪·眩晕/戟·AOE溅射/炮·AOE范围）由此生效；属性类占位技能(Dumb)无实际效果，加成仍走下方 LinkSelf/LinkTeam
+            SetJobSkillLevel(jobGroup.Value, jobGroup.Key, tierLv);
+
+            var cfg = GetTierConfig(jobGroup.Key, jobGroup.Value.Count);
             if (cfg == null)
                 continue;
 
-            var self = ParseBonuses(cfg.LinkSelf);
-            var team = ParseBonuses(cfg.LinkTeam);
+            var linkSelfBonuses = ParseBonuses(cfg.LinkSelf);
+            var linkTeamBonuses = ParseBonuses(cfg.LinkTeam);
+            var auraBonuses = ParseBonuses(cfg.AuroAttrs);
 
             // LinkSelf：该职业每个连接英雄自身获得加成
-            foreach (var hero in kv.Value)
-                foreach (var b in self)
-                    ApplyAttr(hero, b.Attr, b.Value);
+            foreach (var hero in jobGroup.Value)
+                foreach (var bonus in linkSelfBonuses)
+                    ApplyAttr(hero, bonus.Attr, bonus.Value);
 
-            // LinkTeam：该档位全队（含英雄与士兵）获得的总量
-            foreach (var unit in units)
-                foreach (var b in team)
-                    ApplyAttr(unit, b.Attr, b.Value);
+            // AuroAttrs：光环技能效果，我方全体英雄（含提供者，不用排除）获得，
+            // 效果受光环来源英雄 auroEffectRate 修正（同职业多个提供者取最高，先应用 LinkSelf 再取值）
+            if (auraBonuses.Count > 0)
+            {
+                var auraMultiplier = 1f;
+                foreach (var hero in jobGroup.Value)
+                    auraMultiplier = Mathf.Max(auraMultiplier, hero.auroEffectRate);
+                foreach (var unit in allMySideUnits)
+                {
+                    if (!unit.isHero)
+                        continue;
+                    foreach (var bonus in auraBonuses)
+                        ApplyAttr(unit, bonus.Attr, bonus.Value * auraMultiplier);
+                }
+            }
+
+            // LinkTeam：该档位除该职业英雄外的我方全体英雄获得的总量（该职业英雄已由 LinkSelf 覆盖，不重复给）
+            foreach (var unit in allMySideUnits)
+            {
+                if (!unit.isHero || jobGroup.Value.Contains(unit))
+                    continue;
+                foreach (var bonus in linkTeamBonuses)
+                    ApplyAttr(unit, bonus.Attr, bonus.Value);
+            }
+        }
+    }
+
+    // 将同职业英雄的兵种技能 SetLevel 到当前档位（机械类技能依赖技能行参数，如 枪·眩晕几率/戟·AOE溅射）
+    private static void SetJobSkillLevel(List<Chess> heroes, string job, int lv)
+    {
+        var jobCfg = ConfigManager.GetJobConfig(job);
+        var sname = jobCfg != null ? jobCfg.SkillId : null;
+        if (string.IsNullOrEmpty(sname))
+            return;
+        foreach (var hero in heroes)
+        {
+            foreach (var skill in hero.skills)
+            {
+                if (skill.skillCfg.Sname == sname)
+                {
+                    skill.SetLevel(lv);
+                    break;
+                }
+            }
         }
     }
 
@@ -138,9 +188,20 @@ public static class JobLinkManager
         sb.Append('\n');
         sb.Append(isCurrent ? "<color=green>" : "<color=#808080>");
         sb.Append('(').Append(linkTiers[lv - 1]).Append("人) ");
-        sb.Append(AttrText(ParseBonuses(cfg.LinkSelf)));
-        sb.Append(" | ");
-        sb.Append(AttrText(ParseBonuses(cfg.LinkTeam)));
+        // 机械类技能（枪·眩晕/戟·AOE溅射/炮·AOE范围）：不走属性加成，直接展示技能描述
+        if (string.IsNullOrEmpty(cfg.LinkSelf) && string.IsNullOrEmpty(cfg.LinkTeam) && string.IsNullOrEmpty(cfg.AuroAttrs))
+            sb.Append(cfg.Descript);
+        else
+        {
+            var parts = new List<string>();
+            if (!string.IsNullOrEmpty(cfg.LinkSelf))
+                parts.Add(AttrText(ParseBonuses(cfg.LinkSelf)));
+            if (!string.IsNullOrEmpty(cfg.LinkTeam))
+                parts.Add(AttrText(ParseBonuses(cfg.LinkTeam)));
+            if (!string.IsNullOrEmpty(cfg.AuroAttrs))
+                parts.Add("光环:" + AttrText(ParseBonuses(cfg.AuroAttrs)));
+            sb.Append(parts.Count > 0 ? string.Join(" | ", parts.ToArray()) : "无");
+        }
         sb.Append("</color>");
     }
 
@@ -176,28 +237,27 @@ public static class JobLinkManager
         return sb.Length > 0 ? sb.ToString() : "无";
     }
 
+    // 属性中文名：从 HeroAttrConfig 查询（name=JobLink属性键）；未登记的键告警并回退原始键名
     private static string AttrName(string attr)
     {
-        switch (attr)
+        try
         {
-            case "atk": return "攻";
-            case "ap": return "法强";
-            case "might": return "武力";
-            case "armor": return "护甲";
-            case "magicRes": return "魔抗";
-            case "maxHp": return "生命";
-            case "critRate": return "暴击";
-            case "attackRate": return "攻速";
-            case "soldierAtk": return "士兵攻";
-            case "soldierHp": return "士兵生命";
-            case "range": return "射程";
-            default: return attr;
+            return HeroAttrConfig.GetConfigByname(attr).Cname;
+        }
+        catch (KeyNotFoundException)
+        {
+            GameLog.Warn("JobLink 属性键未配置中文名 attr=" + attr);
+            return attr;
         }
     }
 
     private static string FormatValue(string attr, float v)
     {
-        if (attr == "critRate" || attr == "soldierAtk" || attr == "soldierHp")
+        // 百分比类属性：v为比例值（0.1=10%）
+        if (attr == "critRate" || attr == "soldierAtk" || attr == "soldierHp"
+            || attr == "dodgeRate" || attr == "critDamageMulti"
+            || attr == "healRate" || attr == "healedRate" || attr == "buffEffectRate" || attr == "debuffDur"
+            || attr == "auroEffectRate")
             return Mathf.RoundToInt(v * 100) + "%";
         if (v < 1f)
             return v.ToString("0.##");
@@ -233,6 +293,41 @@ public static class JobLinkManager
                 break;
             case "attackRate":
                 unit.attackRate += value;
+                break;
+            case "dodgeRate":
+                // 马·闪避
+                unit.dodgeRate += value;
+                break;
+            case "critDamageMulti":
+                unit.critDamageMulti += value;
+                break;
+            case "mpRegen":
+                // 相/扇·法力回复
+                unit.mpRegen += value;
+                break;
+            case "hpRegen":
+                // 医·生命回复
+                unit.hpRegen += (int)value;
+                break;
+            case "healRate":
+                // 医·治疗强化
+                unit.healRate += value;
+                break;
+            case "healedRate":
+                // 受治疗系数（可为负=减疗）
+                unit.healedRate += value;
+                break;
+            case "buffEffectRate":
+                // 琴·祝福效果：统一buff效果加成系数
+                unit.buffEffectRate += value;
+                break;
+            case "auroEffectRate":
+                // 鼓·光环技能效果：修正 AuroAttrs 光环属性的效果值
+                unit.auroEffectRate += value;
+                break;
+            case "debuffDur":
+                // 扇·负面buff时长延长
+                unit.debuffDur += value;
                 break;
             case "soldierAtk":
                 // 相的羁绊：全军士兵攻击+%

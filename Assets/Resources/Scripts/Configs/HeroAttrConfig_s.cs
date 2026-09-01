@@ -123,6 +123,22 @@ namespace CommonConfig
             config[9] = new HeroAttrConfig(9, "range", "射程", "", "", "attrrange", false);
             config[10] = new HeroAttrConfig(10, "crit", "暴击", "", "", "attrcrit", false);
             config[11] = new HeroAttrConfig(11, "dodge", "闪避", "", "", "attrdodge", false);
+            // JobLink 属性键（SkillConfig LinkSelf/LinkTeam 使用的键名，中文名供 JobLinkManager tooltip 查询）
+            config[12] = new HeroAttrConfig(12, "maxHp", "生命", "", "", "attrhp", false);
+            config[13] = new HeroAttrConfig(13, "critRate", "暴击", "", "", "attrcrit", false);
+            config[14] = new HeroAttrConfig(14, "attackRate", "攻速", "", "", "attackspeed", false);
+            config[15] = new HeroAttrConfig(15, "dodgeRate", "闪避", "", "", "attrdodge", false);
+            config[16] = new HeroAttrConfig(16, "magicRes", "魔抗", "", "", "attrmagicshield", false);
+            config[17] = new HeroAttrConfig(17, "soldierAtk", "士兵攻", "", "", "attratk", false);
+            config[18] = new HeroAttrConfig(18, "soldierHp", "士兵生命", "", "", "attrhp", false);
+            config[19] = new HeroAttrConfig(19, "critDamageMulti", "暴伤", "", "", "attrcrit", false);
+            config[20] = new HeroAttrConfig(20, "mpRegen", "法力回复", "", "", "", false);
+            config[21] = new HeroAttrConfig(21, "hpRegen", "生命回复", "", "", "attrhp", false);
+            config[22] = new HeroAttrConfig(22, "healRate", "治疗强化", "", "", "", false);
+            config[23] = new HeroAttrConfig(23, "healedRate", "受治疗", "", "", "", false);
+            config[24] = new HeroAttrConfig(24, "buffEffectRate", "buff效果", "", "", "", false);
+            config[25] = new HeroAttrConfig(25, "debuffDur", "负面持续", "", "", "", false);
+            config[26] = new HeroAttrConfig(26, "auroEffectRate", "光环效果", "", "", "", false);
 
             RebuildIndex();
 

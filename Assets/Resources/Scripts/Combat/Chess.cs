@@ -36,6 +36,11 @@ public class Chess : MonoBehaviour
     public float dodgeRate; //闪避
     public float critRate; //暴击
     public float critDamageMulti = 0.5f; //暴击伤害倍率
+    public float healRate; //治疗强化系数（0.1=治疗效果+10%）
+    public float healedRate; //受治疗系数（可为负，-0.1=受到的治疗-10%，减疗）
+    public float buffEffectRate = 1f; //buff效果加成系数（1=无加成，琴祝福等效果值乘算）
+    public float auroEffectRate = 1f; //光环效果加成系数（1=无加成，鼓光环等 AuroAttrs 光环属性效果值乘算）
+    public float debuffDur; //负面buff时长延长比例（0.1=负面buff持续+10%，扇）
 
     public int lastDamagedPlayerId = -1;
 
@@ -85,8 +90,10 @@ public class Chess : MonoBehaviour
     private HashSet<int> friendIds = new HashSet<int>(); //连线(武将关系)好友
     private int friendAtkBonus; //连线好友带来的攻击加成值
 
-    private float regeTimer; //1s回复一次
-    public int regeHp; //回复血量
+    private float secondTimer; //每秒事件计时，满1s触发一次OnSecond
+    public int regeHp; //回复血量（OnSecond事件结算）
+    public int hpRegen; //生命回复/秒（正=回复，负=扣减，OnSecond事件结算）
+    public float mpRegen; //法力回复/秒（为设置了MpCost的技能持续充能，可为负=倒扣，OnSecond事件结算）
 
     // Start is called before the first frame update
     void Start()
@@ -202,14 +209,12 @@ public class Chess : MonoBehaviour
 
         buffs.Where(x => Time.time > x.endTime).ToList().ForEach(x => BuffManager.RemoveBuff(this, x.id));
 
-        if(regeHp > 0)
+        // 每秒计时，满1s触发一次OnSecond事件（回复/充能等按秒结算的逻辑统一在该事件处理）
+        secondTimer += deltaTime;
+        while (secondTimer >= 1)
         {
-            regeTimer += deltaTime;
-            if(regeTimer >= 1)
-            {
-                regeTimer -= 1;
-                AddHp(regeHp);
-            }
+            secondTimer -= 1;
+            OnSecond();
         }
 
         MoveAndFight(deltaTime);
@@ -221,6 +226,29 @@ public class Chess : MonoBehaviour
             {
                 Ondying();
             }
+        }
+    }
+
+    // 每秒事件：regeHp/hpRegen/mpRegen 等按秒结算的逻辑统一在此处理
+    private void OnSecond()
+    {
+        if (regeHp > 0)
+            AddHp(regeHp);
+
+        if (hpRegen != 0)
+        {
+            // 生命回复属性：正=回复，负=扣减（可为负=持续扣减）
+            hp = Mathf.Clamp(hp + hpRegen, 0, maxHp);
+            OnHpChanged();
+            if (hp <= 0)
+                Ondying();
+        }
+
+        if (mpRegen != 0)
+        {
+            // 法力回复属性：为所有设置了MpCost的技能持续充能（可为负=充能倒扣）
+            foreach (var skill in skills)
+                skill.AddRegenMp(mpRegen);
         }
     }
 
@@ -722,7 +750,10 @@ public class Chess : MonoBehaviour
     public void HealTarget(Chess target, int checkSkillId, int addon)
     {
         SkillManager.OnHealTarget(this, target, checkSkillId, ref addon);
-        target.AddHp(addon);
+        // 治疗强化系数（治疗者）与受治疗系数（目标，可为负=减疗）
+        addon = Mathf.RoundToInt(addon * (1f + healRate + target.healedRate));
+        if (addon > 0)
+            target.AddHp(addon);
     }
 
     public void Cooldown(float time)

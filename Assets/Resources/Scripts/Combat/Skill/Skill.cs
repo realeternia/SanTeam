@@ -95,6 +95,14 @@ public class Skill
         mp = Mathf.Min(mp + skillCfg.MpCost / 3f, skillCfg.MpCost);
     }
 
+    // 法力回复属性（mpRegen）为技能持续充能：正=回复，负=倒扣，范围[0, MpCost]
+    public void AddRegenMp(float add)
+    {
+        if (skillCfg.MpCost <= 0)
+            return;
+        mp = Mathf.Clamp(mp + add, 0f, skillCfg.MpCost);
+    }
+
     // MP是否已满（未设置MpCost的技能不受MP限制）
     public bool IsMpFull()
     {
