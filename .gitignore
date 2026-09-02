@@ -24,3 +24,6 @@
 /obj
 /Logs
 .vs
+/Tools/DesignCoder/DesignCoder/obj
+/Tools/DesignCoder/DesignCoder/.trae
+/Tools/DesignCoder/DesignCoder/bin

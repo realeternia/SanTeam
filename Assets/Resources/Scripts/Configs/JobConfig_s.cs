@@ -46,8 +46,8 @@ namespace CommonConfig
             {"NameS", new FieldMetaInfo("名字", "string", 0)},
             {"SkillId", new FieldMetaInfo("技能缩写", "string", 0)},
             {"SourceJob", new FieldMetaInfo("元职业", "int", 0)},
-            {"Range", new FieldMetaInfo("射程（近战17 弓50 弩70 炮50 扇/相/谋/鼓/乐/医35）", "int", 0)},
-            {"MoveSpeed", new FieldMetaInfo("移动速度（帅/士/盾/刀/枪/戟10 马/车12 弓/炮/扇/相/谋/鼓/乐/医8 弩7）", "int", 0)},
+            {"Range", new FieldMetaInfo("射程（近战17 弓50 弩70 炮50 扇/相/棋/鼓/琴/医35）", "int", 0)},
+            {"MoveSpeed", new FieldMetaInfo("移动速度（帅/士/盾/锤/枪/戟10 马/车12 弓/炮/扇/相/棋/鼓/琴/医8 弩7）", "int", 0)},
             {"AtkSpeed", new FieldMetaInfo("攻速（30=每秒攻击1次，攻速20=1.5秒/次，15=2秒/次）", "int", 0)},
             {"Armor", new FieldMetaInfo("护甲（职业基准值）", "int", 0)},
             {"MagicRes", new FieldMetaInfo("魔抗（职业基准值）", "int", 0)},
@@ -82,11 +82,11 @@ namespace CommonConfig
         /// </summary>
         public int SourceJob;
         /// <summary>
-        ///射程（近战17 弓50 弩70 炮50 扇/相/谋/鼓/乐/医35）
+        ///射程（近战17 弓50 弩70 炮50 扇/相/棋/鼓/琴/医35）
         /// </summary>
         public int Range;
         /// <summary>
-        ///移动速度（帅/士/盾/刀/枪/戟10 马/车12 弓/炮/扇/相/谋/鼓/乐/医8 弩7）
+        ///移动速度（帅/士/盾/锤/枪/戟10 马/车12 弓/炮/扇/相/棋/鼓/琴/医8 弩7）
         /// </summary>
         public int MoveSpeed;
         /// <summary>
@@ -160,11 +160,11 @@ namespace CommonConfig
             config[302] = new JobConfig(302, "shidun", "盾", "", 301, 17, 10, 20, 45, 35, 65, 50, 80);
             config[401] = new JobConfig(401, "shan", "扇", "扇", 0, 35, 8, 20, 25, 35, 60, 80, 45);
             config[402] = new JobConfig(402, "shanxiang", "相", "相", 401, 35, 8, 20, 35, 45, 65, 85, 45);
-            config[403] = new JobConfig(403, "shanmou", "谋", "谋", 401, 35, 8, 20, 35, 45, 70, 90, 45);
+            config[403] = new JobConfig(403, "qi", "棋", "棋", 401, 35, 8, 20, 35, 45, 70, 90, 45);
             config[501] = new JobConfig(501, "gu", "鼓", "鼓", 0, 35, 8, 20, 25, 35, 45, 65, 55);
-            config[502] = new JobConfig(502, "gusong", "乐", "乐", 501, 35, 8, 20, 15, 25, 45, 85, 40);
+            config[502] = new JobConfig(502, "qin", "琴", "琴", 501, 35, 8, 20, 15, 25, 45, 85, 40);
             config[503] = new JobConfig(503, "guyi", "医", "医", 501, 35, 8, 20, 25, 35, 55, 85, 45);
-            config[601] = new JobConfig(601, "dao", "刀", "刀", 0, 17, 10, 20, 25, 15, 65, 55, 85);
+            config[601] = new JobConfig(601, "chui", "锤", "锤", 0, 17, 10, 20, 25, 15, 65, 55, 85);
             config[602] = new JobConfig(602, "daoqiang", "枪", "枪", 601, 17, 10, 20, 55, 45, 80, 55, 80);
             config[603] = new JobConfig(603, "daoji", "戟", "戟", 601, 17, 10, 20, 45, 35, 75, 55, 75);
 
