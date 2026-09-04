@@ -129,7 +129,7 @@ namespace CommonConfig
             config[23] = new HeroFriendConfig(23, "瑜策", 3, new int[]{103001,103008}, "", "");
             config[24] = new HeroFriendConfig(24, "二乔", 3, new int[]{103016,103017}, "", "");
             config[25] = new HeroFriendConfig(25, "帆箭", 2, new int[]{103003,103004}, "", "");
-            config[27] = new HeroFriendConfig(27, "吕布帐下", 1, new int[]{104001,104006,104005}, "", "");
+            config[27] = new HeroFriendConfig(27, "吕布帐下", 1, new int[]{104001,104006,102004}, "", "");
             config[28] = new HeroFriendConfig(28, "河北庭柱", 2, new int[]{106006,106001,106002,102008}, "", "");
             config[29] = new HeroFriendConfig(29, "黄巾之乱", 3, new int[]{110007,110008,110009}, "", "");
             config[30] = new HeroFriendConfig(30, "司马家族", 3, new int[]{105002,105003,100005,102016}, "", "");
@@ -149,10 +149,9 @@ namespace CommonConfig
             config[46] = new HeroFriendConfig(46, "有勇有谋", 2, new int[]{104001,104008}, "", "");
             config[47] = new HeroFriendConfig(47, "官渡奇谋", 1, new int[]{106005,100002}, "", "");
             config[48] = new HeroFriendConfig(48, "灭蜀之功", 1, new int[]{105003,105001}, "", "");
-            config[49] = new HeroFriendConfig(49, "舟楫平吴", 1, new int[]{105004,105007,100005}, "", "");
+            config[49] = new HeroFriendConfig(49, "舟楫平吴", 1, new int[]{105008,105007,100005}, "", "");
             config[50] = new HeroFriendConfig(50, "合肥同心", 1, new int[]{102004,102021}, "", "");
             config[51] = new HeroFriendConfig(51, "凤仪亭", 1, new int[]{100004,104001}, "", "");
-            config[52] = new HeroFriendConfig(52, "四世三公", 2, new int[]{100006,110004}, "", "");
             config[53] = new HeroFriendConfig(53, "河北智囊", 2, new int[]{106003,106007,106008}, "", "");
             config[54] = new HeroFriendConfig(54, "英雄美人", 3, new int[]{103001,103016}, "", "");
             config[55] = new HeroFriendConfig(55, "顾曲周郎", 3, new int[]{103008,103017}, "", "");
@@ -174,20 +173,17 @@ namespace CommonConfig
             config[85] = new HeroFriendConfig(85, "江东屏障", 2, new int[]{103015,103006}, "", "");
             config[86] = new HeroFriendConfig(86, "毒士枭雄", 3, new int[]{104007,100004}, "", "");
             config[87] = new HeroFriendConfig(87, "陈氏父子", 2, new int[]{105006,102020}, "", "");
-            config[88] = new HeroFriendConfig(88, "卢门同窗", 1, new int[]{110001,100001}, "", "");
-            config[89] = new HeroFriendConfig(89, "白马白卫", 1, new int[]{110001,101001}, "", "");
             config[91] = new HeroFriendConfig(91, "杀父之仇", 2, new int[]{103003,103019}, "", "");
             config[92] = new HeroFriendConfig(92, "文武双全", 2, new int[]{104002,104003}, "", "");
             config[93] = new HeroFriendConfig(93, "西凉军", 2, new int[]{101003,101011,102014}, "", "");
             config[94] = new HeroFriendConfig(94, "樊城防御", 1, new int[]{102011,102014}, "", "");
             config[95] = new HeroFriendConfig(95, "虎侯之威", 1, new int[]{102005,101003}, "", "");
-            config[96] = new HeroFriendConfig(96, "讨董联盟", 1, new int[]{100002,103002,100006,110004,110005}, "", "");
+            config[96] = new HeroFriendConfig(96, "讨董联盟", 1, new int[]{100002,103002,100006,110005}, "", "");
             config[98] = new HeroFriendConfig(98, "吴下阿蒙", 2, new int[]{103007,103010}, "", "");
             config[99] = new HeroFriendConfig(99, "白衣渡江", 2, new int[]{103020,103010}, "", "");
             config[101] = new HeroFriendConfig(101, "华佗治病", 2, new int[]{100002,110003}, "", "");
             config[102] = new HeroFriendConfig(102, "刮骨疗毒", 2, new int[]{101005,110003}, "", "");
             config[103] = new HeroFriendConfig(103, "文帝潜邸", 2, new int[]{102016,102022,102020,104003}, "", "");
-            config[108] = new HeroFriendConfig(108, "盟友抗曹", 2, new int[]{110004,104001,103001}, "", "");
 
             RebuildIndex();
 
