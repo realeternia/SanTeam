@@ -644,11 +644,14 @@ public class Chess : MonoBehaviour
         if(damage <= 0)
             throw new Exception("伤害值不能小于等于0");
 
-        // 法术强度类技能伤害受法术抗性减免（无双/物理技能不受减免）
+        // 抗性减免（英雄与士兵统一结算，参考金铲铲）：法术强度(Ap)类技能受魔抗减免，无双(Might)类技能受护甲减免；普攻联动(Atk)类已在普攻阶段结算护甲
         var skillCfg = SkillConfig.GetConfig(skillId);
-        if (skillCfg != null && skillCfg.Attr == "ap" && isHero)
+        if (skillCfg != null)
         {
-            damage = Math.Max(1, (int)(damage * (100f / (100f + magicRes))));
+            if (skillCfg.Attr == "ap")
+                damage = Math.Max(1, (int)(damage * CombatConst.ResistMultiplier(magicRes)));
+            else if (skillCfg.Attr == "might")
+                damage = Math.Max(1, (int)(damage * CombatConst.ResistMultiplier(armor)));
         }
 
         if (isHero)
@@ -724,17 +727,17 @@ public class Chess : MonoBehaviour
 
     private int calculateDamage(Chess attacker, Chess defender, out string type)
     {
-        if (!attacker.isHero || !defender.isHero)
-        {
-            type = "atk";
-            // 士兵攻击受加成系数影响（相的职业羁绊：全军士兵攻击+%）
-            return (int)(attacker.attackDamage * attacker.soldierAtkRate);
-        }
-
-        // 普通攻击以攻击(Atk)为基准，受目标护甲减免：实际伤害 = Atk × 100/(100+护甲)
-        int damage = attacker.atk;
-        damage = (int)(damage * (100f / (100f + defender.armor)));
         type = "atk";
+
+        // 攻击基准：英雄取攻击(Atk)；士兵取士兵攻击×加成系数（相的职业羁绊：全军士兵攻击+%）
+        int damage;
+        if (attacker.isHero)
+            damage = attacker.atk;
+        else
+            damage = (int)(attacker.attackDamage * attacker.soldierAtkRate);
+
+        // 普攻受目标护甲减免（英雄与士兵统一结算，参考金铲铲）：实际伤害 = 攻击 × 100/(100+护甲)
+        damage = (int)(damage * CombatConst.ResistMultiplier(defender.armor));
         return Mathf.Max(1, damage);
     }
 

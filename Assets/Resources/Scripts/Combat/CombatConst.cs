@@ -32,6 +32,16 @@ public static class CombatConst
     /// <summary>主公(帅/王)在场：全队护盾额外加成（百分比）</summary>
     public const float KingShieldBonusRate = 0.1f;
 
+    // ---- 抗性减伤公式（参考金铲铲：实际伤害 = 原伤害 × 100/(100+抗性)） ----
+    /// <summary>抗性减伤基准值（减伤% = 抗性/(抗性+基准值)，如50点抗性≈减伤33%）</summary>
+    public const float ResistBase = 100f;
+
+    /// <summary>按抗性计算伤害系数（护甲/魔抗通用，抗性越高受到伤害越低）</summary>
+    public static float ResistMultiplier(int resist)
+    {
+        return ResistBase / (ResistBase + resist);
+    }
+
     // ---- 其他 ----
     /// <summary>近战/远程士兵射程判定阈值</summary>
     public const float MeleeRange = 30f;
