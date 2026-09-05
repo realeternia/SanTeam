@@ -10,7 +10,8 @@ using UnityEngine;
 /// 1. 属性加成（不走技能系统）：按 LinkSelf/LinkTeam/AuroAttrs 施加被动属性
 ///    - LinkSelf：连接英雄（该职业每个英雄自身）获得的属性；其中 soldierAtk/soldierHp 例外，施加给本侧全部士兵（全军士兵）
 ///    - LinkTeam：我方其他英雄（除该职业英雄外的全体英雄）获得的总量，配置即该档位总量，不再乘人数
-///    - AuroAttrs：光环技能效果，我方全体英雄（含提供者，不用排除）获得，效果受来源英雄 auroEffectRate 修正
+///    - AuroAttrs：光环技能效果（ApplyJobLinks 后由 ApplyAuroAttrs 阶段单独结算），遍历每个英雄携带的光环技能，
+///      各自对本侧全体英雄（含提供者）生效，效果值受光环来源英雄 auroEffectRate 修正
 /// 2. 脚本技能效果：职业技能行 ScriptName 挂真实技能脚本，运行时 SetJobSkillLevel 切到当前档位行，
 ///    通过技能事件生效（如 枪·眩晕/戟·AOE溅射/炮·AOE范围走 HitBuff 系技能；扇·负面buff延长/琴·正面buff延长走 ModifyBuffTime 的 OnAddBuff 事件）
 /// 数值统一由 SkillConfig 表配置，本类不再硬编码。
@@ -34,6 +35,8 @@ public static class JobLinkManager
             if (!handledSides.Add(player.battleSide))
                 continue;
             ApplyJobLinks(player.battleSide);
+            // 光环技能效果：独立于职业属性加成，按每个英雄携带的光环技能对本侧全体英雄生效
+            ApplyAuroAttrs(player.battleSide);
         }
     }
 
@@ -75,7 +78,6 @@ public static class JobLinkManager
 
             var linkSelfBonuses = ParseBonuses(cfg.LinkSelf);
             var linkTeamBonuses = ParseBonuses(cfg.LinkTeam);
-            var auraBonuses = ParseBonuses(cfg.AuroAttrs);
 
             // LinkSelf：该职业每个连接英雄自身获得加成；
             // 士兵类属性（soldierAtk/soldierHp）例外：按"全军士兵"施加给本侧全部士兵单位（总量不乘人数）
@@ -93,22 +95,6 @@ public static class JobLinkManager
                         ApplyAttr(unit, bonus.Attr, bonus.Value);
             }
 
-            // AuroAttrs：光环技能效果，我方全体英雄（含提供者，不用排除）获得，
-            // 效果受光环来源英雄 auroEffectRate 修正（同职业多个提供者取最高，先应用 LinkSelf 再取值）
-            if (auraBonuses.Count > 0)
-            {
-                var auraMultiplier = 1f;
-                foreach (var hero in jobGroup.Value)
-                    auraMultiplier = Mathf.Max(auraMultiplier, hero.auroEffectRate);
-                foreach (var unit in allMySideUnits)
-                {
-                    if (!unit.isHero)
-                        continue;
-                    foreach (var bonus in auraBonuses)
-                        ApplyAttr(unit, bonus.Attr, bonus.Value * auraMultiplier);
-                }
-            }
-
             // LinkTeam：该档位除该职业英雄外的我方全体英雄获得的总量（该职业英雄已由 LinkSelf 覆盖，不重复给）
             foreach (var unit in allMySideUnits)
             {
@@ -116,6 +102,39 @@ public static class JobLinkManager
                     continue;
                 foreach (var bonus in linkTeamBonuses)
                     ApplyAttr(unit, bonus.Attr, bonus.Value);
+            }
+        }
+    }
+
+    // 结算光环技能效果（AuroAttrs）：遍历本侧每个英雄携带的光环技能，各自对本侧全体英雄生效（含提供者）。
+    // 效果值按光环来源英雄自身的 auroEffectRate 修正（鼓·战鼓 LinkSelf 提升该值），
+    // 因此在 ApplyJobLinks 之后调用，保证先完成 LinkSelf 属性加成再取值。
+    private static void ApplyAuroAttrs(int side)
+    {
+        var allMySideUnits = WorldManager.Instance.GetUnitsMySide(side);
+        if (allMySideUnits.Count == 0)
+            return;
+
+        foreach (var provider in allMySideUnits)
+        {
+            if (!provider.isHero || provider.hp <= 0)
+                continue;
+            foreach (var skill in provider.skills)
+            {
+                var cfg = skill != null ? skill.skillCfg : null;
+                if (cfg == null || string.IsNullOrEmpty(cfg.AuroAttrs))
+                    continue;
+                var auraBonuses = ParseBonuses(cfg.AuroAttrs);
+                if (auraBonuses.Count == 0)
+                    continue;
+
+                foreach (var unit in allMySideUnits)
+                {
+                    if (!unit.isHero)
+                        continue;
+                    foreach (var bonus in auraBonuses)
+                        ApplyAttr(unit, bonus.Attr, bonus.Value * provider.auroEffectRate);
+                }
             }
         }
     }

@@ -26,10 +26,9 @@ public static class CombatConst
     public static readonly float[] FactionShieldRates = { 0.18f, 0.24f, 0.30f, 0.36f };
     /// <summary>护盾持续时间(整场战斗)</summary>
     public const float FactionShieldTime = 999f;
-    /// <summary>主公技：护盾加倍倍率</summary>
-    public const float MasterShieldDouble = 2f;
 
-    /// <summary>主公(帅/王)在场：全队护盾额外加成（百分比）</summary>
+
+    /// <summary>主公(帅/王)上阵：同阵营护盾额外加成（百分比）</summary>
     public const float KingShieldBonusRate = 0.1f;
 
     // ---- 抗性减伤公式（参考金铲铲：实际伤害 = 原伤害 × 100/(100+抗性)） ----

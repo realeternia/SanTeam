@@ -3,7 +3,7 @@ using CommonConfig;
 
 /// <summary>
 /// 默认护盾机制：战斗开始时统计同阵营英雄数量，达到档位(3/5/7/9)后该阵营英雄直接获得护盾(类似连线)。
-/// 主公技(王/帅)：所在同阵营护盾效果加倍；有王(帅)在场时，全队护盾额外+10%。
+/// 主公技(王/帅)：所在同阵营护盾效果加倍；同阵营护盾额外+10%（按上阵情况在初始化时结算一次）。
 /// </summary>
 public static class FactionShieldManager
 {
@@ -26,14 +26,22 @@ public static class FactionShieldManager
 
         // 统计各阵营英雄数量
         var factionCount = new Dictionary<int, int>();
+        var kingCount = 0;
         foreach (var unit in units)
         {
             if (!unit.isHero || unit.hp <= 0)
                 continue;
-            var faction = HeroConfig.GetConfig(unit.heroId).Side;
+
+            var heroCfg = HeroConfig.GetConfig(unit.heroId);
+            if (heroCfg.Side  == 10)
+                continue;
+            var faction = heroCfg.Side;
             if (!factionCount.ContainsKey(faction))
                 factionCount[faction] = 0;
             factionCount[faction]++;
+
+            if (HeroConfig.GetConfig(unit.heroId).Job == "帅")
+                kingCount++;
         }
 
         foreach (var kv in factionCount)
@@ -42,13 +50,9 @@ public static class FactionShieldManager
             if (rate <= 0)
                 continue;
 
-            // 主公技：同阵营存在主公时护盾加倍
-            if (HasMasterShieldSkill(units, kv.Key))
-                rate *= CombatConst.MasterShieldDouble;
-
-            // 主公(帅/王)在场：本侧有王时，全队护盾额外+10%
-            if (CountKings(units) > 0)
-                rate += CombatConst.KingShieldBonusRate;
+            // 主公(帅/王)上阵：同阵营护盾额外+10%（本侧有王即生效，初始化结算一次）
+            if (kingCount > 0)
+                rate += CombatConst.KingShieldBonusRate * kingCount;
 
             foreach (var unit in units)
             {
@@ -75,35 +79,4 @@ public static class FactionShieldManager
         return 0;
     }
 
-    // 本侧上阵的王(帅/主公)英雄数：按英雄职业的职业技能缩写(JobConfig.SkillId)是否为 帅 判定
-    private static int CountKings(List<Chess> units)
-    {
-        var count = 0;
-        foreach (var unit in units)
-        {
-            if (unit.hp <= 0 || !unit.isHero)
-                continue;
-            if (HeroConfig.GetConfig(unit.heroId).Job == "帅")
-                count++;
-        }
-        return count;
-    }
-
-    // 该阵营是否存在携带主公技的英雄
-    private static bool HasMasterShieldSkill(List<Chess> units, int faction)
-    {
-        foreach (var unit in units)
-        {
-            if (unit.hp <= 0 || !unit.isHero)
-                continue;
-            if (HeroConfig.GetConfig(unit.heroId).Side != faction)
-                continue;
-            foreach (var skill in unit.skills)
-            {
-                if (skill.id == CombatConst.MasterShieldSkillId)
-                    return true;
-            }
-        }
-        return false;
-    }
 }
