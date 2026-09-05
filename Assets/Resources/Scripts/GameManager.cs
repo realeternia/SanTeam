@@ -32,8 +32,6 @@ public class GameManager : MonoBehaviour
     public List<int> heroIds;
     public int year;
 
-    private int tempFriendIdIdx = 1000;
-
     private void Awake()
     {
         Instance = this;
@@ -232,86 +230,12 @@ public class GameManager : MonoBehaviour
     {
         if (!loadSave)
         {
+            // 随机好友功能已移除，新游戏清空历史随机配对数据
             friendRdData = new List<FriendRandomData>();
-
-            for (int i = 0; i < 6; i++)
-            {
-                // 筛选side=i且FriendCount<4的英雄
-                var heroList2 = HeroConfig.ConfigList.Where(x => x.Side == i && heroIds.Contains(x.Id) && x.FriendCount < 4).ToList();
-
-                // 法术强度分组
-                var inteHighList = heroList2.Where(x => x.Ap > 80).ToList();
-                var inteLowList = heroList2.Where(x => x.Ap < 60).ToList();
-
-                // 随机2v2匹配
-                CreateRandomFriendPairs(inteHighList, inteLowList, "法术辅佐");
-
-                // 无双强度分组和匹配
-                var strHighList = heroList2.Where(x => x.Might > 80).ToList();
-                var strLowList = heroList2.Where(x => x.Might < 60).ToList();
-
-                CreateRandomFriendPairs(strHighList, strLowList, "无双指导");
-
-                heroList2 = HeroConfig.ConfigList.Where(x => x.Side == i && heroIds.Contains(x.Id) && x.FriendCount < 2).ToList();
-                if (heroList2.Count > 2)
-                {
-                    // 随机打乱heroList，然后分成前一半和后一半
-                    var random = new System.Random();
-                    var shuffledList = heroList2.OrderBy(x => random.Next()).ToList();
-                    int halfCount = shuffledList.Count / 2;
-                    var firstHalf = shuffledList.Take(halfCount).ToList();
-                    var secondHalf = shuffledList.Skip(halfCount).ToList();
-
-                    CreateRandomFriendPairs(firstHalf, secondHalf, "协作如坚");
-                }
-            }
-
-            var heroList = HeroConfig.ConfigList.Where(x => heroIds.Contains(x.Id) && x.FriendCount < 1).ToList();
-            if (heroList.Count > 2)
-            {
-                // 随机打乱heroList，然后分成前一半和后一半
-                var random = new System.Random();
-                var shuffledList = heroList.OrderBy(x => random.Next()).ToList();
-                int halfCount = shuffledList.Count / 2;
-                var firstHalf = shuffledList.Take(halfCount).ToList();
-                var secondHalf = shuffledList.Skip(halfCount).ToList();
-
-                CreateRandomFriendPairs(firstHalf, secondHalf, "儿时好友");
-            }
         }
 
         ConfigManager.InitFriend();
     }
-
-    private void CreateRandomFriendPairs(List<HeroConfig> inteHighList, List<HeroConfig> inteLowList, string name)
-    {
-        if (inteHighList.Count < 1 || inteLowList.Count < 1)
-            return;
-
-        var rnd = new System.Random();
-        var shuffledHigh = inteHighList.OrderBy(x => rnd.Next()).ToList();
-        var shuffledLow = inteLowList.OrderBy(x => rnd.Next()).ToList();
-
-        // 循环配对直到消耗完所有英雄
-        while (shuffledHigh.Count > 0 && shuffledLow.Count > 0)
-        {
-            // 每次取2个高智力和2个低智力
-            var highPair = shuffledHigh.Take(SysRandom.Range(1, 3)).ToList();
-            var lowPair = shuffledLow.Take(SysRandom.Range(1, 3)).ToList();
-            
-            var heroes = highPair.Concat(lowPair).Select(x => x.Id).ToArray();
-
-            var friendPair = new FriendRandomData();
-            friendPair.id = tempFriendIdIdx++;
-            friendPair.name = name;
-            friendPair.friendIds = heroes;
-            friendRdData.Add(friendPair);
-
-            // 移除已配对的英雄
-            shuffledHigh.RemoveRange(0, highPair.Count);
-            shuffledLow.RemoveRange(0, lowPair.Count);
-        }
-    } 
 
     public void InitHeros(bool loadSave)
     {

@@ -51,7 +51,7 @@ public class Skill
     public void SetLevel(int lv)
     {
         Level = lv;
-        var newCfg = SkillConfig.GetConfig(skillCfg.Sname, lv);
+        var newCfg = ConfigManager.GetSkillConfig(skillCfg.Sname, lv);
         if (newCfg != null)
             skillCfg = newCfg;
     }
@@ -135,6 +135,11 @@ public class Skill
         }
 
         isBurst = !IsInCD() && (skillCfg.Rate <= 0 || SysRandom.Value < rate);
+
+        // 触发条件不满足（如 hprate<50=自身生命低于50%）则本次不触发技能
+        if (isBurst && !MeetTriggerCondition())
+            isBurst = false;
+
         GameLog.Debug("CheckBurst isBurst=" + isBurst.ToString() + " skillId=" + id.ToString());
         if(isBurst)
         {
@@ -142,6 +147,82 @@ public class Skill
             mp = 0; // 发动技能后清空MP
         }
         return isBurst;
+    }
+
+    // 技能触发条件是否满足（TriggerCondition为空表示无条件触发）
+    // 支持格式：键+比较符+数值，如 hprate<50=自身生命低于50%；多条件用;分隔，全部满足才可触发
+    private bool MeetTriggerCondition()
+    {
+        var condStr = skillCfg.TriggerCondition;
+        if (string.IsNullOrEmpty(condStr))
+            return true;
+
+        foreach (var seg in condStr.Split(';'))
+        {
+            var s = seg.Trim();
+            if (s.Length == 0)
+                continue;
+
+            // 拆分比较符（先匹配多字符 <= >= == !=，再匹配单字符 < >）
+            var op = "";
+            var opIdx = -1;
+            for (var i = 0; i < s.Length; i++)
+            {
+                var two = i + 1 < s.Length ? s.Substring(i, 2) : "";
+                if (two == "<=" || two == ">=" || two == "==" || two == "!=")
+                {
+                    op = two;
+                    opIdx = i;
+                    break;
+                }
+                var one = s[i].ToString();
+                if (one == "<" || one == ">")
+                {
+                    op = one;
+                    opIdx = i;
+                    break;
+                }
+            }
+            if (op == "" || opIdx <= 0)
+            {
+                GameLog.Warn("无法解析技能触发条件：" + s + "，技能id=" + skillCfg.Id);
+                return false; // 配置异常时不触发，避免条件形同虚设
+            }
+
+            float val;
+            if (!float.TryParse(s.Substring(opIdx + op.Length).Trim(), out val))
+            {
+                GameLog.Warn("技能触发条件数值无效：" + s + "，技能id=" + skillCfg.Id);
+                return false;
+            }
+
+            var key = s.Substring(0, opIdx).Trim();
+            // 条件键取值统一走 Chess.GetAttr（hprate=自身生命百分比0~100），不在技能侧重复维护属性映射
+            int cur;
+            try
+            {
+                cur = owner.GetAttr(key);
+            }
+            catch (Exception)
+            {
+                GameLog.Warn("未知的技能触发条件键：" + key + "，技能id=" + skillCfg.Id);
+                return false; // 配置异常时不触发，避免条件形同虚设
+            }
+
+            var satisfied = false;
+            switch (op)
+            {
+                case "<": satisfied = cur < val; break;
+                case "<=": satisfied = cur <= val; break;
+                case ">": satisfied = cur > val; break;
+                case ">=": satisfied = cur >= val; break;
+                case "==": satisfied = Mathf.Approximately(cur, val); break;
+                case "!=": satisfied = !Mathf.Approximately(cur, val); break;
+            }
+            if (!satisfied)
+                return false;
+        }
+        return true;
     }
 
     public virtual void BattleBegin()

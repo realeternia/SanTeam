@@ -157,7 +157,7 @@ namespace CommonConfig
             config[202] = new JobConfig(202, "gongnu", "弩", "弩", 201, 70, 7, 20, 25, 30, 60, 50, 70);
             config[203] = new JobConfig(203, "gongpao", "炮", "炮", 201, 50, 8, 20, 25, 30, 60, 60, 60);
             config[301] = new JobConfig(301, "shi", "士", "士", 0, 17, 10, 20, 45, 35, 70, 55, 85);
-            config[302] = new JobConfig(302, "shidun", "盾", "", 301, 17, 10, 20, 45, 35, 65, 50, 80);
+            config[302] = new JobConfig(302, "shidun", "盾", "盾", 301, 17, 10, 20, 45, 35, 65, 50, 80);
             config[401] = new JobConfig(401, "shan", "扇", "扇", 0, 35, 8, 20, 25, 35, 60, 80, 45);
             config[402] = new JobConfig(402, "shanxiang", "相", "相", 401, 35, 8, 20, 35, 45, 65, 85, 45);
             config[403] = new JobConfig(403, "qi", "棋", "棋", 401, 35, 8, 20, 35, 45, 70, 90, 45);
@@ -167,7 +167,7 @@ namespace CommonConfig
             config[601] = new JobConfig(601, "chui", "锤", "锤", 0, 17, 10, 20, 25, 15, 65, 55, 85);
             config[602] = new JobConfig(602, "daoqiang", "枪", "枪", 601, 17, 10, 20, 55, 45, 80, 55, 80);
             config[603] = new JobConfig(603, "daoji", "戟", "戟", 601, 17, 10, 20, 45, 35, 75, 55, 75);
-            config[701] = new JobConfig(701, "gongjiang", "工", "", 0, 35, 8, 20, 25, 35, 55, 80, 45);
+            config[701] = new JobConfig(701, "gongjiang", "工", "工", 0, 35, 8, 20, 25, 35, 55, 80, 45);
 
             RebuildIndex();
 

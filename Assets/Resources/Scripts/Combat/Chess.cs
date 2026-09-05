@@ -865,6 +865,8 @@ public class Chess : MonoBehaviour
                 return might;
             case "hp":
                 return hp;
+            case "hprate":
+                return (int)(HpRate * 100f);
             default:
                 throw new ArgumentException("Invalid attribute name: " + attr);
         }

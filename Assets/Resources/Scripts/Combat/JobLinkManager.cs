@@ -138,7 +138,7 @@ public static class JobLinkManager
         var lv = GetTierLevel(fieldCount);
         if (lv <= 0)
             return null;
-        return SkillConfig.GetConfig(sname, lv);
+        return ConfigManager.GetSkillConfig(sname, lv);
     }
 
     // 当前生效档位等级（Lv1~5），上阵0人返回0
@@ -181,7 +181,7 @@ public static class JobLinkManager
     {
         if (lv < 1 || lv > linkTiers.Length)
             return;
-        var cfg = SkillConfig.GetConfig(sname, lv);
+        var cfg = ConfigManager.GetSkillConfig(sname, lv);
         if (cfg == null)
             return;
 

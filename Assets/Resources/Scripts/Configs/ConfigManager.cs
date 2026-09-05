@@ -63,7 +63,7 @@ public static class ConfigManager
         {
             heroCfg.Job = jobNameConvDict.ContainsKey(heroCfg.Job) ? jobNameConvDict[heroCfg.Job] : heroCfg.Job;
             // 技能不再在此绑定为固定Id：同一技能会因等级不同映射到不同行Id，
-            // 改由战斗/界面按 Sname+等级 实时解析（GetHeroSkillConfigs / SkillConfig.GetConfig(sname, lv)）
+            // 改由战斗/界面按 Sname+等级 实时解析（GetHeroSkillConfigs / GetSkillConfig(sname, lv)）
         }
 
 
@@ -256,7 +256,7 @@ public static class ConfigManager
             if (c.Sname == sname)
                 return; // 同一技能只保留一个，避免重复实例
         }
-        var cfg = SkillConfig.GetConfig(sname, 1);
+        var cfg = GetSkillConfig(sname, 1);
         if (cfg == null)
         {
             GameLog.Warn($"技能缩写[{sname}]未在SkillConfig中配置，暂不加入英雄技能");
@@ -284,6 +284,18 @@ public static class ConfigManager
         if (skillDict.TryGetValue(skillName, out SkillConfig value))
         {
             return value;
+        }
+        return null;
+    }
+
+    // 按 缩写+等级 取技能配置：同一技能在 SkillConfig 表按 Sname 展开为 Lv1~5 多行，
+    // 战斗/界面（兵种连锁档位、好友特殊连线、技能等级切换）按需定位到具体等级行；未配置对应等级行返回 null。
+    public static SkillConfig GetSkillConfig(string sname, int lv)
+    {
+        foreach (var skillCfg in SkillConfig.ConfigList)
+        {
+            if (skillCfg.Sname == sname && skillCfg.Lv == lv)
+                return skillCfg;
         }
         return null;
     }
