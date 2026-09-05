@@ -17,18 +17,12 @@ public static class SkillManager
                 return new SkillAttackSpinAttack(skillId, owner);
             case "AttackAddDamage":
                 return new SkillAttackAddDamage(skillId, owner);
-            case "InitMasterShield":
-                return new SkillInitMasterShield(skillId, owner);
-            case "InitSoldierShield":
-                return new SkillInitSoldierShield(skillId, owner);
             case "AttackedBuff":
                 return new SkillAttackedBuff(skillId, owner);
             case "AttackRunCross":
                 return new SkillAttackRunCross(skillId, owner);
             case "AttackRunCrossPlus":
                 return new SkillAttackRunCrossPlus(skillId, owner);                
-            case "HelpAidHeal":
-                return new SkillHelpAidHeal(skillId, owner);
             case "HelpAidBuff":
                 return new SkillHelpAidBuff(skillId, owner);
             case "AttackAntiShield":
@@ -46,18 +40,6 @@ public static class SkillManager
                 return new SkillDefPlantSkin(skillId, owner);
             case "DefHpLow":
                 return new SkillDefHpLow(skillId, owner);
-            case "DefSkillDamageReduce":
-                return new SkillDefSkillDamageReduce(skillId, owner);
-            case "HelpInitTeach":
-                return new SkillHelpInitTeach(skillId, owner);
-            case "InitSoldierUp":
-                return new SkillInitSoldierUp(skillId, owner);
-            case "InitSoldierSummon":
-                return new SkillInitSoldierSummon(skillId, owner);      
-            case "InitGold":
-                return new SkillInitGold(skillId, owner);
-            case "InitAttrZhiheng":
-                return new SkillInitAttrZhiheng(skillId, owner);
             case "HitBuff":
                 return new SkillHitBuff(skillId, owner);
             case "HitBuffArea":
@@ -93,8 +75,6 @@ public static class SkillManager
                 return new SkillBuffExpandPos(skillId, owner);                
             case "ModifyBuffTime":
                 return new SkillModifyBuffTime(skillId, owner);
-            case "ModifyBeBuffTime":
-                return new SkillModifyBeBuffTime(skillId, owner);
             case "BuffTieqi":
                 return new SkillBuffTieqi(skillId, owner);
             case "ModifyShootSpeed":

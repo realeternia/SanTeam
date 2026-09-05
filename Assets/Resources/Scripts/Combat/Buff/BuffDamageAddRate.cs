@@ -15,7 +15,7 @@ public class BuffDamageAddRate : Buff
         }
         else
         {
-            damageMulti += skillCfg.Strength * effectMulti;
+            damageMulti += skillCfg.Strength;
         }
     }
 }

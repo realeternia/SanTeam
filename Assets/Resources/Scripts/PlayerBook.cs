@@ -69,29 +69,4 @@ public class PlayerBook
         return resultIds.ToArray();
     }
 
-    public static List<Tuple<string, int>> GetCardNeeds(int id)
-    {
-        List<Tuple<string, int>> needs = new List<Tuple<string, int>>();
-        PlayerConfig cfg = PlayerConfig.GetConfig(id);
-        if (cfg == null)
-            return needs;
-        //cfg.Cardsneed是字符串数组，形如["atk","1","def","1","inte","1"]
-        string[] needsStr = cfg.Cardsneed;
-        if (needsStr == null)
-            return needs;
-            
-        for (int i = 0; i < needsStr.Length; i += 2)
-        {
-            if (i + 1 < needsStr.Length)
-            {
-                string type = needsStr[i].Trim('"');
-                if (int.TryParse(needsStr[i + 1].Trim('"'), out int num))
-                {
-                    needs.Add(new Tuple<string, int>(type, num));
-                }
-            }
-        }
-        return needs;
-    }
-    
 }

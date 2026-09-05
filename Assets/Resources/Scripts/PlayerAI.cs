@@ -48,19 +48,6 @@ public static class PlayerAI
                 continue;
             if(playerConfig.Banweakcard && heroConfig.Atk + heroConfig.Ap + heroConfig.Might > 215)
                 continue;
-            bool find = false;
-            var cardsNeed = PlayerBook.GetCardNeeds(playerConfig.Id);
-            foreach(var item in cardsNeed)
-            {
-                if(!string.IsNullOrEmpty(heroConfig.Group) && item.Item1 == heroConfig.Group)
-                {
-                    find = true;
-                    break;
-                }
-            }
-            if(find)
-                continue;
-            
             availableBans.Add(cell);            
         }
 
@@ -128,7 +115,7 @@ public static class PlayerAI
         }
 
         //把战力前6的卡放到一个队列里
-        var strongList = GetStrongCards(playerInfo, out var groupList, out var rangeCount, out var combatCount);
+        var strongList = GetStrongCards(playerInfo, out var rangeCount, out var combatCount);
         // 初始化 side 卡牌数量
         Dictionary<int, SideInfo> sideInfos = new Dictionary<int, SideInfo>();
         foreach (int cardId in strongList)
@@ -204,27 +191,12 @@ public static class PlayerAI
                         score *= rate * rate;
                 }
 
-                if (heroCardCount < 3)
-                { //前几张不拿辅助卡
-                    if (string.IsNullOrEmpty(heroCfg.Group) || heroCfg.Group == "help")
-                        score *= 0.4f;
-                }
-                var needs = PlayerBook.GetCardNeeds(playerConfig.Id);
-                if (!string.IsNullOrEmpty(heroCfg.Group) && needs.Exists(x => x.Item1 == heroCfg.Group))
-                {
-                    int count = 0;
-                    var find = groupList.Find(x => x.Item1 == heroCfg.Group);
-                    if (find != null)
-                        count = find.Item2;
-                    if (count < needs.Find(x => x.Item1 == heroCfg.Group).Item2)
-                        score *= 1.6f;
-                }
-
                 if (combatCount + rangeCount >= 3)
                 {
-                    if (heroCfg.Pos == 1 && combatCount < rangeCount)
+                    // 按射程判近战/远程（近战<=20，远程>20）：缺哪类补哪类
+                    if (HeroSelectionTool.IsMeleeHero(heroCfg) && combatCount < rangeCount)
                         score *= 1 + (rangeCount - combatCount) * .5f;
-                    else if (heroCfg.Pos > 1 && rangeCount < combatCount)
+                    else if (HeroSelectionTool.IsRangedHero(heroCfg) && rangeCount < combatCount)
                         score *= 1 + (combatCount - rangeCount) * .5f;
                 }
 
@@ -416,12 +388,11 @@ public static class PlayerAI
         return true;
     }
 
-    private static List<int> GetStrongCards(PlayerInfo playerInfo, out List<Tuple<string, int>> groupList, out int rangeCount, out int combatCount)
+    private static List<int> GetStrongCards(PlayerInfo playerInfo, out int rangeCount, out int combatCount)
     {  
         var cards = playerInfo.cards;        
         // 创建一个列表存储卡牌ID和对应的总战力
         List<(int cardId, int totalPrice)> sortDataList = new List<(int cardId, int totalPrice)>();
-        groupList = new List<Tuple<string, int>>();
         rangeCount = 0;
         combatCount = 0;
         foreach (int cardId in cards.Keys)
@@ -444,23 +415,8 @@ public static class PlayerAI
 
             // 获取当前卡牌的配置
             var heroConfig = HeroConfig.GetConfig(sortDataList[i].cardId);
-            if(!string.IsNullOrEmpty(heroConfig.Group))
-            {
-                var group = heroConfig.Group;
-                int existingIndex = groupList.FindIndex(x => x.Item1 == group);
-                if(existingIndex >= 0)
-                {
-                    // 使用索引更新元组
-                    var existingTuple = groupList[existingIndex];
-                    groupList[existingIndex] = new Tuple<string, int>(existingTuple.Item1, existingTuple.Item2 + 1);
-                }
-                else
-                {
-                    groupList.Add(new Tuple<string, int>(group, 1));
-                }
-            }
-
-            if(heroConfig.Pos == 1)
+            // 按射程判近战/远程（近战<=20，远程>20）
+            if (HeroSelectionTool.IsMeleeHero(heroConfig))
                 combatCount++;
             else
                 rangeCount++;
@@ -479,7 +435,7 @@ public static class PlayerAI
                 continue;
 
             var heroCfg = HeroConfig.GetConfig(cardId);
-            if(heroCfg.Pos == 1)
+            if(HeroSelectionTool.IsMeleeHero(heroCfg))
                 combatCount++;
             else
                 rangeCount++;
@@ -504,8 +460,8 @@ public static class PlayerAI
 
         var lastCard = sortDataList[sortDataList.Count - 1];
         var last2Card = sortDataList[sortDataList.Count - 2];
-        var lastCardIsCombat = HeroConfig.GetConfig(lastCard.Item1).Pos == 1;
-        var last2CardIsCombat = HeroConfig.GetConfig(last2Card.Item1).Pos == 1;
+        var lastCardIsCombat = HeroSelectionTool.IsMeleeHero(HeroConfig.GetConfig(lastCard.Item1));
+        var last2CardIsCombat = HeroSelectionTool.IsMeleeHero(HeroConfig.GetConfig(last2Card.Item1));
 
         var lastCardLevel = HeroSelectionTool.GetCardLevel(playerInfo.cards[lastCard.Item1], true);
         var last2CardLevel = HeroSelectionTool.GetCardLevel(playerInfo.cards[last2Card.Item1], true);
@@ -539,7 +495,6 @@ public static class PlayerAI
                 var attr = HeroSelectionTool.GetCardAttr(playerInfo, heroId, cardLevel);
                 
                 var heroCfg = HeroConfig.GetConfig(heroId);
-                int pos = heroCfg.Pos;
                 
                 // 获取三个属性值
                 int might = attr.Might;
@@ -578,11 +533,11 @@ public static class PlayerAI
                 // 如果物品属性是最强属性
                 else if (itemAttr == strongestAttr)
                 {
-                    if (pos == 3)
+                    if (HeroSelectionTool.IsRangedHero(heroCfg))
                     {
                         needValue = strongest - secondStrongest;
                     }
-                    else if (pos == 1)
+                    else // 近战英雄
                     {
                         needValue = (strongest - secondStrongest) / 2f;
                     }

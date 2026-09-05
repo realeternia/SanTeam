@@ -170,6 +170,18 @@ public static class HeroSelectionTool
         return heroCfg.Price;
     }
 
+    // 英雄近战/远程判定：HeroConfig.Range 加载后已由 ConfigManager.PostModify 合并职业基准射程
+    // （近战职业 17，远程职业 35~70），按总射程 > 20 判为远程，与战斗侧 JobLinkManager 的 attackRange>20 规则一致
+    public static bool IsRangedHero(HeroConfig heroCfg)
+    {
+        return heroCfg != null && heroCfg.Range > 20;
+    }
+
+    public static bool IsMeleeHero(HeroConfig heroCfg)
+    {
+        return heroCfg != null && heroCfg.Range <= 20;
+    }
+
     // 属性字符串 → 图标贴图路径（指向 Textures 下的文件）
     public static string GetAttrIcon(string attr)
     {

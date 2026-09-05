@@ -38,9 +38,7 @@ public class Chess : MonoBehaviour
     public float critDamageMulti = 0.5f; //暴击伤害倍率
     public float healRate; //治疗强化系数（0.1=治疗效果+10%）
     public float healedRate; //受治疗系数（可为负，-0.1=受到的治疗-10%，减疗）
-    public float buffEffectRate = 1f; //buff效果加成系数（1=无加成，琴祝福等效果值乘算）
     public float auroEffectRate = 1f; //光环效果加成系数（1=无加成，鼓光环等 AuroAttrs 光环属性效果值乘算）
-    public float debuffDur; //负面buff时长延长比例（0.1=负面buff持续+10%，扇）
 
     public int lastDamagedPlayerId = -1;
 

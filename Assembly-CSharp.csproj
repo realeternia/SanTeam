@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <!-- Generated file, do not modify, your changes will be overwritten (use AssetPostprocessor.OnGeneratedCSProject) -->
   <PropertyGroup>
@@ -76,7 +76,6 @@
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffNoMove.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillHitAround.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillModifyShootSpeed.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillHelpAidHeal.cs" />
     <Compile Include="Assets\Resources\Scripts\Configs\JobConfig_s.cs" />
     <Compile Include="Assets\Resources\Scripts\PlayerAI.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillHitBuff.cs" />
@@ -102,7 +101,6 @@
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillInitAddDodge.cs" />
     <Compile Include="Assets\SineVFX\TopDownEffects\Scripts\SineUIControllerTopDownEffects.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAttackReboundArrow.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillInitGold.cs" />
     <Compile Include="Assets\SineVFX\TopDownEffects\Scripts\RampGeneratorTDE.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillBuffTieqi.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffCoolDown.cs" />
@@ -132,10 +130,8 @@
     <Compile Include="Assets\Resources\Scripts\Configs\ItemConfig_s.cs" />
     <Compile Include="Assets\Resources\Scripts\PO\SideInfo.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffLock.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillHelpInitTeach.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAttackMultiArrow.cs" />
     <Compile Include="Assets\Resources\Scripts\IconLoader.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillInitSoldierUp.cs" />
     <Compile Include="Assets\SineVFX\TopDownEffects\Scripts\PrefabSpawner.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillDefPlantSkin.cs" />
     <Compile Include="Assets\Resources\Scripts\PO\BuffTime.cs" />
@@ -152,10 +148,8 @@
     <Compile Include="Assets\SineVFX\TopDownEffects\Scripts\SineCameraControllerTopDownEffects.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffManager.cs" />
     <Compile Include="Assets\Resources\Scripts\Configs\HeroAttrConfig_s.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillInitSoldierSummon.cs" />
     <Compile Include="Assets\Resources\Scripts\CastleHUD.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillBuffExpand.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillInitAttrZhiheng.cs" />
     <Compile Include="Assets\Resources\Scripts\Configs\PlayerLevelConfig_s.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAttackSpeedAttack.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillModifySummonTime.cs" />
@@ -166,11 +160,9 @@
     <Compile Include="Assets\Resources\Scripts\Combat\BattleStatManager.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\Skill.cs" />
     <Compile Include="Assets\Resources\Scripts\BagRecycler.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillDefSkillDamageReduce.cs" />
     <Compile Include="Assets\Resources\Scripts\BagFieldUnitControl.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\CombatConst.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillHitAttr.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillInitMasterShield.cs" />
     <Compile Include="Assets\Resources\Scripts\RankPlayerCellInfo.cs" />
     <Compile Include="Assets\Resources\Scripts\HeroInfoGroup.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffSpeedDown.cs" />
@@ -180,7 +172,6 @@
     <Compile Include="Assets\Resources\Scripts\Effect\GlowBeamController.cs" />
     <Compile Include="Assets\Resources\Scripts\LoopScrollRect.cs" />
     <Compile Include="Assets\Resources\Scripts\Configs\SkillConfig_s.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillInitSoldierShield.cs" />
     <Compile Include="Assets\Resources\Scripts\ChessHUD.cs" />
     <Compile Include="Assets\Resources\Scripts\Configs\PlayerConfig_s.cs" />
     <Compile Include="Assets\Resources\Scripts\MapConfig.cs" />
@@ -191,7 +182,6 @@
     <Compile Include="Assets\Resources\Scripts\HeroInfo.cs" />
     <Compile Include="Assets\Resources\Scripts\PlayerBook.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffDamagedAddRate.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillModifyBeBuffTime.cs" />
     <Compile Include="Assets\Epic Toon FX\Scripts\ETFXPitchRandomizer.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillManager.cs" />
     <Compile Include="Assets\Resources\Scripts\Profile.cs" />

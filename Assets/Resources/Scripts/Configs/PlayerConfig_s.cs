@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -102,13 +102,9 @@ namespace CommonConfig
         ///卡牌风险把控
         /// </summary>
         public float OwnTooMuchCardRate;
-        /// <summary>
-        ///需求
-        /// </summary>
-        public string[] Cardsneed;
 
 
-        public PlayerConfig(int Id, string Name, string Imgpath, string Colorstr, bool CanPlay, int InitGold, int[] InitCards, bool Banstrongcard, bool Banweakcard, int Pricelower, int Priceupper, float Priceoutrate, float sameCardRate, int Cardherolimit, int Carditemlimit, float Futurerate, float Findmasterrate, int Pickside, float PickFirst, float FriendFactor, float PickSoldierUp, float HeroGoldRate, float ItemGoldRate, float OwnTooMuchCardRate, string[] Cardsneed)
+        public PlayerConfig(int Id, string Name, string Imgpath, string Colorstr, bool CanPlay, int InitGold, int[] InitCards, bool Banstrongcard, bool Banweakcard, int Pricelower, int Priceupper, float Priceoutrate, float sameCardRate, int Cardherolimit, int Carditemlimit, float Futurerate, float Findmasterrate, int Pickside, float PickFirst, float FriendFactor, float PickSoldierUp, float HeroGoldRate, float ItemGoldRate, float OwnTooMuchCardRate)
         {
             this.Id = Id;
             this.Name = Name;
@@ -134,7 +130,6 @@ namespace CommonConfig
             this.HeroGoldRate = HeroGoldRate;
             this.ItemGoldRate = ItemGoldRate;
             this.OwnTooMuchCardRate = OwnTooMuchCardRate;
-            this.Cardsneed = Cardsneed;
 
         }
 
@@ -197,7 +192,6 @@ namespace CommonConfig
             {"HeroGoldRate", new FieldMetaInfo("英雄花钱比警戒线", "float", 0)},
             {"ItemGoldRate", new FieldMetaInfo("道具花钱比警戒线", "float", 0)},
             {"OwnTooMuchCardRate", new FieldMetaInfo("卡牌风险把控", "float", 0)},
-            {"Cardsneed", new FieldMetaInfo("需求", "string[]", 0)},
         };
 
         public static Dictionary<string, FieldMetaInfo> FieldMeta { get { return fieldMeta; } }
@@ -221,20 +215,20 @@ namespace CommonConfig
         public static void Load()
         {
             config.Clear();
-            config[1] = new PlayerConfig(1, "旺仔", "PlayerPic/wang", "#00FF00", false, 0, new int[0], false, false, 0, 0, 0f, 0f, 0, 0, 0f, 0f, 0, 0f, 0f, 0f, 0f, 0f, 0f, null);
-            config[2] = new PlayerConfig(2, "布布", "PlayerPic/bubu", "#333333", true, 0, new int[0], true, false, 2, 6, 0.1f, 5f, 8, 5, 0.6f, 1f, 0, 0.5f, 1f, 0.5f, 0.85f, 0.25f, 0.7f, new string[]{"\"def\"，\"2\"，\"inte\"，\"1\"，\"shoot\"，\"1\""});
-            config[3] = new PlayerConfig(3, "翔阳", "PlayerPic/xiangyang", "#FF8000", true, 0, new int[0], false, false, 8, 12, 0.3f, 3f, 7, 6, 0.5f, 1f, 0, 0.5f, 1f, 0.5f, 0.8f, 0.3f, 0.7f, new string[]{"\"atk\"，\"1\"，\"def\"，\"1\"，\"inte\"，\"1\"，\"shoot\"，\"1\""});
-            config[4] = new PlayerConfig(4, "屁屁", "PlayerPic/pp", "#F9BEB0", true, 0, new int[0], false, false, 8, 12, 0.2f, 3f, 7, 6, 0.7f, 1f, 0, 0.5f, 1f, 0.5f, 0.8f, 0.3f, 0.7f, new string[]{"\"def\"，\"1\"，\"help\"，\"1\"，\"inte\"，\"3\""});
-            config[5] = new PlayerConfig(5, "八戒", "PlayerPic/bajie", "#FFCC99", true, 0, new int[0], true, false, 8, 12, 0.3f, 3f, 8, 6, 0.28f, 1f, 0, 1f, 1f, 0.5f, 0.85f, 0.25f, 0.7f, new string[]{"\"atk\"，\"2\"，\"shoot\"，\"1\""});
-            config[6] = new PlayerConfig(6, "艾沙", "PlayerPic/aisha", "#2BD9F9", true, 0, new int[0], false, true, 8, 12, 0.3f, 3f, 9, 6, 0.2f, 1f, 0, 0.5f, 0.65f, 0.3f, 0.8f, 0.3f, 0.7f, new string[]{"\"inte\"，\"3\""});
-            config[8] = new PlayerConfig(8, "巴爸", "PlayerPic/baba", "#FF73FF", true, 0, new int[0], false, false, 7, 9, 0.3f, 3f, 8, 6, 0.28f, 1f, 0, 0.5f, 1f, 0.5f, 0.85f, 0.25f, 0.85f, new string[]{"\"atk\"，\"1\"，\"def\"，\"1\"，\"inte\"，\"1\"，\"shoot\"，\"1\""});
-            config[9] = new PlayerConfig(9, "巴妈", "PlayerPic/bama", "#333333", true, 0, new int[0], false, false, 8, 10, 0.3f, 3f, 9, 6, 0.35f, 1f, 0, 3f, 1.2f, 1f, 0.8f, 0.35f, 0.5f, new string[]{"\"shoot\"，\"2\"，\"def\"，\"2\""});
-            config[100] = new PlayerConfig(100, "魔童", "PlayerPic/nezha", "#8C0000", false, -5, new int[]{409001}, false, true, 8, 12, 0.3f, 3f, 7, 6, 0.5f, 1f, 0, 2f, 0.5f, 0.5f, 0.84f, 0.23f, 0.9f, new string[]{"\"atk\"，\"1\"，\"def\"，\"1\"，\"inte\"，\"1\""});
-            config[101] = new PlayerConfig(101, "钱多", "PlayerPic/qian", "#FFFFFF", false, 5, new int[]{409002}, false, true, 9, 12, 0.1f, 5f, 8, 7, 0.525f, 1f, 0, 1f, 1.5f, 2f, 0.95f, 0.13f, 0.7f, new string[]{"\"shoot\"，\"1\"，\"help\"，\"2\"，\"def\"，\"1\""});
-            config[102] = new PlayerConfig(102, "黄眉", "PlayerPic/huangmei", "#5555FF", false, -5, new int[]{100002,409004}, false, true, 8, 12, 0.2f, 3f, 7, 6, 0.5f, 2.5f, 2, 1f, 1.2f, 1.5f, 0.95f, 0.12f, 0.85f, new string[]{"\"inte\"，\"1\"，\"help\"，\"1\"，\"def\"，\"2\""});
-            config[103] = new PlayerConfig(103, "无量", "PlayerPic/wuliang", "#FF3333", false, -5, new int[]{100003,409005}, false, true, 9, 12, 0.2f, 3f, 8, 7, 0.5f, 2.5f, 3, 2f, 0.5f, 0.5f, 0.85f, 0.2f, 0.9f, new string[]{"\"atk\"，\"1\"，\"def\"，\"1\"，\"inte\"，\"1\"，\"shoot\"，\"1\""});
-            config[104] = new PlayerConfig(104, "大虎", "PlayerPic/dahu", "#006633", false, -5, new int[]{100001,409003}, false, true, 8, 12, 0.3f, 3f, 7, 6, 0.5f, 3f, 1, 2f, 0.5f, 0.5f, 0.85f, 0.2f, 0.9f, new string[]{"\"atk\"，\"1\"，\"def\"，\"1\"，\"inte\"，\"2\""});
-            config[999] = new PlayerConfig(999, "怪物", "PlayerPic/tower", "#FF0000", false, 0, new int[0], false, false, 0, 0, 0f, 0f, 0, 0, 0f, 0f, 0, 0f, 0f, 0f, 0f, 0f, 0f, null);
+            config[1] = new PlayerConfig(1, "旺仔", "PlayerPic/wang", "#00FF00", false, 0, new int[0], false, false, 0, 0, 0f, 0f, 0, 0, 0f, 0f, 0, 0f, 0f, 0f, 0f, 0f, 0f);
+            config[2] = new PlayerConfig(2, "布布", "PlayerPic/bubu", "#333333", true, 0, new int[0], true, false, 2, 6, 0.1f, 5f, 8, 5, 0.6f, 1f, 0, 0.5f, 1f, 0.5f, 0.85f, 0.25f, 0.7f);
+            config[3] = new PlayerConfig(3, "翔阳", "PlayerPic/xiangyang", "#FF8000", true, 0, new int[0], false, false, 8, 12, 0.3f, 3f, 7, 6, 0.5f, 1f, 0, 0.5f, 1f, 0.5f, 0.8f, 0.3f, 0.7f);
+            config[4] = new PlayerConfig(4, "屁屁", "PlayerPic/pp", "#F9BEB0", true, 0, new int[0], false, false, 8, 12, 0.2f, 3f, 7, 6, 0.7f, 1f, 0, 0.5f, 1f, 0.5f, 0.8f, 0.3f, 0.7f);
+            config[5] = new PlayerConfig(5, "八戒", "PlayerPic/bajie", "#FFCC99", true, 0, new int[0], true, false, 8, 12, 0.3f, 3f, 8, 6, 0.28f, 1f, 0, 1f, 1f, 0.5f, 0.85f, 0.25f, 0.7f);
+            config[6] = new PlayerConfig(6, "艾沙", "PlayerPic/aisha", "#2BD9F9", true, 0, new int[0], false, true, 8, 12, 0.3f, 3f, 9, 6, 0.2f, 1f, 0, 0.5f, 0.65f, 0.3f, 0.8f, 0.3f, 0.7f);
+            config[8] = new PlayerConfig(8, "巴爸", "PlayerPic/baba", "#FF73FF", true, 0, new int[0], false, false, 7, 9, 0.3f, 3f, 8, 6, 0.28f, 1f, 0, 0.5f, 1f, 0.5f, 0.85f, 0.25f, 0.85f);
+            config[9] = new PlayerConfig(9, "巴妈", "PlayerPic/bama", "#333333", true, 0, new int[0], false, false, 8, 10, 0.3f, 3f, 9, 6, 0.35f, 1f, 0, 3f, 1.2f, 1f, 0.8f, 0.35f, 0.5f);
+            config[100] = new PlayerConfig(100, "魔童", "PlayerPic/nezha", "#8C0000", false, -5, new int[]{409001}, false, true, 8, 12, 0.3f, 3f, 7, 6, 0.5f, 1f, 0, 2f, 0.5f, 0.5f, 0.84f, 0.23f, 0.9f);
+            config[101] = new PlayerConfig(101, "钱多", "PlayerPic/qian", "#FFFFFF", false, 5, new int[]{409002}, false, true, 9, 12, 0.1f, 5f, 8, 7, 0.525f, 1f, 0, 1f, 1.5f, 2f, 0.95f, 0.13f, 0.7f);
+            config[102] = new PlayerConfig(102, "黄眉", "PlayerPic/huangmei", "#5555FF", false, -5, new int[]{100002,409004}, false, true, 8, 12, 0.2f, 3f, 7, 6, 0.5f, 2.5f, 2, 1f, 1.2f, 1.5f, 0.95f, 0.12f, 0.85f);
+            config[103] = new PlayerConfig(103, "无量", "PlayerPic/wuliang", "#FF3333", false, -5, new int[]{100003,409005}, false, true, 9, 12, 0.2f, 3f, 8, 7, 0.5f, 2.5f, 3, 2f, 0.5f, 0.5f, 0.85f, 0.2f, 0.9f);
+            config[104] = new PlayerConfig(104, "大虎", "PlayerPic/dahu", "#006633", false, -5, new int[]{100001,409003}, false, true, 8, 12, 0.3f, 3f, 7, 6, 0.5f, 3f, 1, 2f, 0.5f, 0.5f, 0.85f, 0.2f, 0.9f);
+            config[999] = new PlayerConfig(999, "怪物", "PlayerPic/tower", "#FF0000", false, 0, new int[0], false, false, 0, 0, 0f, 0f, 0, 0, 0f, 0f, 0, 0f, 0f, 0f, 0f, 0f, 0f);
 
             RebuildIndex();
 

@@ -695,7 +695,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         {
             var cardId = sortDataList[i].Item1;
             var heroConfig = HeroConfig.GetConfig(cardId);
-            if (checkCombat && heroConfig.Pos == 1 || !checkCombat && heroConfig.Pos > 1) // combat类型
+            if (checkCombat && HeroSelectionTool.IsMeleeHero(heroConfig) || !checkCombat && HeroSelectionTool.IsRangedHero(heroConfig)) // combat类型
             {
                 lastCombatIndex = i;
                 break;
@@ -711,7 +711,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
             {
                 var cardId = sortDataList[i].Item1;
                 var heroConfig = HeroConfig.GetConfig(cardId);
-                if (checkCombat && heroConfig.Pos != 1 || !checkCombat && heroConfig.Pos == 1) // range类型
+                if (checkCombat && HeroSelectionTool.IsRangedHero(heroConfig) || !checkCombat && HeroSelectionTool.IsMeleeHero(heroConfig)) // range类型
                 {
                     rangeCardIndex = i;
                     break;
@@ -744,7 +744,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         {
             var cardId = sortDataList[i].Item1;
             var heroConfig = HeroConfig.GetConfig(cardId);
-            if (heroConfig.Pos == 1)
+            if (HeroSelectionTool.IsMeleeHero(heroConfig))
                 combatCount++;
             else
                 rangeCount++;
@@ -800,7 +800,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
                         else if (itemCfg.Attr1 == "atk" && heroCfg.Atk == maxAttr)
                             isMaxAttr = true;
 
-                        if(heroCfg.Pos == 1)
+                        if(HeroSelectionTool.IsMeleeHero(heroCfg))
                         {
                             if(isMinAttr && attrDiff > 15)
                                 score *= 1 + attrDiff * .015f;
@@ -873,11 +873,11 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         List<Tuple<int, int>> pos123 = new List<Tuple<int, int>>();
         List<Tuple<int, int>> pos456 = new List<Tuple<int, int>>();
 
-        // 根据 Pos 分类卡牌
+        // 根据近战/远程分类卡牌（射程<=20为近战，>20为远程）
         foreach (var item in results)
         {
-            int pos = HeroConfig.GetConfig(item.Item1).Pos;
-            if (pos == 3 || pos == 2)
+            var heroCfg = HeroConfig.GetConfig(item.Item1);
+            if (HeroSelectionTool.IsRangedHero(heroCfg))
                 pos456.Add(item);
             else
                 pos123.Add(item);

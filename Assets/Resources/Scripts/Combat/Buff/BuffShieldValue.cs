@@ -10,7 +10,7 @@ public class BuffShieldValue : Buff
 
     public override void DuringAttacked(Chess attacker, string damType, ref int damageBase, ref float damageMulti, ref string effect)
     {
-        var strength = skillCfg.Strength * effectMulti;
+        var strength = skillCfg.Strength;
         if((float)attacker.GetAttr(skillCfg.Attr) > owner.GetAttr(skillCfg.Attr) * 1.2f)
             strength *= .75f;
 

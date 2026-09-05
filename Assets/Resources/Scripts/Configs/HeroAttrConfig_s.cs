@@ -136,8 +136,6 @@ namespace CommonConfig
             config[21] = new HeroAttrConfig(21, "hpRegen", "生命回复", "", "", "attrhp", false);
             config[22] = new HeroAttrConfig(22, "healRate", "治疗强化", "", "", "", false);
             config[23] = new HeroAttrConfig(23, "healedRate", "受治疗", "", "", "", false);
-            config[24] = new HeroAttrConfig(24, "buffEffectRate", "buff效果", "", "", "", false);
-            config[25] = new HeroAttrConfig(25, "debuffDur", "负面持续", "", "", "", false);
             config[26] = new HeroAttrConfig(26, "auroEffectRate", "光环效果", "", "", "", false);
 
             RebuildIndex();

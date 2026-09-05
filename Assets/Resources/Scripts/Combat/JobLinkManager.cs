@@ -5,11 +5,14 @@ using UnityEngine;
 
 /// <summary>
 /// 兵种连锁（金铲铲式职业羁绊）：战斗开始时统计本侧同职业英雄数量，
-/// 按 SkillConfig 职业技能行（Sname=JobConfig.SkillId）的 LinkSelf/LinkTeam 施加被动属性加成，不走技能系统。
-/// 档位：上阵该职业 1/2/3/4/5 人时对应职业技能 Lv1~5 行。
-/// - LinkSelf：连接英雄（该职业每个英雄自身）获得的属性
-/// - LinkTeam：我方其他英雄（除该职业英雄外的全体英雄）获得的总量，配置即该档位总量，不再乘人数
-/// - AuroAttrs：光环技能效果，我方全体英雄（含提供者，不用排除）获得，效果受来源英雄 auroEffectRate 修正
+/// 按 SkillConfig 职业技能行（Sname=JobConfig.SkillId）触发羁绊效果。档位：上阵 1/2/3/4/5 人对应职业技能 Lv1~5 行。
+/// 效果分两类：
+/// 1. 属性加成（不走技能系统）：按 LinkSelf/LinkTeam/AuroAttrs 施加被动属性
+///    - LinkSelf：连接英雄（该职业每个英雄自身）获得的属性；其中 soldierAtk/soldierHp 例外，施加给本侧全部士兵（全军士兵）
+///    - LinkTeam：我方其他英雄（除该职业英雄外的全体英雄）获得的总量，配置即该档位总量，不再乘人数
+///    - AuroAttrs：光环技能效果，我方全体英雄（含提供者，不用排除）获得，效果受来源英雄 auroEffectRate 修正
+/// 2. 脚本技能效果：职业技能行 ScriptName 挂真实技能脚本，运行时 SetJobSkillLevel 切到当前档位行，
+///    通过技能事件生效（如 枪·眩晕/戟·AOE溅射/炮·AOE范围走 HitBuff 系技能；扇·负面buff延长/琴·正面buff延长走 ModifyBuffTime 的 OnAddBuff 事件）
 /// 数值统一由 SkillConfig 表配置，本类不再硬编码。
 /// </summary>
 public static class JobLinkManager
@@ -62,7 +65,8 @@ public static class JobLinkManager
                 continue;
 
             // 兵种技能按同职业英雄数 SetLevel 匹配对应档位的技能行：
-            // 机械类技能（枪·眩晕/戟·AOE溅射/炮·AOE范围）由此生效；属性类占位技能(Dumb)无实际效果，加成仍走下方 LinkSelf/LinkTeam
+            // 脚本类技能（枪·眩晕/戟·AOE溅射/炮·AOE范围/扇·负面buff延长/琴·正面buff延长）由此以当前档位生效；
+            // 属性类占位技能(Dumb)无实际效果，加成仍走下方 LinkSelf/LinkTeam
             SetJobSkillLevel(jobGroup.Value, jobGroup.Key, tierLv);
 
             var cfg = GetTierConfig(jobGroup.Key, jobGroup.Value.Count);
@@ -73,10 +77,21 @@ public static class JobLinkManager
             var linkTeamBonuses = ParseBonuses(cfg.LinkTeam);
             var auraBonuses = ParseBonuses(cfg.AuroAttrs);
 
-            // LinkSelf：该职业每个连接英雄自身获得加成
+            // LinkSelf：该职业每个连接英雄自身获得加成；
+            // 士兵类属性（soldierAtk/soldierHp）例外：按"全军士兵"施加给本侧全部士兵单位（总量不乘人数）
             foreach (var hero in jobGroup.Value)
                 foreach (var bonus in linkSelfBonuses)
-                    ApplyAttr(hero, bonus.Attr, bonus.Value);
+                    if (bonus.Attr != "soldierAtk" && bonus.Attr != "soldierHp")
+                        ApplyAttr(hero, bonus.Attr, bonus.Value);
+
+            foreach (var unit in allMySideUnits)
+            {
+                if (unit.isHero)
+                    continue;
+                foreach (var bonus in linkSelfBonuses)
+                    if (bonus.Attr == "soldierAtk" || bonus.Attr == "soldierHp")
+                        ApplyAttr(unit, bonus.Attr, bonus.Value);
+            }
 
             // AuroAttrs：光环技能效果，我方全体英雄（含提供者，不用排除）获得，
             // 效果受光环来源英雄 auroEffectRate 修正（同职业多个提供者取最高，先应用 LinkSelf 再取值）
@@ -188,20 +203,25 @@ public static class JobLinkManager
         sb.Append('\n');
         sb.Append(isCurrent ? "<color=green>" : "<color=#808080>");
         sb.Append('(').Append(linkTiers[lv - 1]).Append("人) ");
-        // 机械类技能（枪·眩晕/戟·AOE溅射/炮·AOE范围）：不走属性加成，直接展示技能描述
-        if (string.IsNullOrEmpty(cfg.LinkSelf) && string.IsNullOrEmpty(cfg.LinkTeam) && string.IsNullOrEmpty(cfg.AuroAttrs))
-            sb.Append(cfg.Descript);
-        else
+        // 脚本类技能（枪·眩晕/戟·AOE溅射/炮·AOE范围/扇·负面buff延长/琴·正面buff延长等）不走属性加成：
+        // 未配置属性加成时直接展示技能描述（如 枪·眩晕 整行）；
+        // 同时配置了属性加成（扇/琴的 LinkTeam 属性 + ModifyBuffTime 机制）时，属性文本与机制描述用 " | " 并显
+        var isScriptSkill = !string.IsNullOrEmpty(cfg.ScriptName) && cfg.ScriptName != "Dumb";
+        var parts = new List<string>();
+        if (!string.IsNullOrEmpty(cfg.LinkSelf))
+            parts.Add(AttrText(ParseBonuses(cfg.LinkSelf)));
+        if (!string.IsNullOrEmpty(cfg.LinkTeam))
+            parts.Add(AttrText(ParseBonuses(cfg.LinkTeam)));
+        if (!string.IsNullOrEmpty(cfg.AuroAttrs))
+            parts.Add("光环:" + AttrText(ParseBonuses(cfg.AuroAttrs)));
+        if (parts.Count > 0)
         {
-            var parts = new List<string>();
-            if (!string.IsNullOrEmpty(cfg.LinkSelf))
-                parts.Add(AttrText(ParseBonuses(cfg.LinkSelf)));
-            if (!string.IsNullOrEmpty(cfg.LinkTeam))
-                parts.Add(AttrText(ParseBonuses(cfg.LinkTeam)));
-            if (!string.IsNullOrEmpty(cfg.AuroAttrs))
-                parts.Add("光环:" + AttrText(ParseBonuses(cfg.AuroAttrs)));
-            sb.Append(parts.Count > 0 ? string.Join(" | ", parts.ToArray()) : "无");
+            sb.Append(string.Join(" | ", parts.ToArray()));
+            if (isScriptSkill && !string.IsNullOrEmpty(cfg.Descript))
+                sb.Append(" | ").Append(cfg.Descript);
         }
+        else
+            sb.Append(cfg.Descript);
         sb.Append("</color>");
     }
 
@@ -256,7 +276,7 @@ public static class JobLinkManager
         // 百分比类属性：v为比例值（0.1=10%）
         if (attr == "critRate" || attr == "soldierAtk" || attr == "soldierHp"
             || attr == "dodgeRate" || attr == "critDamageMulti"
-            || attr == "healRate" || attr == "healedRate" || attr == "buffEffectRate" || attr == "debuffDur"
+            || attr == "healRate" || attr == "healedRate"
             || attr == "auroEffectRate")
             return Mathf.RoundToInt(v * 100) + "%";
         if (v < 1f)
@@ -317,17 +337,9 @@ public static class JobLinkManager
                 // 受治疗系数（可为负=减疗）
                 unit.healedRate += value;
                 break;
-            case "buffEffectRate":
-                // 琴·祝福效果：统一buff效果加成系数
-                unit.buffEffectRate += value;
-                break;
             case "auroEffectRate":
                 // 鼓·光环技能效果：修正 AuroAttrs 光环属性的效果值
                 unit.auroEffectRate += value;
-                break;
-            case "debuffDur":
-                // 扇·负面buff时长延长
-                unit.debuffDur += value;
                 break;
             case "soldierAtk":
                 // 相的羁绊：全军士兵攻击+%
