@@ -22,7 +22,7 @@ public class SkillAidSuddenArrow : Skill
         if (!CheckBurst(null))
             return false;
 
-        var skillAttr = owner.GetAttr(skillCfg.Attr);
+        var skillAttr = owner.GetAttr(AttrKey(skillCfg));
 
         //排序，优先给hero，然后优先给生命值低的
         unitsInRange.Sort((a, b) =>
@@ -31,13 +31,13 @@ public class SkillAidSuddenArrow : Skill
                 return -1;
             if (b.isHero && !a.isHero)
                 return 1;
-            return a.GetAttr(skillCfg.Attr).CompareTo(b.GetAttr(skillCfg.Attr));
+            return a.GetAttr(AttrKey(skillCfg)).CompareTo(b.GetAttr(AttrKey(skillCfg)));
         });
 
         var targetUnit = unitsInRange[0];
 
         owner.PlayerAnim(skillCfg.Action);
-        var attrDiff = Math.Max(10, owner.GetAttr(skillCfg.Attr) - targetUnit.GetAttr(skillCfg.Attr));
+        var attrDiff = Math.Max(10, owner.GetAttr(AttrKey(skillCfg)) - targetUnit.GetAttr(AttrKey(skillCfg)));
         var damage = (int)(attrDiff * skillCfg.SkillDamageAttrRate);
         WorldManager.Instance.CreateSpellMissile(owner, targetUnit, owner.transform.position, id, damage, skillCfg.HitEffect);
 

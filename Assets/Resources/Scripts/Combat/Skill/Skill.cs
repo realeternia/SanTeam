@@ -27,12 +27,23 @@ public class Skill
     public float mp; // 当前技能MP，战斗开始为0，满值=MpCost
 
     /// <summary>
-    /// 统一技能伤害公式：固定系数(Strength) + 比例系数(SkillDamageAttrRate) × 关联属性(Attr)
-    /// Attr 取值：ap=法强 / atk=攻击（无双强度已并入，物理技能统一按 atk 成长、护甲减免）
+    /// 统一技能伤害公式：固定系数(Strength) + 比例系数(SkillDamageAttrRate) × 关联属性(IsMagic映射 ap/atk)
+    /// IsMagic=true→ap 法强(受魔抗减免)；false→atk 攻击(无双已并入，受护甲减免)
     /// </summary>
     public int GetSkillDamage()
     {
-        return (int)(skillCfg.Strength + owner.GetAttr(skillCfg.Attr) * skillCfg.SkillDamageAttrRate);
+        if(skillCfg.isMagic)
+            return (int)(skillCfg.Strength + owner.GetAttr("ap") * skillCfg.SkillDamageAttrRate);
+        else
+            return (int)(skillCfg.Strength + owner.GetAttr("atk") * skillCfg.SkillDamageAttrRate);
+    }
+
+    /// <summary>
+    /// 技能类型限定判断：CheckTypeLimit=false 不限定；否则 CheckIsMagic 与目标技能是否法术比对（true=仅法术 / false=仅物理）
+    /// </summary>
+    public static bool TypeMatched(SkillConfig cfg, bool isMagic)
+    {
+        return !cfg.CheckTypeLimit || cfg.CheckIsMagic == isMagic;
     }
 
     public Skill(int id, Chess unit)
@@ -121,16 +132,7 @@ public class Skill
         var rate = skillCfg.Rate;
         if (rate > 0 && rate < 1 && target != null && target != owner)
         {
-            var myAttr = owner.GetAttr(skillCfg.Attr);
-            var defAttr = target.GetAttr(skillCfg.Attr);
-            if (owner.side != target.side)
-            {
-                if (myAttr > defAttr)
-                    rate *= Math.Min(2, 1 + (myAttr - defAttr) * .02f);
-                else if (myAttr < defAttr)
-                    rate /= Math.Min(2, 1 + (defAttr - myAttr) * .02f);
-            }
-
+            // 不再按双方属性差值放大/缩小发动概率，仅保留其他技能/机制对概率的修正(如百出)
             SkillManager.OnCheckBurst(owner, skillCfg, ref rate);
         }
 

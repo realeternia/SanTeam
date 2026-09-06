@@ -326,7 +326,7 @@ public class BagControl : MonoBehaviour, IPanelEvent
                 if(helpSkillId > 0)
                 {
                     var skillCfg = SkillConfig.GetConfig(helpSkillId);
-                    var color = SysColor.GetSkillAttrColor(skillCfg.Attr);
+                    var color = SysColor.GetSkillAttrColor(skillCfg.IsMagic);
                     // 创建连接线
                     CreateConnectionLine(heroUnits[i].transform, heroUnits[j].transform, color, new Vector2(-25, -25), Resources.Load<Sprite>("SkillPic/" + skillCfg.Icon));
                 }
@@ -335,7 +335,7 @@ public class BagControl : MonoBehaviour, IPanelEvent
                 if(helpSkillId > 0)
                 {
                     var skillCfg = SkillConfig.GetConfig(helpSkillId);
-                    var color = SysColor.GetSkillAttrColor(skillCfg.Attr);
+                    var color = SysColor.GetSkillAttrColor(skillCfg.IsMagic);
                     // 创建连接线
                     CreateConnectionLine(heroUnits[i].transform, heroUnits[j].transform, color, new Vector2(25, 25), Resources.Load<Sprite>("SkillPic/" + skillCfg.Icon));
                 }

@@ -229,8 +229,8 @@ public class Tooltip : MonoBehaviour
             for(int i = 0; i < skillCfgs.Count; i++)
             {
                 var skillConfig = skillCfgs[i];
-                // 属性标签前缀：ap=法(蓝)，atk/might(无双已并入，兼容旧数据)=攻(黄)
-                var skillAttrStr = skillConfig.Attr == "ap" ? "<color=blue>[法]</color>" : (skillConfig.Attr == "atk" || skillConfig.Attr == "might") ? "<color=yellow>[攻]</color>" : "";
+                // 属性标签前缀：IsMagic=法术(蓝)，否则=物理(黄)
+                var skillAttrStr = skillConfig.IsMagic ? "<color=blue>[法]</color>" : "<color=yellow>[攻]</color>";
                 if (skillConfig.Type == "职业")
                 {
                     // 职业技能（兵种连锁）：显示各档位两列数值并按上阵数高亮当前档位

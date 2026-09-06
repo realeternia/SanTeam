@@ -12,19 +12,19 @@ public class SkillDefFeedback : Skill
 
     public override void OnAttacked(Chess attacker, string damType, int damage)
     {
-        DoFeedback(attacker, damType, damage);
+        DoFeedback(attacker, false, damage); // 普攻固定为物理
     }
 
     public override void OnBeDoSkillDamage(Chess caster, SkillConfig checkSkillCfg, ref int damage, bool isFeedback)
     {
         if(isFeedback)
             return;
-        DoFeedback(caster, checkSkillCfg.Attr, damage);
+        DoFeedback(caster, checkSkillCfg.IsMagic, damage);
     }    
 
-    private void DoFeedback(Chess attacker, string damType, int damage)
+    private void DoFeedback(Chess attacker, bool isMagic, int damage)
     {
-        if (skillCfg.CheckAttrs != null && !skillCfg.CheckAttrs.Contains(damType))
+        if (!TypeMatched(skillCfg, isMagic))
             return;
 
         if (skillCfg.Range > 0)

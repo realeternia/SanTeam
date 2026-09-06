@@ -8,7 +8,8 @@ using UnityEngine;
 /// 按 SkillConfig 职业技能行（Sname=JobConfig.SkillId）触发羁绊效果。档位：上阵 1/2/3/4/5 人对应职业技能 Lv1~5 行。
 /// 效果分两类：
 /// 1. 属性加成（不走技能系统）：按 LinkSelf/LinkTeam/AuroAttrs 施加被动属性
-///    - LinkSelf：连接英雄（该职业每个英雄自身）获得的属性；其中 soldierAtk/soldierHp 例外，施加给本侧全部士兵（全军士兵）
+///    - LinkSelf：连接英雄（该职业每个英雄自身）获得的属性；其中 soldierAtk/soldierHp 例外，按乘法系数施加给本侧全部士兵
+///      （多职业组系数先累加、每侧结算前复位一次，最后统一按初始基准乘一次，避免多次施加累乘）
 ///    - LinkTeam：我方其他英雄（除该职业英雄外的全体英雄）获得的总量，配置即该档位总量，不再乘人数
 ///    - AuroAttrs：光环技能效果（ApplyJobLinks 后由 ApplyAuroAttrs 阶段单独结算），遍历每个英雄携带的光环技能，
 ///      各自对本侧全体英雄（含提供者）生效，效果值受光环来源英雄 auroEffectRate 修正
@@ -88,21 +89,30 @@ public static class JobLinkManager
 
             foreach (var unit in allMySideUnits)
             {
-                if (unit.isHero)
-                    continue;
-                foreach (var bonus in linkSelfBonuses)
-                    if (bonus.Attr == "soldierAtk" || bonus.Attr == "soldierHp")
+                if (unit.isHero && !jobGroup.Value.Contains(unit))
+                {
+                    foreach (var bonus in linkTeamBonuses)
                         ApplyAttr(unit, bonus.Attr, bonus.Value);
+                }
+                if (!unit.isHero)
+                {
+                    foreach (var bonus in linkSelfBonuses)
+                        if (bonus.Attr == "soldierAtk" || bonus.Attr == "soldierHp")
+                            ApplyAttr(unit, bonus.Attr, bonus.Value);
+                }
             }
+        }
 
-            // LinkTeam：该档位除该职业英雄外的我方全体英雄获得的总量（该职业英雄已由 LinkSelf 覆盖，不重复给）
-            foreach (var unit in allMySideUnits)
-            {
-                if (!unit.isHero || jobGroup.Value.Contains(unit))
-                    continue;
-                foreach (var bonus in linkTeamBonuses)
-                    ApplyAttr(unit, bonus.Attr, bonus.Value);
-            }
+        // 统一结算士兵生命加成：目标最大生命 = 初始基准 × 累计系数（只乘一次），
+        // 多个职业组系数先累加、多次调用先复位再累加，均不会把已加成数值当基数二次乘算
+        foreach (var unit in allMySideUnits)
+        {
+            if (unit.isHero)
+                continue;
+            var targetMaxHp = (int)(unit.MaxHp * (1 + unit.soldierHpRate));
+            unit.hp = targetMaxHp;
+            unit.maxHp = targetMaxHp;
+            unit.attack = (int)(unit.attack * (1 + unit.soldierAtkRate));
         }
     }
 
@@ -361,18 +371,15 @@ public static class JobLinkManager
                 unit.auroEffectRate += value;
                 break;
             case "soldierAtk":
-                // 相的羁绊：全军士兵攻击+%
+                // 相的羁绊：全军士兵攻击+%（乘法系数，此处只累加，伤害结算时乘 attackDamage 一次）
                 if (!unit.isHero)
                     unit.soldierAtkRate += value;
                 break;
             case "soldierHp":
             {
-                // 相的羁绊：全军士兵生命+%
-                if (unit.isHero)
-                    break;
-                var add = (int)(unit.maxHp * value);
-                unit.maxHp += add;
-                unit.hp += add;
+                // 相的羁绊：全军士兵生命+%（乘法系数，此处只累加，ApplyJobLinks 末尾统一按初始基准结算一次）
+                if (!unit.isHero)
+                    unit.soldierHpRate += value;
                 break;
             }
             case "range":

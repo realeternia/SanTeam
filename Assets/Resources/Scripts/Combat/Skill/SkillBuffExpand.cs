@@ -17,7 +17,7 @@ public class SkillBuffExpand : Skill
         if(checkSkillId == skillId)
             return; //自己挂的buff，不再连续触发
 
-        if (skillCfg.CheckAttrs != null && !skillCfg.CheckAttrs.Contains(SkillConfig.GetConfig(checkSkillId).Attr))
+        if (!TypeMatched(skillCfg, SkillConfig.GetConfig(checkSkillId).IsMagic))
             return;            
 
         var buffCfg = BuffConfig.GetConfig(buffId); 

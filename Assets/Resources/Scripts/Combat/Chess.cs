@@ -49,7 +49,8 @@ public class Chess : MonoBehaviour
     // 是否正在使用偏移路径
     public int hp = 100;
     public int attackDamage = 30;
-    public float soldierAtkRate = 1f; // 士兵攻击加成系数（相的职业羁绊：全军士兵攻击+%）
+    public float soldierAtkRate = 1f; // 士兵攻击加成系数（相的职业羁绊：全军士兵攻击+%，伤害结算时乘算一次）
+    public float soldierHpRate = 1f; // 士兵生命加成系数（相的职业羁绊：全军士兵生命+%，由 JobLinkManager 累加系数后统一结算）
 
     // 护甲/魔抗：英雄与士兵初始化时从配置赋值
     public int armor;
@@ -88,8 +89,7 @@ public class Chess : MonoBehaviour
     private int friendAtkBonus; //连线好友带来的攻击加成值
 
     private float secondTimer; //每秒事件计时，满1s触发一次OnSecond
-    public int regeHp; //回复血量（OnSecond事件结算）
-    public int hpRegen; //生命回复/秒（正=回复，负=扣减，OnSecond事件结算）
+    public int hpRegen; //生命回复/秒（正=回复，负=扣减；来源：属性羁绊或复原/药仙技能加成，OnSecond事件结算）
     public float mpRegen; //法力回复/秒（为设置了MpCost的技能持续充能，可为负=倒扣，OnSecond事件结算）
 
     // Start is called before the first frame update
@@ -160,6 +160,8 @@ public class Chess : MonoBehaviour
                 attackDamage += (int)((playerInfo.sodatk + playerInfo.GetItemPAttr("satk") + playerInfo.GetSoldierAtkAdd()) * soldierCfg.SoldierAtkRate);
             }
         }
+        // 记录士兵初始生命基准：职业生命系数结算始终以它为基数（士兵无其他生命来源，此值即为战斗前最终生命）
+        soldierBaseMaxHp = maxHp;
         hp = maxHp;
         if (heroInfo != null) // 英雄
             heroInfo.SetHpRate(hp, maxHp);
@@ -226,12 +228,9 @@ public class Chess : MonoBehaviour
         }
     }
 
-    // 每秒事件：regeHp/hpRegen/mpRegen 等按秒结算的逻辑统一在此处理
+    // 每秒事件：hpRegen/mpRegen 等按秒结算的逻辑统一在此处理
     private void OnSecond()
     {
-        if (regeHp > 0)
-            AddHp(regeHp);
-
         if (hpRegen != 0)
         {
             // 生命回复属性：正=回复，负=扣减（可为负=持续扣减）
@@ -644,14 +643,14 @@ public class Chess : MonoBehaviour
         if(damage <= 0)
             throw new Exception("伤害值不能小于等于0");
 
-        // 抗性减免（英雄与士兵统一结算，参考金铲铲）：ap 法术技能受魔抗减免；物理技能(atk/might 无双已并入)受护甲减免
+        // 抗性减免（英雄与士兵统一结算，参考金铲铲）：IsMagic=true 法术受魔抗减免；false 物理(atk)受护甲减免
         var skillCfg = SkillConfig.GetConfig(skillId);
         if (skillCfg != null)
         {
-            if (skillCfg.Attr == "ap")
-                damage = Math.Max(1, (int)(damage * CombatConst.ResistMultiplier(magicRes)));
-            else if (skillCfg.Attr == "atk" || skillCfg.Attr == "might")
-                damage = Math.Max(1, (int)(damage * CombatConst.ResistMultiplier(armor)));
+            if (skillCfg.IsMagic)
+                damage = Math.Max(1, (int)(damage * CombatConst.ResistMultiplier(magicRes))); // 法术：魔抗减免
+            else
+                damage = Math.Max(1, (int)(damage * CombatConst.ResistMultiplier(armor))); // 物理(atk)：护甲减免
         }
 
         if (isHero)

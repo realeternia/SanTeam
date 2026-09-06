@@ -15,7 +15,7 @@ public class SkillModifySkillRateTime : Skill
     {
         if(checkSkillCfg.Rate == 0)
             return;
-        if (skillCfg.CheckAttrs != null && !skillCfg.CheckAttrs.Contains(checkSkillCfg.Attr))
+        if (!TypeMatched(skillCfg, checkSkillCfg.IsMagic))
             return;                 
         rate += Math.Min(rate, checkSkillCfg.Rate);
     }
@@ -24,7 +24,7 @@ public class SkillModifySkillRateTime : Skill
     {
         if(skillCfg.BuffTime == 0)
             return;
-        if (skillCfg.CheckAttrs != null && !skillCfg.CheckAttrs.Contains(SkillConfig.GetConfig(checkSkillId).Attr))
+        if (!TypeMatched(skillCfg, SkillConfig.GetConfig(checkSkillId).IsMagic))
             return;              
         var buffCfg = BuffConfig.GetConfig(buffId);
         if(!buffCfg.IsPositive)
@@ -35,7 +35,7 @@ public class SkillModifySkillRateTime : Skill
     {
         if(skillCfg.Strength == 0)
             return;
-        if (skillCfg.CheckAttrs != null && !skillCfg.CheckAttrs.Contains(checkSkillCfg.Attr))
+        if (!TypeMatched(skillCfg, checkSkillCfg.IsMagic))
             return; 
         
         GameLog.Debug(owner.id + " OnCheckCD " + cdTime + " skillId " + skillId);

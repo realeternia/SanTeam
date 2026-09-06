@@ -47,14 +47,10 @@ public static class SysColor
         }
     }
 
-    // 技能属性连接线颜色（ap-智谋蓝 atk(含无双并入)-黄绿）
-    public static Color GetSkillAttrColor(string attr)
+    // 技能属性连接线颜色（法术IsMagic-智谋蓝 / 物理-黄绿）
+    public static Color GetSkillAttrColor(bool isMagic)
     {
-        switch (attr)
-        {
-            case "ap": return new Color(0.55f, 0.55f, 1f, 0.6f);
-            default: return new Color(0.7f, 0.8f, 0.3f, 0.6f);
-        }
+        return isMagic ? new Color(0.55f, 0.55f, 1f, 0.6f) : new Color(0.7f, 0.8f, 0.3f, 0.6f);
     }
 
     public static Color GetColorByValue(string attrName, int value)

@@ -12,7 +12,7 @@ public class SkillInitAddRege : Skill
 
     public override void BattleBegin()
     {
-        owner.regeHp += skillCfg.StrengthInt;
+        owner.hpRegen += skillCfg.StrengthInt;
         owner.PlayerAnim(skillCfg.Action);
     }
 

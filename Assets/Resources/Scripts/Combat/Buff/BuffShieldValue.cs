@@ -10,10 +10,8 @@ public class BuffShieldValue : Buff
 
     public override void DuringAttacked(Chess attacker, string damType, ref int damageBase, ref float damageMulti, ref string effect)
     {
+        // 减伤盾：恒定按 Strength 减免，不再做攻守属性对比
         var strength = skillCfg.Strength;
-        if((float)attacker.GetAttr(skillCfg.Attr) > owner.GetAttr(skillCfg.Attr) * 1.2f)
-            strength *= .75f;
-
         damageMulti -= strength;
         WorldManager.Instance.AddBattleText("抵抗", owner.transform.position, new UnityEngine.Vector2(0, 60), Color.green, 3);
     }
