@@ -301,6 +301,12 @@ public class Chess : MonoBehaviour
                 might += equipAttr.Might;
                 atk += equipAttr.Atk;
                 maxHp += equipAttr.Hp;
+                // 金铲铲式基础组件扩展属性：护甲/魔抗/攻速/暴击/回蓝
+                armor += equipAttr.Armor;
+                magicRes += equipAttr.MagicRes;
+                attackRate += equipAttr.AttackRate;
+                critRate += equipAttr.CritRate;
+                mpRegen += equipAttr.MpRegen;
             }
         }
 

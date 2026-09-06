@@ -201,7 +201,7 @@ namespace CommonConfig
             config[502003] = new SoldierConfig(502003, "喷火兽lv1", 1, 22, 160, 15, 2, 0, 9, 38, 15, 1.5f, false, 0f, 0f, new int[0], "UnitBing2", "BulletExplosionFire", "", "");
             config[502004] = new SoldierConfig(502004, "机巧辅助lv1", 1, 8, 240, 14, 4, 6, 8, 12, 0, 0f, false, 0f, 0f, new int[0], "UnitBing", "SwordHitYellowCritical", "", "");
             config[502005] = new SoldierConfig(502005, "喷火兽lv2", 2, 30, 220, 16, 3, 0, 9, 40, 16, 1.5f, false, 0f, 0f, new int[0], "UnitBing2", "BulletExplosionFire", "", "");
-            config[590001] = new SoldierConfig(590001, "野怪", 1, 25, 200, 15, 2, 2, 9, 12, 0, 0f, false, 0f, 0f, new int[0], "UnitBing", "SwordHitYellowCritical", "400001;40|400002;50", "MonsterPic/wolf");
+            config[590001] = new SoldierConfig(590001, "野怪", 1, 25, 200, 15, 2, 2, 9, 12, 0, 0f, false, 0f, 0f, new int[0], "UnitBing", "SwordHitYellowCritical", "400007;10|400012;10|400013;10|400016;10|400017;10|400018;10|400019;10|400020;10", "MonsterPic/wolf");
 
             RebuildIndex();
 

@@ -252,39 +252,8 @@ public static class HeroSelectionTool
         else
         {
             var itemConfig = ItemConfig.GetConfig(cardId);
-            if (itemConfig.Attr1 == "might")
-            {
-                attrInfo.Might = itemConfig.Attr1Val;
-            }
-            else if (itemConfig.Attr1 == "ap")
-            {
-                attrInfo.Ap = itemConfig.Attr1Val;
-            }
-            else if (itemConfig.Attr1 == "atk")
-            {
-                attrInfo.Atk = itemConfig.Attr1Val;
-            }
-            else if (itemConfig.Attr1 == "hp")
-            {
-                attrInfo.Hp = itemConfig.Attr1Val;
-            }
-
-            if (itemConfig.Attr2 == "might")
-            {
-                attrInfo.Might = itemConfig.Attr2Val;
-            }
-            else if (itemConfig.Attr2 == "ap")
-            {
-                attrInfo.Ap = itemConfig.Attr2Val;
-            }
-            else if (itemConfig.Attr2 == "atk")
-            {
-                attrInfo.Atk = itemConfig.Attr2Val;
-            }
-            else if (itemConfig.Attr2 == "hp")
-            {
-                attrInfo.Hp = itemConfig.Attr2Val;
-            }
+            ApplyItemAttr(attrInfo, itemConfig.Attr1, itemConfig.Attr1Val);
+            ApplyItemAttr(attrInfo, itemConfig.Attr2, itemConfig.Attr2Val);
             // 装备升级机制已移除：属性不再乘等级，每件装备固定属性
         }
         if(player.attrAddons.ContainsKey(cardId))
@@ -292,6 +261,44 @@ public static class HeroSelectionTool
 
         return attrInfo;
 
+    }
+
+    // 道具属性键解析：四主属性(四维)外，支持护甲/魔抗/回蓝及金铲铲式基础组件的攻速/暴击
+    // 比例属性（attackRate/critRate/dodgeRate）配置存百分数（10=+10%），这里 ÷100 转为运行时比例；其余直接按数值
+    private static void ApplyItemAttr(AttrInfo attrInfo, string key, int value)
+    {
+        if (string.IsNullOrEmpty(key) || value == 0)
+            return;
+        switch (key)
+        {
+            case "might":
+                attrInfo.Might = value;
+                break;
+            case "ap":
+                attrInfo.Ap = value;
+                break;
+            case "atk":
+                attrInfo.Atk = value;
+                break;
+            case "hp":
+                attrInfo.Hp = value;
+                break;
+            case "armor":
+                attrInfo.Armor = value;
+                break;
+            case "magicRes":
+                attrInfo.MagicRes = value;
+                break;
+            case "mpRegen":
+                attrInfo.MpRegen = value;
+                break;
+            case "attackRate":
+                attrInfo.AttackRate = value / 100f;
+                break;
+            case "critRate":
+                attrInfo.CritRate = value / 100f;
+                break;
+        }
     }
 
     // 品质色/阵营色定义已迁至 SysColor.GetQualityColor / SysColor.GetSideColor
