@@ -47,13 +47,12 @@ public static class SysColor
         }
     }
 
-    // 技能属性连接线颜色（ap-智谋蓝 might-武力红 其他-黄绿）
+    // 技能属性连接线颜色（ap-智谋蓝 atk(含无双并入)-黄绿）
     public static Color GetSkillAttrColor(string attr)
     {
         switch (attr)
         {
             case "ap": return new Color(0.55f, 0.55f, 1f, 0.6f);
-            case "might": return new Color(0.95f, 0.4f, 0.4f, 0.6f);
             default: return new Color(0.7f, 0.8f, 0.3f, 0.6f);
         }
     }

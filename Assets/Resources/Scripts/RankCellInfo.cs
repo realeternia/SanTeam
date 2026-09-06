@@ -77,8 +77,8 @@ public class RankCellInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandle
         heroName.text = heroConfig.Name;
         heroName.color = SysColor.GetQualityColor(heroConfig.Quality);
         heroId = (int)heroConfig.Id;
-        // 排行展示统一口径：HeroConfig 四主数值经 PostModify 写回为 1星带品质面板（职业基准×修正%×品质系数）
-        str = heroConfig.Might;
+        // 排行展示统一口径：HeroConfig 主数值经 PostModify 写回为 1星带品质面板（无双强度已并入 Atk，Str 列不再有数据）
+        str = 0;
         inte = heroConfig.Ap;
         leadShip = heroConfig.Atk;
         hp = heroConfig.Hp;
@@ -97,6 +97,9 @@ public class RankCellInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandle
 
         // 数值不再按大小做红/黄特化色，统一展示1星面板
         heroStr.text = str.ToString();
+        // 无双强度已并入攻击(Atk)：Str 列无数据，隐藏数值占位（待 UI 在预制体中移除该列）
+        if (heroStr != null)
+            heroStr.gameObject.SetActive(false);
         heroInte.text = inte.ToString();
         heroLeadShip.text = leadShip.ToString();
         heroPrice.text = price.ToString();

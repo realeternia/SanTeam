@@ -28,7 +28,7 @@ public class Skill
 
     /// <summary>
     /// 统一技能伤害公式：固定系数(Strength) + 比例系数(SkillDamageAttrRate) × 关联属性(Attr)
-    /// Attr 取值：ap=法强 / might=无双 / atk=武力（在配置表里按技能配置）
+    /// Attr 取值：ap=法强 / atk=攻击（无双强度已并入，物理技能统一按 atk 成长、护甲减免）
     /// </summary>
     public int GetSkillDamage()
     {

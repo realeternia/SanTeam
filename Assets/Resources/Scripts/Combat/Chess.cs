@@ -28,8 +28,7 @@ public class Chess : MonoBehaviour
     public float moveSpeed = 5f;
     public float attackRange = 10f;
     public int ap;      // 法术强度（原智力）
-    public int might;   // 无双强度（原武力）
-    public int atk;     // 攻击（原统王）
+    public int atk;     // 攻击（原统王；无双强度已并入此值）
     public int level = 1;
     public bool isShadow;
     public bool isFakeHero;
@@ -283,7 +282,6 @@ public class Chess : MonoBehaviour
         attackRate = heroConfig.AtkSpeed / 30f; // 攻速值→每秒攻击次数（30=1次/秒；攻速20=1.5秒/次，15=2秒/次）
         attackDamage = attr.Atk;
         ap = attr.Ap;
-        might = attr.Might;
         atk = attr.Atk;
         armor = heroConfig.Armor;
         magicRes = heroConfig.MagicRes;
@@ -298,7 +296,6 @@ public class Chess : MonoBehaviour
                 var equipAttr = HeroSelectionTool.GetCardAttr(player, equipId, 1);
 
                 ap += equipAttr.Ap;
-                might += equipAttr.Might;
                 atk += equipAttr.Atk;
                 maxHp += equipAttr.Hp;
                 // 金铲铲式基础组件扩展属性：护甲/魔抗/攻速/暴击/回蓝
@@ -313,7 +310,7 @@ public class Chess : MonoBehaviour
         hp = maxHp;
 
         if (heroInfo != null)
-            heroInfo.SetAttr(ap, might, atk);
+            heroInfo.SetAttr(ap, atk);
     }
 
     // 记录连线(武将关系)好友
@@ -335,19 +332,17 @@ public class Chess : MonoBehaviour
     public void RefreshHeroAttr()
     {
         if (heroInfo != null)
-            heroInfo.SetAttr(ap, might, atk);
+            heroInfo.SetAttr(ap, atk);
     }
 
-    public void UpdateAttr(int ap, int might, int atk)
+    public void UpdateAttr(int ap, int atk)
     {
         if (ap > 0)
             this.ap = ap;
-        if (might > 0)
-            this.might = might;
         if (atk > 0)
             this.atk = atk;
         if (heroInfo != null)
-            heroInfo.SetAttr(this.ap, this.might, this.atk);
+            heroInfo.SetAttr(this.ap, this.atk);
     }
 
     // 只能开场用
@@ -649,13 +644,13 @@ public class Chess : MonoBehaviour
         if(damage <= 0)
             throw new Exception("伤害值不能小于等于0");
 
-        // 抗性减免（英雄与士兵统一结算，参考金铲铲）：法术强度(Ap)类技能受魔抗减免，无双(Might)类技能受护甲减免；普攻联动(Atk)类已在普攻阶段结算护甲
+        // 抗性减免（英雄与士兵统一结算，参考金铲铲）：ap 法术技能受魔抗减免；物理技能(atk/might 无双已并入)受护甲减免
         var skillCfg = SkillConfig.GetConfig(skillId);
         if (skillCfg != null)
         {
             if (skillCfg.Attr == "ap")
                 damage = Math.Max(1, (int)(damage * CombatConst.ResistMultiplier(magicRes)));
-            else if (skillCfg.Attr == "might")
+            else if (skillCfg.Attr == "atk" || skillCfg.Attr == "might")
                 damage = Math.Max(1, (int)(damage * CombatConst.ResistMultiplier(armor)));
         }
 
@@ -726,7 +721,7 @@ public class Chess : MonoBehaviour
         atk += friendAtkBonus;
 
         if (heroInfo != null)
-            heroInfo.SetAttr(ap, might, atk);
+            heroInfo.SetAttr(ap, atk);
     }
 
 
@@ -865,9 +860,8 @@ public class Chess : MonoBehaviour
             case "ap":
                 return ap;
             case "atk":
+            case "might": // 无双已并入攻击：老配置(未同步源表的 might 键)兼容为 atk
                 return atk;
-            case "might":
-                return might;
             case "hp":
                 return hp;
             case "hprate":
@@ -879,7 +873,7 @@ public class Chess : MonoBehaviour
 
     public int GetAttrTotal()
     {
-        return ap + atk + might;
+        return ap + atk;
     }
 
     public void AddAttr(string attr, int value)
@@ -890,14 +884,12 @@ public class Chess : MonoBehaviour
                 ap += value;
                 break;
             case "atk":
+            case "might": // 无双已并入攻击：老配置(未同步源表的 might 键)兼容为加攻击
                 atk += value;
-                break;
-            case "might":
-                might += value;
                 break;
         }
         if(heroInfo != null)
-            heroInfo.SetAttr(ap, might, atk);
+            heroInfo.SetAttr(ap, atk);
     }
 
     public float HpRate{ get { return (float)hp / maxHp; } }

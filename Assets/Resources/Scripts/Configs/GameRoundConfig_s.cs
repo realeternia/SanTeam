@@ -149,10 +149,10 @@ namespace CommonConfig
         public static void Load()
         {
             config.Clear();
-            config[1] = new GameRoundConfig(1, "180年", new int[]{1}, 2, 0f, 2, 0, 0, 20, 0, 0, 1, "590001;0|590001;23");
-            config[2] = new GameRoundConfig(2, "181年", new int[]{1}, 3, 0f, 3, 0, 0, 20, 0, 0, 1, "590001;0|590001;12|590001;23");
-            config[3] = new GameRoundConfig(3, "182年", new int[]{1}, 4, 0f, 4, 0, 0, 20, 5, 0, 0, "");
-            config[4] = new GameRoundConfig(4, "183年", new int[]{1}, 5, 0f, 5, 1, 0, 20, 5, 0, 0, "");
+            config[1] = new GameRoundConfig(1, "180年", new int[]{1}, 2, 0f, 2, 0, 0, 0, 0, 0, 1, "590001;0|590001;23");
+            config[2] = new GameRoundConfig(2, "181年", new int[]{1}, 3, 0f, 3, 0, 0, 5, 0, 0, 1, "590001;0|590001;12|590001;23");
+            config[3] = new GameRoundConfig(3, "182年", new int[]{1}, 4, 0f, 4, 0, 0, 10, 0, 0, 0, "");
+            config[4] = new GameRoundConfig(4, "183年", new int[]{1}, 5, 0f, 5, 1, 0, 15, 5, 0, 0, "");
             config[5] = new GameRoundConfig(5, "184年", new int[]{1,2,3}, 6, 0f, 6, 1, 0, 20, 5, 0, 0, "");
             config[6] = new GameRoundConfig(6, "185年", new int[]{1,2,3}, 7, 0f, 7, 1, 5, 25, 7, 0, 0, "");
             config[7] = new GameRoundConfig(7, "186年", new int[]{1,2,3}, 8, 0f, 8, 2, 5, 25, 7, 0, 0, "");

@@ -81,13 +81,17 @@ public static class ConfigManager
             heroCfg.AtkSpeed = (int)Math.Round(jobCfg.AtkSpeed * (100f + heroCfg.AtkSpeed) / 100f);
             heroCfg.Armor = (int)Math.Round(jobCfg.Armor * (100f + heroCfg.Armor) / 100f);
             heroCfg.MagicRes = (int)Math.Round(jobCfg.MagicRes * (100f + heroCfg.MagicRes) / 100f);
-            // 四主（攻击/法术/无双/生命）：写回 = 职业基准×(1+修正%/100) × 品质系数1.15^(Q-1)，即“1星带品质面板”
-            // （图鉴/排行/发卡/AI/排序直接读即为此口径）；星级成长保留到运行时按 AtkP/ApP/MightP/HpP 乘
+            // 主属性（攻击/法术/生命）：写回 = 职业基准×(1+修正%/100) × 品质系数1.15^(Q-1)，即“1星带品质面板”
+            // （图鉴/排行/发卡/AI/排序直接读即为此口径）；星级成长保留到运行时按 AtkP/ApP/HpP 乘
             float qualityFactor = Mathf.Pow(1.15f, Mathf.Max(1, heroCfg.Quality) - 1);
             heroCfg.Atk = (int)Math.Round(jobCfg.Atk * (100f + heroCfg.Atk) / 100f * qualityFactor);
             heroCfg.Ap = (int)Math.Round(jobCfg.Ap * (100f + heroCfg.Ap) / 100f * qualityFactor);
             heroCfg.Might = (int)Math.Round(jobCfg.Might * (100f + heroCfg.Might) / 100f * qualityFactor);
             heroCfg.Hp = (int)Math.Round(jobCfg.Hp * (100f + heroCfg.Hp) / 100f * qualityFactor);
+            // 无双强度(Might)并入攻击(atk)：项目内不再使用无双属性，物理伤害统一按 atk 成长、护甲减免。
+            // Might/MightP 列后续在配置源表删除，届时需同步删除上方 Might 写回与本行合并代码
+            heroCfg.Atk += heroCfg.Might;
+            heroCfg.Might = 0;
         }
     }
 

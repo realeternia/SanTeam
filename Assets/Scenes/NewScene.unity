@@ -6371,7 +6371,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 16, y: -99.099976}
-  m_SizeDelta: {x: 230, y: 610}
+  m_SizeDelta: {x: 210, y: 610}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &1019877982
 MonoBehaviour:
@@ -9143,7 +9143,7 @@ RectTransform:
   m_AnchorMin: {x: 1, y: 1}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: -244, y: -99.10004}
-  m_SizeDelta: {x: 230, y: 610}
+  m_SizeDelta: {x: 210, y: 610}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &1576754178
 MonoBehaviour:
@@ -13110,3 +13110,15 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2143582089}
   m_CullTransparentMesh: 1
+--- !u!1660057539 &9223372036854775807
+SceneRoots:
+  m_ObjectHideFlags: 0
+  m_Roots:
+  - {fileID: 258915174}
+  - {fileID: 566742079}
+  - {fileID: 596088743}
+  - {fileID: 842711793}
+  - {fileID: 891716376}
+  - {fileID: 1590568464}
+  - {fileID: 1788356932}
+  - {fileID: 1806119237}

@@ -499,50 +499,44 @@ public static class PlayerAI
                 
                 var heroCfg = HeroConfig.GetConfig(heroId);
                 
-                // 获取三个属性值
-                int might = attr.Might;
+                // 获取属性值（无双已并入攻击：攻/法 两主属性）
                 int ap = attr.Ap;
                 int atk = attr.Atk;
-                
+
                 // 计算总属性
-                int totalAttr = might + ap + atk;
-                
-                // 找出最弱和次弱属性，最强和次强属性
+                int totalAttr = ap + atk;
+
+                // 找出最弱和最强属性
                 List<Tuple<string, int>> attrValues = new List<Tuple<string, int>>();
-                attrValues.Add(new Tuple<string, int>("might", might));
                 attrValues.Add(new Tuple<string, int>("ap", ap));
                 attrValues.Add(new Tuple<string, int>("atk", atk));
-                
+
                 // 按属性值排序
                 attrValues.Sort((a, b) => a.Item2.CompareTo(b.Item2));
-                
-                // 最弱和次弱属性
+
+                // 最弱和最强属性
                 int weakest = attrValues[0].Item2;
-                int secondWeakest = attrValues[1].Item2;
+                int strongest = attrValues[1].Item2;
                 string weakestAttr = attrValues[0].Item1;
-                
-                // 最强和次强属性
-                int strongest = attrValues[2].Item2;
-                int secondStrongest = attrValues[1].Item2;
-                string strongestAttr = attrValues[2].Item1;
-                
+                string strongestAttr = attrValues[1].Item1;
+
                 float needValue = 0;
-                
+
                 // 如果物品属性是最弱属性
                 if (itemAttr == weakestAttr)
                 {
-                    needValue = Math.Abs(weakest - secondWeakest);
+                    needValue = Math.Abs(weakest - strongest);
                 }
                 // 如果物品属性是最强属性
                 else if (itemAttr == strongestAttr)
                 {
                     if (HeroSelectionTool.IsRangedHero(heroCfg))
                     {
-                        needValue = strongest - secondStrongest;
+                        needValue = strongest - weakest;
                     }
                     else // 近战英雄
                     {
-                        needValue = (strongest - secondStrongest) / 2f;
+                        needValue = (strongest - weakest) / 2f;
                     }
                 }
                 

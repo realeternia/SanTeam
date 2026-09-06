@@ -111,22 +111,22 @@ public class Tooltip : MonoBehaviour
         }
         else
         {
-            // 无玩家上下文（如排行榜）：直接显示写回的 1星带品质面板
+            // 无玩家上下文（如排行榜）：直接显示写回的 1星带品质面板（无双强度已并入 Atk）
             var heroCfg = HeroConfig.GetConfig(heroId);
-            attr = new AttrInfo() { Atk = heroCfg.Atk, Ap = heroCfg.Ap, Might = heroCfg.Might, Hp = heroCfg.Hp };
+            attr = new AttrInfo() { Atk = heroCfg.Atk, Ap = heroCfg.Ap, Hp = heroCfg.Hp };
         }
 
-        // 属性列表：英雄显示全部9项（攻/法/武/命/攻速/护甲/魔抗/移速/射程），道具只显示有效属性
+        // 属性列表：英雄显示全部8项（攻/法/命/攻速/护甲/魔抗/移速/射程，无双已并入攻），道具只显示有效属性
         bool isHero = ConfigManager.IsHeroCard(heroId);
         string[] attrKeys;
         string[] attrVals;
         if (isHero)
         {
             var heroCfg = HeroConfig.GetConfig(heroId);
-            attrKeys = new string[] { "atk", "ap", "might", "hp", "atkspeed", "armor", "magicres", "movespeed", "range" };
+            attrKeys = new string[] { "atk", "ap", "hp", "atkspeed", "armor", "magicres", "movespeed", "range" };
             attrVals = new string[]
             {
-                attr.Atk.ToString(), attr.Ap.ToString(), attr.Might.ToString(), attr.Hp.ToString(),
+                attr.Atk.ToString(), attr.Ap.ToString(), attr.Hp.ToString(),
                 heroCfg.AtkSpeed.ToString(),
                 heroCfg.Armor.ToString(), heroCfg.MagicRes.ToString(),
                 heroCfg.MoveSpeed.ToString(), heroCfg.Range.ToString()
@@ -229,7 +229,8 @@ public class Tooltip : MonoBehaviour
             for(int i = 0; i < skillCfgs.Count; i++)
             {
                 var skillConfig = skillCfgs[i];
-                var skillAttrStr = skillConfig.Attr == "might" ? "<color=red>[无双]</color>" : skillConfig.Attr == "atk" ? "<color=yellow>[攻]</color>" : skillConfig.Attr == "ap" ? "<color=blue>[法]</color>" : "";
+                // 属性标签前缀：ap=法(蓝)，atk/might(无双已并入，兼容旧数据)=攻(黄)
+                var skillAttrStr = skillConfig.Attr == "ap" ? "<color=blue>[法]</color>" : (skillConfig.Attr == "atk" || skillConfig.Attr == "might") ? "<color=yellow>[攻]</color>" : "";
                 if (skillConfig.Type == "职业")
                 {
                     // 职业技能（兵种连锁）：显示各档位两列数值并按上阵数高亮当前档位

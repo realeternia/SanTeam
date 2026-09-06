@@ -16,7 +16,6 @@ public class HeroInfo : MonoBehaviour
 
     public TMP_Text heroInteTxt;
     public TMP_Text heroStrTxt;
-    public TMP_Text heroLeadTxt;
 
     // Start is called before the first frame update
     void Start()
@@ -30,37 +29,24 @@ public class HeroInfo : MonoBehaviour
         
     }
 
-    public void SetAttr(int ap, int might, int atk)
+    public void SetAttr(int ap, int atk)
     {
         SetText(heroInteTxt, ap);
-        SetText(heroStrTxt, might);
-        SetText(heroLeadTxt, atk);
 
-        // 确定英雄的最高属性（法术强度/攻击/无双强度）
+        // 无双强度已并入攻击：原“无双/武力”数值列隐藏，不再单独展示
+        if (heroStrTxt != null)
+            heroStrTxt.gameObject.SetActive(false);
+
+        // 确定英雄的最高属性（法术强度 / 攻击，攻击含无双强度）
         string highestAttr = "";
-        var highestAttrValue = 0;
-
-        var total = ap + atk + might;
-        if (ap >= atk && ap >= might)
+        var total = ap + atk;
+        if (ap >= atk)
         {
             highestAttr = "attrinte";
-            highestAttrValue = ap;
         }
-        else if (atk >= ap && atk >= might)
+        else
         {
             highestAttr = "attrlead";
-            highestAttrValue = atk;
-
-        }
-        else if (might >= ap && might >= atk)
-        {
-            highestAttr = "attrstr";
-            highestAttrValue = might;
-
-        }
-        else if (total >= 235)
-        {
-            highestAttr = "attrshield";
         }
 
         if (highestAttr != "")
@@ -128,7 +114,7 @@ public class HeroInfo : MonoBehaviour
     {
         var hpRate = (float)hp / maxHp;
         heroHpTxt.text = hp + " / " + maxHp;
-        healthImg.rectTransform.sizeDelta = new Vector2((int)(hpRate * 230), healthImg.rectTransform.sizeDelta.y);
+        healthImg.rectTransform.sizeDelta = new Vector2((int)(hpRate * 210), healthImg.rectTransform.sizeDelta.y);
         if (hpRate <= 0)
         {
             errorImg.gameObject.SetActive(true);

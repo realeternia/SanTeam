@@ -112,7 +112,8 @@ public class RankPanelManager : MonoBehaviour
         switch (rankType)
         {
             case "LeadShip": return h.Atk;
-            case "Str": return h.Might;
+            // 无双强度已并入攻击：Str 列不再单独展示，排序复用合并后的攻击(Atk)数值
+            case "Str": return h.Atk;
             case "Inte": return h.Ap;
             case "Hp": return h.Hp;
             case "Price": return HeroSelectionTool.GetPrice(h);

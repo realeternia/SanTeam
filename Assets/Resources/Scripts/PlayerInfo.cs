@@ -120,15 +120,15 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
                 cards[card] = 1;
         }
 
-        // 每局开局：随机发一张品质1且三攻总和240以下魏蜀吴(阵营1/2/3)的卡片
+        // 每局开局：随机发一张品质1且攻+法总面板240以下魏蜀吴(阵营1/2/3)的卡片
         var starterCandidates = HeroConfig.ConfigList
             .Where(x => x.Side >= 1 && x.Side <= 3 && x.Quality == 1)
             .ToList();
-        // 校验：列出被排除的240及以上强卡(仅魏蜀吴阵营)
+        // 校验：列出被排除的240及以上强卡(仅魏蜀吴阵营)（无双强度已在 PostModify 并入 Atk，Might=0）
         var excludedStrongCards = HeroConfig.ConfigList
-            .Where(x => x.Side >= 1 && x.Side <= 3 && x.Atk + x.Ap + x.Might >= 240)
-            .OrderBy(x => x.Atk + x.Ap + x.Might)
-            .Select(x => string.Format("{0}({1})总={2}", x.Name, x.Id, x.Atk + x.Ap + x.Might))
+            .Where(x => x.Side >= 1 && x.Side <= 3 && x.Atk + x.Ap >= 240)
+            .OrderBy(x => x.Atk + x.Ap)
+            .Select(x => string.Format("{0}({1})总={2}", x.Name, x.Id, x.Atk + x.Ap))
             .ToList();
         GameLog.Debug(string.Format(
             "[开局发卡] pid={0} 候选弱卡数量={1}，被排除的240及以上强卡({2}张): {3}",
@@ -142,7 +142,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
                 cards[starterHero.Id] = 1;
             GameLog.Debug(string.Format(
                 "[开局发卡] pid={0} 随机到：{1}(id={2}, 阵营={3}, 总属性={4})",
-                pid, starterHero.Name, starterHero.Id, starterHero.Side, starterHero.Atk + starterHero.Ap + starterHero.Might));
+                pid, starterHero.Name, starterHero.Id, starterHero.Side, starterHero.Atk + starterHero.Ap));
         }
         else
         {
@@ -763,8 +763,8 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         {
             var heroCfg = HeroConfig.GetConfig(results[i].Item1);
 
-            // 找短板属性：HeroConfig 四主数值经 PostModify 写回为 1星带品质面板（与战斗/排行口径一致）
-            int[] heroAttributes = { heroCfg.Might, heroCfg.Ap, heroCfg.Atk };
+            // 找短板属性：攻/法两主属性（无双强度已在 PostModify 并入 Atk，HeroConfig 数值为 1星带品质面板）
+            int[] heroAttributes = { heroCfg.Ap, heroCfg.Atk };
 
             int minAttr = heroAttributes.Min();
             int maxAttr = heroAttributes.Max();
@@ -787,14 +787,10 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
                         bool isMinAttr = false;
                         bool isMaxAttr = false;
 
-                        if (itemCfg.Attr1 == "might" && heroCfg.Might == minAttr)
-                            isMinAttr = true;
-                        else if (itemCfg.Attr1 == "ap" && heroCfg.Ap == minAttr)
+                        if (itemCfg.Attr1 == "ap" && heroCfg.Ap == minAttr)
                             isMinAttr = true;
                         else if (itemCfg.Attr1 == "atk" && heroCfg.Atk == minAttr)
                             isMinAttr = true;
-                        else if (itemCfg.Attr1 == "might" && heroCfg.Might == maxAttr)
-                            isMaxAttr = true;
                         else if (itemCfg.Attr1 == "ap" && heroCfg.Ap == maxAttr)
                             isMaxAttr = true;
                         else if (itemCfg.Attr1 == "atk" && heroCfg.Atk == maxAttr)

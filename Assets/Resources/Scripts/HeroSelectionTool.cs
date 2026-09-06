@@ -78,8 +78,8 @@ public static class HeroSelectionTool
                 return isBelow100100A ? -1 : 1;
             }
 
-            // 按三攻总和排序（Atk/Ap/Might 已由 PostModify 写回为 1星带品质面板）
-            return (configB.Atk + configB.Ap + configB.Might).CompareTo(configA.Atk + configA.Ap + configA.Might);
+            // 按攻+法总面板排序（无双强度已在 PostModify 并入 Atk，Atk/Ap 为 1星带品质面板）
+            return (configB.Atk + configB.Ap).CompareTo(configA.Atk + configA.Ap);
         });
 
     }
@@ -182,10 +182,10 @@ public static class HeroSelectionTool
         return heroCfg != null && heroCfg.Range <= 20;
     }
 
-    // 四主属性面板（Atk/Ap/Might/Hp 统一计算入口）：
+    // 主属性面板（Atk/Ap/Hp 统一计算入口，无双强度已并入 Atk）：
     // HeroConfig 数值列经 ConfigManager.PostModify 写回为“1星带品质面板” = 职业基准×(1+修正%/100) × 品质系数1.15^(Q-1)，
     // 此处只按星级成长放大：(100 + XP×(lv-1))/100。
-    // XP(AtkP/ApP/MightP/HpP) 为每星成长百分比：80=每星+80%(2星≈1.8倍1星)，100=每星翻倍(2星2倍)；品质系数对四主统一
+    // XP(AtkP/ApP/HpP) 为每星成长百分比：80=每星+80%(2星≈1.8倍1星)，100=每星翻倍(2星2倍)；品质系数对主属性统一
     public static AttrInfo GetHeroAttr(HeroConfig heroCfg, int lv)
     {
         var attrInfo = new AttrInfo();
@@ -198,7 +198,6 @@ public static class HeroSelectionTool
         attrInfo.Hp = GrowPanel(heroCfg.Hp, heroCfg.HpP, lvGrow);    // 生命独立成长字段
         attrInfo.Atk = GrowPanel(heroCfg.Atk, heroCfg.AtkP, lvGrow);
         attrInfo.Ap = GrowPanel(heroCfg.Ap, heroCfg.ApP, lvGrow);
-        attrInfo.Might = GrowPanel(heroCfg.Might, heroCfg.MightP, lvGrow);
         return attrInfo;
     }
 
@@ -271,14 +270,12 @@ public static class HeroSelectionTool
             return;
         switch (key)
         {
-            case "might":
-                attrInfo.Might = value;
+            case "might": // 无双已并入攻击：老数据(未同步源表的 might 键)兼容为加攻击
+            case "atk":
+                attrInfo.Atk = value;
                 break;
             case "ap":
                 attrInfo.Ap = value;
-                break;
-            case "atk":
-                attrInfo.Atk = value;
                 break;
             case "hp":
                 attrInfo.Hp = value;

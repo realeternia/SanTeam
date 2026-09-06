@@ -309,7 +309,7 @@ public static class JobLinkManager
         {
             case "atk":
             case "ap":
-            case "might":
+            case "might": // 无双已并入攻击：Chess.AddAttr 内部按 atk 兼容处理
                 unit.AddAttr(attr, (int)value);
                 break;
             case "armor":

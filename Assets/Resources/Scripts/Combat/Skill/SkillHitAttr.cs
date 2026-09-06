@@ -13,8 +13,8 @@ public class SkillHitAttr : Skill
     {
         if(CheckBurst(defender))
         {
-            var roll = SysRandom.Range(0, 3);
-            var attr = roll == 0 ? "ap" : (roll == 1 ? "might" : "atk");
+            // 无双已并入攻击：随机强化在 法强(ap)/攻击(atk) 之间二选一
+            var attr = SysRandom.Range(0, 2) == 0 ? "ap" : "atk";
             owner.AddAttr(attr, skillCfg.StrengthInt);
             owner.PlayerAnim(skillCfg.Action);
             EffectManager.PlaySkillEffect(owner, skillCfg.HitEffect);

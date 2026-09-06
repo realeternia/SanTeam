@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace CommonConfig
@@ -114,7 +114,7 @@ namespace CommonConfig
             config.Clear();
             config[1] = new HeroAttrConfig(1, "atk", "攻击", "", "", "attratk", false);
             config[2] = new HeroAttrConfig(2, "ap", "法术", "", "", "attrap", false);
-            config[3] = new HeroAttrConfig(3, "might", "无双", "", "", "attrmight", false);
+            // 无双强度(Might)已并入攻击(atk)：原序列3 might 行删除，代码层兼容 might 键；源表需同步删行
             config[4] = new HeroAttrConfig(4, "hp", "生命", "", "", "attrhp", false);
             config[5] = new HeroAttrConfig(5, "atkspeed", "攻速", "", "", "attackspeed", false);
             config[6] = new HeroAttrConfig(6, "armor", "护甲", "", "", "attrarmor", false);

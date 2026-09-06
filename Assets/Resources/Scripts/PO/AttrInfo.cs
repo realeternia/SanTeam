@@ -3,9 +3,8 @@ using System;
 [System.Serializable]
 public class AttrInfo
 {
-    public int Might; // 无双强度（原武力 Str）
     public int Ap;    // 法术强度（原智力 Inte）
-    public int Atk;   // 攻击（原统王 Lead）
+    public int Atk;   // 攻击（原统王 Lead；无双强度已并入此处）
     public int Hp;
     // 装备扩展属性（金铲铲式基础组件）：护甲/魔抗为实际数值，攻速/暴击为比例（0.1=+10%）
     public int Armor;        // 护甲
@@ -16,12 +15,11 @@ public class AttrInfo
 
     public int Total
     {
-        get { return Might + Ap + Atk; }
+        get { return Ap + Atk; }
     }
 
     public void AddAttr(AttrInfo attr)
     {
-        Might += attr.Might;
         Ap += attr.Ap;
         Atk += attr.Atk;
         Hp += attr.Hp;
