@@ -29,7 +29,7 @@ public class Chess : MonoBehaviour
     public float attackRange = 10f;
     public int ap;      // 法术强度（原智力）
     public int might;   // 无双强度（原武力）
-    public int atk;     // 攻击（原统帅）
+    public int atk;     // 攻击（原统王）
     public int level = 1;
     public bool isShadow;
     public bool isFakeHero;

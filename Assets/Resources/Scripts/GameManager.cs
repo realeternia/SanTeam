@@ -251,7 +251,7 @@ public class GameManager : MonoBehaviour
         heroIds = new List<int>();
 
         int[] sideCounts = new int[10];
-        // 核心英雄（Id<100100 的帅）始终进入英雄池
+        // 核心英雄（Id<100100 的王）始终进入英雄池
         List<HeroConfig> tempHeroes = new List<HeroConfig>(allHeroes);
         foreach (var hero in tempHeroes)
         {

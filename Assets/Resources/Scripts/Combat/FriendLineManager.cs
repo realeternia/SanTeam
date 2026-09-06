@@ -43,7 +43,9 @@ public static class FriendLineManager
                 continue;
 
             chess.AddFriendId(friendId);
-            CreateFriendLine(chess, friendId, chess.GetPlayerInfo().lineColor);
+            // 线颜色取该武将对所在关系行配置的 LineColor（未配置默认暗灰）
+            var lineColor = ParseLineColor(ConfigManager.GetFriendLineColor(chess.heroId, friendId), SysColor.FriendLine.DefaultLine);
+            CreateFriendLine(chess, friendId, lineColor);
             friendCount++;
         }
 
@@ -131,8 +133,8 @@ public static class FriendLineManager
             var skillLevel = CombatConst.FriendSpecialBaseLevel + presentCount;
             GrantFriendSpecialSkill(chess, relCfg.SkillId, skillLevel);
 
-            // 特殊连锁仍然拉线，线颜色取 HeroFriendConfig.LineColor
-            var lineColor = ParseLineColor(relCfg.LineColor, chess.GetPlayerInfo().lineColor);
+            // 特殊连锁仍然拉线，线颜色取 HeroFriendConfig.LineColor（未配置默认暗灰）
+            var lineColor = ParseLineColor(relCfg.LineColor, SysColor.FriendLine.DefaultLine);
             foreach (var memberId in presentMembers)
                 CreateFriendLine(chess, memberId, lineColor);
 
@@ -157,7 +159,7 @@ public static class FriendLineManager
             skill.SetLevel(level);
     }
 
-    // 解析HeroFriendConfig中的连线颜色（HTML色值），未配置时使用玩家默认线色
+    // 解析HeroFriendConfig中的连线颜色（HTML色值），未配置时使用默认暗灰线色
     private static Color ParseLineColor(string colorStr, Color defaultColor)
     {
         if (string.IsNullOrEmpty(colorStr))

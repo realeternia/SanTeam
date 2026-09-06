@@ -129,6 +129,9 @@ public static class ConfigManager
                         heroFriendDict.Add(id2, new Dictionary<int, int>());
                     heroFriendDict[id2][id1] = Math.Max(heroFriendCfg.Level, heroFriendDict[id2].ContainsKey(id1) ? heroFriendDict[id2][id1] : 0);
 
+                    // 记录该关系行配置的连线颜色（普通/特殊通用；同一对先配先得，未配置跳过）
+                    AddFriendPairColor(id1, id2, heroFriendCfg.LineColor);
+
                     // 特殊连锁（配置了关联技能）：记录技能缩写与连线颜色
                     if (!string.IsNullOrEmpty(heroFriendCfg.SkillId))
                         AddFriendSpecialPair(id1, id2, heroFriendCfg.SkillId, heroFriendCfg.LineColor);
@@ -163,6 +166,21 @@ public static class ConfigManager
                 heroFriendColorDict.Add(id2, new Dictionary<int, string>());
             heroFriendColorDict[id2][id1] = lineColor;
         }
+    }
+
+    // 记录一对英雄的连线颜色（未配置跳过；同一对保留先配置的）
+    private static void AddFriendPairColor(int id1, int id2, string lineColor)
+    {
+        if (string.IsNullOrEmpty(lineColor))
+            return;
+        if (!heroFriendColorDict.ContainsKey(id1))
+            heroFriendColorDict.Add(id1, new Dictionary<int, string>());
+        if (!heroFriendColorDict[id1].ContainsKey(id2))
+            heroFriendColorDict[id1][id2] = lineColor;
+        if (!heroFriendColorDict.ContainsKey(id2))
+            heroFriendColorDict.Add(id2, new Dictionary<int, string>());
+        if (!heroFriendColorDict[id2].ContainsKey(id1))
+            heroFriendColorDict[id2][id1] = lineColor;
     }
 
     // 好友连锁·特殊：返回两个英雄之间的关联技能缩写（非空表示特殊连线，空表示普通连线）

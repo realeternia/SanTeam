@@ -168,6 +168,12 @@ public static class SysColor
         public static readonly Color TierLowColor = Color.green;
     }
 
+    // 好友连线（武将关系 linkline）颜色
+    public static class FriendLine
+    {
+        public static readonly Color DefaultLine = new Color(0.4f, 0.4f, 0.4f, 1f); // 默认连线-暗灰(#666666)
+    }
+
     public static class Chess
     {
         public static readonly Color GoldMain = new Color(1f, 0.843f, 0f, 1f);

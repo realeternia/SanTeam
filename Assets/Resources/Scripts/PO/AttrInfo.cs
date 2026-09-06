@@ -5,7 +5,7 @@ public class AttrInfo
 {
     public int Might; // 无双强度（原武力 Str）
     public int Ap;    // 法术强度（原智力 Inte）
-    public int Atk;   // 攻击（原统帅 Lead）
+    public int Atk;   // 攻击（原统王 Lead）
     public int Hp;
 
     public int Total

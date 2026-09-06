@@ -3,7 +3,7 @@ using CommonConfig;
 
 /// <summary>
 /// 默认护盾机制：战斗开始时统计同阵营英雄数量，达到档位(3/5/7/9)后该阵营英雄直接获得护盾(类似连线)。
-/// 主公技(王/帅)：所在同阵营护盾效果加倍；同阵营护盾额外+10%（按上阵情况在初始化时结算一次）。
+/// 主公技(王/王)：所在同阵营护盾效果加倍；同阵营护盾额外+10%（按上阵情况在初始化时结算一次）。
 /// </summary>
 public static class FactionShieldManager
 {
@@ -40,7 +40,7 @@ public static class FactionShieldManager
                 factionCount[faction] = 0;
             factionCount[faction]++;
 
-            if (HeroConfig.GetConfig(unit.heroId).Job == "帅")
+            if (HeroConfig.GetConfig(unit.heroId).Job == "王")
                 kingCount++;
         }
 
@@ -50,7 +50,7 @@ public static class FactionShieldManager
             if (rate <= 0)
                 continue;
 
-            // 主公(帅/王)上阵：同阵营护盾额外+10%（本侧有王即生效，初始化结算一次）
+            // 主公(王/王)上阵：同阵营护盾额外+10%（本侧有王即生效，初始化结算一次）
             if (kingCount > 0)
                 rate += CombatConst.KingShieldBonusRate * kingCount;
 

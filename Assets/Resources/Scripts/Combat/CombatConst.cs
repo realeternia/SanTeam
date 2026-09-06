@@ -12,7 +12,7 @@ public static class CombatConst
     public const int LockBuffId = 301002;
 
     // ---- 技能Id ----
-    /// <summary>主公技(王/帅)：所在同阵营护盾效果加倍（技能表 帅 的5级行，Id=原Id*10+级）</summary>
+    /// <summary>主公技(王/王)：所在同阵营护盾效果加倍（技能表 王 的5级行，Id=原Id*10+级）</summary>
     public const int MasterShieldSkillId = 2000015;
     /// <summary>仁德：给与我方前排士兵护盾（技能表 仁 的5级行）</summary>
     public const int SoldierShieldSkillId = 2090035;
@@ -28,7 +28,7 @@ public static class CombatConst
     public const float FactionShieldTime = 999f;
 
 
-    /// <summary>主公(帅/王)上阵：同阵营护盾额外加成（百分比）</summary>
+    /// <summary>主公(王/王)上阵：同阵营护盾额外加成（百分比）</summary>
     public const float KingShieldBonusRate = 0.1f;
 
     // ---- 抗性减伤公式（参考金铲铲：实际伤害 = 原伤害 × 100/(100+抗性)） ----

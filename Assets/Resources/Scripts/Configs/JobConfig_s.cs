@@ -47,7 +47,7 @@ namespace CommonConfig
             {"SkillId", new FieldMetaInfo("技能缩写", "string", 0)},
             {"SourceJob", new FieldMetaInfo("元职业", "int", 0)},
             {"Range", new FieldMetaInfo("射程（近战17 弓50 弩70 炮50 扇/相/棋/鼓/琴/医/工35）", "int", 0)},
-            {"MoveSpeed", new FieldMetaInfo("移动速度（帅/士/盾/锤/枪/戟10 马/车12 弓/炮/扇/相/棋/鼓/琴/医/工8 弩7）", "int", 0)},
+            {"MoveSpeed", new FieldMetaInfo("移动速度（王/士/盾/锤/枪/戟10 马/车12 弓/炮/扇/相/棋/鼓/琴/医/工8 弩7）", "int", 0)},
             {"AtkSpeed", new FieldMetaInfo("攻速（30=每秒攻击1次，攻速20=1.5秒/次，15=2秒/次）", "int", 0)},
             {"Armor", new FieldMetaInfo("护甲（职业基准值）", "int", 0)},
             {"MagicRes", new FieldMetaInfo("魔抗（职业基准值）", "int", 0)},
@@ -74,7 +74,7 @@ namespace CommonConfig
         /// </summary>
         public string NameS;
         /// <summary>
-        ///技能缩写（关联SkillConfig.Sname，如 帅/刀/扇）
+        ///技能缩写（关联SkillConfig.Sname，如 王/刀/扇）
         /// </summary>
         public string SkillId;
         /// <summary>
@@ -86,7 +86,7 @@ namespace CommonConfig
         /// </summary>
         public int Range;
         /// <summary>
-        ///移动速度（帅/士/盾/锤/枪/戟10 马/车12 弓/炮/扇/相/棋/鼓/琴/医/工8 弩7）
+        ///移动速度（王/士/盾/锤/枪/戟10 马/车12 弓/炮/扇/相/棋/鼓/琴/医/工8 弩7）
         /// </summary>
         public int MoveSpeed;
         /// <summary>
@@ -150,7 +150,7 @@ namespace CommonConfig
         public static void Load()
         {
             config.Clear();
-            config[1] = new JobConfig(1, "shuai", "帅", "帅", 0, 17, 10, 20, 40, 35, 75, 75, 70);
+            config[1] = new JobConfig(1, "shuai", "王", "王", 0, 17, 10, 20, 40, 35, 75, 75, 70);
             config[101] = new JobConfig(101, "ma", "马", "马", 0, 17, 12, 20, 55, 45, 80, 55, 80);
             config[102] = new JobConfig(102, "mache", "车", "车", 101, 17, 12, 20, 55, 45, 90, 50, 90);
             config[201] = new JobConfig(201, "gong", "弓", "弓", 0, 50, 8, 20, 25, 30, 70, 55, 70);
