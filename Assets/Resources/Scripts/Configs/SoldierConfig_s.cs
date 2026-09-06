@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -6,6 +6,67 @@ namespace CommonConfig
 {
     public class SoldierConfig
     {
+        public class FieldMetaInfo
+        {
+            public string fieldName;
+            public string fieldType;
+            public int fieldWidth;
+            public string fieldRule;
+            public bool fieldIndex;
+            public FieldMetaInfo(string name, string type, int width = 0, string rule = "", bool index = false)
+            {
+                fieldName = name;
+                fieldType = type;
+                fieldWidth = width;
+                fieldRule = rule;
+                fieldIndex = index;
+            }
+        }
+
+        public class CellMeta
+        {
+            public int row;
+            public int col;
+            public int? foreColor;
+            public int? backColor;
+            public CellMeta(int row, int col, int? foreColor, int? backColor)
+            {
+                this.row = row;
+                this.col = col;
+                this.foreColor = foreColor;
+                this.backColor = backColor;
+            }
+        }
+
+        private static Dictionary<string, FieldMetaInfo> fieldMeta = new Dictionary<string, FieldMetaInfo>()
+        {
+            {"Id", new FieldMetaInfo("序列", "int", 60)},
+            {"Name", new FieldMetaInfo("名字", "string", 0)},
+            {"Lv", new FieldMetaInfo("等级", "int", 60)},
+            {"Atk", new FieldMetaInfo("攻击力", "int", 60)},
+            {"Hp", new FieldMetaInfo("生命", "int", 60)},
+            {"AtkSpeed", new FieldMetaInfo("攻速（30=每秒攻击1次，攻速20=1.5秒/次，15=2秒/次）", "int", 60)},
+            {"Armor", new FieldMetaInfo("护甲", "int", 60)},
+            {"MagicRes", new FieldMetaInfo("魔抗", "int", 60)},
+            {"MoveSpeed", new FieldMetaInfo("移动速度", "int", 60)},
+            {"Range", new FieldMetaInfo("攻击距离", "int", 60)},
+            {"MissileSpeed", new FieldMetaInfo("导弹速度", "int", 60)},
+            {"MissileHight", new FieldMetaInfo("导弹高度", "float", 60)},
+            {"IsShadow", new FieldMetaInfo("是否隐藏", "bool", 0)},
+            {"SoldierAtkRate", new FieldMetaInfo("士兵加成攻击系数", "float", 60)},
+            {"SoldierHpRate", new FieldMetaInfo("士兵加成hp系数", "float", 60)},
+            {"Skills", new FieldMetaInfo("技能", "int[]", 0)},
+            {"Model", new FieldMetaInfo("模型", "string", 0)},
+            {"HitEffect", new FieldMetaInfo("hit", "string", 0)},
+            {"Drops", new FieldMetaInfo("掉落（itemid;权重|itemid;权重，权重=百分比）", "string", 288)},
+            {"Img", new FieldMetaInfo("贴图/头像路径（PVE怪物代替玩家头像）", "string", 387)},
+        };
+
+        public static Dictionary<string, FieldMetaInfo> FieldMeta { get { return fieldMeta; } }
+
+        private static List<CellMeta> cellMeta = new List<CellMeta>();
+        public static List<CellMeta> CellMetas { get { return cellMeta; } }
+
         /// <summary>
         ///序列
         /// </summary>
@@ -110,97 +171,9 @@ namespace CommonConfig
             this.HitEffect = HitEffect;
             this.Drops = Drops;
             this.Img = Img;
-
         }
 
         public SoldierConfig() { }
-
-        private static System.Random dropRandom = new System.Random();
-
-        /// <summary>
-        /// 加权掉落：按 Drops 配置（itemid;权重|itemid;权重）逐条独立判定，权重=掉落百分比
-        /// 返回本次掉落的道具id列表（可能多条，也可能为空）
-        /// </summary>
-        public List<int> RollDrops()
-        {
-            var result = new List<int>();
-            if (string.IsNullOrEmpty(Drops))
-                return result;
-            foreach (var seg in Drops.Split('|'))
-            {
-                var parts = seg.Split(';');
-                if (parts.Length != 2)
-                    continue;
-                int itemId, weight;
-                if (!int.TryParse(parts[0].Trim(), out itemId) || !int.TryParse(parts[1].Trim(), out weight))
-                    continue;
-                if (weight <= 0)
-                    continue;
-                if (dropRandom.Next(100) < weight)
-                    result.Add(itemId);
-            }
-            return result;
-        }
-        public class FieldMetaInfo
-        {
-            public string fieldName;
-            public string fieldType;
-            public int fieldWidth;
-            public string fieldRule;
-            public bool fieldIndex;
-            public FieldMetaInfo(string name, string type, int width = 0, string rule = "", bool index = false)
-            {
-                fieldName = name;
-                fieldType = type;
-                fieldWidth = width;
-                fieldRule = rule;
-                fieldIndex = index;
-            }
-        }
-
-        public class CellMeta
-        {
-            public int row;
-            public int col;
-            public int? foreColor;
-            public int? backColor;
-            public CellMeta(int row, int col, int? foreColor, int? backColor)
-            {
-                this.row = row;
-                this.col = col;
-                this.foreColor = foreColor;
-                this.backColor = backColor;
-            }
-        }
-
-        private static Dictionary<string, FieldMetaInfo> fieldMeta = new Dictionary<string, FieldMetaInfo>()
-        {
-            {"Id", new FieldMetaInfo("序列", "int", 60)},
-            {"Name", new FieldMetaInfo("名字", "string", 0)},
-            {"Lv", new FieldMetaInfo("等级", "int", 60)},
-            {"Atk", new FieldMetaInfo("攻击力", "int", 60)},
-            {"Hp", new FieldMetaInfo("生命", "int", 60)},
-            {"AtkSpeed", new FieldMetaInfo("攻速（30=每秒攻击1次，攻速20=1.5秒/次，15=2秒/次）", "int", 60)},
-            {"Armor", new FieldMetaInfo("护甲", "int", 60)},
-            {"MagicRes", new FieldMetaInfo("魔抗", "int", 60)},
-            {"MoveSpeed", new FieldMetaInfo("移动速度", "int", 60)},
-            {"Range", new FieldMetaInfo("攻击距离", "int", 60)},
-            {"MissileSpeed", new FieldMetaInfo("导弹速度", "int", 60)},
-            {"MissileHight", new FieldMetaInfo("导弹高度", "float", 60)},
-            {"IsShadow", new FieldMetaInfo("是否隐藏", "bool", 0)},
-            {"SoldierAtkRate", new FieldMetaInfo("士兵加成攻击系数", "float", 60)},
-            {"SoldierHpRate", new FieldMetaInfo("士兵加成hp系数", "float", 60)},
-            {"Skills", new FieldMetaInfo("技能", "int[]", 0)},
-            {"Model", new FieldMetaInfo("模型", "string", 0)},
-            {"HitEffect", new FieldMetaInfo("hit", "string", 0)},
-            {"Drops", new FieldMetaInfo("掉落（itemid;权重|itemid;权重，权重=百分比）", "string", 288)},
-            {"Img", new FieldMetaInfo("贴图/头像路径（PVE怪物代替玩家头像）", "string", 387)},
-        };
-
-        public static Dictionary<string, FieldMetaInfo> FieldMeta { get { return fieldMeta; } }
-
-        private static List<CellMeta> cellMeta = new List<CellMeta>();
-        public static List<CellMeta> CellMetas { get { return cellMeta; } }
 
         private static Dictionary<int, SoldierConfig> config = new Dictionary<int, SoldierConfig>();
         public static Dictionary<int, SoldierConfig>.ValueCollection ConfigList
@@ -222,8 +195,13 @@ namespace CommonConfig
             config[500002] = new SoldierConfig(500002, "远程小兵", 1, 17, 90, 15, 0, 0, 7, 35, 15, 1.5f, false, .8f, .65f, new int[0], "UnitBing2", "BulletExplosionFire", "", "");
             config[501001] = new SoldierConfig(501001, "法术场", 1, 0, 9999, 15, 0, 0, 0, 0, 0, 0f, true, 0f, 0f, new int[0], "UnitSpell", "", "", "");
             config[501002] = new SoldierConfig(501002, "关羽影子", 1, 2, 2, 15, 0, 0, 10, 17, 0, 0f, false, 0f, 0f, new int[0], "UnitHero", "SwordHitYellowCritical", "", "");
+            // 工·机巧 召唤单位：木牛流马(肉盾)/喷火兽(远程火DPS)/辅助(加buff)
+            config[502001] = new SoldierConfig(502001, "木牛流马lv1", 1, 12, 420, 12, 10, 8, 6, 9, 0, 0f, false, 0f, 0f, new int[0], "UnitBing", "SwordHitBlue", "", "");
+            config[502002] = new SoldierConfig(502002, "木牛流马lv2", 2, 16, 620, 12, 14, 12, 6, 9, 0, 0f, false, 0f, 0f, new int[0], "UnitBing", "SwordHitBlue", "", "");
+            config[502003] = new SoldierConfig(502003, "喷火兽lv1", 1, 22, 160, 15, 2, 0, 9, 38, 15, 1.5f, false, 0f, 0f, new int[0], "UnitBing2", "BulletExplosionFire", "", "");
+            config[502004] = new SoldierConfig(502004, "机巧辅助lv1", 1, 8, 240, 14, 4, 6, 8, 12, 0, 0f, false, 0f, 0f, new int[0], "UnitBing", "SwordHitYellowCritical", "", "");
+            config[502005] = new SoldierConfig(502005, "喷火兽lv2", 2, 30, 220, 16, 3, 0, 9, 40, 16, 1.5f, false, 0f, 0f, new int[0], "UnitBing2", "BulletExplosionFire", "", "");
             config[590001] = new SoldierConfig(590001, "野怪", 1, 25, 200, 15, 2, 2, 9, 12, 0, 0f, false, 0f, 0f, new int[0], "UnitBing", "SwordHitYellowCritical", "400001;40|400002;50", "MonsterPic/wolf");
-            config[0] = new SoldierConfig(0, "", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0f, false, 0f, 0f, new int[0], "", "", "", "");
 
             RebuildIndex();
 
@@ -275,6 +253,28 @@ namespace CommonConfig
             {
                 config.Remove(id);
             }
+        }
+
+        /// <summary>
+        /// 按 Drops 掉落串（itemid;权重|itemid;权重，权重=独立掉落百分比）掷一次掉落，返回本次实际掉落的道具id
+        /// </summary>
+        public List<int> RollDrops()
+        {
+            var result = new List<int>();
+            if (string.IsNullOrEmpty(Drops))
+                return result;
+            foreach (var seg in Drops.Split('|'))
+            {
+                var parts = seg.Split(';');
+                if (parts.Length != 2)
+                    continue;
+                int itemId, weight;
+                if (!int.TryParse(parts[0].Trim(), out itemId) || !int.TryParse(parts[1].Trim(), out weight))
+                    continue;
+                if (SysRandom.Range(0, 100) < weight)
+                    result.Add(itemId);
+            }
+            return result;
         }
     }
 }
