@@ -763,7 +763,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         {
             var heroCfg = HeroConfig.GetConfig(results[i].Item1);
 
-            // 获取英雄的各项属性
+            // 找短板属性：HeroConfig 四主数值经 PostModify 写回为 1星带品质面板（与战斗/排行口径一致）
             int[] heroAttributes = { heroCfg.Might, heroCfg.Ap, heroCfg.Atk };
 
             int minAttr = heroAttributes.Min();

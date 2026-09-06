@@ -78,7 +78,7 @@ public static class HeroSelectionTool
                 return isBelow100100A ? -1 : 1;
             }
 
-            // 按三攻总和排序
+            // 按三攻总和排序（Atk/Ap/Might 已由 PostModify 写回为 1星带品质面板）
             return (configB.Atk + configB.Ap + configB.Might).CompareTo(configA.Atk + configA.Ap + configA.Might);
         });
 
@@ -170,8 +170,8 @@ public static class HeroSelectionTool
         return heroCfg.Price;
     }
 
-    // 英雄近战/远程判定：HeroConfig.Range 加载后已由 ConfigManager.PostModify 合并职业基准射程
-    // （近战职业 17，远程职业 35~70），按总射程 > 20 判为远程，与战斗侧 JobLinkManager 的 attackRange>20 规则一致
+    // 英雄近战/远程判定：HeroConfig.Range 经 ConfigManager.PostModify 写回为 职业基准×(1+修正%/100)
+    // （近战职业 17，远程职业 35~70），按写回射程 > 20 判为远程，与战斗侧 JobLinkManager 的 attackRange>20 规则一致
     public static bool IsRangedHero(HeroConfig heroCfg)
     {
         return heroCfg != null && heroCfg.Range > 20;
@@ -182,36 +182,36 @@ public static class HeroSelectionTool
         return heroCfg != null && heroCfg.Range <= 20;
     }
 
-    // 属性字符串 → 图标贴图路径（指向 Textures 下的文件）
-    public static string GetAttrIcon(string attr)
+    // 四主属性面板（Atk/Ap/Might/Hp 统一计算入口）：
+    // HeroConfig 数值列经 ConfigManager.PostModify 写回为“1星带品质面板” = 职业基准×(1+修正%/100) × 品质系数1.15^(Q-1)，
+    // 此处只按星级成长放大：(100 + XP×(lv-1))/100。
+    // XP(AtkP/ApP/MightP/HpP) 为每星成长百分比：80=每星+80%(2星≈1.8倍1星)，100=每星翻倍(2星2倍)；品质系数对四主统一
+    public static AttrInfo GetHeroAttr(HeroConfig heroCfg, int lv)
     {
-        switch (attr)
+        var attrInfo = new AttrInfo();
+        if (heroCfg == null)
         {
-            case "atk":
-                return "Icons/attratk";
-            case "ap":
-                return "Icons/attrap";
-            case "might":
-                return "Icons/attrmight";
-            case "hp":
-                return "Icons/attrhp";
-            case "atkspeed":
-                return "Icons/attackspeed";
-            case "armor":
-                return "Icons/attrarmor";
-            case "magicres":
-                return "Icons/attrmagicshield";
-            case "movespeed":
-                return "Icons/attrspeed";
-            case "range":
-                return "Icons/attrrange";
-            case "satk": // 士兵攻（图标在 Textures 根目录）
-                return "attrsatk";
-            case "shp": // 士兵命（图标在 Textures 根目录）
-                return "attrshp";
-            default:
-                return "Icons/attrhp";
+            GameLog.Error("HeroSelectionTool.GetHeroAttr: heroCfg 为 null，无法计算面板");
+            return attrInfo;
         }
+        int lvGrow = Mathf.Max(1, lv) - 1;
+        attrInfo.Hp = GrowPanel(heroCfg.Hp, heroCfg.HpP, lvGrow);    // 生命独立成长字段
+        attrInfo.Atk = GrowPanel(heroCfg.Atk, heroCfg.AtkP, lvGrow);
+        attrInfo.Ap = GrowPanel(heroCfg.Ap, heroCfg.ApP, lvGrow);
+        attrInfo.Might = GrowPanel(heroCfg.Might, heroCfg.MightP, lvGrow);
+        return attrInfo;
+    }
+
+    private static int GrowPanel(int panelValue, int growP, int lvGrow)
+    {
+        // 1星带品质面板 × (100 + 成长P×已升星数)/100
+        return (int)Math.Round(panelValue * (100f + growP * lvGrow) / 100f);
+    }
+
+    // 1星带品质主属性面板：图鉴/排行/开局发卡/AI判断/卡池排序统一口径（= GetHeroAttr 的 lv=1，即 PostModify 写回值）
+    public static AttrInfo GetRankAttr(HeroConfig heroCfg)
+    {
+        return GetHeroAttr(heroCfg, 1);
     }
 
     // 升星成本：1→2星需3张，2→3星需5张，3→4星需7张……（每级新增2N-1张，累计n²张）
@@ -246,16 +246,8 @@ public static class HeroSelectionTool
         var attrInfo = new AttrInfo();
         if (ConfigManager.IsHeroCard(cardId))
         {
-            var heroConfig = HeroConfig.GetConfig(cardId);
-
-            // 品质系数：品质每高一档基础属性×1.15（普通1.0 优秀1.15 精良1.32 史诗1.52），参照金铲铲费用梯度
-            float qualityFactor = Mathf.Pow(1.15f, heroConfig.Quality - 1);
-
-            // 线性成长：每星按配置的成长百分比提升（AtkP/ApP/MightP，默认80=每星+80%，2星≈1.8倍1星）
-            attrInfo.Hp = (int)(heroConfig.Hp * qualityFactor * (100 + heroConfig.HpP * (lv - 1)) / 100); // Hp 独立成长字段（每星+80%）
-            attrInfo.Ap = (int)(heroConfig.Ap * qualityFactor * (100 + heroConfig.ApP * (lv - 1)) / 100);
-            attrInfo.Might = (int)(heroConfig.Might * qualityFactor * (100 + heroConfig.MightP * (lv - 1)) / 100);
-            attrInfo.Atk = (int)(heroConfig.Atk * qualityFactor * (100 + heroConfig.AtkP * (lv - 1)) / 100);
+            // 四主属性统一入口：职业基准×(1+修正%/100) × 品质系数 × 星级成长
+            attrInfo = GetHeroAttr(HeroConfig.GetConfig(cardId), lv);
         }
         else
         {

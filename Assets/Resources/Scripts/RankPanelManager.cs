@@ -108,6 +108,7 @@ public class RankPanelManager : MonoBehaviour
     private int GetHeroVal(HeroConfig h, string rankType)
     {
         if (h == null) return 0;
+        // 排序与展示同口径：HeroConfig 数值经 PostModify 写回为 1星带品质面板
         switch (rankType)
         {
             case "LeadShip": return h.Atk;

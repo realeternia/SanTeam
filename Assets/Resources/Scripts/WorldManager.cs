@@ -196,6 +196,19 @@ public class WorldManager : MonoBehaviour
                 currentMatch[i] = currentMatch[j];
                 currentMatch[j] = temp;
             }
+
+            // 玩家(pid=0)永远固定1号位(P1)，其余玩家随机2~8号位；
+            // 商店按积分排序只影响回合顺序turnOrder与UI头像，不改变战场号位
+            for (int i = 0; i < currentMatch.Length; i++)
+            {
+                if (currentMatch[i] == 0)
+                {
+                    int tmp = currentMatch[0];
+                    currentMatch[0] = currentMatch[i];
+                    currentMatch[i] = tmp;
+                    break;
+                }
+            }
         }
         return currentMatch;
     }
@@ -234,18 +247,8 @@ public class WorldManager : MonoBehaviour
             if (isPveRound)
             {
                 // PVE：仅显示玩家0打怪局，AI不打怪
-                // 玩家0固定占1号位，怪物刷2号位；其余玩家无战斗单位
+                // 玩家0固定占1号位（GetMatch已保证match[0]=玩家0），怪物刷2号位；其余玩家无战斗单位
                 // 其他玩家（AI）战斗结束一起随机获得装备
-                for (int i = 0; i < match.Length; i++)
-                {
-                    if (match[i] == 0)
-                    {
-                        int tmp = match[0];
-                        match[0] = match[i];
-                        match[i] = tmp;
-                        break;
-                    }
-                }
                 for (int i = 0; i < 8; i++)
                     GameManager.Instance.GetPlayer(match[i]).battleSide = i == 0 ? 1 : 0;
 

@@ -44,9 +44,12 @@ public static class PlayerAI
                     continue;
             }
 
-            if(playerConfig.Banstrongcard && heroConfig.Atk + heroConfig.Ap + heroConfig.Might < 240)
+            // 强弱卡改按品质判定：强卡=品质4；弱卡=品质1/2
+            // Banstrongcard：只允许 ban 品质4（强卡）
+            if (playerConfig.Banstrongcard && heroConfig.Quality != 4)
                 continue;
-            if(playerConfig.Banweakcard && heroConfig.Atk + heroConfig.Ap + heroConfig.Might > 215)
+            // Banweakcard：只允许 ban 品质1/2（弱卡），品质3/4 视为强卡不参与
+            if (playerConfig.Banweakcard && heroConfig.Quality >= 3)
                 continue;
             availableBans.Add(cell);            
         }

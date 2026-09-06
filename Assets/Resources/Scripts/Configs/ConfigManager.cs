@@ -66,24 +66,29 @@ public static class ConfigManager
             // 改由战斗/界面按 Sname+等级 实时解析（GetHeroSkillConfigs / GetSkillConfig(sname, lv)）
         }
 
-
+        // 数值写回（百分比语义）：HeroConfig 数值列 = 相对 JobConfig 职业基准的百分比修正（0=无修正用基准，非0=±%）
         foreach (var heroCfg in HeroConfig.ConfigList)
         {
-            // 移速/射程/攻速/护甲/魔抗/攻击/法术/无双：HeroConfig 为 0 时使用职业基准值，非 0 时与职业值相加
             var jobCfg = GetJobConfig(heroCfg.Job);
-            if (jobCfg != null)
+            if (jobCfg == null)
             {
-                heroCfg.MoveSpeed = heroCfg.MoveSpeed == 0 ? jobCfg.MoveSpeed : heroCfg.MoveSpeed + jobCfg.MoveSpeed;
-                heroCfg.Range = heroCfg.Range == 0 ? jobCfg.Range : heroCfg.Range + jobCfg.Range;
-                heroCfg.AtkSpeed = heroCfg.AtkSpeed == 0 ? jobCfg.AtkSpeed : heroCfg.AtkSpeed + jobCfg.AtkSpeed;
-                heroCfg.Armor = heroCfg.Armor == 0 ? jobCfg.Armor : heroCfg.Armor + jobCfg.Armor;
-                heroCfg.MagicRes = heroCfg.MagicRes == 0 ? jobCfg.MagicRes : heroCfg.MagicRes + jobCfg.MagicRes;
-                heroCfg.Atk = heroCfg.Atk == 0 ? jobCfg.Atk : heroCfg.Atk + jobCfg.Atk;
-                heroCfg.Ap = heroCfg.Ap == 0 ? jobCfg.Ap : heroCfg.Ap + jobCfg.Ap;
-                heroCfg.Might = heroCfg.Might == 0 ? jobCfg.Might : heroCfg.Might + jobCfg.Might;
+                GameLog.Error(string.Format("ConfigManager.PostModify: 英雄[{0}]职业[{1}]缺少 JobConfig，无法写回基准属性", heroCfg.Name, heroCfg.Job));
+                continue;
             }
+            // 次级面板（移速/射程/攻速/护甲/魔抗）：写回 = 职业基准×(1+修正%/100)，不乘品质系数
+            heroCfg.MoveSpeed = (int)Math.Round(jobCfg.MoveSpeed * (100f + heroCfg.MoveSpeed) / 100f);
+            heroCfg.Range = (int)Math.Round(jobCfg.Range * (100f + heroCfg.Range) / 100f);
+            heroCfg.AtkSpeed = (int)Math.Round(jobCfg.AtkSpeed * (100f + heroCfg.AtkSpeed) / 100f);
+            heroCfg.Armor = (int)Math.Round(jobCfg.Armor * (100f + heroCfg.Armor) / 100f);
+            heroCfg.MagicRes = (int)Math.Round(jobCfg.MagicRes * (100f + heroCfg.MagicRes) / 100f);
+            // 四主（攻击/法术/无双/生命）：写回 = 职业基准×(1+修正%/100) × 品质系数1.15^(Q-1)，即“1星带品质面板”
+            // （图鉴/排行/发卡/AI/排序直接读即为此口径）；星级成长保留到运行时按 AtkP/ApP/MightP/HpP 乘
+            float qualityFactor = Mathf.Pow(1.15f, Mathf.Max(1, heroCfg.Quality) - 1);
+            heroCfg.Atk = (int)Math.Round(jobCfg.Atk * (100f + heroCfg.Atk) / 100f * qualityFactor);
+            heroCfg.Ap = (int)Math.Round(jobCfg.Ap * (100f + heroCfg.Ap) / 100f * qualityFactor);
+            heroCfg.Might = (int)Math.Round(jobCfg.Might * (100f + heroCfg.Might) / 100f * qualityFactor);
+            heroCfg.Hp = (int)Math.Round(jobCfg.Hp * (100f + heroCfg.Hp) / 100f * qualityFactor);
         }
-
     }
 
     public static void InitFriend()

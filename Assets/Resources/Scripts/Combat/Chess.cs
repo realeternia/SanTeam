@@ -277,6 +277,7 @@ public class Chess : MonoBehaviour
         var attr = HeroSelectionTool.GetCardAttr(player, heroId, lv);
 
         maxHp = attr.Hp;
+        // 次级面板（移速/射程/攻速/护甲/魔抗）已由 PostModify 写回为 职业基准×(1+修正%/100)
         moveSpeed = heroConfig.MoveSpeed;
         attackRange = heroConfig.Range;
         attackRate = heroConfig.AtkSpeed / 30f; // 攻速值→每秒攻击次数（30=1次/秒；攻速20=1.5秒/次，15=2秒/次）

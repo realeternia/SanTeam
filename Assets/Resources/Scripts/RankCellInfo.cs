@@ -77,6 +77,7 @@ public class RankCellInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandle
         heroName.text = heroConfig.Name;
         heroName.color = SysColor.GetQualityColor(heroConfig.Quality);
         heroId = (int)heroConfig.Id;
+        // 排行展示统一口径：HeroConfig 四主数值经 PostModify 写回为 1星带品质面板（职业基准×修正%×品质系数）
         str = heroConfig.Might;
         inte = heroConfig.Ap;
         leadShip = heroConfig.Atk;
@@ -94,32 +95,12 @@ public class RankCellInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandle
         if (!HeroSelectionTool.HasHeroInPool(heroId))
             heroName.color = Color.gray;
 
-        heroStr.text = heroConfig.Might.ToString();
-        if (heroConfig.Might >= 95)
-            heroStr.text = "<color=red>" + heroConfig.Might.ToString() + "</color>";
-        else if (heroConfig.Might >= 90)
-            heroStr.text = "<color=yellow>" + heroConfig.Might.ToString() + "</color>";
-
-        heroInte.text = heroConfig.Ap.ToString();
-        if (heroConfig.Ap >= 95)
-            heroInte.text = "<color=red>" + heroConfig.Ap.ToString() + "</color>";
-        else if (heroConfig.Ap >= 90)
-            heroInte.text = "<color=yellow>" + heroConfig.Ap.ToString() + "</color>";
-
-        heroLeadShip.text = heroConfig.Atk.ToString();
-        if (heroConfig.Atk >= 95)
-            heroLeadShip.text = "<color=red>" + heroConfig.Atk.ToString() + "</color>";
-        else if (heroConfig.Atk >= 90)
-            heroLeadShip.text = "<color=yellow>" + heroConfig.Atk.ToString() + "</color>";
-
-
+        // 数值不再按大小做红/黄特化色，统一展示1星面板
+        heroStr.text = str.ToString();
+        heroInte.text = inte.ToString();
+        heroLeadShip.text = leadShip.ToString();
         heroPrice.text = price.ToString();
-        if (price >= 22)
-            heroPrice.text = "<color=red>" + price.ToString() + "</color>";
-        else if (price >= 19)
-            heroPrice.text = "<color=yellow>" + price.ToString() + "</color>";
-
-        heroHp.text = heroConfig.Hp.ToString();
+        heroHp.text = hp.ToString();
 
         UpdateLoveBtn(); // 复用池中单元格时刷新收藏图标
     }

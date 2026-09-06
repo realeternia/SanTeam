@@ -101,7 +101,7 @@ public class Tooltip : MonoBehaviour
         bool hasSkill = skillCfgs != null && skillCfgs.Count > 0;
         bool hasFriend = friendInfo != null && friendInfo.Count > 0;
 
-        // 属性取值与战斗统一走 GetCardAttr（JobConfig 基础值 + 英雄覆盖 + 等级成长），无需外部传入
+        // 属性取值与战斗统一：HeroConfig 数值经 PostModify 写回为 1星带品质面板（四主），星级成长走 GetCardAttr
         AttrInfo attr;
         if (player != null)
         {
@@ -111,7 +111,7 @@ public class Tooltip : MonoBehaviour
         }
         else
         {
-            // 无玩家上下文（如排行榜）：显示英雄基础属性
+            // 无玩家上下文（如排行榜）：直接显示写回的 1星带品质面板
             var heroCfg = HeroConfig.GetConfig(heroId);
             attr = new AttrInfo() { Atk = heroCfg.Atk, Ap = heroCfg.Ap, Might = heroCfg.Might, Hp = heroCfg.Hp };
         }
@@ -149,7 +149,10 @@ public class Tooltip : MonoBehaviour
                 textAttrs[i].gameObject.SetActive(show);
                 if (show)
                 {
-                    imageAttrs[i].sprite = Resources.Load<Sprite>("Textures/" + HeroSelectionTool.GetAttrIcon(attrKeys[i]));
+                    // 属性图标统一读 HeroAttrConfig 表（name → Icon）
+                    var attrCfg = HeroAttrConfig.GetConfigByname(attrKeys[i]);
+                    string attrIcon = string.IsNullOrEmpty(attrCfg.Icon) ? "attrhp" : attrCfg.Icon;
+                    imageAttrs[i].sprite = Resources.Load<Sprite>("Textures/Icons/" + attrIcon);
                     textAttrs[i].text = attrVals[i];
                     shownAttr++;
                 }
