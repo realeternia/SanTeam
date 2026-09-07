@@ -20,7 +20,7 @@ public class SkillHitArea : Skill
             //创建一个hitEffect
             EffectManager.PlaySkillEffect(defender, skillCfg.HitEffect);
 
-            var unitsInRange = WorldManager.Instance.GetUnitsInRange(targetPos, skillCfg.Range, owner.side, true);
+            var unitsInRange = WorldManager.Instance.GetUnitsInRange(targetPos, skillCfg.Area, owner.side, true);
             unitsInRange.Remove(defender);
             if (unitsInRange.Count > 0)
             {

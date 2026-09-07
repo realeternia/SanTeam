@@ -49,7 +49,7 @@ public class Missile : MonoBehaviour
         if (skillId > 0)
         {
             var skillCfg = SkillConfig.GetConfig(skillId);
-            detectArea = skillCfg.SummonArea * 1.5f;
+            detectArea = skillCfg.Area * 1.5f;
             targetCount = skillCfg.TargetCount;
         }
 
