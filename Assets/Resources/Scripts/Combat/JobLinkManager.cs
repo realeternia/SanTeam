@@ -340,8 +340,8 @@ public static class JobLinkManager
             case "critRate":
                 unit.critRate += value;
                 break;
-            case "attackRate":
-                unit.attackRate += value;
+            case "attackSpeedRate":
+                unit.attackSpeedRate += value;
                 break;
             case "dodgeRate":
                 // 马·闪避

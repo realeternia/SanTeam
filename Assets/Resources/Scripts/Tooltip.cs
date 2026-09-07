@@ -349,7 +349,7 @@ public class Tooltip : MonoBehaviour
         if (string.IsNullOrEmpty(key) || value == 0)
             return;
         keys.Add(key);
-        bool isPercent = key == "attackRate" || key == "critRate";
+        bool isPercent = key == "attackSpeedRate" || key == "critRate";
         vals.Add(isPercent ? value + "%" : value.ToString());
     }
 }

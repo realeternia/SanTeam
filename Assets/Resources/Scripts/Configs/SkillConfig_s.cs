@@ -57,7 +57,7 @@ namespace CommonConfig
             {"CheckTypeLimit", new FieldMetaInfo("是否按类型限定(仅法术或仅物理)", "bool", 70)},
             {"CheckIsMagic", new FieldMetaInfo("限定法术(true=法/false=物)", "bool", 61)},
             {"Range", new FieldMetaInfo("范围", "float", 60)},
-            {"Area", new FieldMetaInfo("范围", "int", 0, "伤害范围等")},
+            {"Area", new FieldMetaInfo("范围", "int", 60, "伤害范围等")},
             {"TargetType", new FieldMetaInfo("选取点", "string", 0)},
             {"TargetCount", new FieldMetaInfo("最大目标数", "int", 60)},
             {"Strength", new FieldMetaInfo("技能强度（恒定）", "float", 60)},
@@ -83,8 +83,8 @@ namespace CommonConfig
             {"HitEffect", new FieldMetaInfo("hit", "string", 0)},
             {"EffectSize", new FieldMetaInfo("size", "float", 60)},
             {"Icon", new FieldMetaInfo("图标", "string", 0)},
-            {"LinkSelf", new FieldMetaInfo("连接英雄加成", "string", 241)},
-            {"LinkTeam", new FieldMetaInfo("我方其他英雄加成", "string", 0)},
+            {"LinkSelf", new FieldMetaInfo("连接英雄加成", "string", 231)},
+            {"LinkTeam", new FieldMetaInfo("我方其他英雄加成", "string", 155)},
             {"AuroAttrs", new FieldMetaInfo("光环技能效果", "string", 0)},
         };
 
@@ -392,11 +392,11 @@ namespace CommonConfig
             config[2000093] = new SkillConfig(2000093, "炮车", "炮", "攻击时27%几率对周围造成50%溅射伤害，范围+30%", "职业", "", 3, 0.27f, 0f, 0, "", 0f, 0f, false, false, false, 0f, 7.8, "", 3, 0f, 0, 0f, 0.5f, 0f, 0, 0f, 0, "", "", 0, false, 0f, "", 0, 0f, 0f, 0f, "HitArea", "", "SparkleAreaWhite", 0f, "pao", "", "", "");
             config[2000094] = new SkillConfig(2000094, "炮车", "炮", "攻击时30%几率对周围造成50%溅射伤害，范围+50%", "职业", "", 4, 0.3f, 0f, 0, "", 0f, 0f, false, false, false, 0f, 9, "", 3, 0f, 0, 0f, 0.5f, 0f, 0, 0f, 0, "", "", 0, false, 0f, "", 0, 0f, 0f, 0f, "HitArea", "", "SparkleAreaWhite", 0f, "pao", "", "", "");
             config[2000095] = new SkillConfig(2000095, "炮车", "炮", "攻击时35%几率对周围造成50%溅射伤害，范围+80%", "职业", "", 5, 0.35f, 0f, 0, "", 0f, 0f, false, false, false, 0f, 10.8, "", 3, 0f, 0, 0f, 0.5f, 0f, 0, 0f, 0, "", "", 0, false, 0f, "", 0, 0f, 0f, 0f, "HitArea", "", "SparkleAreaWhite", 0f, "pao", "", "", "");
-            config[2000101] = new SkillConfig(2000101, "弩手", "弩", "自身攻速+0.04，全队攻速+0.04", "职业", "", 1, 0f, 0f, 0, "", 0f, 0f, false, false, false, 0f, 0, "", 0, 0f, 0, 0f, 0f, 0f, 0, 0f, 0, "", "", 0, false, 0f, "", 0, 0f, 0f, 0f, "Dumb", "", "", 0f, "nu", "attackRate+0.04", "attackRate+0.04", "");
-            config[2000102] = new SkillConfig(2000102, "弩手", "弩", "自身攻速+0.05，全队攻速+0.05", "职业", "", 2, 0f, 0f, 0, "", 0f, 0f, false, false, false, 0f, 0, "", 0, 0f, 0, 0f, 0f, 0f, 0, 0f, 0, "", "", 0, false, 0f, "", 0, 0f, 0f, 0f, "Dumb", "", "", 0f, "nu", "attackRate+0.05", "attackRate+0.05", "");
-            config[2000103] = new SkillConfig(2000103, "弩手", "弩", "自身攻速+0.06，全队攻速+0.06", "职业", "", 3, 0f, 0f, 0, "", 0f, 0f, false, false, false, 0f, 0, "", 0, 0f, 0, 0f, 0f, 0f, 0, 0f, 0, "", "", 0, false, 0f, "", 0, 0f, 0f, 0f, "Dumb", "", "", 0f, "nu", "attackRate+0.06", "attackRate+0.06", "");
-            config[2000104] = new SkillConfig(2000104, "弩手", "弩", "自身攻速+0.07，全队攻速+0.07", "职业", "", 4, 0f, 0f, 0, "", 0f, 0f, false, false, false, 0f, 0, "", 0, 0f, 0, 0f, 0f, 0f, 0, 0f, 0, "", "", 0, false, 0f, "", 0, 0f, 0f, 0f, "Dumb", "", "", 0f, "nu", "attackRate+0.07", "attackRate+0.07", "");
-            config[2000105] = new SkillConfig(2000105, "弩手", "弩", "自身攻速+0.08，全队攻速+0.08", "职业", "", 5, 0f, 0f, 0, "", 0f, 0f, false, false, false, 0f, 0, "", 0, 0f, 0, 0f, 0f, 0f, 0, 0f, 0, "", "", 0, false, 0f, "", 0, 0f, 0f, 0f, "Dumb", "", "", 0f, "nu", "attackRate+0.08", "attackRate+0.08", "");
+            config[2000101] = new SkillConfig(2000101, "弩手", "弩", "自身攻速+10%，全队攻速+5%", "职业", "", 1, 0f, 0f, 0, "", 0f, 0f, false, false, false, 0f, 0, "", 0, 0f, 0, 0f, 0f, 0f, 0, 0f, 0, "", "", 0, false, 0f, "", 0, 0f, 0f, 0f, "Dumb", "", "", 0f, "nu", "attackSpeedRate+0.1", "attackSpeedRate+0.05", "");
+            config[2000102] = new SkillConfig(2000102, "弩手", "弩", "自身攻速+20%，全队攻速+10%", "职业", "", 2, 0f, 0f, 0, "", 0f, 0f, false, false, false, 0f, 0, "", 0, 0f, 0, 0f, 0f, 0f, 0, 0f, 0, "", "", 0, false, 0f, "", 0, 0f, 0f, 0f, "Dumb", "", "", 0f, "nu", "attackSpeedRate+0.2", "attackSpeedRate+0.1", "");
+            config[2000103] = new SkillConfig(2000103, "弩手", "弩", "自身攻速+35%，全队攻速+15%", "职业", "", 3, 0f, 0f, 0, "", 0f, 0f, false, false, false, 0f, 0, "", 0, 0f, 0, 0f, 0f, 0f, 0, 0f, 0, "", "", 0, false, 0f, "", 0, 0f, 0f, 0f, "Dumb", "", "", 0f, "nu", "attackSpeedRate+0.35", "attackSpeedRate+0.15", "");
+            config[2000104] = new SkillConfig(2000104, "弩手", "弩", "自身攻速+50%，全队攻速+20%", "职业", "", 4, 0f, 0f, 0, "", 0f, 0f, false, false, false, 0f, 0, "", 0, 0f, 0, 0f, 0f, 0f, 0, 0f, 0, "", "", 0, false, 0f, "", 0, 0f, 0f, 0f, "Dumb", "", "", 0f, "nu", "attackSpeedRate+0.5", "attackSpeedRate+0.2", "");
+            config[2000105] = new SkillConfig(2000105, "弩手", "弩", "自身攻速+70%，全队攻速+25%", "职业", "", 5, 0f, 0f, 0, "", 0f, 0f, false, false, false, 0f, 0, "", 0, 0f, 0, 0f, 0f, 0f, 0, 0f, 0, "", "", 0, false, 0f, "", 0, 0f, 0f, 0f, "Dumb", "", "", 0f, "nu", "attackSpeedRate+0.7", "attackSpeedRate+0.25", "");
             config[2000111] = new SkillConfig(2000111, "碾压", "车", "自身暴击+10%，全队暴击+1%", "职业", "", 1, 0f, 0f, 0, "", 0f, 0f, false, false, false, 0f, 0, "", 0, 0f, 0, 0f, 0f, 0f, 0, 0f, 0, "", "", 0, false, 0f, "", 0, 0f, 0f, 0f, "Dumb", "", "", 0f, "che", "critRate+0.1", "critRate+0.01", "");
             config[2000112] = new SkillConfig(2000112, "碾压", "车", "自身暴击+15%，全队暴击+2%", "职业", "", 2, 0f, 0f, 0, "", 0f, 0f, false, false, false, 0f, 0, "", 0, 0f, 0, 0f, 0f, 0f, 0, 0f, 0, "", "", 0, false, 0f, "", 0, 0f, 0f, 0f, "Dumb", "", "", 0f, "che", "critRate+0.15", "critRate+0.02", "");
             config[2000113] = new SkillConfig(2000113, "碾压", "车", "自身暴击+20%，全队暴击+3%", "职业", "", 3, 0f, 0f, 0, "", 0f, 0f, false, false, false, 0f, 0, "", 0, 0f, 0, 0f, 0f, 0f, 0, 0f, 0, "", "", 0, false, 0f, "", 0, 0f, 0f, 0f, "Dumb", "", "", 0f, "che", "critRate+0.2", "critRate+0.03", "");

@@ -125,7 +125,7 @@ namespace CommonConfig
             config[11] = new HeroAttrConfig(11, "dodge", "闪避", "", "", "attrdodge", false);
             config[12] = new HeroAttrConfig(12, "maxHp", "生命", "", "", "attrhp", false);
             config[13] = new HeroAttrConfig(13, "critRate", "暴击", "", "", "attrcrit", false);
-            config[14] = new HeroAttrConfig(14, "attackRate", "攻速", "", "", "attackspeed", false);
+            config[14] = new HeroAttrConfig(14, "attackSpeedRate", "攻速", "", "", "attackspeed", false);
             config[15] = new HeroAttrConfig(15, "dodgeRate", "闪避", "", "", "attrdodge", false);
             config[16] = new HeroAttrConfig(16, "magicRes", "魔抗", "", "", "attrmagicshield", false);
             config[17] = new HeroAttrConfig(17, "soldierAtk", "士兵攻", "", "", "attratk", false);

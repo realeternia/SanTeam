@@ -64,7 +64,8 @@ public class Chess : MonoBehaviour
 
     // 攻击冷却时间
     public float attackPoint;
-    public float attackRate; //攻击频率（每秒攻击次数，=攻速值/30；攻速20=1.5秒/次，15=2秒/次）
+    public float attackSpeed; //攻击频率（每秒攻击次数，=攻速值/30；攻速20=1.5秒/次，15=2秒/次）
+    public float attackSpeedRate; //攻速比例加成（0.1=+10%，最终攻速=attackSpeed×(1+attackSpeedRate)）
     private float lastAttackTime = 0f;
     private float lastTargetUpdateTime = 0f; // 上次更新目标的时间
 
@@ -167,7 +168,7 @@ public class Chess : MonoBehaviour
             heroInfo.SetHpRate(hp, maxHp);
         
         attackPoint = SysRandom.Range(0f, 1f); // 随机获得初始气力
-        // attackRate 已在 SpawnUnitsForRegion/SpawnHerosForRegion 中按配置设置（攻速值/30），此处不能覆盖
+        // attackSpeed 已在 SpawnUnitsForRegion/SpawnHerosForRegion 中按配置设置（攻速值/30），此处不能覆盖
     }
 
     // 创建血条HUD
@@ -278,7 +279,7 @@ public class Chess : MonoBehaviour
         // 次级面板（移速/射程/攻速/护甲/魔抗）已由 PostModify 写回为 职业基准×(1+修正%/100)
         moveSpeed = heroConfig.MoveSpeed;
         attackRange = heroConfig.Range;
-        attackRate = heroConfig.AtkSpeed / 30f; // 攻速值→每秒攻击次数（30=1次/秒；攻速20=1.5秒/次，15=2秒/次）
+        attackSpeed = heroConfig.AtkSpeed / 30f; // 攻速值→每秒攻击次数（30=1次/秒；攻速20=1.5秒/次，15=2秒/次）
         attackDamage = attr.Atk;
         ap = attr.Ap;
         atk = attr.Atk;
@@ -300,7 +301,7 @@ public class Chess : MonoBehaviour
                 // 金铲铲式基础组件扩展属性：护甲/魔抗/攻速/暴击/回蓝
                 armor += equipAttr.Armor;
                 magicRes += equipAttr.MagicRes;
-                attackRate += equipAttr.AttackRate;
+                attackSpeedRate += equipAttr.AttackSpeedRate;
                 critRate += equipAttr.CritRate;
                 mpRegen += equipAttr.MpRegen;
             }
@@ -475,8 +476,8 @@ public class Chess : MonoBehaviour
         // 检查目标是否在攻击范围内
         if (WorldManager.Instance.CheckInRange(transform.position, targetChess.transform.position, attackRange))
         {
-            attackPoint += deltaTime * attackRate;
-            // 检查攻击冷却（攻击频率累积满1次即可出手，attackRate=攻速值/30）
+            attackPoint += deltaTime * attackSpeed * (1 + attackSpeedRate);
+            // 检查攻击冷却（攻击频率累积满1次即可出手，attackSpeed=攻速值/30，attackSpeedRate为乘法比例加成）
             if (attackPoint >= 1f)
             {
             //    PlayerAnim("jumpspin");

@@ -3,7 +3,7 @@ using System;
 public class BuffSpeedDown : Buff
 {
     private float moveSpeedDiff;
-    private float attackRateDiff;
+    private float attackSpeedRateDiff;
     public BuffSpeedDown(int id, int skillId, Chess caster, Chess target, float lastTime)
      : base(id, skillId, caster, target, lastTime)
     {
@@ -15,14 +15,14 @@ public class BuffSpeedDown : Buff
         moveSpeedDiff = chess.moveSpeed * skillCfg.Strength;
         chess.moveSpeed -= moveSpeedDiff;
 
-        attackRateDiff = chess.attackRate * skillCfg.Strength;
-        chess.attackRate -= attackRateDiff;
+        attackSpeedRateDiff = skillCfg.Strength;
+        chess.attackSpeedRate -= attackSpeedRateDiff;
     }
 
     public override void OnRemove(Chess chess)
     {
         base.OnRemove(chess);
         chess.moveSpeed += moveSpeedDiff;
-        chess.attackRate += attackRateDiff;
+        chess.attackSpeedRate += attackSpeedRateDiff;
     }
 }

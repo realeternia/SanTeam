@@ -455,7 +455,7 @@ public class WorldManager : MonoBehaviour
             chessComponent.moveSpeed = soldierConfig.MoveSpeed;
             chessComponent.attackRange = soldierConfig.Range;
             chessComponent.attackDamage = soldierConfig.Atk;
-            chessComponent.attackRate = soldierConfig.AtkSpeed / 30f; // 攻速值→每秒攻击次数（30=1次/秒；攻速20=1.5秒/次，15=2秒/次）
+            chessComponent.attackSpeed = soldierConfig.AtkSpeed / 30f; // 攻速值→每秒攻击次数（30=1次/秒；攻速20=1.5秒/次，15=2秒/次）
             chessComponent.missileSpeed = soldierConfig.MissileSpeed;
             chessComponent.missileHight = soldierConfig.MissileHight;
             chessComponent.armor = soldierConfig.Armor;
@@ -530,7 +530,7 @@ public class WorldManager : MonoBehaviour
             chessComponent.moveSpeed = soldierConfig.MoveSpeed;
             chessComponent.attackRange = soldierConfig.Range;
             chessComponent.attackDamage = soldierConfig.Atk;
-            chessComponent.attackRate = soldierConfig.AtkSpeed / 30f;
+            chessComponent.attackSpeed = soldierConfig.AtkSpeed / 30f;
             chessComponent.missileSpeed = soldierConfig.MissileSpeed;
             chessComponent.missileHight = soldierConfig.MissileHight;
             chessComponent.armor = soldierConfig.Armor;

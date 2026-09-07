@@ -209,8 +209,8 @@ namespace CommonConfig
             config[400014] = new ItemConfig(400014, "的卢马", "", 1, "attr", "hp", 50, "", 0, new int[0], "", 0, 5, false, false, false, 10, 0f, false, "dilu");
             config[400015] = new ItemConfig(400015, "大宛宝马", "", 1, "attr", "hp", 30, "", 0, new int[0], "", 0, 0, false, false, false, 5, 0f, false, "dawan");
             // ---- 金铲铲式基础组件（三国化）：反曲弓/女神之泪/锁子甲/负极斗篷/格斗手套对应攻速/回蓝/护甲/魔抗/暴击 ----
-            // 比例属性约定：attackRate/critRate/dodgeRate 的 Attr1Val 存百分数（10=+10%），运行时 ÷100；armor/magicRes/mpRegen 存实际数值
-            config[400016] = new ItemConfig(400016, "穿杨弓", "攻速+10%", 1, "attr", "attackRate", 10, "", 0, new int[0], "", 0, 5, false, false, false, 10, 0f, false, "chuanyang");
+            // 比例属性约定：attackSpeedRate/critRate/dodgeRate 的 Attr1Val 存百分数（10=+10%），运行时 ÷100；armor/magicRes/mpRegen 存实际数值
+            config[400016] = new ItemConfig(400016, "穿杨弓", "攻速+10%", 1, "attr", "attackSpeedRate", 10, "", 0, new int[0], "", 0, 5, false, false, false, 10, 0f, false, "chuanyang");
             config[400017] = new ItemConfig(400017, "承露瓶", "每秒回复3点法力", 1, "attr", "mpRegen", 3, "", 0, new int[0], "", 0, 5, false, false, false, 10, 0f, false, "chenglu");
             config[400018] = new ItemConfig(400018, "明光铠", "护甲+5", 1, "attr", "armor", 5, "", 0, new int[0], "", 0, 5, false, false, false, 10, 0f, false, "mingguang");
             config[400019] = new ItemConfig(400019, "鹤氅", "魔抗+5", 1, "attr", "magicRes", 5, "", 0, new int[0], "", 0, 5, false, false, false, 10, 0f, false, "hechang");
