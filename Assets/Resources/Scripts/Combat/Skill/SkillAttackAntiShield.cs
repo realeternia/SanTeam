@@ -12,7 +12,7 @@ public class SkillAttackAntiShield : Skill
 
     public override void DuringAttack(Chess defender, string damType, ref int damageBase, ref float damageMulti, ref int damageReal, ref string effect)
     {
-        var buff = defender.GetBuff(skillCfg.BuffId);
+        var buff = defender.GetBuff(BuffConfig.GetConfigByNameS(skillCfg.BuffId).Id);
         if (buff != null)
         {
             var shield = buff as BuffShield;

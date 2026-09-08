@@ -571,9 +571,11 @@ public class WorldManager : MonoBehaviour
             chessComponent.heroId = (int)heroConfig.Id;
             chessComponent.side = side;
             chessComponent.chessName = heroConfig.Icon;
-            chessComponent.hitEffect = heroConfig.HitEffect;
-            chessComponent.missileSpeed = heroConfig.MissileSpeed;
-            chessComponent.missileHight = heroConfig.MissileHight;
+            // 导弹速度/高度、命中特效按职业基准从 JobConfig 取（HeroConfig 不再配置）
+            var jobCfg = ConfigManager.GetJobConfig(heroConfig.Job);
+            chessComponent.hitEffect = jobCfg != null ? jobCfg.HitEffect : "";
+            chessComponent.missileSpeed = jobCfg != null ? jobCfg.MissileSpeed : 0;
+            chessComponent.missileHight = jobCfg != null ? jobCfg.MissileHight : 0f;
 
             if (side <= 2)
             {
@@ -1375,9 +1377,10 @@ public class WorldManager : MonoBehaviour
             return;
         if(unitsInRange.Count > limit)
         {
+            System.Random random = new System.Random();
             while (unitsInRange.Count > limit)
             {
-                int indexToRemove = SysRandom.Range(0, unitsInRange.Count);
+                int indexToRemove = random.Next(0, unitsInRange.Count);
                 unitsInRange.RemoveAt(indexToRemove);
             }
         }

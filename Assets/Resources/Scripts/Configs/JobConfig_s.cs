@@ -54,6 +54,9 @@ namespace CommonConfig
             {"MagicRes", new FieldMetaInfo("魔抗（职业基准值）", "int", 60)},
             {"MoveSpeed", new FieldMetaInfo("移动速度（王/士/盾/锤/枪/戟10 马/车12 弓/炮/扇/相/棋/鼓/琴/医/工8 弩7）", "int", 60)},
             {"AtkSpeed", new FieldMetaInfo("攻速（30=每秒攻击1次，攻速20=1.5秒/次，15=2秒/次）", "int", 60)},
+            {"MissileSpeed", new FieldMetaInfo("导弹速度", "int", 60)},
+            {"MissileHight", new FieldMetaInfo("导弹高度", "float", 60)},
+            {"HitEffect", new FieldMetaInfo("hit", "string", 364)},
         };
 
         public static Dictionary<string, FieldMetaInfo> FieldMeta { get { return fieldMeta; } }
@@ -117,9 +120,21 @@ namespace CommonConfig
         ///攻速（20=每秒攻击1次，40=每秒2次）
         /// </summary>
         public int AtkSpeed;
+        /// <summary>
+        ///导弹速度（0=无导弹，近战职业默认0）
+        /// </summary>
+        public int MissileSpeed;
+        /// <summary>
+        ///导弹高度
+        /// </summary>
+        public float MissileHight;
+        /// <summary>
+        ///hit
+        /// </summary>
+        public string HitEffect;
 
 
-        public JobConfig(int Id, string Name, string NameS, string SkillId, int SourceJob, int Atk, int Ap, int Might, int Hp, int Range, int Armor, int MagicRes, int MoveSpeed, int AtkSpeed)
+        public JobConfig(int Id, string Name, string NameS, string SkillId, int SourceJob, int Atk, int Ap, int Might, int Hp, int Range, int Armor, int MagicRes, int MoveSpeed, int AtkSpeed, int MissileSpeed, float MissileHight, string HitEffect)
         {
             this.Id = Id;
             this.Name = Name;
@@ -135,6 +150,9 @@ namespace CommonConfig
             this.MagicRes = MagicRes;
             this.MoveSpeed = MoveSpeed;
             this.AtkSpeed = AtkSpeed;
+            this.MissileSpeed = MissileSpeed;
+            this.MissileHight = MissileHight;
+            this.HitEffect = HitEffect;
         }
 
         public JobConfig() { }
@@ -155,24 +173,24 @@ namespace CommonConfig
         public static void Load()
         {
             config.Clear();
-            config[1] = new JobConfig(1, "shuai", "王", "王", 0, 75, 60, 60, 700, 17, 40, 40, 10, 20);
-            config[101] = new JobConfig(101, "ma", "马", "马", 0, 80, 55, 80, 620, 17, 35, 35, 12, 20);
-            config[102] = new JobConfig(102, "mache", "车", "车", 101, 80, 50, 80, 600, 17, 35, 35, 12, 20);
-            config[201] = new JobConfig(201, "gong", "弓", "弓", 0, 65, 55, 65, 450, 50, 25, 35, 8, 20);
-            config[202] = new JobConfig(202, "gongnu", "弩", "弩", 201, 60, 50, 70, 400, 60, 25, 35, 7, 20);
-            config[203] = new JobConfig(203, "gongpao", "炮", "炮", 201, 55, 60, 55, 450, 50, 25, 35, 8, 20);
-            config[301] = new JobConfig(301, "shi", "士", "士", 0, 60, 55, 85, 660, 17, 50, 40, 10, 20);
-            config[302] = new JobConfig(302, "shidun", "盾", "盾", 301, 65, 50, 80, 760, 17, 45, 25, 10, 20);
-            config[401] = new JobConfig(401, "shan", "扇", "扇", 0, 60, 80, 45, 560, 35, 25, 40, 8, 20);
-            config[402] = new JobConfig(402, "shanxiang", "相", "相", 401, 65, 85, 45, 600, 35, 25, 45, 8, 20);
-            config[403] = new JobConfig(403, "qi", "棋", "棋", 401, 70, 90, 45, 550, 35, 25, 45, 8, 20);
-            config[501] = new JobConfig(501, "gu", "鼓", "鼓", 0, 45, 65, 55, 520, 35, 25, 40, 8, 20);
-            config[502] = new JobConfig(502, "qin", "琴", "琴", 501, 45, 80, 40, 480, 35, 30, 30, 8, 20);
-            config[503] = new JobConfig(503, "guyi", "医", "医", 501, 55, 80, 45, 560, 35, 25, 35, 8, 20);
-            config[601] = new JobConfig(601, "chui", "锤", "锤", 0, 65, 55, 80, 720, 17, 40, 20, 10, 20);
-            config[602] = new JobConfig(602, "daoqiang", "枪", "枪", 601, 70, 55, 80, 640, 17, 40, 30, 10, 20);
-            config[603] = new JobConfig(603, "daoji", "戟", "戟", 601, 75, 55, 75, 700, 17, 45, 30, 10, 20);
-            config[701] = new JobConfig(701, "gongjiang", "工", "工", 0, 55, 70, 45, 520, 35, 25, 35, 8, 20);
+            config[1] = new JobConfig(1, "shuai", "王", "王", 0, 75, 60, 60, 700, 17, 40, 40, 10, 20, 0, 0f, "SwordHitYellowCritical");
+            config[101] = new JobConfig(101, "ma", "马", "马", 0, 80, 55, 80, 620, 17, 35, 35, 12, 20, 0, 0f, "SwordHitYellowCritical");
+            config[102] = new JobConfig(102, "mache", "车", "车", 101, 80, 50, 80, 600, 17, 35, 35, 12, 20, 0, 0f, "SwordHitYellowCritical");
+            config[201] = new JobConfig(201, "gong", "弓", "弓", 0, 65, 55, 65, 450, 50, 25, 35, 8, 20, 20, 1.5f, "BulletExplosionBlue");
+            config[202] = new JobConfig(202, "gongnu", "弩", "弩", 201, 60, 50, 70, 400, 60, 25, 35, 7, 20, 25, 0f, "BulletExplosionBlue");
+            config[203] = new JobConfig(203, "gongpao", "炮", "炮", 201, 55, 60, 55, 450, 50, 25, 35, 8, 20, 13, 2.5f, "GasShootFire");
+            config[301] = new JobConfig(301, "shi", "士", "士", 0, 60, 55, 85, 660, 17, 50, 40, 10, 20, 0, 0f, "SwordHitYellowCritical");
+            config[302] = new JobConfig(302, "shidun", "盾", "盾", 301, 65, 50, 80, 760, 17, 45, 25, 10, 20, 0, 0f, "SwordHitYellowCritical");
+            config[401] = new JobConfig(401, "shan", "扇", "扇", 0, 60, 80, 45, 560, 35, 25, 40, 8, 20, 15, 0f, "StormExplosion");
+            config[402] = new JobConfig(402, "shanxiang", "相", "相", 401, 65, 85, 45, 600, 35, 25, 45, 8, 20, 18, 0f, "SharpExplosionGreen");
+            config[403] = new JobConfig(403, "qi", "棋", "棋", 401, 70, 90, 45, 550, 35, 25, 45, 8, 20, 15, 0f, "LightningExplosionBlue");
+            config[501] = new JobConfig(501, "gu", "鼓", "鼓", 0, 45, 65, 55, 520, 35, 25, 40, 8, 20, 15, 0f, "SharpExplosionGreen");
+            config[502] = new JobConfig(502, "qin", "琴", "琴", 501, 45, 80, 40, 480, 35, 30, 30, 8, 20, 15, 0f, "StormExplosion");
+            config[503] = new JobConfig(503, "guyi", "医", "医", 501, 55, 80, 45, 560, 35, 25, 35, 8, 20, 14, 0f, "ShadowExplosionGreen");
+            config[601] = new JobConfig(601, "chui", "锤", "锤", 0, 65, 55, 80, 720, 17, 40, 20, 10, 20, 0, 0f, "SwordHitYellowCritical");
+            config[602] = new JobConfig(602, "daoqiang", "枪", "枪", 601, 70, 55, 80, 640, 17, 40, 30, 10, 20, 0, 0f, "SwordHitYellowCritical");
+            config[603] = new JobConfig(603, "daoji", "戟", "戟", 601, 75, 55, 75, 700, 17, 45, 30, 10, 20, 0, 0f, "SwordHitYellowCritical");
+            config[701] = new JobConfig(701, "gongjiang", "工", "工", 0, 55, 70, 45, 520, 35, 25, 35, 8, 20, 18, 1f, "ToolExplosion");
 
             RebuildIndex();
 

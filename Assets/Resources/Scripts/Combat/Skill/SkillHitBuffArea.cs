@@ -23,7 +23,7 @@ public class SkillHitBuffArea : Skill
                 WorldManager.Instance.RandomSelect(unitsInRange, skillCfg.TargetCount);
 
                 foreach (var unit in unitsInRange)
-                    BuffManager.AddBuff(unit, owner, id, skillCfg.BuffId, skillCfg.BuffTime);
+                    BuffManager.AddBuff(unit, owner, id, BuffConfig.GetConfigByNameS(skillCfg.BuffId).Id, skillCfg.BuffTime);
             }
         }
     }

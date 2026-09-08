@@ -1,18 +1,17 @@
 %YAML 1.1
-%TAG !u! tag:yousandi.cn,2023:
+%TAG !u! tag:unity3d.com,2011:
 --- !u!1 &3393007838943379664
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 3393007838943379665}
   - component: {fileID: 3393007838943379671}
   - component: {fileID: 3393007838943379670}
   m_Layer: 0
-  m_HasEditorInfo: 1
   m_Name: GlowTrail
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4715,10 +4714,6 @@ ParticleSystemRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 0
   m_RayTraceProcedural: 0
-  m_virtualGeometry: 0
-  m_virtualGeometryShadow: 0
-  m_ShadingRate: 0
-  m_ForceDisableGRD: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -4781,13 +4776,12 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 3393007838986990809}
   - component: {fileID: 3393007838986990815}
   - component: {fileID: 3393007838986990814}
   m_Layer: 0
-  m_HasEditorInfo: 1
   m_Name: DropletTrail
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -9526,10 +9520,6 @@ ParticleSystemRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 0
   m_RayTraceProcedural: 0
-  m_virtualGeometry: 0
-  m_virtualGeometryShadow: 0
-  m_ShadingRate: 0
-  m_ForceDisableGRD: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -9592,13 +9582,12 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 3393007839334849289}
   - component: {fileID: 3393007839334849295}
   - component: {fileID: 3393007839334849294}
   m_Layer: 0
-  m_HasEditorInfo: 1
   m_Name: SparkleTrail
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -14467,10 +14456,6 @@ ParticleSystemRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 0
   m_RayTraceProcedural: 0
-  m_virtualGeometry: 0
-  m_virtualGeometryShadow: 0
-  m_ShadingRate: 0
-  m_ForceDisableGRD: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -14533,15 +14518,14 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 3393007839811104676}
   - component: {fileID: 3393007839811104679}
   - component: {fileID: 3393007839811104678}
   - component: {fileID: 3393007839811104673}
   m_Layer: 0
-  m_HasEditorInfo: 1
-  m_Name: BananaExplosion
+  m_Name: ToolExplosion
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -15544,8 +15528,8 @@ ParticleSystem:
           inWeight: 0.33333334
           outWeight: 0.33333334
         - serializedVersion: 3
-          time: 0.48782587
-          value: 0.8526978
+          time: 0.49527216
+          value: 0.8961243
           inSlope: 0
           outSlope: 0
           tangentMode: 0
@@ -19255,14 +19239,10 @@ ParticleSystemRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 0
   m_RayTraceProcedural: 0
-  m_virtualGeometry: 0
-  m_virtualGeometryShadow: 0
-  m_ShadingRate: 0
-  m_ForceDisableGRD: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 8206bf6b1c2da79498788144a74dab6c, type: 2}
+  - {fileID: 2100000, guid: d7546d3e0c454522bd46355f9ce534d4, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

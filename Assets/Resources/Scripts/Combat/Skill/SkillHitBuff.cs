@@ -14,7 +14,7 @@ public class SkillHitBuff : Skill
         if(CheckBurst(defender))
         {
             owner.PlayerAnim(skillCfg.Action);
-            BuffManager.AddBuff(defender, owner, id, skillCfg.BuffId, skillCfg.BuffTime);
+            BuffManager.AddBuff(defender, owner, id, BuffConfig.GetConfigByNameS(skillCfg.BuffId).Id, skillCfg.BuffTime);
         }
     }
 

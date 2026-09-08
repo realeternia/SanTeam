@@ -51,6 +51,7 @@ public class Chess : MonoBehaviour
     public int attackDamage = 30;
     public float soldierAtkRate = 1f; // 士兵攻击加成系数（相的职业羁绊：全军士兵攻击+%，伤害结算时乘算一次）
     public float soldierHpRate = 1f; // 士兵生命加成系数（相的职业羁绊：全军士兵生命+%，由 JobLinkManager 累加系数后统一结算）
+    public int soldierBaseMaxHp; // 士兵初始生命基准快照（Init 末尾记录，JobLinkManager 按此基数统一结算生命系数）
 
     // 护甲/魔抗：英雄与士兵初始化时从配置赋值
     public int armor;

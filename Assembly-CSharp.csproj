@@ -102,7 +102,6 @@
     <Compile Include="Assets\SineVFX\TopDownEffects\Scripts\SineUIControllerTopDownEffects.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAttackReboundArrow.cs" />
     <Compile Include="Assets\SineVFX\TopDownEffects\Scripts\RampGeneratorTDE.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillBuffTieqi.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffCoolDown.cs" />
     <Compile Include="Assets\Epic Toon FX\Scripts\ETFXRotation.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillDumb.cs" />

@@ -103,16 +103,16 @@ public static class JobLinkManager
             }
         }
 
-        // 统一结算士兵生命加成：目标最大生命 = 初始基准 × 累计系数（只乘一次），
-        // 多个职业组系数先累加、多次调用先复位再累加，均不会把已加成数值当基数二次乘算
+        // 统一结算士兵生命加成：目标最大生命 = 初始基准快照 × 累计系数（只乘一次），
+        // 多个职业组系数先累加，不会把已加成数值当基数二次乘算；
+        // 士兵攻击不在此结算（伤害计算时已按 attackDamage × soldierAtkRate 乘算一次）
         foreach (var unit in allMySideUnits)
         {
             if (unit.isHero)
                 continue;
-            var targetMaxHp = (int)(unit.MaxHp * (1 + unit.soldierHpRate));
+            var targetMaxHp = (int)(unit.soldierBaseMaxHp * unit.soldierHpRate);
             unit.hp = targetMaxHp;
             unit.maxHp = targetMaxHp;
-            unit.attack = (int)(unit.attack * (1 + unit.soldierAtkRate));
         }
     }
 
@@ -306,7 +306,7 @@ public static class JobLinkManager
         if (attr == "critRate" || attr == "soldierAtk" || attr == "soldierHp"
             || attr == "dodgeRate" || attr == "critDamageMulti"
             || attr == "healRate" || attr == "healedRate"
-            || attr == "attackSpeedRate" || attr == "auroEffectRate")
+            || attr == "auroEffectRate")
             return Mathf.RoundToInt(v * 100) + "%";
         if (v < 1f)
             return v.ToString("0.##");

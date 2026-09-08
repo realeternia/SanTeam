@@ -15,7 +15,7 @@ public class SkillAttackedBuff : Skill
         {
             owner.PlayerAnim(skillCfg.Action);
 
-            BuffManager.AddBuff(owner, owner, id, skillCfg.BuffId, skillCfg.BuffTime);
+            BuffManager.AddBuff(owner, owner, id, BuffConfig.GetConfigByNameS(skillCfg.BuffId).Id, skillCfg.BuffTime);
         }
     }
 

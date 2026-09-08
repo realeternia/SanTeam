@@ -75,8 +75,6 @@ public static class SkillManager
                 return new SkillBuffExpandPos(skillId, owner);                
             case "ModifyBuffTime":
                 return new SkillModifyBuffTime(skillId, owner);
-            case "BuffTieqi":
-                return new SkillBuffTieqi(skillId, owner);
             case "ModifyShootSpeed":
                 return new SkillModifyShootSpeed(skillId, owner);
             case "ModifySummonTime":

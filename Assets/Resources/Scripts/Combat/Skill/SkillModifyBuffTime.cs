@@ -24,7 +24,7 @@ public class SkillModifyBuffTime : Skill
         if (buffCfg.IsPositive == skillCfg.NegBuff)
             return;
 
-        if (skillCfg.BuffId > 0 && buffId != skillCfg.BuffId) //为强化id
+        if (!string.IsNullOrEmpty(skillCfg.BuffId) && buffId != BuffConfig.GetConfigByNameS(skillCfg.BuffId).Id) //为强化id
             return;
 
         time *= (1 + skillCfg.Strength);

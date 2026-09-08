@@ -57,10 +57,10 @@ public class SkillAttackRunCrossPlus : Skill
             Vector3 currentPos = Vector3.Lerp(startPos, targetPos, t);
           //  currentPos.y += yOffset;
 
-            var enmeyList = WorldManager.Instance.GetUnitsInRange(currentPos, 12, owner.side, true);
+            var enmeyList = WorldManager.Instance.GetUnitsInRange(currentPos, skillCfg.Area, owner.side, true);
             foreach(var chess in enmeyList)
             {
-                if(pushedList.Contains(chess.id))
+                if(pushedList.Contains(chess.id) || pushedList.Count >= skillCfg.TargetCount)
                     continue;
                     
                 // 计算敌人相对于移动直线的位置
@@ -77,7 +77,7 @@ public class SkillAttackRunCrossPlus : Skill
                 chess.MoveTo(chess.transform.position + pushDirection * 15f, true);
                 pushedList.Add(chess.id);
 
-                BuffManager.AddBuff(chess, owner, id, skillCfg.BuffId, skillCfg.BuffTime); //加负面buff
+                BuffManager.AddBuff(chess, owner, id, BuffConfig.GetConfigByNameS(skillCfg.BuffId).Id, skillCfg.BuffTime); //加负面buff
             }
 
             owner.transform.position = currentPos;

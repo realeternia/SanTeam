@@ -32,7 +32,7 @@ public class Skill
     /// </summary>
     public int GetSkillDamage()
     {
-        if(skillCfg.isMagic)
+        if(skillCfg.IsMagic)
             return (int)(skillCfg.Strength + owner.GetAttr("ap") * skillCfg.SkillDamageAttrRate);
         else
             return (int)(skillCfg.Strength + owner.GetAttr("atk") * skillCfg.SkillDamageAttrRate);
