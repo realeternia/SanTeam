@@ -1375,10 +1375,9 @@ public class WorldManager : MonoBehaviour
             return;
         if(unitsInRange.Count > limit)
         {
-            System.Random random = new System.Random();
             while (unitsInRange.Count > limit)
             {
-                int indexToRemove = random.Next(0, unitsInRange.Count);
+                int indexToRemove = SysRandom.Range(0, unitsInRange.Count);
                 unitsInRange.RemoveAt(indexToRemove);
             }
         }

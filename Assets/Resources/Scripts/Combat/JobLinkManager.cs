@@ -306,7 +306,7 @@ public static class JobLinkManager
         if (attr == "critRate" || attr == "soldierAtk" || attr == "soldierHp"
             || attr == "dodgeRate" || attr == "critDamageMulti"
             || attr == "healRate" || attr == "healedRate"
-            || attr == "auroEffectRate")
+            || attr == "attackSpeedRate" || attr == "auroEffectRate")
             return Mathf.RoundToInt(v * 100) + "%";
         if (v < 1f)
             return v.ToString("0.##");
