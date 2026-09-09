@@ -68,12 +68,12 @@ public static class HeroSelectionTool
                 return sideCompare;
             }
 
-            // 检查ID是否在100100以下
-            bool isBelow100100A = a.Item1 < 100100;
-            bool isBelow100100B = b.Item1 < 100100;
-            if (isBelow100100A != isBelow100100B)
+            // 主公（王）排在同阵营非主公之前
+            bool isKingA = ConfigManager.IsKingHero(a.Item1);
+            bool isKingB = ConfigManager.IsKingHero(b.Item1);
+            if (isKingA != isKingB)
             {
-                return isBelow100100A ? -1 : 1;
+                return isKingA ? -1 : 1;
             }
 
             // 按攻+法总面板排序（无双强度已在 PostModify 并入 Atk，Atk/Ap 为 1星带品质面板）

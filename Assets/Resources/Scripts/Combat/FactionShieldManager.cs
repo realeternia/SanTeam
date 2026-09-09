@@ -33,14 +33,15 @@ public static class FactionShieldManager
                 continue;
 
             var heroCfg = HeroConfig.GetConfig(unit.heroId);
-            if (heroCfg.Side  == 10)
+            var forceCfg = ConfigManager.GetForceConfig(heroCfg.Side);
+            if (forceCfg == null || !forceCfg.JoinFactionShield)
                 continue;
             var faction = heroCfg.Side;
             if (!factionCount.ContainsKey(faction))
                 factionCount[faction] = 0;
             factionCount[faction]++;
 
-            if (HeroConfig.GetConfig(unit.heroId).Job == "王")
+            if (ConfigManager.IsKingHero(unit.heroId))
                 kingCount++;
         }
 

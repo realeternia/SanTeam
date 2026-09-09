@@ -251,11 +251,11 @@ public class GameManager : MonoBehaviour
         heroIds = new List<int>();
 
         int[] sideCounts = new int[10];
-        // 核心英雄（Id<100100 的王）始终进入英雄池
+        // 核心英雄（各势力主公 王）始终进入英雄池
         List<HeroConfig> tempHeroes = new List<HeroConfig>(allHeroes);
         foreach (var hero in tempHeroes)
         {
-            if (hero.Id < 100100)
+            if (ConfigManager.IsKingHero(hero.Id))
             {
                 heroIds.Add(hero.Id);
                 sideCounts[hero.Side - 1]++;
@@ -276,9 +276,10 @@ public class GameManager : MonoBehaviour
                 int side4Count = i + 6;
                 side4Count = Mathf.Min(side4Count, side4Heroes.Count);
 
-                if(HeroConfig.HasConfig(100000 + side))
+                var kingId = ConfigManager.GetKingHeroId(side);
+                if (kingId > 0 && HeroConfig.HasConfig(kingId))
                 {
-                    var heroConfig = HeroConfig.GetConfig(100000 + side);
+                    var heroConfig = HeroConfig.GetConfig(kingId);
                     heroIds.Add((int)heroConfig.Id);
                     sideCounts[side - 1]++;
                     allHeroes.Remove(heroConfig);

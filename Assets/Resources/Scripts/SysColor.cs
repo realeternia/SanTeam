@@ -32,19 +32,14 @@ public static class SysColor
         }
     }
 
-    // 阵营背景色（1魏 2蜀 3吴 4晋 5群 6神，其他-灰）
+    // 阵营背景色（1魏 2蜀 3吴 4晋 5群 6神 10野，颜色数据在 ForceConfig，未登记-灰）
     public static Color GetSideColor(int side)
     {
-        switch (side)
-        {
-            case 1: return new Color(40 / 255f, 70 / 255f, 0 / 255f, 255 / 255f);
-            case 2: return new Color(0 / 255f, 35 / 255f, 100 / 255f, 255 / 255f);
-            case 3: return new Color(100 / 255f, 0 / 255f, 0 / 255f, 255 / 255f);
-            case 4: return new Color(30 / 255f, 100 / 255f, 110 / 255f, 255 / 255f);
-            case 5: return new Color(90 / 255f, 50 / 255f, 110 / 255f, 255 / 255f);
-            case 6: return new Color(120 / 255f, 90 / 255f, 30 / 255f, 255 / 255f);
-            default: return new Color(50 / 255f, 50 / 255f, 50 / 255f, 255 / 255f);
-        }
+        var forceCfg = ConfigManager.GetForceConfig(side);
+        if (forceCfg != null && !string.IsNullOrEmpty(forceCfg.Colorstr)
+            && ColorUtility.TryParseHtmlString(forceCfg.Colorstr, out Color color))
+            return color;
+        return new Color(50 / 255f, 50 / 255f, 50 / 255f, 255 / 255f);
     }
 
     // 技能属性连接线颜色（法术IsMagic-智谋蓝 / 物理-黄绿）

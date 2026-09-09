@@ -35,6 +35,7 @@ public static class ConfigManager
         SoldierLevelConfig.Load();
         FormulaLearnAttrConfig.Load();
         JobConfig.Load();
+        ForceConfig.Load();
         HeroAttrConfig.Load();
         SystemAttrConfig.Load();
 
@@ -294,6 +295,30 @@ public static class ConfigManager
             return value;
         }
         return null;
+    }
+
+    // 势力配置：按阵营Id(HeroConfig.Side)取，未登记返回 null
+    public static ForceConfig GetForceConfig(int side)
+    {
+        return ForceConfig.HasConfig(side) ? ForceConfig.GetConfig(side) : null;
+    }
+
+    // 势力主公英雄Id（未登记返回0）
+    public static int GetKingHeroId(int side)
+    {
+        var forceCfg = GetForceConfig(side);
+        return forceCfg != null ? forceCfg.KingId : 0;
+    }
+
+    // 是否某势力的主公（王）：主公Id登记在 ForceConfig.KingId
+    public static bool IsKingHero(int heroId)
+    {
+        foreach (var forceCfg in ForceConfig.ConfigList)
+        {
+            if (forceCfg.KingId == heroId)
+                return true;
+        }
+        return false;
     }
 
     public static SkillConfig GetSkillConfig(string skillName)

@@ -22,7 +22,7 @@ public static class PlayerAI
         // 首先筛选出未被ban且不是主公的英雄
         foreach (var cell in cellControls)
         {
-            if (cell.banState > 0 || cell.heroId < 100100)
+            if (cell.banState > 0 || ConfigManager.IsKingHero(cell.heroId))
                 continue;
 
             var heroConfig = HeroConfig.GetConfig(cell.heroId);
@@ -66,7 +66,7 @@ public static class PlayerAI
             List<PickPanelCellControl> basicAvailableCells = new List<PickPanelCellControl>();
             foreach (var cell in cellControls)
             {
-                if (cell.banState == 0 && cell.heroId > 100100)
+                if (cell.banState == 0 && !ConfigManager.IsKingHero(cell.heroId))
                     basicAvailableCells.Add(cell);
             }
             
@@ -126,7 +126,7 @@ public static class PlayerAI
             var heroConfig = HeroConfig.GetConfig(cardId);
             if (!sideInfos.TryGetValue(heroConfig.Side, out var info))
                 sideInfos[heroConfig.Side] = new SideInfo();
-            if (heroConfig.Job == "王")
+            if (ConfigManager.IsKingHero(heroConfig.Id))
                 sideInfos[heroConfig.Side].HasShuai = true;
             else
                 sideInfos[heroConfig.Side].Count++;
@@ -178,7 +178,7 @@ public static class PlayerAI
                 {
                     if (heroCfg.Side != playerConfig.Pickside)
                         continue;
-                    if (pickCard.cardId < 100010) //主公卡一定要拿
+                    if (ConfigManager.IsKingHero(pickCard.cardId)) //主公卡一定要拿
                         score *= playerConfig.Findmasterrate;
                 }
 
@@ -207,9 +207,9 @@ public static class PlayerAI
                 {
                     if (sideInfos.TryGetValue(heroCfg.Side, out var info))
                     {
-                        if (heroCfg.Job != "王" && info.HasShuai)
+                        if (!ConfigManager.IsKingHero(heroCfg.Id) && info.HasShuai)
                             score *= playerConfig.Findmasterrate * .6f;
-                        else if (heroCfg.Job == "王" && info.Count > 1)
+                        else if (ConfigManager.IsKingHero(heroCfg.Id) && info.Count > 1)
                             score *= playerConfig.Findmasterrate;
                     }
                 }

@@ -46,7 +46,7 @@ public class PickPanelCellControl : MonoBehaviour
         if(banState > 0)
             return;
 
-        if(heroId < 100100) //主公不能ban
+        if(ConfigManager.IsKingHero(heroId)) //主公不能ban
             return;
 
         banState = pid + 1;

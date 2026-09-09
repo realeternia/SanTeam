@@ -660,7 +660,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 
             if (!sideInfos.TryGetValue(heroConfig.Side, out var info))
                 sideInfos[heroConfig.Side] = new SideInfo();
-            if (heroConfig.Job == "王")
+            if (ConfigManager.IsKingHero(heroConfig.Id))
                 sideInfos[heroConfig.Side].HasShuai = true;
             else
                 sideInfos[heroConfig.Side].Count++;
@@ -670,7 +670,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         {
             if (!sideItem.Value.HasShuai && sideItem.Value.Count >= 2)
             {
-                var shuaiId = 100000 + sideItem.Key;
+                var shuaiId = ConfigManager.GetKingHeroId(sideItem.Key);
                 if (cards.ContainsKey(shuaiId))
                 {
                     sortDataList[sortDataList.Count - 1] = new Tuple<int, int>(shuaiId, 1);

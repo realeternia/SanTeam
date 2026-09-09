@@ -156,6 +156,7 @@
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\Buff.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffSuck.cs" />
     <Compile Include="Assets\Resources\Scripts\SelectCardNodeControl.cs" />
+    <Compile Include="Assets\Resources\Scripts\Configs\ForceConfig_s.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\BattleStatManager.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\Skill.cs" />
     <Compile Include="Assets\Resources\Scripts\BagRecycler.cs" />

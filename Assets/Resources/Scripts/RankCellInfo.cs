@@ -83,7 +83,7 @@ public class RankCellInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandle
         leadShip = heroConfig.Atk;
         hp = heroConfig.Hp;
         price = HeroSelectionTool.GetPrice(heroConfig);
-        if (heroConfig.Job == "王")
+        if (ConfigManager.IsKingHero(heroConfig.Id))
             loveBtn.gameObject.SetActive(false);
         else
             loveBtn.gameObject.SetActive(true); // 复用池中单元格时恢复被隐藏的按钮

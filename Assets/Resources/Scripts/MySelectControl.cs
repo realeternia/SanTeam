@@ -182,6 +182,23 @@ public class MySelectControl : MonoBehaviour
             entries.Add(new BondEntry { Name = friendCfg.Name, Count = present, Icon = GetSkillIcon(friendCfg.SkillId), Color = lineColor });
         }
 
+        // 国家势力：按上阵英雄阵营计数；不参与同阵营护盾(野=10)或图标为空的国家跳过
+        var forceCounts = new Dictionary<int, int>();
+        foreach (var id in battleHeroes)
+        {
+            var side = HeroConfig.GetConfig(id).Side;
+            forceCounts.TryGetValue(side, out var c);
+            forceCounts[side] = c + 1;
+        }
+        foreach (var kv in forceCounts)
+        {
+            var forceCfg = ConfigManager.GetForceConfig(kv.Key);
+            if (forceCfg == null || !forceCfg.JoinFactionShield)
+                continue;
+
+            entries.Add(new BondEntry { Name = forceCfg.Name, Count = kv.Value, Icon = "Textures/Icons/" + forceCfg.Icon });
+        }
+
         // 羁绊人数倒序排序
         entries.Sort((a, b) => b.Count.CompareTo(a.Count));
 
