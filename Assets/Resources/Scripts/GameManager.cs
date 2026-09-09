@@ -250,7 +250,6 @@ public class GameManager : MonoBehaviour
         List<HeroConfig> allHeroes = new List<HeroConfig>(HeroConfig.ConfigList);
         heroIds = new List<int>();
 
-        int[] sideCounts = new int[10];
         // 核心英雄（各势力主公 王）始终进入英雄池
         List<HeroConfig> tempHeroes = new List<HeroConfig>(allHeroes);
         foreach (var hero in tempHeroes)
@@ -258,46 +257,23 @@ public class GameManager : MonoBehaviour
             if (ConfigManager.IsKingHero(hero.Id))
             {
                 heroIds.Add(hero.Id);
-                sideCounts[hero.Side - 1]++;
                 allHeroes.Remove(hero);
             }
         }
 
-        // 先随机选择5-7张Side=4的卡牌
+        // 魏蜀吴之外的4个阵营(4晋/5群/6神/10野)4选2，选中阵营的全部英雄进英雄池
         int[] sides = {4, 5, 6, 10};
+        int[] pickedSides = new int[2];
         for (int i = 0; i < 2; i++)
         {
             var side = sides[SysRandom.Range(0, sides.Length)];
             sides = sides.Where(s => s != side).ToArray();
-
-            List<HeroConfig> side4Heroes = allHeroes.FindAll(hero => hero.Side == side);
-            if (side4Heroes.Count > 0)
-            {
-                int side4Count = i + 6;
-                side4Count = Mathf.Min(side4Count, side4Heroes.Count);
-
-                var kingId = ConfigManager.GetKingHeroId(side);
-                if (kingId > 0 && HeroConfig.HasConfig(kingId))
-                {
-                    var heroConfig = HeroConfig.GetConfig(kingId);
-                    heroIds.Add((int)heroConfig.Id);
-                    sideCounts[side - 1]++;
-                    allHeroes.Remove(heroConfig);
-                    side4Heroes.Remove(heroConfig);
-                }
-                
-                List<HeroConfig> tempSide4Heroes = new List<HeroConfig>(side4Heroes);
-                for (int j = sideCounts[side - 1]; j < side4Count; j++)
-                {
-                    // 该阵营内随机选一张
-                    int randomIndex = SysRandom.Range(0, tempSide4Heroes.Count);
-                    HeroConfig heroCfg = tempSide4Heroes[randomIndex];
-                    heroIds.Add((int)heroCfg.Id);
-                    allHeroes.Remove(heroCfg);
-                    tempSide4Heroes.Remove(heroCfg);
-                    sideCounts[side - 1]++;
-                }
-            }
+            pickedSides[i] = side;
+        }
+        foreach (var side in pickedSides)
+        {
+            foreach (var hero in allHeroes.FindAll(h => h.Side == side))
+                heroIds.Add(hero.Id);
         }
 
         // side 1/2/3 全部加入英雄池，不做随机筛选

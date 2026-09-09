@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -317,7 +317,7 @@ namespace CommonConfig
             config[110007] = new HeroConfig(110007, "张角", 1, "工", 3, 0, 0, 0, 0, 100, 100, 100, 100, 0, 0, 0, 10, 6, 0, 0, "", "", "zhangjiao");
             config[110008] = new HeroConfig(110008, "张宝", 1, "医", 2, 0, 0, 0, 0, 100, 100, 100, 100, 0, 0, 0, 10, 4, 0, 0, "", "", "zhangbao2");
             config[110009] = new HeroConfig(110009, "张梁", 1, "士", 1, 0, 0, 0, 0, 100, 100, 100, 100, 0, 0, 0, 10, 2, 0, 0, "", "", "zhangliang");
-            config[110010] = new HeroConfig(110010, "孟获", 1, "锤", 3, 0, 0, 0, 0, 100, 100, 100, 100, 0, 0, 0, 10, 6, 0, 0, "", "", "menghuo");
+            config[101024] = new HeroConfig(101024, "孟获", 1, "锤", 3, 0, 0, 0, 0, 100, 100, 100, 100, 0, 0, 0, 1, 6, 0, 0, "", "", "menghuo");
             config[110011] = new HeroConfig(110011, "左慈", 1, "医", 3, 0, 0, 0, 0, 100, 100, 100, 100, 0, 0, 0, 10, 6, 0, 0, "", "", "zuoci");
 
             RebuildIndex();

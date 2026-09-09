@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
@@ -182,6 +183,9 @@ public class PickPanelControl : MonoBehaviour
 
         // 获取英雄池缓存
         List<int> heroPool = HeroSelectionTool.GetHeroPoolCache();
+
+        // 王(主公)不参与pick展示与ban，但仍保留在英雄池用于商店卡池
+        heroPool = heroPool.Where(heroId => !ConfigManager.IsKingHero(heroId)).ToList();
         
         // 每行显示10个，共5行
         int itemsPerRow = 13;
