@@ -55,8 +55,6 @@ public static class HeroSelectionTool
         {
             var config = HeroConfig.GetConfig(heroId);
             var rate = 1000 / Math.Max(5, GetPrice(config));
-            if (config.Job == "shuai")
-                rate += 15;
             heroPoolCache.Add(new Tuple<int, int>(heroId, rate));
         }
 

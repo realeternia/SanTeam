@@ -157,7 +157,7 @@ public class MySelectControl : MonoBehaviour
             var jobCfg = ConfigManager.GetJobConfig(kv.Key);
             if (jobCfg == null)
                 continue;
-            entries.Add(new BondEntry { Name = jobCfg.NameS, Count = kv.Value, Icon = GetSkillIcon(jobCfg.SkillId) });
+            entries.Add(new BondEntry { Name = jobCfg.Name, Count = kv.Value, Icon = GetSkillIcon(jobCfg.SkillId) });
         }
 
         // 好友羁绊：HeroFriendConfig.Heros 中拥有英雄数即等级；普通组无特殊技能则不显示图标；

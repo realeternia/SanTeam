@@ -660,7 +660,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 
             if (!sideInfos.TryGetValue(heroConfig.Side, out var info))
                 sideInfos[heroConfig.Side] = new SideInfo();
-            if (heroConfig.Job == "shuai")
+            if (heroConfig.Job == "王")
                 sideInfos[heroConfig.Side].HasShuai = true;
             else
                 sideInfos[heroConfig.Side].Count++;

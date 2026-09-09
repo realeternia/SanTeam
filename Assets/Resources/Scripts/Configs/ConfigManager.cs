@@ -45,25 +45,15 @@ public static class ConfigManager
 
     public static void PostModify()
     {
-        var jobNameConvDict = new Dictionary<string, string>();
         foreach (var jobCfg in JobConfig.ConfigList)
         {
-            jobDict.Add(jobCfg.Name, jobCfg);
             jobDict.Add(jobCfg.NameS, jobCfg);
-            jobNameConvDict[jobCfg.NameS] = jobCfg.Name;
         }      
         foreach (var skillCfg in SkillConfig.ConfigList)
         {
             // 每个技能在配置表中展开为1-5级多行，按缩写去重时优先取5级作为代表（数值各级相同）
             if (!skillDict.ContainsKey(skillCfg.Sname) || skillCfg.Lv == 5)
                 skillDict[skillCfg.Sname] = skillCfg;
-        }
-
-        foreach (var heroCfg in HeroConfig.ConfigList)
-        {
-            heroCfg.Job = jobNameConvDict.ContainsKey(heroCfg.Job) ? jobNameConvDict[heroCfg.Job] : heroCfg.Job;
-            // 技能不再在此绑定为固定Id：同一技能会因等级不同映射到不同行Id，
-            // 改由战斗/界面按 Sname+等级 实时解析（GetHeroSkillConfigs / GetSkillConfig(sname, lv)）
         }
 
         // 数值写回（百分比语义）：HeroConfig 数值列 = 相对 JobConfig 职业基准的百分比修正（0=无修正用基准，非0=±%）

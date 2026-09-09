@@ -126,7 +126,7 @@ public static class PlayerAI
             var heroConfig = HeroConfig.GetConfig(cardId);
             if (!sideInfos.TryGetValue(heroConfig.Side, out var info))
                 sideInfos[heroConfig.Side] = new SideInfo();
-            if (heroConfig.Job == "shuai")
+            if (heroConfig.Job == "王")
                 sideInfos[heroConfig.Side].HasShuai = true;
             else
                 sideInfos[heroConfig.Side].Count++;
@@ -207,9 +207,9 @@ public static class PlayerAI
                 {
                     if (sideInfos.TryGetValue(heroCfg.Side, out var info))
                     {
-                        if (heroCfg.Job != "shuai" && info.HasShuai)
+                        if (heroCfg.Job != "王" && info.HasShuai)
                             score *= playerConfig.Findmasterrate * .6f;
-                        else if (heroCfg.Job == "shuai" && info.Count > 1)
+                        else if (heroCfg.Job == "王" && info.Count > 1)
                             score *= playerConfig.Findmasterrate;
                     }
                 }
