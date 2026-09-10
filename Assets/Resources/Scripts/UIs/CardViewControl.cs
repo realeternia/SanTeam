@@ -428,14 +428,14 @@ public class CardViewControl : MonoBehaviour, IPointerDownHandler, IPointerUpHan
         effectLayer.SetActive(isShow);
     }
 
-    // 按当前阵容重新计算特效层：仅满足自动上阵的英雄卡点亮（道具卡不适用）
-    public void UpdateEffectLayer(PlayerInfo player)
+    // 同步特效层容器：绿/黄/灰（与背包已拥有卡重复/好友/同职业关联）任意一个点亮时显示容器
+    public void UpdateEffectLayer()
     {
         if (effectLayer == null)
             return;
-        bool show = false;
-        if (isHeroCard)
-            show = player.CanAutoEquipHero(cardId);
+        bool show = (effectGreen != null && effectGreen.activeSelf)
+            || (effectYellow != null && effectYellow.activeSelf)
+            || (effectGray != null && effectGray.activeSelf);
         effectLayer.SetActive(show);
     }
 

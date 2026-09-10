@@ -15,10 +15,8 @@ public class WorldManager : MonoBehaviour
     public GameObject Units;
     public int gridCellSize = 3; // 每个格子的实际大小(米)
 
-    private Dictionary<int, List<Vector2Int>> occupiedGrids = new Dictionary<int, List<Vector2Int>>(); // 所有被占据的格子，键为chess.id
-
-    public bool showDebugCube = false;
-    private Dictionary<Vector2Int, GameObject> debugGridCubes = new Dictionary<Vector2Int, GameObject>(); // 格子与调试cube的映射
+    private HashSet<Vector2Int> wallGrids = new HashSet<Vector2Int>(); // 墙占用的格子(静态障碍，单位不可入，踩墙校验用)
+    private HashSet<Vector2Int> pathBlockedGrids = new HashSet<Vector2Int>(); // 墙膨胀2格后的寻路障碍(短程寻路/直线通畅判定用)
 
     private List<Chess> chessList = new List<Chess>(); // 所有棋子
     private int[] killMark = new int[8];
@@ -220,10 +218,10 @@ public class WorldManager : MonoBehaviour
         {
             Destroy(child.gameObject);
         }
-        occupiedGrids.Clear();
+        wallGrids.Clear();
+        pathBlockedGrids.Clear();
         heroInfoGroup.Reset();
 
-        List<Vector2Int> unitGrids = new List<Vector2Int>();
         // 生成墙
         for (int i = 0; i < mapConfig.WallNode.transform.childCount; i++)
         {
@@ -234,12 +232,18 @@ public class WorldManager : MonoBehaviour
 
             foreach (var gridPos in requiredGrids)
             {
-                unitGrids.Add(gridPos);
-                CreateDebugCube(300001, gridPos);
+                wallGrids.Add(gridPos);
+                // 膨胀2格(约6米，超过单位半宽4.5米)作为寻路障碍，保证单位按路走不擦墙
+                for (int dx = -gridCellSize * 2; dx <= gridCellSize * 2; dx += gridCellSize)
+                {
+                    for (int dz = -gridCellSize * 2; dz <= gridCellSize * 2; dz += gridCellSize)
+                    {
+                        pathBlockedGrids.Add(new Vector2Int(gridPos.x + dx, gridPos.y + dz));
+                    }
+                }
               //  GameLog.Debug("Lock " + gridPos + " for wall");
             }
         }
-        occupiedGrids[300001] = unitGrids;
 
         if (!isDebug)
         {
@@ -830,7 +834,7 @@ public class WorldManager : MonoBehaviour
         return new Vector2Int(x, z);
     }
 
-    // 尝试锁定目标位置的格子
+    // 检查目标位置是否可用(不会被墙阻挡)：单位间不再锁格子，由互斥力控制间距；冲刺/镜像类技能落点校验用
     public bool TryLockGridPositions(Chess unit, Vector3 targetPosition, out List<Vector2Int> requiredGrids)
     {
         // 获取单位包围盒
@@ -838,107 +842,21 @@ public class WorldManager : MonoBehaviour
 
         // 使用GetOccupiedGrids方法获取需要锁定的格子列表
         requiredGrids = GetOccupiedGrids(targetPosition, collider, true);
-        // GameLog.Debug($"id:{unit.id} requiredGrids: Target Position = {targetPosition}, Collider Size = {collider.bounds.size}");
-        // string gridPositions = string.Join(", ", requiredGrids);
-        // GameLog.Debug($"Grids: {gridPositions}");
 
-        // 检查所有格子是否可用
+        // 只要落点不踩进墙就算可用
         foreach (var gridPos in requiredGrids)
         {
-            foreach (var entry in occupiedGrids)
-            {
-                if (entry.Key != unit.id)
-                {
-                    foreach (var occupiedGrid in entry.Value)
-                    {
-                        if (occupiedGrid.x == gridPos.x && occupiedGrid.y == gridPos.y)
-                        {
-                         //   GameLog.Debug("Grid " + gridPos + " is already occupied by unit: " + entry.Key);
-                            return false; // 格子不可用
-                        }
-                    }
-                }
-            }
+            if (wallGrids.Contains(gridPos))
+                return false;
         }
         return true;
     }
 
-    public void DoLockGridPositions(Chess unit, List<Vector2Int> requiredGrids)
-    {
-        ReleaseGridPositions(unit);
-        // 锁定新格子
-        List<Vector2Int> unitGrids = new List<Vector2Int>();
-        foreach (var gridPos in requiredGrids)
-        {
-            unitGrids.Add(gridPos);
-            CreateDebugCube(unit.id, gridPos);
-         //   GameLog.Debug("Lock " + gridPos + " for unit: " + unit.id);
-        }
-
-        // 存储单位占据的格子
-        occupiedGrids[unit.id] = unitGrids;
-    }
-
-    public void ForceLockGridPositions(Chess unit, Vector3 targetPosition)
-    {
-        // 获取单位包围盒
-        var collider = unit.GetComponent<Collider>();
-
-        // 使用GetOccupiedGrids方法获取需要锁定的格子列表
-        List<Vector2Int> requiredGrids = GetOccupiedGrids(targetPosition, collider, true);
-        List<Vector2Int> toRemoves = new List<Vector2Int>();
-
-        // 检查所有格子是否可用
-        foreach (var gridPos in requiredGrids)
-        {
-            foreach (var entry in occupiedGrids)
-            {
-                if (entry.Key != unit.id)
-                {
-                    foreach (var occupiedGrid in entry.Value)
-                    {
-                        if (occupiedGrid.x == gridPos.x && occupiedGrid.y == gridPos.y)
-                            toRemoves.Add(occupiedGrid);
-                    }
-                }
-            }
-        }
-
-        ReleaseGridPositions(unit);
-        requiredGrids.RemoveAll(x => toRemoves.Contains(x));
-        // 锁定新格子
-        List<Vector2Int> unitGrids = new List<Vector2Int>();
-        foreach (var gridPos in requiredGrids)
-        {
-            unitGrids.Add(gridPos);
-            CreateDebugCube(unit.id, gridPos);
-         //   GameLog.Debug("Lock " + gridPos + " for unit: " + unit.id);
-        }
-
-        // 存储单位占据的格子
-        occupiedGrids[unit.id] = unitGrids;
-    }    
-
     public bool MoveTo(Chess unit, Vector3 targetPosition, bool isForce = false)
     {
-        if (isForce)
-        {
-            ForceLockGridPositions(unit, targetPosition);
-            unit.transform.position = targetPosition;
-
-            return true;
-        }
-        else
-        { 
-            if(TryLockGridPositions(unit, targetPosition, out List<Vector2Int> requiredGrids))
-            {
-                DoLockGridPositions(unit, requiredGrids);
-                unit.transform.position = targetPosition;
-                return true;
-            }
-            return false;
-        }
-
+        // 单位移动已改为转向制(短程寻路+互斥力)，不再锁格子；技能强制位移直接落位
+        unit.transform.position = targetPosition;
+        return true;
     }
 
     // 获取指定位置和碰撞体占据的所有格子
@@ -980,59 +898,120 @@ public class WorldManager : MonoBehaviour
         return occupiedGrids;
     }
 
-    // 释放指定位置的格子
-    // 释放指定单位占据的格子
-    public void ReleaseGridPositions(Chess unit)
+    // ---- 短程寻路(单位转向制移动用：墙为唯一障碍，单位间用互斥力控制间距) ----
+
+    /// <summary>格子是否为寻路障碍(墙膨胀2格)</summary>
+    public bool IsPathBlockedGrid(Vector2Int grid)
     {
-        // 检查单位是否有占据的格子
-        if (occupiedGrids.ContainsKey(unit.id))
+        return pathBlockedGrids.Contains(grid);
+    }
+
+    /// <summary>校验某位置的单位阻挡范围是否会踩进墙(静态障碍)，寻路失效时的兜底</summary>
+    public bool CheckPositionBlocked(Chess unit, Vector3 position)
+    {
+        var collider = unit.GetComponent<Collider>();
+        if (collider == null)
+            return false;
+        foreach (var gridPos in GetOccupiedGrids(position, collider, true))
         {
-            // 删除该单位占据的所有格子的调试cube
-            foreach (var gridPos in occupiedGrids[unit.id])
+            if (wallGrids.Contains(gridPos))
+                return true;
+        }
+        return false;
+    }
+
+    /// <summary>短程寻路：从 from 到 to 绕过墙取下一个途经点(格子中心)；直线通畅返回null(直接朝目标走)</summary>
+    /// <remarks>目标太远时在搜索预算内取"最接近目标的一步"返回，保证持续朝目标推进；被墙围死返回null</remarks>
+    public Vector3? FindMoveWaypoint(Vector3 from, Vector3 to)
+    {
+        int cell = gridCellSize;
+        Vector2Int start = WorldToGridPosition(from, true);
+        Vector2Int goal = WorldToGridPosition(to, true);
+        if (start == goal)
+            return null;
+        // 直线通畅直接直行
+        if (IsLineClear(start, goal))
+            return null;
+
+        // BFS(4邻域)：预算内优先到达目标；到不了则记录最接近目标的可达格子作为推进方向
+        Queue<(Vector2Int node, int depth)> queue = new Queue<(Vector2Int, int)>();
+        Dictionary<Vector2Int, Vector2Int> parent = new Dictionary<Vector2Int, Vector2Int> { [start] = start };
+        queue.Enqueue((start, 0));
+
+        Vector2Int bestNode = start;
+        int bestDist = ManhattanDist(start, goal);
+
+        while (queue.Count > 0)
+        {
+            var (node, depth) = queue.Dequeue();
+            if (node == goal)
             {
-                DestroyDebugCube(gridPos);
+                bestNode = node;
+                break;
             }
-            occupiedGrids[unit.id].Clear();
-          //  GameLog.Debug("Released all grids for unit: " + unit.id);
+            if (depth >= CombatConst.MovePathMaxDepth)
+                continue; // 超出搜索深度不再扩展
+            TryNeighbor(queue, parent, node, node.x + cell, node.y, depth, goal, ref bestNode, ref bestDist);
+            TryNeighbor(queue, parent, node, node.x - cell, node.y, depth, goal, ref bestNode, ref bestDist);
+            TryNeighbor(queue, parent, node, node.x, node.y + cell, depth, goal, ref bestNode, ref bestDist);
+            TryNeighbor(queue, parent, node, node.x, node.y - cell, depth, goal, ref bestNode, ref bestDist);
         }
-    }
 
-    // 创建调试用的cube
-    private void CreateDebugCube(int oid, Vector2Int gridPos)
-    {
-        if(!showDebugCube)
-            return;
+        if (bestNode == start)
+            return null; // 一步都走不了(被墙围死)
 
-        if (debugGridCubes.ContainsKey(gridPos))
-            return; // 已存在则不再创建
-
-        GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
-        cube.transform.position = new Vector3(gridPos.x, 0.5f, gridPos.y);
-        cube.transform.localScale = new Vector3(gridCellSize * 0.9f, 1f, gridCellSize * 0.9f);
-        // 将oid散列到RGB值中
-        int hash = oid * oid * 31 + oid * 3779; // 对哈希值进行位运算打散，避免值为1时不被打散的问题
-        float r = Mathf.Abs((float)(hash & 0xFF) / 255f);
-        float g = Mathf.Abs((float)((hash >> 8) & 0xFF) / 255f);
-        float b = Mathf.Abs((float)((hash >> 16) & 0xFF) / 255f);
-        cube.GetComponent<Renderer>().material.color = new Color(r, g, b);
-        cube.name = "GridCube_" + hash;
-        cube.transform.parent = Units.transform;
-        cube.transform.localPosition += new Vector3(0, 10f, 0);
-
-        debugGridCubes[gridPos] = cube;
-    }
-
-    // 销毁调试用的cube
-    private void DestroyDebugCube(Vector2Int gridPos)
-    {
-        if(!showDebugCube)
-            return;
-
-        if (debugGridCubes.TryGetValue(gridPos, out GameObject cube))
+        // 回溯到起点，返回起点后的第一个格子中心
+        Vector2Int cur = bestNode;
+        while (parent[cur] != start)
         {
-            Destroy(cube);
-            debugGridCubes.Remove(gridPos);
+            cur = parent[cur];
+            if (cur == start)
+                return null;
         }
+        return new Vector3(cur.x, 0f, cur.y);
+    }
+
+    // BFS 尝试扩展一个邻格
+    private void TryNeighbor(Queue<(Vector2Int, int)> queue, Dictionary<Vector2Int, Vector2Int> parent, Vector2Int node,
+        int nx, int nz, int depth, Vector2Int goal, ref Vector2Int bestNode, ref int bestDist)
+    {
+        Vector2Int nb = new Vector2Int(nx, nz);
+        if (parent.ContainsKey(nb) || IsPathBlockedGrid(nb))
+            return;
+        parent[nb] = node;
+        int d = ManhattanDist(nb, goal);
+        if (d < bestDist)
+        {
+            bestDist = d;
+            bestNode = nb;
+        }
+        queue.Enqueue((nb, depth + 1));
+    }
+
+    // 起点到终点连线经过的格子是否都通畅(无寻路障碍)
+    private bool IsLineClear(Vector2Int from, Vector2Int to)
+    {
+        int x0 = from.x, y0 = from.y;
+        int dx = Mathf.Abs(to.x - x0), dy = Mathf.Abs(to.y - y0);
+        int sx = x0 < to.x ? gridCellSize : -gridCellSize;
+        int sy = y0 < to.y ? gridCellSize : -gridCellSize;
+        int err = dx - dy;
+        while (true)
+        {
+            if (IsPathBlockedGrid(new Vector2Int(x0, y0)))
+                return false;
+            if (x0 == to.x && y0 == to.y)
+                return true;
+            int e2 = 2 * err;
+            if (e2 > -dy) { err -= dy; x0 += sx; }
+            if (e2 < dx) { err += dx; y0 += sy; }
+        }
+    }
+
+    // 格子间曼哈顿距离(米)
+    private int ManhattanDist(Vector2Int a, Vector2Int b)
+    {
+        return Mathf.Abs(a.x - b.x) + Mathf.Abs(a.y - b.y);
     }
 
     public bool IsEnemy(int a, int b)
@@ -1545,17 +1524,4 @@ public class WorldManager : MonoBehaviour
         return localPosition;
     }
 
-
-    // 管理器销毁时释放所有格子
-    private void OnDestroy()
-    {
-        occupiedGrids.Clear();
-
-        // 销毁所有调试cube
-        foreach (var cube in debugGridCubes.Values)
-        {
-            Destroy(cube);
-        }
-        debugGridCubes.Clear();
-    }
 }

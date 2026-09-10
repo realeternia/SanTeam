@@ -41,11 +41,19 @@ public static class CombatConst
         return ResistBase / (ResistBase + resist);
     }
 
-    // ---- 移动避障 ----
-    /// <summary>单位间距小于该值(米)时触发分离推力，防止贴脸卡位（略大于阻挡格尺寸，让单位在硬卡前先滑开）</summary>
-    public const float MoveSeparationDist = 10f;
-    /// <summary>分离推力权重(0~1，越大越容易被挤开)</summary>
-    public const float MoveSeparationForce = 0.35f;
+    // ---- 移动避障(转向制：互斥力+短程寻路，不再锁单位格子) ----
+    /// <summary>单位间距小于该值(米)时触发分离推力，防止贴脸卡住</summary>
+    public const float MoveSeparationDist = 9f;
+    /// <summary>敌方(非目标)单位分离推力权重(0~1，线性衰减，顺滑擦身而过)</summary>
+    public const float MoveSeparationForce = 1.0f;
+    /// <summary>同阵营单位恒定推力(必须>1才能压住前进意图，防止跟屁股堆叠黏在一起)</summary>
+    public const float MoveSeparationAllyForce = 1.4f;
+    /// <summary>短程寻路重规划间隔(秒)：目标远距离移动过程中环境变化大，定期重算</summary>
+    public const float MoveReplanInterval = 0.5f;
+    /// <summary>单位侧向错位权重(拥挤时叠加横向分量打散同向队列；独行时不偏移)</summary>
+    public const float MoveLaneBias = 0.4f;
+    /// <summary>短程寻路最大搜索深度(格)，超过预算取最接近目标的一步继续推进</summary>
+    public const int MovePathMaxDepth = 6;
 
     // ---- 其他 ----
     /// <summary>近战/远程士兵射程判定阈值</summary>

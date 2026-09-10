@@ -42,11 +42,13 @@ public class Chess : MonoBehaviour
     public int lastDamagedPlayerId = -1;
 
     private Vector3? moveDest = null;
-    // 移动失败计数器
-    private int moveFailCount = 0;
-    // 绕障方向记忆：-1 向左绕，1 向右绕，0 未决定（一旦定下保持到直行通畅，避免每帧随机翻转导致原地抖动）
-    private int avoidDir = 0;
-    // 最大连续移动尝试次数
+    // 上次短程寻路重规划时间(移动目标远距离变化大，定期重算途经点)
+    private float moveDestPlanTime = -1f;
+    // 单位侧向错位方向(±1，按id奇偶分边)：拥挤时叠加横向分量打散同向队列，独行不偏移
+    private float laneBias;
+    // 地面基准高度与微调偏移：贴脸单位按id微调y错开(0/0.15/0.3三档)，避免模型重叠z-fighting闪面
+    public float baseY;
+    public float heightOffset;
 
     // 是否正在使用偏移路径
     public int hp = 100;
@@ -107,6 +109,14 @@ public class Chess : MonoBehaviour
     {
         playerId = pid;
         pos = posId;
+        // 侧向错位方向按id奇偶分边，避免同向部队整齐排队成一条线
+        laneBias = id % 2 == 0 ? 1f : -1f;
+        // 记录地面基准高度并微调y错开：贴脸单位高度差0.15m三档，避免模型重叠z-fighting闪面
+        baseY = transform.position.y;
+        heightOffset = (id % 10) * 0.0015f;
+        var initPos = transform.position;
+        initPos.y = baseY + heightOffset;
+        transform.position = initPos;
         // 创建材质实例
         material = new Material(rend.sharedMaterial);
         if (!string.IsNullOrEmpty(chessName))
@@ -256,19 +266,6 @@ public class Chess : MonoBehaviour
     void Update()
     {
 
-    }
-
-    private void OnDestroy()
-    {
-        // 单位销毁时释放格子锁定
-        if (WorldManager.Instance != null)
-        {
-            Collider collider = GetComponent<Collider>();
-            if (collider != null)
-            {
-                WorldManager.Instance.ReleaseGridPositions(this);
-            }
-        }
     }
 
     public void CheckInitAttr(PlayerInfo player, int lv)
@@ -504,85 +501,65 @@ public class Chess : MonoBehaviour
         if (noMoveCount > 0 || moveSpeed == 0)
             return;
 
-        if (moveDest == null || WorldManager.Instance.GetRange(targetChess.transform.position, moveDest.Value) > 40)
-            moveDest = targetChess.transform.position;
-        
-        //如果当前位置很接近moveDirection，就直接移动到moveDirection
-        if (WorldManager.Instance.GetRange(transform.position, moveDest.Value) <= moveSpeed * 0.1f)
+        // 短程寻路重规划：无目的地/到达途经点/定期重算，绕墙取下一格
+        float now = Time.time;
+        if (moveDest == null
+            || now - moveDestPlanTime >= CombatConst.MoveReplanInterval
+            || WorldManager.Instance.GetRange(transform.position, moveDest.Value) <= moveSpeed * 0.1f)
         {
-            moveDest = targetChess.transform.position;
+            ReplanMoveDest();
         }
 
         if (moveDest != null)
         {
-            // 基础移动方向：朝向目的地
-            Vector3 moveDir = (moveDest.Value - transform.position).normalized;
+            // 基础移动方向：朝向途经点(直线通畅时途经点即目标位置)
+            Vector3 moveDir = moveDest.Value - transform.position;
+            moveDir.y = 0;
+            float dist = moveDir.magnitude;
+            if (dist < 0.01f)
+                return;
+            moveDir /= dist;
 
-            // 分离推力：与周围过近的单位互相推开（目标除外），避免贴脸卡位、顺势绕行
+            // 互斥力：与周围过近的单位互相推开(目标除外)，防止贴脸黏住、顺势绕人
             Vector3 separation = GetSeparationPush();
             if (separation.sqrMagnitude > 0.0001f)
                 moveDir = (moveDir + separation).normalized;
 
+            // 侧向错位：拥挤(存在互斥力)时叠加横向分量，打散同向队列；独行时不偏移
+            Vector3 lateral = Vector3.Cross(Vector3.up, moveDir) * laneBias
+                * CombatConst.MoveLaneBias * Mathf.Min(separation.magnitude, 1f);
+            moveDir = (moveDir + lateral).normalized;
+
             // 计算下一步位置
             Vector3 nextPosition = transform.position + moveDir * moveSpeed * 0.05f;
 
-            // 尝试锁定目标格子
-            if (WorldManager.Instance.TryLockGridPositions(this, nextPosition, out List<Vector2Int> requiredGrids))
-            {
-                WorldManager.Instance.DoLockGridPositions(this, requiredGrids);
-                // 锁定成功，移动到新位置
-                transform.position = nextPosition;
-                moveFailCount = 0; // 重置失败计数器
+            // 兜底：下一位置踩进墙(寻路失效)则原地等待下次重规划，绝不穿墙
+            if (WorldManager.Instance.CheckPositionBlocked(this, nextPosition))
+                return;
 
-                // 朝目标直行通畅才清除绕障记忆；绕障途中(还在走偏移路径)继续沿同侧绕行
-                Vector3 toTarget = targetChess.transform.position - transform.position;
-                toTarget.y = 0;
-                if (WorldManager.Instance.TryLockGridPositions(this, transform.position + toTarget.normalized * moveSpeed * 0.05f, out _))
-                    avoidDir = 0;
-            }
-            else
-            {
-                // 锁定失败，绕障：绕障方向一旦定下就保持，直到直行通畅，避免每帧随机翻转导致原地抖动
-                moveFailCount++;
-                if (avoidDir == 0)
-                    avoidDir = SysRandom.Value > 0.5f ? 1 : -1;
-
-                // 计算原始方向
-                Vector3 direction = (targetChess.transform.position - transform.position).normalized;
-                float angleOffset = 0f;
-
-                // 根据失败次数确定偏移角度
-                if (moveFailCount <= 3)
-                    angleOffset = 45f;
-                else if (moveFailCount <= 5)
-                    angleOffset = 90f;
-                else
-                    angleOffset = 135f;
-
-                // 沿记忆的绕障方向偏移（同一侧绕行，不随机翻转）
-                angleOffset *= avoidDir;
-
-                // 计算旋转后的方向
-                Quaternion rotation = Quaternion.Euler(0, angleOffset, 0);
-                Vector3 newDirection = rotation * direction;
-
-                // 计算新的下一步位置
-                nextPosition = transform.position + newDirection * moveSpeed * 0.05f;
-
-                // 尝试移动到新位置
-                if (WorldManager.Instance.TryLockGridPositions(this, nextPosition, out requiredGrids))
-                {
-                    WorldManager.Instance.DoLockGridPositions(this, requiredGrids);
-                    transform.position = nextPosition;
-                    moveDest = transform.position + newDirection * moveSpeed * 0.05f * 10;
-                    moveFailCount = 0; // 重置失败计数器
-                    // avoidDir 保留：绕障途中继续沿同侧绕行
-                }
-            }
+            transform.position = nextPosition;
         }
     }
 
-    // 分离推力：与周围过近的单位互相推开（目标除外），防止贴脸卡位导致移动卡死
+    // 短程寻路重规划：朝目标绕墙取下一个途经点；直线通畅则直接朝目标
+    private void ReplanMoveDest()
+    {
+        moveDestPlanTime = Time.time;
+        var wp = WorldManager.Instance.FindMoveWaypoint(transform.position, targetChess.transform.position);
+        if (wp.HasValue)
+        {
+            var p = wp.Value;
+            p.y = transform.position.y;
+            moveDest = p;
+        }
+        else
+        {
+            // 直线通畅(或无法寻路时直接朝目标)，由踩墙校验兜底
+            moveDest = targetChess.transform.position;
+        }
+    }
+
+    // 互斥力：与周围过近的单位互相推开(目标除外)，防止贴脸黏住导致移动卡死
     private Vector3 GetSeparationPush()
     {
         Vector3 push = Vector3.zero;
@@ -598,10 +575,14 @@ public class Chess : MonoBehaviour
             float dist = offset.magnitude;
             if (dist < 0.01f || dist >= CombatConst.MoveSeparationDist)
                 continue;
-            // 距离越近推力越大（线性衰减），方向为远离对方
-            push += offset / dist * (1f - dist / CombatConst.MoveSeparationDist);
+            // 同阵营：恒定强推力(>1 压住前进意图)，防止跟屁股堆叠黏住；
+            // 敌方(非目标)：线性衰减推开，顺滑擦身而过
+            float strength = other.side == side
+                ? CombatConst.MoveSeparationAllyForce
+                : CombatConst.MoveSeparationForce * (1f - dist / CombatConst.MoveSeparationDist);
+            push += offset / dist * strength;
         }
-        return push * CombatConst.MoveSeparationForce;
+        return push;
     }
 
     // 攻击目标
@@ -972,7 +953,7 @@ public class Chess : MonoBehaviour
         {
             StopCoroutine(jumpCoroutine);
             jumpCoroutine = null;
-            transform.position = new Vector3(transform.position.x, 7, transform.position.z); // 恢复到原始位置
+            transform.position = new Vector3(transform.position.x, baseY + heightOffset, transform.position.z); // 恢复到原始位置
         }
         
         jumpCoroutine = StartCoroutine(JumpCoroutine(height, time));
@@ -984,7 +965,7 @@ public class Chess : MonoBehaviour
         {
             StopCoroutine(jumpCoroutine);
             jumpCoroutine = null;
-            transform.position = new Vector3(transform.position.x, 7, transform.position.z); // 恢复到原始位置
+            transform.position = new Vector3(transform.position.x, baseY + heightOffset, transform.position.z); // 恢复到原始位置
         }
     }
 
@@ -1010,7 +991,7 @@ public class Chess : MonoBehaviour
         }
         
         // 确保最终回到原始位置
-        transform.position = new Vector3(transform.position.x, 7, transform.position.z);
+        transform.position = new Vector3(transform.position.x, baseY + heightOffset, transform.position.z);
         jumpCoroutine = null;
     }
 

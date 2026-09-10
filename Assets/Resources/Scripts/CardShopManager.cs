@@ -79,10 +79,9 @@ public class CardShopManager : MonoBehaviour
 
     public void OnShow()
     {
-        // 回到商店（背包/排行关闭等）：按当前阵容逐张重算特效层，亮起满足自动上阵的英雄卡
-        var player = GameManager.Instance.GetPlayer(0);
+        // 回到商店（背包/排行关闭等）：逐张同步特效层容器，亮起与背包卡重复/好友/同职业关联的商店卡
         for (int i = 0; i < cardViews.Count; i++)
-            cardViews[i].UpdateEffectLayer(player);
+            cardViews[i].UpdateEffectLayer();
     }
 
     private IEnumerator DelayedUpdate()
