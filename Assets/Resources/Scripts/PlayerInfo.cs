@@ -475,7 +475,12 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 
         // 购买英雄卡后自动上阵：场上英雄数少于当前上限时，把新英雄放到空闲英雄格
         if (isHero)
+        {
             AutoEquipBoughtHero(cardId);
+            // 阵容变化后重算商店特效层，亮起现在仍满足自动上阵的英雄卡
+            if (CardShopManager.Instance != null)
+                CardShopManager.Instance.OnShow();
+        }
 
         return true;
     }
@@ -483,20 +488,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     // 购买英雄卡自动上阵：已在场上或场上英雄达到上限则不处理，否则放到第一个空闲英雄格
     private void AutoEquipBoughtHero(int heroId)
     {
-        if (battleCards == null)
-            return;
-        for (int i = 0; i < battleCards.Length; i++)
-        {
-            if (battleCards[i] == heroId)
-                return; // 已上阵（购买重复卡升星），无需重复放置
-        }
-        int heroCount = 0;
-        for (int i = 0; i < battleCards.Length; i++)
-        {
-            if (battleCards[i] > 0 && ConfigManager.IsHeroCard(battleCards[i]))
-                heroCount++;
-        }
-        if (heroCount >= GetSlotCount())
+        if (!CanAutoEquipHero(heroId))
             return;
         foreach (int pos in CombatConst.HeroCells)
         {
@@ -507,6 +499,25 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
                 return;
             }
         }
+    }
+
+    // 该英雄是否满足自动上阵条件：已在场上（购买重复卡升星）或场上英雄达到上限则不满足
+    public bool CanAutoEquipHero(int heroId)
+    {
+        if (battleCards == null)
+            return false;
+        for (int i = 0; i < battleCards.Length; i++)
+        {
+            if (battleCards[i] == heroId)
+                return false; // 已上阵
+        }
+        int heroCount = 0;
+        for (int i = 0; i < battleCards.Length; i++)
+        {
+            if (battleCards[i] > 0 && ConfigManager.IsHeroCard(battleCards[i]))
+                heroCount++;
+        }
+        return heroCount < GetSlotCount();
     }
 
     public List<int> GetHeroCardList()

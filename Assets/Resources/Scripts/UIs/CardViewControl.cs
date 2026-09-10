@@ -196,20 +196,30 @@ public class CardViewControl : MonoBehaviour, IPointerDownHandler, IPointerUpHan
 
         if (isHeroCard)
         {
+            var heroCfg = HeroConfig.GetConfig(cardId);
             if (player0.HasCard(cardId))
             {
                 effectGreen.SetActive(true);
                 effectYellow.SetActive(false);
+                effectGray.SetActive(false);
             }
             else if (player0.HasFriend(cardId))
             {
                 effectGreen.SetActive(false);
                 effectYellow.SetActive(true);
+                effectGray.SetActive(false);
+            }
+            else if (HasSameJob(player0, heroCfg.Job))
+            {
+                effectGreen.SetActive(false);
+                effectYellow.SetActive(false);
+                effectGray.SetActive(true);
             }
             else
             {
                 effectGreen.SetActive(false);
                 effectYellow.SetActive(false);
+                effectGray.SetActive(false);
             }
         }
         else
@@ -219,6 +229,17 @@ public class CardViewControl : MonoBehaviour, IPointerDownHandler, IPointerUpHan
             else
                 effectGreen.SetActive(false);
         }
+    }
+
+    // 玩家已拥有（卡牌集合中）与指定职业相同的英雄
+    private bool HasSameJob(PlayerInfo player0, string job)
+    {
+        foreach (var ownedId in player0.cards.Keys)
+        {
+            if (HeroConfig.HasConfig(ownedId) && HeroConfig.GetConfig(ownedId).Job == job)
+                return true;
+        }
+        return false;
     }
 
     private void SetColoredText(TMP_Text text, int value)
@@ -253,6 +274,8 @@ public class CardViewControl : MonoBehaviour, IPointerDownHandler, IPointerUpHan
                 effectGreen.SetActive(false);
             if (effectYellow != null) //道具的情况
                 effectYellow.SetActive(false);
+            if (effectGray != null) //道具的情况
+                effectGray.SetActive(false);
 
             //把heroImage变灰色 - 改为将整个panel变成灰度图
             SetGrayscaleEffect();
@@ -403,6 +426,17 @@ public class CardViewControl : MonoBehaviour, IPointerDownHandler, IPointerUpHan
     public void ShowEffectLayer(bool isShow)
     {
         effectLayer.SetActive(isShow);
+    }
+
+    // 按当前阵容重新计算特效层：仅满足自动上阵的英雄卡点亮（道具卡不适用）
+    public void UpdateEffectLayer(PlayerInfo player)
+    {
+        if (effectLayer == null)
+            return;
+        bool show = false;
+        if (isHeroCard)
+            show = player.CanAutoEquipHero(cardId);
+        effectLayer.SetActive(show);
     }
 
 }

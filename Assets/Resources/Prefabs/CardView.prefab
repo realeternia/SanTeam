@@ -1920,6 +1920,10 @@ PrefabInstance:
       propertyPath: m_LocalScale.y
       value: 1.7
       objectReference: {fileID: 0}
+    - target: {fileID: 8610178211876992745, guid: 15f386a1c7efb1b46aaf53fe923472d7, type: 3}
+      propertyPath: m_Layer
+      value: 5
+      objectReference: {fileID: 0}
     - target: {fileID: 8610178211900346679, guid: 15f386a1c7efb1b46aaf53fe923472d7, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -1963,6 +1967,10 @@ PrefabInstance:
     - target: {fileID: 8610178211900346680, guid: 15f386a1c7efb1b46aaf53fe923472d7, type: 3}
       propertyPath: m_Name
       value: IconEffect_31
+      objectReference: {fileID: 0}
+    - target: {fileID: 8610178211900346680, guid: 15f386a1c7efb1b46aaf53fe923472d7, type: 3}
+      propertyPath: m_Layer
+      value: 5
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

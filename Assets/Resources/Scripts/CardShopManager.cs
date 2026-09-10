@@ -79,8 +79,10 @@ public class CardShopManager : MonoBehaviour
 
     public void OnShow()
     {
-        for(int i = 0; i < cardViews.Count; i++)
-            cardViews[i].ShowEffectLayer(true);
+        // 回到商店（背包/排行关闭等）：按当前阵容逐张重算特效层，亮起满足自动上阵的英雄卡
+        var player = GameManager.Instance.GetPlayer(0);
+        for (int i = 0; i < cardViews.Count; i++)
+            cardViews[i].UpdateEffectLayer(player);
     }
 
     private IEnumerator DelayedUpdate()
@@ -156,9 +158,18 @@ public class CardShopManager : MonoBehaviour
         List<Tuple<int, int>> heroIds = new List<Tuple<int, int>>();
         int TOTAL_HERO_CARDS = 15;        
         // hero card
-        for (int i = 0; i < TOTAL_HERO_CARDS; i++)
+        // 防死循环：卡池中某品质（第一回合恒为品质1）人数可能被ban到少于15张，
+        // 原 for+i-- 命中重复卡会原地打转永不前进，导致点"结束"进商店时卡死。
+        // 改为 while + 尝试上限：能凑满15张就凑满，凑不满则生成已有的全部不重复卡后结束。
+        int totalUnique = 0;                       // 已生成的不同英雄卡数量
+        int maxAttempts = TOTAL_HERO_CARDS * 20;   // 尝试上限，保证必然终止
+        int attempt = 0;
+        while (totalUnique < TOTAL_HERO_CARDS && attempt < maxAttempts)
         {
+            attempt++;
             var heroId = HeroSelectionTool.GetRandomHeroIdByQuality(shopCfg);
+            if (heroId == 0)
+                break; // 卡池为空，无法再生成，跳出避免死循环
             var existingIndex = heroIds.FindIndex(x => x.Item1 == heroId);
             if (existingIndex >= 0)
             { //重复卡的处理
@@ -168,7 +179,6 @@ public class CardShopManager : MonoBehaviour
                     heroIds[existingIndex] = new Tuple<int, int>(existingTuple.Item1, existingTuple.Item2 + 1);
                 }
 
-                i--;
                 continue;
             }
 
@@ -191,6 +201,7 @@ public class CardShopManager : MonoBehaviour
             }
 
             heroIds.Add(new Tuple<int, int>(heroId, count));
+            totalUnique++;
         }
 
 
