@@ -36,6 +36,7 @@ public class CardViewControl : MonoBehaviour, IPointerDownHandler, IPointerUpHan
     public Image itemImage;
     public GameObject effectGreen;
     public GameObject effectYellow;
+    public GameObject effectGray;
     public GameObject effectLayer;
 
     // Start is called before the first frame update

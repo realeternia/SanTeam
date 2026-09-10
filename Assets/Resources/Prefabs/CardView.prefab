@@ -915,6 +915,7 @@ RectTransform:
   m_Children:
   - {fileID: 3926510453526454}
   - {fileID: 1223528818961248170}
+  - {fileID: 5636532531425244014}
   m_Father: {fileID: 8083084728444211593}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -1391,6 +1392,7 @@ MonoBehaviour:
   itemImage: {fileID: 1514705944255524546}
   effectGreen: {fileID: 3926510453526449}
   effectYellow: {fileID: 1223528818961248173}
+  effectGray: {fileID: 5636532531425244001}
   effectLayer: {fileID: 3863863620166204467}
 --- !u!1 &6572764651896833733
 GameObject:
@@ -1902,6 +1904,81 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!1001 &4126848730943464025
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 4889453099878034316}
+    m_Modifications:
+    - target: {fileID: 8610178211876992744, guid: 15f386a1c7efb1b46aaf53fe923472d7, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8610178211876992744, guid: 15f386a1c7efb1b46aaf53fe923472d7, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1.7
+      objectReference: {fileID: 0}
+    - target: {fileID: 8610178211900346679, guid: 15f386a1c7efb1b46aaf53fe923472d7, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8610178211900346679, guid: 15f386a1c7efb1b46aaf53fe923472d7, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8610178211900346679, guid: 15f386a1c7efb1b46aaf53fe923472d7, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8610178211900346679, guid: 15f386a1c7efb1b46aaf53fe923472d7, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8610178211900346679, guid: 15f386a1c7efb1b46aaf53fe923472d7, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8610178211900346679, guid: 15f386a1c7efb1b46aaf53fe923472d7, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8610178211900346679, guid: 15f386a1c7efb1b46aaf53fe923472d7, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8610178211900346679, guid: 15f386a1c7efb1b46aaf53fe923472d7, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8610178211900346679, guid: 15f386a1c7efb1b46aaf53fe923472d7, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8610178211900346679, guid: 15f386a1c7efb1b46aaf53fe923472d7, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8610178211900346680, guid: 15f386a1c7efb1b46aaf53fe923472d7, type: 3}
+      propertyPath: m_Name
+      value: IconEffect_31
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 15f386a1c7efb1b46aaf53fe923472d7, type: 3}
+--- !u!1 &5636532531425244001 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8610178211900346680, guid: 15f386a1c7efb1b46aaf53fe923472d7, type: 3}
+  m_PrefabInstance: {fileID: 4126848730943464025}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &5636532531425244014 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 8610178211900346679, guid: 15f386a1c7efb1b46aaf53fe923472d7, type: 3}
+  m_PrefabInstance: {fileID: 4126848730943464025}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &5659209453712851522
 PrefabInstance:
   m_ObjectHideFlags: 0
