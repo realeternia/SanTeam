@@ -837,7 +837,7 @@ public class WorldManager : MonoBehaviour
         var collider = unit.GetComponent<Collider>();
 
         // 使用GetOccupiedGrids方法获取需要锁定的格子列表
-        requiredGrids = GetOccupiedGrids(targetPosition, collider);
+        requiredGrids = GetOccupiedGrids(targetPosition, collider, true);
         // GameLog.Debug($"id:{unit.id} requiredGrids: Target Position = {targetPosition}, Collider Size = {collider.bounds.size}");
         // string gridPositions = string.Join(", ", requiredGrids);
         // GameLog.Debug($"Grids: {gridPositions}");
@@ -885,7 +885,7 @@ public class WorldManager : MonoBehaviour
         var collider = unit.GetComponent<Collider>();
 
         // 使用GetOccupiedGrids方法获取需要锁定的格子列表
-        List<Vector2Int> requiredGrids = GetOccupiedGrids(targetPosition, collider);
+        List<Vector2Int> requiredGrids = GetOccupiedGrids(targetPosition, collider, true);
         List<Vector2Int> toRemoves = new List<Vector2Int>();
 
         // 检查所有格子是否可用
@@ -942,13 +942,22 @@ public class WorldManager : MonoBehaviour
     }
 
     // 获取指定位置和碰撞体占据的所有格子
-    public List<Vector2Int> GetOccupiedGrids(Vector3 position, Collider collider)
+    // clampUnit=true 用于单位移动/技能落点：阻挡半径上限2格(6m)再除3，即最多占3x3格(9m)，
+    // 避免英雄(碰撞体10m)占5x5格(15m)比布阵格间距(13m)还大，导致两单位稍近就互卡无法移动；墙等静态障碍不收缩
+    public List<Vector2Int> GetOccupiedGrids(Vector3 position, Collider collider, bool clampUnit = false)
     {
         List<Vector2Int> occupiedGrids = new List<Vector2Int>();
 
         // 获取碰撞体边界
         Vector3 boundsSize = collider.bounds.size;
         Vector3 halfBounds = boundsSize / 3f;
+        if (clampUnit)
+        {
+            halfBounds = new Vector3(
+                Mathf.Min(halfBounds.x, gridCellSize * 2f / 3f),
+                Mathf.Min(halfBounds.y, gridCellSize * 2f / 3f),
+                Mathf.Min(halfBounds.z, gridCellSize * 2f / 3f));
+        }
 
         // 计算边界的最小和最大世界坐标
         Vector3 minWorldPos = position - halfBounds;

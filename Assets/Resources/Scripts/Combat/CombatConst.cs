@@ -41,6 +41,12 @@ public static class CombatConst
         return ResistBase / (ResistBase + resist);
     }
 
+    // ---- 移动避障 ----
+    /// <summary>单位间距小于该值(米)时触发分离推力，防止贴脸卡位（略大于阻挡格尺寸，让单位在硬卡前先滑开）</summary>
+    public const float MoveSeparationDist = 10f;
+    /// <summary>分离推力权重(0~1，越大越容易被挤开)</summary>
+    public const float MoveSeparationForce = 0.35f;
+
     // ---- 其他 ----
     /// <summary>近战/远程士兵射程判定阈值</summary>
     public const float MeleeRange = 30f;

@@ -44,6 +44,8 @@ public class Chess : MonoBehaviour
     private Vector3? moveDest = null;
     // 移动失败计数器
     private int moveFailCount = 0;
+    // 绕障方向记忆：-1 向左绕，1 向右绕，0 未决定（一旦定下保持到直行通畅，避免每帧随机翻转导致原地抖动）
+    private int avoidDir = 0;
     // 最大连续移动尝试次数
 
     // 是否正在使用偏移路径
@@ -513,8 +515,16 @@ public class Chess : MonoBehaviour
 
         if (moveDest != null)
         {
+            // 基础移动方向：朝向目的地
+            Vector3 moveDir = (moveDest.Value - transform.position).normalized;
+
+            // 分离推力：与周围过近的单位互相推开（目标除外），避免贴脸卡位、顺势绕行
+            Vector3 separation = GetSeparationPush();
+            if (separation.sqrMagnitude > 0.0001f)
+                moveDir = (moveDir + separation).normalized;
+
             // 计算下一步位置
-            Vector3 nextPosition = Vector3.MoveTowards(transform.position, moveDest.Value, moveSpeed * 0.05f);
+            Vector3 nextPosition = transform.position + moveDir * moveSpeed * 0.05f;
 
             // 尝试锁定目标格子
             if (WorldManager.Instance.TryLockGridPositions(this, nextPosition, out List<Vector2Int> requiredGrids))
@@ -523,14 +533,20 @@ public class Chess : MonoBehaviour
                 // 锁定成功，移动到新位置
                 transform.position = nextPosition;
                 moveFailCount = 0; // 重置失败计数器
+
+                // 朝目标直行通畅才清除绕障记忆；绕障途中(还在走偏移路径)继续沿同侧绕行
+                Vector3 toTarget = targetChess.transform.position - transform.position;
+                toTarget.y = 0;
+                if (WorldManager.Instance.TryLockGridPositions(this, transform.position + toTarget.normalized * moveSpeed * 0.05f, out _))
+                    avoidDir = 0;
             }
             else
             {
-                // 锁定失败，不动
+                // 锁定失败，绕障：绕障方向一旦定下就保持，直到直行通畅，避免每帧随机翻转导致原地抖动
                 moveFailCount++;
+                if (avoidDir == 0)
+                    avoidDir = SysRandom.Value > 0.5f ? 1 : -1;
 
-                // 根据连续失败次数尝试不同角度找路
-                // 如果已经在使用偏移路径或者失败次数达到阈值，则继续使用偏移
                 // 计算原始方向
                 Vector3 direction = (targetChess.transform.position - transform.position).normalized;
                 float angleOffset = 0f;
@@ -543,8 +559,8 @@ public class Chess : MonoBehaviour
                 else
                     angleOffset = 135f;
 
-                // 随机选择向上或向下偏移
-                angleOffset *= SysRandom.Value > 0.5f ? 1 : -1;
+                // 沿记忆的绕障方向偏移（同一侧绕行，不随机翻转）
+                angleOffset *= avoidDir;
 
                 // 计算旋转后的方向
                 Quaternion rotation = Quaternion.Euler(0, angleOffset, 0);
@@ -560,9 +576,32 @@ public class Chess : MonoBehaviour
                     transform.position = nextPosition;
                     moveDest = transform.position + newDirection * moveSpeed * 0.05f * 10;
                     moveFailCount = 0; // 重置失败计数器
+                    // avoidDir 保留：绕障途中继续沿同侧绕行
                 }
             }
         }
+    }
+
+    // 分离推力：与周围过近的单位互相推开（目标除外），防止贴脸卡位导致移动卡死
+    private Vector3 GetSeparationPush()
+    {
+        Vector3 push = Vector3.zero;
+        // 获取半径4格(约12米)内敌我双方单位，再按米级距离过滤
+        var nearUnits = WorldManager.Instance.GetUnitsInRange(transform.position, 4f, side, true);
+        nearUnits.AddRange(WorldManager.Instance.GetUnitsInRange(transform.position, 4f, side, false));
+        foreach (var other in nearUnits)
+        {
+            if (other == this || other == targetChess || other.hp <= 0 || other.isShadow)
+                continue;
+            Vector3 offset = transform.position - other.transform.position;
+            offset.y = 0;
+            float dist = offset.magnitude;
+            if (dist < 0.01f || dist >= CombatConst.MoveSeparationDist)
+                continue;
+            // 距离越近推力越大（线性衰减），方向为远离对方
+            push += offset / dist * (1f - dist / CombatConst.MoveSeparationDist);
+        }
+        return push * CombatConst.MoveSeparationForce;
     }
 
     // 攻击目标
