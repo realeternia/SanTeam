@@ -627,7 +627,8 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     }
 
 
-    private List<Tuple<int, int>> GetStrongCardList(int count)
+    // 按总战力(价格×卡等级)降序取前count张英雄卡
+    public List<Tuple<int, int>> GetStrongCardList(int count)
     {
         List<Tuple<int, int>> sortDataList = new List<Tuple<int, int>>();
 
@@ -643,158 +644,12 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         }
 
         sortDataList.Sort((a, b) => b.Item2.CompareTo(a.Item2));
-        if(isAI)
-        {
-            // 获取前count张卡
-            var top5Cards = sortDataList.Take(count).ToList();
-            
-            // 计算所有卡对前count张卡的friend数量，如果没有friend则item2*1.1
-            for (int i = 0; i < sortDataList.Count; i++)
-            {
-                var currentCardId = sortDataList[i].Item1;
-                var currentHeroConfig = HeroConfig.GetConfig(currentCardId);
-                
-                float friendCountMark = 0;
-
-                // 检查当前卡是否与前count张卡中的任何一个有friend关系
-                for (int j = 0; j < top5Cards.Count; j++)
-                {
-                    if (currentCardId == top5Cards[j].Item1)
-                        continue;
-
-                    var friendLevel = ConfigManager.GetFriendLevel(currentCardId, top5Cards[j].Item1);
-                    if (friendLevel > 0)
-                        friendCountMark += 0.13f - 0.02f * j; //名次前的卡因子大
-                }
-
-                if (friendCountMark > 0)
-                    sortDataList[i] = new Tuple<int, int>(currentCardId, (int)(sortDataList[i].Item2 * (1 + friendCountMark)));
-            }
-            
-            // 重新排序
-            sortDataList.Sort((a, b) => b.Item2.CompareTo(a.Item2));
-        }
-
-        if(sortDataList.Count > count)
-        {
-            int combatCount = 0;
-            int rangeCount = 0;
-            CountCard(sortDataList, ref combatCount, ref rangeCount, count);
-            while (combatCount > count / 2)
-            {
-                if (!SwapCard(sortDataList, true, count))
-                    break;
-
-                CountCard(sortDataList, ref combatCount, ref rangeCount, count);
-            }
-            CountCard(sortDataList, ref combatCount, ref rangeCount, count);
-            while (rangeCount > count / 2)
-            {
-                if (!SwapCard(sortDataList, false, count))
-                    break;
-
-                CountCard(sortDataList, ref combatCount, ref rangeCount, count);
-            }
-            sortDataList = sortDataList.Take(count).ToList(); //按战力排出前count   
-        }
-
-        Dictionary<int, SideInfo> sideInfos = new Dictionary<int, SideInfo>();
-        for (int i = 0; i < sortDataList.Count; i++)
-        {
-            var cardId = sortDataList[i].Item1;
-            var heroConfig = HeroConfig.GetConfig(cardId);
-
-            if (!sideInfos.TryGetValue(heroConfig.Side, out var info))
-                sideInfos[heroConfig.Side] = new SideInfo();
-            if (ConfigManager.IsKingHero(heroConfig.Id))
-                sideInfos[heroConfig.Side].HasShuai = true;
-            else
-                sideInfos[heroConfig.Side].Count++;
-        }
-
-        foreach (var sideItem in sideInfos)
-        {
-            if (!sideItem.Value.HasShuai && sideItem.Value.Count >= 2)
-            {
-                var shuaiId = ConfigManager.GetKingHeroId(sideItem.Key);
-                if (cards.ContainsKey(shuaiId))
-                {
-                    sortDataList[sortDataList.Count - 1] = new Tuple<int, int>(shuaiId, 1);
-                    break;
-                }
-            }
-        }
 
         List<Tuple<int, int>> results = new List<Tuple<int, int>>();
-        for (int i = 0; i < sortDataList.Count; i++)
+        for (int i = 0; i < Math.Min(count, sortDataList.Count); i++)
             results.Add(new Tuple<int, int>(sortDataList[i].Item1, HeroSelectionTool.GetCardLevel(cards[sortDataList[i].Item1], true)));
 
         return results;
-
-    }
-
-    private static bool SwapCard(List<Tuple<int, int>> sortDataList, bool checkCombat, int count)
-    {
-        // 找到count以内最后一张combat卡
-        int lastCombatIndex = -1;
-        for (int i = count - 1; i >= count / 2; i--)
-        {
-            var cardId = sortDataList[i].Item1;
-            var heroConfig = HeroConfig.GetConfig(cardId);
-            if (checkCombat && HeroSelectionTool.IsMeleeHero(heroConfig) || !checkCombat && HeroSelectionTool.IsRangedHero(heroConfig)) // combat类型
-            {
-                lastCombatIndex = i;
-                break;
-            }
-        }
-
-        if (lastCombatIndex >= 0)
-        {
-            GameLog.Debug("SwapCard lastCombatIndex: " + lastCombatIndex);
-            // 在count以外且index+3内（即前count+3名内）寻找range卡
-            int rangeCardIndex = -1;
-            for (int i = count; i < Math.Min(sortDataList.Count, lastCombatIndex + 3); i++)
-            {
-                var cardId = sortDataList[i].Item1;
-                var heroConfig = HeroConfig.GetConfig(cardId);
-                if (checkCombat && HeroSelectionTool.IsRangedHero(heroConfig) || !checkCombat && HeroSelectionTool.IsMeleeHero(heroConfig)) // range类型
-                {
-                    rangeCardIndex = i;
-                    break;
-                }
-            }
-
-            // 如果找到合适的range卡，则进行交换
-            GameLog.Debug("SwapCard lastCombatIndex: " + lastCombatIndex + " rangeCardIndex: " + rangeCardIndex);
-            if (rangeCardIndex >= 0)
-            {
-                var temp = sortDataList[lastCombatIndex];
-                sortDataList[lastCombatIndex] = sortDataList[rangeCardIndex];
-                sortDataList[rangeCardIndex] = temp;
-            }
-            else
-                return false;
-        }
-        else
-        {
-            return false;
-        }
-        return true;
-    }
-
-    private static void CountCard(List<Tuple<int, int>> sortDataList, ref int combatCount, ref int rangeCount, int count)
-    {
-        combatCount = 0;
-        rangeCount = 0;
-        for (int i = 0; i < count; i++)
-        {
-            var cardId = sortDataList[i].Item1;
-            var heroConfig = HeroConfig.GetConfig(cardId);
-            if (HeroSelectionTool.IsMeleeHero(heroConfig))
-                combatCount++;
-            else
-                rangeCount++;
-        }
     }
 
     private void AutoCheckItem(List<Tuple<int, int>> results)

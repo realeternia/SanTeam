@@ -30,20 +30,6 @@ public static class PlayerAI
             if (playerConfig.Pickside > 0 && playerConfig.Pickside == heroConfig.Side)
                 continue;
 
-            var cardPrice = HeroSelectionTool.GetPrice(heroConfig);
-            if(playerConfig.Pricelower > 0 && playerConfig.Priceupper > 0)
-            {
-                if (playerConfig.Pricelower <= cardPrice && playerConfig.Priceupper >= cardPrice)
-                    continue;
-            }
-            else
-            {
-                if (playerConfig.Pricelower > 0 && playerConfig.Pricelower <= cardPrice)
-                    continue;
-                if (playerConfig.Priceupper > 0 && playerConfig.Priceupper >= cardPrice)
-                    continue;
-            }
-
             // 强弱卡改按品质判定：强卡=品质4；弱卡=品质1/2
             // Banstrongcard：只允许 ban 品质4（强卡）
             if (playerConfig.Banstrongcard && heroConfig.Quality != 4)
@@ -106,7 +92,7 @@ public static class PlayerAI
         bool hasSameCard = false;
         Tuple<int, int> weakHeroCard = null;
         var heroCardCount = playerInfo.GetHeroCardList().Count;
-        if (heroCardCount >= playerConfig.Cardherolimit)
+        if (heroCardCount >= playerInfo.GetSlotCount() + playerConfig.Cardherolimit)
         {
             weakHeroCard = FindWeakCard(playerInfo);
             if (weakHeroCard != null)
@@ -117,8 +103,16 @@ public static class PlayerAI
             }
         }
 
-        //把战力前6的卡放到一个队列里
-        var strongList = GetStrongCards(playerInfo, out var rangeCount, out var combatCount);
+        // 直接复用 PlayerInfo 自动上阵的最强卡选择：按总战力取当前上限张
+        var strongList = playerInfo.GetStrongCardList(playerInfo.GetSlotCount()).Select(x => x.Item1).ToList();
+        int rangeCount = 0, combatCount = 0;
+        foreach (var heroId in strongList)
+        {
+            if (HeroSelectionTool.IsMeleeHero(HeroConfig.GetConfig(heroId)))
+                combatCount++;
+            else
+                rangeCount++;
+        }
         // 初始化 side 卡牌数量
         Dictionary<int, SideInfo> sideInfos = new Dictionary<int, SideInfo>();
         foreach (int cardId in strongList)
@@ -132,7 +126,6 @@ public static class PlayerAI
                 sideInfos[heroConfig.Side].Count++;
         }
 
-        CardViewControl checkFirst = null;            
         // 计算每张卡片的加权分
         List<(CardViewControl card, float score)> scoredCards = new List<(CardViewControl card, float score)>();
         foreach (var pickCard in affordableCards)
@@ -162,7 +155,7 @@ public static class PlayerAI
 
             if (pickCard.isHeroCard)
             {
-                if (!hasSameCard && heroCardCount >= playerConfig.Cardherolimit)
+                if (!hasSameCard && heroCardCount >= playerInfo.GetSlotCount() + playerConfig.Cardherolimit)
                 {
                     if (weakHeroCard == null) //没有可以换的卡
                         continue;
@@ -180,18 +173,6 @@ public static class PlayerAI
                         continue;
                     if (ConfigManager.IsKingHero(pickCard.cardId)) //主公卡一定要拿
                         score *= playerConfig.Findmasterrate;
-                }
-
-                // 根据价格区间调整分数
-                if (pickCard.priceI < playerConfig.Pricelower || pickCard.priceI > playerConfig.Priceupper)
-                {
-                    score *= playerConfig.Priceoutrate;
-                }
-                else
-                {
-                    var rate = pickCard.priceI / (playerConfig.Pricelower / 2 + playerConfig.Priceupper / 2); //高分卡加成
-                    if (rate > 1)
-                        score *= rate * rate;
                 }
 
                 if (combatCount + rangeCount >= 3)
@@ -227,16 +208,6 @@ public static class PlayerAI
                 }
                 if(nowFriendCount > 0)
                     score *= 1 + playerConfig.FriendFactor * nowFriendCount * .25f;
-
-                if (!hasSameCard)
-                {
-                    if (playerInfo.goldCostHero > 200)
-                    {
-                        var heroRate = (playerInfo.goldCostHero / playerInfo.goldCostHero + playerInfo.goldCostItem);
-                        if (heroRate > playerConfig.HeroGoldRate)
-                            score *= 0.5f;
-                    }
-                }
             }
             else
             {
@@ -245,17 +216,6 @@ public static class PlayerAI
 
                 var itemCfg = ItemConfig.GetConfig(pickCard.cardId);
                 var itemCount = playerInfo.GetItemList("attr").Count;
-                if (!hasSameCard)
-                {
-                    if (itemCount >= playerConfig.Carditemlimit && itemCfg.Effect == "attr")
-                        continue; //武器太多了
-                    if (playerInfo.goldCostItem > 100)
-                    {
-                        var itemRate = (playerInfo.goldCostItem / playerInfo.goldCostHero + playerInfo.goldCostItem);
-                        if (itemRate > playerConfig.ItemGoldRate)
-                            score *= 0.5f;
-                    }
-                }
 
                 if (itemCfg.Effect == "attr" && !hasSameCard)
                 {
@@ -268,10 +228,6 @@ public static class PlayerAI
                         else if (itemCount < 3)
                             score *= 1 + (3 - itemCount) * 0.6f;
                     }
-                }
-                else if (itemCfg.Effect == "first")
-                {
-                    checkFirst = pickCard;
                 }
                 else if (itemCfg.Effect == "tpattr" && year <= 8)
                 {
@@ -323,13 +279,6 @@ public static class PlayerAI
             }
         }
 
-        var mostScore = scoredCards.Max(x => x.score);
-        if (checkFirst != null && mostScore < 1 && playerInfo.gold > 40)
-        {
-            var index = scoredCards.FindIndex(x => x.card == checkFirst);
-            scoredCards[index] = (scoredCards[index].card, scoredCards[index].score * playerConfig.PickFirst);
-        }
-
         scoredCards = scoredCards.OrderByDescending(x => x.score).ToList();
         //日志打印scoredCards和selectedCard
 
@@ -376,7 +325,7 @@ public static class PlayerAI
         GameLog.Debug(sb.ToString());                
 
         hasSameCard = cards.ContainsKey(selectedCard.cardId);
-        if (selectedCard.isHeroCard && heroCardCount >= playerConfig.Cardherolimit && !hasSameCard && weakHeroCard != null)
+        if (selectedCard.isHeroCard && heroCardCount >= playerInfo.GetSlotCount() + playerConfig.Cardherolimit && !hasSameCard && weakHeroCard != null)
             playerInfo.SellCard(weakHeroCard.Item1); //卖掉最弱的卡
 
         var finalBuyCount = 1;
@@ -389,42 +338,6 @@ public static class PlayerAI
         }
 
         return true;
-    }
-
-    private static List<int> GetStrongCards(PlayerInfo playerInfo, out int rangeCount, out int combatCount)
-    {  
-        var cards = playerInfo.cards;        
-        // 创建一个列表存储卡牌ID和对应的总战力
-        List<(int cardId, int totalPrice)> sortDataList = new List<(int cardId, int totalPrice)>();
-        rangeCount = 0;
-        combatCount = 0;
-        foreach (int cardId in cards.Keys)
-        {
-            if(!ConfigManager.IsHeroCard(cardId))
-                continue;
-
-            var price = HeroSelectionTool.GetPrice(HeroConfig.GetConfig(cardId));
-            var cardLevel = HeroSelectionTool.GetCardLevel(cards[cardId], true);
-            sortDataList.Add((cardId, price * cardLevel));
-        }
-        // 按总战力降序排序
-        sortDataList.Sort((a, b) => b.totalPrice.CompareTo(a.totalPrice));
-
-        // 将最强的前6张卡的ID加入队列
-        List<int> strongCardIds = new List<int>();
-        for (int i = 0; i < Math.Min(6, sortDataList.Count); i++)
-        {
-            strongCardIds.Add(sortDataList[i].cardId);
-
-            // 获取当前卡牌的配置
-            var heroConfig = HeroConfig.GetConfig(sortDataList[i].cardId);
-            // 按射程判近战/远程（近战<=20，远程>20）
-            if (HeroSelectionTool.IsMeleeHero(heroConfig))
-                combatCount++;
-            else
-                rangeCount++;
-        }
-        return strongCardIds;
     }
 
     public static Tuple<int, int> FindWeakCard(PlayerInfo playerInfo)
