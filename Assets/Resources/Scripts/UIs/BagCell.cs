@@ -14,6 +14,7 @@ public class BagCell : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragH
     public int level;
     public TMP_Text textItemName;
     public Image itemImage;
+    public Image jobImage;
     public Image[] equipImages; // 最多3件装备槽，需在预制体上按槽位顺序拖入引用
     
     public Image shieldImage;
@@ -58,6 +59,15 @@ public class BagCell : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragH
         }
 
         itemImage.sprite = Resources.Load<Sprite>("SkinsBig/" + heroCfg.Icon);
+
+        // 显示职业图标：取职业技能（GetHeroSkillConfigs 第一项为 JobConfig.SkillId）的图标
+        if (jobImage != null)
+        {
+            var skillCfgs = ConfigManager.GetHeroSkillConfigs(heroCfg);
+            jobImage.gameObject.SetActive(skillCfgs.Count > 0);
+            if (skillCfgs.Count > 0)
+                jobImage.sprite = Resources.Load<Sprite>("SkillPic/" + skillCfgs[0].Icon);
+        }
 
         expBar.rectTransform.sizeDelta = new Vector2(140 * HeroSelectionTool.GetExpRate(count, true), 20);
     }

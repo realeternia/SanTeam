@@ -20,10 +20,10 @@ public static class CombatConst
     public const int LockSkillId = 2030025;
 
     // ---- 默认护盾机制(同阵营连线，数值参考金铲铲神盾使羁绊) ----
-    /// <summary>同阵营英雄数量档位(3/5/7/9)</summary>
-    public static readonly int[] FactionShieldCounts = { 3, 5, 7, 9 };
-    /// <summary>各档位对应的护盾(生命值百分比)</summary>
-    public static readonly float[] FactionShieldRates = { 0.18f, 0.24f, 0.30f, 0.36f };
+    /// <summary>同阵营英雄数量档位(2/3/4/5/6)</summary>
+    public static readonly int[] FactionShieldCounts = { 2, 3, 4, 5, 6 };
+    /// <summary>各档位对应的护盾(生命值百分比，每档+15%)</summary>
+    public static readonly float[] FactionShieldRates = { 0.15f, 0.30f, 0.45f, 0.60f, 0.75f };
     /// <summary>护盾持续时间(整场战斗)</summary>
     public const float FactionShieldTime = 999f;
 
@@ -66,10 +66,10 @@ public static class CombatConst
     public const float MeleeRange = 30f;
 
     // ---- 连线(武将关系) ----
-    /// <summary>连线好友数量档位(2/3/4/5/6/7)</summary>
-    public static readonly int[] FriendLineCounts = { 2, 3, 4, 5, 6, 7 };
-    /// <summary>各档位对应的攻击强化(百分比)</summary>
-    public static readonly float[] FriendLineAtkRates = { 0.05f, 0.10f, 0.15f, 0.20f, 0.25f, 0.30f };
+    /// <summary>连线好友数量档位(2/3/4/5/6)</summary>
+    public static readonly int[] FriendLineCounts = { 2, 3, 4, 5, 6 };
+    /// <summary>各档位对应的攻击强化(百分比，每档+10%)</summary>
+    public static readonly float[] FriendLineAtkRates = { 0.10f, 0.20f, 0.30f, 0.40f, 0.50f };
 
     // ---- 兵种连锁 ----
     /// <summary>兵种默认技能起始等级（默认兵种技能1级，每多一个同兵种英雄+1级）</summary>
@@ -112,6 +112,8 @@ public static class CombatConst
     public const int BattleWinExp = 2;
     /// <summary>战斗失败获得经验（失败给一点）</summary>
     public const int BattleLoseExp = 1;
+    /// <summary>背包英雄卡上限（最多持有12种不同英雄，重复卡计入经验不占位）</summary>
+    public const int PlayerMaxHeroCards = 12;
     // ---- 买经验（预留：金铲铲4金币买4经验，1金币=1经验；UI后续接入） ----
     /// <summary>购买经验所需金币</summary>
     public const int ExpBuyGoldCost = 4;

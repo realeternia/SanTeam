@@ -52,7 +52,6 @@ public class Chess : MonoBehaviour
 
     // 是否正在使用偏移路径
     public int hp = 100;
-    public int attackDamage = 30;
     public float soldierAtkRate = 1f; // 士兵攻击加成系数（相的职业羁绊：全军士兵攻击+%，伤害结算时乘算一次）
     public float soldierHpRate = 1f; // 士兵生命加成系数（相的职业羁绊：全军士兵生命+%，由 JobLinkManager 累加系数后统一结算）
     public int soldierBaseMaxHp; // 士兵初始生命基准快照（Init 末尾记录，JobLinkManager 按此基数统一结算生命系数）
@@ -173,7 +172,7 @@ public class Chess : MonoBehaviour
             if (playerInfo != null && soldierCfg.SoldierAtkRate > 0)
             {
                 maxHp += (int)((playerInfo.sodhp + playerInfo.GetItemPAttr("shp") + playerInfo.GetSoldierHpAdd()) * soldierCfg.SoldierHpRate);
-                attackDamage += (int)((playerInfo.sodatk + playerInfo.GetItemPAttr("satk") + playerInfo.GetSoldierAtkAdd()) * soldierCfg.SoldierAtkRate);
+                atk += (int)((playerInfo.sodatk + playerInfo.GetItemPAttr("satk") + playerInfo.GetSoldierAtkAdd()) * soldierCfg.SoldierAtkRate);
             }
         }
         // 记录士兵初始生命基准：职业生命系数结算始终以它为基数（士兵无其他生命来源，此值即为战斗前最终生命）
@@ -282,7 +281,6 @@ public class Chess : MonoBehaviour
         moveSpeed = heroConfig.MoveSpeed;
         attackRange = heroConfig.Range;
         attackSpeed = heroConfig.AtkSpeed / 30f; // 攻速值→每秒攻击次数（30=1次/秒；攻速20=1.5秒/次，15=2秒/次）
-        attackDamage = attr.Atk;
         ap = attr.Ap;
         atk = attr.Atk;
         armor = heroConfig.Armor;
@@ -361,7 +359,7 @@ public class Chess : MonoBehaviour
         soldierLevel += lv;
         transform.localScale = new Vector3(5 + soldierLevel * 0.75f, 3, 5 + soldierLevel * 0.75f);
 
-        attackDamage += (int)(lv * atkAdd * soldierCfg.SoldierAtkRate);
+        atk += (int)(lv * atkAdd * soldierCfg.SoldierAtkRate);
         maxHp += (int)(lv * hpAdd * soldierCfg.SoldierHpRate);
         hp = maxHp;
     }
@@ -681,10 +679,6 @@ public class Chess : MonoBehaviour
         {
             SkillManager.OnDoSkillDamage(this, caster, SkillConfig.GetConfig(skillId), ref damage, isFeedback);
         }
-        else
-        {
-            damage = Math.Max(damage, caster.attackDamage);//防止对士兵伤害过大
-        }
 
         if(hp <= 0)
             return;
@@ -757,7 +751,7 @@ public class Chess : MonoBehaviour
         if (attacker.isHero)
             damage = attacker.atk;
         else
-            damage = (int)(attacker.attackDamage * attacker.soldierAtkRate);
+            damage = (int)(attacker.atk * attacker.soldierAtkRate);
 
         // 普攻受目标护甲减免（英雄与士兵统一结算，参考金铲铲）：实际伤害 = 攻击 × 100/(100+护甲)
         damage = (int)(damage * CombatConst.ResistMultiplier(defender.armor));
@@ -785,7 +779,7 @@ public class Chess : MonoBehaviour
     public void Cooldown(float time)
     {
         // 冷却进度按百分比填充（1=完全冷却），最大不超过1
-        attackPoint = Mathf.Min(attackPoint + Mathf.Clamp01(time), 1f);
+        attackPoint = Mathf.Min(attackPoint + time, 1f);
     }
 
     public void SetLifeTime(float time)

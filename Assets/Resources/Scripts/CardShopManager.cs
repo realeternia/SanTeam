@@ -92,6 +92,12 @@ public class CardShopManager : MonoBehaviour
         {    
             yield return new WaitForSeconds(SysRandom.Range(0.3f, 0.5f));
 
+            // 有商店以外的面板打开（背包/排行/查看玩家等）时暂停AI选牌，等玩家关闭面板再继续；
+            // 商店面板本身会常驻 openPanelList，需排除
+            if (PanelManager.Instance != null
+                && PanelManager.Instance.openPanelList.Any(p => p != null && p != PanelManager.Instance.cardShopPanel))
+                continue;
+
             int currentPlayerId = GetTurnPid();
                 
             // 如果当前玩家已经pass，则直接进入下一回合

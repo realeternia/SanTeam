@@ -56,6 +56,15 @@ public class BagControl : MonoBehaviour, IPanelEvent
             UpdateFieldView();
             UpdateExpView();
 
+            // 调试辅助：上阵英雄少于5时，直接把补齐 job/force/friend 羁绊的英雄卡放进背包（各到2~3级）
+            // 仅编辑器/开发版生效（Debug.isDebugBuild），正式包不触发
+            if (Debug.isDebugBuild)
+            {
+                var heroOnField = p1.battleCards.Count(c => c > 0 && ConfigManager.IsHeroCard(c));
+                if (heroOnField < 5)
+                    DebugAddCardsForBonds(p1);
+            }
+
             GameManager.Instance.PlaySound("Sounds/equip");
         });
         aiSwitchBtn.onClick.AddListener(() =>
@@ -275,6 +284,112 @@ public class BagControl : MonoBehaviour, IPanelEvent
             var bagCell = child.GetComponent<BagCell>();
             bagCell.UpdateItemInfo();
         }
+    }
+
+    // 调试辅助：把最多10张能补齐羁绊的英雄卡直接放进玩家背包
+    // 按当前上阵阵容的缺口挑选：职业同职业3人=3级、势力同阵营4人=3级、好友同组4人=3级（2级起步）
+    private void DebugAddCardsForBonds(PlayerInfo p1)
+    {
+        var heroIds = p1.battleCards.Where(c => c > 0 && ConfigManager.IsHeroCard(c)).ToList();
+        var used = new HashSet<int>(heroIds);
+
+        // 统计当前各羁绊在场人数
+        var jobCounts = new Dictionary<string, int>();
+        var forceCounts = new Dictionary<int, int>();
+        var friendPresent = new Dictionary<int, int>();
+        foreach (var id in heroIds)
+        {
+            var cfg = HeroConfig.GetConfig(id);
+            jobCounts.TryGetValue(cfg.Job, out var jc);
+            jobCounts[cfg.Job] = jc + 1;
+            forceCounts.TryGetValue(cfg.Side, out var fc);
+            forceCounts[cfg.Side] = fc + 1;
+        }
+        foreach (var friendCfg in HeroFriendConfig.ConfigList)
+        {
+            var present = friendCfg.Heros.Count(m => heroIds.Contains(m));
+            if (present > 0)
+                friendPresent[friendCfg.Id] = present;
+        }
+
+        const int JOB_GOAL = 3;
+        const int FORCE_GOAL = 4;
+        const int FRIEND_GOAL = 4;
+        const int MAX_CARDS = 10;
+
+        var candidates = new List<int>();
+        while (candidates.Count < MAX_CARDS)
+        {
+            var before = candidates.Count;
+
+            // 1. 职业：优先补人数最多的同职业英雄
+            foreach (var kv in jobCounts.OrderByDescending(x => x.Value))
+            {
+                if (candidates.Count >= MAX_CARDS)
+                    break;
+                if (kv.Value >= JOB_GOAL)
+                    continue;
+                var cand = HeroConfig.ConfigList.FirstOrDefault(h => h.Job == kv.Key && !used.Contains(h.Id));
+                if (cand == null)
+                    continue;
+                candidates.Add(cand.Id);
+                used.Add(cand.Id);
+            }
+
+            // 2. 势力：补同阵营英雄（排除不参与同阵营护盾的野）
+            foreach (var kv in forceCounts.OrderByDescending(x => x.Value))
+            {
+                if (candidates.Count >= MAX_CARDS)
+                    break;
+                if (kv.Value >= FORCE_GOAL)
+                    continue;
+                var forceCfg = ConfigManager.GetForceConfig(kv.Key);
+                if (forceCfg == null || !forceCfg.JoinFactionShield)
+                    continue;
+                var cand = HeroConfig.ConfigList.FirstOrDefault(h => h.Side == kv.Key && !used.Contains(h.Id));
+                if (cand == null)
+                    continue;
+                candidates.Add(cand.Id);
+                used.Add(cand.Id);
+            }
+
+            // 3. 好友：补同组中不在场的英雄
+            foreach (var kv in friendPresent.OrderByDescending(x => x.Value))
+            {
+                if (candidates.Count >= MAX_CARDS)
+                    break;
+                if (kv.Value >= FRIEND_GOAL)
+                    continue;
+                var friendCfg = HeroFriendConfig.GetConfig(kv.Key);
+                if (friendCfg == null)
+                    continue;
+                var cand = friendCfg.Heros.FirstOrDefault(h => !used.Contains(h));
+                if (cand == 0)
+                    continue;
+                candidates.Add(cand);
+                used.Add(cand);
+            }
+
+            if (candidates.Count == before)
+                break; // 无可补英雄，结束
+        }
+
+        if (candidates.Count == 0)
+            return;
+
+        // 直接加入玩家背包（累计经验提升卡等级）；达到英雄卡上限(12张)后不再加新英雄
+        var heroList = p1.GetHeroCardList();
+        foreach (var heroId in candidates)
+        {
+            var isNew = !heroList.Contains(heroId);
+            if (isNew && heroList.Count >= CombatConst.PlayerMaxHeroCards)
+                break;
+            p1.cards.TryGetValue(heroId, out var exp);
+            p1.cards[heroId] = exp + 1;
+            if (isNew)
+                heroList.Add(heroId);
+        }
+        UpdateView(); // 背包区域重建，显示新加入的卡
     }
 
     private List<GameObject> connectionLines = new List<GameObject>();

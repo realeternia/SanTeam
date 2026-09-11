@@ -131,7 +131,8 @@ public class MySelectControl : MonoBehaviour
         }
     }
 
-    // 羁绊模式：显示职业羁绊与好友羁绊，按羁绊人数（等级）倒序，格式"名字+人数"（如 xx1 = xx技能1级）
+    // 羁绊模式：显示职业羁绊、好友羁绊与国家羁绊，按羁绊人数（等级）倒序，格式"等级+名字"
+    // 职业：等级=上阵人数（1人=Lv1）；好友/国家：等级=人数-1（1人=0级，2人=Lv1起，最多5级）
     private void ShowBondCards(PlayerInfo checkPlayer)
     {
         var entries = new List<BondEntry>();
@@ -160,8 +161,8 @@ public class MySelectControl : MonoBehaviour
             entries.Add(new BondEntry { Name = jobCfg.Name, Count = kv.Value, Icon = GetSkillIcon(jobCfg.SkillId) });
         }
 
-        // 好友羁绊：HeroFriendConfig.Heros 中拥有英雄数即等级；普通组无特殊技能则不显示图标；
-        // 配置了 LineColor 的组用该颜色作为文字前景色
+        // 好友羁绊：HeroFriendConfig.Heros 中拥有英雄数即人数，等级=人数-1（1人=0级）；
+        // 普通组无特殊技能则不显示图标；配置了 LineColor 的组用该颜色作为文字前景色
         foreach (var friendCfg in HeroFriendConfig.ConfigList)
         {
             var present = 0;
@@ -179,10 +180,11 @@ public class MySelectControl : MonoBehaviour
                 if (ColorUtility.TryParseHtmlString(friendCfg.LineColor, out var parsed))
                     lineColor = parsed;
             }
-            entries.Add(new BondEntry { Name = friendCfg.Name, Count = present, Icon = GetSkillIcon(friendCfg.SkillId), Color = lineColor });
+            entries.Add(new BondEntry { Name = friendCfg.Name, Count = present - 1, Icon = GetSkillIcon(friendCfg.SkillId), Color = lineColor });
         }
 
-        // 国家势力：按上阵英雄阵营计数；不参与同阵营护盾(野=10)或图标为空的国家跳过
+        // 国家势力：按上阵英雄阵营计数；不参与同阵营护盾(野=10)或图标为空的国家跳过；
+        // 等级=同阵营人数-1（1人=0级）
         var forceCounts = new Dictionary<int, int>();
         foreach (var id in battleHeroes)
         {
@@ -196,7 +198,7 @@ public class MySelectControl : MonoBehaviour
             if (forceCfg == null || !forceCfg.JoinFactionShield)
                 continue;
 
-            entries.Add(new BondEntry { Name = forceCfg.Name, Count = kv.Value, Icon = "Textures/Icons/" + forceCfg.Icon });
+            entries.Add(new BondEntry { Name = forceCfg.Name, Count = kv.Value - 1, Icon = "Textures/Icons/" + forceCfg.Icon });
         }
 
         // 羁绊人数倒序排序

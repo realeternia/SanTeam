@@ -19,7 +19,7 @@ public class SkillAttackedShadow : Skill
             Vector2 randomDir = SysRandom.InsideUnitCircle.normalized;
             Vector3 randomPosition = owner.transform.position + new Vector3(randomDir.x, 0, randomDir.y) * skillCfg.Range;
             var shadowUnit = SummonUnit(randomPosition, CombatConst.SoldierShadow, HeroConfig.GetConfig(owner.heroId).Icon);
-            shadowUnit.attackDamage = (int)(owner.attackDamage * skillCfg.SkillDamageRate);
+            shadowUnit.atk = (int)(owner.atk * skillCfg.SkillDamageRate);
             shadowUnit.maxHp = (int)(owner.maxHp * skillCfg.SkillAttrRate);
             shadowUnit.hp = (int)(shadowUnit.maxHp * owner.HpRate);
             shadowUnit.material.SetFloat("_SecondTexSize", 2f);

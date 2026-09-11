@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <!-- Generated file, do not modify, your changes will be overwritten (use AssetPostprocessor.OnGeneratedCSProject) -->
   <PropertyGroup>
@@ -75,6 +75,7 @@
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillHitAround.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillModifyShootSpeed.cs" />
     <Compile Include="Assets\Resources\Scripts\Configs\JobConfig_s.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillHitFireArea.cs" />
     <Compile Include="Assets\Resources\Scripts\PlayerAI.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillHitBuff.cs" />
     <Compile Include="Assets\Resources\Scripts\WorldManager.cs" />
@@ -89,7 +90,6 @@
     <Compile Include="Assets\Resources\Scripts\UIs\BagControl.cs" />
     <Compile Include="Assets\Resources\Scripts\CardShopManager.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillHitWall.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillHitFireArea.cs" />
     <Compile Include="Assets\Resources\Scripts\PlayerInfo.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\CastleHUD.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillInitAddRege.cs" />
@@ -129,7 +129,6 @@
     <Compile Include="Assets\Resources\Scripts\Configs\ItemConfig_s.cs" />
     <Compile Include="Assets\Resources\Scripts\PO\SideInfo.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffLock.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAttackMultiArrow.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\PickPanelControl.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\RankPanelManager.cs" />
     <Compile Include="Assets\SineVFX\TopDownEffects\Scripts\PrefabSpawner.cs" />

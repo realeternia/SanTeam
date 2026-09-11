@@ -446,6 +446,13 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         if (gold < price)
             return false;
 
+        // 背包英雄卡上限：新英雄（尚未拥有）会占用一个卡位，达到上限不能再买
+        if (isHero && !cards.ContainsKey(cardId) && GetHeroCardList().Count >= CombatConst.PlayerMaxHeroCards)
+        {
+            GameLog.Warn($"英雄背包已满({CombatConst.PlayerMaxHeroCards}张)，无法购买新英雄 cardId={cardId}");
+            return false;
+        }
+
         SubGold(price, isHero);
         if (!ctr.isHeroCard)
         {

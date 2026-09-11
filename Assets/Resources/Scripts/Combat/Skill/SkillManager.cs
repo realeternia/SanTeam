@@ -32,8 +32,6 @@ public static class SkillManager
                 return new SkillDefFeedback(skillId, owner);
             case "AttackSpeedAttack":
                 return new SkillAttackSpeedAttack(skillId, owner);
-            case "AttackMultiArrow":
-                return new SkillAttackMultiArrow(skillId, owner);
             case "AttackReboundArrow":
                 return new SkillAttackReboundArrow(skillId, owner);
             case "DefPlantSkin":
@@ -221,7 +219,8 @@ public static class SkillManager
         {
             if (!skill.IsInCD() && skill.CheckAidSkill())
             {
-                attacker.attackPoint -= skill.skillCfg.AttackPointReduce;
+                // 辅助技能释放消耗气力（负数=延长冷却，走 Cooldown 统一限制在0~1）
+                attacker.Cooldown(-skill.skillCfg.AttackPointReduce);
                 return true;
             }
         }

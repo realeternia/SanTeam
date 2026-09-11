@@ -105,7 +105,7 @@ public static class JobLinkManager
 
         // 统一结算士兵生命加成：目标最大生命 = 初始基准快照 × 累计系数（只乘一次），
         // 多个职业组系数先累加，不会把已加成数值当基数二次乘算；
-        // 士兵攻击不在此结算（伤害计算时已按 attackDamage × soldierAtkRate 乘算一次）
+        // 士兵攻击不在此结算（伤害计算时已按 atk × soldierAtkRate 乘算一次）
         foreach (var unit in allMySideUnits)
         {
             if (unit.isHero)
@@ -371,7 +371,7 @@ public static class JobLinkManager
                 unit.auroEffectRate += value;
                 break;
             case "soldierAtk":
-                // 相的羁绊：全军士兵攻击+%（乘法系数，此处只累加，伤害结算时乘 attackDamage 一次）
+                // 相的羁绊：全军士兵攻击+%（乘法系数，此处只累加，伤害结算时乘 atk 一次）
                 if (!unit.isHero)
                     unit.soldierAtkRate += value;
                 break;
