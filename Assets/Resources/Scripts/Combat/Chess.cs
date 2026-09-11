@@ -782,7 +782,8 @@ public class Chess : MonoBehaviour
 
     public void Cooldown(float time)
     {
-        attackPoint += time;
+        // 冷却进度按百分比填充（1=完全冷却），最大不超过1
+        attackPoint = Mathf.Min(attackPoint + Mathf.Clamp01(time), 1f);
     }
 
     public void SetLifeTime(float time)

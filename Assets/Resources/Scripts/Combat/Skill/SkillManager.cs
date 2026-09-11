@@ -48,6 +48,8 @@ public static class SkillManager
                 return new SkillHitRegion(skillId, owner);
             case "HitWall":
                 return new SkillHitWall(skillId, owner);
+            case "HitFireArea":
+                return new SkillHitFireArea(skillId, owner);
             case "DamageReal":
                 return new SkillDamageReal(skillId, owner);
             case "AttackedShadow":
