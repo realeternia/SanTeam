@@ -43,11 +43,11 @@ public class BagFieldUnitControl : MonoBehaviour, IDropHandler, IBeginDragHandle
             heroIcon.gameObject.SetActive(true);
             jobIcon.gameObject.SetActive(true);
             var heroCfg = HeroConfig.GetConfig(unitId);
-            heroIcon.sprite = Resources.Load<Sprite>("Skins/" + heroCfg.Icon);
+            heroIcon.sprite = Resources.Load<Sprite>("Textures/Skins/" + heroCfg.Icon);
             var skillCfgs = ConfigManager.GetHeroSkillConfigs(heroCfg);
             if (skillCfgs.Count > 0)
             {
-                jobIcon.sprite = Resources.Load<Sprite>("SkillPic/" + skillCfgs[0].Icon);
+                jobIcon.sprite = Resources.Load<Sprite>("Textures/SkillPic/" + skillCfgs[0].Icon);
             }
         }
 
@@ -241,6 +241,6 @@ public class BagFieldUnitControl : MonoBehaviour, IDropHandler, IBeginDragHandle
         if (unitId == 500002)
             return Resources.Load<Sprite>("Textures/bing2");
         var heroCfg = HeroConfig.GetConfig(unitId);
-        return Resources.Load<Sprite>("Skins/" + heroCfg.Icon);
+        return Resources.Load<Sprite>("Textures/Skins/" + heroCfg.Icon);
     }
 }

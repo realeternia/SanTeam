@@ -54,11 +54,11 @@ public class BagCell : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragH
                 bool has = slots != null && i < slots.Length && slots[i] != 0;
                 equipImages[i].gameObject.SetActive(has);
                 if (has)
-                    equipImages[i].sprite = Resources.Load<Sprite>("ItemPic/" + ItemConfig.GetConfig(slots[i]).Icon);
+                    equipImages[i].sprite = Resources.Load<Sprite>("Textures/ItemPic/" + ItemConfig.GetConfig(slots[i]).Icon);
             }
         }
 
-        itemImage.sprite = Resources.Load<Sprite>("SkinsBig/" + heroCfg.Icon);
+        itemImage.sprite = Resources.Load<Sprite>("Textures/SkinsBig/" + heroCfg.Icon);
 
         // 显示职业图标：取职业技能（GetHeroSkillConfigs 第一项为 JobConfig.SkillId）的图标
         if (jobImage != null)
@@ -66,7 +66,7 @@ public class BagCell : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragH
             var skillCfgs = ConfigManager.GetHeroSkillConfigs(heroCfg);
             jobImage.gameObject.SetActive(skillCfgs.Count > 0);
             if (skillCfgs.Count > 0)
-                jobImage.sprite = Resources.Load<Sprite>("SkillPic/" + skillCfgs[0].Icon);
+                jobImage.sprite = Resources.Load<Sprite>("Textures/SkillPic/" + skillCfgs[0].Icon);
         }
 
         expBar.rectTransform.sizeDelta = new Vector2(140 * HeroSelectionTool.GetExpRate(count, true), 20);
@@ -77,7 +77,7 @@ public class BagCell : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragH
     {
         // 装备升级机制已移除：物品不叠加格子，每格一个，无升级进度条
         var itemCfg = ItemConfig.GetConfig(cardId);
-        itemImage.sprite = Resources.Load<Sprite>("ItemPic/" + itemCfg.Icon);
+        itemImage.sprite = Resources.Load<Sprite>("Textures/ItemPic/" + itemCfg.Icon);
 
         // 有副本处于装备中时显示角标
         bool equipped = bagControl.bindPlayer.itemEquips.Values.Any(v => v != null && v.Contains(cardId));
@@ -124,7 +124,7 @@ public class BagCell : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragH
         if(ConfigManager.IsHeroCard(cardId))
         {
             var heroCfg = HeroConfig.GetConfig(cardId);
-            dragImage.sprite = Resources.Load<Sprite>("Skins/" + heroCfg.Icon);
+            dragImage.sprite = Resources.Load<Sprite>("Textures/Skins/" + heroCfg.Icon);
         }
         else
         {

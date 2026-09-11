@@ -55,7 +55,7 @@ public class RankCellInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandle
     public void Init(HeroConfig heroConfig)
     {
         // 设置英雄信息
-        heroPic.sprite = Resources.Load<Sprite>("Skins/" + heroConfig.Icon);
+        heroPic.sprite = Resources.Load<Sprite>("Textures/Skins/" + heroConfig.Icon);
 
         var skillCfgs = ConfigManager.GetHeroSkillConfigs(heroConfig);
         for (int i = 0; i < heroSkill.Length; i++)
@@ -64,7 +64,7 @@ public class RankCellInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandle
             {
                 heroSkill[i].gameObject.SetActive(true); // 复用池中单元格时恢复之前被隐藏的图标
                 var skillIcon = skillCfgs[i].Icon;
-                heroSkill[i].sprite = Resources.Load<Sprite>("SkillPic/" + skillIcon);
+                heroSkill[i].sprite = Resources.Load<Sprite>("Textures/SkillPic/" + skillIcon);
             }
             else
             {

@@ -65,7 +65,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     // 在 PlayerInfo 类中添加 AICardConfig 实例
     public PlayerConfig playerConfig;
 
-    public string imgPath{ get { return playerConfig.Imgpath; } }
+    public string imgPath{ get { return "Textures/" + playerConfig.Imgpath; } }
     public Color lineColor;
     public int banCount = 1; //最多一张
     public int battleSide;

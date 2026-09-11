@@ -122,10 +122,12 @@ public class Chess : MonoBehaviour
         material = new Material(rend.sharedMaterial);
         if (!string.IsNullOrEmpty(chessName))
         {
-            if (chessName.StartsWith("PlayerPic") || chessName.StartsWith("MonsterPic"))
+            if (chessName.StartsWith("Textures/"))
                 material.mainTexture = Resources.Load<Texture>(chessName);
+            else if (chessName.StartsWith("PlayerPic") || chessName.StartsWith("MonsterPic"))
+                material.mainTexture = Resources.Load<Texture>("Textures/" + chessName);
             else
-                material.mainTexture = Resources.Load<Texture>("Skins/" + chessName);
+                material.mainTexture = Resources.Load<Texture>("Textures/Skins/" + chessName);
         }
         material.SetColor("_OutlineColor", c);
 
@@ -150,7 +152,7 @@ public class Chess : MonoBehaviour
                 skills.Add(skill);
                 if (!string.IsNullOrEmpty(skillCfg.Icon) && !hasSKill)
                 {
-                    material.SetTexture("_SecondTex", Resources.Load<Texture>("SkillPic/" + skillCfg.Icon));
+                    material.SetTexture("_SecondTex", Resources.Load<Texture>("Textures/SkillPic/" + skillCfg.Icon));
                     hasSKill = true;
                 }
             }

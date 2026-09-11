@@ -40,7 +40,7 @@ public class SelectCardNodeControl : MonoBehaviour
         {
             jobImg.gameObject.SetActive(true);
             // 带路径的图标（如国家 Textures/Icons/xxx）直接加载，否则按技能图标 SkillPic/ 前缀
-            var loadPath = icon.Contains("/") ? icon : "SkillPic/" + icon;
+            var loadPath = icon.Contains("/") ? icon : "Textures/SkillPic/" + icon;
             jobImg.sprite = Resources.Load<Sprite>(loadPath);
         }
     }
@@ -58,7 +58,7 @@ public class SelectCardNodeControl : MonoBehaviour
         else
         {
             jobImg.gameObject.SetActive(true);
-            jobImg.sprite = Resources.Load<Sprite>("SkillPic/" + icon);
+            jobImg.sprite = Resources.Load<Sprite>("Textures/SkillPic/" + icon);
         }
 
     }

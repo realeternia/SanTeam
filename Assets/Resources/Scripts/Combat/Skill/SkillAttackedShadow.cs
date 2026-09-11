@@ -23,7 +23,7 @@ public class SkillAttackedShadow : Skill
             shadowUnit.maxHp = (int)(owner.maxHp * skillCfg.SkillAttrRate);
             shadowUnit.hp = (int)(shadowUnit.maxHp * owner.HpRate);
             shadowUnit.material.SetFloat("_SecondTexSize", 2f);
-            shadowUnit.material.SetTexture("_SecondTex", Resources.Load<Texture>("SkillPic/" + skillCfg.Icon));
+            shadowUnit.material.SetTexture("_SecondTex", Resources.Load<Texture>("Textures/SkillPic/" + skillCfg.Icon));
             EffectManager.PlaySkillEffect(owner, skillCfg.HitEffect);
             EffectManager.PlaySkillEffect(shadowUnit, skillCfg.HitEffect);
 

@@ -443,7 +443,7 @@ public class BagControl : MonoBehaviour, IPanelEvent
                     var skillCfg = SkillConfig.GetConfig(helpSkillId);
                     var color = SysColor.GetSkillAttrColor(skillCfg.IsMagic);
                     // 创建连接线
-                    CreateConnectionLine(heroUnits[i].transform, heroUnits[j].transform, color, new Vector2(-25, -25), Resources.Load<Sprite>("SkillPic/" + skillCfg.Icon));
+                    CreateConnectionLine(heroUnits[i].transform, heroUnits[j].transform, color, new Vector2(-25, -25), Resources.Load<Sprite>("Textures/SkillPic/" + skillCfg.Icon));
                 }
 
                 helpSkillId = ConfigManager.GetShowHelpSkillId(heroId2, heroId1, j, i);
@@ -452,7 +452,7 @@ public class BagControl : MonoBehaviour, IPanelEvent
                     var skillCfg = SkillConfig.GetConfig(helpSkillId);
                     var color = SysColor.GetSkillAttrColor(skillCfg.IsMagic);
                     // 创建连接线
-                    CreateConnectionLine(heroUnits[i].transform, heroUnits[j].transform, color, new Vector2(25, 25), Resources.Load<Sprite>("SkillPic/" + skillCfg.Icon));
+                    CreateConnectionLine(heroUnits[i].transform, heroUnits[j].transform, color, new Vector2(25, 25), Resources.Load<Sprite>("Textures/SkillPic/" + skillCfg.Icon));
                 }
             }
         }

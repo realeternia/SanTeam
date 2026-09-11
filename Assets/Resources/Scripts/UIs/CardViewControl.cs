@@ -132,7 +132,7 @@ public class CardViewControl : MonoBehaviour, IPointerDownHandler, IPointerUpHan
             isItemCardNode.SetActive(false);
 
             var heroCfg = HeroConfig.GetConfig(cid);
-            heroImage.sprite = Resources.Load<Sprite>("SkinsBig/" + heroCfg.Icon);
+            heroImage.sprite = Resources.Load<Sprite>("Textures/SkinsBig/" + heroCfg.Icon);
             cardNameS = heroCfg.Name;
             cardName.text = heroCfg.Name;
             cardName.color = SysColor.GetQualityColor(heroCfg.Quality);
@@ -145,7 +145,7 @@ public class CardViewControl : MonoBehaviour, IPointerDownHandler, IPointerUpHan
                 if (i < heroSkillCfgs.Count)
                 {
                     heroJobImage[i].gameObject.SetActive(true);
-                    heroJobImage[i].sprite = Resources.Load<Sprite>("SkillPic/" + heroSkillCfgs[i].Icon);
+                    heroJobImage[i].sprite = Resources.Load<Sprite>("Textures/SkillPic/" + heroSkillCfgs[i].Icon);
                 }
                 else
                 {
@@ -169,7 +169,7 @@ public class CardViewControl : MonoBehaviour, IPointerDownHandler, IPointerUpHan
             cardName.text = itemCfg.Name;
             if (count > 1)
                 cardName.text += "x" + count;
-            itemImage.sprite = Resources.Load<Sprite>("ItemPic/" + itemCfg.Icon);
+            itemImage.sprite = Resources.Load<Sprite>("Textures/ItemPic/" + itemCfg.Icon);
 
             priceI = itemCfg.Price + (int)Math.Floor(itemCfg.PriceRound * shopOpenIndex);
 

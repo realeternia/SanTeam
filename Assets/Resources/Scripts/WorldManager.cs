@@ -743,7 +743,7 @@ public class WorldManager : MonoBehaviour
             var card = Instantiate(movingCardPrefab, canvas.transform, false);
             var img = card.GetComponent<Image>();
             if (ItemConfig.HasConfig(drop.Item3))
-                img.sprite = Resources.Load<Sprite>("ItemPic/" + ItemConfig.GetConfig(drop.Item3).Icon);
+                img.sprite = Resources.Load<Sprite>("Textures/ItemPic/" + ItemConfig.GetConfig(drop.Item3).Icon);
             card.GetComponent<RectTransform>().anchoredPosition = startLocalPos;
 
             cards.Add(card);

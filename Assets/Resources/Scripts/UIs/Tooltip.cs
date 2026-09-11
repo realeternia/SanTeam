@@ -240,7 +240,7 @@ public class Tooltip : MonoBehaviour
                 {
                     textSkills[i].text = skillAttrStr + skillConfig.Name + skillConfig.Descript; //富文本
                 }
-                imageSkills[i].sprite = Resources.Load<Sprite>("SkillPic/" + skillConfig.Icon);
+                imageSkills[i].sprite = Resources.Load<Sprite>("Textures/SkillPic/" + skillConfig.Icon);
             }
 
             for (int i = 0; i < skillCfgs.Count; i++)
