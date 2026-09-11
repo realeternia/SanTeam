@@ -17,6 +17,7 @@ namespace DesignCoder
         private const int HeaderRowCount = 3;
 
         private ConfigData currentConfig;
+        private string currentConfigName;   // 当前已加载的配置名（不带 _s 后缀），用于滚动位置缓存
         private string currentFilePath;
         private DataTable dataTable;
         private int sortedColumnIndex = -1;
@@ -30,6 +31,14 @@ namespace DesignCoder
         private Dictionary<string, string> originalSources = new Dictionary<string, string>();
         private HashSet<string> modifiedConfigs = new HashSet<string>();
         private string copiedCellValue = null;
+
+        // 各行/列滚动位置缓存，键为配置名
+        private Dictionary<string, int> scrollRowCache = new Dictionary<string, int>();
+        private Dictionary<string, int> scrollColCache = new Dictionary<string, int>();
+
+        // 各行/列高亮位置缓存（键为配置名），切换表格后恢复
+        private Dictionary<string, int> highlightColCache = new Dictionary<string, int>();
+        private Dictionary<string, int> highlightRowCache = new Dictionary<string, int>();
 
         public Form1()
         {
@@ -77,6 +86,11 @@ namespace DesignCoder
 
             SaveCurrentEditingData();
 
+            // 切换表前，缓存当前表格的滚动位置（按配置名区分）
+            CacheCurrentScroll();
+            // 同时记住当前表格高亮的行/列（按配置名区分）
+            SaveHighlightState();
+
             string selectedName = listView1.SelectedItems[0].Text.TrimEnd('*');
             string filePath = Path.Combine(ConfigDir, selectedName + "_s.cs");
 
@@ -115,6 +129,8 @@ namespace DesignCoder
             isLoading = true;
             try
             {
+                currentConfigName = configName;
+
                 if (loadedConfigs.ContainsKey(configName) && modifiedConfigs.Contains(configName))
                 {
                     currentConfig = loadedConfigs[configName];
@@ -129,8 +145,8 @@ namespace DesignCoder
                 
                 sortedColumnIndex = -1;
                 sortAscending = true;
-                selectedColumnIndex = -1;
-                selectedRowIndex = -1;
+                // 恢复该表上次高亮的行/列（无记录则 -1 即不高亮）
+                RestoreHighlightState(configName);
                 BuildDataTable();
                 SetupDataGridView();
                 ApplyColors();
@@ -301,7 +317,54 @@ namespace DesignCoder
 
             dataGridView1.ResumeLayout(false);
 
-            dataGridView1.FirstDisplayedScrollingRowIndex = HeaderRowCount;
+            RestoreScrollPosition();
+        }
+
+        // 缓存当前表格的滚动位置，键为配置名，供切换回来后恢复
+        private void CacheCurrentScroll()
+        {
+            if (currentConfigName == null || dataGridView1 == null) return;
+            if (dataGridView1.Rows.Count > HeaderRowCount)
+                scrollRowCache[currentConfigName] = dataGridView1.FirstDisplayedScrollingRowIndex;
+            scrollColCache[currentConfigName] = dataGridView1.FirstDisplayedScrollingColumnIndex;
+        }
+
+        // 恢复当前配置名对应的滚动位置；无缓存或越界则回退到首个数据行
+        private void RestoreScrollPosition()
+        {
+            if (currentConfigName == null || dataGridView1 == null) return;
+
+            int minRow = HeaderRowCount;
+            int maxRow = Math.Max(minRow, dataGridView1.Rows.Count - 1);
+
+            if (scrollRowCache.TryGetValue(currentConfigName, out int rowIdx))
+                dataGridView1.FirstDisplayedScrollingRowIndex = Math.Min(Math.Max(minRow, rowIdx), maxRow);
+            else
+                dataGridView1.FirstDisplayedScrollingRowIndex = minRow;
+
+            if (scrollColCache.TryGetValue(currentConfigName, out int colIdx))
+            {
+                int maxCol = Math.Max(0, dataGridView1.Columns.Count - 1);
+                dataGridView1.FirstDisplayedScrollingColumnIndex = Math.Min(Math.Max(0, colIdx), maxCol);
+            }
+        }
+
+        // 保存当前表格高亮的行/列（键为配置名），供切换回来恢复
+        private void SaveHighlightState()
+        {
+            if (currentConfigName == null) return;
+            highlightColCache[currentConfigName] = selectedColumnIndex;
+            highlightRowCache[currentConfigName] = selectedRowIndex;
+        }
+
+        // 恢复指定配置名对应的高亮行/列；无记录时置 -1（不高亮）
+        private void RestoreHighlightState(string configName)
+        {
+            if (configName == null) return;
+            if (!highlightColCache.TryGetValue(configName, out selectedColumnIndex))
+                selectedColumnIndex = -1;
+            if (!highlightRowCache.TryGetValue(configName, out selectedRowIndex))
+                selectedRowIndex = -1;
         }
 
         private void SyncDataTableToConfig()
@@ -1091,42 +1154,29 @@ namespace DesignCoder
                 SortDataByColumn(e.ColumnIndex);
             }
 
-            if (e.ColumnIndex >= 0 && e.ColumnIndex != selectedColumnIndex)
+            // 点击前三行（表头区）→ 整列高亮；点击第一列（Id列）→ 整行高亮；已点亮再点一次取消
+            if (e.RowIndex >= 0 && e.ColumnIndex >= 0)
             {
-                int oldSel = selectedColumnIndex;
-                selectedColumnIndex = e.ColumnIndex;
-                InvalidateColumnHeaders(oldSel);
-                InvalidateColumnHeaders(selectedColumnIndex);
-            }
-        }
+                bool isHeaderRow = e.RowIndex < HeaderRowCount;
+                bool isFirstCol = e.ColumnIndex == firstDataColIdx;
 
-        private void InvalidateColumnHeaders(int colIdx)
-        {
-            if (colIdx < 0 || colIdx >= dataGridView1.Columns.Count) return;
-            for (int r = 0; r < HeaderRowCount && r < dataGridView1.Rows.Count; r++)
-            {
-                dataGridView1.InvalidateCell(colIdx, r);
+                if (isHeaderRow)
+                {
+                    selectedColumnIndex = (selectedColumnIndex == e.ColumnIndex) ? -1 : e.ColumnIndex;
+                    dataGridView1.Invalidate();
+                }
+                else if (isFirstCol)
+                {
+                    selectedRowIndex = (selectedRowIndex == e.RowIndex) ? -1 : e.RowIndex;
+                    dataGridView1.Invalidate();
+                }
             }
         }
 
         private void dataGridView1_SelectionChanged(object sender, EventArgs e)
         {
-            if (isLoading || dataGridView1 == null) return;
-
-            int oldRow = selectedRowIndex;
-
-            if (dataGridView1.CurrentCell != null && dataGridView1.CurrentCell.RowIndex >= HeaderRowCount)
-                selectedRowIndex = dataGridView1.CurrentCell.RowIndex;
-            else
-                selectedRowIndex = -1;
-
-            if (oldRow != selectedRowIndex)
-            {
-                if (oldRow >= HeaderRowCount && oldRow < dataGridView1.Rows.Count && firstDataColIdx >= 0)
-                    dataGridView1.InvalidateCell(firstDataColIdx, oldRow);
-                if (selectedRowIndex >= HeaderRowCount && selectedRowIndex < dataGridView1.Rows.Count && firstDataColIdx >= 0)
-                    dataGridView1.InvalidateCell(firstDataColIdx, selectedRowIndex);
-            }
+            // 行/列高亮不再跟随当前选中格自动变化，统一由 CellClick 点击表头/首列时显式设置
+            if (isLoading) return;
         }
 
         private void dataGridView1_Scroll(object sender, ScrollEventArgs e)
@@ -1304,10 +1354,11 @@ namespace DesignCoder
                 e.Paint(e.CellBounds, DataGridViewPaintParts.All & ~DataGridViewPaintParts.ContentForeground & ~DataGridViewPaintParts.Background);
 
                 Color headerBg;
+                Color headerText = isSelectedCol ? Color.FromArgb(45, 42, 15) : Color.White;
                 if (isIndexCol)
-                    headerBg = isSelectedCol ? Color.FromArgb(160, 140, 70) : Color.FromArgb(130, 110, 50);
+                    headerBg = isSelectedCol ? Color.FromArgb(230, 216, 110) : Color.FromArgb(130, 110, 50);
                 else
-                    headerBg = isSelectedCol ? Color.FromArgb(90, 120, 160) : Color.FromArgb(70, 90, 115);
+                    headerBg = isSelectedCol ? Color.FromArgb(244, 233, 145) : Color.FromArgb(70, 90, 115);
                 using (Brush bgBrush = new SolidBrush(headerBg))
                 {
                     e.Graphics.FillRectangle(bgBrush, e.CellBounds);
@@ -1321,7 +1372,7 @@ namespace DesignCoder
                     {
                         displayText += sortAscending ? " ▲" : " ▼";
                     }
-                    using (Brush brush = new SolidBrush(Color.White))
+                    using (Brush brush = new SolidBrush(headerText))
                     {
                         SizeF textSize = e.Graphics.MeasureString(displayText, e.CellStyle.Font);
                         float x = e.CellBounds.Left + (e.CellBounds.Width - textSize.Width) / 2;
@@ -1332,7 +1383,7 @@ namespace DesignCoder
                 else
                 {
                     string cellValue = e.Value != null ? e.Value.ToString() : "";
-                    using (Brush brush = new SolidBrush(Color.White))
+                    using (Brush brush = new SolidBrush(headerText))
                     {
                         StringFormat sf = new StringFormat { LineAlignment = StringAlignment.Center, Alignment = StringAlignment.Center };
                         e.Graphics.DrawString(cellValue, e.CellStyle.Font, brush, e.CellBounds, sf);
@@ -1356,29 +1407,41 @@ namespace DesignCoder
                 bool isBoolTrue = cellValue == "true" || cellValue == "True";
                 bool isBoolFalse = cellValue == "false" || cellValue == "False";
                 bool isNumberType = fieldType == "int" || fieldType == "float";
+                bool isRowHighlighted = (e.RowIndex == selectedRowIndex);
+                bool isColHighlighted = (e.ColumnIndex == selectedColumnIndex);
+                bool isHighlighted = isRowHighlighted || isColHighlighted;
                 bool isFirstColHighlight = (e.ColumnIndex == firstDataColIdx && e.RowIndex == selectedRowIndex);
 
-                if (colorValue.HasValue || isBoolTrue || isBoolFalse || isNumberType || isFirstColHighlight)
+                if (colorValue.HasValue || isBoolTrue || isBoolFalse || isNumberType || isHighlighted)
                 {
                     Color bgColor = e.CellStyle.BackColor;
                     Color fgColor = e.CellStyle.ForeColor;
 
-                    if (isFirstColHighlight)
+                    if (isHighlighted)
                     {
-                        bgColor = Color.FromArgb(80, 130, 200);
+                        // 整行/整列高亮：统一亮黄色背景 + 深色文本
+                        bgColor = Color.FromArgb(245, 235, 150);
+                        fgColor = Color.FromArgb(40, 40, 30);
                     }
-
-                    if (isNumberType && !isFirstColHighlight)
+                    else
                     {
-                        fgColor = Color.FromArgb(100, 220, 130);
-                        if (fieldIdx >= 0 && fieldIdx < currentConfig.Fields.Count)
+                        if (isFirstColHighlight)
                         {
-                            var fieldDef = currentConfig.Fields[fieldIdx];
-                            Color? ruleColor = GetRuleColor(fieldDef.FieldRule, cellValue);
-                            if (ruleColor.HasValue)
+                            bgColor = Color.FromArgb(80, 130, 200);
+                        }
+
+                        if (isNumberType)
+                        {
+                            fgColor = Color.FromArgb(100, 220, 130);
+                            if (fieldIdx >= 0 && fieldIdx < currentConfig.Fields.Count)
                             {
-                                bgColor = ruleColor.Value;
-                                fgColor = e.CellStyle.ForeColor;
+                                var fieldDef = currentConfig.Fields[fieldIdx];
+                                Color? ruleColor = GetRuleColor(fieldDef.FieldRule, cellValue);
+                                if (ruleColor.HasValue)
+                                {
+                                    bgColor = ruleColor.Value;
+                                    fgColor = e.CellStyle.ForeColor;
+                                }
                             }
                         }
                     }
@@ -1386,7 +1449,7 @@ namespace DesignCoder
                     {
                         e.Graphics.FillRectangle(bgBrush, e.CellBounds);
                     }
-                    if ((e.State & DataGridViewElementStates.Selected) == DataGridViewElementStates.Selected)
+                    if (!isHighlighted && (e.State & DataGridViewElementStates.Selected) == DataGridViewElementStates.Selected)
                     {
                         using (Brush selBrush = new SolidBrush(e.CellStyle.SelectionBackColor))
                         {
@@ -1399,7 +1462,7 @@ namespace DesignCoder
                     int iconSize = 12;
                     int leftOffset = barPadding;
 
-                    if (colorValue.HasValue)
+                    if (colorValue.HasValue && !isHighlighted)
                     {
                         Rectangle barRect = new Rectangle(
                             e.CellBounds.Left + barPadding,
@@ -1414,7 +1477,7 @@ namespace DesignCoder
                         leftOffset = barWidth + barPadding * 2;
                     }
 
-                    if (isBoolTrue || isBoolFalse)
+                    if ((isBoolTrue || isBoolFalse) && !isHighlighted)
                     {
                         int iconX = e.CellBounds.Left + barPadding + 2;
                         int iconY = e.CellBounds.Top + (e.CellBounds.Height - iconSize) / 2;
