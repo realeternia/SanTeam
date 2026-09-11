@@ -64,6 +64,8 @@ public class Chess : MonoBehaviour
     public int missileSpeed = 10;
     public float missileHight;
     public int soldierId;
+    /// <summary>召唤物标签（技能召唤时由 SkillConfig.SummonTag 标记，如"火"，用于技能识别场景中的召唤物类型）</summary>
+    public string SummonTag;
     private int soldierLevel = 0;
 
 

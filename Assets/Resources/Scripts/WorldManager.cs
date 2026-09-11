@@ -1359,6 +1359,29 @@ public class WorldManager : MonoBehaviour
         return unitsInRange;
     }
 
+    /// <summary>
+    /// 获取指定范围内所有带指定 SummonTag 的召唤物（不分敌我，按召唤物标签识别，如"火"/"雷"）
+    /// </summary>
+    public List<Chess> GetUnitsInRangeByTag(Vector3 wPos, float range, string summonTag)
+    {
+        var result = new List<Chess>();
+        if (string.IsNullOrEmpty(summonTag))
+            return result;
+
+        Vector2Int center = WorldManager.Instance.WorldToGridPosition(wPos, true);
+        foreach (var chessComponent in chessList)
+        {
+            if (chessComponent == null || chessComponent.hp <= 0 || chessComponent.isShadow || chessComponent.SummonTag != summonTag)
+                continue;
+
+            Vector2Int chessPos = WorldToGridPosition(chessComponent.transform.position, true);
+            if (Vector2Int.Distance(center, chessPos) <= range || range == 0)
+                result.Add(chessComponent);
+        }
+
+        return result;
+    }
+
     public void RandomSelect(List<Chess> unitsInRange, int limit)
     {
         if(limit < 0)

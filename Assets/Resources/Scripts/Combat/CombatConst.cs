@@ -55,6 +55,12 @@ public static class CombatConst
     /// <summary>短程寻路最大搜索深度(格)，超过预算取最接近目标的一步继续推进</summary>
     public const int MovePathMaxDepth = 6;
 
+    // ---- 技能召唤物(士兵Id) ----
+    /// <summary>法术场(501001)：技能场/火攻场/火墙的召唤物载体（类型用 SummonTag 区分，如"火"/"雷"）</summary>
+    public const int SoldierMagicField = 501001;
+    /// <summary>影子(501002)：分兵/影技能召唤的分身</summary>
+    public const int SoldierShadow = 501002;
+
     // ---- 其他 ----
     /// <summary>近战/远程士兵射程判定阈值</summary>
     public const float MeleeRange = 30f;

@@ -20,9 +20,7 @@ public class SkillHitWall : Skill
             // 在目标位置，以及owner和defender方向90度两侧，各创建一个effect
             var targetPos = defender.transform.position;
 
-            var magicStub = WorldManager.Instance.SpawnUnitsForRegion(owner.GetPlayerInfo(), 501001, -1, targetPos, owner.side, "");
-            var summonTime = GetSummonTime();
-            magicStub.SetLifeTime(summonTime);
+            var magicStub = SummonMagicField(targetPos, out var summonTime);
             
             // 计算owner到defender的方向
             Vector3 direction = (defender.transform.position - owner.transform.position).normalized;

@@ -298,6 +298,28 @@ public class Skill
 
     }
 
+    /// <summary>
+    /// 召唤技能单位（法术场/分身等）：在指定位置创建单位，并将技能配置的 SummonTag 标记到召唤物上
+    /// </summary>
+    protected Chess SummonUnit(Vector3 pos, int soldierId, string imgPath = "")
+    {
+        var unit = WorldManager.Instance.SpawnUnitsForRegion(owner.GetPlayerInfo(), soldierId, -1, pos, owner.side, imgPath);
+        if (!string.IsNullOrEmpty(skillCfg.SummonTag))
+            unit.SummonTag = skillCfg.SummonTag;
+        return unit;
+    }
+
+    /// <summary>
+    /// 召唤技能法术场(501001)：创建并标记 SummonTag、设置存在时长，返回召唤物与存在时长（时长同时用于技能特效生命周期）
+    /// </summary>
+    protected Chess SummonMagicField(Vector3 pos, out float summonTime)
+    {
+        var magicStub = SummonUnit(pos, CombatConst.SoldierMagicField);
+        summonTime = GetSummonTime();
+        magicStub.SetLifeTime(summonTime);
+        return magicStub;
+    }
+
     public float GetSummonTime()
     {
         var summonTime = skillCfg.SummonTime;
