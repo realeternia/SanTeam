@@ -433,8 +433,13 @@ public class BagControl : MonoBehaviour, IPanelEvent
                 // 检查是否是好友关系
                 if (ConfigManager.GetFriendLevel(heroId1, heroId2) > 0)
                 {
+                    // 线颜色取该武将所在关系行配置的 LineColor（未配置默认暗灰），与战场 FriendLineManager 一致
+                    var lineColor = SysColor.FriendLine.DefaultLine;
+                    var lineColorStr = ConfigManager.GetFriendLineColor(heroId1, heroId2);
+                    if (!string.IsNullOrEmpty(lineColorStr))
+                        ColorUtility.TryParseHtmlString(lineColorStr, out lineColor);
                     // 创建连接线
-                    CreateConnectionLine(heroUnits[i].transform, heroUnits[j].transform, Color.white, Vector2.zero);
+                    CreateConnectionLine(heroUnits[i].transform, heroUnits[j].transform, lineColor, Vector2.zero);
                 }
 
                 var helpSkillId = ConfigManager.GetShowHelpSkillId(heroId1, heroId2, i, j);

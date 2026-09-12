@@ -10,24 +10,42 @@ public class PanelManager : MonoBehaviour
         Instance = this;
     }
 
+    // 面板改为运行时动态加载创建：首次 Show 时从 Resources/Prefabs 实例化并缓存，
+    // Hide 只隐藏不销毁，避免商店等面板的运行时状态（回合/购买记录/单例引用）丢失
     public GameObject cardShopPanel;
-    public GameObject rankPanel;
-    public GameObject rankPlayerPanel;
-    public GameObject pickPanel;
+    private GameObject rankPanel;
+    private GameObject rankPlayerPanel;
+    private GameObject pickPanel;
+    private GameObject bagPanel;
 
-
-    public GameObject bagPanel;
 
     public List<GameObject> openPanelList;
 
     // Start is called before the first frame update
     void Start()
     {
-       // ShowBag();
+        // 面板已改为动态加载，开局先创建选牌面板（其 Start 会继续走游戏初始化流程）
+        ShowPick();
+    }
+
+    // 从 Resources/Prefabs 动态加载并实例化面板（挂在当前节点下，根节点为拉伸锚点铺满全屏）
+    private GameObject LoadPanel(string prefabName)
+    {
+        var prefab = Resources.Load<GameObject>("Prefabs/" + prefabName);
+        if (prefab == null)
+        {
+            GameLog.Error($"PanelManager 面板预制体加载失败: Prefabs/{prefabName}");
+            return null;
+        }
+        return Instantiate(prefab, transform);
     }
 
     public void ShowShop()
     {
+        if (cardShopPanel == null)
+            cardShopPanel = LoadPanel("ShopPanelBg");
+        if (cardShopPanel == null)
+            return;
         cardShopPanel.SetActive(true);
       //  cardShopTxt.SetActive(true);
 
@@ -36,6 +54,8 @@ public class PanelManager : MonoBehaviour
 
     public void HideShop()
     {
+        if (cardShopPanel == null)
+            return;
         cardShopPanel.SetActive(false);
      //   cardShopTxt.SetActive(false);
 
@@ -45,6 +65,10 @@ public class PanelManager : MonoBehaviour
     public void ShowBag()
     {
         GameManager.Instance.PlaySound("Sounds/deck");
+        if (bagPanel == null)
+            bagPanel = LoadPanel("BagPanel");
+        if (bagPanel == null)
+            return;
         bagPanel.SetActive(true);
         bagPanel.GetComponent<BagControl>().OnShow();
 
@@ -53,6 +77,8 @@ public class PanelManager : MonoBehaviour
 
     public void HideBag()
     {
+        if (bagPanel == null)
+            return;
         GameManager.Instance.PlaySound("Sounds/deck");
         bagPanel.SetActive(false);
         bagPanel.GetComponent<BagControl>().OnHide();
@@ -63,6 +89,10 @@ public class PanelManager : MonoBehaviour
     public void ShowRank()
     {
         GameManager.Instance.PlaySound("Sounds/deck");
+        if (rankPanel == null)
+            rankPanel = LoadPanel("RankInfoPanel");
+        if (rankPanel == null)
+            return;
         rankPanel.SetActive(true);
         rankPanel.GetComponent<RankPanelManager>().OnShow();
 
@@ -71,6 +101,8 @@ public class PanelManager : MonoBehaviour
 
     public void HideRank()
     {
+        if (rankPanel == null)
+            return;
         GameManager.Instance.PlaySound("Sounds/deck");
         rankPanel.SetActive(false);
         rankPanel.GetComponent<RankPanelManager>().OnHide();
@@ -81,6 +113,10 @@ public class PanelManager : MonoBehaviour
     public void ShowRankPlayer()
     {
         GameManager.Instance.PlaySound("Sounds/deck");
+        if (rankPlayerPanel == null)
+            rankPlayerPanel = LoadPanel("PlayerInfoPanel");
+        if (rankPlayerPanel == null)
+            return;
         rankPlayerPanel.SetActive(true);
         rankPlayerPanel.GetComponent<RankPlayerPanelManager>().OnShow();
 
@@ -89,6 +125,8 @@ public class PanelManager : MonoBehaviour
 
     public void HideRankPlayer()
     {
+        if (rankPlayerPanel == null)
+            return;
         GameManager.Instance.PlaySound("Sounds/deck");
         rankPlayerPanel.SetActive(false);
         rankPlayerPanel.GetComponent<RankPlayerPanelManager>().OnHide();
@@ -99,6 +137,10 @@ public class PanelManager : MonoBehaviour
     public void ShowPick()
     {
       //  GameManager.Instance.PlaySound("Sounds/deck");
+        if (pickPanel == null)
+            pickPanel = LoadPanel("PickPanelBg");
+        if (pickPanel == null)
+            return;
         pickPanel.SetActive(true);
 
         ChangePanelCount(pickPanel, true);
@@ -106,6 +148,8 @@ public class PanelManager : MonoBehaviour
 
     public void HidePick()
     {
+        if (pickPanel == null)
+            return;
      //   GameManager.Instance.PlaySound("Sounds/deck");
         pickPanel.SetActive(false);
 
@@ -126,7 +170,10 @@ public class PanelManager : MonoBehaviour
     private void ChangePanelCount(GameObject panel, bool isShow)
     {
         if(isShow)
-            openPanelList.Add(panel);
+        {
+            if(!openPanelList.Contains(panel))
+                openPanelList.Add(panel);
+        }
         else
             openPanelList.Remove(panel);
         if(openPanelList.Count <= 0)

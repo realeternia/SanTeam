@@ -226,7 +226,6 @@
     <None Include="Assets\SineVFX\TopDownEffects\Environment\EnvShaders\SkyboxProceduralDesaturatedTDE.shader" />
     <None Include="Assets\ToonTastic - Vegetation &amp; Plants\Demo\Shaders\Skybox Gradient 1.shader" />
     <None Include="Assets\Shaders\GlowBeamShader.shader" />
-    <None Include="Assets\TextMesh Pro\Glyph Report.txt" />
     <None Include="Assets\TextMesh Pro\Resources\LineBreaking Following Characters.txt" />
     <None Include="Assets\Shaders\DiffuseWithOutline.shader" />
     <None Include="Assets\Shaders\GlowBeamUsage.txt" />
