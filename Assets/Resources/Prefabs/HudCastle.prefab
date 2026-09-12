@@ -162,6 +162,7 @@ GameObject:
   - component: {fileID: 4892339546741178573}
   - component: {fileID: 970637949839323205}
   - component: {fileID: 8504728114606778316}
+  - component: {fileID: 7651240728781600355}
   m_Layer: 5
   m_Name: IconShield
   m_TagString: Untagged
@@ -185,7 +186,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 4.9000244, y: -86.50002}
+  m_AnchoredPosition: {x: 4.1, y: -86.50002}
   m_SizeDelta: {x: 26, y: 26}
   m_Pivot: {x: 0, y: 0}
 --- !u!222 &970637949839323205
@@ -216,7 +217,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 1b029b171e25422ab5a14f0655269603, type: 3}
+  m_Sprite: {fileID: 0}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -226,6 +227,22 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &7651240728781600355
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2972394882620248168}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6049a48beb41dc04a9d347d7ca4e8dbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sourceType: 1
+  iconPath: 
+  configId: 18
+  image: {fileID: 0}
 --- !u!1 &3095841636187759542
 GameObject:
   m_ObjectHideFlags: 0
@@ -737,6 +754,7 @@ GameObject:
   - component: {fileID: 3009347529322235052}
   - component: {fileID: 7206220077696768752}
   - component: {fileID: 3700302030962305332}
+  - component: {fileID: 4328656814058829897}
   m_Layer: 5
   m_Name: IconSword
   m_TagString: Untagged
@@ -791,7 +809,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 89fde855d881494ea9955af31aaa5282, type: 3}
+  m_Sprite: {fileID: 0}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -801,3 +819,19 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &4328656814058829897
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9170504237727420141}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6049a48beb41dc04a9d347d7ca4e8dbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sourceType: 1
+  iconPath: 
+  configId: 17
+  image: {fileID: 0}
