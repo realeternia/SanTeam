@@ -30,6 +30,7 @@ public class BagControl : MonoBehaviour, IPanelEvent
     public Button sodLvupBtn;
 
     public PlayerInfo bindPlayer;
+    public MySelectControl mySelect;
 
     void Start()
     {
@@ -235,10 +236,10 @@ public class BagControl : MonoBehaviour, IPanelEvent
             // 修改原代码，将新创建的 cell 加入缓存
             GameObject heroCell = Instantiate(Resources.Load<GameObject>("Prefabs/BagCellHero"), bagHeroRegion.transform);
             cellCache.Add(heroCell);
-            int xOff = index % 6;
-            int yOff = index / 6;
+            int xOff = index % 5;
+            int yOff = index / 5;
 
-            heroCell.transform.localPosition = new Vector3(100 + 164 * xOff, -131 - 226 * yOff, 0);
+            heroCell.transform.localPosition = new Vector3(100 + 164 * xOff, -110 - 203 * yOff, 0);
 
             BagCell bagCell = heroCell.GetComponent<BagCell>();
             bagCell.bagControl = this;
@@ -260,7 +261,7 @@ public class BagControl : MonoBehaviour, IPanelEvent
                 cellCache.Add(cell);
                 int xOff = index % 9;
                 int yOff = index / 9;
-                cell.transform.localPosition = new Vector3(95 + 104 * xOff, -71 - 104 * yOff, 0);
+                cell.transform.localPosition = new Vector3(70 + 104 * xOff, -61 - 104 * yOff, 0);
 
                 BagCell bagCell = cell.GetComponent<BagCell>();
                 bagCell.bagControl = this;
@@ -377,7 +378,7 @@ public class BagControl : MonoBehaviour, IPanelEvent
         if (candidates.Count == 0)
             return;
 
-        // 直接加入玩家背包（累计经验提升卡等级）；达到英雄卡上限(12张)后不再加新英雄
+        // 直接加入玩家背包（累计经验提升卡等级）；达到英雄卡上限(15张)后不再加新英雄
         var heroList = p1.GetHeroCardList();
         foreach (var heroId in candidates)
         {
@@ -398,6 +399,9 @@ public class BagControl : MonoBehaviour, IPanelEvent
     {
         // 清除之前的连接线
         ClearConnectionLines();
+        
+        // 背包的羁绊列表默认停在"羁绊"模式，并随阵容调整实时刷新（上阵变化后调用方统一走 UpdateFieldView）
+        RefreshMySelect();
         
         // 更新所有fieldUnit的信息
         foreach (Transform child in fieldRegion.transform)
@@ -521,6 +525,15 @@ public class BagControl : MonoBehaviour, IPanelEvent
         connectionLines.Add(lineObject);
     }
     
+    // 刷新羁绊列表：固定停在"羁绊"模式，按当前上阵阵容重算职业/好友/国家羁绊
+    private void RefreshMySelect()
+    {
+        if (mySelect == null || bindPlayer == null)
+            return;
+        mySelect.SetMode(MySelectControl.ViewMode.Bond);
+        mySelect.UpdateCards(bindPlayer);
+    }
+
     // 清除所有连接线
     private void ClearConnectionLines()
     {

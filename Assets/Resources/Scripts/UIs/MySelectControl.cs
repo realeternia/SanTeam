@@ -26,8 +26,19 @@ public class MySelectControl : MonoBehaviour
 
     void Start()
     {
-        changeButton.onClick.AddListener(OnChangeMode);
-        changeButtonText = changeButton.GetComponentInChildren<TMP_Text>();
+        // 容错：背包等场景的 MySelectControl 未配置 changeButton 时不做切换绑定
+        if (changeButton != null)
+        {
+            changeButton.onClick.AddListener(OnChangeMode);
+            changeButtonText = changeButton.GetComponentInChildren<TMP_Text>();
+            UpdateChangeButtonText();
+        }
+    }
+
+    // 外部设置显示模式（背包默认停在羁绊模式，且无 changeButton 不可手动切换）
+    public void SetMode(ViewMode newMode)
+    {
+        mode = newMode;
         UpdateChangeButtonText();
     }
 

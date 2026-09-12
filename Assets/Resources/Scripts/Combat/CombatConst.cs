@@ -112,8 +112,8 @@ public static class CombatConst
     public const int BattleWinExp = 2;
     /// <summary>战斗失败获得经验（失败给一点）</summary>
     public const int BattleLoseExp = 1;
-    /// <summary>背包英雄卡上限（最多持有12种不同英雄，重复卡计入经验不占位）</summary>
-    public const int PlayerMaxHeroCards = 12;
+    /// <summary>背包英雄卡上限（最多持有15种不同英雄，重复卡计入经验不占位）</summary>
+    public const int PlayerMaxHeroCards = 15;
     // ---- 买经验（预留：金铲铲4金币买4经验，1金币=1经验；UI后续接入） ----
     /// <summary>购买经验所需金币</summary>
     public const int ExpBuyGoldCost = 4;
