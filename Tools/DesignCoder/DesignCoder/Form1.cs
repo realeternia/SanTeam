@@ -32,6 +32,19 @@ namespace DesignCoder
         private HashSet<string> modifiedConfigs = new HashSet<string>();
         private string copiedCellValue = null;
 
+        // 枚举列自动配色序列（按枚举值取色，可自行调整顺序/颜色；规则里显式写"值:标签:#颜色"可覆盖）
+        private static readonly Color[] EnumPalette = new Color[]
+        {
+            Color.FromArgb(105, 105, 110),  // 0 灰
+            Color.FromArgb(60, 125, 70),    // 1 绿
+            Color.FromArgb(140, 120, 45),   // 2 黄
+            Color.FromArgb(150, 95, 45),    // 3 橙
+            Color.FromArgb(150, 65, 60),    // 4 红
+            Color.FromArgb(60, 95, 150),    // 5 蓝
+            Color.FromArgb(105, 75, 145),   // 6 紫
+            Color.FromArgb(55, 125, 125),   // 7 青
+        };
+
         // 各行/列滚动位置缓存，键为配置名
         private Dictionary<string, int> scrollRowCache = new Dictionary<string, int>();
         private Dictionary<string, int> scrollColCache = new Dictionary<string, int>();
@@ -1407,6 +1420,12 @@ namespace DesignCoder
                 bool isBoolTrue = cellValue == "true" || cellValue == "True";
                 bool isBoolFalse = cellValue == "false" || cellValue == "False";
                 bool isNumberType = fieldType == "int" || fieldType == "float";
+                string enumLabel = null;
+                Color? enumColor = null;
+                if (isNumberType && fieldIdx >= 0 && fieldIdx < currentConfig.Fields.Count)
+                {
+                    TryGetEnumInfo(currentConfig.Fields[fieldIdx].FieldRule, cellValue, out enumLabel, out enumColor);
+                }
                 bool isRowHighlighted = (e.RowIndex == selectedRowIndex);
                 bool isColHighlighted = (e.ColumnIndex == selectedColumnIndex);
                 bool isHighlighted = isRowHighlighted || isColHighlighted;
@@ -1436,7 +1455,7 @@ namespace DesignCoder
                             if (fieldIdx >= 0 && fieldIdx < currentConfig.Fields.Count)
                             {
                                 var fieldDef = currentConfig.Fields[fieldIdx];
-                                Color? ruleColor = GetRuleColor(fieldDef.FieldRule, cellValue);
+                                Color? ruleColor = enumColor ?? GetRuleColor(fieldDef.FieldRule, cellValue);
                                 if (ruleColor.HasValue)
                                 {
                                     bgColor = ruleColor.Value;
@@ -1501,20 +1520,57 @@ namespace DesignCoder
                         leftOffset = iconSize + barPadding * 2 + 4;
                     }
 
-                    using (Brush textBrush = new SolidBrush(fgColor))
+                    if (enumLabel != null)
                     {
-                        Rectangle textRect = new Rectangle(
-                            e.CellBounds.Left + leftOffset,
-                            e.CellBounds.Top,
-                            e.CellBounds.Width - leftOffset,
-                            e.CellBounds.Height
-                        );
-                        StringFormat sf = new StringFormat
+                        // 枚举列：左侧显示语义标签，右侧显示实际数值
+                        using (Brush labelBrush = new SolidBrush(fgColor))
                         {
-                            LineAlignment = StringAlignment.Center,
-                            Alignment = StringAlignment.Near
-                        };
-                        e.Graphics.DrawString(cellValue, e.CellStyle.Font, textBrush, textRect, sf);
+                            Rectangle labelRect = new Rectangle(
+                                e.CellBounds.Left + leftOffset,
+                                e.CellBounds.Top,
+                                e.CellBounds.Width - leftOffset,
+                                e.CellBounds.Height
+                            );
+                            StringFormat labelFormat = new StringFormat
+                            {
+                                LineAlignment = StringAlignment.Center,
+                                Alignment = StringAlignment.Near
+                            };
+                            e.Graphics.DrawString(enumLabel, e.CellStyle.Font, labelBrush, labelRect, labelFormat);
+                        }
+                        using (Brush valBrush = new SolidBrush(Color.FromArgb(130, 140, 150)))
+                        {
+                            Rectangle valRect = new Rectangle(
+                                e.CellBounds.Right - 26,
+                                e.CellBounds.Top,
+                                22,
+                                e.CellBounds.Height
+                            );
+                            StringFormat valFormat = new StringFormat
+                            {
+                                LineAlignment = StringAlignment.Center,
+                                Alignment = StringAlignment.Far
+                            };
+                            e.Graphics.DrawString(cellValue, e.CellStyle.Font, valBrush, valRect, valFormat);
+                        }
+                    }
+                    else
+                    {
+                        using (Brush textBrush = new SolidBrush(fgColor))
+                        {
+                            Rectangle textRect = new Rectangle(
+                                e.CellBounds.Left + leftOffset,
+                                e.CellBounds.Top,
+                                e.CellBounds.Width - leftOffset,
+                                e.CellBounds.Height
+                            );
+                            StringFormat sf = new StringFormat
+                            {
+                                LineAlignment = StringAlignment.Center,
+                                Alignment = StringAlignment.Near
+                            };
+                            e.Graphics.DrawString(cellValue, e.CellStyle.Font, textBrush, textRect, sf);
+                        }
                     }
 
                     using (Pen borderPen = new Pen(dataGridView1.GridColor))
@@ -1524,6 +1580,74 @@ namespace DesignCoder
                     e.Handled = true;
                 }
             }
+        }
+
+        /// <summary>
+        /// 从 FieldRule 解析枚举条目并返回该值对应的标签与颜色。
+        /// 规则格式："key:标签:#颜色"（颜色可省）、"key:标签"、"key:#颜色"，多个条目用逗号分隔；
+        /// 区间配色（min-max:#颜色）不属于枚举，跳过（仍由 GetRuleColor 处理）。
+        /// 未显式写颜色时按枚举值取 EnumPalette 调色板（0灰/1绿/2黄…）。未命中返回 false。
+        /// </summary>
+        private bool TryGetEnumInfo(string fieldRule, string cellValue, out string label, out Color? color)
+        {
+            label = null;
+            color = null;
+            if (string.IsNullOrEmpty(fieldRule) || string.IsNullOrEmpty(cellValue)) return false;
+
+            string trimmedValue = cellValue.Trim();
+            string[] rules = fieldRule.Split(',');
+            foreach (string rule in rules)
+            {
+                string trimmed = rule.Trim();
+                if (trimmed.Length == 0) continue;
+
+                int lastColon = trimmed.LastIndexOf(':');
+                if (lastColon < 0) continue;
+
+                string keyPart = trimmed.Substring(0, lastColon).Trim();
+                string rightPart = trimmed.Substring(lastColon + 1).Trim();
+                if (rightPart.Length == 0) continue;
+
+                string lab = null;
+                Color? c = null;
+
+                if (rightPart[0] == '#')
+                {
+                    // key:标签:#颜色 或 key:#颜色（纯配色）
+                    c = TryParseColorString(rightPart);
+                    if (!c.HasValue) continue;
+
+                    int innerColon = keyPart.LastIndexOf(':');
+                    if (innerColon >= 0)
+                    {
+                        lab = keyPart.Substring(innerColon + 1).Trim();
+                        keyPart = keyPart.Substring(0, innerColon).Trim();
+                    }
+                    // 区间配色（如 0-10:#xxx）按范围匹配，不属于枚举，交给 GetRuleColor
+                    if (keyPart.IndexOf('-') >= 0) continue;
+                }
+                else
+                {
+                    // key:标签
+                    lab = rightPart;
+                }
+
+                if (keyPart != trimmedValue) continue;
+
+                label = lab;
+                if (c.HasValue)
+                {
+                    color = c;
+                }
+                else
+                {
+                    int idx;
+                    if (int.TryParse(trimmedValue, out idx) && idx >= 0)
+                        color = EnumPalette[idx % EnumPalette.Length];
+                }
+                return true;
+            }
+            return false;
         }
 
         private Color? GetRuleColor(string fieldRule, string cellValue)

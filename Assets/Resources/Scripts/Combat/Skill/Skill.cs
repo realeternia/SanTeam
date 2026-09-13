@@ -39,11 +39,11 @@ public class Skill
     }
 
     /// <summary>
-    /// 技能类型限定判断：CheckTypeLimit=false 不限定；否则 CheckIsMagic 与目标技能是否法术比对（true=仅法术 / false=仅物理）
+    /// 技能类型限定判断：CheckType=0 不限定；1=仅物理；2=仅法术（isMagic 为目标技能是否法术）
     /// </summary>
     public static bool TypeMatched(SkillConfig cfg, bool isMagic)
     {
-        return !cfg.CheckTypeLimit || cfg.CheckIsMagic == isMagic;
+        return cfg.CheckType == 0 || cfg.CheckType == (isMagic ? 2 : 1);
     }
 
     public Skill(int id, Chess unit)
