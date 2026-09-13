@@ -31,6 +31,8 @@ public static class SkillManager
                 return new SkillAttackArmorPierce(skillId, owner);
             case "AttackStunDamage":
                 return new SkillAttackStunDamage(skillId, owner);
+            case "DeathGroupHeal":
+                return new SkillDeathGroupHeal(skillId, owner);
 
             case "DefFeedback":
                 return new SkillDefFeedback(skillId, owner);
@@ -114,6 +116,14 @@ public static class SkillManager
         foreach (var skill in chess.skills)
         {
             skill.BattleBegin();
+        }
+    }
+
+    public static void OnDeath(Chess chess)
+    {
+        foreach (var skill in chess.skills)
+        {
+            skill.OnDeath();
         }
     }
 

@@ -232,6 +232,12 @@ public class Skill
 
     }
 
+    // 死亡时触发（Chess.Ondying 调用）
+    public virtual void OnDeath()
+    {
+
+    }
+
     public virtual void AimTarget(Chess target)
     {
 

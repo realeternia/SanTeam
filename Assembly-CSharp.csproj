@@ -113,6 +113,7 @@
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAttackRunCross.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAttackShieldPierce.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\BattleResultHeroCellControl.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillDeathGroupHeal.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\MySelectControl.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffShield.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillHelpAidBuff.cs" />
@@ -139,7 +140,6 @@
     <Compile Include="Assets\Resources\Scripts\Configs\GameRoundConfig_s.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAttackSpinAttack.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAttackArmorPierce.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAttackStunDamage.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillHitRegion.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillModifyBuffTime.cs" />
     <Compile Include="Assets\SineVFX\TopDownEffects\Scripts\SineCameraControllerTopDownEffects.cs" />

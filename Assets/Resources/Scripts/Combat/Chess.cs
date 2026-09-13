@@ -680,6 +680,7 @@ public class Chess : MonoBehaviour
 
     public void Ondying()
     {
+        SkillManager.OnDeath(this);
         buffs.Clear();
         WorldManager.Instance.OnUnitDying(this, lastDamagedPlayerId);
 
