@@ -253,8 +253,12 @@ public class BagControl : MonoBehaviour, IPanelEvent
         index = 0;
         foreach (var itemCell in itemCards)
         {
-            // 装备不叠加：每个未装备副本单独占一格
-            for (int n = 0; n < itemCell.Value; n++)
+            var itemCfg = ItemConfig.GetConfig(itemCell.Key);
+            int available = itemCell.Value;
+            int stackLimit = itemCfg.StackLimit;
+            // 按堆叠上限分格：上限>1（RemoveWhenUse 消耗品=99）合并为一格显示数量；默认1 每格一件
+            int cellCount = stackLimit > 1 ? (available + stackLimit - 1) / stackLimit : available;
+            for (int n = 0; n < cellCount; n++)
             {
                 // 修改原代码，将新创建的 cell 加入缓存
                 GameObject cell = Instantiate(Resources.Load<GameObject>("Prefabs/BagCellItem"), bagItemRegion.transform);
@@ -267,6 +271,8 @@ public class BagControl : MonoBehaviour, IPanelEvent
                 bagCell.bagControl = this;
                 bagCell.cardId = itemCell.Key;
                 bagCell.level = HeroSelectionTool.GetCardLevel(itemCell.Owned, false);
+                // 每格数量：堆叠格取 min(上限, 剩余)，单格物品恒为1（textItemCount 仅堆叠时显示）
+                bagCell.count = stackLimit > 1 ? Mathf.Min(stackLimit, available - n * stackLimit) : 1;
                 bagCell.UpdateItemInfo();
                 index++;
             }
@@ -597,14 +603,26 @@ public class BagControl : MonoBehaviour, IPanelEvent
         UpdateView(); // 卸下的装备回到背包，整体刷新
     }
 
+    // 物品消耗/出售1个后的格子刷新：堆叠格（上限>1）数量减1后刷新显示，归零才移除；单格物品直接移除
     private void RemoveCell(int itemCardId)
     {
-        var cell = cellCache.Find(x => x.GetComponent<BagCell>().cardId == itemCardId);
-        if (cell != null)
+        var cell = cellCache.Find(x => x != null && x.GetComponent<BagCell>().cardId == itemCardId);
+        if (cell == null)
+            return;
+        var itemCfg = ItemConfig.GetConfig(itemCardId);
+        if (itemCfg.StackLimit > 1)
         {
-            cellCache.Remove(cell);
-            Destroy(cell);
+            int owned = bindPlayer.cards.TryGetValue(itemCardId, out var c) ? c : 0;
+            if (owned > 0)
+            {
+                var bagCell = cell.GetComponent<BagCell>();
+                bagCell.count = Mathf.Min(itemCfg.StackLimit, owned);
+                bagCell.UpdateItemInfo();
+                return;
+            }
         }
+        cellCache.Remove(cell);
+        Destroy(cell);
     }
 
     // 在信息栏短暂显示提示文字（2秒后恢复原信息）

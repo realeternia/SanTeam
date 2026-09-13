@@ -13,6 +13,8 @@ public class BagCell : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragH
     public int count;
     public int level;
     public TMP_Text textItemName;
+    public TMP_Text textItemCount;
+
     public Image itemImage;
     public Image jobImage;
     public Image[] equipImages; // 最多3件装备槽，需在预制体上按槽位顺序拖入引用
@@ -75,7 +77,7 @@ public class BagCell : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragH
 
     public void UpdateItemInfo()
     {
-        // 装备升级机制已移除：物品不叠加格子，每格一个，无升级进度条
+        // 装备升级机制已移除：物品按堆叠上限分格（默认1 每格一件），堆叠格右下角显示持有数量
         var itemCfg = ItemConfig.GetConfig(cardId);
         itemImage.sprite = Resources.Load<Sprite>("Textures/ItemPic/" + itemCfg.Icon);
 
@@ -84,6 +86,10 @@ public class BagCell : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragH
         shieldImage.gameObject.SetActive(equipped);
 
         expBar.rectTransform.sizeDelta = new Vector2(0, 15);
+
+        // 堆叠数量：仅堆叠格（count>1）显示，单格物品不显示
+        if (textItemCount != null)
+            textItemCount.text = count > 1 ? count.ToString() : "";
 
     }
 

@@ -134,12 +134,12 @@ public class Tooltip : MonoBehaviour
         }
         else
         {
-            // 道具只显示配置的有效属性行（四主属性 + 护甲/魔抗/攻速/暴击/回蓝等扩展属性）
+            // 道具只显示配置的有效属性行（Attrs："attr+value,attr+value" 解析，含护甲/魔抗/攻速/暴击/回蓝等扩展属性）
             var itemCfg = ItemConfig.GetConfig(heroId);
             var listKeys = new List<string>();
             var listVals = new List<string>();
-            AddItemAttrRow(itemCfg.Attr1, itemCfg.Attr1Val, listKeys, listVals);
-            AddItemAttrRow(itemCfg.Attr2, itemCfg.Attr2Val, listKeys, listVals);
+            foreach (var bonus in JobLinkManager.ParseBonuses(itemCfg.Attrs))
+                AddItemAttrRow(bonus.Attr, bonus.Value, listKeys, listVals);
             attrKeys = listKeys.ToArray();
             attrVals = listVals.ToArray();
         }
@@ -344,12 +344,12 @@ public class Tooltip : MonoBehaviour
     }
 
     // 道具属性行：键值按配置输出，比例属性（攻速/暴击）带 % 后缀，其余直接显示数值
-    private void AddItemAttrRow(string key, int value, List<string> keys, List<string> vals)
+    private void AddItemAttrRow(string key, float value, List<string> keys, List<string> vals)
     {
         if (string.IsNullOrEmpty(key) || value == 0)
             return;
         keys.Add(key);
         bool isPercent = key == "attackSpeedRate" || key == "critRate";
-        vals.Add(isPercent ? value + "%" : value.ToString());
+        vals.Add(isPercent ? Mathf.RoundToInt(value * 100) + "%" : value.ToString("0.##"));
     }
 }

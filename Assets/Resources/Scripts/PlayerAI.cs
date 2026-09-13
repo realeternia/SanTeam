@@ -401,7 +401,9 @@ public static class PlayerAI
         var itemCfg = ItemConfig.GetConfig(cardId);
         if (itemCfg.Effect == "tpattr")
         {
-            var itemAttr = itemCfg.Attr1;
+            // 属性加成走 Attrs：取第一条加成的主属性键（tpattr 消耗品均为 atk/ap 单条配置）
+            var itemBonuses = JobLinkManager.ParseBonuses(itemCfg.Attrs);
+            var itemAttr = itemBonuses.Count > 0 ? itemBonuses[0].Attr : "";
             List<Tuple<int, float>> needList = new List<Tuple<int, float>>();
             float totalNeed = 0;
             

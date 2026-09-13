@@ -584,7 +584,7 @@ public class CardShopManager : MonoBehaviour
         {
             var itemId = HeroSelectionTool.GetRandomItemId(shopCfg.Id);
             var itemCfg = ItemConfig.GetConfig(itemId);
-            var count = itemCfg.SellOne ? 1 : GetMultiCount(itemCfg.Price, shopCfg);
+            var count = GetMultiCount(itemCfg.Price, shopCfg);
             newCtr.Init(itemId, false, count, year);
         }
 

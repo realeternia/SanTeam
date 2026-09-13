@@ -249,8 +249,9 @@ public static class HeroSelectionTool
         else
         {
             var itemConfig = ItemConfig.GetConfig(cardId);
-            ApplyItemAttr(attrInfo, itemConfig.Attr1, itemConfig.Attr1Val);
-            ApplyItemAttr(attrInfo, itemConfig.Attr2, itemConfig.Attr2Val);
+            // 属性加成走 Attrs 配置（"attr+value,attr+value"，与 JobLink 同格式同比例约定）
+            foreach (var bonus in JobLinkManager.ParseBonuses(itemConfig.Attrs))
+                ApplyItemAttr(attrInfo, bonus.Attr, bonus.Value);
             // 装备升级机制已移除：属性不再乘等级，每件装备固定属性
         }
         if(player.attrAddons.ContainsKey(cardId))
@@ -261,8 +262,8 @@ public static class HeroSelectionTool
     }
 
     // 道具属性键解析：四主属性(四维)外，支持护甲/魔抗/回蓝及金铲铲式基础组件的攻速/暴击
-    // 比例属性（attackSpeedRate/critRate/dodgeRate）配置存百分数（10=+10%），这里 ÷100 转为运行时比例；其余直接按数值
-    private static void ApplyItemAttr(AttrInfo attrInfo, string key, int value)
+    // 比例属性（attackSpeedRate/critRate）按 Attrs 约定直接配比例（0.1=+10%），不再 ÷100；其余直接按数值
+    private static void ApplyItemAttr(AttrInfo attrInfo, string key, float value)
     {
         if (string.IsNullOrEmpty(key) || value == 0)
             return;
@@ -270,28 +271,28 @@ public static class HeroSelectionTool
         {
             case "might": // 无双已并入攻击：老数据(未同步源表的 might 键)兼容为加攻击
             case "atk":
-                attrInfo.Atk = value;
+                attrInfo.Atk = (int)value;
                 break;
             case "ap":
-                attrInfo.Ap = value;
+                attrInfo.Ap = (int)value;
                 break;
             case "hp":
-                attrInfo.Hp = value;
+                attrInfo.Hp = (int)value;
                 break;
             case "armor":
-                attrInfo.Armor = value;
+                attrInfo.Armor = (int)value;
                 break;
             case "magicRes":
-                attrInfo.MagicRes = value;
+                attrInfo.MagicRes = (int)value;
                 break;
             case "mpRegen":
                 attrInfo.MpRegen = value;
                 break;
             case "attackSpeedRate":
-                attrInfo.AttackSpeedRate = value / 100f;
+                attrInfo.AttackSpeedRate = value;
                 break;
             case "critRate":
-                attrInfo.CritRate = value / 100f;
+                attrInfo.CritRate = value;
                 break;
         }
     }

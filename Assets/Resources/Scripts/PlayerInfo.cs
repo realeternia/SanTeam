@@ -563,10 +563,11 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
             var itemCfg = ItemConfig.GetConfig(cardId);
             if(itemCfg.Effect != "pattr")
                 continue;
-            if(itemCfg.Attr1 == attrName)
-                attrVal += itemCfg.Attr1Val;
-            else if(itemCfg.Attr2 == attrName)
-                attrVal += itemCfg.Attr2Val;
+            foreach (var bonus in JobLinkManager.ParseBonuses(itemCfg.Attrs))
+            {
+                if (bonus.Attr == attrName)
+                    attrVal += (int)bonus.Value;
+            }
         }
         return attrVal;
     }
@@ -688,20 +689,25 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
                 foreach(var itemId in attrItemList)
                 {
                     var itemCfg = ItemConfig.GetConfig(itemId);
-                    float score = itemCfg.Attr1Val * HeroSelectionTool.GetCardLevel(cards[itemId], false); //乘上等级
+                    // 属性加成走 Attrs：取第一条加成做主属性（attr 装备均为 atk/ap 单条配置）
+                    var itemBonuses = JobLinkManager.ParseBonuses(itemCfg.Attrs);
+                    if (itemBonuses.Count == 0)
+                        continue;
+                    var firstAttr = itemBonuses[0];
+                    float score = firstAttr.Value * HeroSelectionTool.GetCardLevel(cards[itemId], false); //乘上等级
 
-                    if (!string.IsNullOrEmpty(itemCfg.Attr1))
+                    if (!string.IsNullOrEmpty(firstAttr.Attr))
                     {
                         bool isMinAttr = false;
                         bool isMaxAttr = false;
 
-                        if (itemCfg.Attr1 == "ap" && heroCfg.Ap == minAttr)
+                        if (firstAttr.Attr == "ap" && heroCfg.Ap == minAttr)
                             isMinAttr = true;
-                        else if (itemCfg.Attr1 == "atk" && heroCfg.Atk == minAttr)
+                        else if (firstAttr.Attr == "atk" && heroCfg.Atk == minAttr)
                             isMinAttr = true;
-                        else if (itemCfg.Attr1 == "ap" && heroCfg.Ap == maxAttr)
+                        else if (firstAttr.Attr == "ap" && heroCfg.Ap == maxAttr)
                             isMaxAttr = true;
-                        else if (itemCfg.Attr1 == "atk" && heroCfg.Atk == maxAttr)
+                        else if (firstAttr.Attr == "atk" && heroCfg.Atk == maxAttr)
                             isMaxAttr = true;
 
                         if(HeroSelectionTool.IsMeleeHero(heroCfg))
