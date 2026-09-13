@@ -9,7 +9,7 @@ public class SkillDefHpLow : Skill
     {
     }
 
-    public override void DuringAttacked(Chess attacker, string damType, ref int damageBase, ref float damageMulti, ref string effect)
+    public override void DuringAttacked(Chess attacker, ref int damageBase, ref float damageMulti, ref string effect)
     {
         if (owner.HpRate < skillCfg.ConditionParm && CheckBurst(attacker))
         {
@@ -18,7 +18,7 @@ public class SkillDefHpLow : Skill
         }
     }
 
-    public override void OnBeDoSkillDamage(Chess caster, SkillConfig checkSkillCfg, ref int damage, bool isFeedback)
+    public override void BeforeCalDamaged(Chess caster, SkillConfig checkSkillCfg, ref int damage, string hurtTag, bool isFeedback)
     {
         if(isFeedback)
             return;

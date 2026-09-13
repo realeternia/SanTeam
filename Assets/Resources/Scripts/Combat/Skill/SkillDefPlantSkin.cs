@@ -10,9 +10,9 @@ public class SkillDefPlantSkin : Skill
     {
     }
 
-    public override void DuringAttacked(Chess attacker, string damType, ref int damageBase, ref float damageMulti, ref string effect)
+    public override void DuringAttacked(Chess attacker, ref int damageBase, ref float damageMulti, ref string effect)
     {
-        var isMagic = damType == "ap";
+        var isMagic = false; // 普攻固定为物理
         if (!TypeMatched(skillCfg, isMagic))
         {
             WorldManager.Instance.AddBattleText("弱点", owner.transform.position, new UnityEngine.Vector2(0, 60), Color.red, 3);
@@ -25,9 +25,12 @@ public class SkillDefPlantSkin : Skill
         }
     }
 
-    public override void OnBeDoSkillDamage(Chess caster, SkillConfig checkSkillCfg, ref int damage, bool isFeedback)
+    public override void BeforeCalDamaged(Chess caster, SkillConfig checkSkillCfg, ref int damage, string hurtTag, bool isFeedback)
     {
         if(isFeedback)
+            return;
+        
+        if(checkSkillCfg == null)
             return;
 
         if (!TypeMatched(skillCfg, checkSkillCfg.IsMagic))

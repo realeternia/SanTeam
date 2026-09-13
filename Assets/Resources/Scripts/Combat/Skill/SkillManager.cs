@@ -25,8 +25,8 @@ public static class SkillManager
                 return new SkillAttackRunCrossPlus(skillId, owner);                
             case "HelpAidBuff":
                 return new SkillHelpAidBuff(skillId, owner);
-            case "AttackAntiShield":
-                return new SkillAttackAntiShield(skillId, owner);
+            case "AttackShieldPierce":
+                return new SkillAttackShieldPierce(skillId, owner);
 
             case "DefFeedback":
                 return new SkillDefFeedback(skillId, owner);
@@ -160,47 +160,72 @@ public static class SkillManager
 
 
 
-    public static void DuringAttack(Chess attacker, Chess defender, string damType, ref int damageBase, ref float damageMulti, ref int damageReal, ref string effect)
+    public static void DuringAttack(Chess attacker, Chess defender, ref int damageBase, ref float damageMulti, ref string effect)
     {       
         foreach(var skill in attacker.skills)
         {
-            skill.DuringAttack(defender, damType, ref damageBase, ref damageMulti, ref damageReal, ref effect);
+            skill.DuringAttack(defender, ref damageBase, ref damageMulti, ref effect);
 
         }    
         foreach(var skill in defender.skills)
         {
-            skill.DuringAttacked(attacker, damType, ref damageBase, ref damageMulti, ref effect);
+            skill.DuringAttacked(attacker, ref damageBase, ref damageMulti, ref effect);
 
         }
         foreach(var buff in attacker.buffs)
         {
-            buff.DuringAttack(defender, damType, ref damageBase, ref damageMulti, ref effect);
+            buff.DuringAttack(defender, ref damageBase, ref damageMulti, ref effect);
 
         }   
         foreach(var buff in defender.buffs)
         {
-            buff.DuringAttacked(attacker, damType, ref damageBase, ref damageMulti, ref effect);
+            buff.DuringAttacked(attacker, ref damageBase, ref damageMulti, ref effect);
         }
     }
 
-    // 护盾要再这一层算
-    public static void BeforeAttack(Chess attacker, Chess defender, ref int damage)
-    {
-        foreach(var buff in defender.buffs)
-        {
-            buff.BeforeAttacked(attacker, ref damage);
-        }
-    }
-
-    public static void OnAttack(Chess attacker, Chess defender, string damType, int damage)
+    /// <summary>
+    /// 伤害结算前·攻击方修正：技能伤害修正（Skill.BeforeCalDamage）。
+    /// 普攻(Attack)时 skillCfg 传 null 表示非技能伤害，直接跳过
+    /// </summary>
+    public static void BeforeCalDamage(Chess attacker, Chess defender, SkillConfig skillCfg, ref int damage, string hurtTag, bool isFeedback)
     {
         foreach (var skill in attacker.skills)
         {
-            skill.OnAttack(defender, damType, damage);
+            if (skillCfg != null && skillCfg.Id == skill.skillId)
+                continue;
+            skill.BeforeCalDamage(defender, skillCfg, ref damage, hurtTag, isFeedback);
+        }
+    }
+
+    /// <summary>
+    /// 伤害结算前·受击方修正：护盾吸收（Buff.BeforeCalDamaged 按 hurtTag 决定是否吸收，如"AntiShield"绕过护盾打血，普通攻击传空）+ 技能受击修正（Skill.BeforeCalDamaged）。
+    /// 普攻(Attack)时 skillCfg 传 null，只做护盾吸收，跳过技能受击修正
+    /// </summary>
+    public static void BeforeCalDamaged(Chess attacker, Chess defender, SkillConfig skillCfg, ref int damage, string hurtTag, bool isFeedback)
+    {
+        // 护盾吸收（AntiShield 标签时护盾不吸收，直接放行打血）
+        foreach (var buff in defender.buffs)
+        {
+            buff.BeforeCalDamaged(attacker, ref damage, hurtTag);
+        }
+
+        foreach (var skill in defender.skills)
+        {
+            if (skillCfg != null && skillCfg.Id == skill.skillId)
+                continue;
+            skill.BeforeCalDamaged(attacker, skillCfg, ref damage, hurtTag, isFeedback);
+        }
+    }
+
+    public static void OnAttack(Chess attacker, Chess defender, int damage)
+    {
+        foreach (var skill in attacker.skills)
+        {
+            skill.OnAttack(defender, damage);
         }
         foreach (var skill in defender.skills)
         {
-            skill.OnAttacked(attacker, damType, damage);
+            skill.OnAttacked(attacker, damage);
         }
 
         foreach(var buff in attacker.buffs)
@@ -239,23 +264,6 @@ public static class SkillManager
         }
     }
 
-    public static void OnDoSkillDamage(Chess target, Chess caster, SkillConfig skillCfg, ref int damage, bool isFeedback)
-    {
-        foreach (var skill in caster.skills)
-        {
-            if(skillCfg.Id == skill.skillId)
-                continue;
-            skill.OnDoSkillDamage(target, skillCfg, ref damage, isFeedback);
-        }
-        foreach (var skill in target.skills)
-        {
-            if (skillCfg.Id == skill.skillId)
-                continue;
-            skill.OnBeDoSkillDamage(caster, skillCfg, ref damage, isFeedback);
-        }
-    }
-
-    
     public static void OnHealTarget(Chess healer, Chess target, int checkSkillId, ref int addon)
     {
         foreach (var skill in healer.skills)

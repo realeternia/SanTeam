@@ -9,7 +9,7 @@ public class SkillAttackReboundArrow : Skill
     {
     }
 
-    public override void OnAttack(Chess defender, string damType, int damage)
+    public override void OnAttack(Chess defender, int damage)
     {
         var unitsInRange = WorldManager.Instance.GetUnitsInRange(defender.transform.position, skillCfg.Range, owner.side, true);
         unitsInRange.Remove(defender);

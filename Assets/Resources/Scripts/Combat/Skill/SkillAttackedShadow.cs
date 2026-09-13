@@ -12,7 +12,7 @@ public class SkillAttackedShadow : Skill
         count = skillCfg.DoCount;
     }
 
-    public override void OnAttacked(Chess attacker, string damType, int damage)
+    public override void OnAttacked(Chess attacker, int damage)
     {
         if (count > 0 && CheckBurst(attacker))
         {

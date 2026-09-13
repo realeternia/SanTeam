@@ -7,7 +7,7 @@ public class BuffDamagedAddRate : Buff
     {
     }
 
-    public override void DuringAttacked(Chess attacker, string damType, ref int damageBase, ref float damageMulti, ref string effect)
+    public override void DuringAttacked(Chess attacker, ref int damageBase, ref float damageMulti, ref string effect)
     {
         if (damageBase < 10)
         {

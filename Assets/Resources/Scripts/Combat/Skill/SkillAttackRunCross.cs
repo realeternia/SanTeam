@@ -11,7 +11,7 @@ public class SkillAttackRunCross : Skill
     {
     }
 
-    public override void OnAttack(Chess defender, string damType, int damage)
+    public override void OnAttack(Chess defender, int damage)
     {
         // 计算镜像位置
         Vector3 ownerPos = owner.transform.position;

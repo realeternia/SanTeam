@@ -11,6 +11,10 @@ public static class CombatConst
     /// <summary>连锁(BuffLock)</summary>
     public const int LockBuffId = 301002;
 
+    // ---- 伤害标签(SkillConfig.HurtTag) ----
+    /// <summary>AntiShield：绕过护盾直接打血（破盾类技能，BuffShield 判定该标签不吸收）</summary>
+    public const string AntiShieldHurtTag = "AntiShield";
+
     // ---- 技能Id ----
     /// <summary>主公技(王/王)：所在同阵营护盾效果加倍（技能表 王 的5级行，Id=原Id*10+级）</summary>
     public const int MasterShieldSkillId = 2000015;

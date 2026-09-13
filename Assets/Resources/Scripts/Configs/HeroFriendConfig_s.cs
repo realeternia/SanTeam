@@ -115,7 +115,7 @@ namespace CommonConfig
             config[6] = new HeroFriendConfig(6, "身负异禀", 1, new int[]{100003,110011,110007,101014,101019,105001}, "", "");
             config[7] = new HeroFriendConfig(7, "经世济民", 1, new int[]{103012,102020,101017,100005,101012}, "", "");
             config[8] = new HeroFriendConfig(8, "老当益壮", 1, new int[]{101008,101022,103005,103022,102005}, "", "");
-            config[9] = new HeroFriendConfig(9, "先登陷阵", 1, new int[]{102004,103019,101001,105006,102009}, "", "");
+            config[9] = new HeroFriendConfig(9, "先登陷阵", 1, new int[]{102004,103019,101001,105006,102009}, "破", "#FF6600");
             config[10] = new HeroFriendConfig(10, "深谋远虑", 1, new int[]{103010,102011,104007,106003,103012}, "", "");
             config[11] = new HeroFriendConfig(11, "治军严明", 1, new int[]{101003,104006,102017,101013,102012,106006}, "", "");
             config[12] = new HeroFriendConfig(12, "王佐之才", 1, new int[]{101010,103013,102010,102003,101006,105007}, "", "");
@@ -135,7 +135,7 @@ namespace CommonConfig
             config[26] = new HeroFriendConfig(26, "铁骑纵横", 1, new int[]{101003,106001,106002,102014,102006}, "冲", "#FF9933");
             config[27] = new HeroFriendConfig(27, "智勇双全", 1, new int[]{102019,103004,102009,100003,104008,101006}, "", "");
             config[28] = new HeroFriendConfig(28, "坚壁善守", 1, new int[]{102016,103015,101008,102013,104009}, "", "");
-            config[29] = new HeroFriendConfig(29, "虎狼之师", 1, new int[]{101011,104001,103006,103018,102006}, "破", "#0000FF");
+            config[29] = new HeroFriendConfig(29, "虎狼之师", 1, new int[]{101011,104001,103006,103018,102006}, "突", "#0000FF");
             config[31] = new HeroFriendConfig(31, "乱世枭雄", 1, new int[]{100004,110007,101024,103002,110005}, "", "");
             config[32] = new HeroFriendConfig(32, "济世安民", 1, new int[]{106007,100001,106003,102010,103023,103014}, "", "");
 

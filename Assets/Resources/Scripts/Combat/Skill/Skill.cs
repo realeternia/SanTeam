@@ -237,19 +237,19 @@ public class Skill
 
     }
 
-    public virtual void OnAttack(Chess defender, string damType, int damage)
+    public virtual void OnAttack(Chess defender, int damage)
     {
     }
 
-    public virtual void OnAttacked(Chess attacker, string damType, int damage)
+    public virtual void OnAttacked(Chess attacker, int damage)
     {
     }
 
-    public virtual void DuringAttack(Chess defender, string damType, ref int damageBase, ref float damageMulti, ref int damageReal, ref string effect)
+    public virtual void DuringAttack(Chess defender, ref int damageBase, ref float damageMulti, ref string effect)
     {
     }
 
-    public virtual void DuringAttacked(Chess attacker, string damType, ref int damageBase, ref float damageMulti, ref string effect)
+    public virtual void DuringAttacked(Chess attacker, ref int damageBase, ref float damageMulti, ref string effect)
     {
     }
 
@@ -278,12 +278,12 @@ public class Skill
         
     }
 
-    public virtual void OnDoSkillDamage(Chess target, SkillConfig checkSkillCfg, ref int damage, bool isFeedback)
+    public virtual void BeforeCalDamage(Chess target, SkillConfig checkSkillCfg, ref int damage, string hurtTag, bool isFeedback)
     {
         
     }
 
-    public virtual void OnBeDoSkillDamage(Chess caster, SkillConfig checkSkillCfg, ref int damage, bool isFeedback)
+    public virtual void BeforeCalDamaged(Chess caster, SkillConfig checkSkillCfg, ref int damage, string hurtTag, bool isFeedback)
     {
         
     }

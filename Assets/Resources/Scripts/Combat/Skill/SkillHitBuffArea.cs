@@ -9,7 +9,7 @@ public class SkillHitBuffArea : Skill
     {
     }
 
-    public override void OnAttack(Chess defender, string damType, int damage)
+    public override void OnAttack(Chess defender, int damage)
     {
         if (CheckBurst(defender))
         {

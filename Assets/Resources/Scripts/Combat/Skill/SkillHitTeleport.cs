@@ -9,7 +9,7 @@ public class SkillHitTeleport : Skill
     {
     }
 
-    public override void OnAttacked(Chess attacker, string damType, int damage)
+    public override void OnAttacked(Chess attacker, int damage)
     {
         if(!WorldManager.Instance.CheckInRange(owner.transform.position, attacker.transform.position, skillCfg.Range) && CheckBurst(attacker))
         {

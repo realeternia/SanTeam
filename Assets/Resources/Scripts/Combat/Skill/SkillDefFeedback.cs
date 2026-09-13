@@ -10,14 +10,17 @@ public class SkillDefFeedback : Skill
     {
     }
 
-    public override void OnAttacked(Chess attacker, string damType, int damage)
+    public override void OnAttacked(Chess attacker, int damage)
     {
         DoFeedback(attacker, false, damage); // 普攻固定为物理
     }
 
-    public override void OnBeDoSkillDamage(Chess caster, SkillConfig checkSkillCfg, ref int damage, bool isFeedback)
+    public override void BeforeCalDamaged(Chess caster, SkillConfig checkSkillCfg, ref int damage, string hurtTag, bool isFeedback)
     {
         if(isFeedback)
+            return;
+        
+        if(checkSkillCfg == null)
             return;
         DoFeedback(caster, checkSkillCfg.IsMagic, damage);
     }    

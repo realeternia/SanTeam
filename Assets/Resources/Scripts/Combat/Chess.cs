@@ -438,7 +438,7 @@ public class Chess : MonoBehaviour
     //    score += 100f / (distance + 1f);  // 避免除以0
 
         // 添加最大属性差作为积分项（权重可根据游戏平衡调整）
-        score += calculateDamage(this, target, out var type) / 2;
+        score += calculateDamage(this, target) / 2;
         score += (level - target.level) * 7f;
 
         // 生命值权重（生命值越低分数越高）
@@ -594,41 +594,20 @@ public class Chess : MonoBehaviour
             return;
 
         // 造成伤害
-        var damage = calculateDamage(this, victim, out var damType);
+        var damage = calculateDamage(this, victim);
         var effect = hitEffectName;
         var damageBase = damage;
         var damageMulti = 1f;
-        var damageReal = 0; //真实伤害
-        bool isCrit = false;
-
-        SkillManager.DuringAttack(this, victim, damType, ref damageBase, ref damageMulti, ref damageReal, ref effect);
+        
+        SkillManager.DuringAttack(this, victim, ref damageBase, ref damageMulti, ref effect);
         // 暴击
         if (critRate > 0 && SysRandom.Value < critRate)
         {
             damageMulti += critDamageMulti;
             WorldManager.Instance.AddBattleText("暴!", transform.position, new UnityEngine.Vector2(0, 40), Color.red, 3);
-            isCrit = true;
         }
 
         damage = (int)(damageBase * damageMulti);
-        var minDamage = 10 + level / 2;
-        var maxDamage = 50 + level;
-        if (isHero && victim.isHero)
-        {
-            //等级压制
-            var levelDiff = level - victim.level;
-            if (levelDiff != 0)
-            {
-                minDamage = Math.Clamp(minDamage + levelDiff, 8, minDamage * 2);
-                maxDamage = Math.Clamp(maxDamage + levelDiff * 4, 40, maxDamage * 2);
-            }
-        }
-        if(isCrit)
-        {
-            minDamage = (int)(minDamage * (1 + critDamageMulti));
-            maxDamage = (int)(maxDamage * (1 + critDamageMulti));
-        }
-        damage = Mathf.Clamp(damage, minDamage, maxDamage);
         if (damage > 0)
         {
             if (victim.dodgeRate > 0 && SysRandom.Value < victim.dodgeRate)
@@ -638,15 +617,14 @@ public class Chess : MonoBehaviour
             }
             else
             {
-                //这里不改数值，只能伤害吸收
-                SkillManager.BeforeAttack(this, victim, ref damage);
+                //这里不改数值，只能伤害吸收（普攻无伤害标签、非技能伤害，护盾正常吸收；skillCfg=null 跳过技能修正）
+                SkillManager.BeforeCalDamage(this, victim, null, ref damage, "", false);
+                SkillManager.BeforeCalDamaged(this, victim, null, ref damage, "", false);
             }
         }
 
-        if (damage + damageReal > 0)
+        if (damage > 0)
         {
-            damage = Math.Max(damage, damageReal);
-
             victim.hp -= damage;
             if (victim != this)
                 victim.lastDamagedPlayerId = playerId;
@@ -654,7 +632,7 @@ public class Chess : MonoBehaviour
             if (isHero)
                 BattleStatManager.AddBattleStat(playerId, heroId, damage, true, victim.isHero);
 
-            SkillManager.OnAttack(this, victim, damType, damage);
+            SkillManager.OnAttack(this, victim, damage);
         }
 
         if(!string.IsNullOrEmpty(effect))
@@ -662,7 +640,7 @@ public class Chess : MonoBehaviour
         victim.OnHpChanged();
     }
 
-    public void OnSkillDamaged(Chess caster, int skillId, int damage, bool isFeedback = false)
+    public void OnSkillDamaged(Chess caster, int skillId, int damage, bool isFeedback = false, string hurtTag = "")
     {
         if(damage <= 0)
             throw new Exception("伤害值不能小于等于0");
@@ -677,10 +655,9 @@ public class Chess : MonoBehaviour
                 damage = Math.Max(1, (int)(damage * CombatConst.ResistMultiplier(armor))); // 物理(atk)：护甲减免
         }
 
-        if (isHero)
-        {
-            SkillManager.OnDoSkillDamage(this, caster, SkillConfig.GetConfig(skillId), ref damage, isFeedback);
-        }
+        // 伤害结算前统一入口：攻击方技能修正 + 受击方（护盾吸收 hurtTag + 技能受击修正）
+        SkillManager.BeforeCalDamage(caster, this, skillCfg, ref damage, hurtTag, isFeedback);
+        SkillManager.BeforeCalDamaged(caster, this, skillCfg, ref damage, hurtTag, isFeedback);
 
         if(hp <= 0)
             return;
@@ -744,10 +721,8 @@ public class Chess : MonoBehaviour
     }
 
 
-    private int calculateDamage(Chess attacker, Chess defender, out string type)
+    private int calculateDamage(Chess attacker, Chess defender)
     {
-        type = "atk";
-
         // 攻击基准：英雄取攻击(Atk)；士兵取士兵攻击×加成系数（相的职业羁绊：全军士兵攻击+%）
         int damage;
         if (attacker.isHero)

@@ -8,7 +8,7 @@ public class BuffShieldValue : Buff
     {
     }
 
-    public override void DuringAttacked(Chess attacker, string damType, ref int damageBase, ref float damageMulti, ref string effect)
+    public override void DuringAttacked(Chess attacker, ref int damageBase, ref float damageMulti, ref string effect)
     {
         // 减伤盾：恒定按 Strength 减免，不再做攻守属性对比
         var strength = skillCfg.Strength;
