@@ -288,6 +288,18 @@ public class Skill
         
     }
 
+    /// <summary>
+    /// 护甲修正增量：物理伤害结算时，对受击方护甲的倍率增量（最终倍率 = 1 + Σ各技能增量；0=不改变护甲）。
+    /// 多个技能按加法叠加：破甲类(攻击方, isAttackerSide=true)返回负值（如 -0.3 → 护甲×0.7，完全无视=返回-1）；
+    /// 加甲类(受击方, isAttackerSide=false)返回正值（如 0.2 → 护甲×1.2）。
+    /// 注意：不能把"Strength 即生效"做进默认实现，否则扇(ModifyBuffTime)/速射(ModifyShootSpeed)等
+    /// 无关技能因 Strength>0 会让持有者凭空获得护甲加成，必须显式覆写。
+    /// </summary>
+    public virtual float GetArmorDelta(bool isAttackerSide)
+    {
+        return 0f;
+    }
+
     public virtual void OnHealTarget(Chess target, int checkSkillId, ref int addon)
     {
         

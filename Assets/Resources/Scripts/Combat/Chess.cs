@@ -418,7 +418,7 @@ public class Chess : MonoBehaviour
         List<(Chess chess, float score)> scoredTargets = new List<(Chess, float)>();
         foreach (var (chess, distance) in topTargets)
         {
-            float score = CalculateTargetScore(chess, distance);
+            float score = CalculateTargetScore(chess);
             scoredTargets.Add((chess, score));
         }
 
@@ -430,16 +430,9 @@ public class Chess : MonoBehaviour
     }
 
     // 计算目标分数
-    private float CalculateTargetScore(Chess target, float distance)
+    private float CalculateTargetScore(Chess target)
     {
         float score = target.isHero ? 10 : 30;
-
-        // 距离权重（距离越近分数越高）
-    //    score += 100f / (distance + 1f);  // 避免除以0
-
-        // 添加最大属性差作为积分项（权重可根据游戏平衡调整）
-        score += CalculateDamage(this, target) / 2;
-        score += (level - target.level) * 7f;
 
         // 生命值权重（生命值越低分数越高）
         var targetHpRate = (float)target.hp / target.maxHp;
@@ -593,8 +586,9 @@ public class Chess : MonoBehaviour
         if (victim == null)
             return;
 
-        // 造成伤害
-        var damage = CalculateDamage(this, victim);
+        // 普攻基准统一为 atk（英雄取攻击；士兵加成系数已折算进atk），受目标护甲减免：
+        // 实际护甲 = 目标护甲 × 攻击方破甲/受击方加甲修正系数（实际伤害 = 攻击 × 100/(100+等效护甲)）
+        var damage = Math.Max(1, (int)(atk * CombatConst.ResistMultiplier(victim.GetEffectiveArmor(this))));
         var effect = hitEffectName;
         var damageBase = damage;
         var damageMulti = 1f;
@@ -652,7 +646,7 @@ public class Chess : MonoBehaviour
             if (skillCfg.IsMagic)
                 damage = Math.Max(1, (int)(damage * CombatConst.ResistMultiplier(magicRes))); // 法术：魔抗减免
             else
-                damage = Math.Max(1, (int)(damage * CombatConst.ResistMultiplier(armor))); // 物理(atk)：护甲减免
+                damage = Math.Max(1, (int)(damage * CombatConst.ResistMultiplier(GetEffectiveArmor(caster)))); // 物理(atk)：等效护甲减免（攻方破甲可无视守方护甲）
         }
 
         // 伤害结算前统一入口：攻击方技能修正 + 受击方（护盾吸收 hurtTag + 技能受击修正）
@@ -721,14 +715,18 @@ public class Chess : MonoBehaviour
     }
 
 
-    private int CalculateDamage(Chess attacker, Chess defender)
+    /// <summary>
+    /// 物理伤害结算时受击方的等效护甲：原始护甲 × (1 + Σ攻击方破甲增量 + Σ受击方加甲增量)，多技能按加法叠加
+    /// </summary>
+    private int GetEffectiveArmor(Chess attacker)
     {
-        // 攻击基准统一为 atk：英雄取攻击；士兵的士兵攻击加成系数(相羁绊)已在 ApplyJobLinks 初始化时折算进 atk
-        int damage = attacker.atk;
-
-        // 普攻受目标护甲减免（英雄与士兵统一结算，参考金铲铲）：实际伤害 = 攻击 × 100/(100+护甲)
-        damage = (int)(damage * CombatConst.ResistMultiplier(defender.armor));
-        return Mathf.Max(1, damage);
+        var delta = 0f;
+        foreach (var s in attacker.skills)
+            delta += s.GetArmorDelta(true);
+        foreach (var s in skills)
+            delta += s.GetArmorDelta(false);
+        var rate = Mathf.Max(0f, 1f + delta);
+        return (int)(armor * rate);
     }
 
     public void AddHp(int addon)

@@ -114,6 +114,7 @@
     <Compile Include="Assets\Resources\Scripts\Configs\BuffConfig_s.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAttackRunCross.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAttackShieldPierce.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAttackArmorPierce.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\BattleResultHeroCellControl.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\MySelectControl.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffShield.cs" />
