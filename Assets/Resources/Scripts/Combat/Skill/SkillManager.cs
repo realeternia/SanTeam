@@ -81,10 +81,8 @@ public static class SkillManager
                 return new SkillModifySummonTime(skillId, owner);
             case "InitAddCrit":
                 return new SkillInitAddCrit(skillId, owner);
-            case "InitAddDodge":
-                return new SkillInitAddDodge(skillId, owner);
-            case "InitAddRege":
-                return new SkillInitAddRege(skillId, owner);
+            case "InitAttrChange":
+                return new SkillInitAttrChange(skillId, owner);
 
             case "Dumb":
                 return new SkillDumb(skillId, owner);               

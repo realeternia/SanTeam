@@ -22,7 +22,7 @@ public static class JobLinkManager
     // 职业羁绊档位：上阵该职业英雄数达到 1/2/3/4/5 人时对应职业技能 Lv1~5
     private static readonly int[] linkTiers = { 1, 2, 3, 4, 5 };
 
-    private struct AttrBonus
+    internal struct AttrBonus
     {
         public string Attr;
         public float Value;
@@ -254,8 +254,8 @@ public static class JobLinkManager
         sb.Append("</color>");
     }
 
-    // 解析 "attr+value,attr+value" 格式的加成串
-    private static List<AttrBonus> ParseBonuses(string str)
+    // 解析 "attr+value,attr+value" 格式的加成串（职业技能 LinkSelf/LinkTeam 与开局属性技能共用）
+    internal static List<AttrBonus> ParseBonuses(string str)
     {
         var list = new List<AttrBonus>();
         if (string.IsNullOrEmpty(str))
@@ -313,7 +313,8 @@ public static class JobLinkManager
         return ((int)v).ToString();
     }
 
-    private static void ApplyAttr(Chess unit, string attr, float value)
+    // 属性施加（职业技能 LinkSelf/LinkTeam 与开局属性技能共用）
+    internal static void ApplyAttr(Chess unit, string attr, float value)
     {
         switch (attr)
         {

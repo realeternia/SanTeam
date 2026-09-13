@@ -92,13 +92,12 @@
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillHitWall.cs" />
     <Compile Include="Assets\Resources\Scripts\PlayerInfo.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\CastleHUD.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillInitAddRege.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\JobLinkManager.cs" />
     <Compile Include="Assets\Resources\Scripts\Configs\ConfigManager.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffDamageAddRate.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillBuffExpandPos.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillHitRepeat.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillInitAddDodge.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillInitAttrChange.cs" />
     <Compile Include="Assets\SineVFX\TopDownEffects\Scripts\SineUIControllerTopDownEffects.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAttackReboundArrow.cs" />
     <Compile Include="Assets\SineVFX\TopDownEffects\Scripts\RampGeneratorTDE.cs" />
