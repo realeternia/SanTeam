@@ -79,6 +79,7 @@
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillHitBuff.cs" />
     <Compile Include="Assets\Resources\Scripts\WorldManager.cs" />
     <Compile Include="Assets\Resources\Scripts\GameManager.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidBuffLowHp.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\ILoopScrollItem.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\CardViewControl.cs" />
     <Compile Include="Assets\Resources\Scripts\Configs\FormulaLearnAttrConfig_s.cs" />

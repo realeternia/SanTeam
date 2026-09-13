@@ -121,7 +121,7 @@ namespace CommonConfig
             config[12] = new HeroFriendConfig(12, "王佐之才", 1, new int[]{101010,103013,102010,102003,101006,105007}, "", "");
             config[13] = new HeroFriendConfig(13, "剽悍迅捷", 1, new int[]{103006,106001,102008,104002,102007}, "连", "#339933");
             config[14] = new HeroFriendConfig(14, "骄兵悍将", 1, new int[]{101005,106005,105009,104002,103021,106002}, "穿", "#FF3399");
-            config[15] = new HeroFriendConfig(15, "忠肝义胆", 1, new int[]{101001,101009,110002,104008,104004,102018}, "", "");
+            config[15] = new HeroFriendConfig(15, "忠肝义胆", 1, new int[]{101001,101009,110002,104008,104004,102018}, "护", "#453572");
             config[16] = new HeroFriendConfig(16, "权奸当道", 1, new int[]{100004,104007,106008,106004,105002}, "", "");
             config[17] = new HeroFriendConfig(17, "名门望族", 1, new int[]{103002,100006,102025,101020,103001,102002}, "", "");
             config[18] = new HeroFriendConfig(18, "出将入相", 1, new int[]{102016,105005,103007,103011,104003}, "", "");

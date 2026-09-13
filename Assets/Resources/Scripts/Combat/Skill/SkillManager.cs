@@ -25,6 +25,8 @@ public static class SkillManager
                 return new SkillAttackRunCrossPlus(skillId, owner);                
             case "HelpAidBuff":
                 return new SkillHelpAidBuff(skillId, owner);
+            case "AidBuffLowHp":
+                return new SkillAidBuffLowHp(skillId, owner);
             case "AttackShieldPierce":
                 return new SkillAttackShieldPierce(skillId, owner);
             case "AttackArmorPierce":
