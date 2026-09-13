@@ -103,9 +103,10 @@ public static class JobLinkManager
             }
         }
 
-        // 统一结算士兵生命加成：目标最大生命 = 初始基准快照 × 累计系数（只乘一次），
+        // 统一结算士兵加成：目标最大生命 = 初始基准快照 × 累计系数（只乘一次），
         // 多个职业组系数先累加，不会把已加成数值当基数二次乘算；
-        // 士兵攻击不在此结算（伤害计算时已按 atk × soldierAtkRate 乘算一次）
+        // 士兵攻击系数同样在此一并发结算：atk = 当前atk × soldierAtkRate（只乘一次），
+        // 结算后复位系数并折算进 atk，伤害计算时攻击基准统一为 atk，不再乘算
         foreach (var unit in allMySideUnits)
         {
             if (unit.isHero)
@@ -113,6 +114,8 @@ public static class JobLinkManager
             var targetMaxHp = (int)(unit.soldierBaseMaxHp * unit.soldierHpRate);
             unit.hp = targetMaxHp;
             unit.maxHp = targetMaxHp;
+            unit.atk = (int)(unit.atk * unit.soldierAtkRate);
+            unit.soldierAtkRate = 1f;
         }
     }
 
@@ -372,7 +375,7 @@ public static class JobLinkManager
                 unit.auroEffectRate += value;
                 break;
             case "soldierAtk":
-                // 相的羁绊：全军士兵攻击+%（乘法系数，此处只累加，伤害结算时乘 atk 一次）
+                // 相的羁绊：全军士兵攻击+%（乘法系数，此处只累加，ApplyJobLinks 末尾统一折算进 atk）
                 if (!unit.isHero)
                     unit.soldierAtkRate += value;
                 break;

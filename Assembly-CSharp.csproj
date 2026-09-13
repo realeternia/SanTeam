@@ -97,7 +97,6 @@
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffDamageAddRate.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillBuffExpandPos.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillHitRepeat.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillInitAttrChange.cs" />
     <Compile Include="Assets\SineVFX\TopDownEffects\Scripts\SineUIControllerTopDownEffects.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAttackReboundArrow.cs" />
     <Compile Include="Assets\SineVFX\TopDownEffects\Scripts\RampGeneratorTDE.cs" />
@@ -125,7 +124,6 @@
     <Compile Include="Assets\Resources\Scripts\Configs\SoldierLevelConfig_s.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\HeroInfo.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\FriendLineManager.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAttackAntiShield.cs" />
     <Compile Include="Assets\Resources\Scripts\Configs\ItemConfig_s.cs" />
     <Compile Include="Assets\Resources\Scripts\PO\SideInfo.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffLock.cs" />
@@ -164,6 +162,7 @@
     <Compile Include="Assets\Resources\Scripts\Tools\SysRandom.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\CombatConst.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillHitAttr.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillInitAttrChange.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffSpeedDown.cs" />
     <Compile Include="Assets\Resources\Scripts\Tools\BGMPlayer.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAttackedShadow.cs" />

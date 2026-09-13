@@ -52,7 +52,7 @@ public class Chess : MonoBehaviour
 
     // 是否正在使用偏移路径
     public int hp = 100;
-    public float soldierAtkRate = 1f; // 士兵攻击加成系数（相的职业羁绊：全军士兵攻击+%，伤害结算时乘算一次）
+    public float soldierAtkRate = 1f; // 士兵攻击加成系数（相的职业羁绊：全军士兵攻击+%，ApplyJobLinks 末尾结算时折算进 atk）
     public float soldierHpRate = 1f; // 士兵生命加成系数（相的职业羁绊：全军士兵生命+%，由 JobLinkManager 累加系数后统一结算）
     public int soldierBaseMaxHp; // 士兵初始生命基准快照（Init 末尾记录，JobLinkManager 按此基数统一结算生命系数）
 
@@ -438,7 +438,7 @@ public class Chess : MonoBehaviour
     //    score += 100f / (distance + 1f);  // 避免除以0
 
         // 添加最大属性差作为积分项（权重可根据游戏平衡调整）
-        score += calculateDamage(this, target) / 2;
+        score += CalculateDamage(this, target) / 2;
         score += (level - target.level) * 7f;
 
         // 生命值权重（生命值越低分数越高）
@@ -594,7 +594,7 @@ public class Chess : MonoBehaviour
             return;
 
         // 造成伤害
-        var damage = calculateDamage(this, victim);
+        var damage = CalculateDamage(this, victim);
         var effect = hitEffectName;
         var damageBase = damage;
         var damageMulti = 1f;
@@ -721,14 +721,10 @@ public class Chess : MonoBehaviour
     }
 
 
-    private int calculateDamage(Chess attacker, Chess defender)
+    private int CalculateDamage(Chess attacker, Chess defender)
     {
-        // 攻击基准：英雄取攻击(Atk)；士兵取士兵攻击×加成系数（相的职业羁绊：全军士兵攻击+%）
-        int damage;
-        if (attacker.isHero)
-            damage = attacker.atk;
-        else
-            damage = (int)(attacker.atk * attacker.soldierAtkRate);
+        // 攻击基准统一为 atk：英雄取攻击；士兵的士兵攻击加成系数(相羁绊)已在 ApplyJobLinks 初始化时折算进 atk
+        int damage = attacker.atk;
 
         // 普攻受目标护甲减免（英雄与士兵统一结算，参考金铲铲）：实际伤害 = 攻击 × 100/(100+护甲)
         damage = (int)(damage * CombatConst.ResistMultiplier(defender.armor));
