@@ -82,6 +82,8 @@ public static class SkillManager
 
             case "InitAttrChange":
                 return new SkillInitAttrChange(skillId, owner);
+            case "InitSneakChangePos":
+                return new SkillInitSneakChangePos(skillId, owner);
 
             case "Dumb":
                 return new SkillDumb(skillId, owner);               

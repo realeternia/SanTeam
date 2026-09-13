@@ -20,6 +20,7 @@ public class Chess : MonoBehaviour
     public int heroId;
     public string chessName = "0";
     public int pos;
+    public bool sneakSwapped; // 偷袭交换标记：每个敌方英雄整场只可能被交换一次（战斗内Chess实例每次新建，天然按场重置）
 
 
     // 目标单位

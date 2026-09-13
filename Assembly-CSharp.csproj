@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <!-- Generated file, do not modify, your changes will be overwritten (use AssetPostprocessor.OnGeneratedCSProject) -->
   <PropertyGroup>
@@ -162,6 +162,7 @@
     <Compile Include="Assets\Resources\Scripts\Tools\SysRandom.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\CombatConst.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillInitAttrChange.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillInitSneakChangePos.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffSpeedDown.cs" />
     <Compile Include="Assets\Resources\Scripts\Tools\BGMPlayer.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAttackedShadow.cs" />
