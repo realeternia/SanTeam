@@ -135,6 +135,7 @@
     <Compile Include="Assets\Resources\Scripts\UIs\BattleResultCellControl.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\HeroInfoGroup.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\FactionShieldManager.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillInitAddItem.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillInitSneakChangePos.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillDefFeedback.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Chess.cs" />

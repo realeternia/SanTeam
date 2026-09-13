@@ -946,6 +946,28 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
             cards[itemId] = count + 1;
         else
             cards[itemId] = 1;
+        // 进背包自动合成：按 ItemConfig 配置检查该道具是否达到合成需求
+        CheckAutoCombine(itemId);
+    }
+
+    // 背包自动合成：仅检查指定道具是否达到配置的合成需求，达到则消耗并合成目标道具
+    private void CheckAutoCombine(int itemId)
+    {
+        var cfg = ItemConfig.GetConfig(itemId);
+        if (cfg == null || cfg.CombineId <= 0 || cfg.CombineNeed <= 0)
+            return;
+        if (!cards.TryGetValue(itemId, out int srcCount) || srcCount < cfg.CombineNeed)
+            return;
+        int combineCount = srcCount / cfg.CombineNeed;
+        int leftCount = srcCount - combineCount * cfg.CombineNeed;
+        if (leftCount > 0)
+            cards[itemId] = leftCount;
+        else
+            cards.Remove(itemId);
+        cards.TryGetValue(cfg.CombineId, out int dstCount);
+        cards[cfg.CombineId] = dstCount + combineCount;
+        GameLog.Debug(string.Format("背包自动合成：玩家{0} 消耗{1}个道具{2}合成{3}个道具{4}",
+            pid, combineCount * cfg.CombineNeed, itemId, combineCount, cfg.CombineId));
     }
 
     public bool HasFriend(int cardId)
