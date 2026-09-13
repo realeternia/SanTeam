@@ -127,6 +127,7 @@
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffLock.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\PickPanelControl.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\RankPanelManager.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAttackStunDamage.cs" />
     <Compile Include="Assets\SineVFX\TopDownEffects\Scripts\PrefabSpawner.cs" />
     <Compile Include="Assets\Resources\Scripts\PO\BuffTime.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\BattleResultCellControl.cs" />
@@ -138,6 +139,7 @@
     <Compile Include="Assets\Resources\Scripts\Configs\GameRoundConfig_s.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAttackSpinAttack.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAttackArmorPierce.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAttackStunDamage.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillHitRegion.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillModifyBuffTime.cs" />
     <Compile Include="Assets\SineVFX\TopDownEffects\Scripts\SineCameraControllerTopDownEffects.cs" />

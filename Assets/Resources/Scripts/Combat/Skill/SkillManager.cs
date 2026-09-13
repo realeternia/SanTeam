@@ -29,6 +29,8 @@ public static class SkillManager
                 return new SkillAttackShieldPierce(skillId, owner);
             case "AttackArmorPierce":
                 return new SkillAttackArmorPierce(skillId, owner);
+            case "AttackStunDamage":
+                return new SkillAttackStunDamage(skillId, owner);
 
             case "DefFeedback":
                 return new SkillDefFeedback(skillId, owner);
