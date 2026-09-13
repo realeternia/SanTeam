@@ -36,8 +36,6 @@ public static class SkillManager
                 return new SkillAttackSpeedAttack(skillId, owner);
             case "AttackReboundArrow":
                 return new SkillAttackReboundArrow(skillId, owner);
-            case "DefPlantSkin":
-                return new SkillDefPlantSkin(skillId, owner);
             case "DefHpLow":
                 return new SkillDefHpLow(skillId, owner);
             case "HitBuff":
@@ -59,8 +57,6 @@ public static class SkillManager
                 return new SkillHitTeleport(skillId, owner);
             case "HitRepeat":
                 return new SkillHitRepeat(skillId, owner);
-            case "HitAttr":
-                return new SkillHitAttr(skillId, owner);
             case "HitArea":
                 return new SkillHitArea(skillId, owner);
             case "HitAround":
@@ -79,10 +75,7 @@ public static class SkillManager
                 return new SkillModifyBuffTime(skillId, owner);
             case "ModifyShootSpeed":
                 return new SkillModifyShootSpeed(skillId, owner);
-            case "ModifySummonTime":
-                return new SkillModifySummonTime(skillId, owner);
-            case "InitAddCrit":
-                return new SkillInitAddCrit(skillId, owner);
+
             case "InitAttrChange":
                 return new SkillInitAttrChange(skillId, owner);
 
@@ -149,16 +142,6 @@ public static class SkillManager
                 skill.OnCheckCD(skillCfg, ref cdTime);
         }
     }
-    public static void OnCheckSummonTime(Chess caster, SkillConfig skillCfg, ref float summonTime)
-    {
-        foreach (var skill in caster.skills)
-        {
-            if(skill.skillId != skillCfg.Id) //防止自己判定自己
-                skill.OnCheckSummonTime(skillCfg, ref summonTime);
-        }
-    }
-
-
 
     public static void DuringAttack(Chess attacker, Chess defender, ref int damageBase, ref float damageMulti, ref string effect)
     {       

@@ -305,11 +305,6 @@ public class Skill
         
     }
 
-    public virtual void OnCheckSummonTime(SkillConfig checkSkillCfg, ref float summonTime)
-    {
-
-    }
-
     /// <summary>
     /// 召唤技能单位（法术场/分身等）：在指定位置创建单位，并将技能配置的 SummonTag 标记到召唤物上
     /// </summary>
@@ -334,9 +329,7 @@ public class Skill
 
     public float GetSummonTime()
     {
-        var summonTime = skillCfg.SummonTime;
-        SkillManager.OnCheckSummonTime(owner, skillCfg, ref summonTime);
-        return summonTime;
+        return skillCfg.SummonTime;
     }
 
 }
