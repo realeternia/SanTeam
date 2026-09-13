@@ -15,15 +15,6 @@ public class SkillDefFeedback : Skill
         DoFeedback(attacker, false, damage); // 普攻固定为物理
     }
 
-    public override void BeforeCalDamaged(Chess caster, SkillConfig checkSkillCfg, ref int damage, string hurtTag, bool isFeedback)
-    {
-        if(isFeedback)
-            return;
-        
-        if(checkSkillCfg == null)
-            return;
-        DoFeedback(caster, checkSkillCfg.IsMagic, damage);
-    }    
 
     private void DoFeedback(Chess attacker, bool isMagic, int damage)
     {
@@ -32,7 +23,7 @@ public class SkillDefFeedback : Skill
 
         if (skillCfg.Range > 0)
         {
-            // 配置表重生成后已无 RangeOut 列：Range 表示反弹生效范围（范围内才触发，对应旧表 RangeOut=false 语义，刺甲/明镜均适用）
+            // 配置表重生成后已无 RangeOut 列：Range 表示反弹生效范围（范围内才触发，对应旧表 RangeOut=false 语义，刺甲适用）
             var isInRange = WorldManager.Instance.CheckInRange(owner.transform.position, attacker.transform.position, skillCfg.Range);
             if (!isInRange)
                 return;
