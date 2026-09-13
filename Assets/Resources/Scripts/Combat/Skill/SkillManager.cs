@@ -36,8 +36,8 @@ public static class SkillManager
                 return new SkillAttackSpeedAttack(skillId, owner);
             case "AttackReboundArrow":
                 return new SkillAttackReboundArrow(skillId, owner);
-            case "DefHpLow":
-                return new SkillDefHpLow(skillId, owner);
+            case "ReduceDamageRate":
+                return new SkillDefReduceDamageRate(skillId, owner);
             case "HitBuff":
                 return new SkillHitBuff(skillId, owner);
             case "HitBuffArea":
@@ -48,8 +48,6 @@ public static class SkillManager
                 return new SkillHitWall(skillId, owner);
             case "HitFireArea":
                 return new SkillHitFireArea(skillId, owner);
-            case "DamageReal":
-                return new SkillDamageReal(skillId, owner);
             case "AttackedShadow":
                 return new SkillAttackedShadow(skillId, owner);
 

@@ -107,7 +107,7 @@ namespace CommonConfig
         public static void Load()
         {
             config.Clear();
-            config[1] = new HeroFriendConfig(1, "万人敌", 1, new int[]{101005,101002,104001,102005,102007}, "", "");
+            config[1] = new HeroFriendConfig(1, "无双天下", 1, new int[]{101005,101002,104001,102005,102007}, "双", "#3399CC");
             config[2] = new HeroFriendConfig(2, "野火燎原", 1, new int[]{101004,102001,103008,104003,101012}, "火", "#FF0000");
             config[3] = new HeroFriendConfig(3, "骑射无双", 1, new int[]{103004,103003,102023,104009,105008}, "冷", "#0077FF");
             config[4] = new HeroFriendConfig(4, "风华绝代", 1, new int[]{104004,103001,101023,102001,103014}, "", "");
@@ -117,7 +117,7 @@ namespace CommonConfig
             config[8] = new HeroFriendConfig(8, "老当益壮", 1, new int[]{101008,101022,103005,103022,102005}, "", "");
             config[9] = new HeroFriendConfig(9, "先登陷阵", 1, new int[]{102004,103019,101001,105006,102009}, "破", "#FF6600");
             config[10] = new HeroFriendConfig(10, "深谋远虑", 1, new int[]{103010,102011,104007,106003,103012}, "", "");
-            config[11] = new HeroFriendConfig(11, "治军严明", 1, new int[]{101003,104006,102017,101013,102012,106006}, "", "");
+            config[11] = new HeroFriendConfig(11, "治军严明", 1, new int[]{101003,104006,102017,101013,102012,106006}, "坚", "#44AA00");
             config[12] = new HeroFriendConfig(12, "王佐之才", 1, new int[]{101010,103013,102010,102003,101006,105007}, "", "");
             config[13] = new HeroFriendConfig(13, "剽悍迅捷", 1, new int[]{103006,106001,102008,104002,102007}, "连", "#339933");
             config[14] = new HeroFriendConfig(14, "骄兵悍将", 1, new int[]{101005,106005,105009,104002,103021,106002}, "穿", "#FF3399");
