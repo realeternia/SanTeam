@@ -9,7 +9,7 @@ public class SkillAttackedShadow : Skill
     private int count;
     public SkillAttackedShadow(int id, Chess unit) : base(id, unit)
     {
-        count = skillCfg.DoCount;
+        count = skillCfg.StrengthInt;
     }
 
     public override void OnAttacked(Chess attacker, int damage)

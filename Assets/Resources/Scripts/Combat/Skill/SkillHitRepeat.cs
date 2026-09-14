@@ -21,9 +21,9 @@ public class SkillHitRepeat : Skill
 
     IEnumerator DelayAttack(Chess defender, int damage)
     {
-        for (int i = 0; i < skillCfg.DoCount; i++)
+        for (int i = 0; i < skillCfg.StrengthInt; i++)
         {
-            yield return new WaitForSeconds(skillCfg.TimeDelay);
+            yield return new WaitForSeconds(0.3f);
             if (defender != null && defender.hp > 0)
             {
                 var d = (int)(damage * skillCfg.SkillDamageRate);

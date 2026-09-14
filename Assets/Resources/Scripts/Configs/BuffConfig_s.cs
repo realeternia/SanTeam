@@ -43,10 +43,11 @@ namespace CommonConfig
             {"Id", new FieldMetaInfo("序列", "int", 60)},
             {"Name", new FieldMetaInfo("名字", "string", 0)},
             {"NameS", new FieldMetaInfo("短名", "string", 0, "", true)},
-            {"ScriptName", new FieldMetaInfo("脚本名", "string", 135)},
+            {"Des", new FieldMetaInfo("描述", "string", 344)},
+            {"IsPositive", new FieldMetaInfo("是否正面", "bool", 0)},
+            {"ScriptName", new FieldMetaInfo("脚本名", "string", 171)},
             {"ColorStart", new FieldMetaInfo("启动色", "string", 0)},
             {"ColorEnd", new FieldMetaInfo("结束色", "string", 0)},
-            {"IsPositive", new FieldMetaInfo("是否正面", "bool", 0)},
             {"BuffEffect", new FieldMetaInfo("hit", "string", 0)},
             {"Icon", new FieldMetaInfo("图标", "string", 0)},
         };
@@ -69,6 +70,14 @@ namespace CommonConfig
         /// </summary>
         public string NameS;
         /// <summary>
+        ///描述
+        /// </summary>
+        public string Des;
+        /// <summary>
+        ///是否正面
+        /// </summary>
+        public bool IsPositive;
+        /// <summary>
         ///脚本名
         /// </summary>
         public string ScriptName;
@@ -81,10 +90,6 @@ namespace CommonConfig
         /// </summary>
         public string ColorEnd;
         /// <summary>
-        ///是否正面
-        /// </summary>
-        public bool IsPositive;
-        /// <summary>
         ///hit
         /// </summary>
         public string BuffEffect;
@@ -94,15 +99,16 @@ namespace CommonConfig
         public string Icon;
 
 
-        public BuffConfig(int Id, string Name, string NameS, string ScriptName, string ColorStart, string ColorEnd, bool IsPositive, string BuffEffect, string Icon)
+        public BuffConfig(int Id, string Name, string NameS, string Des, bool IsPositive, string ScriptName, string ColorStart, string ColorEnd, string BuffEffect, string Icon)
         {
             this.Id = Id;
             this.Name = Name;
             this.NameS = NameS;
+            this.Des = Des;
+            this.IsPositive = IsPositive;
             this.ScriptName = ScriptName;
             this.ColorStart = ColorStart;
             this.ColorEnd = ColorEnd;
-            this.IsPositive = IsPositive;
             this.BuffEffect = BuffEffect;
             this.Icon = Icon;
         }
@@ -125,17 +131,17 @@ namespace CommonConfig
         public static void Load()
         {
             config.Clear();
-            config[300001] = new BuffConfig(300001, "护盾", "盾", "BuffShield", "", "", true, "ShieldSoftBlue", "");
-            config[300002] = new BuffConfig(300002, "减伤盾", "硬", "BuffShieldValue", "#B25900", "#FFD24D", true, "", "");
-            config[300003] = new BuffConfig(300003, "吸血", "吸", "BuffSuck", "#FF0000", "#993333", true, "", "");
-            config[300004] = new BuffConfig(300004, "伤害提升", "重", "BuffDamageAddRate", "", "", true, "SparkleAreaWhite", "");
-            config[300005] = new BuffConfig(300005, "攻速提升", "快", "BuffCoolDown", "", "", true, "HeartStream", "");
-            config[301001] = new BuffConfig(301001, "混乱", "乱", "BuffNoAction", "", "", false, "StunnedCirclingStarsSimple", "");
-            config[301002] = new BuffConfig(301002, "连锁", "锁", "BuffLock", "", "", false, "StunnedLock", "");
-            config[301003] = new BuffConfig(301003, "增伤", "伤", "BuffDamagedAddRate", "", "", false, "StunnedDamageUp", "");
-            config[301004] = new BuffConfig(301004, "减速", "慢", "BuffSpeedDown", "", "", false, "SlowAuraYellow", "");
-            config[301005] = new BuffConfig(301005, "陷阵", "停", "BuffNoMove", "", "", false, "AuraSoftPurple", "");
-            config[301006] = new BuffConfig(301006, "溃败", "败", "BuffTimeDamage", "", "", false, "BloodExplosion", "");
+            config[300001] = new BuffConfig(300001, "护盾", "盾", "吸收受到的伤害，护盾值耗尽后消失（破盾标签的伤害可绕过）", true, "BuffShield", "", "", "ShieldSoftBlue", "");
+            config[300002] = new BuffConfig(300002, "减伤盾", "硬", "受到攻击时按固定比例减免伤害", true, "BuffShieldValue", "#B25900", "#FFD24D", "", "");
+            config[300003] = new BuffConfig(300003, "吸血", "吸", "攻击时按造成伤害的一定比例回复生命", true, "BuffSuck", "#FF0000", "#993333", "", "");
+            config[300004] = new BuffConfig(300004, "伤害提升", "重", "造成的伤害按比例提升", true, "BuffDamageAddRate", "", "", "SparkleAreaWhite", "");
+            config[300005] = new BuffConfig(300005, "攻速提升", "快", "攻击速度按比例提升", true, "BuffCoolDown", "", "", "HeartStream", "");
+            config[301001] = new BuffConfig(301001, "混乱", "乱", "眩晕，无法行动", false, "BuffNoAction", "", "", "StunnedCirclingStarsSimple", "");
+            config[301002] = new BuffConfig(301002, "连锁", "锁", "被攻击时，向范围内同样带连锁的友军传递同比例伤害", false, "BuffLock", "", "", "StunnedLock", "");
+            config[301003] = new BuffConfig(301003, "增伤", "伤", "受到的伤害按比例增加", false, "BuffDamagedAddRate", "", "", "StunnedDamageUp", "");
+            config[301004] = new BuffConfig(301004, "减速", "慢", "移动速度与攻击速度降低", false, "BuffSpeedDown", "", "", "SlowAuraYellow", "");
+            config[301005] = new BuffConfig(301005, "陷阵", "停", "无法移动", false, "BuffNoMove", "", "", "AuraSoftPurple", "");
+            config[301006] = new BuffConfig(301006, "溃败", "败", "持续受到随时间结算的伤害", false, "BuffTimeDamage", "", "", "BloodExplosion", "");
 
             RebuildIndex();
 
