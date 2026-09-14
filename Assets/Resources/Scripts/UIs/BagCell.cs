@@ -110,8 +110,7 @@ public class BagCell : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragH
     public void OnBeginDrag(PointerEventData eventData)
     {
         // 拖拽开始时隐藏 tooltip
-        if (Tooltip.Instance != null)
-            Tooltip.Instance.HideTooltip();
+        PanelManager.Instance.GetTooltip()?.HideTooltip();
 
         if(bagControl.bindPlayer.isAI)
             return;
@@ -237,7 +236,7 @@ public class BagCell : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragH
     // 按住卡片显示 tooltip（由 cellButton 上的 BagCellPointerForwarder 转发调用）
     public void ShowTooltip()
     {
-        if (Tooltip.Instance == null || bagControl == null || bagControl.bindPlayer == null)
+        if (PanelManager.Instance.GetTooltip() == null || bagControl == null || bagControl.bindPlayer == null)
             return;
 
         var player = bagControl.bindPlayer;
@@ -246,21 +245,18 @@ public class BagCell : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragH
         {
             var heroCfg = HeroConfig.GetConfig(cardId);
             var friendInfo = ConfigManager.GetHeroFriendInfo(cardId);
-            Tooltip.Instance.ShowTooltip(ConfigManager.GetHeroSkillConfigs(heroCfg), friendInfo, cardId, player);
+            PanelManager.Instance.GetTooltip().ShowTooltip(ConfigManager.GetHeroSkillConfigs(heroCfg), friendInfo, cardId, player);
         }
         else
         {
-            Tooltip.Instance.ShowTooltip(null, null, cardId, player);
+            PanelManager.Instance.GetTooltip().ShowTooltip(null, null, cardId, player);
         }
     }
 
     // 松开卡片隐藏 tooltip
     public void HideTooltip()
     {
-        if (Tooltip.Instance != null)
-        {
-            Tooltip.Instance.HideTooltip();
-        }
+        PanelManager.Instance.GetTooltip()?.HideTooltip();
     }
 
     // Update is called once per frame

@@ -18,6 +18,10 @@ public class PanelManager : MonoBehaviour
     private GameObject pickPanel;
     private GameObject bagPanel;
 
+    public GameObject tipNode;
+
+    // Tooltip 运行时动态创建并挂到 tipNode 下（首次访问时加载，之后缓存复用）
+    private Tooltip tooltip;
 
     public List<GameObject> openPanelList;
 
@@ -25,7 +29,31 @@ public class PanelManager : MonoBehaviour
     void Start()
     {
         // 面板已改为动态加载，开局先创建选牌面板（其 Start 会继续走游戏初始化流程）
+        // Tooltip 按需创建：首次经 GetTooltip() 实例化并挂到 tipNode 下，调用入口统一走 PanelManager
         ShowPick();
+    }
+
+    // 从 Resources/Prefabs 动态加载并实例化 Tooltip（挂到 tipNode 下，只创建一次）
+    public Tooltip GetTooltip()
+    {
+        if (tooltip != null)
+            return tooltip;
+        if (tipNode == null)
+        {
+            GameLog.Error("PanelManager tipNode 未在场景中配置");
+            return null;
+        }
+        var prefab = Resources.Load<GameObject>("Prefabs/ToolTipHero");
+        if (prefab == null)
+        {
+            GameLog.Error("PanelManager ToolTipHero 预制体加载失败: Prefabs/ToolTipHero");
+            return null;
+        }
+        var go = Instantiate(prefab, tipNode.transform);
+        tooltip = go.GetComponent<Tooltip>();
+        if (tooltip == null)
+            GameLog.Error("PanelManager ToolTipHero 预制体上缺少 Tooltip 组件");
+        return tooltip;
     }
 
     // 从 Resources/Prefabs 动态加载并实例化面板（挂在当前节点下，根节点为拉伸锚点铺满全屏）

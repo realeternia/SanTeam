@@ -4,18 +4,12 @@ using TMPro;
 using CommonConfig;
 using System.Collections.Generic;
 
-public class Tooltip : MonoBehaviour
+public class Tooltip : BaseTooltip
 {
-    public static Tooltip Instance;
-
     public TMP_Text[] textSkills;
     public TMP_Text textFriend;
-    public RectTransform rect;
     public Image[] imageSkills;
     public int maxWidth = 300;
-
-    // 整体缩放：图标、字体、背景一起等比放大
-    private const float UIScale = 1.3f;
 
     // 卡片属性显示：图标 + 属性值，一行两个（最多4个属性 = 2行）
     private Image[] imageAttrs;
@@ -25,24 +19,10 @@ public class Tooltip : MonoBehaviour
     // 道具描述文本（动态创建，道具卡显示）
     private TMP_Text textDes;
 
-    private void Awake()
+    protected override void Awake()
     {
-        if (Instance == null)
-            Instance = this;
-        // else
-        //     Destroy(gameObject);
-
+        base.Awake();
         CreateAttrControls();
-
-        // 统一pivot/anchor为父物体中心，保证ShowTooltip中的局部坐标计算与实际渲染位置一致
-        rect.anchorMin = new Vector2(0.5f, 0.5f);
-        rect.anchorMax = new Vector2(0.5f, 0.5f);
-        rect.pivot = new Vector2(0.5f, 0.5f);
-
-        // 整体放大（图标、字体、背景等比缩放；ShowTooltip中会按屏幕高度自适应覆盖）
-        rect.localScale = Vector3.one * UIScale;
-
-        gameObject.SetActive(false);
     }
 
     // 用已有的技能图标/文本作为模板，动态生成属性控件（2行×2列）
@@ -283,64 +263,8 @@ public class Tooltip : MonoBehaviour
         float height = Mathf.Max(50f, currentY + 10f);
         rect.sizeDelta = new Vector2(400, height);
 
-        RectTransform canvasRect = transform.parent as RectTransform;
-        if (canvasRect == null)
-        {
-            gameObject.SetActive(true);
-            return;
-        }
-
-        // Canvas挂了CanvasScaler，屏幕像素与UI单位不一致；
-        // 统一在canvas局部空间（与sizeDelta同单位）计算，边界用canvasRect.rect，避免像素/UI单位换算误差
-        float baseWidth = rect.sizeDelta.x;
-        float baseHeight = rect.sizeDelta.y;
-        float viewWidth = canvasRect.rect.width;
-        float viewHeight = canvasRect.rect.height;
-
-        // 动态整体缩放：默认放大30%；若整体高度超过可视高度，则缩小到刚好撑满（留5%边距）
-        float scale = UIScale;
-        if (baseHeight * scale > viewHeight * 0.95f)
-            scale = viewHeight * 0.95f / baseHeight;
-        rect.localScale = Vector3.one * scale;
-
-        // 缩放后的实际宽高
-        float tooltipWidth = baseWidth * scale;
-        float tooltipHeight = baseHeight * scale;
-
-        // 鼠标位置转为canvas局部坐标
-        Vector2 localPoint;
-        RectTransformUtility.ScreenPointToLocalPointInRectangle(
-            canvasRect, Input.mousePosition, WorldManager.Instance.uiCamera, out localPoint);
-
-        float halfW = viewWidth * 0.5f;
-        float halfH = viewHeight * 0.5f;
-
-        // 水平定位（触摸屏：tips不挡点击点）：默认从点击位置右边开始显示（左边贴点击点）
-        const float gapX = 20f;
-        float centerX = localPoint.x + gapX + tooltipWidth * 0.5f;
-        // 右侧超出可视区：翻到点击位置左边显示（右边贴点击点）
-        if (centerX + tooltipWidth * 0.5f > halfW - 10f)
-            centerX = localPoint.x - gapX - tooltipWidth * 0.5f;
-        // 左侧也超出（点击点太靠左）：夹在左边界内
-        if (centerX - tooltipWidth * 0.5f < -halfW + 10f)
-            centerX = -halfW + tooltipWidth * 0.5f + 10f;
-
-        // 垂直定位：以点击点为中心，上下夹紧保证完整可见（底部留边距40）
-        float centerY = localPoint.y;
-        if (centerY - tooltipHeight * 0.5f < -halfH + 40f)
-            centerY = -halfH + tooltipHeight * 0.5f + 40f;
-        if (centerY + tooltipHeight * 0.5f > halfH - 10f)
-            centerY = halfH - tooltipHeight * 0.5f - 10f;
-
-        // pivot已统一为中心点，anchoredPosition即tooltip中心位置
-        rect.anchoredPosition = new Vector2(centerX, centerY);
-
-        gameObject.SetActive(true);
-    }
-
-    public void HideTooltip()
-    {
-        gameObject.SetActive(false);
+        // 内容填充完毕，走基类统一显示/定位逻辑（同一时刻只显示一个、贴边不出屏）
+        Show();
     }
 
     // 道具属性行：键值按配置输出，比例属性（攻速/暴击）带 % 后缀，其余直接显示数值

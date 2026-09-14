@@ -66,6 +66,7 @@
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidSuddenArrow.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\IconLoader.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\BagCellPointerForwarder.cs" />
+    <Compile Include="Assets\Resources\Scripts\UIs\TooltipHero.cs" />
     <Compile Include="Assets\Resources\Scripts\Configs\SystemAttrConfig_s.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffShieldValue.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Missile.cs" />
@@ -130,6 +131,7 @@
     <Compile Include="Assets\Resources\Scripts\UIs\PickPanelControl.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\RankPanelManager.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAttackStunDamage.cs" />
+    <Compile Include="Assets\Resources\Scripts\UIs\BaseTooltip.cs" />
     <Compile Include="Assets\SineVFX\TopDownEffects\Scripts\PrefabSpawner.cs" />
     <Compile Include="Assets\Resources\Scripts\PO\BuffTime.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\BattleResultCellControl.cs" />
@@ -181,7 +183,6 @@
     <Compile Include="Assets\Resources\Scripts\PO\AttrInfo.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\RankCellInfo.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffDamagedAddRate.cs" />
-    <Compile Include="Assets\Resources\Scripts\UIs\Tooltip.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\BagFieldUnitControl.cs" />
     <Compile Include="Assets\Epic Toon FX\Scripts\ETFXPitchRandomizer.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillManager.cs" />
