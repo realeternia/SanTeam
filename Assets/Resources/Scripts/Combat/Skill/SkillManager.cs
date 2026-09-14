@@ -33,6 +33,8 @@ public static class SkillManager
                 return new SkillAttackArmorPierce(skillId, owner);
             case "AttackStunDamage":
                 return new SkillAttackStunDamage(skillId, owner);
+            case "AttackMagicDamage":
+                return new SkillAttackMagicDamage(skillId, owner);
             case "DeathGroupHeal":
                 return new SkillDeathGroupHeal(skillId, owner);
 

@@ -43,7 +43,7 @@ namespace CommonConfig
             {"Id", new FieldMetaInfo("序列", "int", 60)},
             {"Name", new FieldMetaInfo("名字", "string", 0)},
             {"Level", new FieldMetaInfo("支援级别（3最高，1最低（比如共事））", "int", 60)},
-            {"Heros", new FieldMetaInfo("英雄列表，一组 5-6 人", "int[]", 794)},
+            {"Heros", new FieldMetaInfo("英雄列表，一组 5-6 人", "int[]", 686)},
             {"SkillId", new FieldMetaInfo("关联技能缩写", "string", 60)},
             {"LineColor", new FieldMetaInfo("连线颜色", "string", 0)},
         };
@@ -110,7 +110,7 @@ namespace CommonConfig
             config[1] = new HeroFriendConfig(1, "无双天下", 1, new int[]{101005,101002,104001,102005,102007}, "双", "#3399CC");
             config[2] = new HeroFriendConfig(2, "野火燎原", 1, new int[]{101004,102001,103008,104003,101012}, "火", "#FF0000");
             config[3] = new HeroFriendConfig(3, "骑射无双", 1, new int[]{103004,103003,102023,104009,105008}, "冷", "#0077FF");
-            config[4] = new HeroFriendConfig(4, "风华绝代", 1, new int[]{104004,103001,101023,102001,103014}, "", "");
+            config[4] = new HeroFriendConfig(4, "风华绝代", 1, new int[]{104004,103001,101023,102001,103014}, "华", "#3789C2");
             config[5] = new HeroFriendConfig(5, "仁德济世", 1, new int[]{110003,100001,101015,110009,103007,103016}, "仁", "#FFAA33");
             config[6] = new HeroFriendConfig(6, "身负异禀", 1, new int[]{100003,110011,110007,101014,101019,105001}, "", "");
             config[7] = new HeroFriendConfig(7, "经世济民", 1, new int[]{103012,102020,101017,100005,101012}, "", "");

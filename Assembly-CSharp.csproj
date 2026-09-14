@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+﻿﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <!-- Generated file, do not modify, your changes will be overwritten (use AssetPostprocessor.OnGeneratedCSProject) -->
   <PropertyGroup>
@@ -130,6 +130,7 @@
     <Compile Include="Assets\Resources\Scripts\UIs\PickPanelControl.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\RankPanelManager.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAttackStunDamage.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAttackMagicDamage.cs" />
     <Compile Include="Assets\SineVFX\TopDownEffects\Scripts\PrefabSpawner.cs" />
     <Compile Include="Assets\Resources\Scripts\PO\BuffTime.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\BattleResultCellControl.cs" />

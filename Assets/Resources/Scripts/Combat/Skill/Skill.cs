@@ -27,15 +27,15 @@ public class Skill
     public float mp; // 当前技能MP，战斗开始为0，满值=MpCost
 
     /// <summary>
-    /// 统一技能伤害公式：固定系数(Strength) + 比例系数(SkillDamageAttrRate) × 关联属性(IsMagic映射 ap/atk)
+    /// 统一技能伤害公式：固定系数(Strength) + 比例系数(SkillDamageRate) × 关联属性(IsMagic映射 ap/atk)
     /// IsMagic=true→ap 法强(受魔抗减免)；false→atk 攻击(无双已并入，受护甲减免)
     /// </summary>
     public int GetSkillDamage()
     {
         if(skillCfg.IsMagic)
-            return (int)(skillCfg.Strength + owner.GetAttr("ap") * skillCfg.SkillDamageAttrRate);
+            return (int)(skillCfg.Strength + owner.GetAttr("ap") * skillCfg.SkillDamageRate);
         else
-            return (int)(skillCfg.Strength + owner.GetAttr("atk") * skillCfg.SkillDamageAttrRate);
+            return (int)(skillCfg.Strength + owner.GetAttr("atk") * skillCfg.SkillDamageRate);
     }
 
     /// <summary>
