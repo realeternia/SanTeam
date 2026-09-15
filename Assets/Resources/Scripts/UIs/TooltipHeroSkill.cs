@@ -8,6 +8,7 @@ public class TooltipHeroSkill : MonoBehaviour
 {
     public TMP_Text textSkill;
     public Image img;
+    public TMP_Text textFriend;
 
     // 文字显示：字号相对预制体略缩小，超出截断
     private const float SkillFontScale = 0.9f;
@@ -19,16 +20,24 @@ public class TooltipHeroSkill : MonoBehaviour
     public void SetSkill(string text, string icon)
     {
         img.sprite = Resources.Load<Sprite>("Textures/SkillPic/" + icon);
+        img.gameObject.SetActive(true);
         textSkill.text = text;
         ApplyStyle(textSkill, ref skillFontBase);
+        // 技能行无人员列表，隐藏旧列表残留
+        textFriend.gameObject.SetActive(false);
     }
 
-    // 好友组：图标 + 技能描述(最多2行) + 人员列表(1行，直接拼接到描述第3行)；行高固定，不改布局
+    // 好友组/职业技能：图标 + 技能描述(最多2行) + 人员列表(1行)；行高固定，不改布局
     public void SetFriendSkill(string skillText, string icon, string listText)
     {
-        // 人员列表拼接为第3行（不单独建文本控件、不调整本行高度）
-        textSkill.text = skillText + "\n" + listText;
+        textSkill.text = skillText;
         ApplyStyle(textSkill, ref skillFontBase);
+
+        // 人员列表（空则不显示，避免残留上次内容）
+        bool hasList = !string.IsNullOrEmpty(listText);
+        textFriend.gameObject.SetActive(hasList);
+        if (hasList)
+            textFriend.text = listText;
 
         // 图标：无图标（无连接技能）时隐藏
         img.gameObject.SetActive(!string.IsNullOrEmpty(icon));

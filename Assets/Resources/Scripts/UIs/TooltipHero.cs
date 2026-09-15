@@ -241,19 +241,27 @@ public class TooltipHero : BaseTooltip
 
         if (hasSkill)
         {
-            // 职业技能行：统计当前玩家上阵同职业英雄数，用于羁绊档位高亮
+            // 职业技能行：档位按当前上阵同职业人数（与战斗连锁一致）；列表行显示配置表里所有同职业英雄
             int jobFieldCount = 0;
             string heroJob = null;
+            var jobHeroNames = new List<string>();
             if (isHero)
             {
                 heroJob = HeroConfig.GetConfig(heroId).Job;
                 if (player != null)
                 {
+                    // 档位：上阵同职业人数
                     foreach (var cardId in player.battleCards)
                     {
                         if (cardId > 0 && ConfigManager.IsHeroCard(cardId) && HeroConfig.GetConfig(cardId).Job == heroJob)
                             jobFieldCount++;
                     }
+                }
+                // 列表：配置表里所有同职业英雄（无颜色，名字只保留最后一个字）
+                foreach (var cfg in HeroConfig.ConfigList)
+                {
+                    if (cfg.Id != heroId && cfg.Job == heroJob)
+                        jobHeroNames.Add(cfg.Name.Substring(cfg.Name.Length - 1));
                 }
             }
 
@@ -264,20 +272,21 @@ public class TooltipHero : BaseTooltip
                     break;
                 row.gameObject.SetActive(true);
                 var skillConfig = skillCfgs[i];
-                // 属性标签前缀：IsMagic=法术(蓝)，否则=物理(黄)
-                var skillAttrStr = skillConfig.IsMagic ? "<color=blue>[法]</color>" : "<color=yellow>[攻]</color>";
                 string skillText;
                 if (skillConfig.Type == "职业")
                 {
-                    // 职业技能（兵种连锁）：单行差值格式（当前档数值 + 下一档差异括号）
-                    skillText = skillConfig.Name + JobLinkManager.GetJobLinkTipText(heroJob, jobFieldCount);
+                    // 职业技能（兵种连锁）：技能名 + 效果（当前档数值 + 下一档差异括号）
+                    string effect = JobLinkManager.GetJobLinkTipText(heroJob, jobFieldCount);
+                    skillText = string.IsNullOrEmpty(effect) ? skillConfig.Name : skillConfig.Name + "：" + effect;
+                    // 列表行：同职业英雄（无颜色）
+                    string jobList = jobHeroNames.Count > 0 ? string.Join(" ", jobHeroNames) : "";
+                    row.SetFriendSkill(heroJob + "：" + skillText, skillConfig.Icon, jobList);
                 }
                 else
                 {
-                    skillText = skillAttrStr + skillConfig.Name + skillConfig.Descript; //富文本
+                    skillText = skillConfig.Name + skillConfig.Descript; //富文本
+                    row.SetSkill(skillText, skillConfig.Icon);
                 }
-                // 图标 + 文字（含字号缩放/截断）由 TooltipHeroSkill 统一实现
-                row.SetSkill(skillText, skillConfig.Icon);
 
                 // 每行固定高度100，自上而下排列（锚定 tooltip 左上角，与当前高度无关）
                 var rowRt = (RectTransform)row.transform;
@@ -315,21 +324,17 @@ public class TooltipHero : BaseTooltip
                 string icon = "";
                 if (friendSkillCfg != null)
                 {
-                    var friendAttrStr = friendSkillCfg.IsMagic ? "<color=blue>[法]</color>" : "<color=yellow>[攻]</color>";
-                    skillText = friendAttrStr + friendSkillCfg.Name
+                    skillText = friendSkillCfg.Name
                         + JobLinkManager.GetTierDiffTipText(friendCfg.SkillId, GetFriendSkillLv(friendCfg, heroId, player));
                     icon = friendSkillCfg.Icon;
                 }
 
-                // 人员列表（1行，超出截断）
-                string listStr = "<color=green>" + friendCfg.Name + "</color>：";
+                // 人员列表（1行，超出截断），无颜色，每个名字只保留最后一个字
+                string listStr = "";
                 foreach (var hid in friendCfg.Heros)
                 {
                     var heroConfig = HeroConfig.GetConfig(hid);
-                    if (!HeroSelectionTool.HasHeroInPool(hid))
-                        listStr += "<color=#808080>" + heroConfig.Name + "</color> ";
-                    else
-                        listStr += heroConfig.Name + " ";
+                    listStr += heroConfig.Name.Substring(heroConfig.Name.Length - 1) + " ";
                 }
 
                 // 图标 + 描述(最多2行) + 列表(1行) 由好友行承载，行高固定与技能行一致
