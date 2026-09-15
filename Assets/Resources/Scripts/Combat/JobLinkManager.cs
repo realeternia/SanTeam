@@ -201,8 +201,8 @@ public static class JobLinkManager
     }
 
     /// <summary>
-    /// 生成职业羁绊的 tooltip 富文本：只显示当前档与下一档两行，
-    /// 格式"(N人) 连接英雄加成 | 我方其他英雄加成"，当前档绿色、下一档灰色。
+    /// 生成职业羁绊的 tooltip 文本（单行）：当前档数值 + 下一档不同数值（括号内），
+    /// 格式"自身暴击+17%( +25% )，全队暴击+5% (+7%)"，只显示与下一档不同的属性。
     /// 商店/排行榜等无上阵上下文（上阵0人）时默认显示1级档。
     /// </summary>
     public static string GetJobLinkTipText(string job, int fieldCount)
@@ -216,45 +216,93 @@ public static class JobLinkManager
         var activeLv = GetTierLevel(fieldCount);
         if (activeLv <= 0)
             activeLv = 1;
+        return GetTierDiffTipText(sname, activeLv);
+    }
 
-        var sb = new StringBuilder();
-        AppendTierLine(sb, sname, activeLv, true);
-        AppendTierLine(sb, sname, activeLv + 1, false);
+    /// <summary>
+    /// 档位差值文本（职业/好友连接技能共用）：当前档数值 + 下一档不同的数值（括号内），
+    /// 格式"自身暴击+17%( +25% )，全队暴击+5% (+7%)"。下一档等级超出配置时只显示当前档。
+    /// </summary>
+    public static string GetTierDiffTipText(string sname, int activeLv)
+    {
+        if (activeLv < 1)
+            activeLv = 1;
+        if (activeLv > linkTiers.Length)
+            activeLv = linkTiers.Length;
+
+        var curCfg = ConfigManager.GetSkillConfig(sname, activeLv);
+        if (curCfg == null)
+            return "";
+
+        var nextCfg = activeLv < linkTiers.Length ? ConfigManager.GetSkillConfig(sname, activeLv + 1) : null;
+        var nextSelf = nextCfg != null ? ParseBonuses(nextCfg.LinkSelf) : null;
+        var nextTeam = nextCfg != null ? ParseBonuses(nextCfg.LinkTeam) : null;
+        var nextAuro = nextCfg != null ? ParseBonuses(nextCfg.AuroAttrs) : null;
+
+        var parts = new List<string>();
+        if (!string.IsNullOrEmpty(curCfg.LinkSelf))
+            parts.Add(AttrDiffText("自身", ParseBonuses(curCfg.LinkSelf), nextSelf));
+        if (!string.IsNullOrEmpty(curCfg.LinkTeam))
+            parts.Add(AttrDiffText("全队", ParseBonuses(curCfg.LinkTeam), nextTeam));
+        if (!string.IsNullOrEmpty(curCfg.AuroAttrs))
+            parts.Add(AttrDiffText("光环:", ParseBonuses(curCfg.AuroAttrs), nextAuro));
+
+        if (parts.Count > 0)
+        {
+            // 脚本类技能（枪·眩晕/戟·AOE溅射/扇·buff延长等）同时配置属性加成与机制描述时用 " | " 并显
+            var isScriptSkill = !string.IsNullOrEmpty(curCfg.ScriptName) && curCfg.ScriptName != "Dumb";
+            if (isScriptSkill && !string.IsNullOrEmpty(curCfg.Descript))
+                parts.Add(curCfg.Descript);
+            return string.Join("，", parts.ToArray());
+        }
+        return curCfg.Descript;
+    }
+
+    // 生成一段属性差值文本：当前值 + 下一档不同值（括号内），如 "自身暴击+17%( +25% )"；
+    // 下一档新增（当前档没有）的属性以"( +值 )"追加
+    private static string AttrDiffText(string prefix, List<AttrBonus> curList, List<AttrBonus> nextList)
+    {
+        if (curList == null || curList.Count == 0)
+            return "";
+        var sb = new StringBuilder(prefix);
+        for (var i = 0; i < curList.Count; i++)
+        {
+            if (i > 0)
+                sb.Append("、");
+            var cur = curList[i];
+            sb.Append(AttrName(cur.Attr)).Append("+").Append(FormatValue(cur.Attr, cur.Value));
+            if (TryGetBonus(nextList, cur.Attr, out var next) && next.Value != cur.Value)
+                sb.Append("( +").Append(FormatValue(cur.Attr, next.Value)).Append(" )");
+        }
+        if (nextList != null)
+        {
+            foreach (var next in nextList)
+            {
+                if (TryGetBonus(curList, next.Attr, out _))
+                    continue;
+                if (sb.Length > 0)
+                    sb.Append("、");
+                sb.Append(AttrName(next.Attr)).Append("( +").Append(FormatValue(next.Attr, next.Value)).Append(" )");
+            }
+        }
         return sb.ToString();
     }
 
-    // 追加一行档位文本（isCurrent=true 绿色，否则灰色）；等级超出配置时不追加
-    private static void AppendTierLine(StringBuilder sb, string sname, int lv, bool isCurrent)
+    // 在加成列表里按属性名查找（AttrBonus 是结构体，不能与 null 比较，用返回值表示是否存在）
+    private static bool TryGetBonus(List<AttrBonus> list, string attr, out AttrBonus bonus)
     {
-        if (lv < 1 || lv > linkTiers.Length)
-            return;
-        var cfg = ConfigManager.GetSkillConfig(sname, lv);
-        if (cfg == null)
-            return;
-
-        sb.Append('\n');
-        sb.Append(isCurrent ? "<color=green>" : "<color=#808080>");
-        sb.Append('(').Append(linkTiers[lv - 1]).Append("人) ");
-        // 脚本类技能（枪·眩晕/戟·AOE溅射/炮·AOE范围/扇·负面buff延长/琴·正面buff延长等）不走属性加成：
-        // 未配置属性加成时直接展示技能描述（如 枪·眩晕 整行）；
-        // 同时配置了属性加成（扇/琴的 LinkTeam 属性 + ModifyBuffTime 机制）时，属性文本与机制描述用 " | " 并显
-        var isScriptSkill = !string.IsNullOrEmpty(cfg.ScriptName) && cfg.ScriptName != "Dumb";
-        var parts = new List<string>();
-        if (!string.IsNullOrEmpty(cfg.LinkSelf))
-            parts.Add(AttrText(ParseBonuses(cfg.LinkSelf)));
-        if (!string.IsNullOrEmpty(cfg.LinkTeam))
-            parts.Add(AttrText(ParseBonuses(cfg.LinkTeam)));
-        if (!string.IsNullOrEmpty(cfg.AuroAttrs))
-            parts.Add("光环:" + AttrText(ParseBonuses(cfg.AuroAttrs)));
-        if (parts.Count > 0)
+        bonus = default(AttrBonus);
+        if (list == null)
+            return false;
+        for (var i = 0; i < list.Count; i++)
         {
-            sb.Append(string.Join(" | ", parts.ToArray()));
-            if (isScriptSkill && !string.IsNullOrEmpty(cfg.Descript))
-                sb.Append(" | ").Append(cfg.Descript);
+            if (list[i].Attr == attr)
+            {
+                bonus = list[i];
+                return true;
+            }
         }
-        else
-            sb.Append(cfg.Descript);
-        sb.Append("</color>");
+        return false;
     }
 
     // 解析 "attr+value,attr+value" 格式的加成串（职业技能 LinkSelf/LinkTeam 与开局属性技能共用）
@@ -275,18 +323,6 @@ public static class JobLinkManager
             list.Add(new AttrBonus { Attr = seg.Substring(0, idx), Value = v });
         }
         return list;
-    }
-
-    private static string AttrText(List<AttrBonus> list)
-    {
-        var sb = new StringBuilder();
-        for (var i = 0; i < list.Count; i++)
-        {
-            if (i > 0)
-                sb.Append("、");
-            sb.Append(AttrName(list[i].Attr)).Append("+").Append(FormatValue(list[i].Attr, list[i].Value));
-        }
-        return sb.Length > 0 ? sb.ToString() : "无";
     }
 
     // 属性中文名：从 HeroAttrConfig 查询（name=JobLink属性键）；未登记的键告警并回退原始键名

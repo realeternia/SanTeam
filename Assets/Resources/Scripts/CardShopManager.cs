@@ -697,7 +697,7 @@ public class CardShopManager : MonoBehaviour
         foreach(var img in movingCardImages)
             Destroy(img);
 
-        PanelManager.Instance.GetTooltip()?.HideTooltip();
+        PanelManager.Instance.GetTooltip<BaseTooltip>()?.HideTooltip();
         PanelManager.Instance.HideShop();
         WorldManager.Instance.BattleBegin(); 
         hasEnterBattle = true;

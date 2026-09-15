@@ -127,7 +127,7 @@ public class RankCellInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandle
 
     public void OnPointerUp(PointerEventData eventData)
     {
-        PanelManager.Instance.GetTooltip()?.HideTooltip();
+        PanelManager.Instance.GetTooltip<BaseTooltip>()?.HideTooltip();
     }
 
     public void OnPointerDown(PointerEventData eventData)
@@ -156,7 +156,7 @@ public class RankCellInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandle
         var skillCfgs = ConfigManager.GetHeroSkillConfigs(heroCfg);
         if (skillCfgs.Count > 0 || friendInfo != null)
         {
-            PanelManager.Instance.GetTooltip()?.ShowTooltip(skillCfgs, friendInfo, heroId);
+            PanelManager.Instance.GetTooltip<TooltipHero>()?.ShowTooltip(skillCfgs, friendInfo, heroId);
         }
     }
 

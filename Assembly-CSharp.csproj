@@ -111,6 +111,7 @@
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffNoAction.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAttackedBuff.cs" />
     <Compile Include="Assets\Resources\Scripts\Configs\HeroFriendConfig_s.cs" />
+    <Compile Include="Assets\Resources\Scripts\UIs\TooltipHeroSkill.cs" />
     <Compile Include="Assets\Resources\Scripts\Configs\BuffConfig_s.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAttackRunCross.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAttackShieldPierce.cs" />
@@ -187,6 +188,7 @@
     <Compile Include="Assets\Epic Toon FX\Scripts\ETFXPitchRandomizer.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillManager.cs" />
     <Compile Include="Assets\Resources\Scripts\Profile.cs" />
+    <Compile Include="Assets\Resources\Scripts\UIs\TooltipHeroAttr.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillDefReduceDamageRate.cs" />
   </ItemGroup>
   <ItemGroup>

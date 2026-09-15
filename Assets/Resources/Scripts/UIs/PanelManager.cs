@@ -21,7 +21,7 @@ public class PanelManager : MonoBehaviour
     public GameObject tipNode;
 
     // Tooltip 运行时动态创建并挂到 tipNode 下（首次访问时加载，之后缓存复用）
-    private Tooltip tooltip;
+    private BaseTooltip tooltip;
 
     public List<GameObject> openPanelList;
 
@@ -34,26 +34,29 @@ public class PanelManager : MonoBehaviour
     }
 
     // 从 Resources/Prefabs 动态加载并实例化 Tooltip（挂到 tipNode 下，只创建一次）
-    public Tooltip GetTooltip()
+    // 泛型返回具体类型：填充内容用 GetTooltip<TooltipHero>()（能拿到 ShowTooltip），
+    // 仅隐藏用 GetTooltip<BaseTooltip>()（不关心具体类型，隐藏当前显示的提示）
+    public T GetTooltip<T>() where T : BaseTooltip
     {
-        if (tooltip != null)
-            return tooltip;
-        if (tipNode == null)
-        {
-            GameLog.Error("PanelManager tipNode 未在场景中配置");
-            return null;
-        }
-        var prefab = Resources.Load<GameObject>("Prefabs/ToolTipHero");
-        if (prefab == null)
-        {
-            GameLog.Error("PanelManager ToolTipHero 预制体加载失败: Prefabs/ToolTipHero");
-            return null;
-        }
-        var go = Instantiate(prefab, tipNode.transform);
-        tooltip = go.GetComponent<Tooltip>();
         if (tooltip == null)
-            GameLog.Error("PanelManager ToolTipHero 预制体上缺少 Tooltip 组件");
-        return tooltip;
+        {
+            if (tipNode == null)
+            {
+                GameLog.Error("PanelManager tipNode 未在场景中配置");
+                return null;
+            }
+            var prefab = Resources.Load<GameObject>("Prefabs/ToolTipHero");
+            if (prefab == null)
+            {
+                GameLog.Error("PanelManager ToolTipHero 预制体加载失败: Prefabs/ToolTipHero");
+                return null;
+            }
+            var go = Instantiate(prefab, tipNode.transform);
+            tooltip = go.GetComponent<TooltipHero>();
+            if (tooltip == null)
+                GameLog.Error("PanelManager ToolTipHero 预制体上缺少 TooltipHero 组件");
+        }
+        return tooltip as T;
     }
 
     // 从 Resources/Prefabs 动态加载并实例化面板（挂在当前节点下，根节点为拉伸锚点铺满全屏）

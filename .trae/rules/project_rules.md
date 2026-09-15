@@ -111,6 +111,7 @@ UI 图标统一走 `IconLoader` 组件（Inspector 配 sourceType：Path / HeroA
 - 新增 `.cs` 文件必须在 `Assembly-CSharp.csproj` 添加 `<Compile Include>`（Editor 脚本加到 `Assembly-CSharp-Editor.csproj`）
 - 新增配置类必须在 `ConfigManager.Init()` 中注册 Load
 - 禁止静默 null check return，必须记录日志
+- 禁止手工创建或修改 `.meta` 文件（含手动指定 guid / 手写 prefab 的 meta）：`.meta` 由 Unity 自动生成维护，新增资源只需落对应源文件，由 Unity 导入后自动生成 meta
 
 ## 错误处理
 

@@ -89,7 +89,7 @@ public class CardViewControl : MonoBehaviour, IPointerDownHandler, IPointerUpHan
 
     public void OnPointerUp(PointerEventData eventData)
     {
-        PanelManager.Instance.GetTooltip()?.HideTooltip();
+        PanelManager.Instance.GetTooltip<BaseTooltip>()?.HideTooltip();
     }
 
     public void OnPointerDown(PointerEventData eventData)
@@ -103,11 +103,11 @@ public class CardViewControl : MonoBehaviour, IPointerDownHandler, IPointerUpHan
         {
             var heroCfg = HeroConfig.GetConfig(cardId);
             var friendInfo = ConfigManager.GetHeroFriendInfo(cardId);
-            PanelManager.Instance.GetTooltip()?.ShowTooltip(ConfigManager.GetHeroSkillConfigs(heroCfg), friendInfo, cardId, player);
+            PanelManager.Instance.GetTooltip<TooltipHero>()?.ShowTooltip(ConfigManager.GetHeroSkillConfigs(heroCfg), friendInfo, cardId, player);
         }
         else
         {
-            PanelManager.Instance.GetTooltip()?.ShowTooltip(null, null, cardId, player);
+            PanelManager.Instance.GetTooltip<TooltipHero>()?.ShowTooltip(null, null, cardId, player);
         }
     }
 
