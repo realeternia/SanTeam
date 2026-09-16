@@ -9,6 +9,7 @@ public class TooltipHeroSkill : MonoBehaviour
     public TMP_Text textSkill;
     public Image img;
     public TMP_Text textFriend;
+    public TMP_Text textSkillLv;
 
     // 文字显示：字号相对预制体略缩小，超出截断
     private const float SkillFontScale = 0.9f;
@@ -16,8 +17,8 @@ public class TooltipHeroSkill : MonoBehaviour
     // 预制体基准字号（避免每次显示累乘缩小）
     private float skillFontBase = -1f;
 
-    // 技能行：图标 + 文本（行高度固定100，由外部排列）
-    public void SetSkill(string text, string icon)
+    // 技能行：图标 + 文本（行高度固定100，由外部排列）；level<=0 时文字置灰（显示未激活的1级效果）
+    public void SetSkill(string text, string icon, int level = 1)
     {
         img.sprite = Resources.Load<Sprite>("Textures/SkillPic/" + icon);
         img.gameObject.SetActive(true);
@@ -25,10 +26,11 @@ public class TooltipHeroSkill : MonoBehaviour
         ApplyStyle(textSkill, ref skillFontBase);
         // 技能行无人员列表，隐藏旧列表残留
         textFriend.gameObject.SetActive(false);
+        SetLevel(level);
     }
 
     // 好友组/职业技能：图标 + 技能描述(最多2行) + 人员列表(1行)；行高固定，不改布局
-    public void SetFriendSkill(string skillText, string icon, string listText)
+    public void SetFriendSkill(string skillText, string icon, string listText, int level = 1)
     {
         textSkill.text = skillText;
         ApplyStyle(textSkill, ref skillFontBase);
@@ -43,6 +45,17 @@ public class TooltipHeroSkill : MonoBehaviour
         img.gameObject.SetActive(!string.IsNullOrEmpty(icon));
         if (!string.IsNullOrEmpty(icon))
             img.sprite = Resources.Load<Sprite>("Textures/SkillPic/" + icon);
+
+        SetLevel(level);
+    }
+
+    // 等级角标与置灰：level<=0 表示未激活（技能文字已由外部填1级效果），文字置灰显示
+    private void SetLevel(int level)
+    {
+        textSkillLv.text = level.ToString();
+        bool active = level > 0;
+        textSkillLv.color = active ? Color.white : Color.gray;
+        textSkill.color = active ? Color.white : Color.gray;
     }
 
     // 文字样式：字号略缩小、超出截断

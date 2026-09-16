@@ -103,11 +103,12 @@ public class CardViewControl : MonoBehaviour, IPointerDownHandler, IPointerUpHan
         {
             var heroCfg = HeroConfig.GetConfig(cardId);
             var friendInfo = ConfigManager.GetHeroFriendInfo(cardId);
-            PanelManager.Instance.GetTooltip<TooltipHero>()?.ShowTooltip(ConfigManager.GetHeroSkillConfigs(heroCfg), friendInfo, cardId, player);
+            // 商店牌：职业技能默认显示1级
+            PanelManager.Instance.GetTooltip<TooltipHero>()?.ShowTooltip(ConfigManager.GetHeroSkillConfigs(heroCfg), friendInfo, cardId, player, true);
         }
         else
         {
-            PanelManager.Instance.GetTooltip<TooltipHero>()?.ShowTooltip(null, null, cardId, player);
+            PanelManager.Instance.GetTooltip<TooltipHero>()?.ShowTooltip(null, null, cardId, player, true);
         }
     }
 

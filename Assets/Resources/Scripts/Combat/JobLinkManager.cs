@@ -201,25 +201,6 @@ public static class JobLinkManager
     }
 
     /// <summary>
-    /// 生成职业羁绊的 tooltip 文本（单行）：当前档数值 + 下一档不同数值（括号内），
-    /// 格式"自身暴击+17%( +25% )，全队暴击+5% (+7%)"，只显示与下一档不同的属性。
-    /// 商店/排行榜等无上阵上下文（上阵0人）时默认显示1级档。
-    /// </summary>
-    public static string GetJobLinkTipText(string job, int fieldCount)
-    {
-        var jobCfg = ConfigManager.GetJobConfig(job);
-        var sname = jobCfg != null ? jobCfg.SkillId : null;
-        if (string.IsNullOrEmpty(sname))
-            return "";
-
-        // 当前档：上阵0人（商店卡等）默认取1级
-        var activeLv = GetTierLevel(fieldCount);
-        if (activeLv <= 0)
-            activeLv = 1;
-        return GetTierDiffTipText(sname, activeLv);
-    }
-
-    /// <summary>
     /// 档位差值文本（职业/好友连接技能共用）：当前档数值 + 下一档不同的数值（括号内），
     /// 格式"自身暴击+17%( +25% )，全队暴击+5% (+7%)"。下一档等级超出配置时只显示当前档。
     /// </summary>

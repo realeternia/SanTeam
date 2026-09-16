@@ -6,6 +6,10 @@ using System.Linq;
 
 public class TooltipHero : BaseTooltip
 {
+    // 英雄名字 + 等级行：tooltip 最上方显示（仅英雄卡），名字按品质上色
+    private const float NameRowHeight = 30f;
+    private TMP_Text textName;
+
     // 卡片属性显示：图标 + 属性值，一行两个（最多4个属性 = 2行）
     private const float AttrRowHeight = 40f;
     private static GameObject attrPrefab;                                           // 属性格预制体缓存
@@ -54,7 +58,8 @@ public class TooltipHero : BaseTooltip
             int row = i / 2;
             int col = i % 2;
             float baseX = 20f + col * 200f;
-            float y = -20f - row * AttrRowHeight;
+            // 属性区顶部让出名字行（名字行底 -50 起再留 15 间距，首行中心 -65）
+            float y = -20f - NameRowHeight - 15f - row * AttrRowHeight;
             var rt = (RectTransform)cell.transform;
             rt.anchorMin = new Vector2(0, 1);
             rt.anchorMax = new Vector2(0, 1);
@@ -82,6 +87,26 @@ public class TooltipHero : BaseTooltip
         desRt.sizeDelta = new Vector2(360, 30);
         textDes.gameObject.SetActive(false);
         Destroy(desGo);
+
+        // 英雄名字 + 等级行（复用属性格预制体的文字控件，tooltip 最上方，仅英雄卡显示）
+        var nameGo = Instantiate(attrPrefab, rect);
+        var nameCell = nameGo.GetComponent<TooltipHeroAttr>();
+        if (nameCell == null || nameCell.text == null)
+        {
+            GameLog.Error("TooltipHero 属性格预制体缺少 TooltipHeroAttr 组件或文字控件");
+            Destroy(nameGo);
+            return;
+        }
+        textName = nameCell.text;
+        textName.rectTransform.SetParent(rect, false);
+        var nameRt = textName.rectTransform;
+        nameRt.anchorMin = new Vector2(0, 1);
+        nameRt.anchorMax = new Vector2(0, 1);
+        nameRt.pivot = new Vector2(0, 1);
+        nameRt.anchoredPosition = new Vector2(15, -10);
+        nameRt.sizeDelta = new Vector2(360, NameRowHeight);
+        textName.gameObject.SetActive(false);
+        Destroy(nameGo);
     }
 
     // 取第 index 个好友行（ToolTipHeroSkill.prefab 实例，按需创建扩容）
@@ -136,18 +161,31 @@ public class TooltipHero : BaseTooltip
         return skillRows[index];
     }
 
-    public void ShowTooltip(List<SkillConfig> skillCfgs, HashSet<int> friendInfo, int heroId, PlayerInfo player = null)
+    // 排列技能/好友行：锚定 tooltip 左上角，每行固定高度100，自上而下排列；返回累加后的Y
+    private float LayoutRow(TooltipHeroSkill row, float currentY)
+    {
+        var rowRt = (RectTransform)row.transform;
+        rowRt.anchorMin = new Vector2(0, 1);
+        rowRt.anchorMax = new Vector2(0, 1);
+        rowRt.pivot = new Vector2(0.5f, 0.5f);
+        rowRt.anchoredPosition = new Vector2(250, -currentY - SkillRowHeight * 0.5f);
+        return currentY + SkillRowHeight;
+    }
+
+    public void ShowTooltip(List<SkillConfig> skillCfgs, HashSet<int> friendInfo, int heroId, PlayerInfo player = null, bool isShopCard = false)
     {
         bool hasSkill = skillCfgs != null && skillCfgs.Count > 0;
         bool hasFriend = friendInfo != null && friendInfo.Count > 0;
 
+        // 卡片等级：在身上时=卡片等级（可能超5，普通技能显示时截断到5）；商店/排行榜默认1级
+        int cardLv = 1;
         // 属性取值与战斗统一：HeroConfig 数值经 PostModify 写回为 1星带品质面板（四主），星级成长走 GetCardAttr
         AttrInfo attr;
         if (player != null)
         {
             int exp = player.cards.TryGetValue(heroId, out int e) ? e : 1;
-            int lv = HeroSelectionTool.GetCardLevel(exp, ConfigManager.IsHeroCard(heroId));
-            attr = HeroSelectionTool.GetCardAttr(player, heroId, lv);
+            cardLv = HeroSelectionTool.GetCardLevel(exp, ConfigManager.IsHeroCard(heroId));
+            attr = HeroSelectionTool.GetCardAttr(player, heroId, cardLv);
         }
         else
         {
@@ -201,6 +239,22 @@ public class TooltipHero : BaseTooltip
         }
         attrRows = (shownAttr + 1) / 2;
 
+        // 英雄名字 + 等级行（仅英雄卡显示，名字按品质上色；等级=卡片等级）
+        if (textName != null)
+        {
+            if (isHero)
+            {
+                var heroCfg = HeroConfig.GetConfig(heroId);
+                string nameHex = ColorUtility.ToHtmlStringRGB(SysColor.GetQualityColor(heroCfg.Quality));
+                textName.text = "<color=#" + nameHex + ">" + heroCfg.Name + "</color> Lv" + cardLv;
+                textName.gameObject.SetActive(true);
+            }
+            else
+            {
+                textName.gameObject.SetActive(false);
+            }
+        }
+
         // 道具卡：显示道具描述（属性区下方）
         bool isItem = !ConfigManager.IsHeroCard(heroId);
         string itemDes = null;
@@ -219,7 +273,7 @@ public class TooltipHero : BaseTooltip
             return;
         }
 
-        float currentY = 10f + attrRows * AttrRowHeight; // 起始Y位置（属性区下方）
+        float currentY = 10f + NameRowHeight + 15f + attrRows * AttrRowHeight; // 起始Y位置（名字行 + 属性区下方）
         float spacing = 5f;   // 控件间距
 
         if (hasDes)
@@ -244,7 +298,7 @@ public class TooltipHero : BaseTooltip
             // 职业技能行：档位按当前上阵同职业人数（与战斗连锁一致）；列表行显示配置表里所有同职业英雄
             int jobFieldCount = 0;
             string heroJob = null;
-            var jobHeroNames = new List<string>();
+            var jobHeroIds = new List<int>();
             if (isHero)
             {
                 heroJob = HeroConfig.GetConfig(heroId).Job;
@@ -257,11 +311,11 @@ public class TooltipHero : BaseTooltip
                             jobFieldCount++;
                     }
                 }
-                // 列表：配置表里所有同职业英雄（无颜色，名字只保留最后一个字）
+                // 列表：配置表里所有同职业英雄（不含自己）
                 foreach (var cfg in HeroConfig.ConfigList)
                 {
                     if (cfg.Id != heroId && cfg.Job == heroJob)
-                        jobHeroNames.Add(cfg.Name.Substring(cfg.Name.Length - 1));
+                        jobHeroIds.Add(cfg.Id);
                 }
             }
 
@@ -276,25 +330,27 @@ public class TooltipHero : BaseTooltip
                 if (skillConfig.Type == "职业")
                 {
                     // 职业技能（兵种连锁）：技能名 + 效果（当前档数值 + 下一档差异括号）
-                    string effect = JobLinkManager.GetJobLinkTipText(heroJob, jobFieldCount);
-                    skillText = string.IsNullOrEmpty(effect) ? skillConfig.Name : skillConfig.Name + "：" + effect;
-                    // 列表行：同职业英雄（无颜色）
-                    string jobList = jobHeroNames.Count > 0 ? string.Join(" ", jobHeroNames) : "";
-                    row.SetFriendSkill(heroJob + "：" + skillText, skillConfig.Icon, jobList);
+                    // 等级：商店牌默认1级；背包按上阵同职业人数（0级时显示1级效果并置灰）
+                    int jobLv = isShopCard || player == null ? 1 : jobFieldCount;
+                    // 内联原 GetJobLinkTipText：取职业配置的 SkillId 作技能缩写名，查当前档与下一档差值文本
+                    var jobCfg = ConfigManager.GetJobConfig(heroJob);
+                    string effect = jobCfg == null || string.IsNullOrEmpty(jobCfg.SkillId)
+                        ? "" : JobLinkManager.GetTierDiffTipText(jobCfg.SkillId, jobLv);
+                    skillText = string.IsNullOrEmpty(effect) ? skillConfig.Name : skillConfig.Name + " " + effect;
+                    // 列表行：同职业英雄（按品质倒排；商店全部按品质上色，背包仅上阵的上色）
+                    string jobList = BuildHeroNameList(jobHeroIds, player, isShopCard);
+                    row.SetFriendSkill(skillText, skillConfig.Icon, jobList, jobLv);
                 }
                 else
                 {
                     skillText = skillConfig.Name + skillConfig.Descript; //富文本
-                    row.SetSkill(skillText, skillConfig.Icon);
+                    // 非职业等级：在身上时等级=卡片等级（最高5）；商店/排行榜默认1级
+                    int skillLv = player != null ? Mathf.Min(cardLv, 5) : 1;
+                    row.SetSkill(skillText, skillConfig.Icon, skillLv);
                 }
 
-                // 每行固定高度100，自上而下排列（锚定 tooltip 左上角，与当前高度无关）
-                var rowRt = (RectTransform)row.transform;
-                rowRt.anchorMin = new Vector2(0, 1);
-                rowRt.anchorMax = new Vector2(0, 1);
-                rowRt.pivot = new Vector2(0.5f, 0.5f);
-                rowRt.anchoredPosition = new Vector2(250, -currentY - SkillRowHeight * 0.5f);
-                currentY += SkillRowHeight;
+                // 每行固定高度100，自上而下排列
+                currentY = LayoutRow(row, currentY);
             }
         }
         
@@ -322,29 +378,21 @@ public class TooltipHero : BaseTooltip
                 var friendSkillCfg = !string.IsNullOrEmpty(friendCfg.SkillId) ? ConfigManager.GetSkillConfig(friendCfg.SkillId, 1) : null;
                 string skillText = "";
                 string icon = "";
+                int friendLv = 1;
                 if (friendSkillCfg != null)
                 {
-                    skillText = friendSkillCfg.Name
-                        + JobLinkManager.GetTierDiffTipText(friendCfg.SkillId, GetFriendSkillLv(friendCfg, heroId, player));
+                    // 商店牌默认1级；排行榜无上下文也默认1级；背包按在场成员数（可为0级置灰）
+                    friendLv = isShopCard || player == null ? 1 : GetFriendSkillLv(friendCfg, heroId, player);
+                    skillText = friendSkillCfg.Name + " " + JobLinkManager.GetTierDiffTipText(friendCfg.SkillId, friendLv);
                     icon = friendSkillCfg.Icon;
                 }
 
-                // 人员列表（1行，超出截断），无颜色，每个名字只保留最后一个字
-                string listStr = "";
-                foreach (var hid in friendCfg.Heros)
-                {
-                    var heroConfig = HeroConfig.GetConfig(hid);
-                    listStr += heroConfig.Name.Substring(heroConfig.Name.Length - 1) + " ";
-                }
+                // 人员列表（1行，超出截断）：按品质倒排；商店全部按品质上色，背包仅上阵的上色
+                string listStr = BuildHeroNameList(friendCfg.Heros, player, isShopCard);
 
                 // 图标 + 描述(最多2行) + 列表(1行) 由好友行承载，行高固定与技能行一致
-                row.SetFriendSkill(skillText, icon, listStr);
-                var rowRt = (RectTransform)row.transform;
-                rowRt.anchorMin = new Vector2(0, 1);
-                rowRt.anchorMax = new Vector2(0, 1);
-                rowRt.pivot = new Vector2(0.5f, 0.5f);
-                rowRt.anchoredPosition = new Vector2(250, -currentY - SkillRowHeight * 0.5f);
-                currentY += SkillRowHeight;
+                row.SetFriendSkill(skillText, icon, listStr, friendLv);
+                currentY = LayoutRow(row, currentY);
                 idx++;
             }
         }
@@ -357,8 +405,8 @@ public class TooltipHero : BaseTooltip
         Show();
     }
 
-    // 好友连接技能当前档位：该关系组在场（上阵）成员数（不含自己），与战斗规则一致；
-    // 无玩家上下文（排行榜）或未达标时默认显示1级档
+    // 好友连接技能当前档位：等级=该关系组在场（上阵）成员数（不含自己），可为0级；
+    // 0级时文本仍按1级档显示（GetTierDiffTipText 内部钳制），等级角标置灰表示未激活
     private static int GetFriendSkillLv(HeroFriendConfig friendCfg, int heroId, PlayerInfo player)
     {
         int present = 0;
@@ -370,8 +418,30 @@ public class TooltipHero : BaseTooltip
                     present++;
             }
         }
-        int lv = CombatConst.FriendSpecialBaseLevel + present;
-        return lv < 1 ? 1 : lv;
+        return CombatConst.FriendSpecialBaseLevel + present;
+    }
+
+    // 拼英雄名字列表（职业/好友列表共用）：按品质倒排（同品质保持原顺序），名字只保留最后一个字；
+    // 商店牌：全部名字按品质上色；背包：只有上阵（battleCards 内）的按品质上色，未上阵的保持默认色
+    private static string BuildHeroNameList(IEnumerable<int> heroIds, PlayerInfo player, bool isShopCard)
+    {
+        var valid = new List<int>();
+        foreach (var hid in heroIds)
+        {
+            if (HeroConfig.GetConfig(hid) != null)
+                valid.Add(hid);
+        }
+
+        var parts = new List<string>();
+        foreach (var hid in valid.OrderByDescending(id => HeroConfig.GetConfig(id).Quality))
+        {
+            var cfg = HeroConfig.GetConfig(hid);
+            string name = cfg.Name.Substring(cfg.Name.Length - 1);
+            if (isShopCard || (player != null && player.battleCards.Contains(hid)))
+                name = "<color=#" + ColorUtility.ToHtmlStringRGB(SysColor.GetQualityColor(cfg.Quality)) + ">" + name + "</color>";
+            parts.Add(name);
+        }
+        return string.Join(" ", parts);
     }
 
     // 道具属性行：键值按配置输出，比例属性（攻速/暴击）带 % 后缀，其余直接显示数值
