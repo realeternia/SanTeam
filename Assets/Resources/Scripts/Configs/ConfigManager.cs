@@ -341,4 +341,41 @@ public static class ConfigManager
         }
         return null;
     }
+
+    // 技能完整描述：Lv1 的 Descript 为模板（占位符/1 /2...），用当前等级行 DescriptVal（;分隔）按顺序替换拼出；
+    // 非 Lv1 行 Descript 通常为空（取 Lv1 模板+本级参数）；结构无法用模板表达的技能（如机巧/炮车）各等级行直接填完整 Descript，无占位符时原样返回。
+    // withNext=true 为"当前+下一级"模式：每个参数位后附下一级不同值（括号内、淡绿色，相同则不附），如"自身生命+10%(+20%)"；供职业/好友连接技能档位提示使用
+    public static string GetSkillDescript(SkillConfig cfg, bool withNext = false)
+    {
+        if (cfg == null)
+            return "";
+        var templateCfg = cfg;
+        if (string.IsNullOrEmpty(cfg.Descript))
+            templateCfg = GetSkillConfig(cfg.Sname, 1) ?? cfg;
+        if (templateCfg == null || string.IsNullOrEmpty(templateCfg.Descript))
+            return "";
+        // 无参数：模板即完整文案（全同文案/结构兜底技能），下一级没有参数位可比，直接返回
+        if (string.IsNullOrEmpty(cfg.DescriptVal))
+            return templateCfg.Descript;
+
+        string[] nextVals = null;
+        if (withNext)
+        {
+            var nextCfg = GetSkillConfig(cfg.Sname, cfg.Lv + 1);
+            if (nextCfg != null && !string.IsNullOrEmpty(nextCfg.DescriptVal))
+                nextVals = nextCfg.DescriptVal.Split(';');
+        }
+
+        var vals = cfg.DescriptVal.Split(';');
+        var desc = templateCfg.Descript;
+        for (int i = 0; i < vals.Length; i++)
+        {
+            var cur = vals[i];
+            var rep = cur;
+            if (nextVals != null && i < nextVals.Length && nextVals[i] != cur)
+                rep = cur + SysColor.ColorText("(" + nextVals[i] + ")", SysColor.UI.NextLv);
+            desc = desc.Replace("/" + (i + 1), rep);
+        }
+        return desc;
+    }
 }

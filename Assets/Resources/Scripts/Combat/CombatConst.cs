@@ -30,6 +30,8 @@ public static class CombatConst
     public static readonly float[] FactionShieldRates = { 0.15f, 0.30f, 0.45f, 0.60f, 0.75f };
     /// <summary>护盾持续时间(整场战斗)</summary>
     public const float FactionShieldTime = 999f;
+    /// <summary>国家护盾展示技能缩写（SkillConfig 2000001~2000005，仅供羁绊提示显示，Lv=同阵营人数-1）</summary>
+    public const string FactionShieldSkillSname = "国";
 
 
     /// <summary>主公(王/王)上阵：同阵营护盾额外加成（百分比）</summary>

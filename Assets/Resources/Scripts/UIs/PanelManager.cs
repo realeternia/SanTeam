@@ -21,6 +21,7 @@ public class PanelManager : MonoBehaviour
     public GameObject tipNode;
 
     // Tooltip 运行时动态创建并挂到 tipNode 下（首次访问时加载，之后缓存复用）
+    // 英雄/羁绊提示共用同一缓存：两者不会同时显示，新的创建前会隐藏旧的
     private BaseTooltip tooltip;
 
     public List<GameObject> openPanelList;
@@ -33,30 +34,43 @@ public class PanelManager : MonoBehaviour
         ShowPick();
     }
 
-    // 从 Resources/Prefabs 动态加载并实例化 Tooltip（挂到 tipNode 下，只创建一次）
-    // 泛型返回具体类型：填充内容用 GetTooltip<TooltipHero>()（能拿到 ShowTooltip），
-    // 仅隐藏用 GetTooltip<BaseTooltip>()（不关心具体类型，隐藏当前显示的提示）
+    // 从 Resources/Prefabs 动态加载并实例化 Tooltip（挂到 tipNode 下，每种只创建一次）
+    // 泛型返回具体类型：填充内容用 GetTooltip<TooltipHero>() / GetTooltip<TooltipFriend>()（能拿到 ShowTooltip），
+    // 仅隐藏用 GetTooltip<BaseTooltip>()（返回当前缓存的提示，不关心具体类型）
     public T GetTooltip<T>() where T : BaseTooltip
     {
-        if (tooltip == null)
+        // 仅隐藏用：直接返回当前缓存的提示
+        if (typeof(T) == typeof(BaseTooltip))
+            return tooltip as T;
+        // 填充用：缓存类型不匹配时重建并隐藏旧的（英雄/羁绊复用同一缓存，两者不会同时显示）
+        if (tooltip == null || !(tooltip is T))
         {
-            if (tipNode == null)
-            {
-                GameLog.Error("PanelManager tipNode 未在场景中配置");
-                return null;
-            }
-            var prefab = Resources.Load<GameObject>("Prefabs/ToolTipHero");
-            if (prefab == null)
-            {
-                GameLog.Error("PanelManager ToolTipHero 预制体加载失败: Prefabs/ToolTipHero");
-                return null;
-            }
-            var go = Instantiate(prefab, tipNode.transform);
-            tooltip = go.GetComponent<TooltipHero>();
-            if (tooltip == null)
-                GameLog.Error("PanelManager ToolTipHero 预制体上缺少 TooltipHero 组件");
+            if (tooltip != null)
+                tooltip.HideTooltip();
+            tooltip = CreateTooltip(typeof(T) == typeof(TooltipFriend) ? "ToolTipFriend" : "ToolTipHero");
         }
         return tooltip as T;
+    }
+
+    // 加载指定 Tooltip 预制体并实例化到 tipNode 下
+    private BaseTooltip CreateTooltip(string prefabName)
+    {
+        if (tipNode == null)
+        {
+            GameLog.Error("PanelManager tipNode 未在场景中配置");
+            return null;
+        }
+        var prefab = Resources.Load<GameObject>("Prefabs/" + prefabName);
+        if (prefab == null)
+        {
+            GameLog.Error($"PanelManager {prefabName} 预制体加载失败: Prefabs/{prefabName}");
+            return null;
+        }
+        var go = Instantiate(prefab, tipNode.transform);
+        var comp = go.GetComponent<BaseTooltip>();
+        if (comp == null)
+            GameLog.Error($"PanelManager {prefabName} 预制体上缺少 Tooltip 组件");
+        return comp;
     }
 
     // 从 Resources/Prefabs 动态加载并实例化面板（挂在当前节点下，根节点为拉伸锚点铺满全屏）

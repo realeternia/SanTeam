@@ -146,7 +146,7 @@ public class MySelectControl : MonoBehaviour
     // 职业：等级=上阵人数（1人=Lv1）；好友/国家：等级=人数-1（1人=0级，2人=Lv1起，最多5级）
     private void ShowBondCards(PlayerInfo checkPlayer)
     {
-        var entries = new List<BondEntry>();
+        var entries = new List<BondTipData>();
 
         // 统计上阵英雄卡（羁绊按上阵阵容 battleCards 统计）
         var battleHeroes = new List<int>();
@@ -156,33 +156,57 @@ public class MySelectControl : MonoBehaviour
                 battleHeroes.Add(id);
         }
 
-        // 职业羁绊：同职业人数即等级，名字取 JobConfig.NameS
-        var jobCounts = new Dictionary<string, int>();
+        // 职业羁绊：同职业人数即等级，名字取 JobConfig.NameS；同时记录该职业当前上阵的英雄（点击提示用）
+        var jobHeroes = new Dictionary<string, List<int>>();
         foreach (var id in battleHeroes)
         {
             var job = HeroConfig.GetConfig(id).Job;
-            jobCounts.TryGetValue(job, out var c);
-            jobCounts[job] = c + 1;
+            if (!jobHeroes.TryGetValue(job, out var list))
+            {
+                list = new List<int>();
+                jobHeroes[job] = list;
+            }
+            list.Add(id);
         }
-        foreach (var kv in jobCounts)
+        // 该职业全部英雄（提示列表参考 TooltipHero 职业列表：显示所有同职业英雄，上阵的按品质上色）
+        var jobAllHeroes = new Dictionary<string, List<int>>();
+        foreach (var cfg in HeroConfig.ConfigList)
+        {
+            if (!jobAllHeroes.TryGetValue(cfg.Job, out var list))
+            {
+                list = new List<int>();
+                jobAllHeroes[cfg.Job] = list;
+            }
+            list.Add(cfg.Id);
+        }
+        foreach (var kv in jobHeroes)
         {
             var jobCfg = ConfigManager.GetJobConfig(kv.Key);
             if (jobCfg == null)
                 continue;
-            entries.Add(new BondEntry { Name = jobCfg.Name, Count = kv.Value, Icon = GetSkillIcon(jobCfg.SkillId) });
+            entries.Add(new BondTipData
+            {
+                Kind = BondKind.Job,
+                Name = jobCfg.Name,
+                Level = kv.Value.Count,
+                Icon = GetSkillIcon(jobCfg.SkillId),
+                SkillId = jobCfg.SkillId,
+                HeroIds = jobAllHeroes.TryGetValue(kv.Key, out var all) ? all : kv.Value,
+                Player = checkPlayer,
+            });
         }
 
         // 好友羁绊：HeroFriendConfig.Heros 中拥有英雄数即人数，等级=人数-1（1人=0级）；
         // 普通组无特殊技能则不显示图标；配置了 LineColor 的组用该颜色作为文字前景色
         foreach (var friendCfg in HeroFriendConfig.ConfigList)
         {
-            var present = 0;
+            var present = new List<int>();
             foreach (var memberId in friendCfg.Heros)
             {
                 if (battleHeroes.Contains(memberId))
-                    present++;
+                    present.Add(memberId);
             }
-            if (present <= 0)
+            if (present.Count <= 0)
                 continue;
 
             Color? lineColor = null;
@@ -191,11 +215,21 @@ public class MySelectControl : MonoBehaviour
                 if (ColorUtility.TryParseHtmlString(friendCfg.LineColor, out var parsed))
                     lineColor = parsed;
             }
-            entries.Add(new BondEntry { Name = friendCfg.Name, Count = present - 1, Icon = GetSkillIcon(friendCfg.SkillId), Color = lineColor });
+            entries.Add(new BondTipData
+            {
+                Kind = BondKind.Friend,
+                Name = friendCfg.Name,
+                Level = present.Count - 1,
+                Icon = GetSkillIcon(friendCfg.SkillId),
+                Color = lineColor,
+                SkillId = friendCfg.SkillId,
+                HeroIds = new List<int>(friendCfg.Heros), // 提示列表显示该好友组全部成员，上阵的按品质上色
+                Player = checkPlayer,
+            });
         }
 
         // 国家势力：按上阵英雄阵营计数；不参与同阵营护盾(野=10)或图标为空的国家跳过；
-        // 等级=同阵营人数-1（1人=0级）
+        // 等级=同阵营人数-1（1人=0级）；技能为护盾展示技能（图标用国家图标，点击提示不显示人员列表）
         var forceCounts = new Dictionary<int, int>();
         foreach (var id in battleHeroes)
         {
@@ -209,11 +243,26 @@ public class MySelectControl : MonoBehaviour
             if (forceCfg == null || !forceCfg.JoinFactionShield)
                 continue;
 
-            entries.Add(new BondEntry { Name = forceCfg.Name, Count = kv.Value - 1, Icon = "Textures/Icons/" + forceCfg.Icon });
+            var sideHeroes = new List<int>();
+            foreach (var id in battleHeroes)
+            {
+                if (HeroConfig.GetConfig(id).Side == kv.Key)
+                    sideHeroes.Add(id);
+            }
+            entries.Add(new BondTipData
+            {
+                Kind = BondKind.Force,
+                Name = forceCfg.Name,
+                Level = kv.Value - 1,
+                Icon = "Textures/Icons/" + forceCfg.Icon,
+                SkillId = CombatConst.FactionShieldSkillSname,
+                HeroIds = sideHeroes,
+                Player = checkPlayer,
+            });
         }
 
         // 羁绊人数倒序排序
-        entries.Sort((a, b) => b.Count.CompareTo(a.Count));
+        entries.Sort((a, b) => b.Level.CompareTo(a.Level));
 
         var existingTexts = new List<SelectCardNodeControl>(GetComponentsInChildren<SelectCardNodeControl>());
         int i = 0;
@@ -221,7 +270,7 @@ public class MySelectControl : MonoBehaviour
         {
             var selectNode = GetOrCreateNode(existingTexts, i);
             selectNode.cardId = 0;
-            selectNode.UpdateBond(entry.Count + entry.Name, entry.Icon, entry.Color);
+            selectNode.UpdateBond(entry);
             i++;
         }
         for (int j = i; j < existingTexts.Count; j++)
@@ -263,13 +312,5 @@ public class MySelectControl : MonoBehaviour
             return "";
         var cfg = ConfigManager.GetSkillConfig(sname);
         return cfg != null ? cfg.Icon : "";
-    }
-
-    private struct BondEntry
-    {
-        public string Name;
-        public int Count;
-        public string Icon;
-        public Color? Color;
     }
 }

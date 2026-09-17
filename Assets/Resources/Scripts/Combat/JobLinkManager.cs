@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Text;
 using CommonConfig;
 using UnityEngine;
 
@@ -201,90 +200,9 @@ public static class JobLinkManager
     }
 
     /// <summary>
-    /// 档位差值文本（职业/好友连接技能共用）：当前档数值 + 下一档不同的数值（括号内），
-    /// 格式"自身暴击+17%( +25% )，全队暴击+5% (+7%)"。下一档等级超出配置时只显示当前档。
+    /// 档位差值文本已移除：职业/好友连接技能档位展示统一走 ConfigManager.GetSkillDescript(cfg, withNext:true)，
+    /// 由 Lv1 模板 + 本级 DescriptVal 拼出当前档描述，每个参数位附下一档不同值（括号内），如"自身生命+10%(+20%)"。
     /// </summary>
-    public static string GetTierDiffTipText(string sname, int activeLv)
-    {
-        if (activeLv < 1)
-            activeLv = 1;
-        if (activeLv > linkTiers.Length)
-            activeLv = linkTiers.Length;
-
-        var curCfg = ConfigManager.GetSkillConfig(sname, activeLv);
-        if (curCfg == null)
-            return "";
-
-        var nextCfg = activeLv < linkTiers.Length ? ConfigManager.GetSkillConfig(sname, activeLv + 1) : null;
-        var nextSelf = nextCfg != null ? ParseBonuses(nextCfg.LinkSelf) : null;
-        var nextTeam = nextCfg != null ? ParseBonuses(nextCfg.LinkTeam) : null;
-        var nextAuro = nextCfg != null ? ParseBonuses(nextCfg.AuroAttrs) : null;
-
-        var parts = new List<string>();
-        if (!string.IsNullOrEmpty(curCfg.LinkSelf))
-            parts.Add(AttrDiffText("自身", ParseBonuses(curCfg.LinkSelf), nextSelf));
-        if (!string.IsNullOrEmpty(curCfg.LinkTeam))
-            parts.Add(AttrDiffText("全队", ParseBonuses(curCfg.LinkTeam), nextTeam));
-        if (!string.IsNullOrEmpty(curCfg.AuroAttrs))
-            parts.Add(AttrDiffText("光环:", ParseBonuses(curCfg.AuroAttrs), nextAuro));
-
-        if (parts.Count > 0)
-        {
-            // 脚本类技能（枪·眩晕/戟·AOE溅射/扇·buff延长等）同时配置属性加成与机制描述时用 " | " 并显
-            var isScriptSkill = !string.IsNullOrEmpty(curCfg.ScriptName) && curCfg.ScriptName != "Dumb";
-            if (isScriptSkill && !string.IsNullOrEmpty(curCfg.Descript))
-                parts.Add(curCfg.Descript);
-            return string.Join("，", parts.ToArray());
-        }
-        return curCfg.Descript;
-    }
-
-    // 生成一段属性差值文本：当前值 + 下一档不同值（括号内），如 "自身暴击+17%( +25% )"；
-    // 下一档新增（当前档没有）的属性以"( +值 )"追加
-    private static string AttrDiffText(string prefix, List<AttrBonus> curList, List<AttrBonus> nextList)
-    {
-        if (curList == null || curList.Count == 0)
-            return "";
-        var sb = new StringBuilder(prefix);
-        for (var i = 0; i < curList.Count; i++)
-        {
-            if (i > 0)
-                sb.Append("、");
-            var cur = curList[i];
-            sb.Append(AttrName(cur.Attr)).Append("+").Append(FormatValue(cur.Attr, cur.Value));
-            if (TryGetBonus(nextList, cur.Attr, out var next) && next.Value != cur.Value)
-                sb.Append("( +").Append(FormatValue(cur.Attr, next.Value)).Append(" )");
-        }
-        if (nextList != null)
-        {
-            foreach (var next in nextList)
-            {
-                if (TryGetBonus(curList, next.Attr, out _))
-                    continue;
-                if (sb.Length > 0)
-                    sb.Append("、");
-                sb.Append(AttrName(next.Attr)).Append("( +").Append(FormatValue(next.Attr, next.Value)).Append(" )");
-            }
-        }
-        return sb.ToString();
-    }
-
-    // 在加成列表里按属性名查找（AttrBonus 是结构体，不能与 null 比较，用返回值表示是否存在）
-    private static bool TryGetBonus(List<AttrBonus> list, string attr, out AttrBonus bonus)
-    {
-        bonus = default(AttrBonus);
-        if (list == null)
-            return false;
-        for (var i = 0; i < list.Count; i++)
-        {
-            if (list[i].Attr == attr)
-            {
-                bonus = list[i];
-                return true;
-            }
-        }
-        return false;
-    }
 
     // 解析 "attr+value,attr+value" 格式的加成串（职业技能 LinkSelf/LinkTeam 与开局属性技能共用）
     internal static List<AttrBonus> ParseBonuses(string str)
@@ -304,33 +222,6 @@ public static class JobLinkManager
             list.Add(new AttrBonus { Attr = seg.Substring(0, idx), Value = v });
         }
         return list;
-    }
-
-    // 属性中文名：从 HeroAttrConfig 查询（name=JobLink属性键）；未登记的键告警并回退原始键名
-    private static string AttrName(string attr)
-    {
-        try
-        {
-            return HeroAttrConfig.GetConfigByname(attr).Cname;
-        }
-        catch (KeyNotFoundException)
-        {
-            GameLog.Warn("JobLink 属性键未配置中文名 attr=" + attr);
-            return attr;
-        }
-    }
-
-    private static string FormatValue(string attr, float v)
-    {
-        // 百分比类属性：v为比例值（0.1=10%）
-        if (attr == "critRate" || attr == "soldierAtk" || attr == "soldierHp"
-            || attr == "dodgeRate" || attr == "critDamageMulti"
-            || attr == "healRate" || attr == "healedRate"
-            || attr == "auroEffectRate")
-            return Mathf.RoundToInt(v * 100) + "%";
-        if (v < 1f)
-            return v.ToString("0.##");
-        return ((int)v).ToString();
     }
 
     // 属性施加（职业技能 LinkSelf/LinkTeam 与开局属性技能共用）

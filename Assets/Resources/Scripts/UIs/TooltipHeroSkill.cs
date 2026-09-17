@@ -41,10 +41,10 @@ public class TooltipHeroSkill : MonoBehaviour
         if (hasList)
             textFriend.text = listText;
 
-        // 图标：无图标（无连接技能）时隐藏
+        // 图标：无图标（无连接技能）时隐藏；带路径的图标（如国家 Textures/Icons/xxx）直接加载，否则按技能图标 SkillPic/ 前缀
         img.gameObject.SetActive(!string.IsNullOrEmpty(icon));
         if (!string.IsNullOrEmpty(icon))
-            img.sprite = Resources.Load<Sprite>("Textures/SkillPic/" + icon);
+            img.sprite = Resources.Load<Sprite>(icon.Contains("/") ? icon : "Textures/SkillPic/" + icon);
 
         SetLevel(level);
     }

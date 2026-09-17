@@ -329,13 +329,17 @@ public class TooltipHero : BaseTooltip
                 string skillText;
                 if (skillConfig.Type == "职业")
                 {
-                    // 职业技能（兵种连锁）：技能名 + 效果（当前档数值 + 下一档差异括号）
+                    // 职业技能（兵种连锁）：技能名 + 效果（当前档描述 + 下一档不同描述括号）
                     // 等级：商店牌默认1级；背包按上阵同职业人数（0级时显示1级效果并置灰）
-                    int jobLv = isShopCard || player == null ? 1 : jobFieldCount;
-                    // 内联原 GetJobLinkTipText：取职业配置的 SkillId 作技能缩写名，查当前档与下一档差值文本
+                    int jobLv = isShopCard || player == null ? 1 : Mathf.Max(1, jobFieldCount);
                     var jobCfg = ConfigManager.GetJobConfig(heroJob);
-                    string effect = jobCfg == null || string.IsNullOrEmpty(jobCfg.SkillId)
-                        ? "" : JobLinkManager.GetTierDiffTipText(jobCfg.SkillId, jobLv);
+                    string effect = "";
+                    if (jobCfg != null && !string.IsNullOrEmpty(jobCfg.SkillId))
+                    {
+                        var jobSkillCfg = ConfigManager.GetSkillConfig(jobCfg.SkillId, jobLv);
+                        if (jobSkillCfg != null)
+                            effect = ConfigManager.GetSkillDescript(jobSkillCfg, true);
+                    }
                     skillText = string.IsNullOrEmpty(effect) ? skillConfig.Name : skillConfig.Name + " " + effect;
                     // 列表行：同职业英雄（按品质倒排；商店全部按品质上色，背包仅上阵的上色）
                     string jobList = BuildHeroNameList(jobHeroIds, player, isShopCard);
@@ -343,7 +347,7 @@ public class TooltipHero : BaseTooltip
                 }
                 else
                 {
-                    skillText = skillConfig.Name + skillConfig.Descript; //富文本
+                    skillText = skillConfig.Name + ConfigManager.GetSkillDescript(skillConfig); //富文本
                     // 非职业等级：在身上时等级=卡片等级（最高5）；商店/排行榜默认1级
                     int skillLv = player != null ? Mathf.Min(cardLv, 5) : 1;
                     row.SetSkill(skillText, skillConfig.Icon, skillLv);
@@ -375,15 +379,15 @@ public class TooltipHero : BaseTooltip
                 row.gameObject.SetActive(true);
 
                 // 技能描述（最多2行，超出截断）+ 图标
-                var friendSkillCfg = !string.IsNullOrEmpty(friendCfg.SkillId) ? ConfigManager.GetSkillConfig(friendCfg.SkillId, 1) : null;
+                int friendLv = isShopCard || player == null ? 1 : GetFriendSkillLv(friendCfg, heroId, player);
                 string skillText = "";
                 string icon = "";
-                int friendLv = 1;
+                var friendSkillCfg = !string.IsNullOrEmpty(friendCfg.SkillId)
+                    ? ConfigManager.GetSkillConfig(friendCfg.SkillId, Mathf.Max(1, friendLv)) : null;
                 if (friendSkillCfg != null)
                 {
                     // 商店牌默认1级；排行榜无上下文也默认1级；背包按在场成员数（可为0级置灰）
-                    friendLv = isShopCard || player == null ? 1 : GetFriendSkillLv(friendCfg, heroId, player);
-                    skillText = friendSkillCfg.Name + " " + JobLinkManager.GetTierDiffTipText(friendCfg.SkillId, friendLv);
+                    skillText = friendSkillCfg.Name + " " + ConfigManager.GetSkillDescript(friendSkillCfg, true);
                     icon = friendSkillCfg.Icon;
                 }
 
@@ -406,7 +410,7 @@ public class TooltipHero : BaseTooltip
     }
 
     // 好友连接技能当前档位：等级=该关系组在场（上阵）成员数（不含自己），可为0级；
-    // 0级时文本仍按1级档显示（GetTierDiffTipText 内部钳制），等级角标置灰表示未激活
+    // 0级时文本仍按1级档显示（调用处 Mathf.Max(1, lv) 钳制），等级角标置灰表示未激活
     private static int GetFriendSkillLv(HeroFriendConfig friendCfg, int heroId, PlayerInfo player)
     {
         int present = 0;
@@ -423,7 +427,8 @@ public class TooltipHero : BaseTooltip
 
     // 拼英雄名字列表（职业/好友列表共用）：按品质倒排（同品质保持原顺序），名字只保留最后一个字；
     // 商店牌：全部名字按品质上色；背包：只有上阵（battleCards 内）的按品质上色，未上阵的保持默认色
-    private static string BuildHeroNameList(IEnumerable<int> heroIds, PlayerInfo player, bool isShopCard)
+    // internal 供 TooltipFriend（羁绊提示）复用
+    internal static string BuildHeroNameList(IEnumerable<int> heroIds, PlayerInfo player, bool isShopCard)
     {
         var valid = new List<int>();
         foreach (var hid in heroIds)

@@ -117,6 +117,7 @@
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAttackShieldPierce.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\BattleResultHeroCellControl.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillDeathGroupHeal.cs" />
+    <Compile Include="Assets\Resources\Scripts\UIs\TooltipFriend.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\MySelectControl.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffShield.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillHelpAidBuff.cs" />

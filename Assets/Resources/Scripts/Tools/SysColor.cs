@@ -63,6 +63,12 @@ public static class SysColor
         return $"<color=#{colorHex}>{value}</color>";
     }
 
+    // 富文本着色：返回 <color=#hex>text</color>
+    public static string ColorText(string text, Color color)
+    {
+        return "<color=#" + ColorUtility.ToHtmlStringRGB(color) + ">" + text + "</color>";
+    }
+
     public static Color GetTextColorOnBackground(Color bgColor)
     {
         float brightness = 0.299f * bgColor.r + 0.587f * bgColor.g + 0.114f * bgColor.b;
@@ -134,6 +140,8 @@ public static class SysColor
 
         public static readonly Color CheckBtnSelected = new Color(1f, 0.843f, 0f, 1f);
         public static readonly Color CheckBtnNormal = new Color(0.15f, 0.15f, 0.15f, 1f);
+
+        public static readonly Color NextLv = new Color(0.4f, 1f, 0.4f); // 技能说明下一档差值-淡绿
     }
 
     public static class Battle
