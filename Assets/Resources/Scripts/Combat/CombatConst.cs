@@ -69,6 +69,12 @@ public static class CombatConst
     public static readonly int[] FriendLineCounts = { 2, 3, 4, 5, 6 };
     /// <summary>连线(默认连接)技能缩写（技能Id按 Lv 取 SkillConfig 2000006~2000010，攻击强化比例配在 LinkSelf）</summary>
     public const string FriendLineSkillSname = "友";
+    /// <summary>好友·每回合金币技能缩写（技能Id按 Lv 取 SkillConfig 2010091~2010095；Dumb技能，金币在回合发钱时结算，不在战斗内生效）</summary>
+    public const string FriendGoldSkillSname = "济";
+    /// <summary>好友·每回合金币技能的每人金币数（每名上阵同组英雄+1金）</summary>
+    public const int FriendGoldPerMember = 1;
+    /// <summary>好友·每回合金币技能的最少上阵人数（1人不成团，默认2人起生效）</summary>
+    public const int FriendGoldMinCount = 2;
 
     // ---- 兵种连锁 ----
     /// <summary>兵种默认技能起始等级（默认兵种技能1级，每多一个同兵种英雄+1级）</summary>

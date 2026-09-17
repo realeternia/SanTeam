@@ -206,7 +206,41 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     public void RoundGold(int g)
     {
         g += GetItemPAttr("roundgold");
+        g += GetFriendGold();
         AddGold(g);
+    }
+
+    // 好友羁绊·每回合金币（「济」组，技能为Dumb，金币在回合发钱时按上阵阵容结算）：
+    // 遍历上阵阵容统计属于该好友组的英雄数，每名+1金；至少 FriendGoldMinCount(2) 人才生效，1人不成团
+    private int GetFriendGold()
+    {
+        if (battleCards == null)
+            return 0;
+
+        int count = 0;
+        foreach (int cardId in battleCards)
+        {
+            if (cardId <= 0 || !ConfigManager.IsHeroCard(cardId))
+                continue;
+            var relIds = ConfigManager.GetHeroFriendInfo(cardId);
+            if (relIds == null)
+                continue;
+            foreach (int relId in relIds)
+            {
+                var relCfg = HeroFriendConfig.GetConfig(relId);
+                if (relCfg == null || relCfg.SkillId != CombatConst.FriendGoldSkillSname)
+                    continue;
+                // 同一英雄可能属于多个关系组，只计一次
+                count++;
+                break;
+            }
+        }
+        if (count < CombatConst.FriendGoldMinCount)
+            return 0;
+
+        int bonus = count * CombatConst.FriendGoldPerMember;
+        GameLog.Debug($"每回合金币：玩家{pid}上阵{count}人，获得{bonus}金");
+        return bonus;
     }
 
     public void OnEra(int era)

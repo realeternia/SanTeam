@@ -1,4 +1,4 @@
-﻿﻿using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -113,7 +113,7 @@ namespace CommonConfig
             config[4] = new HeroFriendConfig(4, "风华绝代", 1, new int[]{104004,103001,101023,102001,103014}, "华", "#3789C2");
             config[5] = new HeroFriendConfig(5, "仁德济世", 1, new int[]{110003,100001,101015,110009,103007,103016}, "仁", "#FFAA33");
             config[6] = new HeroFriendConfig(6, "身负异禀", 1, new int[]{100003,110011,110007,101014,101019,105001}, "", "");
-            config[7] = new HeroFriendConfig(7, "经世济民", 1, new int[]{103012,102020,101017,100005,101012}, "", "");
+            config[7] = new HeroFriendConfig(7, "经世济民", 1, new int[]{103012,102020,101017,100005,101012}, "济", "#FFD700");
             config[8] = new HeroFriendConfig(8, "老当益壮", 1, new int[]{101008,101022,103005,103022,102005}, "", "");
             config[9] = new HeroFriendConfig(9, "先登陷阵", 1, new int[]{102004,103019,101001,105006,102009}, "破", "#FF6600");
             config[10] = new HeroFriendConfig(10, "深谋远虑", 1, new int[]{103010,102011,104007,106003,103012}, "谋", "#0000FF");
@@ -122,7 +122,7 @@ namespace CommonConfig
             config[13] = new HeroFriendConfig(13, "剽悍迅捷", 1, new int[]{103006,106001,102008,104002,102007}, "连", "#339933");
             config[14] = new HeroFriendConfig(14, "骄兵悍将", 1, new int[]{101005,106005,105009,104002,103021,106002}, "穿", "#FF3399");
             config[15] = new HeroFriendConfig(15, "忠肝义胆", 1, new int[]{101001,101009,110002,104008,104004,102018}, "护", "#453572");
-            config[16] = new HeroFriendConfig(16, "权奸当道", 1, new int[]{100004,104007,106008,106004,105002}, "", "");
+            config[16] = new HeroFriendConfig(16, "权奸当道", 1, new int[]{100004,104007,106008,106004,105002}, "奸", "#660033");
             config[17] = new HeroFriendConfig(17, "名门望族", 1, new int[]{103002,100006,102025,101020,103001,102002}, "", "");
             config[18] = new HeroFriendConfig(18, "出将入相", 1, new int[]{102016,105005,103007,103011,104003}, "", "");
             config[19] = new HeroFriendConfig(19, "谦冲自守", 1, new int[]{102008,102012,103016,101021,105003,101007}, "刺", "#997757");

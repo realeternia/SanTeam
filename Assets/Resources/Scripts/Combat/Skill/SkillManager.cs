@@ -88,6 +88,8 @@ public static class SkillManager
                 return new SkillInitSneakChangePos(skillId, owner);
             case "InitAddItem":
                 return new SkillInitAddItem(skillId, owner);
+            case "InitEnemyRandomBuff":
+                return new SkillInitEnemyRandomBuff(skillId, owner);
 
             case "FactionShield":
                 return new SkillFactionShield(skillId, owner);
