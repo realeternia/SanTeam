@@ -16,25 +16,18 @@ public static class CombatConst
     public const string AntiShieldHurtTag = "AntiShield";
 
     // ---- 技能Id ----
-    /// <summary>主公技(王/王)：所在同阵营护盾效果加倍（技能表 王 的5级行，Id=原Id*10+级）</summary>
-    public const int MasterShieldSkillId = 2000015;
     /// <summary>仁德：给与我方前排士兵护盾（技能表 仁 的5级行）</summary>
     public const int SoldierShieldSkillId = 2090035;
     /// <summary>连锁：锁定目标并传递伤害（技能表 锁 的5级行）</summary>
     public const int LockSkillId = 2030025;
 
-    // ---- 默认护盾机制(同阵营连线，数值参考金铲铲神盾使羁绊) ----
-    /// <summary>同阵营英雄数量档位(2/3/4/5/6)</summary>
+    // ---- 国家护盾机制(同阵营连线，数值参考金铲铲神盾使羁绊) ----
+    /// <summary>同阵营英雄数量档位(2/3/4/5/6，对应国家护盾技能 Lv1~5)</summary>
     public static readonly int[] FactionShieldCounts = { 2, 3, 4, 5, 6 };
-    /// <summary>各档位对应的护盾(生命值百分比，每档+15%)</summary>
-    public static readonly float[] FactionShieldRates = { 0.15f, 0.30f, 0.45f, 0.60f, 0.75f };
-    /// <summary>护盾持续时间(整场战斗)</summary>
-    public const float FactionShieldTime = 999f;
-    /// <summary>国家护盾展示技能缩写（SkillConfig 2000001~2000005，仅供羁绊提示显示，Lv=同阵营人数-1）</summary>
+    /// <summary>国家护盾技能缩写（技能Id按 Lv 取 SkillConfig 2000001~2000005，护盾=最大生命×SkillDamageRate）</summary>
     public const string FactionShieldSkillSname = "国";
 
-
-    /// <summary>主公(王/王)上阵：同阵营护盾额外加成（百分比）</summary>
+    /// <summary>主公(王/王)上阵：同阵营护盾额外加成（百分比，国家护盾技能内结算）</summary>
     public const float KingShieldBonusRate = 0.1f;
 
     // ---- 抗性减伤公式（参考金铲铲：实际伤害 = 原伤害 × 100/(100+抗性)） ----

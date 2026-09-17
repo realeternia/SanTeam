@@ -89,6 +89,9 @@ public static class SkillManager
             case "InitAddItem":
                 return new SkillInitAddItem(skillId, owner);
 
+            case "FactionShield":
+                return new SkillFactionShield(skillId, owner);
+
             case "Dumb":
                 return new SkillDumb(skillId, owner);               
         }

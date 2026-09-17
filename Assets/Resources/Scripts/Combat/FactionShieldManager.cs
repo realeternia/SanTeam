@@ -2,8 +2,9 @@ using System.Collections.Generic;
 using CommonConfig;
 
 /// <summary>
-/// 默认护盾机制：战斗开始时统计同阵营英雄数量，达到档位(2/3/4/5/6)后该阵营英雄直接获得护盾(类似连线)。
-/// 主公技(王/王)：所在同阵营护盾效果加倍；同阵营护盾额外+10%（按上阵情况在初始化时结算一次）。
+/// 国家护盾机制：战斗开始时统计同阵营英雄数量，达到档位(2/3/4/5/6)后给该阵营英雄授予对应等级的国家护盾技能
+/// （技能等级=档位 Lv1~5，效果由 SkillFactionShield 走技能/Buff 系统：护盾=最大生命×档位比例）。
+/// 主公(王)加成由技能内结算（同阵营护盾额外+10%×王数，与旧默认护盾机制一致）。
 /// </summary>
 public static class FactionShieldManager
 {
@@ -26,7 +27,6 @@ public static class FactionShieldManager
 
         // 统计各阵营英雄数量
         var factionCount = new Dictionary<int, int>();
-        var kingCount = 0;
         foreach (var unit in units)
         {
             if (!unit.isHero || unit.hp <= 0)
@@ -37,23 +37,23 @@ public static class FactionShieldManager
             if (forceCfg == null || !forceCfg.JoinFactionShield)
                 continue;
             var faction = heroCfg.Side;
-            if (!factionCount.ContainsKey(faction))
-                factionCount[faction] = 0;
-            factionCount[faction]++;
-
-            if (ConfigManager.IsKingHero(unit.heroId))
-                kingCount++;
+            factionCount[faction] = factionCount.TryGetValue(faction, out var c) ? c + 1 : 1;
         }
 
         foreach (var kv in factionCount)
         {
-            var rate = GetFactionShieldRate(kv.Value);
-            if (rate <= 0)
+            var level = GetFactionShieldLevel(kv.Value);
+            if (level <= 0)
                 continue;
 
-            // 主公(王/王)上阵：同阵营护盾额外+10%（本侧有王即生效，初始化结算一次）
-            if (kingCount > 0)
-                rate += CombatConst.KingShieldBonusRate * kingCount;
+            // 按等级取国家护盾技能Id（Sname+level → SkillConfig 2000001~2000005）
+            var skillCfg = ConfigManager.GetSkillConfig(CombatConst.FactionShieldSkillSname, level);
+            if (skillCfg == null)
+            {
+                GameLog.Error($"国家护盾技能配置缺失: Sname={CombatConst.FactionShieldSkillSname} Lv={level}");
+                continue;
+            }
+            var skillId = skillCfg.Id;
 
             foreach (var unit in units)
             {
@@ -62,20 +62,19 @@ public static class FactionShieldManager
                 if (HeroConfig.GetConfig(unit.heroId).Side != kv.Key)
                     continue;
 
-                var shieldHp = (int)(unit.maxHp * rate);
-                BuffManager.AddShield(unit, unit, shieldHp, CombatConst.FactionShieldTime);
-                GameLog.Debug($"FactionShield 阵营{kv.Key} 英雄数{kv.Value} 护盾{shieldHp}({rate * 100:0}%)");
+                unit.AddSkill(skillId, skillId, level);
+                GameLog.Debug($"国家护盾 阵营{kv.Key} 英雄数{kv.Value} 授予技能等级{level}");
             }
         }
     }
 
-    // 根据同阵营英雄数量获取护盾百分比，未达标返回0
-    private static float GetFactionShieldRate(int count)
+    // 根据同阵营英雄数量获取技能等级（档位2/3/4/5/6人 → Lv1~5），未达标返回0
+    private static int GetFactionShieldLevel(int count)
     {
         for (int i = CombatConst.FactionShieldCounts.Length - 1; i >= 0; i--)
         {
             if (count >= CombatConst.FactionShieldCounts[i])
-                return CombatConst.FactionShieldRates[i];
+                return i + 1;
         }
         return 0;
     }
