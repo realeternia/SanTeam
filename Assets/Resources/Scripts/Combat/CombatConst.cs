@@ -65,10 +65,10 @@ public static class CombatConst
     public const float MeleeRange = 30f;
 
     // ---- 连线(武将关系) ----
-    /// <summary>连线好友数量档位(2/3/4/5/6)</summary>
+    /// <summary>连线好友数量档位(2/3/4/5/6，对应连线技能 Lv1~5)</summary>
     public static readonly int[] FriendLineCounts = { 2, 3, 4, 5, 6 };
-    /// <summary>各档位对应的攻击强化(百分比，每档+10%)</summary>
-    public static readonly float[] FriendLineAtkRates = { 0.10f, 0.20f, 0.30f, 0.40f, 0.50f };
+    /// <summary>连线(默认连接)技能缩写（技能Id按 Lv 取 SkillConfig 2000006~2000010，攻击强化比例配在 LinkSelf）</summary>
+    public const string FriendLineSkillSname = "友";
 
     // ---- 兵种连锁 ----
     /// <summary>兵种默认技能起始等级（默认兵种技能1级，每多一个同兵种英雄+1级）</summary>

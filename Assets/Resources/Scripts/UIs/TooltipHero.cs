@@ -378,15 +378,15 @@ public class TooltipHero : BaseTooltip
                     break;
                 row.gameObject.SetActive(true);
 
-                // 技能描述（最多2行，超出截断）+ 图标
-                int friendLv = isShopCard || player == null ? 1 : GetFriendSkillLv(friendCfg, heroId, player);
+                // 技能描述（最多2行，超出截断）+ 图标：组内配了特殊技能用特殊技能，未配则用默认连线技能"友"
+                int present = CountFriendPresent(friendCfg, heroId, player);
+                var friendSkillCfg = GetFriendShowSkill(friendCfg, present, out int friendLv);
+                if (isShopCard || player == null)
+                    friendLv = 1; // 商店牌默认1级；排行榜无上下文也默认1级
                 string skillText = "";
                 string icon = "";
-                var friendSkillCfg = !string.IsNullOrEmpty(friendCfg.SkillId)
-                    ? ConfigManager.GetSkillConfig(friendCfg.SkillId, Mathf.Max(1, friendLv)) : null;
                 if (friendSkillCfg != null)
                 {
-                    // 商店牌默认1级；排行榜无上下文也默认1级；背包按在场成员数（可为0级置灰）
                     skillText = friendSkillCfg.Name + " " + ConfigManager.GetSkillDescript(friendSkillCfg, true);
                     icon = friendSkillCfg.Icon;
                 }
@@ -409,9 +409,8 @@ public class TooltipHero : BaseTooltip
         Show();
     }
 
-    // 好友连接技能当前档位：等级=该关系组在场（上阵）成员数（不含自己），可为0级；
-    // 0级时文本仍按1级档显示（调用处 Mathf.Max(1, lv) 钳制），等级角标置灰表示未激活
-    private static int GetFriendSkillLv(HeroFriendConfig friendCfg, int heroId, PlayerInfo player)
+    // 好友关系组在场（上阵）成员数（不含自己）
+    private static int CountFriendPresent(HeroFriendConfig friendCfg, int heroId, PlayerInfo player)
     {
         int present = 0;
         if (player != null && player.battleCards != null)
@@ -422,7 +421,25 @@ public class TooltipHero : BaseTooltip
                     present++;
             }
         }
-        return CombatConst.FriendSpecialBaseLevel + present;
+        return present;
+    }
+
+    // 好友组提示里展示的技能：组内配置了特殊技能就用特殊技能（等级=在场成员数，0级=未激活，文本按1级档显示）；
+    // 未配置特殊技能则回退默认连线技能"友"（等级按 CombatConst.FriendLineCounts 档位，好友不足2人=0级）。
+    // level 返回实际展示等级（调用方据此置灰），返回 null 表示无可用技能配置
+    internal static SkillConfig GetFriendShowSkill(HeroFriendConfig friendCfg, int presentCount, out int level)
+    {
+        string sname = friendCfg.SkillId;
+        if (string.IsNullOrEmpty(sname))
+        {
+            sname = CombatConst.FriendLineSkillSname;
+            level = FriendLineManager.GetFriendLineLevel(presentCount);
+        }
+        else
+        {
+            level = CombatConst.FriendSpecialBaseLevel + presentCount;
+        }
+        return ConfigManager.GetSkillConfig(sname, Mathf.Max(1, level));
     }
 
     // 拼英雄名字列表（职业/好友列表共用）：按品质倒排（同品质保持原顺序），名字只保留最后一个字；

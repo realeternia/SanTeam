@@ -93,8 +93,6 @@ public class Chess : MonoBehaviour
 
     private bool dieAfterLifeTime;
     private float lifeTime;
-    private HashSet<int> friendIds = new HashSet<int>(); //连线(武将关系)好友
-    private int friendAtkBonus; //连线好友带来的攻击加成值
 
     private float secondTimer; //每秒事件计时，满1s触发一次OnSecond
     public int hpRegen; //生命回复/秒（正=回复，负=扣减；来源：属性羁绊或复原/药仙技能加成，OnSecond事件结算）
@@ -314,21 +312,6 @@ public class Chess : MonoBehaviour
 
         if (heroInfo != null)
             heroInfo.SetAttr(ap, atk);
-    }
-
-    // 记录连线(武将关系)好友
-    public void AddFriendId(int friendId)
-    {
-        friendIds.Add(friendId);
-    }
-
-    // 应用连线(武将关系)攻击强化
-    public void ApplyFriendAtkBonus(float rate)
-    {
-        if (rate <= 0)
-            return;
-        friendAtkBonus = (int)(atk * rate);
-        atk += friendAtkBonus;
     }
 
     // 刷新英雄属性显示(连线加成在战斗开始时应用后调用)
@@ -689,31 +672,6 @@ public class Chess : MonoBehaviour
 
         if ((side == 1 || side == 2 && !isShadow ))
             GameManager.Instance.PlaySound("Sounds/tnt", 7);
-
-        if (isHero)
-        {
-            foreach (var chess in WorldManager.Instance.GetUnitsMySide(transform.position, 0, side))
-            {
-                if (!chess.isHero)
-                    continue;
-                chess.OnFriendDie(heroId);
-            }
-        }
-    }
-
-    public void OnFriendDie(int friendId)
-    {
-        if (!friendIds.Contains(friendId))
-            return;
-
-        friendIds.Remove(friendId);
-        // 移除旧加成，并按剩余好友数量重算攻击强化
-        atk -= friendAtkBonus;
-        friendAtkBonus = (int)(atk * FriendLineManager.GetFriendLineAtkRate(friendIds.Count));
-        atk += friendAtkBonus;
-
-        if (heroInfo != null)
-            heroInfo.SetAttr(ap, atk);
     }
 
 

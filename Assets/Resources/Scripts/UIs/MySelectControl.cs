@@ -197,7 +197,8 @@ public class MySelectControl : MonoBehaviour
         }
 
         // 好友羁绊：HeroFriendConfig.Heros 中拥有英雄数即人数，等级=人数-1（1人=0级）；
-        // 普通组无特殊技能则不显示图标；配置了 LineColor 的组用该颜色作为文字前景色
+        // 组内配了特殊技能用特殊技能（等级=人数-1），未配置则用默认连线技能"友"（等级按连线档位，2人才生效）；
+        // 配置了 LineColor 的组用该颜色作为文字前景色
         foreach (var friendCfg in HeroFriendConfig.ConfigList)
         {
             var present = new List<int>();
@@ -215,14 +216,18 @@ public class MySelectControl : MonoBehaviour
                 if (ColorUtility.TryParseHtmlString(friendCfg.LineColor, out var parsed))
                     lineColor = parsed;
             }
+            // 无特殊技能的好友组展示默认连线技能（战斗加成同样走该技能）
+            string skillSname = string.IsNullOrEmpty(friendCfg.SkillId) ? CombatConst.FriendLineSkillSname : friendCfg.SkillId;
+            int bondLevel = string.IsNullOrEmpty(friendCfg.SkillId)
+                ? FriendLineManager.GetFriendLineLevel(present.Count - 1) : present.Count - 1;
             entries.Add(new BondTipData
             {
                 Kind = BondKind.Friend,
                 Name = friendCfg.Name,
-                Level = present.Count - 1,
-                Icon = GetSkillIcon(friendCfg.SkillId),
+                Level = bondLevel,
+                Icon = GetSkillIcon(skillSname),
                 Color = lineColor,
-                SkillId = friendCfg.SkillId,
+                SkillId = skillSname,
                 HeroIds = new List<int>(friendCfg.Heros), // 提示列表显示该好友组全部成员，上阵的按品质上色
                 Player = checkPlayer,
             });

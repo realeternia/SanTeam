@@ -4,8 +4,8 @@ using CommonConfig;
 using UnityEngine;
 
 /// <summary>
-/// 连线(武将关系)初始化：战斗开始时，按连线好友数量分档强化攻击并创建连线特效。
-/// 档位数值统一维护在 CombatConst。
+/// 连线(武将关系)初始化：战斗开始时，按连线好友数量授予连线技能（Sname="友"，等级=档位）并创建连线特效。
+/// 档位数值维护在 CombatConst，攻击加成值配在 SkillConfig 的 LinkSelf，由技能在 BattleBegin 施加（走 InitAttrChange）。
 /// </summary>
 public static class FriendLineManager
 {
@@ -42,24 +42,44 @@ public static class FriendLineManager
             if (!string.IsNullOrEmpty(ConfigManager.GetFriendSkillId(chess.heroId, friendId)))
                 continue;
 
-            chess.AddFriendId(friendId);
             // 线颜色取该武将对所在关系行配置的 LineColor（未配置默认暗灰）
             var lineColor = ParseLineColor(ConfigManager.GetFriendLineColor(chess.heroId, friendId), SysColor.FriendLine.DefaultLine);
             CreateFriendLine(chess, friendId, lineColor);
             friendCount++;
         }
 
-        chess.ApplyFriendAtkBonus(GetFriendLineAtkRate(friendCount));
-        chess.RefreshHeroAttr();
+        // 按连线好友数量授予连线技能（等级=档位），攻击加成由技能 BattleBegin 施加
+        GrantFriendLineSkill(chess, friendCount);
     }
 
-    // 根据连线好友数量获取攻击强化百分比，未达标返回0
-    public static float GetFriendLineAtkRate(int count)
+    // 按连线好友数量授予/更新连线技能（Sname+level → SkillConfig 2000006~2000010）
+    private static void GrantFriendLineSkill(Chess chess, int count)
+    {
+        var level = GetFriendLineLevel(count);
+        if (level <= 0)
+            return;
+
+        var cfg = ConfigManager.GetSkillConfig(CombatConst.FriendLineSkillSname, level);
+        if (cfg == null)
+        {
+            GameLog.Error($"连线技能配置缺失: Sname={CombatConst.FriendLineSkillSname} Lv={level}");
+            return;
+        }
+
+        var skill = chess.skills.Find(s => s.skillCfg.Sname == CombatConst.FriendLineSkillSname);
+        if (skill == null)
+            chess.AddSkill(cfg.Id, cfg.Id, level);
+        else
+            skill.SetLevel(level);
+    }
+
+    // 根据连线好友数量获取连线技能等级（档位2/3/4/5/6人 → Lv1~5），未达标返回0
+    public static int GetFriendLineLevel(int count)
     {
         for (int i = CombatConst.FriendLineCounts.Length - 1; i >= 0; i--)
         {
             if (count >= CombatConst.FriendLineCounts[i])
-                return CombatConst.FriendLineAtkRates[i];
+                return i + 1;
         }
         return 0;
     }

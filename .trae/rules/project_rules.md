@@ -42,6 +42,7 @@ Unity (C#) | JsonUtility | UGUI | TextMeshPro
 ### 配置系统
 
 - 命名空间：`CommonConfig`，文件命名 `XxxConfig_s.cs`，类内只定义公共字段（禁止属性），字段加 `/// <summary>` 中文注释
+- 配置类（`XxxConfig_s.cs`）为工程内手写维护的唯一数据源，没有外部源表/Excel/导入工具：改配置直接编辑该文件即可，无需（也不要）考虑"同步源表"
 - 加载入口：`ConfigManager.Init()` 统一调用各 `XxxConfig.Load()`，新增配置类必须在 `ConfigManager.Init()` 中注册
 - 获取配置：`XxxConfig.GetConfig(id)` / `HasConfig(id)` / `ConfigList`；技能按缩写+等级取：`ConfigManager.GetSkillConfig(sname, lv)`；属性配置按名取：`GetConfigByname(name)`
 - 配置后处理（字段补默认值/联动修正）统一放 `ConfigManager.PostModify()`，如 HeroConfig 数值为 0 时取职业基准值

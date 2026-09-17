@@ -126,7 +126,7 @@ public class WorldManager : MonoBehaviour
         // 好友连锁·特殊：在场好友数量提升关联(助益)技能等级（默认无技能，每多一个+1级）
         FriendLineManager.ApplyFriendSpecialSkills();
 
-        // 默认护盾机制：同阵营英雄数量达到档位后直接获得护盾
+        // 国家护盾：同阵营英雄数量达到档位后授予对应等级的国家护盾技能（效果由技能在 BattleBegin 施加）
         FactionShieldManager.ApplyFactionShields();        
 
         // 战斗开始技能：必须等在好友特殊技能授予之后，否则 BattleBegin 型技能（如偷袭/明镜）取不到技能

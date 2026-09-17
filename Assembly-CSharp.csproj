@@ -97,13 +97,13 @@
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffDamageAddRate.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillBuffExpandPos.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillHitRepeat.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillFactionShield.cs" />
     <Compile Include="Assets\SineVFX\TopDownEffects\Scripts\SineUIControllerTopDownEffects.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAttackReboundArrow.cs" />
     <Compile Include="Assets\SineVFX\TopDownEffects\Scripts\RampGeneratorTDE.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffCoolDown.cs" />
     <Compile Include="Assets\Epic Toon FX\Scripts\ETFXRotation.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillDumb.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillFactionShield.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAttackRunCrossPlus.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\BagRecycler.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\MissileComp.cs" />
