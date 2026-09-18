@@ -257,9 +257,30 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         roundOverImg.gameObject.SetActive(isOver);
     }
 
+    // 道具是否可对指定英雄卡使用：ItemConfig.LimitSkillSname 非空时，目标英雄需属于该技能的好友羁绊组（如万民书限定「仁」）
+    public bool CanUseItemToHero(int heroId, int itemId)
+    {
+        var itemCfg = ItemConfig.GetConfig(itemId);
+        if (itemCfg == null)
+            return false;
+
+        return ConfigManager.HeroHasFriendSkill(heroId, itemCfg.LimitSkillSname);
+    }
+
     public void UseItemToHero(int heroId, int itemId)
     {
         GameLog.Debug($"UseItemToHero {heroId} {itemId}");
+
+        if (!CanUseItemToHero(heroId, itemId))
+        {
+            var itemCfg = ItemConfig.GetConfig(itemId);
+            if (itemCfg == null)
+                GameLog.Error($"道具使用失败：道具配置不存在 itemId={itemId}");
+            else
+                GameLog.Warn($"道具{itemId}限定了使用对象：仅可对拥有技能「{itemCfg.LimitSkillSname}」的英雄使用，heroId={heroId} 不满足，已取消");
+            return;
+        }
+
         AddAttrAddon(heroId, HeroSelectionTool.GetCardAttr(this, itemId, 1));
         RemoveCard(itemId, 1);
     }

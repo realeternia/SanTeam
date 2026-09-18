@@ -409,6 +409,10 @@ public static class PlayerAI
             
             foreach (var heroId in strongList)
             {
+                // 道具使用限制（如万民书只能给拥有「仁」的英雄）：不满足的目标不参与评估
+                if (!playerInfo.CanUseItemToHero(heroId, cardId))
+                    continue;
+
                 var cardLevel = HeroSelectionTool.GetCardLevel(playerInfo.cards[heroId], true);
                 var attr = HeroSelectionTool.GetCardAttr(playerInfo, heroId, cardLevel);
                 

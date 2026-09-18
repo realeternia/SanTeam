@@ -559,6 +559,14 @@ public class BagControl : MonoBehaviour, IPanelEvent
 
         var p1 = GameManager.Instance.GetPlayer(bindPlayer.pid);
         var itemCfg = ItemConfig.GetConfig(itemCardId);
+
+        // 使用限制：目标英雄需属于该技能的好友羁绊组（如万民书限定「仁」）
+        if (!p1.CanUseItemToHero(heroCardId, itemCardId))
+        {
+            ShowTipText($"只能对拥有「{itemCfg.LimitSkillSname}」的英雄使用");
+            return;
+        }
+
         if(itemCfg.RemoveWhenUse)
         {
             p1.UseItemToHero(heroCardId, itemCardId);

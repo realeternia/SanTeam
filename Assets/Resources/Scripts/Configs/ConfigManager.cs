@@ -250,6 +250,25 @@ public static class ConfigManager
         return null;
     }
 
+    // 英雄是否属于指定技能缩写的好友羁绊组（道具使用限制等按技能缩写判定时复用，如万民书限定「仁」）
+    public static bool HeroHasFriendSkill(int heroId, string sname)
+    {
+        if (string.IsNullOrEmpty(sname))
+            return true;
+
+        var relIds = GetHeroFriendInfo(heroId);
+        if (relIds == null)
+            return false;
+
+        foreach (var relId in relIds)
+        {
+            var relCfg = HeroFriendConfig.GetConfig(relId);
+            if (relCfg != null && relCfg.SkillId == sname)
+                return true;
+        }
+        return false;
+    }
+
     // 英雄技能列表：职业兵种技能 + 个人技能(Skill1/Skill2)，按缩写去重。
     // 默认取各缩写的1级行（界面显示统一1级）。战斗创建后按来源修正：
     // 个人技能按卡片等级、兵种技能由JobLinkManager、好友特殊技能由FriendLineManager 各自 SetLevel 匹配 Sname+等级 的行。
