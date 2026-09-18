@@ -210,6 +210,8 @@ namespace CommonConfig
             config[401011] = new ItemConfig(401011, "沙拉", "法术强度+5", 1, "tpattr", "ap+5", new int[0], "", 0, 6, false, false, true, 99, 0, 0, 6, 0.4f, "shala");
             config[401012] = new ItemConfig(401012, "万民书", "护甲+1，魔法抗性+1（仅限拥有「仁」的英雄）", 1, "tpattr", "armor+1,magicRes+1", new int[0], "仁", 0, 6, false, false, true, 99, 401013, 5, 6, 0.4f, "wanming1");
             config[401013] = new ItemConfig(401013, "万民书·精", "护甲+5，魔法抗性+5（仅限拥有「仁」的英雄）", 1, "tpattr", "armor+5,magicRes+5", new int[0], "仁", 0, 6, false, false, true, 99, 0, 0, 6, 0.4f, "wanming2");
+            config[401014] = new ItemConfig(401014, "文赋", "法术强度+1，魔法抗性+1", 1, "tpattr", "ap+1,magicRes+1", new int[0], "", 0, 6, false, false, true, 99, 401015, 5, 6, 0.4f, "wenfu1");
+            config[401015] = new ItemConfig(401015, "文赋·精", "法术强度+5，魔法抗性+5", 1, "tpattr", "ap+5,magicRes+5", new int[0], "", 0, 6, false, false, true, 99, 0, 0, 6, 0.4f, "wenfu2");
             config[409001] = new ItemConfig(409001, "火尖枪", "", 1, "attr", "atk+15", new int[0], "", 0, 999, false, false, false, 1, 0, 0, 12, 0f, "huojianqiang");
             config[409002] = new ItemConfig(409002, "聚宝盆", "每年额外获得5金币", 1, "pattr", "roundgold+5", new int[0], "", 0, 999, false, false, false, 1, 0, 0, 12, 0f, "jubaopeng");
             config[409003] = new ItemConfig(409003, "虎王重甲", "", 1, "pattr", "shp+40", new int[0], "", 0, 999, false, false, false, 1, 0, 0, 12, 0f, "armor");

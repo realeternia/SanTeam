@@ -61,7 +61,7 @@ HeroFriendConfig(Id, Name, Level, Heros, SkillId, LineColor)
 |---|---|---|---|---|---|
 | G7 经世济民 | 济 | 每回合额外金币 | ✅ 已完成（Dumb） | — | Lv4 |
 | G6 身负异禀 | 异 | 开局随机获得 攻/法强/护甲/魔抗 之一强化 | 复用 `SkillInitAttrChange`（加随机分组） | 小改 | **Lv5** |
-| G8 老当益壮 | 壮 | 永久 +生命回复 2~6；生命<30% 时给自己释放 攻击×240%~480% 护盾（CD 10s） | ✅ 已完成（`SkillAidSelfShieldLowHp`） | — | Lv4 |
+| G8 老当益壮 | 老 | 受击且生命<30% 时给自己释放 攻击×240%~480% 护盾（CD 15s），每次触发永久 +生命回复 2~6 | ✅ 已完成（`SkillAttackedShield`） | — | Lv4 |
 | G11 治军严明 | 令 | 全军士兵 攻 +X%、生命 +X% | 新脚本（复用士兵系数机制） | ✅ | **Lv5** |
 | G12 王佐之才 | 佐 | 我方其他英雄 攻击/法强 +X（辅佐光环） | 新脚本（遍历友方 `ApplyAttr`） | ✅ | **Lv5** |
 | G16 权奸当道 | 奸 | 开局对随机 1 名敌方英雄施加增伤（10~20s，+30%~60%），每个有 link 的 hero 各自触发 | ✅ 已完成（通用技能 `SkillInitEnemyRandomBuff`） | — | Lv4 |
@@ -69,7 +69,7 @@ HeroFriendConfig(Id, Name, Level, Heros, SkillId, LineColor)
 | G18 出将入相 | 仕※ | 自身 攻击 +X、法强 +X | 复用 `SkillInitAttrChange` | 无 | Lv4 |
 | G20 身负奇才 | 奇 | 技能触发概率提升 / 技能 CD 缩短 | 复用 `SkillModifySkillRateTime` | 无 | **Lv5** |
 | G21 温良恭俭 | 和 | 自身治疗量 + 受治疗量提升 | 复用 `SkillInitAttrChange` | 无 | **Lv5** |
-| G24 文采出众 | 文 | 每秒法力回复 +X | 复用 `SkillInitAttrChange` | 无 | Lv4 |
+| G24 文采出众 | 文 | 开局按概率获得道具「文赋」（上一局战败时概率 +50%；概率过 100% 时保底 1 本、超出部分再判 1 本） | ✅ 已完成（新脚本 `SkillInitAddItemChance` + 新道具 401014 文赋） | — | Lv4 |
 | G25 儒将风范 | 儒 | 自身周围友军获得属性加成 | 复用 `SkillHelpAidBuff` + 新增属性增益 Buff | ✅ | Lv4 |
 | G31 乱世枭雄 | 枭 | 击杀敌方英雄后永久叠加自身攻击 | 新脚本 + 新增击杀事件钩子 | ✅ | Lv4 |
 | G32 济世安民 | 安 | 开局给全队英雄护盾 | 新脚本（参照 `SkillFactionShield.cs`） | ✅ | **Lv5** |
@@ -210,12 +210,24 @@ HeroFriendConfig(Id, Name, Level, Heros, SkillId, LineColor)
 - 复用：`SkillInitAttrChange`，`LinkSelf = "healRate+X,healedRate+X"`
 - 建议数值（小数，0.1 = +10%）：`+0.10 / +0.18 / +0.26 / +0.36 / +0.48`
 
-### G24 文采出众「文」（5 人，最高 Lv4）
+### G24 文采出众「文」（5 人，最高 Lv4）— 已完成（改版，覆盖旧的"每秒法力回复"）
 
 - 成员：曹操·王 100002、诸葛亮·工 101004、蔡文姬·琴 102024、法正·棋 101020、诸葛瑾·鼓 103013
-- 效果：每秒法力回复 `mpRegen` +X（文士技能循环更快）
-- 复用：`SkillInitAttrChange`，`LinkSelf = "mpRegen+X"`（参考琴·战鼓 `2000021` 的职业行写法）
-- 建议数值：`+1 / +2 / +3 / +4 / +5`
+- 效果（类似「仁者无敌」，但给的是另一种道具）：**战斗开始按概率获得道具「文赋」**
+  - 基础概率 = `SkillConfig.Rate`（Lv1~5 = 40% / 48% / 56% / 64% / 72%）
+  - **上一局战败时概率 ×1.5**（+50%，`CombatConst.InitAddItemLoseRateBonus`；首局无加成）
+  - **概率超过 100%** 时：先保底获得 1 本，超出 100% 的部分再判定一次，命中则额外再获得 1 本（Lv5 战败 = 72%×1.5 = 108% → 必定 1 本 + 8% 概率第 2 本）
+- 落地内容：
+  - 新脚本 `Combat/Skill/SkillInitAddItemChance.cs`（`ScriptName = "InitAddItemChance"`，已注册 `SkillManager.CreateSkill` + `Assembly-CSharp.csproj`）
+    - `BattleBegin`：`ItemId <= 0` / 无玩家 → 记日志返回；概率 `Rate`（战败则 ×1.5）→ 保底与超出部分判定 → 循环 `player.AddItemCard(ItemId)`
+  - `PlayerInfo` 新增 `[CustomSerializeField] public bool lastBattleLose;`，在 `onBattleResult(isWin, add)` 里赋值 `lastBattleLose = !isWin`（首局默认 `false`＝无加成；自定义存档序列化已支持 `bool`）
+  - 新道具 `ItemConfig 401014 文赋`（`Effect = "tpattr"`、`Attrs = "ap+1,magicRes+1"`、`RemoveWhenUse = true`、`StackLimit = 99`、`LimitSkillSname = 空`＝**可对我方任意英雄使用**，与万民书限定「仁」不同）
+    - 同族 5 合 1：`CombineId = 401015`、`CombineNeed = 5` → 自动合成 **`401015 文赋·精`**（`ap+5,magicRes+5`，同样不限使用对象），走 `PlayerInfo.CheckAutoCombine` 现成链路，无需改代码
+  - 技能行 `SkillConfig 2010111~2010115`（`Name = 诗书传家`、`Sname = 文`、`Type = 连接`、`Rate = 0.40~0.72`、`ItemId = 401014`、`Icon = wen`）
+  - `HeroFriendConfig[24]` → `SkillId = "文"`、`LineColor = "#7A5CB8"`
+- 备注：
+  - 道具发放是**玩家级**的（`player.AddItemCard`），5 名成员各挂一份技能 → 理论上会触发 5 次判定（同「仁」的处理方式，若只想要一次判定需要额外去重，**待确认**）
+  - "上一局战败"取的是**玩家上一轮战斗结果**，与"是否上阵了该组英雄"无关
 
 ### G25 儒将风范「儒」（5 人，最高 Lv4）— 需新增 Buff
 
@@ -289,7 +301,7 @@ HeroFriendConfig(Id, Name, Level, Heros, SkillId, LineColor)
 | G18 出将入相 | 仕 | `#009999` |
 | G20 身负奇才 | 奇 | `#6633CC` |
 | G21 温良恭俭 | 和 | `#66AA88` |
-| G24 文采出众 | 文 | `#0088AA` |
+| G24 文采出众 | 文 | `#7A5CB8` |
 | G25 儒将风范 | 儒 | `#557755` |
 | G31 乱世枭雄 | 枭 | `#883300` |
 | G32 济世安民 | 安 | `#33AA55` |
@@ -308,9 +320,9 @@ HeroFriendConfig(Id, Name, Level, Heros, SkillId, LineColor)
 
 ### 建议实施顺序（先易后难）
 
-1. **零新增脚本批**（改配置即可）：G17 / G18 / G21 / G24 → 再 G20（复用 `ModifySkillRateTime`）
+1. **零新增脚本批**（改配置即可）：G17 / G18 / G21 → 再 G20（复用 `ModifySkillRateTime`）
 2. **小改批**：G6（`InitAttrChange` 加随机组）
-3. **新脚本批**：✅ G16、✅ G8 → G32（照抄 `FactionShield`）→ G12 → G11（含士兵结算坑）→ G25（含新 Buff）→ G31（含击杀事件钩子，改动面最大，放最后）
+3. **新脚本批**：✅ G16、✅ G8、✅ G24（`InitAddItemChance`）→ G32（照抄 `FactionShield`）→ G12 → G11（含士兵结算坑）→ G25（含新 Buff）→ G31（含击杀事件钩子，改动面最大，放最后）
 
 ---
 
@@ -322,3 +334,5 @@ HeroFriendConfig(Id, Name, Level, Heros, SkillId, LineColor)
 4. G16 是否需要"每个敌方英雄每场只被选中一次"限制（当前设计允许同一目标被重复命中，只刷时间）？
 5. G31 是否要"击杀附带金币"？是否需要叠加层数上限（建议 5 层）？
 6. G11/G12 的"每侧只结算一次"实现方式：技能内静态 guard，还是把全队类结算搬到 `FriendLineManager`？
+7. G24 的"上一局战败 +50%"按 **×1.5（相对提升）** 实现（40%→60%），若想要 **+50 个百分点**（40%→90%）需改 `CombatConst.InitAddItemLoseRateBonus` 的用法为加法
+8. G24 同组 5 人各挂一份技能 → 战斗开始会各判定一次（可能一次拿到多本），是否需要"每场只判定一次"？

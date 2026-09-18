@@ -35,6 +35,9 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     public int winCount;
     [CustomSerializeField]
     public int loseCount;
+    // 上一局是否失败（战斗开始类技能判定用，如「文」的获得道具概率加成；首局默认false=无加成）
+    [CustomSerializeField]
+    public bool lastBattleLose;
     [CustomSerializeField]
     public int mark;
     [CustomSerializeField]
@@ -892,6 +895,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
             winCount++;
         else
             loseCount++;
+        lastBattleLose = !isWin;
         mark += add;
         resultText.text = mark.ToString();
         // 玩家等级体系：战斗获胜/失败获得经验（参考金铲铲，节奏放慢一倍：胜利+2，失败+1）

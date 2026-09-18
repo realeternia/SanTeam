@@ -76,6 +76,10 @@ public static class CombatConst
     /// <summary>好友·每回合金币技能的最少上阵人数（1人不成团，默认2人起生效）</summary>
     public const int FriendGoldMinCount = 2;
 
+    // ---- 战斗开始获得道具（InitAddItemChance） ----
+    /// <summary>上一局战斗失败时，战斗开始获得道具技能的发动概率倍率（+50%）</summary>
+    public const float InitAddItemLoseRateBonus = 1.5f;
+
     // ---- 兵种连锁 ----
     /// <summary>兵种默认技能起始等级（默认兵种技能1级，每多一个同兵种英雄+1级）</summary>
     public const int JobLinkBaseLevel = 1;

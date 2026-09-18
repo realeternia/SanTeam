@@ -170,6 +170,7 @@
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\Skill.cs" />
     <Compile Include="Assets\Resources\Scripts\Tools\SysRandom.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\CombatConst.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillInitAddItemChance.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillInitAttrChange.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillInitEnemyRandomBuff.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffSpeedDown.cs" />
