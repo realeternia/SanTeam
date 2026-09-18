@@ -74,13 +74,13 @@ public class PanelManager : MonoBehaviour
         return comp;
     }
 
-    // 从 Resources/Prefabs 动态加载并实例化面板（挂在当前节点下，根节点为拉伸锚点铺满全屏）
+    // 从 Resources/Prefabs/UIs 动态加载并实例化面板（挂在当前节点下，根节点为拉伸锚点铺满全屏）
     private GameObject LoadPanel(string prefabName)
     {
-        var prefab = Resources.Load<GameObject>("Prefabs/" + prefabName);
+        var prefab = Resources.Load<GameObject>("Prefabs/UIs/" + prefabName);
         if (prefab == null)
         {
-            GameLog.Error($"PanelManager 面板预制体加载失败: Prefabs/{prefabName}");
+            GameLog.Error($"PanelManager 面板预制体加载失败: Prefabs/UIs/{prefabName}");
             return null;
         }
         return Instantiate(prefab, transform);

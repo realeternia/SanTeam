@@ -110,7 +110,7 @@ public class BagControl : MonoBehaviour, IPanelEvent
         float half = (CombatConst.FormationGridSize - 1) * cellGap * 0.5f;
         for (int i = 0; i < CombatConst.FormationCellCount; i++)
         {
-            GameObject fieldUnit = Instantiate(Resources.Load<GameObject>("Prefabs/FieldUnit"), fieldRegion.transform);
+            GameObject fieldUnit = Instantiate(Resources.Load<GameObject>("Prefabs/UIs/Cells/FieldUnit"), fieldRegion.transform);
             var fieldUnitControl = fieldUnit.GetComponent<BagFieldUnitControl>();
             fieldUnitControl.SetInfo(i, 0);
             fieldUnitControl.bagControl = this;
@@ -232,7 +232,7 @@ public class BagControl : MonoBehaviour, IPanelEvent
         foreach (var item in heroCards)
         {
             // 修改原代码，将新创建的 cell 加入缓存
-            GameObject heroCell = Instantiate(Resources.Load<GameObject>("Prefabs/BagCellHero"), bagHeroRegion.transform);
+            GameObject heroCell = Instantiate(Resources.Load<GameObject>("Prefabs/UIs/Cells/BagCellHero"), bagHeroRegion.transform);
             cellCache.Add(heroCell);
             int xOff = index % 5;
             int yOff = index / 5;
@@ -259,7 +259,7 @@ public class BagControl : MonoBehaviour, IPanelEvent
             for (int n = 0; n < cellCount; n++)
             {
                 // 修改原代码，将新创建的 cell 加入缓存
-                GameObject cell = Instantiate(Resources.Load<GameObject>("Prefabs/BagCellItem"), bagItemRegion.transform);
+                GameObject cell = Instantiate(Resources.Load<GameObject>("Prefabs/UIs/Cells/BagCellItem"), bagItemRegion.transform);
                 cellCache.Add(cell);
                 int xOff = index % 9;
                 int yOff = index / 9;

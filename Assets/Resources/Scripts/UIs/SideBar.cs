@@ -92,10 +92,10 @@ public class SideBar : MonoBehaviour, IPointerClickHandler
             Destroy(child.gameObject);
         }
 
-        var prefab = Resources.Load<GameObject>("Prefabs/" + panelName);
+        var prefab = Resources.Load<GameObject>("Prefabs/UIs/" + panelName);
         if (prefab == null)
         {
-            GameLog.Error($"SideBar 子面板预制体加载失败: Prefabs/{panelName}");
+            GameLog.Error($"SideBar 子面板预制体加载失败: Prefabs/UIs/{panelName}");
             return;
         }
         var panelObj = Instantiate(prefab, subRegionNode.transform);
