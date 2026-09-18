@@ -17,6 +17,7 @@ public class PanelManager : MonoBehaviour
     private GameObject rankPlayerPanel;
     private GameObject pickPanel;
     private GameObject bagPanel;
+    private GameObject sideBar;
 
     public GameObject tipNode;
 
@@ -199,6 +200,33 @@ public class PanelManager : MonoBehaviour
         pickPanel.SetActive(false);
 
         ChangePanelCount(pickPanel, false);
+    }
+
+    // 右侧滑出侧边栏：首次从 Resources/Prefabs/SideBar 实例化并缓存，子面板预制体按 panelName 加载到 SideBar 内容节点
+    public void ShowSideBar(string panelName, System.Action<GameObject> onCreated = null)
+    {
+        GameManager.Instance.PlaySound("Sounds/deck");
+        if (sideBar == null)
+            sideBar = LoadPanel("SideBar");
+        if (sideBar == null)
+            return;
+        sideBar.SetActive(true);
+        sideBar.GetComponent<SideBar>().OnShow(panelName, onCreated);
+
+        ChangePanelCount(sideBar, true);
+    }
+
+    // 收起侧边栏：等滑出动画播完再隐藏并移除面板计数，避免中途被根节点隐藏打断动画
+    public void HideSideBar()
+    {
+        if (sideBar == null)
+            return;
+        GameManager.Instance.PlaySound("Sounds/deck");
+        sideBar.GetComponent<SideBar>().OnHide(() =>
+        {
+            sideBar.SetActive(false);
+            ChangePanelCount(sideBar, false);
+        });
     }
 
     public void SendSignal(string name, string parm1, int parm2)
