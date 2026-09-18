@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using CommonConfig;
 
 /// <summary>
@@ -23,13 +22,8 @@ public class SkillInitEnemyRandomBuff : Skill
             return;
         }
 
-        // 敌方存活英雄中随机选一名（range=0 表示全场，参考偷袭技能的随机选敌写法）
-        var candidates = new List<Chess>();
-        foreach (var chess in WorldManager.Instance.GetUnitsInRange(owner.transform.position, 0, owner.side, true))
-        {
-            if (chess.isHero && chess.hp > 0)
-                candidates.Add(chess);
-        }
+        // 敌方存活英雄中随机选一名（优先配对敌人，无配对敌人时取全部敌方英雄）
+        var candidates = WorldManager.Instance.GetAllEnemys(owner.side);
         if (candidates.Count == 0)
             return;
 

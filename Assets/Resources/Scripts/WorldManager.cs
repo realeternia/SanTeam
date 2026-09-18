@@ -1362,6 +1362,28 @@ public class WorldManager : MonoBehaviour
     }
 
     /// <summary>
+    /// 获取所有敌方存活英雄：优先返回与自身配对((a+1)/2 == (b+1)/2)的敌方英雄，
+    /// 若不存在配对敌人则返回全部敌方英雄
+    /// </summary>
+    public List<Chess> GetAllEnemys(int mySide)
+    {
+        var result = new List<Chess>();
+        var paired = new List<Chess>();
+        foreach (var chessComponent in chessList)
+        {
+            if (chessComponent != null && chessComponent.hp > 0 && !chessComponent.isShadow && chessComponent.isHero)
+            {
+                if (!IsEnemy(chessComponent.side, mySide))
+                    continue;
+                result.Add(chessComponent);
+                if ((mySide + 1) / 2 == (chessComponent.side + 1) / 2)
+                    paired.Add(chessComponent);
+            }
+        }
+        return paired.Count > 0 ? paired : result;
+    }
+
+    /// <summary>
     /// 获取指定范围内所有带指定 SummonTag 的召唤物（不分敌我，按召唤物标签识别，如"火"/"雷"）
     /// </summary>
     public List<Chess> GetUnitsInRangeByTag(Vector3 wPos, float range, string summonTag)

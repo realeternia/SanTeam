@@ -363,7 +363,7 @@ public class Chess : MonoBehaviour
             return;
 
         // 获取所有Chess组件
-        var allChess = WorldManager.Instance.GetUnitsInRange(transform.position, 0, side, true);
+        var allChess = WorldManager.Instance.GetUnitsInRange(transform.position, attackRange*3, side, true);
         List<(Chess chess, float distance)> validTargets = new List<(Chess, float)>();
 
         // 收集所有有效目标及其距离

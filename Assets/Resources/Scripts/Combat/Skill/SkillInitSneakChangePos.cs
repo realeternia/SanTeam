@@ -15,11 +15,11 @@ public class SkillInitSneakChangePos : Skill
 
     public override void BattleBegin()
     {
-        // 敌方存活且未被交换过的英雄中随机选一名作为偷袭目标（range=0 表示全场）
+        // 敌方存活且未被交换过的英雄中随机选一名作为偷袭目标（优先配对敌人，无配对敌人时取全部敌方英雄）
         var enemyHeroes = new List<Chess>();
-        foreach (var chess in WorldManager.Instance.GetUnitsInRange(owner.transform.position, 0, owner.side, true))
+        foreach (var chess in WorldManager.Instance.GetAllEnemys(owner.side))
         {
-            if (chess.isHero && chess.sneakSwapped == false)
+            if (chess.sneakSwapped == false)
                 enemyHeroes.Add(chess);
         }
         if (enemyHeroes.Count == 0)
