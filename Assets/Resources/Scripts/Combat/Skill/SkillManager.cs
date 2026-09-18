@@ -90,6 +90,8 @@ public static class SkillManager
                 return new SkillInitAddItem(skillId, owner);
             case "InitEnemyRandomBuff":
                 return new SkillInitEnemyRandomBuff(skillId, owner);
+            case "AttackedShield":
+                return new SkillAttackedShield(skillId, owner);
 
             case "FactionShield":
                 return new SkillFactionShield(skillId, owner);

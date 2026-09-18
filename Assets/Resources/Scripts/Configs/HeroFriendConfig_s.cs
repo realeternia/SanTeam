@@ -114,7 +114,7 @@ namespace CommonConfig
             config[5] = new HeroFriendConfig(5, "仁德济世", 1, new int[]{110003,100001,101015,110009,103007,103016}, "仁", "#FFAA33");
             config[6] = new HeroFriendConfig(6, "身负异禀", 1, new int[]{100003,110011,110007,101014,101019,105001}, "", "");
             config[7] = new HeroFriendConfig(7, "经世济民", 1, new int[]{103012,102020,101017,100005,101012}, "济", "#FFD700");
-            config[8] = new HeroFriendConfig(8, "老当益壮", 1, new int[]{101008,101022,103005,103022,102005}, "", "");
+            config[8] = new HeroFriendConfig(8, "老当益壮", 1, new int[]{101008,101022,103005,103022,102005}, "老", "#CC7A00");
             config[9] = new HeroFriendConfig(9, "先登陷阵", 1, new int[]{102004,103019,101001,105006,102009}, "破", "#FF6600");
             config[10] = new HeroFriendConfig(10, "深谋远虑", 1, new int[]{103010,102011,104007,106003,103012}, "谋", "#0000FF");
             config[11] = new HeroFriendConfig(11, "治军严明", 1, new int[]{101003,104006,102017,101013,102012,106006}, "", "");

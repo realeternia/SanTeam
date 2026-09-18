@@ -61,7 +61,7 @@ HeroFriendConfig(Id, Name, Level, Heros, SkillId, LineColor)
 |---|---|---|---|---|---|
 | G7 经世济民 | 济 | 每回合额外金币 | ✅ 已完成（Dumb） | — | Lv4 |
 | G6 身负异禀 | 异 | 开局随机获得 攻/法强/护甲/魔抗 之一强化 | 复用 `SkillInitAttrChange`（加随机分组） | 小改 | **Lv5** |
-| G8 老当益壮 | 壮 | 最大生命 +X、每秒回血 +X | 复用 `SkillInitAttrChange` | 无 | Lv4 |
+| G8 老当益壮 | 壮 | 永久 +生命回复 2~6；生命<30% 时给自己释放 攻击×240%~480% 护盾（CD 10s） | ✅ 已完成（`SkillAidSelfShieldLowHp`） | — | Lv4 |
 | G11 治军严明 | 令 | 全军士兵 攻 +X%、生命 +X% | 新脚本（复用士兵系数机制） | ✅ | **Lv5** |
 | G12 王佐之才 | 佐 | 我方其他英雄 攻击/法强 +X（辅佐光环） | 新脚本（遍历友方 `ApplyAttr`） | ✅ | **Lv5** |
 | G16 权奸当道 | 奸 | 开局对随机 1 名敌方英雄施加增伤（10~20s，+30%~60%），每个有 link 的 hero 各自触发 | ✅ 已完成（通用技能 `SkillInitEnemyRandomBuff`） | — | Lv4 |
@@ -93,18 +93,29 @@ HeroFriendConfig(Id, Name, Level, Heros, SkillId, LineColor)
 - 建议数值（四属性共用同一套，可调）：`+10 / +18 / +28 / +40 / +55`
 - 备注：随机结果建议在 `GameLog.Debug` 里打出来便于排查
 
-### G8 老当益壮「壮」（5 人，最高 Lv4）
+### G8 老当益壮「壮」（5 人，最高 Lv4）— ✅ 已实现
 
 - 成员：黄忠·弓 101008、严颜·盾 101022、黄盖·士 103005、程普·车 103022、许褚·锤 102005
-- 效果：最大生命 +X、每秒回血 +X
-- 复用：`SkillInitAttrChange`，`LinkSelf = "maxHp+X,hpRegen+Y"`
-- ⚠️ **属性名是 `maxHp` 不是 `hp`**（`JobLinkManager.ApplyAttr` 只认 `maxHp`）
-- 建议数值：
-  | Lv | 1 | 2 | 3 | 4 | 5 |
+- **效果（改版，覆盖旧的"最大生命+X、每秒回血+X"）**：
+  1. **受到攻击时**若自身生命低于 **30%**，给自己释放**攻击比例的吸收盾**（护盾容量 = 自身攻击 × 比例），**CD 10s**，数值高于「护卫」（护卫为 AP×200%~400%）
+  2. 每次触发时叠加**永久生命回复** +2~+6（可逐次累积，越老越耐战）
+- 落地内容：
+  - 新脚本 `Combat/Skill/SkillAttackedShield.cs`（`ScriptName = "AttackedShield"`，**通用技能**，已注册 `SkillManager.CreateSkill` + `Assembly-CSharp.csproj`）
+    - 触发方式与 `SkillAttackedBuff` 一致：走 `OnAttacked(attacker, damage)`（非辅助技能轮询），`damage > 10` 且 `CheckBurst` 通过才生效
+    - `OnAttacked`：给自己挂 `BuffId="盾"`（`BuffShield`）并 `SetHp(atk × SkillDamageRate)`；随后直接 `JobLinkManager.ApplyAttr(owner, "hpRegen", skillCfg.StrengthInt)` 叠生命回复（不解析 `LinkSelf`）
+  - 技能行 `SkillConfig 2010106~2010110`（`Name = 宝刀未老`、`Sname = 壮`、`Type = 连接`、`CD = 10f`、`MpCost = 0`、`TriggerCondition = "hprate<30"`、`AttackPointReduce = 0f`、`StrengthInt = 2~6`、`LinkSelf = 空`、`BuffId = "盾"`、`BuffTime = 999f`、`Action = "sway"`、`HitEffect = "MagicChargeYellow"`）
+  - `HeroFriendConfig[8]` → `SkillId = "壮"`、`LineColor = "#CC7A00"`
+- 数值：
+  | Lv | 1 | 2 | 3 | 4 | 5(预留) |
   |---|---|---|---|---|---|
-  | maxHp | +80 | +150 | +240 | +360 | +500 |
-  | hpRegen | +1 | +2 | +3 | +5 | +7 |
-- 备注：`maxHp` 加成后 `ApplyAttr` 内部会同步 `heroInfo.SetHpRate`，无需额外处理
+  | SkillDamageRate（护盾=攻击×） | 2.4 | 3.0 | 3.6 | 4.2 | 4.8 |
+  | StrengthInt（每次触发 生命回复+X） | +2 | +3 | +4 | +5 | +6 |
+- 备注：
+  - 触发条件是"**受击时**生命低于30%"（`TriggerCondition="hprate<30"` 在 `CheckBurst` 里判定），没有挨打就不会触发
+  - 护盾持续整场（`BuffTime=999`），CD 转好后再受击会**重新触发并覆盖护盾容量**（同 id Buff 只 `Refresh`，`SetHp` 为覆盖，不累加），与「护卫」行为一致
+  - 生命回复是**每次触发直接叠加**（`hpRegen += StrengthInt`），不是战斗开始加一次性；CD 10s 内多次受击只结算一次
+  - 阈值 30%/CD 10s/护盾比例/生命回复数值全部在配置行里，改数值不用动代码
+  - 图标需补 `Textures/SkillPic/zhuang.png`（当前引用的文件尚未提供，图标会为空）
 
 ### G11 治军严明「令」（6 人，可到 Lv5）— 需新脚本
 
@@ -297,9 +308,9 @@ HeroFriendConfig(Id, Name, Level, Heros, SkillId, LineColor)
 
 ### 建议实施顺序（先易后难）
 
-1. **零新增脚本批**（改配置即可）：G8 / G17 / G18 / G21 / G24 → 再 G20（复用 `ModifySkillRateTime`）
+1. **零新增脚本批**（改配置即可）：G17 / G18 / G21 / G24 → 再 G20（复用 `ModifySkillRateTime`）
 2. **小改批**：G6（`InitAttrChange` 加随机组）
-3. **新脚本批**：G16（改版效果）→ G32（照抄 `FactionShield`）→ G12 → G11（含士兵结算坑）→ G25（含新 Buff）→ G31（含击杀事件钩子，改动面最大，放最后）
+3. **新脚本批**：✅ G16、✅ G8 → G32（照抄 `FactionShield`）→ G12 → G11（含士兵结算坑）→ G25（含新 Buff）→ G31（含击杀事件钩子，改动面最大，放最后）
 
 ---
 
