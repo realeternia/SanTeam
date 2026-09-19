@@ -159,6 +159,7 @@ public class Chess : MonoBehaviour
             materialFlag = new Material(rendFlag.sharedMaterial);
             materialFlag.mainTexture = Resources.Load<Texture>(playerInfo.imgPath);
             rendFlag.material = materialFlag;
+            GameLog.Debug("Init Hero done " + heroId);
         }
 
         if (!hasSKill)
@@ -362,8 +363,8 @@ public class Chess : MonoBehaviour
         if (attackRange == 0)
             return;
 
-        // 获取所有Chess组件
-        var allChess = WorldManager.Instance.GetUnitsInRange(transform.position, attackRange*3, side, true);
+        // 获取所有敌方单位：range传0表示全地图索敌（单位必须知道远处敌人的位置才能向其推进，近战单位射程近不能因此失去索敌能力）
+        var allChess = WorldManager.Instance.GetUnitsInRange(transform.position, 0, side, true);
         List<(Chess chess, float distance)> validTargets = new List<(Chess, float)>();
 
         // 收集所有有效目标及其距离

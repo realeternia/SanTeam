@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -175,11 +175,11 @@ namespace CommonConfig
             config[6] = new PlayerConfig(6, "艾沙", "PlayerPic/aisha", "#2BD9F9", true, 0, new int[0], false, true, 3f, 1, 0.2f, 1f, 0, 0.65f, 0.7f);
             config[8] = new PlayerConfig(8, "巴爸", "PlayerPic/baba", "#FF73FF", true, 0, new int[0], false, false, 3f, 2, 0.28f, 1f, 0, 1f, 0.85f);
             config[9] = new PlayerConfig(9, "巴妈", "PlayerPic/bama", "#333333", true, 0, new int[0], false, false, 3f, 2, 0.35f, 1f, 0, 1.2f, 0.5f);
-            config[100] = new PlayerConfig(100, "魔童", "PlayerPic/nezha", "#8C0000", false, -5, new int[]{409001}, false, true, 3f, 2, 0.5f, 1f, 0, 0.5f, 0.9f);
-            config[101] = new PlayerConfig(101, "钱多", "PlayerPic/qian", "#FFFFFF", false, 5, new int[]{409002}, false, true, 5f, 3, 0.525f, 1f, 0, 1.5f, 0.7f);
-            config[102] = new PlayerConfig(102, "黄眉", "PlayerPic/huangmei", "#5555FF", false, -5, new int[]{100002,409004}, false, true, 3f, 2, 0.5f, 2.5f, 2, 1.2f, 0.85f);
-            config[103] = new PlayerConfig(103, "无量", "PlayerPic/wuliang", "#FF3333", false, -5, new int[]{100003,409005}, false, true, 3f, 2, 0.5f, 2.5f, 3, 0.5f, 0.9f);
-            config[104] = new PlayerConfig(104, "大虎", "PlayerPic/dahu", "#006633", false, -5, new int[]{100001,409003}, false, true, 3f, 2, 0.5f, 3f, 1, 0.5f, 0.9f);
+            config[100] = new PlayerConfig(100, "魔童", "PlayerPic/nezha", "#8C0000", false, 0, new int[]{409001}, false, true, 3f, 2, 0.5f, 1f, 0, 0.5f, 0.9f);
+            config[101] = new PlayerConfig(101, "钱多", "PlayerPic/qian", "#FFFFFF", false, 2, new int[]{409002}, false, true, 5f, 3, 0.525f, 1f, 0, 1.5f, 0.7f);
+            config[102] = new PlayerConfig(102, "黄眉", "PlayerPic/huangmei", "#5555FF", false, 0, new int[]{100002,409004}, false, true, 3f, 2, 0.5f, 2.5f, 2, 1.2f, 0.85f);
+            config[103] = new PlayerConfig(103, "无量", "PlayerPic/wuliang", "#FF3333", false, 0, new int[]{100003,409005}, false, true, 3f, 2, 0.5f, 2.5f, 3, 0.5f, 0.9f);
+            config[104] = new PlayerConfig(104, "大虎", "PlayerPic/dahu", "#006633", false, 0, new int[]{100001,409003}, false, true, 3f, 2, 0.5f, 3f, 1, 0.5f, 0.9f);
             config[999] = new PlayerConfig(999, "怪物", "PlayerPic/tower", "#FF0000", false, 0, new int[0], false, false, 0f, 0, 0f, 0f, 0, 0f, 0f);
 
             RebuildIndex();

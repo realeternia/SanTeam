@@ -113,26 +113,32 @@ public class WorldManager : MonoBehaviour
 
         BattleResultPanel.gameObject.SetActive(false);
         SpawnUnitsInRegions();
+        GameLog.Debug("[BattleInit] spawn done");
 
         foreach (var chess in chessList.ToArray()) //防止召唤
             SkillManager.CheckAddSkill(chess);
+        GameLog.Debug("[BattleInit] checkAddSkill done");
 
         // 兵种连锁：按同职业英雄数量施加职业被动属性加成（自身加成+全队加成，不走技能系统）
         JobLinkManager.ApplyJobLinks();
+        GameLog.Debug("[BattleInit] jobLink done");
 
         // 连线(武将关系)：计算好友属性加成并创建连线特效
         FriendLineManager.ApplyFriendLines();
+        GameLog.Debug("[BattleInit] friendLine done");
 
         // 好友连锁·特殊：在场好友数量提升关联(助益)技能等级（默认无技能，每多一个+1级）
         FriendLineManager.ApplyFriendSpecialSkills();
+        GameLog.Debug("[BattleInit] friendSpecial done");
 
         // 国家护盾：同阵营英雄数量达到档位后授予对应等级的国家护盾技能（效果由技能在 BattleBegin 施加）
-        FactionShieldManager.ApplyFactionShields();        
+        FactionShieldManager.ApplyFactionShields();
+        GameLog.Debug("[BattleInit] factionShield done");
 
         // 战斗开始技能：必须等在好友特殊技能授予之后，否则 BattleBegin 型技能（如偷袭/明镜）取不到技能
         foreach (var chess in chessList.ToArray()) //防止召唤
             SkillManager.BattleBegin(chess);
-
+        GameLog.Debug("[BattleInit] skills done");
 
         StartCoroutine(GameUpdate());
     }
@@ -267,10 +273,13 @@ public class WorldManager : MonoBehaviour
                     SpawnSoldiersForSide(p, playerCenter, 1);
                     SpawnHerosForSide(p, playerCenter, p.GetBattleCardList(), 1);
                     SpawnGongSummonForSide(p, playerCenter, 1);
+                    GameLog.Debug("[BattleInit] gongSummon done");
                     CreateCastleHUD(p, playerCenter);
+                    GameLog.Debug("[BattleInit] castleHud done");
 
                     if (monsterCenter != null)
                         SpawnMonstersForSide(monsterCenter, 2);
+                    GameLog.Debug("[BattleInit] monsters done");
                 }
             }
             else

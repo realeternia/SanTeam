@@ -211,7 +211,7 @@ namespace CommonConfig
             config[402007] = new ItemConfig(402007, "羽扇", "", 1, "attr", "ap+10", new int[0], "", 0, 0, false, false, false, 0, 0, 0, 0, 0f, "yushan");
             config[402008] = new ItemConfig(402008, "长生镜", "", 1, "attr", "hp+150", new int[0], "", 0, 0, false, false, false, 1, 0, 0, 2, 0.24f, "jingzi");
             config[409001] = new ItemConfig(409001, "火尖枪", "", 1, "attr", "atk+15", new int[0], "", 0, 999, false, false, false, 1, 0, 0, 12, 0f, "huojianqiang");
-            config[409002] = new ItemConfig(409002, "聚宝盆", "每年额外获得5金币", 1, "pattr", "roundgold+5", new int[0], "", 0, 999, false, false, false, 1, 0, 0, 12, 0f, "jubaopeng");
+            config[409002] = new ItemConfig(409002, "聚宝盆", "每年额外获得2金币", 1, "pattr", "roundgold+2", new int[0], "", 0, 999, false, false, false, 1, 0, 0, 12, 0f, "jubaopeng");
             config[409003] = new ItemConfig(409003, "虎王重甲", "", 1, "pattr", "shp+40", new int[0], "", 0, 999, false, false, false, 1, 0, 0, 12, 0f, "armor");
             config[409004] = new ItemConfig(409004, "玉如意", "出售卡牌多获得25%金币", 1, "sellhigh", "", new int[0], "", 0, 999, false, false, false, 1, 0, 0, 12, 0f, "ruyi");
             config[409005] = new ItemConfig(409005, "酒", "", 1, "attr", "atk+10,ap+6", new int[0], "", 0, 999, false, false, false, 1, 0, 0, 12, 0f, "jiu");
