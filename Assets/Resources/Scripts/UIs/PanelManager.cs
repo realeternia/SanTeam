@@ -217,15 +217,19 @@ public class PanelManager : MonoBehaviour
     }
 
     // 收起侧边栏：等滑出动画播完再隐藏并移除面板计数，避免中途被根节点隐藏打断动画
-    public void HideSideBar()
+    public void HideSideBar(System.Action onComplete = null)
     {
         if (sideBar == null)
+        {
+            onComplete?.Invoke();
             return;
+        }
         GameManager.Instance.PlaySound("Sounds/deck");
         sideBar.GetComponent<SideBar>().OnHide(() =>
         {
             sideBar.SetActive(false);
             ChangePanelCount(sideBar, false);
+            onComplete?.Invoke();
         });
     }
 

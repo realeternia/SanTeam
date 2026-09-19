@@ -148,7 +148,14 @@ public class SideComposeSelector : MonoBehaviour
             return;
         }
 
-        onRecipeSelected?.Invoke(selectedItems[0].GetRecipe());
-        PanelManager.Instance.HideSideBar();
+        // 合成与关闭侧边栏都由回调方负责（先收侧边栏，再在背包里播合成动画）
+        if (onRecipeSelected == null)
+        {
+            GameLog.Warn("SideComposeSelector.OnConfirm: 未设置合成回调，直接关闭");
+            PanelManager.Instance.HideSideBar();
+            return;
+        }
+
+        onRecipeSelected.Invoke(selectedItems[0].GetRecipe());
     }
 }

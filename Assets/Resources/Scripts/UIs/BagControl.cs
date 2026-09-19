@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using CommonConfig;
+using DG.Tweening;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
@@ -607,7 +608,7 @@ public class BagControl : MonoBehaviour, IPanelEvent
         UpdateView(); // 卸下的装备回到背包，整体刷新
     }
 
-    // 合成区：拖物品过来 → 侧边栏列出与该物品相关的合成配方（材料不足的置灰排后），确定后合成
+    // 合成区：拖物品过来 → 侧边栏列出与该物品相关的合成配方（材料不足的置灰排后）
     public void OpenComposePanel(int itemCardId)
     {
         if (itemCardId == 0 || ConfigManager.IsHeroCard(itemCardId))
@@ -616,9 +617,22 @@ public class BagControl : MonoBehaviour, IPanelEvent
             return;
         }
 
-        var p1 = GameManager.Instance.GetPlayer(bindPlayer.pid);
-        SideComposeSelector.SetContext(bindPlayer.pid, itemCardId, recipe =>
+        SideComposeSelector.SetContext(bindPlayer.pid, itemCardId, OnComposeConfirm);
+        PanelManager.Instance.ShowSideBar("SideComposeSelector");
+    }
+
+    // 确认合成：先收起侧边栏，等侧边栏滑出后在背包里播合成动画，动画结束才真正合成并刷新
+    private void OnComposeConfirm(ItemCombineConfig recipe)
+    {
+        if (recipe == null)
         {
+            GameLog.Error("BagControl.OnComposeConfirm: 合成配方为空");
+            return;
+        }
+
+        PanelManager.Instance.HideSideBar(() => PlayComposeAnim(recipe, () =>
+        {
+            var p1 = GameManager.Instance.GetPlayer(bindPlayer.pid);
             if (!p1.CombineTwoItems(recipe.ItemA, recipe.ItemB))
             {
                 ShowTipText("材料不足，无法合成");
@@ -627,9 +641,128 @@ public class BagControl : MonoBehaviour, IPanelEvent
 
             GameManager.Instance.PlaySound("Sounds/equip");
             UpdateView(); // 材料消耗、产物进背包，整体刷新
-        });
+        }));
+    }
 
-        PanelManager.Instance.ShowSideBar("SideComposeSelector");
+    // 合成动画：两件材料道具的图标跳出来碰到一起，合并成一个结果道具图标（在背包里播）
+    private void PlayComposeAnim(ItemCombineConfig recipe, System.Action onComplete)
+    {
+        if (recipe == null || !ItemConfig.HasConfig(recipe.ResultId) || bagItemRegion == null)
+        {
+            GameLog.Error($"BagControl.PlayComposeAnim: 配方/结果道具配置缺失或物品区未就绪，跳过动画 resultId={recipe?.ResultId}");
+            onComplete?.Invoke();
+            return;
+        }
+
+        const float iconSize = 80f;
+        const float jumpDuration = 0.3f;  // 材料图标弹起来碰到一起
+        const float mergeDuration = 0.2f; // 合并出结果图标
+        const float flyDuration = 0.35f;  // 结果道具飞向背包
+        const float jumpPower = 90f;      // 跳跃高度
+        const float collideRise = 70f;    // 碰撞点相对两材料中点再上抬的高度
+        const float touchGap = 14f;       // 两图标"碰到一起"时的间距
+
+        // 临时图标容器挂在物品区同层，动画结束后整体销毁
+        GameObject containerObj = new GameObject("ComposeAnim", typeof(RectTransform));
+        RectTransform container = containerObj.GetComponent<RectTransform>();
+        container.SetParent(bagItemRegion.transform.parent, false);
+        container.anchoredPosition = Vector2.zero;
+        container.SetAsLastSibling();
+
+        // 结果道具的落脚点 = 背包物品区中心
+        Vector2 bagPos = ToContainerPos(container, bagItemRegion.transform as RectTransform);
+
+        Vector2 startA = GetItemStartAnchored(container, recipe.ItemA, 0, bagPos - new Vector2(120f, 0f));
+        Vector2 startB = GetItemStartAnchored(container, recipe.ItemB, recipe.ItemA == recipe.ItemB ? 1 : 0, bagPos + new Vector2(120f, 0f));
+
+        // 碰撞点 = 两个材料的中点再上抬一点（弹起来在空中互相碰撞）
+        Vector2 meetPos = (startA + startB) * 0.5f + new Vector2(0f, collideRise);
+
+        Image iconA = CreateTempItemIcon(container, recipe.ItemA, startA, iconSize);
+        Image iconB = CreateTempItemIcon(container, recipe.ItemB, startB, iconSize);
+        Image iconResult = CreateTempItemIcon(container, recipe.ResultId, meetPos, iconSize);
+        if (iconA == null || iconB == null || iconResult == null)
+        {
+            GameLog.Error("BagControl.PlayComposeAnim: 临时图标创建失败，跳过动画");
+            Destroy(containerObj);
+            onComplete?.Invoke();
+            return;
+        }
+
+        iconResult.rectTransform.localScale = Vector3.zero; // 结果图标先收起，等两个材料碰到一起再弹出
+
+        // 各自朝对方靠拢，中间留出 touchGap 表示"碰到"
+        float dir = startA.x <= startB.x ? 1f : -1f;
+        Vector2 endA = meetPos - new Vector2(touchGap, 0f) * dir;
+        Vector2 endB = meetPos + new Vector2(touchGap, 0f) * dir;
+
+        Sequence seq = DOTween.Sequence().SetUpdate(true);
+        seq.Join(iconA.rectTransform.DOJumpAnchorPos(endA, jumpPower, 1, jumpDuration));
+        seq.Join(iconB.rectTransform.DOJumpAnchorPos(endB, jumpPower, 1, jumpDuration));
+
+        // 碰到一起后：材料图标缩小淡出，结果道具在碰撞点弹出
+        seq.Append(iconResult.rectTransform.DOScale(Vector3.one, mergeDuration).SetEase(Ease.OutBack));
+        seq.Join(iconA.DOFade(0f, mergeDuration));
+        seq.Join(iconB.DOFade(0f, mergeDuration));
+        seq.Join(iconA.rectTransform.DOScale(0f, mergeDuration));
+        seq.Join(iconB.rectTransform.DOScale(0f, mergeDuration));
+
+        // 新道具飞向背包
+        seq.Append(iconResult.rectTransform.DOAnchorPos(bagPos, flyDuration).SetEase(Ease.InQuad));
+        seq.Join(iconResult.rectTransform.DOScale(0.7f, flyDuration));
+
+        seq.OnComplete(() =>
+        {
+            Destroy(containerObj);
+            onComplete?.Invoke();
+        });
+    }
+
+    // 取背包里该道具对应格子的位置（第 index 个副本，找不到则用兜底位置）
+    private Vector2 GetItemStartAnchored(RectTransform container, int itemId, int index, Vector2 fallback)
+    {
+        List<RectTransform> cells = new List<RectTransform>();
+        foreach (Transform child in bagItemRegion.transform)
+        {
+            var cell = child.GetComponent<BagCell>();
+            if (cell != null && cell.cardId == itemId && child is RectTransform rt)
+                cells.Add(rt);
+        }
+
+        if (cells.Count == 0)
+            return fallback;
+
+        return ToContainerPos(container, cells[Mathf.Min(index, cells.Count - 1)]);
+    }
+
+    // 目标世界的中心点 → 容器本地坐标（可直接当子图标的 anchoredPosition）
+    private Vector2 ToContainerPos(RectTransform container, RectTransform target)
+    {
+        if (container == null || target == null)
+            return Vector2.zero;
+        return container.InverseTransformPoint(target.TransformPoint(target.rect.center));
+    }
+
+    // 创建一个临时道具图标（仅用于合成动画，无交互）
+    private Image CreateTempItemIcon(RectTransform container, int itemId, Vector2 anchoredPos, float size)
+    {
+        if (!ItemConfig.HasConfig(itemId))
+        {
+            GameLog.Error($"BagControl.CreateTempItemIcon: ItemConfig 不存在 itemId={itemId}");
+            return null;
+        }
+
+        GameObject go = new GameObject("TempItemIcon", typeof(RectTransform), typeof(Image));
+        RectTransform rt = go.GetComponent<RectTransform>();
+        rt.SetParent(container, false);
+        rt.sizeDelta = new Vector2(size, size);
+        rt.anchoredPosition = anchoredPos;
+
+        Image img = go.GetComponent<Image>();
+        img.sprite = Resources.Load<Sprite>("Textures/ItemPic/" + ItemConfig.GetConfig(itemId).Icon);
+        img.preserveAspect = true;
+        img.raycastTarget = false;
+        return img;
     }
 
     // 物品消耗/出售1个后的格子刷新：每件一格，消耗后直接移除该格

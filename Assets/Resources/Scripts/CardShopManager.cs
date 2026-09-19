@@ -584,9 +584,36 @@ public class CardShopManager : MonoBehaviour
             result.Add(cardViews[i]);
     }
 
+    // 8 个基础道具（合成材料，id 连续 402001~402008）
+    private static readonly int[] BaseItemIds = { 402001, 402002, 402003, 402004, 402005, 402006, 402007, 402008 };
+
+    // 调试用：给人类玩家补齐 8 个基础道具（已有该道具的跳过），仅 Debug.isDebugBuild 生效
+    public static void DebugGiveBaseItems()
+    {
+        if (!Debug.isDebugBuild)
+            return;
+
+        var p1 = GameManager.Instance.GetPlayer(0);
+        int given = 0;
+        foreach (int itemId in BaseItemIds)
+        {
+            if (p1.GetItemCount(itemId) > 0)
+                continue;
+            p1.AddItemCard(itemId);
+            given++;
+        }
+
+        if (given > 0)
+            GameLog.Debug($"调试补齐基础道具：玩家0 获得 {given} 个");
+    }
+
     public void ShopBegin()
     {
         GameLog.Debug("ShopBegin");
+
+        // 调试：每次商店阶段开始（含开局与战后回商店）给人类玩家补齐 8 个基础道具
+        DebugGiveBaseItems();
+
         if(hasEnterBattle) //存档拉起进入游戏，不会重复存储
             GameManager.Instance.SaveToFile();
 
