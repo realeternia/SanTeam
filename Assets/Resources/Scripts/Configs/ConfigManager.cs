@@ -67,23 +67,20 @@ public static class ConfigManager
                 GameLog.Error(string.Format("ConfigManager.PostModify: 英雄[{0}]职业[{1}]缺少 JobConfig，无法写回基准属性", heroCfg.Name, heroCfg.Job));
                 continue;
             }
-            // 次级面板（移速/射程/攻速/护甲/魔抗）：写回 = 职业基准×(1+修正%/100)，不乘品质系数
+            // 次级面板（移速/射程/攻速/护甲/魔抗/生命回复/魔法回复）：写回 = 职业基准×(1+修正%/100)，不乘品质系数
             heroCfg.MoveSpeed = (int)Math.Round(jobCfg.MoveSpeed * (100f + heroCfg.MoveSpeed) / 100f);
             heroCfg.Range = (int)Math.Round(jobCfg.Range * (100f + heroCfg.Range) / 100f);
             heroCfg.AtkSpeed = (int)Math.Round(jobCfg.AtkSpeed * (100f + heroCfg.AtkSpeed) / 100f);
             heroCfg.Armor = (int)Math.Round(jobCfg.Armor * (100f + heroCfg.Armor) / 100f);
             heroCfg.MagicRes = (int)Math.Round(jobCfg.MagicRes * (100f + heroCfg.MagicRes) / 100f);
+            heroCfg.HpRegen = (int)Math.Round(jobCfg.HpRegen * (100f + heroCfg.HpRegen) / 100f);
+            heroCfg.MpRegen = (int)Math.Round(jobCfg.MpRegen * (100f + heroCfg.MpRegen) / 100f);
             // 主属性（攻击/法术/生命）：写回 = 职业基准×(1+修正%/100) × 品质系数1.15^(Q-1)，即“1星带品质面板”
             // （图鉴/排行/发卡/AI/排序直接读即为此口径）；星级成长保留到运行时按 AtkP/ApP/HpP 乘
             float qualityFactor = Mathf.Pow(1.15f, Mathf.Max(1, heroCfg.Quality) - 1);
             heroCfg.Atk = (int)Math.Round(jobCfg.Atk * (100f + heroCfg.Atk) / 100f * qualityFactor);
             heroCfg.Ap = (int)Math.Round(jobCfg.Ap * (100f + heroCfg.Ap) / 100f * qualityFactor);
-            heroCfg.Might = (int)Math.Round(jobCfg.Might * (100f + heroCfg.Might) / 100f * qualityFactor);
             heroCfg.Hp = (int)Math.Round(jobCfg.Hp * (100f + heroCfg.Hp) / 100f * qualityFactor);
-            // 无双强度(Might)并入攻击(atk)：项目内不再使用无双属性，物理伤害统一按 atk 成长、护甲减免。
-            // Might/MightP 列后续在配置源表删除，届时需同步删除上方 Might 写回与本行合并代码
-            heroCfg.Atk += heroCfg.Might;
-            heroCfg.Might = 0;
         }
     }
 
@@ -270,7 +267,7 @@ public static class ConfigManager
         return false;
     }
 
-    // 英雄技能列表：职业兵种技能 + 个人技能(Skill1/Skill2)，按缩写去重。
+    // 英雄技能列表：职业兵种技能 + 个人技能(Skill1)，按缩写去重。
     // 默认取各缩写的1级行（界面显示统一1级）。战斗创建后按来源修正：
     // 个人技能按卡片等级、兵种技能由JobLinkManager、好友特殊技能由FriendLineManager 各自 SetLevel 匹配 Sname+等级 的行。
     // 配置中未登记的缩写（如技能表缺失）跳过并告警，避免绑定固定Id时抛异常。
@@ -281,7 +278,6 @@ public static class ConfigManager
         if (jobCfg != null)
             AddHeroSkillCfg(list, jobCfg.SkillId);
         AddHeroSkillCfg(list, heroCfg.Skill1);
-        AddHeroSkillCfg(list, heroCfg.Skill2);
         return list;
     }
 

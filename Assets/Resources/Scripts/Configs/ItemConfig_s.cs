@@ -42,7 +42,7 @@ namespace CommonConfig
         {
             {"Id", new FieldMetaInfo("序列", "int", 60)},
             {"Name", new FieldMetaInfo("名字", "string", 0)},
-            {"Des", new FieldMetaInfo("效果说明", "string", 0)},
+            {"Des", new FieldMetaInfo("效果说明", "string", 155)},
             {"Quality", new FieldMetaInfo("品质", "int", 60)},
             {"Effect", new FieldMetaInfo("效果", "string", 0)},
             {"Attrs", new FieldMetaInfo("属性加成", "string", 210)},
@@ -183,11 +183,11 @@ namespace CommonConfig
             config[402006] = new ItemConfig(402006, "护手", "暴击+15%", 1, "attr", "crit+0.15", "crit", new int[0], "", false, 0, 0, "hushou");
             config[402007] = new ItemConfig(402007, "羽扇", "法强+10", 1, "attr", "ap+10", "ap", new int[0], "", false, 0, 0, "yushan");
             config[402008] = new ItemConfig(402008, "名马", "生命+150", 1, "attr", "hp+150", "hp", new int[0], "", false, 0, 0, "ma1");
-            config[409001] = new ItemConfig(409001, "火尖枪", "攻击+15", 5, "attr", "atk+15", "atk", new int[0], "", false, 0, 0, "huojianqiang");
+            config[409001] = new ItemConfig(409001, "火尖枪", "攻击+20", 5, "attr", "atk+20", "atk", new int[0], "", false, 0, 0, "huojianqiang");
             config[409002] = new ItemConfig(409002, "聚宝盆", "每年额外获得2金币", 5, "pattr", "roundgold+2", "", new int[0], "", false, 0, 0, "jubaopeng");
-            config[409003] = new ItemConfig(409003, "虎王重甲", "士兵生命+40", 5, "pattr", "shp+40", "", new int[0], "", false, 0, 0, "armor");
+            config[409003] = new ItemConfig(409003, "虎王重甲", "士兵生命+100", 5, "pattr", "shp+100", "", new int[0], "", false, 0, 0, "armor");
             config[409004] = new ItemConfig(409004, "玉如意", "出售卡牌多获得25%金币", 5, "sellhigh", "", "", new int[0], "", false, 0, 0, "ruyi");
-            config[409005] = new ItemConfig(409005, "酒", "攻击+10，法强+6", 5, "attr", "atk+10,ap+6", "atk", new int[0], "", false, 0, 0, "jiu");
+            config[409005] = new ItemConfig(409005, "酒", "攻击+10，法强+10", 5, "attr", "atk+10,ap+10", "atk", new int[0], "", false, 0, 0, "jiu");
 
             RebuildIndex();
 

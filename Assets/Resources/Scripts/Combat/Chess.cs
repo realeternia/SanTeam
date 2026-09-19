@@ -141,7 +141,7 @@ public class Chess : MonoBehaviour
             var jobSkillSname = jobCfg != null ? jobCfg.SkillId : "";
             var playerInfo = GameManager.Instance.GetPlayer(playerId);
             // 初始化技能：默认取1级行创建，随后按来源修正等级——
-            // 个人技能(Skill1/Skill2)等级 = 卡片等级；兵种技能为占位技能(Dumb)，职业被动加成由 JobLinkManager 按同职业英雄数直接施加；
+            // 个人技能(Skill1)等级 = 卡片等级（超出技能配置最高等级行时按最高等级行生效）；兵种技能为占位技能(Dumb)，职业被动加成由 JobLinkManager 按同职业英雄数直接施加；
             // 好友特殊技能由 FriendLineManager 按在场好友数计算。
             foreach (var skillCfg in ConfigManager.GetHeroSkillConfigs(heroCfg))
             {
@@ -290,6 +290,9 @@ public class Chess : MonoBehaviour
         atk = attr.Atk;
         armor = heroConfig.Armor;
         magicRes = heroConfig.MagicRes;
+        // 生命/魔法回复同样由 PostModify 写回职业基准（OnSecond 中按秒结算）；装备加成在下方累加
+        hpRegen = heroConfig.HpRegen;
+        mpRegen = heroConfig.MpRegen;
 
         // 装备升级机制已移除：装备属性固定，不再按持有数量计算等级；最多3件装备属性累加
         var equipIds = player != null ? player.GetItemIdsOnHero(heroId) : new List<int>();

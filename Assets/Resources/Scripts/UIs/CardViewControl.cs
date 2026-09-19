@@ -143,19 +143,15 @@ public class CardViewControl : MonoBehaviour, IPointerDownHandler, IPointerUpHan
             if (count > 1)
                 cardName.text += "x" + count;
 
-            var heroSkillCfgs = ConfigManager.GetHeroSkillConfigs(heroCfg);
+            // 卡面只显示职业兵种技能图标，个人技能(Skill1)不在卡面显示
+            var jobCfg = ConfigManager.GetJobConfig(heroCfg.Job);
+            var jobSkillCfg = jobCfg != null ? ConfigManager.GetSkillConfig(jobCfg.SkillId) : null;
             for (int i = 0; i < heroJobImage.Length; i++)
             {
-                if (i < heroSkillCfgs.Count)
-                {
-                    heroJobImage[i].gameObject.SetActive(true);
-                    heroJobImage[i].sprite = Resources.Load<Sprite>("Textures/SkillPic/" + heroSkillCfgs[i].Icon);
-                }
-                else
-                {
-                    heroJobImage[i].gameObject.SetActive(false);
-                }
-
+                bool show = i == 0 && jobSkillCfg != null && !string.IsNullOrEmpty(jobSkillCfg.Icon);
+                heroJobImage[i].gameObject.SetActive(show);
+                if (show)
+                    heroJobImage[i].sprite = Resources.Load<Sprite>("Textures/SkillPic/" + jobSkillCfg.Icon);
             }
 
             gameObject.GetComponent<Image>().color = SysColor.GetSideColor(heroCfg.Side);

@@ -57,12 +57,24 @@ public class Skill
 
     /// <summary>
     /// 设置技能等级（连锁机制：兵种连锁/好友连锁·特殊）
-    /// 实际起效的配置 = 同一Sname组内 level 匹配的那一行（未命中时回退组内配置）
+    /// 实际起效的配置 = 同一Sname组内 level 匹配的那一行；
+    /// 等级超出该组已配置的最高等级行时（个人技能按卡片等级可超过5级）按最高等级行生效，等级不足1时按1级行生效
     /// </summary>
     public void SetLevel(int lv)
     {
         Level = lv;
-        var newCfg = ConfigManager.GetSkillConfig(skillCfg.Sname, lv);
+        var targetLv = Mathf.Max(1, lv);
+        var newCfg = ConfigManager.GetSkillConfig(skillCfg.Sname, targetLv);
+        if (newCfg == null)
+        {
+            foreach (var cfg in SkillConfig.ConfigList)
+            {
+                if (cfg.Sname != skillCfg.Sname)
+                    continue;
+                if (newCfg == null || cfg.Lv > newCfg.Lv)
+                    newCfg = cfg;
+            }
+        }
         if (newCfg != null)
             skillCfg = newCfg;
     }

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -534,6 +534,11 @@ namespace CommonConfig
             config[2010113] = new SkillConfig(2010113, "诗书传家", "文", "", "56%", "连接", "", 3, 0.56f, 0f, 0, "", 0f, false, "", 0, 0f, 0f, "", 0, 0f, 0, 0f, 0, "", "", "", false, 0f, "", 0, 0f, 0f, 0f, 401014, "InitAddItemChance", "", "", 0f, "wen", "", "", "");
             config[2010114] = new SkillConfig(2010114, "诗书传家", "文", "", "64%", "连接", "", 4, 0.64f, 0f, 0, "", 0f, false, "", 0, 0f, 0f, "", 0, 0f, 0, 0f, 0, "", "", "", false, 0f, "", 0, 0f, 0f, 0f, 401014, "InitAddItemChance", "", "", 0f, "wen", "", "", "");
             config[2010115] = new SkillConfig(2010115, "诗书传家", "文", "", "72%", "连接", "", 5, 0.72f, 0f, 0, "", 0f, false, "", 0, 0f, 0f, "", 0, 0f, 0, 0f, 0, "", "", "", false, 0f, "", 0, 0f, 0f, 0f, 401014, "InitAddItemChance", "", "", 0f, "wen", "", "", "");
+            config[2020001] = new SkillConfig(2020001, "强击", "强", "对目标造成法强/1的魔法伤害", "120%", "技", "", 1, 1f, 0f, 12, "", 0f, true, "", 0, 30f, 0f, "", 1, 0f, 0, 1.5f, 0, "", "", "", false, 0f, "", 0, 0f, 0f, 0f, 0, "AidSuddenArrow", "sway", "BulletExplosionBlue", 3f, "", "", "", "");
+            config[2020002] = new SkillConfig(2020002, "强击", "强", "", "150%", "技", "", 2, 1f, 0f, 12, "", 0f, true, "", 0, 30f, 0f, "", 1, 0f, 0, 1.5f, 0, "", "", "", false, 0f, "", 0, 0f, 0f, 0f, 0, "AidSuddenArrow", "sway", "BulletExplosionBlue", 3f, "", "", "", "");
+            config[2020003] = new SkillConfig(2020003, "强击", "强", "", "180%", "技", "", 3, 1f, 0f, 12, "", 0f, true, "", 0, 30f, 0f, "", 1, 0f, 0, 1.5f, 0, "", "", "", false, 0f, "", 0, 0f, 0f, 0f, 0, "AidSuddenArrow", "sway", "BulletExplosionBlue", 3f, "", "", "", "");
+            config[2020004] = new SkillConfig(2020004, "强击", "强", "", "220%", "技", "", 4, 1f, 0f, 12, "", 0f, true, "", 0, 30f, 0f, "", 1, 0f, 0, 1.5f, 0, "", "", "", false, 0f, "", 0, 0f, 0f, 0f, 0, "AidSuddenArrow", "sway", "BulletExplosionBlue", 3f, "", "", "", "");
+            config[2020005] = new SkillConfig(2020005, "强击", "强", "", "300%", "技", "", 5, 1f, 0f, 12, "", 0f, true, "", 0, 30f, 0f, "", 1, 0f, 0, 1.5f, 0, "", "", "", false, 0f, "", 0, 0f, 0f, 0f, 0, "AidSuddenArrow", "sway", "BulletExplosionBlue", 3f, "", "", "", "");
             config[2020071] = new SkillConfig(2020071, "速射", "速", "自己和同行[弓弩]箭矢飞行速度提升", "", "攻击up", "", 1, 0f, 0f, 0, "", 0f, false, "", 0, 0f, 0f, "", 0, 2.5f, 0, 0f, 1, "速", "弓弩", "", false, 0f, "", 0, 0f, 0f, 0f, 0, "ModifyShootSpeed", "", "", 0f, "", "", "", "");
             config[2020072] = new SkillConfig(2020072, "速射", "速", "", "", "攻击up", "", 2, 0f, 0f, 0, "", 0f, false, "", 0, 0f, 0f, "", 0, 2.5f, 0, 0f, 1, "速", "弓弩", "", false, 0f, "", 0, 0f, 0f, 0f, 0, "ModifyShootSpeed", "", "", 0f, "", "", "", "");
             config[2020073] = new SkillConfig(2020073, "速射", "速", "", "", "攻击up", "", 3, 0f, 0f, 0, "", 0f, false, "", 0, 0f, 0f, "", 0, 2.5f, 0, 0f, 1, "速", "弓弩", "", false, 0f, "", 0, 0f, 0f, 0f, 0, "ModifyShootSpeed", "", "", 0f, "", "", "", "");

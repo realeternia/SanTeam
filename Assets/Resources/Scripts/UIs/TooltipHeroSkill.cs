@@ -18,10 +18,12 @@ public class TooltipHeroSkill : MonoBehaviour
     private float skillFontBase = -1f;
 
     // 技能行：图标 + 文本（行高度固定100，由外部排列）；level<=0 时文字置灰（显示未激活的1级效果）
+    // 无图标（如未配图的个人技能）时隐藏图标，避免残留上次的图或空图
     public void SetSkill(string text, string icon, int level = 1)
     {
-        img.sprite = Resources.Load<Sprite>("Textures/SkillPic/" + icon);
-        img.gameObject.SetActive(true);
+        img.gameObject.SetActive(!string.IsNullOrEmpty(icon));
+        if (!string.IsNullOrEmpty(icon))
+            img.sprite = Resources.Load<Sprite>("Textures/SkillPic/" + icon);
         textSkill.text = text;
         ApplyStyle(textSkill, ref skillFontBase);
         // 技能行无人员列表，隐藏旧列表残留

@@ -277,9 +277,9 @@ public class TooltipHero : BaseTooltip
                 AppendEquip(attr.Atk, eAtk),
                 AppendEquipSpeed(heroCfg.AtkSpeed, eAtkSpeedRate),
                 AppendEquip(attr.Ap, eAp),
-                AppendEquip(0, (int)eMpRegen),
+                AppendEquip(heroCfg.MpRegen, (int)eMpRegen),
                 AppendEquip(attr.Hp, eHp),
-                AppendEquip(0, (int)eHpRegen),
+                AppendEquip(heroCfg.HpRegen, (int)eHpRegen),
                 AppendEquip(heroCfg.Armor, eArmor),
                 AppendEquip(heroCfg.MagicRes, eMagicRes),
                 heroCfg.MoveSpeed.ToString(), heroCfg.Range.ToString()
@@ -397,13 +397,26 @@ public class TooltipHero : BaseTooltip
                 }
             }
 
-            for(int i = 0; i < skillCfgs.Count; i++)
+            // 个人技能(Skill1)行排在职业技能行之前：非职业技能先入列，职业技能随后
+            var orderedSkillCfgs = new List<SkillConfig>();
+            foreach (var cfg in skillCfgs)
+            {
+                if (cfg.Type != "职业")
+                    orderedSkillCfgs.Add(cfg);
+            }
+            foreach (var cfg in skillCfgs)
+            {
+                if (cfg.Type == "职业")
+                    orderedSkillCfgs.Add(cfg);
+            }
+
+            for(int i = 0; i < orderedSkillCfgs.Count; i++)
             {
                 var row = GetSkillRow(i);
                 if (row == null)
                     break;
                 row.gameObject.SetActive(true);
-                var skillConfig = skillCfgs[i];
+                var skillConfig = orderedSkillCfgs[i];
                 string skillText;
                 if (skillConfig.Type == "职业")
                 {
@@ -425,9 +438,11 @@ public class TooltipHero : BaseTooltip
                 }
                 else
                 {
-                    skillText = skillConfig.Name + ConfigManager.GetSkillDescript(skillConfig); //富文本
-                    // 非职业等级：在身上时等级=卡片等级（最高5）；商店/排行榜默认1级
+                    // 个人技能(Skill1)：等级=卡片等级（最高5），描述取当前等级那一行，
+                    // withNext=true 使每个参数位附上下一级数值变动（括号内、淡绿色），与职业/好友行口径一致
                     int skillLv = player != null ? Mathf.Min(cardLv, 5) : 1;
+                    var skillLvCfg = ConfigManager.GetSkillConfig(skillConfig.Sname, skillLv) ?? skillConfig;
+                    skillText = skillConfig.Name + ConfigManager.GetSkillDescript(skillLvCfg, true); //富文本
                     row.SetSkill(skillText, skillConfig.Icon, skillLv);
                 }
 
