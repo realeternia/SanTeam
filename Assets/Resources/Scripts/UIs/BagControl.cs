@@ -603,15 +603,18 @@ public class BagControl : MonoBehaviour, IPanelEvent
             return;
 
         var p1 = GameManager.Instance.GetPlayer(bindPlayer.pid);
-        int count = p1.UnwearAllEquips(heroCardId);
-        if (count == 0)
+        var equipIds = p1.GetItemIdsOnHero(heroCardId);
+        if (equipIds.Count == 0)
         {
             SystemTip.Show("该英雄没有装备");
             return;
         }
 
+        p1.UnwearAllEquips(heroCardId);
         GameManager.Instance.PlaySound("Sounds/equip");
-        UpdateView(); // 卸下的装备回到背包，整体刷新
+
+        // 装备图标从英雄卡装备槽飞向物品区，落地后再刷新背包（卸下的装备此时才出现在物品区）
+        PlayEquipsFlyToBag(heroCardId, equipIds, () => UpdateView());
     }
 
     // 合成区：拖物品过来 → 侧边栏列出与该物品相关的合成配方（材料不足的置灰排后）
@@ -771,6 +774,82 @@ public class BagControl : MonoBehaviour, IPanelEvent
         return img;
     }
 
+    // 卸下/卖出英雄装备的飞行动画：装备图标从英雄卡装备槽依次飞向背包物品区（小跳一下再飞，落地后回调）
+    private void PlayEquipsFlyToBag(int heroCardId, List<int> equipIds, System.Action onComplete)
+    {
+        if (equipIds == null || equipIds.Count == 0 || bagItemRegion == null)
+        {
+            onComplete?.Invoke();
+            return;
+        }
+
+        const float iconSize = 60f;
+        const float jumpDuration = 0.15f; // 装备从槽位先小跳起来
+        const float flyDuration = 0.4f;   // 飞向物品区
+        const float jumpPower = 40f;      // 小跳高度
+        const float interval = 0.08f;     // 多件装备依次出发的间隔
+
+        // 临时图标容器挂在物品区同层（UpdateView 只清物品区/英雄区子物体，不影响它），动画结束整体销毁
+        GameObject containerObj = new GameObject("EquipFlyAnim", typeof(RectTransform));
+        RectTransform container = containerObj.GetComponent<RectTransform>();
+        container.SetParent(bagItemRegion.transform.parent, false);
+        container.anchoredPosition = Vector2.zero;
+        container.SetAsLastSibling();
+
+        Vector2 bagPos = ToContainerPos(container, bagItemRegion.transform as RectTransform);
+
+        // 起点：英雄卡的装备槽位（找不到英雄卡则退化到物品区中心，仅起点不同不影响飞行动画）
+        RectTransform heroRt = null;
+        foreach (Transform child in bagHeroRegion.transform)
+        {
+            var cell = child.GetComponent<BagCell>();
+            if (cell != null && cell.cardId == heroCardId && child is RectTransform rt)
+            {
+                heroRt = rt;
+                break;
+            }
+        }
+        var heroCell = heroRt != null ? heroRt.GetComponent<BagCell>() : null;
+
+        int done = 0;
+        int total = 0;
+        for (int i = 0; i < equipIds.Count; i++)
+        {
+            RectTransform slotRt = null;
+            if (heroCell != null && heroCell.equipImages != null && i < heroCell.equipImages.Length && heroCell.equipImages[i] != null)
+                slotRt = heroCell.equipImages[i].rectTransform;
+            Vector2 start = slotRt != null
+                ? ToContainerPos(container, slotRt)
+                : (heroRt != null ? ToContainerPos(container, heroRt) : bagPos) + new Vector2(0, -30f * i);
+
+            Image icon = CreateTempItemIcon(container, equipIds[i], start, iconSize);
+            if (icon == null)
+                continue;
+            total++;
+
+            // 每个装备：小跳起来 → 飞向物品区中心（同时缩小），多件装备依次延迟出发
+            Sequence iconSeq = DOTween.Sequence().SetUpdate(true).SetDelay(interval * i);
+            iconSeq.Append(icon.rectTransform.DOJumpAnchorPos(start + new Vector2(0f, jumpPower), jumpPower * 0.5f, 1, jumpDuration));
+            iconSeq.Append(icon.rectTransform.DOAnchorPos(bagPos, flyDuration).SetEase(Ease.InQuad));
+            iconSeq.Join(icon.rectTransform.DOScale(0.7f, flyDuration));
+            iconSeq.OnComplete(() =>
+            {
+                done++;
+                if (done >= total)
+                {
+                    Destroy(containerObj);
+                    onComplete?.Invoke();
+                }
+            });
+        }
+
+        if (total == 0)
+        {
+            Destroy(containerObj);
+            onComplete?.Invoke();
+        }
+    }
+
     // 物品消耗/出售1个后的格子刷新：每件一格，消耗后直接移除该格
     private void RemoveCell(int itemCardId)
     {
@@ -825,12 +904,31 @@ public class BagControl : MonoBehaviour, IPanelEvent
             SystemTip.Show("物品不可出售");
             return;
         }
-        p1.SellCard(cardId, 0);
-        RemoveCell(cardId);
 
-        GameManager.Instance.PlaySound("Sounds/gold");        
-        UpdateFieldView();
-        UpdateExpView();
+        // 卖出前先脱下装备回背包（否则装备会挂在已卖出的英雄上而丢失），装备图标飞向物品区
+        var equipIds = p1.GetItemIdsOnHero(cardId);
+        if (equipIds.Count > 0)
+            p1.UnwearAllEquips(cardId);
+
+        p1.SellCard(cardId, 0);
+        GameManager.Instance.PlaySound("Sounds/gold");
+
+        if (equipIds.Count > 0)
+        {
+            // 等装备飞完再重建背包（卖出英雄消失、卸下的装备出现在物品区）；飞行起点取自英雄卡装备槽，不能提前销毁
+            PlayEquipsFlyToBag(cardId, equipIds, () =>
+            {
+                UpdateView();
+                UpdateFieldView();
+                UpdateExpView();
+            });
+        }
+        else
+        {
+            RemoveCell(cardId);
+            UpdateFieldView();
+            UpdateExpView();
+        }
     }
 
     public void OnCellClick(BagCell cell)

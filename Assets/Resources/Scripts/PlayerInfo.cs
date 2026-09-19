@@ -310,16 +310,17 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     }
 
     // 脱下英雄身上所有装备：返回脱下的装备数量，0表示没有装备
+    // 卸下的装备记录移到 items 列表末尾（背包物品区按 items 顺序显示，保证解除的装备出现在道具列表最后）
     public int UnwearAllEquips(int heroId)
     {
-        int count = 0;
-        foreach (var slot in items)
+        var equips = items.Where(s => s.HeroId == heroId).ToList();
+        int count = equips.Count;
+        if (count > 0)
         {
-            if (slot.HeroId == heroId)
-            {
-                slot.HeroId = 0;
-                count++;
-            }
+            items.RemoveAll(s => s.HeroId == heroId);
+            foreach (var slot in equips)
+                slot.HeroId = 0; // 回背包
+            items.AddRange(equips); // 保持原相对顺序追加到末尾
         }
         return count;
     }
