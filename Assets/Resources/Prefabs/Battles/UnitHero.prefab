@@ -65,7 +65,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: e85daa878f1a44d484980f8cbdd3351a, type: 2}
+  - {fileID: 2100000, guid: 9ae08abe7d724f0e92790846740c63cd, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -128,11 +128,11 @@ MonoBehaviour:
   heroId: 0
   chessName: zhaoyun
   pos: 0
+  sneakSwapped: 0
   targetChess: {fileID: 0}
   moveSpeed: 10
   attackRange: 15
   ap: 0
-  might: 0
   atk: 0
   level: 1
   isShadow: 0
@@ -140,17 +140,26 @@ MonoBehaviour:
   dodgeRate: 0
   critRate: 0
   critDamageMulti: 0.5
+  healRate: 0
+  healedRate: 0
+  auroEffectRate: 1
   lastDamagedPlayerId: -1
+  baseY: 0
+  heightOffset: 0
   hp: 300
-  attackDamage: 30
+  soldierAtkRate: 1
+  soldierHpRate: 1
+  soldierBaseMaxHp: 0
   armor: 0
   magicRes: 0
   hitEffect: 
   missileSpeed: 10
   missileHight: 0
   soldierId: 0
+  SummonTag: 
   attackPoint: 0
-  attackRate: 0
+  attackSpeed: 0
+  attackSpeedRate: 0
   heroInfo: {fileID: 0}
   noMoveCount: 0
   noActionCount: 0
@@ -158,7 +167,8 @@ MonoBehaviour:
   material: {fileID: 0}
   rendFlag: {fileID: 3405850965569777482}
   materialFlag: {fileID: 0}
-  regeHp: 0
+  hpRegen: 0
+  mpRegen: 0
 --- !u!95 &6736996303604821587
 Animator:
   serializedVersion: 5

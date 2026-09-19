@@ -149,11 +149,14 @@ public class Chess : MonoBehaviour
                 if (skillCfg.Sname != jobSkillSname && playerInfo != null && playerInfo.cards.TryGetValue(heroId, out int heroExp))
                     skill.SetLevel(HeroSelectionTool.GetCardLevel(heroExp, true));
                 skills.Add(skill);
-                if (!string.IsNullOrEmpty(skillCfg.Icon) && !hasSKill)
-                {
-                    material.SetTexture("_SecondTex", Resources.Load<Texture>("Textures/SkillPic/" + skillCfg.Icon));
-                    hasSKill = true;
-                }
+            }
+
+            // 棋子上叠加的第二个纹理用职业图标（取该职业对应技能的 Icon，资源在 Textures/SkillPic/）
+            var jobSkillCfg = ConfigManager.GetSkillConfig(jobSkillSname);
+            if (jobSkillCfg != null && !string.IsNullOrEmpty(jobSkillCfg.Icon))
+            {
+                material.SetTexture("_SecondTex", Resources.Load<Texture>("Textures/SkillPic/" + jobSkillCfg.Icon));
+                hasSKill = true;
             }
 
             materialFlag = new Material(rendFlag.sharedMaterial);

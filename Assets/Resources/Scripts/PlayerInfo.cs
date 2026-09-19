@@ -846,8 +846,52 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         }
     }
 
-    // AI进商店/买英雄时自动穿戴：背包里空余的装备按品质从高到低，依次发给战力从高到低的英雄，每个英雄补满3件
+    // AI每回合进商店时：背包里未装备的合成材料装备，随机两两合成高级装备（配方来自 ItemCombineConfig），只对 AI 生效
+    // 反复合成直到没有可成立的配方为止（剩余材料留给装备环节）
+    public void AutoCombineItems()
+    {
+        if (!isAI)
+            return;
+
+        int combineCount = 0;
+        while (true)
+        {
+            // 当前背包里未装备的道具实例（同 id 多件各算一份）
+            var freeIds = items.Where(slot => slot.HeroId == 0).Select(slot => slot.ItemId).ToList();
+
+            // 筛出材料齐备的配方（同 id 作两侧时需同时满足两份数量）
+            var feasibleRecipes = new List<ItemCombineConfig>();
+            foreach (var rcp in ItemCombineConfig.ConfigList)
+            {
+                if (rcp.ItemA == rcp.ItemB)
+                {
+                    if (freeIds.Count(id => id == rcp.ItemA) >= rcp.ItemAcount + rcp.ItemBcount)
+                        feasibleRecipes.Add(rcp);
+                }
+                else if (freeIds.Count(id => id == rcp.ItemA) >= rcp.ItemAcount &&
+                         freeIds.Count(id => id == rcp.ItemB) >= rcp.ItemBcount)
+                {
+                    feasibleRecipes.Add(rcp);
+                }
+            }
+
+            if (feasibleRecipes.Count == 0)
+                break;
+
+            var pick = feasibleRecipes[SysRandom.Range(0, feasibleRecipes.Count)];
+            if (!CombineTwoItems(pick.ItemA, pick.ItemB))
+                break; // 防御性退出，避免合成失败时死循环
+            combineCount++;
+        }
+
+        if (combineCount > 0)
+            GameLog.Info($"AI自动合成：{playerConfig.Name} 合成{combineCount}件高级装备");
+    }
+
+    // AI进商店/买英雄时自动穿戴
     // 仅 Effect=="attr" 可穿戴（pattr/sellhigh 为玩家级道具，不占用英雄装备槽）；只对 AI 生效
+    // 分配规则：待装备道具按品质从高到低逐件分配，先看培养度（等级+exp）最高的3个英雄、按职业偏好属性第1位→第3位找匹配的空槽，
+    // 都不匹配再把候选扩到第4个英雄往后继续比；全部英雄都没有匹配属性时，兜底发给有空槽的最强英雄
     public void AutoEquipItems()
     {
         if (!isAI)
@@ -863,23 +907,74 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         if (freeItemIds.Count == 0)
             return;
 
-        int equippedCount = 0;
-        foreach (var hero in GetStrongCardList(GetSlotCount()))
-        {
-            while (freeItemIds.Count > 0 && GetHeroEquippedCount(hero.Item1) < MaxEquipSlots)
-            {
-                if (!Equip(hero.Item1, freeItemIds[0]))
-                    break; // 该道具已无空闲副本，换下一个英雄
-                freeItemIds.RemoveAt(0);
-                equippedCount++;
-            }
+        // 候选英雄：全部英雄卡按培养度降序（GetCardLevel 单调于 exp，"等级+exp"等价于按 exp 降序）
+        var heroOrder = GetHeroCardList().OrderByDescending(cardId => cards[cardId]).ToList();
+        if (heroOrder.Count == 0)
+            return;
 
-            if (freeItemIds.Count == 0)
-                break;
+        int equippedCount = 0;
+        foreach (int itemId in freeItemIds)
+        {
+            int heroId = FindEquipHero(heroOrder, itemId);
+            if (heroId == 0)
+                continue; // 所有英雄装备槽都满了
+            if (!Equip(heroId, itemId))
+                continue;
+            equippedCount++;
         }
 
         if (equippedCount > 0)
             GameLog.Info($"AI自动装备：{playerConfig.Name} 装备{equippedCount}件");
+    }
+
+    // 为一件装备挑英雄：第一梯队=培养度最高的3个英雄，第二梯队=第4个往后，两梯队内都按职业偏好属性第1位→第3位比对；
+    // 都没有匹配时兜底取第一个有空槽的英雄（培养度高的优先），返回0表示无空槽可用
+    private int FindEquipHero(List<int> heroOrder, int itemId)
+    {
+        var itemCfg = ItemConfig.GetConfig(itemId);
+        string mainAttr = itemCfg == null ? "" : itemCfg.MainAttr;
+
+        for (int attrIdx = 0; attrIdx < EquipAttrSlotCount; attrIdx++)
+        {
+            for (int i = 0; i < Math.Min(EquipTopHeroCount, heroOrder.Count); i++)
+            {
+                if (IsEquipAttrMatch(heroOrder[i], mainAttr, attrIdx))
+                    return heroOrder[i];
+            }
+        }
+
+        for (int attrIdx = 0; attrIdx < EquipAttrSlotCount; attrIdx++)
+        {
+            for (int i = EquipTopHeroCount; i < heroOrder.Count; i++)
+            {
+                if (IsEquipAttrMatch(heroOrder[i], mainAttr, attrIdx))
+                    return heroOrder[i];
+            }
+        }
+
+        foreach (int heroId in heroOrder)
+        {
+            if (GetHeroEquippedCount(heroId) < MaxEquipSlots)
+                return heroId;
+        }
+        return 0;
+    }
+
+    // 英雄有装备空槽，且其职业偏好属性第 attrIdx 位与装备主属性一致
+    private bool IsEquipAttrMatch(int heroId, string mainAttr, int attrIdx)
+    {
+        if (string.IsNullOrEmpty(mainAttr))
+            return false;
+        if (GetHeroEquippedCount(heroId) >= MaxEquipSlots)
+            return false;
+
+        var heroCfg = HeroConfig.GetConfig(heroId);
+        if (heroCfg == null)
+            return false;
+        var jobCfg = ConfigManager.GetJobConfig(heroCfg.Job);
+        if (jobCfg == null || jobCfg.EquipAttr == null || attrIdx >= jobCfg.EquipAttr.Length)
+            return false;
+        return jobCfg.EquipAttr[attrIdx] == mainAttr;
     }
 
     private void UpdateFightMark(List<Tuple<int, int>> results)
@@ -1606,6 +1701,12 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     
     // 每个英雄最多可装备的物品数（原 3 槽位）
     private const int MaxEquipSlots = 3;
+
+    // AI 装备分配：第一梯队取培养度最高的英雄数（超出后从第4个开始继续比对）
+    private const int EquipTopHeroCount = 3;
+
+    // AI 装备分配：参与比对的职业偏好属性位数（JobConfig.EquipAttr 前 N 位）
+    private const int EquipAttrSlotCount = 3;
 
     // 物品实例数据结构：每件物品一条，ItemId + HeroId(HeroId=0 表示在背包未装备)
     [System.Serializable]

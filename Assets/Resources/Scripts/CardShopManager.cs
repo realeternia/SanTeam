@@ -656,9 +656,13 @@ public class CardShopManager : MonoBehaviour
 
         SortPlayersByScore();
 
-        // AI进商店：把背包里的空余装备从最强英雄到弱依次补满3件（AutoEquipItems 内部只对 AI 生效）
+        // AI进商店：先把背包里的材料装备随机两两合成高级装备，再给英雄穿装备（两方法内部只对 AI 生效）
         for (int i = 0; i < 8; i++)
-            GameManager.Instance.GetPlayer(i).AutoEquipItems();
+        {
+            var aiPlayer = GameManager.Instance.GetPlayer(i);
+            aiPlayer.AutoCombineItems();
+            aiPlayer.AutoEquipItems();
+        }
 
         GameManager.Instance.year++;
         era = 0;
