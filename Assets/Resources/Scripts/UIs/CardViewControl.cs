@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using CommonConfig;
+using DG.Tweening;
 using UnityEngine.EventSystems;
 using System;
 
@@ -364,19 +365,20 @@ public class CardViewControl : MonoBehaviour, IPointerDownHandler, IPointerUpHan
     {
         if(count == 1)
         {
-            StartCoroutine(MoveToPlayerInfo(playerInfo));
+            MoveToPlayerInfo(playerInfo);
         }
         else
         {
             for(int i = 0; i < count; i++)
             {
-                StartCoroutine(MoveToPlayerInfo(playerInfo));
+                MoveToPlayerInfo(playerInfo);
                 yield return new WaitForSeconds(0.2f);
             }
         }
     }
 
-    private System.Collections.IEnumerator MoveToPlayerInfo(PlayerInfo playerInfo)
+    // 买卡后卡牌飞向玩家头像：DoTween 加速曲线（起步慢、越飞越快），同时缩到 50%
+    private void MoveToPlayerInfo(PlayerInfo playerInfo)
     {
         // 创建一个新的Image对象并缓存
         var movingCardPrefab = Resources.Load<GameObject>("Prefabs/MovingCard");
@@ -399,27 +401,16 @@ public class CardViewControl : MonoBehaviour, IPointerDownHandler, IPointerUpHan
 
         targetLocalPos += new Vector2(80, 0);
 
-        // 设置初始位置
-        movingCardImage.GetComponent<RectTransform>().anchoredPosition = startLocalPos;
-
         // 移动动画
-        float duration = 0.7f; // 移动持续时间
-        float elapsedTime = 0;
+        const float duration = 0.7f; // 移动持续时间
+        const float shrinkScale = 0.5f; // 最终缩小到50%
 
-        while (elapsedTime < duration)
-        {
-            elapsedTime += Time.deltaTime;
-            float t = Mathf.Clamp01(elapsedTime / duration);
-            // 使用平滑插值
-            movingCardImage.GetComponent<RectTransform>().anchoredPosition = Vector2.Lerp(startLocalPos, targetLocalPos, t);
-            //逐渐缩小，最终缩小到50%
-            img.rectTransform.sizeDelta = new Vector2(100, 140) * (1f - 0.5f * t);
-            yield return null;
-        }
+        RectTransform cardRect = movingCardImage.GetComponent<RectTransform>();
+        cardRect.anchoredPosition = startLocalPos;
 
-        // 到达目标后销毁
-        Destroy(movingCardImage);
-        movingCardImage = null;
+        cardRect.DOAnchorPos(targetLocalPos, duration).SetEase(Ease.InQuad);
+        cardRect.DOSizeDelta(cardRect.sizeDelta * shrinkScale, duration).SetEase(Ease.InQuad)
+            .OnComplete(() => Destroy(movingCardImage));
     }
 
     public void ShowEffectLayer(bool isShow)

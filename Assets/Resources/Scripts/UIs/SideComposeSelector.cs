@@ -73,7 +73,7 @@ public class SideComposeSelector : MonoBehaviour
             GameObject item = Instantiate(itemPrefab.gameObject, subRegionMain.transform);
             item.transform.localScale = Vector3.one;
             SideComposeItem itemCell = item.GetComponent<SideComposeItem>();
-            itemCell.SetData(recipe, CanCombine(player, recipe));
+            itemCell.SetData(recipe, CanCombine(player, recipe), currentItemId);
             itemCell.SetOnClickCallback(OnItemSelected);
         }
 

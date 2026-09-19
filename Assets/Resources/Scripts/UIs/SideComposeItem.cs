@@ -30,7 +30,8 @@ public class SideComposeItem : MonoBehaviour
     }
 
     // canCombine=false 表示材料不足：格子置灰且不可选中
-    public void SetData(ItemCombineConfig rcp, bool canCombine)
+    // dropItemId 为玩家拖进合成区的道具，显示在第一个材料位（itemSrc1Icon）上
+    public void SetData(ItemCombineConfig rcp, bool canCombine, int dropItemId)
     {
         if (rcp == null)
         {
@@ -62,9 +63,18 @@ public class SideComposeItem : MonoBehaviour
             itemDesc.color = canCombine ? Color.white : SysColor.Theme.DisabledTextColor;
         }
 
+        // 拖入的道具固定放在第一个材料位，另一个材料放在第二位
+        int src1Id = rcp.ItemA;
+        int src2Id = rcp.ItemB;
+        if (dropItemId == rcp.ItemB && rcp.ItemA != rcp.ItemB)
+        {
+            src1Id = rcp.ItemB;
+            src2Id = rcp.ItemA;
+        }
+
         SetIcon(itemResultIcon, rcp.ResultId);
-        SetIcon(itemSrc1Icon, rcp.ItemA);
-        SetIcon(itemSrc2Icon, rcp.ItemB);
+        SetIcon(itemSrc1Icon, src1Id);
+        SetIcon(itemSrc2Icon, src2Id);
 
         SetSelected(false);
     }

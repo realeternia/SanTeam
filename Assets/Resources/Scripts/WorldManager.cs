@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using CommonConfig;
+using DG.Tweening;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
@@ -733,7 +734,6 @@ public class WorldManager : MonoBehaviour
         var movingCardPrefab = Resources.Load<GameObject>("Prefabs/MovingCard");
 
         var cards = new List<GameObject>();
-        var starts = new List<Vector2>();
         var targets = new List<Vector2>();
 
         foreach (var drop in bagDrops)
@@ -758,7 +758,6 @@ public class WorldManager : MonoBehaviour
             card.GetComponent<RectTransform>().anchoredPosition = startLocalPos;
 
             cards.Add(card);
-            starts.Add(startLocalPos);
             targets.Add(targetLocalPos);
 
             // 销毁3D掉落包模型
@@ -766,22 +765,21 @@ public class WorldManager : MonoBehaviour
         }
         bagDrops.Clear();
 
-        // 卡牌飞向玩家头像（逐渐缩小到50%）
-        float duration = 0.8f;
-        float elapsedTime = 0;
-        while (elapsedTime < duration && cards.Count > 0)
+        // 卡牌飞向玩家头像（DoTween 加速曲线：起步慢、越飞越快，同时逐渐缩小到50%）
+        const float duration = 0.8f;
+        const float shrinkScale = 0.5f;
+
+        for (int i = 0; i < cards.Count; i++)
         {
-            elapsedTime += Time.deltaTime;
-            float t = Mathf.Clamp01(elapsedTime / duration);
-            for (int i = 0; i < cards.Count; i++)
-            {
-                if (cards[i] == null)
-                    continue;
-                cards[i].GetComponent<RectTransform>().anchoredPosition = Vector2.Lerp(starts[i], targets[i], t);
-                cards[i].GetComponent<Image>().rectTransform.sizeDelta = new Vector2(100, 140) * (1f - 0.5f * t);
-            }
-            yield return null;
+            if (cards[i] == null)
+                continue;
+
+            RectTransform cardRect = cards[i].GetComponent<RectTransform>();
+            cardRect.DOAnchorPos(targets[i], duration).SetEase(Ease.InQuad);
+            cardRect.DOSizeDelta(cardRect.sizeDelta * shrinkScale, duration).SetEase(Ease.InQuad);
         }
+
+        yield return new WaitForSeconds(duration);
 
         foreach (var card in cards)
         {
