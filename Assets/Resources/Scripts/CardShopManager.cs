@@ -148,12 +148,8 @@ public class CardShopManager : MonoBehaviour
         //移除并销毁旧卡片
         foreach (Transform child in transform)
             Destroy(child.gameObject);
-        // foreach (Transform child in cardItemView.transform)
-        //     Destroy(child.gameObject);
-        var unsoldItems = cardViews.FindAll(x => !x.isHeroCard && !x.isSold && !ItemConfig.GetConfig(x.cardId).AutoRemove).ConvertAll(a => a.cardId);
+        // 物品仅掉落获得，不参与商店：无未售出物品需保留
         cardViews.Clear();
-        if(era == 0) //第一个回合不存装备
-            unsoldItems.Clear();
 
         foreach(var player in GameManager.Instance.players)
             player.OnEra(era);
@@ -244,70 +240,7 @@ public class CardShopManager : MonoBehaviour
             cardViews.Add(cardView);            
         }
 
-        // 先把ItemConfig里所有RateAbs非0的item随出来，放到一个列表
-        var itemIds = new List<int>();
-        foreach (var itemCfg in ItemConfig.ConfigList)
-        {
-            if (itemCfg.RateAbs > 0 && itemCfg.ShopIdx <= shopCfg.Id && SysRandom.Range(0, 100) < itemCfg.RateAbs)
-                itemIds.Add(itemCfg.Id);
-        }
-
-        for (int i = 0; i < shopCfg.ItemCount; i++)
-        {
-            itemIds.Add(HeroSelectionTool.GetRandomItemId(shopCfg.Id));
-        }
-
-        if (itemIds.Count < 9)
-        {
-            if (itemIds.Count + unsoldItems.Count > 9)
-                unsoldItems.RemoveRange(0, itemIds.Count + unsoldItems.Count - 9);
-            if (unsoldItems.Count > 0)
-                itemIds.InsertRange(0, unsoldItems);
-        }
-        else if (itemIds.Count > 9)
-        {
-            itemIds.RemoveRange(9, itemIds.Count - 9);
-        }
-
-        int ids = 0;
-        // item card
-        // foreach (var itemId in itemIds)
-        // {
-        //     // 计算位置
-        //     float x = -560 + ids * (140 + 5);
-        //     ids++;
-        //     float y = 0;
-
-        //     // 创建CardView实例
-        //     GameObject card = Instantiate(cardItemViewPrefab, cardItemView.transform);
-        //     RectTransform rectTransform = card.GetComponent<RectTransform>();
-        //     if (rectTransform != null)
-        //         rectTransform.anchoredPosition = new Vector2(x, y);
-
-        //     var count = 1;
-        //     var itemCfg = ItemConfig.GetConfig(itemId);
-        //     var cardPrice = itemCfg.Price;
-
-        //     if (!itemCfg.SellOne && shopCfg.MultiPriceTotal > 2 * cardPrice)
-        //     {
-        //         var roll = SysRandom.Range(0, 100);
-        //         if (roll < shopCfg.MultiCardRate)
-        //         {
-        //             count = SysRandom.Range(1, shopCfg.MultiPriceTotal / cardPrice + 1);
-        //             if(roll >= 95 && shopCfg.ItemAmazingCount > count)
-        //                 count = shopCfg.ItemAmazingCount;
-        //         }
-
-        //         if (count == 1)
-        //         {
-        //             count = Math.Max(1, shopCfg.MultiPriceTotal / 3 / cardPrice);
-        //         }
-        //     }            
-        //     CardViewControl cardView = card.GetComponent<CardViewControl>();
-
-        //     cardView.Init(itemId, false, count, year);
-        //     cardViews.Add(cardView);
-        // }
+        // 物品仅掉落获得，不参与商店：不再刷出物品卡（原 RateAbs/ShopIdx/unsoldItems 逻辑已随列删除）
 
         era++;
         passBtn.gameObject.SetActive(true);
@@ -582,10 +515,9 @@ public class CardShopManager : MonoBehaviour
         }
         else
         {
-            var itemId = HeroSelectionTool.GetRandomItemId(shopCfg.Id);
-            var itemCfg = ItemConfig.GetConfig(itemId);
-            var count = GetMultiCount(itemCfg.Price, shopCfg);
-            newCtr.Init(itemId, false, count, year);
+            // 物品仅掉落获得，不参与商店，刷新后不补物品卡
+            Destroy(ctr.gameObject);
+            return;
         }
 
         // 保持原卡位的位置并替换列表引用，销毁旧卡

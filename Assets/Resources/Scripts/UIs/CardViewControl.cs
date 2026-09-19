@@ -169,7 +169,8 @@ public class CardViewControl : MonoBehaviour, IPointerDownHandler, IPointerUpHan
                 cardName.text += "x" + count;
             itemImage.sprite = Resources.Load<Sprite>("Textures/ItemPic/" + itemCfg.Icon);
 
-            priceI = itemCfg.Price + (int)Math.Floor(itemCfg.PriceRound * shopOpenIndex);
+            // 物品仅掉落获得，不参与商店购买，价格恒为0（物品卡不再出现于商店）
+            priceI = 0;
 
             UpdateEffects();
         }

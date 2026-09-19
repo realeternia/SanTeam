@@ -252,12 +252,9 @@ public class BagControl : MonoBehaviour, IPanelEvent
         index = 0;
         foreach (var itemCell in itemCards)
         {
-            var itemCfg = ItemConfig.GetConfig(itemCell.Key);
             int available = itemCell.Value;
-            int stackLimit = itemCfg.StackLimit;
-            // 按堆叠上限分格：上限>1（RemoveWhenUse 消耗品=99）合并为一格显示数量；默认1 每格一件
-            int cellCount = stackLimit > 1 ? (available + stackLimit - 1) / stackLimit : available;
-            for (int n = 0; n < cellCount; n++)
+            // 物品实例每件一格显示（堆叠上限列已删除，不再合并堆叠）
+            for (int n = 0; n < available; n++)
             {
                 // 修改原代码，将新创建的 cell 加入缓存
                 GameObject cell = Instantiate(Resources.Load<GameObject>("Prefabs/UIs/Cells/BagCellItem"), bagItemRegion.transform);
@@ -270,8 +267,7 @@ public class BagControl : MonoBehaviour, IPanelEvent
                 bagCell.bagControl = this;
                 bagCell.cardId = itemCell.Key;
                 bagCell.level = HeroSelectionTool.GetCardLevel(itemCell.Owned, false);
-                // 每格数量：堆叠格取 min(上限, 剩余)，单格物品恒为1（textItemCount 仅堆叠时显示）
-                bagCell.count = stackLimit > 1 ? Mathf.Min(stackLimit, available - n * stackLimit) : 1;
+                bagCell.count = 1;
                 bagCell.UpdateItemInfo();
                 index++;
             }
@@ -610,24 +606,12 @@ public class BagControl : MonoBehaviour, IPanelEvent
         UpdateView(); // 卸下的装备回到背包，整体刷新
     }
 
-    // 物品消耗/出售1个后的格子刷新：堆叠格（上限>1）数量减1后刷新显示，归零才移除；单格物品直接移除
+    // 物品消耗/出售1个后的格子刷新：每件一格，消耗后直接移除该格
     private void RemoveCell(int itemCardId)
     {
         var cell = cellCache.Find(x => x != null && x.GetComponent<BagCell>().cardId == itemCardId);
         if (cell == null)
             return;
-        var itemCfg = ItemConfig.GetConfig(itemCardId);
-        if (itemCfg.StackLimit > 1)
-        {
-            int owned = bindPlayer.GetItemCount(itemCardId);
-            if (owned > 0)
-            {
-                var bagCell = cell.GetComponent<BagCell>();
-                bagCell.count = Mathf.Min(itemCfg.StackLimit, owned);
-                bagCell.UpdateItemInfo();
-                return;
-            }
-        }
         cellCache.Remove(cell);
         Destroy(cell);
     }
@@ -683,8 +667,13 @@ public class BagControl : MonoBehaviour, IPanelEvent
         if(p1.isAI)
             return;
 
-        // 物品每格一件只卖一件；英雄整组卖出
-        p1.SellCard(cardId, ConfigManager.IsHeroCard(cardId) ? 0 : 1);
+        // 物品仅掉落获得，不出售；仅英雄可出售（整组）
+        if (!ConfigManager.IsHeroCard(cardId))
+        {
+            ShowTipText("物品不可出售");
+            return;
+        }
+        p1.SellCard(cardId, 0);
         RemoveCell(cardId);
 
         GameManager.Instance.PlaySound("Sounds/gold");        

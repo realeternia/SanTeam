@@ -110,6 +110,17 @@ namespace CommonConfig
         public static void Load()
         {
             config.Clear();
+            // 品质2装备合成（两块品质1材料 1:1 → 品质2装备各1件）
+            // 材料：402001长刀=攻击 402002皮革甲=护甲 402003檀木弓=攻速 402004斗篷=魔抗 402005葫芦=法力回复 402006护手=暴击 402007羽扇=法强 402008名马=生命
+            config[1] = new ItemCombineConfig(1, 402001, 1, 402002, 1, 400001, 1); // 长刀+皮革甲 → 关王刀(atk+armor)
+            config[2] = new ItemCombineConfig(2, 402001, 1, 402006, 1, 400002, 1); // 长刀+护手 → 方天画戟(atk+crit)
+            config[3] = new ItemCombineConfig(3, 402001, 1, 402008, 1, 400003, 1); // 长刀+名马 → 丈八蛇矛(atk+hp)
+            config[4] = new ItemCombineConfig(4, 402007, 1, 402001, 1, 400007, 1); // 羽扇+长刀 → 孙子兵法(ap+atk)
+            config[5] = new ItemCombineConfig(5, 402007, 1, 402008, 1, 400008, 1); // 羽扇+名马 → 诗经(ap+hp)
+            config[6] = new ItemCombineConfig(6, 402007, 1, 402005, 1, 400011, 1); // 羽扇+葫芦 → 易经(ap+mpRegen)
+            config[7] = new ItemCombineConfig(7, 402007, 1, 402004, 1, 400012, 1); // 羽扇+斗篷 → 道德经(ap+magicres)
+            config[8] = new ItemCombineConfig(8, 402008, 1, 402003, 1, 400013, 1); // 名马+檀木弓 → 赤兔马(hp+atkspeed)
+            config[9] = new ItemCombineConfig(9, 402008, 1, 402005, 1, 400014, 1); // 名马+葫芦 → 的卢马(hp+hpRegen)（hpRegen 无专属品质1材料，就近取葫芦）
             RebuildIndex();
         }
 

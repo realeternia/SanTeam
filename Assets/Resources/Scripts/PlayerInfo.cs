@@ -469,19 +469,14 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     public void SellCard(int cardId, int sellCount = 0)
     {
         var isHeroCard = ConfigManager.IsHeroCard(cardId);
-        var price = 0;
-        if(isHeroCard)
+        if (!isHeroCard)
         {
-            price = HeroSelectionTool.GetPrice(HeroConfig.GetConfig(cardId));
+            GameLog.Warn($"物品不可出售 cardId={cardId}，仅掉落获得");
+            return;
         }
-        else
-        {
-            price = ItemConfig.GetConfig(cardId).Price;
-        }
+        var price = HeroSelectionTool.GetPrice(HeroConfig.GetConfig(cardId));
 
-        var count = isHeroCard
-            ? (cards.TryGetValue(cardId, out var owned) ? owned : 0)
-            : GetItemCount(cardId);
+        var count = cards.TryGetValue(cardId, out var owned) ? owned : 0;
         if (sellCount > 0)
             count = Math.Min(sellCount, count);
         AddGold((int)(price * count * GetSellRate()));
@@ -565,21 +560,6 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         }
 
         SubGold(price, isHero);
-        if (!ctr.isHeroCard)
-        {
-            var itemCfg = ItemConfig.GetConfig(cardId);
-            if (itemCfg.AutoUse)
-            {
-                GameManager.Instance.PlaySound("Sounds/gold");
-                ctr.OnSold(this, count);
-                if (itemCfg.Effect == "first")
-                {
-                    nextSkip = true;
-                    CardShopManager.Instance.jadePlayer = pid;
-                }
-                return true;
-            }
-        }
         if (isHero && cards.TryGetValue(cardId, out int exp))
         {
             cards[cardId] = exp + count;
@@ -590,9 +570,8 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         }
         else
         {
-            // 物品：购买 count 件，各占一条实例（初始都在背包）
-            for (int i = 0; i < count; i++)
-                items.Add(new SerializableItemSlot(cardId, 0));
+            // 物品不参与商店购买（仅掉落获得），此处不会执行
+            GameLog.Warn($"物品不参与商店购买 cardId={cardId}");
         }
         GameManager.Instance.PlaySound("Sounds/gold");
         ctr.OnSold(this, count);
@@ -876,7 +855,8 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
             var itemCfg = ItemConfig.GetConfig(slot.ItemId);
             if (itemCfg == null)
                 continue;
-            mark += itemCfg.Price;
+            // 物品无价格字段（仅掉落获得），按品质折算战力分（1白/2绿/3蓝/4紫 → 1/2/3/4 基础，品质5紫金按5）
+            mark += itemCfg.Quality;
         }
         lastFightMark = mark / 10;
         
