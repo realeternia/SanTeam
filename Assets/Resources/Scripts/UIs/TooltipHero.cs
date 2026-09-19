@@ -274,10 +274,14 @@ public class TooltipHero : BaseTooltip
             attrKeys = new string[] { "atk", "atkspeed", "ap", "mpRegen", "hp", "hpRegen", "armor", "magicres", "movespeed", "range" };
             attrVals = new string[]
             {
-                AppendEquip(attr.Atk, eAtk), AppendEquip(attr.Ap, eAp), AppendEquip(attr.Hp, eHp),
+                AppendEquip(attr.Atk, eAtk),
                 AppendEquipSpeed(heroCfg.AtkSpeed, eAtkSpeedRate),
-                AppendEquip(heroCfg.Armor, eArmor), AppendEquip(heroCfg.MagicRes, eMagicRes),
-                AppendEquip(0, (int)eMpRegen), AppendEquip(0, (int)eHpRegen),
+                AppendEquip(attr.Ap, eAp),
+                AppendEquip(0, (int)eMpRegen),
+                AppendEquip(attr.Hp, eHp),
+                AppendEquip(0, (int)eHpRegen),
+                AppendEquip(heroCfg.Armor, eArmor),
+                AppendEquip(heroCfg.MagicRes, eMagicRes),
                 heroCfg.MoveSpeed.ToString(), heroCfg.Range.ToString()
             };
         }

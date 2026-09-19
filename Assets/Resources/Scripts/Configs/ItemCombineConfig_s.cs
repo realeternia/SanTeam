@@ -119,8 +119,10 @@ namespace CommonConfig
             config[5] = new ItemCombineConfig(5, 402007, 1, 402008, 1, 400008, 1); // 羽扇+名马 → 诗经(ap+hp)
             config[6] = new ItemCombineConfig(6, 402007, 1, 402005, 1, 400011, 1); // 羽扇+葫芦 → 易经(ap+mpRegen)
             config[7] = new ItemCombineConfig(7, 402007, 1, 402004, 1, 400012, 1); // 羽扇+斗篷 → 道德经(ap+magicres)
-            config[8] = new ItemCombineConfig(8, 402008, 1, 402003, 1, 400013, 1); // 名马+檀木弓 → 赤兔马(hp+atkspeed)
+            config[8] = new ItemCombineConfig(8, 402003, 1, 402004, 1, 400013, 1); // 檀木弓+斗篷 → 赤兔马(atkspeed+magicres)
             config[9] = new ItemCombineConfig(9, 402008, 1, 402005, 1, 400014, 1); // 名马+葫芦 → 的卢马(hp+hpRegen)（hpRegen 无专属品质1材料，就近取葫芦）
+            config[10] = new ItemCombineConfig(10, 402003, 1, 402005, 1, 402009, 1); // 檀木弓+葫芦 → 李广弓(atkspeed+mpRegen)
+            config[11] = new ItemCombineConfig(11, 402008, 1, 402003, 1, 402010, 1); // 名马+檀木弓 → 养由基弓(atkspeed+hp)
             RebuildIndex();
         }
 

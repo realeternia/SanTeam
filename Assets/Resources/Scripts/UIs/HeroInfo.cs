@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using CommonConfig;
 
 public class HeroInfo : MonoBehaviour
 {
@@ -14,8 +15,8 @@ public class HeroInfo : MonoBehaviour
     public Image errorImg;
     public Image classImg;
 
-    public TMP_Text heroInteTxt;
-    public TMP_Text heroStrTxt;
+    public TMP_Text heroApTxt;
+    public TMP_Text heroAtkTxt;
 
     // Start is called before the first frame update
     void Start()
@@ -31,53 +32,19 @@ public class HeroInfo : MonoBehaviour
 
     public void SetAttr(int ap, int atk)
     {
-        SetText(heroInteTxt, ap);
+        SetText(heroApTxt, ap);
+        SetText(heroAtkTxt, atk);
+    }
 
-        // 无双强度已并入攻击：原“无双/武力”数值列隐藏，不再单独展示
-        if (heroStrTxt != null)
-            heroStrTxt.gameObject.SetActive(false);
-
-        // 确定英雄的最高属性（法术强度 / 攻击，攻击含无双强度）
-        string highestAttr = "";
-        var total = ap + atk;
-        if (ap >= atk)
-        {
-            highestAttr = "attrinte";
-        }
-        else
-        {
-            highestAttr = "attrlead";
-        }
-
-        if (highestAttr != "")
-        {
-            // 根据最高属性加载对应图片
-            classImg.sprite = Resources.Load<Sprite>("Textures/" + highestAttr);
-            if (total >= 600)
-            {
-                classImg.color = SysColor.Tier.Purple;
-            }
-            else if (total >= 500)
-            {
-                classImg.color = SysColor.Tier.Magenta;
-            }
-            else if (total >= 420)
-            {
-                classImg.color = Color.red;
-            }
-            else if (total >= 350)
-            {
-                classImg.color = SysColor.Tier.Orange;
-            }
-            else if (total >= 290)
-            {
-                classImg.color = Color.yellow;
-            }
-            else if (total >= 250)
-            {
-                classImg.color = Color.green;
-            }
-        }
+    // 职业图标（职业技能图标，约定与布阵格 jobIcon 一致：Textures/SkillPic/ + 职业技能 Icon）
+    public void SetJobIcon(HeroConfig heroCfg)
+    {
+        if (classImg == null)
+            return;
+        var skillCfgs = ConfigManager.GetHeroSkillConfigs(heroCfg);
+        classImg.sprite = skillCfgs.Count > 0
+            ? Resources.Load<Sprite>("Textures/SkillPic/" + skillCfgs[0].Icon)
+            : null;
     }
 
     private void SetText(TMP_Text text, int val)

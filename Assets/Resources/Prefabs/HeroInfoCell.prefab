@@ -175,8 +175,8 @@ MonoBehaviour:
   healthImg: {fileID: 1581988183674465141}
   errorImg: {fileID: 8064065875405272674}
   classImg: {fileID: 8658280103416335861}
-  heroInteTxt: {fileID: 1165972560342624310}
-  heroStrTxt: {fileID: 3767406802936462646}
+  heroApTxt: {fileID: 3767406802936462646}
+  heroAtkTxt: {fileID: 1165972560342624310}
 --- !u!1 &3626348444554922844
 GameObject:
   m_ObjectHideFlags: 0
@@ -479,7 +479,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   sourceType: 1
   iconPath: 
-  configId: 1
+  configId: 2
   image: {fileID: 0}
 --- !u!1 &4515198661548328261
 GameObject:
@@ -493,7 +493,7 @@ GameObject:
   - component: {fileID: 6148773804144554160}
   - component: {fileID: 1165972560342624310}
   m_Layer: 5
-  m_Name: Text (TMP) (2)
+  m_Name: Text Atk
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -914,7 +914,7 @@ GameObject:
   - component: {fileID: 6174684418929693159}
   - component: {fileID: 3767406802936462646}
   m_Layer: 5
-  m_Name: Text (TMP) (2)
+  m_Name: Text Ap
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1127,7 +1127,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   sourceType: 1
   iconPath: 
-  configId: 2
+  configId: 1
   image: {fileID: 0}
 --- !u!1 &7928797214833122860
 GameObject:

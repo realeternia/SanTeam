@@ -148,9 +148,11 @@ namespace CommonConfig
             config[400003] = new ItemConfig(400003, "丈八蛇矛", "攻击+30，生命+250", 2, "attr", "atk+30,hp+250", new int[0], "", false, 0, 0, "zhangba");
             config[400007] = new ItemConfig(400007, "孙子兵法", "法强+15，攻击+20", 2, "attr", "ap+15,atk+20", new int[0], "", false, 0, 0, "sunzi");
             config[400008] = new ItemConfig(400008, "诗经", "法强+15，生命+250", 2, "attr", "ap+15,hp+250", new int[0], "", false, 0, 0, "shijing");
+            config[402009] = new ItemConfig(402009, "李广弓", "攻速+10%，法力回复+2", 2, "attr", "atkspeed+0.1,mpRegen+2", new int[0], "", false, 0, 0, "gong2");
+            config[402010] = new ItemConfig(402010, "养由基弓", "攻速+15%，生命+250", 2, "attr", "atkspeed+0.15,hp+250", new int[0], "", false, 0, 0, "gong3");
             config[400011] = new ItemConfig(400011, "易经", "法强+10，法力回复+2", 2, "attr", "ap+10,mpRegen+2", new int[0], "", false, 0, 0, "yijing");
             config[400012] = new ItemConfig(400012, "道德经", "法强+15，魔法抗性+30", 2, "attr", "ap+15,magicres+30", new int[0], "", false, 0, 0, "daode");
-            config[400013] = new ItemConfig(400013, "赤兔马", "生命+250，攻速+15%", 2, "attr", "hp+250,atkspeed+0.15", new int[0], "", false, 0, 0, "chitu");
+            config[400013] = new ItemConfig(400013, "赤兔马", "攻速+15%，魔法抗性+30", 2, "attr", "atkspeed+0.15,magicres+30", new int[0], "", false, 0, 0, "chitu");
             config[400014] = new ItemConfig(400014, "的卢马", "生命+250，生命回复+2", 2, "attr", "hp+250,hpRegen+2", new int[0], "", false, 0, 0, "dilu");
             config[400015] = new ItemConfig(400015, "长生镜", "生命+150", 1, "attr", "hp+150", new int[0], "", false, 0, 0, "jingzi");
             config[401012] = new ItemConfig(401012, "万民书", "护甲+1，魔法抗性+1（仅限拥有「仁」的英雄）", 1, "tpattr", "armor+1,magicres+1", new int[0], "仁", true, 401013, 5, "wanming1");

@@ -58,6 +58,7 @@ public class HeroInfoGroup : MonoBehaviour
 
         heroInfo.heroName.text = heroCfg.Name;
         heroInfo.heroLevelTxt.text = level.ToString();
+        heroInfo.SetJobIcon(heroCfg);
 
         if(side == 1)
         {
