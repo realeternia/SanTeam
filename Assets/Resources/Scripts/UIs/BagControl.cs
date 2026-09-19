@@ -22,6 +22,7 @@ public class BagControl : MonoBehaviour, IPanelEvent
     public GameObject fieldRegion;
     public BagRecycler bagRecycler;
     public BagRecycler bagUnwear; // 卸装区：拖英雄过来脱下所有装备
+    public BagRecycler bagCompose;
     public TMP_Text infoText;
     public TMP_Text expText;
     public Image expBar;
@@ -604,6 +605,31 @@ public class BagControl : MonoBehaviour, IPanelEvent
 
         GameManager.Instance.PlaySound("Sounds/equip");
         UpdateView(); // 卸下的装备回到背包，整体刷新
+    }
+
+    // 合成区：拖物品过来 → 侧边栏列出与该物品相关的合成配方（材料不足的置灰排后），确定后合成
+    public void OpenComposePanel(int itemCardId)
+    {
+        if (itemCardId == 0 || ConfigManager.IsHeroCard(itemCardId))
+        {
+            ShowTipText("英雄不可合成");
+            return;
+        }
+
+        var p1 = GameManager.Instance.GetPlayer(bindPlayer.pid);
+        SideItemSelector.SetContext(bindPlayer.pid, itemCardId, recipe =>
+        {
+            if (!p1.CombineTwoItems(recipe.ItemA, recipe.ItemB))
+            {
+                ShowTipText("材料不足，无法合成");
+                return;
+            }
+
+            GameManager.Instance.PlaySound("Sounds/equip");
+            UpdateView(); // 材料消耗、产物进背包，整体刷新
+        });
+
+        PanelManager.Instance.ShowSideBar("SideItemSelector");
     }
 
     // 物品消耗/出售1个后的格子刷新：每件一格，消耗后直接移除该格

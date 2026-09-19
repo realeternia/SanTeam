@@ -7,7 +7,7 @@ public class BagRecycler : MonoBehaviour, IDropHandler
 {
     public BagControl bagControl;
 
-    // 功能模式："sell"=拖过来卖出，"unwear"=拖过来脱下该英雄所有装备进背包
+    // 功能模式："sell"=拖过来卖出，"unwear"=拖过来脱下该英雄所有装备进背包，"compose"=拖过来打开该道具的合成配方侧边栏
     public string mode = "sell";
 
     // 当有物体拖放到此对象上时调用
@@ -23,7 +23,9 @@ public class BagRecycler : MonoBehaviour, IDropHandler
             return;
 
         draggedCell.RemoveTagImg();
-        if (mode == "unwear")
+        if (mode == "compose")
+            bagControl.OpenComposePanel(draggedCell.cardId);
+        else if (mode == "unwear")
             bagControl.UnwearHeroEquips(draggedCell.cardId);
         else
             bagControl.SellCard(draggedCell.cardId);
