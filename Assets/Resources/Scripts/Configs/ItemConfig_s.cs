@@ -155,6 +155,16 @@ namespace CommonConfig
             config[400013] = new ItemConfig(400013, "赤兔马", "攻速+15%，魔法抗性+30", 2, "attr", "atkspeed+0.15,magicres+30", new int[0], "", false, 0, 0, "chitu");
             config[400014] = new ItemConfig(400014, "的卢马", "生命+250，生命回复+2", 2, "attr", "hp+250,hpRegen+2", new int[0], "", false, 0, 0, "dilu");
             config[400015] = new ItemConfig(400015, "长生镜", "生命+150", 1, "attr", "hp+150", new int[0], "", false, 0, 0, "jingzi");
+            config[400016] = new ItemConfig(400016, "飞羽甲", "护甲+30，攻速+15%", 2, "attr", "armor+30,atkspeed+0.15", new int[0], "", false, 0, 0, "jia3");
+            config[400017] = new ItemConfig(400017, "明光铠", "护甲+30，魔抗+30", 2, "attr", "armor+30,magicres+30", new int[0], "", false, 0, 0, "jia2");
+            config[400018] = new ItemConfig(400018, "兽面吞头铠", "护甲+30，暴击+22%", 2, "attr", "armor+30,crit+0.22", new int[0], "", false, 0, 0, "jia4");
+            config[400019] = new ItemConfig(400019, "八卦袍", "法强+15，护甲+30", 2, "attr", "ap+15,armor+30", new int[0], "", false, 0, 0, "pao1");
+            config[400020] = new ItemConfig(400020, "爪电飞黄", "护甲+30，生命+250", 2, "attr", "armor+30,hp+250", new int[0], "", false, 0, 0, "ma3");
+            config[400021] = new ItemConfig(400021, "穿云弓", "攻速+15%，暴击+22%", 2, "attr", "atkspeed+0.15,crit+0.22", new int[0], "", false, 0, 0, "gong4");
+            config[400022] = new ItemConfig(400022, "白玉环", "暴击+22%，魔抗+30", 2, "attr", "crit+0.22,magicres+30", new int[0], "", false, 0, 0, "huan1");
+            config[400023] = new ItemConfig(400023, "玉龙壁", "魔抗+30，每秒回复2点法力", 2, "attr", "magicres+30,mpRegen+2", new int[0], "", false, 0, 0, "huan2");
+            config[400024] = new ItemConfig(400024, "绝影", "生命+250，魔抗+30", 2, "attr", "hp+250,magicres+30", new int[0], "", false, 0, 0, "ma2");
+            config[400025] = new ItemConfig(400025, "古锭刀", "攻击+20，每秒回复2点法力", 2, "attr", "atk+20,mpRegen+2", new int[0], "", false, 0, 0, "jian2");
             config[401012] = new ItemConfig(401012, "万民书", "护甲+1，魔法抗性+1（仅限拥有「仁」的英雄）", 1, "tpattr", "armor+1,magicres+1", new int[0], "仁", true, 401013, 5, "wanming1");
             config[401013] = new ItemConfig(401013, "万民书·精", "护甲+5，魔法抗性+5（仅限拥有「仁」的英雄）", 2, "tpattr", "armor+5,magicres+5", new int[0], "仁", true, 0, 0, "wanming2");
             config[401014] = new ItemConfig(401014, "文赋", "法术强度+1，魔法抗性+1", 1, "tpattr", "ap+1,magicres+1", new int[0], "", true, 401015, 5, "wenfu1");
