@@ -617,7 +617,7 @@ public class BagControl : MonoBehaviour, IPanelEvent
         }
 
         var p1 = GameManager.Instance.GetPlayer(bindPlayer.pid);
-        SideItemSelector.SetContext(bindPlayer.pid, itemCardId, recipe =>
+        SideComposeSelector.SetContext(bindPlayer.pid, itemCardId, recipe =>
         {
             if (!p1.CombineTwoItems(recipe.ItemA, recipe.ItemB))
             {
@@ -629,7 +629,7 @@ public class BagControl : MonoBehaviour, IPanelEvent
             UpdateView(); // 材料消耗、产物进背包，整体刷新
         });
 
-        PanelManager.Instance.ShowSideBar("SideItemSelector");
+        PanelManager.Instance.ShowSideBar("SideComposeSelector");
     }
 
     // 物品消耗/出售1个后的格子刷新：每件一格，消耗后直接移除该格

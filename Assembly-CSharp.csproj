@@ -99,13 +99,11 @@
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillBuffExpandPos.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillHitRepeat.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillFactionShield.cs" />
-    <Compile Include="Assets\Resources\Scripts\UIs\SideItemItem.cs" />
     <Compile Include="Assets\SineVFX\TopDownEffects\Scripts\SineUIControllerTopDownEffects.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAttackReboundArrow.cs" />
     <Compile Include="Assets\SineVFX\TopDownEffects\Scripts\RampGeneratorTDE.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffCoolDown.cs" />
     <Compile Include="Assets\Epic Toon FX\Scripts\ETFXRotation.cs" />
-    <Compile Include="Assets\Resources\Scripts\UIs\SideItemSelector.cs" />
     <Compile Include="Assets\DOTween\Modules\DOTweenModuleUnityVersion.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillDumb.cs" />
     <Compile Include="Assets\DOTween\Modules\DOTweenModulePhysics.cs" />
@@ -147,6 +145,7 @@
     <Compile Include="Assets\Resources\Scripts\UIs\TooltipHeroEquip.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAttackedShield.cs" />
     <Compile Include="Assets\Resources\Scripts\PO\BuffTime.cs" />
+    <Compile Include="Assets\Resources\Scripts\UIs\SideComposeSelector.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\BattleResultCellControl.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\HeroInfoGroup.cs" />
     <Compile Include="Assets\DOTween\Modules\DOTweenModuleUI.cs" />
@@ -182,6 +181,7 @@
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\Skill.cs" />
     <Compile Include="Assets\Resources\Scripts\Tools\SysRandom.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\CombatConst.cs" />
+    <Compile Include="Assets\Resources\Scripts\UIs\SideComposeItem.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillInitAddItemChance.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillInitAttrChange.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillInitEnemyRandomBuff.cs" />

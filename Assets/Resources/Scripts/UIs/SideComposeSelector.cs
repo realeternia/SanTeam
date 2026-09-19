@@ -6,18 +6,18 @@ using CommonConfig;
 
 // 侧边栏·装备合成面板：列出与拖入道具相关的全部合成配方（每格=结果+两个材料，材料不足的置灰并排到最后）
 // 选中一条配方后通过回调交回调用方执行合成
-public class SideItemSelector : MonoBehaviour
+public class SideComposeSelector : MonoBehaviour
 {
     public ScrollRect scrollRectMain;
     public GameObject subRegionMain;
-    public SideItemItem itemPrefab;
+    public SideComposeItem itemPrefab;
     public Button confirmButton;
 
     private const int MAX_SELECT_COUNT = 1;
 
-    private List<SideItemItem> selectedItems = new List<SideItemItem>();
+    private List<SideComposeItem> selectedItems = new List<SideComposeItem>();
 
-    private static SideItemSelector instance;
+    private static SideComposeSelector instance;
     private static int currentPid;
     private static int currentItemId;
     private static System.Action<ItemCombineConfig> onRecipeSelected;
@@ -32,7 +32,7 @@ public class SideItemSelector : MonoBehaviour
         currentItemId = itemId;
         onRecipeSelected = callback;
 
-        GameLog.Info($"SideItemSelector.SetContext: pid={pid}, itemId={itemId}");
+        GameLog.Info($"SideComposeSelector.SetContext: pid={pid}, itemId={itemId}");
 
         if (instance != null)
             instance.LoadRecipeList();
@@ -72,7 +72,7 @@ public class SideItemSelector : MonoBehaviour
         {
             GameObject item = Instantiate(itemPrefab.gameObject, subRegionMain.transform);
             item.transform.localScale = Vector3.one;
-            SideItemItem itemCell = item.GetComponent<SideItemItem>();
+            SideComposeItem itemCell = item.GetComponent<SideComposeItem>();
             itemCell.SetData(recipe, CanCombine(player, recipe));
             itemCell.SetOnClickCallback(OnItemSelected);
         }
@@ -97,7 +97,7 @@ public class SideItemSelector : MonoBehaviour
         List<ItemCombineConfig> result = new List<ItemCombineConfig>();
         if (player == null)
         {
-            GameLog.Error($"SideItemSelector.GetRelatedRecipes: 玩家不存在 pid={currentPid}");
+            GameLog.Error($"SideComposeSelector.GetRelatedRecipes: 玩家不存在 pid={currentPid}");
             return result;
         }
 
@@ -115,7 +115,7 @@ public class SideItemSelector : MonoBehaviour
             && player.GetItemFreeCount(rcp.ItemB) >= rcp.ItemBcount;
     }
 
-    void OnItemSelected(SideItemItem item)
+    void OnItemSelected(SideComposeItem item)
     {
         // 材料不足的配方置灰不可选
         if (!item.IsCombinable())
@@ -131,7 +131,7 @@ public class SideItemSelector : MonoBehaviour
         // 单选：已选满则把上一次的选择清掉，改为选中当前格子
         while (selectedItems.Count >= MAX_SELECT_COUNT)
         {
-            SideItemItem old = selectedItems[0];
+            SideComposeItem old = selectedItems[0];
             old.SetSelected(false);
             selectedItems.RemoveAt(0);
         }
@@ -144,7 +144,7 @@ public class SideItemSelector : MonoBehaviour
     {
         if (selectedItems.Count == 0)
         {
-            GameLog.Warn("SideItemSelector.OnConfirm: 未选中任何配方");
+            GameLog.Warn("SideComposeSelector.OnConfirm: 未选中任何配方");
             return;
         }
 

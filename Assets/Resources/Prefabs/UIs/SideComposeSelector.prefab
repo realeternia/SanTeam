@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 3007753263536142556}
   - component: {fileID: -5912515570946168633}
   m_Layer: 5
-  m_Name: SideItemSelector
+  m_Name: SideComposeSelector
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

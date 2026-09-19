@@ -5,7 +5,7 @@ using CommonConfig;
 
 // 侧边栏·配方格子：显示合成结果图标 + 两个材料图标，名字（结果道具名，按品质上色）与效果说明
 // 材料不足的配方：名字/说明置灰、背景灰且不可选中
-public class SideItemItem : MonoBehaviour
+public class SideComposeItem : MonoBehaviour
 {
     public Image BG;
     public TMP_Text itemName;
@@ -19,7 +19,7 @@ public class SideItemItem : MonoBehaviour
     private bool isSelected = false;
     private bool isCombinable = true;
     private ItemCombineConfig recipe;
-    private System.Action<SideItemItem> onClickCallback;
+    private System.Action<SideComposeItem> onClickCallback;
 
     void Start()
     {
@@ -34,7 +34,7 @@ public class SideItemItem : MonoBehaviour
     {
         if (rcp == null)
         {
-            GameLog.Error("SideItemItem.SetData: 配方为空");
+            GameLog.Error("SideComposeItem.SetData: 配方为空");
             return;
         }
         recipe = rcp;
@@ -42,7 +42,7 @@ public class SideItemItem : MonoBehaviour
 
         if (!ItemConfig.HasConfig(rcp.ResultId))
         {
-            GameLog.Error($"SideItemItem.SetData: 合成结果配置不存在 resultId={rcp.ResultId}");
+            GameLog.Error($"SideComposeItem.SetData: 合成结果配置不存在 resultId={rcp.ResultId}");
             return;
         }
         var resultCfg = ItemConfig.GetConfig(rcp.ResultId);
@@ -76,14 +76,14 @@ public class SideItemItem : MonoBehaviour
             return;
         if (!ItemConfig.HasConfig(itemId))
         {
-            GameLog.Error($"SideItemItem.SetIcon: ItemConfig 不存在 itemId={itemId}");
+            GameLog.Error($"SideComposeItem.SetIcon: ItemConfig 不存在 itemId={itemId}");
             icon.sprite = null;
             return;
         }
         icon.sprite = Resources.Load<Sprite>("Textures/ItemPic/" + ItemConfig.GetConfig(itemId).Icon);
     }
 
-    public void SetOnClickCallback(System.Action<SideItemItem> callback)
+    public void SetOnClickCallback(System.Action<SideComposeItem> callback)
     {
         onClickCallback = callback;
     }
