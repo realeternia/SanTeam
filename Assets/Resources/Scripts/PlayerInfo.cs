@@ -594,6 +594,8 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         if (isHero)
         {
             AutoEquipBoughtHero(cardId);
+            // AI买完英雄后：背包里还有空余装备就立刻给最强英雄补满（方法内部只对 AI 生效）
+            AutoEquipItems();
             // 阵容变化后重算商店特效层，亮起现在仍满足自动上阵的英雄卡
             if (CardShopManager.Instance != null)
                 CardShopManager.Instance.OnShow();
@@ -842,6 +844,42 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
             if(attrItemList.Count == 0)
                 break;
         }
+    }
+
+    // AI进商店/买英雄时自动穿戴：背包里空余的装备按品质从高到低，依次发给战力从高到低的英雄，每个英雄补满3件
+    // 仅 Effect=="attr" 可穿戴（pattr/sellhigh 为玩家级道具，不占用英雄装备槽）；只对 AI 生效
+    public void AutoEquipItems()
+    {
+        if (!isAI)
+            return;
+
+        var freeItemIds = items
+            .Where(slot => slot.HeroId == 0)
+            .Select(slot => slot.ItemId)
+            .Where(itemId => ItemConfig.HasConfig(itemId) && ItemConfig.GetConfig(itemId).Effect == "attr")
+            .OrderByDescending(itemId => ItemConfig.GetConfig(itemId).Quality)
+            .ToList();
+
+        if (freeItemIds.Count == 0)
+            return;
+
+        int equippedCount = 0;
+        foreach (var hero in GetStrongCardList(GetSlotCount()))
+        {
+            while (freeItemIds.Count > 0 && GetHeroEquippedCount(hero.Item1) < MaxEquipSlots)
+            {
+                if (!Equip(hero.Item1, freeItemIds[0]))
+                    break; // 该道具已无空闲副本，换下一个英雄
+                freeItemIds.RemoveAt(0);
+                equippedCount++;
+            }
+
+            if (freeItemIds.Count == 0)
+                break;
+        }
+
+        if (equippedCount > 0)
+            GameLog.Info($"AI自动装备：{playerConfig.Name} 装备{equippedCount}件");
     }
 
     private void UpdateFightMark(List<Tuple<int, int>> results)

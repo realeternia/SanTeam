@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -197,7 +197,7 @@ namespace CommonConfig
         public static void Load()
         {
             config.Clear();
-            config[1] = new PlayerConfig(1, "旺仔", "PlayerPic/wang", "#00FF00", false, 0, new int[0], false, false, 0f, 0, 0f, 0f, 0, 0f, 0f, 0f, 0f, 0f, 0f, 20);
+            config[1] = new PlayerConfig(1, "旺仔", "PlayerPic/wang", "#00FF00", false, 0, new int[0], false, false, 0f, 0, 0f, 0f, 0, 0f, 0f, 0f, 0f, 0f, 0f, 0);
             config[2] = new PlayerConfig(2, "布布", "PlayerPic/bubu", "#333333", true, 0, new int[0], true, false, 5f, 2, 0.6f, 1f, 0, 1f, 0.7f, 0.3f, 0.4f, 1.4f, 0.4f, 75);
             config[3] = new PlayerConfig(3, "翔阳", "PlayerPic/xiangyang", "#FF8000", true, 0, new int[0], false, false, 3f, 2, 0.5f, 1f, 0, 1f, 0.7f, 1.5f, 0.4f, 0.5f, 0.5f, 60);
             config[4] = new PlayerConfig(4, "屁屁", "PlayerPic/pp", "#F9BEB0", true, 0, new int[0], false, false, 3f, 1, 0.7f, 1f, 0, 1f, 0.7f, 0.4f, 1.5f, 0.5f, 0.5f, 60);
@@ -210,7 +210,7 @@ namespace CommonConfig
             config[102] = new PlayerConfig(102, "黄眉", "PlayerPic/huangmei", "#5555FF", false, 0, new int[]{100002,409004}, false, true, 3f, 2, 0.5f, 2.5f, 2, 1.2f, 0.85f, 1.6f, 0.6f, 0.6f, 0.5f, 85);
             config[103] = new PlayerConfig(103, "无量", "PlayerPic/wuliang", "#FF3333", false, 0, new int[]{100003,409005}, false, true, 3f, 2, 0.5f, 2.5f, 3, 0.5f, 0.9f, 1.5f, 0.5f, 0.6f, 0.6f, 85);
             config[104] = new PlayerConfig(104, "大虎", "PlayerPic/dahu", "#006633", false, 0, new int[]{100001,409003}, false, true, 3f, 2, 0.5f, 3f, 1, 0.5f, 0.9f, 1.7f, 0.4f, 0.7f, 0.5f, 90);
-            config[999] = new PlayerConfig(999, "怪物", "PlayerPic/tower", "#FF0000", false, 0, new int[0], false, false, 0f, 0, 0f, 0f, 0, 0f, 0f, 0f, 0f, 0f, 0f, 10);
+            config[999] = new PlayerConfig(999, "怪物", "PlayerPic/tower", "#FF0000", false, 0, new int[0], false, false, 0f, 0, 0f, 0f, 0, 0f, 0f, 0f, 0f, 0f, 0f, 0);
 
             RebuildIndex();
 

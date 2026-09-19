@@ -267,8 +267,8 @@ public class BagControl : MonoBehaviour, IPanelEvent
                 // 修改原代码，将新创建的 cell 加入缓存
                 GameObject cell = Instantiate(Resources.Load<GameObject>("Prefabs/UIs/Cells/BagCellItem"), bagItemRegion.transform);
                 cellCache.Add(cell);
-                int xOff = index % 9;
-                int yOff = index / 9;
+                int xOff = index % 13;
+                int yOff = index / 13;
                 cell.transform.localPosition = new Vector3(70 + 104 * xOff, -61 - 104 * yOff, 0);
 
                 BagCell bagCell = cell.GetComponent<BagCell>();

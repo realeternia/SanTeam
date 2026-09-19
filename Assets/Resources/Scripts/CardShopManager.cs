@@ -656,6 +656,10 @@ public class CardShopManager : MonoBehaviour
 
         SortPlayersByScore();
 
+        // AI进商店：把背包里的空余装备从最强英雄到弱依次补满3件（AutoEquipItems 内部只对 AI 生效）
+        for (int i = 0; i < 8; i++)
+            GameManager.Instance.GetPlayer(i).AutoEquipItems();
+
         GameManager.Instance.year++;
         era = 0;
         NewEra();     
