@@ -28,7 +28,9 @@ public static class SysColor
             case 1: return new Color(255 / 255f, 255 / 255f, 255 / 255f); // 普通-白
             case 2: return new Color(30 / 255f, 255 / 255f, 0 / 255f);    // 优秀-绿
             case 3: return new Color(0 / 255f, 112 / 255f, 221 / 255f);   // 精良-蓝
-            default: return new Color(163 / 255f, 53 / 255f, 238 / 255f); // 史诗-紫
+            case 4: return new Color(0 / 255f, 112 / 255f, 221 / 255f);   // 精良-蓝
+            case 5: return new Color(255 / 255f, 0 / 255f, 0 / 255f);   // 史诗-红
+            default: return new Color(255 / 255f, 255 / 255f, 255 / 255f); // 普通-白
         }
     }
 

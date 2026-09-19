@@ -43,7 +43,7 @@ namespace CommonConfig
             {"Id", new FieldMetaInfo("序列", "int", 60)},
             {"Name", new FieldMetaInfo("名字", "string", 0)},
             {"Des", new FieldMetaInfo("效果说明", "string", 0)},
-            {"Lv", new FieldMetaInfo("等级", "int", 60)},
+            {"Quality", new FieldMetaInfo("品质", "int", 60)},
             {"Effect", new FieldMetaInfo("效果", "string", 0)},
             {"Attrs", new FieldMetaInfo("属性加成", "string", 210)},
             {"Skills", new FieldMetaInfo("技能", "int[]", 0)},
@@ -79,9 +79,9 @@ namespace CommonConfig
         /// </summary>
         public string Des;
         /// <summary>
-        ///等级
+        ///品质（1白 2绿 3蓝 4紫，同英雄品质）
         /// </summary>
-        public int Lv;
+        public int Quality;
         /// <summary>
         ///效果
         /// </summary>
@@ -144,12 +144,12 @@ namespace CommonConfig
         public string Icon;
 
 
-        public ItemConfig(int Id, string Name, string Des, int Lv, string Effect, string Attrs, int[] Skills, string LimitSkillSname, int RateAbs, int ShopIdx, bool AutoUse, bool AutoRemove, bool RemoveWhenUse, int StackLimit, int CombineId, int CombineNeed, int Price, float PriceRound, string Icon)
+        public ItemConfig(int Id, string Name, string Des, int Quality, string Effect, string Attrs, int[] Skills, string LimitSkillSname, int RateAbs, int ShopIdx, bool AutoUse, bool AutoRemove, bool RemoveWhenUse, int StackLimit, int CombineId, int CombineNeed, int Price, float PriceRound, string Icon)
         {
             this.Id = Id;
             this.Name = Name;
             this.Des = Des;
-            this.Lv = Lv;
+            this.Quality = Quality;
             this.Effect = Effect;
             this.Attrs = Attrs;
             this.Skills = Skills;
@@ -199,9 +199,9 @@ namespace CommonConfig
             config[400013] = new ItemConfig(400013, "赤兔马", "", 1, "attr", "hp+75", new int[0], "", 0, 8, false, false, false, 1, 0, 0, 20, 0f, "chitu");
             config[400014] = new ItemConfig(400014, "的卢马", "", 1, "attr", "hp+50", new int[0], "", 0, 5, false, false, false, 1, 0, 0, 10, 0f, "dilu");
             config[401012] = new ItemConfig(401012, "万民书", "护甲+1，魔法抗性+1（仅限拥有「仁」的英雄）", 1, "tpattr", "armor+1,magicres+1", new int[0], "仁", 0, 6, false, false, true, 99, 401013, 5, 6, 0.4f, "wanming1");
-            config[401013] = new ItemConfig(401013, "万民书·精", "护甲+5，魔法抗性+5（仅限拥有「仁」的英雄）", 1, "tpattr", "armor+5,magicres+5", new int[0], "仁", 0, 6, false, false, true, 99, 0, 0, 6, 0.4f, "wanming2");
+            config[401013] = new ItemConfig(401013, "万民书·精", "护甲+5，魔法抗性+5（仅限拥有「仁」的英雄）", 2, "tpattr", "armor+5,magicres+5", new int[0], "仁", 0, 6, false, false, true, 99, 0, 0, 6, 0.4f, "wanming2");
             config[401014] = new ItemConfig(401014, "文赋", "法术强度+1，魔法抗性+1", 1, "tpattr", "ap+1,magicres+1", new int[0], "", 0, 6, false, false, true, 99, 401015, 5, 6, 0.4f, "wenfu1");
-            config[401015] = new ItemConfig(401015, "文赋·精", "法术强度+5，魔法抗性+5", 1, "tpattr", "ap+5,magicres+5", new int[0], "", 0, 6, false, false, true, 99, 0, 0, 6, 0.4f, "wenfu2");
+            config[401015] = new ItemConfig(401015, "文赋·精", "法术强度+5，魔法抗性+5", 2, "tpattr", "ap+5,magicres+5", new int[0], "", 0, 6, false, false, true, 99, 0, 0, 6, 0.4f, "wenfu2");
             config[402001] = new ItemConfig(402001, "长刀", "攻击+10", 1, "attr", "atk+10", new int[0], "", 0, 0, false, false, false, 1, 0, 0, 5, 0f, "jian1");
             config[402002] = new ItemConfig(402002, "皮革甲", "护甲+20", 1, "attr", "armor+20", new int[0], "", 0, 5, false, false, false, 1, 0, 0, 10, 0f, "jia1");
             config[402003] = new ItemConfig(402003, "檀木弓", "攻速+10%", 1, "attr", "atkspeed+0.1", new int[0], "", 0, 5, false, false, false, 1, 0, 0, 10, 0f, "tanmugong");
@@ -210,11 +210,11 @@ namespace CommonConfig
             config[402006] = new ItemConfig(402006, "护手", "暴击+15%", 1, "attr", "crit+0.15", new int[0], "", 0, 5, false, false, false, 1, 0, 0, 10, 0f, "hushou");
             config[402007] = new ItemConfig(402007, "羽扇", "法强+10", 1, "attr", "ap+10", new int[0], "", 0, 0, false, false, false, 0, 0, 0, 0, 0f, "yushan");
             config[402008] = new ItemConfig(402008, "长生镜", "生命+150", 1, "attr", "hp+150", new int[0], "", 0, 0, false, false, false, 1, 0, 0, 2, 0.24f, "jingzi");
-            config[409001] = new ItemConfig(409001, "火尖枪", "", 1, "attr", "atk+15", new int[0], "", 0, 999, false, false, false, 1, 0, 0, 12, 0f, "huojianqiang");
-            config[409002] = new ItemConfig(409002, "聚宝盆", "每年额外获得2金币", 1, "pattr", "roundgold+2", new int[0], "", 0, 999, false, false, false, 1, 0, 0, 12, 0f, "jubaopeng");
-            config[409003] = new ItemConfig(409003, "虎王重甲", "", 1, "pattr", "shp+40", new int[0], "", 0, 999, false, false, false, 1, 0, 0, 12, 0f, "armor");
-            config[409004] = new ItemConfig(409004, "玉如意", "出售卡牌多获得25%金币", 1, "sellhigh", "", new int[0], "", 0, 999, false, false, false, 1, 0, 0, 12, 0f, "ruyi");
-            config[409005] = new ItemConfig(409005, "酒", "", 1, "attr", "atk+10,ap+6", new int[0], "", 0, 999, false, false, false, 1, 0, 0, 12, 0f, "jiu");
+            config[409001] = new ItemConfig(409001, "火尖枪", "", 5, "attr", "atk+15", new int[0], "", 0, 999, false, false, false, 1, 0, 0, 12, 0f, "huojianqiang");
+            config[409002] = new ItemConfig(409002, "聚宝盆", "每年额外获得2金币", 5, "pattr", "roundgold+2", new int[0], "", 0, 999, false, false, false, 1, 0, 0, 12, 0f, "jubaopeng");
+            config[409003] = new ItemConfig(409003, "虎王重甲", "", 5, "pattr", "shp+40", new int[0], "", 0, 999, false, false, false, 1, 0, 0, 12, 0f, "armor");
+            config[409004] = new ItemConfig(409004, "玉如意", "出售卡牌多获得25%金币", 5, "sellhigh", "", new int[0], "", 0, 999, false, false, false, 1, 0, 0, 12, 0f, "ruyi");
+            config[409005] = new ItemConfig(409005, "酒", "", 5, "attr", "atk+10,ap+6", new int[0], "", 0, 999, false, false, false, 1, 0, 0, 12, 0f, "jiu");
 
             RebuildIndex();
 

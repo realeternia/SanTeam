@@ -130,7 +130,6 @@ GameObject:
   m_Component:
   - component: {fileID: 9219173714850659319}
   - component: {fileID: 2287803449999260934}
-  - component: {fileID: 2753114156277793935}
   - component: {fileID: 8042992919290496458}
   - component: {fileID: 5096776861279770503}
   m_Layer: 5
@@ -171,36 +170,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4272539148925749380}
   m_CullTransparentMesh: 1
---- !u!114 &2753114156277793935
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4272539148925749380}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Material: {fileID: 0}
-  m_Color: {r: 0, g: 0, b: 0, a: 0.392}
-  m_RaycastTarget: 1
-  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
-  m_Maskable: 1
-  m_OnCullStateChanged:
-    m_PersistentCalls:
-      m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 8d8123aa68ce457a9b6ea7d62291a45c, type: 3}
-  m_Type: 0
-  m_PreserveAspect: 0
-  m_FillCenter: 1
-  m_FillMethod: 4
-  m_FillAmount: 1
-  m_FillClockwise: 1
-  m_FillOrigin: 0
-  m_UseSpriteMesh: 0
-  m_PixelsPerUnitMultiplier: 1
 --- !u!114 &8042992919290496458
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -221,10 +190,10 @@ MonoBehaviour:
   itemImage: {fileID: 1540008286836961467}
   jobImage: {fileID: 0}
   equipImages: []
-  shieldImage: {fileID: 0}
   cellButton: {fileID: 6027463124662379144}
   bagControl: {fileID: 0}
   expBar: {fileID: 8008808474712796276}
+  borderImg: {fileID: 8649791181019450358}
 --- !u!114 &5096776861279770503
 MonoBehaviour:
   m_ObjectHideFlags: 0

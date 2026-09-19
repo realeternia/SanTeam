@@ -18,11 +18,13 @@ public class BagCell : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragH
     public Image itemImage;
     public Image jobImage;
     public Image[] equipImages; // 最多3件装备槽，需在预制体上按槽位顺序拖入引用
+    public Image[] equipBorderImages; // 最多3件装备槽，需在预制体上按槽位顺序拖入引用
     
     public Button cellButton;
     public BagControl bagControl;
 
     public Image expBar;
+    public Image borderImg;
 
     private GameObject dragInstance;
     private Transform originalParent;
@@ -55,7 +57,12 @@ public class BagCell : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragH
                 bool has = slots != null && i < slots.Length && slots[i] != 0;
                 equipImages[i].gameObject.SetActive(has);
                 if (has)
+                {
                     equipImages[i].sprite = Resources.Load<Sprite>("Textures/ItemPic/" + ItemConfig.GetConfig(slots[i]).Icon);
+                    // 装备槽边框按装备品质上色（1白 2绿 3蓝 4紫，同英雄品质）
+                    if (equipBorderImages != null && i < equipBorderImages.Length)
+                        equipBorderImages[i].color = SysColor.GetQualityColor(ItemConfig.GetConfig(slots[i]).Quality);
+                }
             }
         }
 
@@ -79,6 +86,10 @@ public class BagCell : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragH
         // 装备升级机制已移除：物品按堆叠上限分格（默认1 每格一件），堆叠格右下角显示持有数量
         var itemCfg = ItemConfig.GetConfig(cardId);
         itemImage.sprite = Resources.Load<Sprite>("Textures/ItemPic/" + itemCfg.Icon);
+
+        // item 边框按品质上色（1白 2绿 3蓝 4紫，同英雄品质）
+        if (borderImg != null)
+            borderImg.color = SysColor.GetQualityColor(itemCfg.Quality);
 
         // 有副本处于装备中时显示角标
         bool equipped = bagControl.bindPlayer.itemEquips.Values.Any(v => v != null && v.Contains(cardId));

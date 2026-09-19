@@ -143,7 +143,7 @@ namespace CommonConfig
         /// </summary>
         public float AttackPointReduce;
         /// <summary>
-        ///是否法术伤害：true=法术（原ap，按法强成长、受魔抗减免）；false=物理（原atk/might，无双已并入，按攻击成长、受护甲减免）
+        ///是否法术伤害：true=法术（原ap，按法强成长，受魔抗减免）；false=物理（原atk/might，无双已并入，按攻击成长，受护甲减免）
         /// </summary>
         public bool IsMagic;
         /// <summary>
@@ -339,7 +339,7 @@ namespace CommonConfig
             config[2000008] = new SkillConfig(2000008, "连线", "友", "", "+45", "连接", "", 3, 0f, 0f, 0, "", 0f, false, "", 0, 0f, 0f, "", 0, 0f, 0, 0f, 0, "", "", "", false, 0f, "", 0, 0f, 0f, 0f, 0, "InitAttrChange", "", "", 0f, "you", "atk+45", "", "");
             config[2000009] = new SkillConfig(2000009, "连线", "友", "", "+60", "连接", "", 4, 0f, 0f, 0, "", 0f, false, "", 0, 0f, 0f, "", 0, 0f, 0, 0f, 0, "", "", "", false, 0f, "", 0, 0f, 0f, 0f, 0, "InitAttrChange", "", "", 0f, "you", "atk+60", "", "");
             config[2000010] = new SkillConfig(2000010, "连线", "友", "", "+90", "连接", "", 5, 0f, 0f, 0, "", 0f, false, "", 0, 0f, 0f, "", 0, 0f, 0, 0f, 0, "", "", "", false, 0f, "", 0, 0f, 0f, 0f, 0, "InitAttrChange", "", "", 0f, "you", "atk+90", "", "");
-            config[2000011] = new SkillConfig(2000011, "诸侯", "王", "自身攻击/1、护甲/2、生命/3；阵营护盾额外/4", "+5;+5;+50;+10%", "职业", "", 1, 0f, 0f, 0, "", 0f, false, "", 0, 0f, 0f, "", 0, 0f, 0, 0f, 0, "", "", "", false, 0f, "", 0, 0f, 0f, 0f, 0, "Dumb", "", "", 0f, "shuai", "atk+5,armor+5,hp+50", "", "");
+            config[2000011] = new SkillConfig(2000011, "诸侯", "王", "自身攻击/1，护甲/2，生命/3；阵营护盾额外/4", "+5;+5;+50;+10%", "职业", "", 1, 0f, 0f, 0, "", 0f, false, "", 0, 0f, 0f, "", 0, 0f, 0, 0f, 0, "", "", "", false, 0f, "", 0, 0f, 0f, 0f, 0, "Dumb", "", "", 0f, "shuai", "atk+5,armor+5,hp+50", "", "");
             config[2000012] = new SkillConfig(2000012, "诸侯", "王", "", "+10;+10;+100;+20%", "职业", "", 2, 0f, 0f, 0, "", 0f, false, "", 0, 0f, 0f, "", 0, 0f, 0, 0f, 0, "", "", "", false, 0f, "", 0, 0f, 0f, 0f, 0, "Dumb", "", "", 0f, "shuai", "atk+10,armor+10,hp+100", "", "");
             config[2000013] = new SkillConfig(2000013, "诸侯", "王", "", "+20;+20;+200;+30%", "职业", "", 3, 0f, 0f, 0, "", 0f, false, "", 0, 0f, 0f, "", 0, 0f, 0, 0f, 0, "", "", "", false, 0f, "", 0, 0f, 0f, 0f, 0, "Dumb", "", "", 0f, "shuai", "atk+20,armor+20,hp+200", "", "");
             config[2000014] = new SkillConfig(2000014, "诸侯", "王", "", "+40;+40;+400;+40%", "职业", "", 4, 0f, 0f, 0, "", 0f, false, "", 0, 0f, 0f, "", 0, 0f, 0, 0f, 0, "", "", "", false, 0f, "", 0, 0f, 0f, 0f, 0, "Dumb", "", "", 0f, "shuai", "atk+40,armor+40,hp+400", "", "");
@@ -364,7 +364,7 @@ namespace CommonConfig
             config[2000053] = new SkillConfig(2000053, "灵活", "马", "", "+20%", "职业", "", 3, 0f, 0f, 0, "", 0f, false, "", 0, 0f, 0f, "", 0, 0f, 0, 0f, 0, "", "", "", false, 0f, "", 0, 0f, 0f, 0f, 0, "Dumb", "", "", 0f, "ma", "dodge+0.20", "", "");
             config[2000054] = new SkillConfig(2000054, "灵活", "马", "", "+33%", "职业", "", 4, 0f, 0f, 0, "", 0f, false, "", 0, 0f, 0f, "", 0, 0f, 0, 0f, 0, "", "", "", false, 0f, "", 0, 0f, 0f, 0f, 0, "Dumb", "", "", 0f, "ma", "dodge+0.33", "", "");
             config[2000055] = new SkillConfig(2000055, "灵活", "马", "", "+45%", "职业", "", 5, 0f, 0f, 0, "", 0f, false, "", 0, 0f, 0f, "", 0, 0f, 0, 0f, 0, "", "", "", false, 0f, "", 0, 0f, 0f, 0f, 0, "Dumb", "", "", 0f, "ma", "dodge+0.45", "", "");
-            config[2000061] = new SkillConfig(2000061, "运筹", "相", "全军士兵攻击/1、生命/2，全队法力回复/3/秒", "+10%;+10%;+1", "职业", "", 1, 0f, 0f, 0, "", 0f, false, "", 0, 0f, 0f, "", 0, 0f, 0, 0f, 0, "", "", "", false, 0f, "", 0, 0f, 0f, 0f, 0, "Dumb", "", "", 0f, "xiang", "soldierAtk+0.1,soldierHp+0.1", "mpRegen+1", "");
+            config[2000061] = new SkillConfig(2000061, "运筹", "相", "全军士兵攻击/1，生命/2，全队法力回复/3/秒", "+10%;+10%;+1", "职业", "", 1, 0f, 0f, 0, "", 0f, false, "", 0, 0f, 0f, "", 0, 0f, 0, 0f, 0, "", "", "", false, 0f, "", 0, 0f, 0f, 0f, 0, "Dumb", "", "", 0f, "xiang", "soldierAtk+0.1,soldierHp+0.1", "mpRegen+1", "");
             config[2000062] = new SkillConfig(2000062, "运筹", "相", "", "+15%;+15%;+2", "职业", "", 2, 0f, 0f, 0, "", 0f, false, "", 0, 0f, 0f, "", 0, 0f, 0, 0f, 0, "", "", "", false, 0f, "", 0, 0f, 0f, 0f, 0, "Dumb", "", "", 0f, "xiang", "soldierAtk+0.15,soldierHp+0.15", "mpRegen+2", "");
             config[2000063] = new SkillConfig(2000063, "运筹", "相", "", "+20%;+20%;+3", "职业", "", 3, 0f, 0f, 0, "", 0f, false, "", 0, 0f, 0f, "", 0, 0f, 0, 0f, 0, "", "", "", false, 0f, "", 0, 0f, 0f, 0f, 0, "Dumb", "", "", 0f, "xiang", "soldierAtk+0.2,soldierHp+0.2", "mpRegen+3", "");
             config[2000064] = new SkillConfig(2000064, "运筹", "相", "", "+27%;+27%;+4", "职业", "", 4, 0f, 0f, 0, "", 0f, false, "", 0, 0f, 0f, "", 0, 0f, 0, 0f, 0, "", "", "", false, 0f, "", 0, 0f, 0f, 0f, 0, "Dumb", "", "", 0f, "xiang", "soldierAtk+0.27,soldierHp+0.27", "mpRegen+4", "");
