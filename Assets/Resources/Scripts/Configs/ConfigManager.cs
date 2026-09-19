@@ -38,6 +38,7 @@ public static class ConfigManager
         ForceConfig.Load();
         HeroAttrConfig.Load();
         SystemAttrConfig.Load();
+        ItemCombineConfig.Load();
 
         ConfigManager.PostModify();      
 

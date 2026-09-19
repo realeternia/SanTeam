@@ -289,7 +289,8 @@ public class Chess : MonoBehaviour
         magicRes = heroConfig.MagicRes;
 
         // 装备升级机制已移除：装备属性固定，不再按持有数量计算等级；最多3件装备属性累加
-        if (player.itemEquips.TryGetValue(heroId, out var equipIds) && equipIds != null)
+        var equipIds = player != null ? player.GetItemIdsOnHero(heroId) : new List<int>();
+        if (player != null)
         {
             foreach (var equipId in equipIds)
             {

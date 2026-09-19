@@ -185,19 +185,20 @@ namespace CommonConfig
         public static void Load()
         {
             config.Clear();
-            config[400001] = new ItemConfig(400001, "关王刀", "", 1, "attr", "atk+10", new int[0], "", 0, 5, false, false, false, 1, 0, 0, 10, 0f, "guanwangdao");
-            config[400002] = new ItemConfig(400002, "方天画戟", "", 1, "attr", "atk+15", new int[0], "", 0, 8, false, false, false, 1, 0, 0, 20, 0f, "fangtian");
-            config[400003] = new ItemConfig(400003, "丈八蛇矛", "", 1, "attr", "atk+11", new int[0], "", 0, 5, false, false, false, 1, 0, 0, 11, 0f, "zhangba");
-            config[400005] = new ItemConfig(400005, "大斧", "", 1, "attr", "atk+6", new int[0], "", 0, 0, false, false, false, 1, 0, 0, 5, 0f, "dafu");
-            config[400006] = new ItemConfig(400006, "三丈枪", "", 1, "attr", "atk+6", new int[0], "", 0, 0, false, false, false, 1, 0, 0, 5, 0f, "sanzhangqiang");
-            config[400007] = new ItemConfig(400007, "孙子兵法", "", 1, "attr", "atk+15", new int[0], "", 0, 8, false, false, false, 1, 0, 0, 20, 0f, "sunzi");
-            config[400008] = new ItemConfig(400008, "墨子", "", 1, "attr", "atk+6", new int[0], "", 0, 0, false, false, false, 1, 0, 0, 5, 0f, "mozi");
-            config[400009] = new ItemConfig(400009, "六韬", "", 1, "attr", "atk+10", new int[0], "", 0, 5, false, false, false, 1, 0, 0, 10, 0f, "liutao");
-            config[400010] = new ItemConfig(400010, "诗经", "", 1, "attr", "ap+6", new int[0], "", 0, 0, false, false, false, 1, 0, 0, 5, 0f, "shijing");
-            config[400011] = new ItemConfig(400011, "易经", "", 1, "attr", "ap+10", new int[0], "", 0, 5, false, false, false, 1, 0, 0, 10, 0f, "yijing");
-            config[400012] = new ItemConfig(400012, "道德经", "", 1, "attr", "ap+15", new int[0], "", 0, 8, false, false, false, 1, 0, 0, 20, 0f, "daode");
-            config[400013] = new ItemConfig(400013, "赤兔马", "", 1, "attr", "hp+75", new int[0], "", 0, 8, false, false, false, 1, 0, 0, 20, 0f, "chitu");
-            config[400014] = new ItemConfig(400014, "的卢马", "", 1, "attr", "hp+50", new int[0], "", 0, 5, false, false, false, 1, 0, 0, 10, 0f, "dilu");
+            config[400001] = new ItemConfig(400001, "关王刀", "", 2, "attr", "atk+10", new int[0], "", 0, 5, false, false, false, 1, 0, 0, 10, 0f, "guanwangdao");
+            config[400002] = new ItemConfig(400002, "方天画戟", "", 2, "attr", "atk+15", new int[0], "", 0, 8, false, false, false, 1, 0, 0, 20, 0f, "fangtian");
+            config[400003] = new ItemConfig(400003, "丈八蛇矛", "", 2, "attr", "atk+11", new int[0], "", 0, 5, false, false, false, 1, 0, 0, 11, 0f, "zhangba");
+            config[400005] = new ItemConfig(400005, "大斧", "", 2, "attr", "atk+6", new int[0], "", 0, 0, false, false, false, 1, 0, 0, 5, 0f, "dafu");
+            config[400006] = new ItemConfig(400006, "三丈枪", "", 2, "attr", "atk+6", new int[0], "", 0, 0, false, false, false, 1, 0, 0, 5, 0f, "sanzhangqiang");
+            config[400007] = new ItemConfig(400007, "孙子兵法", "", 2, "attr", "atk+15", new int[0], "", 0, 8, false, false, false, 1, 0, 0, 20, 0f, "sunzi");
+            config[400008] = new ItemConfig(400008, "墨子", "", 2, "attr", "atk+6", new int[0], "", 0, 0, false, false, false, 1, 0, 0, 5, 0f, "mozi");
+            config[400009] = new ItemConfig(400009, "六韬", "", 2, "attr", "atk+10", new int[0], "", 0, 5, false, false, false, 1, 0, 0, 10, 0f, "liutao");
+            config[400010] = new ItemConfig(400010, "诗经", "", 2, "attr", "ap+6", new int[0], "", 0, 0, false, false, false, 1, 0, 0, 5, 0f, "shijing");
+            config[400011] = new ItemConfig(400011, "易经", "", 2, "attr", "ap+10", new int[0], "", 0, 5, false, false, false, 1, 0, 0, 10, 0f, "yijing");
+            config[400012] = new ItemConfig(400012, "道德经", "", 2, "attr", "ap+15", new int[0], "", 0, 8, false, false, false, 1, 0, 0, 20, 0f, "daode");
+            config[400013] = new ItemConfig(400013, "赤兔马", "", 2, "attr", "hp+75", new int[0], "", 0, 8, false, false, false, 1, 0, 0, 20, 0f, "chitu");
+            config[400014] = new ItemConfig(400014, "的卢马", "", 2, "attr", "hp+50", new int[0], "", 0, 5, false, false, false, 1, 0, 0, 10, 0f, "dilu");
+            config[400015] = new ItemConfig(400015, "长生镜", "生命+150", 1, "attr", "hp+150", new int[0], "", 0, 0, false, false, false, 1, 0, 0, 2, 0.24f, "jingzi");
             config[401012] = new ItemConfig(401012, "万民书", "护甲+1，魔法抗性+1（仅限拥有「仁」的英雄）", 1, "tpattr", "armor+1,magicres+1", new int[0], "仁", 0, 6, false, false, true, 99, 401013, 5, 6, 0.4f, "wanming1");
             config[401013] = new ItemConfig(401013, "万民书·精", "护甲+5，魔法抗性+5（仅限拥有「仁」的英雄）", 2, "tpattr", "armor+5,magicres+5", new int[0], "仁", 0, 6, false, false, true, 99, 0, 0, 6, 0.4f, "wanming2");
             config[401014] = new ItemConfig(401014, "文赋", "法术强度+1，魔法抗性+1", 1, "tpattr", "ap+1,magicres+1", new int[0], "", 0, 6, false, false, true, 99, 401015, 5, 6, 0.4f, "wenfu1");
@@ -209,7 +210,7 @@ namespace CommonConfig
             config[402005] = new ItemConfig(402005, "葫芦", "每秒回复1点法力", 1, "attr", "mpRegen+1", new int[0], "", 0, 5, false, false, false, 1, 0, 0, 10, 0f, "hulu");
             config[402006] = new ItemConfig(402006, "护手", "暴击+15%", 1, "attr", "crit+0.15", new int[0], "", 0, 5, false, false, false, 1, 0, 0, 10, 0f, "hushou");
             config[402007] = new ItemConfig(402007, "羽扇", "法强+10", 1, "attr", "ap+10", new int[0], "", 0, 0, false, false, false, 0, 0, 0, 0, 0f, "yushan");
-            config[402008] = new ItemConfig(402008, "长生镜", "生命+150", 1, "attr", "hp+150", new int[0], "", 0, 0, false, false, false, 1, 0, 0, 2, 0.24f, "jingzi");
+            config[402008] = new ItemConfig(402008, "名马", "生命+150", 1, "attr", "hp+150", new int[0], "", 0, 0, false, false, false, 1, 0, 0, 2, 0.24f, "ma1");
             config[409001] = new ItemConfig(409001, "火尖枪", "", 5, "attr", "atk+15", new int[0], "", 0, 999, false, false, false, 1, 0, 0, 12, 0f, "huojianqiang");
             config[409002] = new ItemConfig(409002, "聚宝盆", "每年额外获得2金币", 5, "pattr", "roundgold+2", new int[0], "", 0, 999, false, false, false, 1, 0, 0, 12, 0f, "jubaopeng");
             config[409003] = new ItemConfig(409003, "虎王重甲", "", 5, "pattr", "shp+40", new int[0], "", 0, 999, false, false, false, 1, 0, 0, 12, 0f, "armor");

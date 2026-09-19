@@ -249,9 +249,10 @@ public class TooltipHero : BaseTooltip
         var equipIds = new List<int>();
         int eAtk = 0, eAp = 0, eHp = 0, eArmor = 0, eMagicRes = 0;
         float eAtkSpeedRate = 0f, eMpRegen = 0f, eHpRegen = 0f;
-        if (player != null && isHero && player.itemEquips.TryGetValue(heroId, out var equipSlots) && equipSlots != null)
+        var heroEquipIds = player != null && isHero ? player.GetItemIdsOnHero(heroId) : new List<int>();
+        if (player != null && isHero)
         {
-            foreach (var itemId in equipSlots)
+            foreach (var itemId in heroEquipIds)
             {
                 if (itemId == 0)
                     continue;

@@ -214,9 +214,10 @@ public class BagControl : MonoBehaviour, IPanelEvent
         int index = 0;
 
         // 装备中的装备不在背包显示：持有数减去已装备数，没有多余副本则不显示（等级仍按持有总数计算）
-        var itemCards = bindPlayer.cards
-            .Where(x => !ConfigManager.IsHeroCard(x.Key))
-            .Select(x => new { Key = x.Key, Owned = x.Value, Value = x.Value - bindPlayer.GetEquippedCount(x.Key) })
+        var itemCards = bindPlayer.items
+            .Select(x => x.ItemId)
+            .Distinct()
+            .Select(id => new { Key = id, Owned = bindPlayer.GetItemCount(id), Value = bindPlayer.GetItemFreeCount(id) })
             .Where(x => x.Value > 0)
             .ToList();
         var heroCards = bindPlayer.cards.Where(x => ConfigManager.IsHeroCard(x.Key)).ToList();
@@ -580,7 +581,7 @@ public class BagControl : MonoBehaviour, IPanelEvent
             // 装备到空槽：没有空槽或没有多余副本时失败
             if (!p1.Equip(heroCardId, itemCardId))
             {
-                ShowTipText(p1.GetEquippedCount(itemCardId) >= (p1.cards.TryGetValue(itemCardId, out var owned) ? owned : 0)
+                ShowTipText(p1.GetEquippedCount(itemCardId) >= p1.GetItemCount(itemCardId)
                     ? "没有多余副本可装备" : "装备槽已满，无法装备");
                 return;
             }
@@ -618,7 +619,7 @@ public class BagControl : MonoBehaviour, IPanelEvent
         var itemCfg = ItemConfig.GetConfig(itemCardId);
         if (itemCfg.StackLimit > 1)
         {
-            int owned = bindPlayer.cards.TryGetValue(itemCardId, out var c) ? c : 0;
+            int owned = bindPlayer.GetItemCount(itemCardId);
             if (owned > 0)
             {
                 var bagCell = cell.GetComponent<BagCell>();
@@ -693,7 +694,8 @@ public class BagControl : MonoBehaviour, IPanelEvent
 
     public void OnCellClick(BagCell cell)
     {
-        if(!bindPlayer.cards.ContainsKey(cell.cardId))
+        // 英雄查 cards，物品查 items
+        if (ConfigManager.IsHeroCard(cell.cardId) ? !bindPlayer.cards.ContainsKey(cell.cardId) : !bindPlayer.HasCard(cell.cardId))
             return;
     }
 

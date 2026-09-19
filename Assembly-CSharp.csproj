@@ -167,6 +167,7 @@
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillBuffExpand.cs" />
     <Compile Include="Assets\Resources\Scripts\Configs\PlayerLevelConfig_s.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAttackSpeedAttack.cs" />
+    <Compile Include="Assets\Resources\Scripts\Configs\ItemCombineConfig_s.cs" />
     <Compile Include="Assets\Epic Toon FX\Scripts\ETFXLightFade.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\Buff.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffSuck.cs" />
@@ -233,7 +234,6 @@
     <None Include="Assets\SineVFX\TopDownEffects\Shaders\DissolveParticleDepth.shader" />
     <None Include="Assets\Epic Toon FX\Shaders\ETFX_PowerboxLit.shader" />
     <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF-Surface.shader" />
-    <None Include="Assets\TextMesh Pro\Glyph Report.txt" />
     <None Include="Assets\SineVFX\TopDownEffects\_Packages\!!!_ReadBeforeImport_!!!.txt" />
     <None Include="Assets\Epic Toon FX\Prefabs\Interactive\Interactive FX.txt" />
     <None Include="Assets\TextMesh Pro\Sprites\EmojiOne Attribution.txt" />

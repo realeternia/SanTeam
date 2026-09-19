@@ -49,12 +49,12 @@ public class BagCell : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragH
         textItemName.color = SysColor.GetQualityColor(heroCfg.Quality);
 
         // 显示已装备的装备（最多3个槽位）
-        bagControl.bindPlayer.itemEquips.TryGetValue(cardId, out var slots);
+        var slots = bagControl.bindPlayer.GetItemIdsOnHero(cardId);
         if (equipImages != null)
         {
             for (int i = 0; i < equipImages.Length; i++)
             {
-                bool has = slots != null && i < slots.Length && slots[i] != 0;
+                bool has = i < slots.Count;
                 equipImages[i].gameObject.SetActive(has);
                 if (has)
                 {
@@ -92,7 +92,7 @@ public class BagCell : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragH
             borderImg.color = SysColor.GetQualityColor(itemCfg.Quality);
 
         // 有副本处于装备中时显示角标
-        bool equipped = bagControl.bindPlayer.itemEquips.Values.Any(v => v != null && v.Contains(cardId));
+        bool equipped = bagControl.bindPlayer.GetEquippedCount(cardId) > 0;
 
         expBar.rectTransform.sizeDelta = new Vector2(0, 15);
 

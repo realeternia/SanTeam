@@ -41,10 +41,9 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     [CustomSerializeField]
     public int mark;
     [CustomSerializeField]
-    public Dictionary<int, int> cards = new Dictionary<int, int>(); // cardid - > exp
-
+    public Dictionary<int, int> cards = new Dictionary<int, int>(); // cardid - > exp（仅英雄卡）
     [CustomSerializeField]
-    public Dictionary<int, int[]> itemEquips = new Dictionary<int, int[]>(); // heroId -> 装备的3个槽位（0=空槽）
+    public List<SerializableItemSlot> items = new List<SerializableItemSlot>(); // 物品实例列表：每件物品一条记录(ItemId + HeroId)，HeroId=0表示在背包未装备，非0表示装备在该英雄上；多个同 id 物品各自一条
     [CustomSerializeField]
     public int[] battleCards = new int[CombatConst.PlayerMaxSlot];
     [CustomSerializeField]
@@ -292,39 +291,59 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     public bool Equip(int heroId, int itemId)
     {
         // 已装备数量不能超过持有数量（同id装备多件可分别装备）
-        int owned = cards.TryGetValue(itemId, out int c) ? c : 0;
+        int owned = GetItemCount(itemId);
         if (GetEquippedCount(itemId) >= owned)
             return false;
+        if (GetHeroEquippedCount(heroId) >= MaxEquipSlots)
+            return false; // 没有空槽
 
-        if (!itemEquips.TryGetValue(heroId, out var slots) || slots == null)
+        // 找一件背包中的该道具实例（HeroId==0）装到英雄上
+        foreach (var slot in items)
         {
-            slots = new int[3];
-            itemEquips[heroId] = slots;
-        }
-        for (int i = 0; i < slots.Length; i++)
-        {
-            if (slots[i] == 0)
+            if (slot.ItemId == itemId && slot.HeroId == 0)
             {
-                slots[i] = itemId;
+                slot.HeroId = heroId;
                 return true;
             }
         }
-        return false; // 没有空槽
+        return false; // 没有空闲副本可装备
     }
 
     // 脱下英雄身上所有装备：返回脱下的装备数量，0表示没有装备
     public int UnwearAllEquips(int heroId)
     {
-        if (!itemEquips.TryGetValue(heroId, out var slots) || slots == null)
-            return 0;
         int count = 0;
-        for (int i = 0; i < slots.Length; i++)
+        foreach (var slot in items)
         {
-            if (slots[i] != 0)
+            if (slot.HeroId == heroId)
             {
+                slot.HeroId = 0;
                 count++;
-                slots[i] = 0;
             }
+        }
+        return count;
+    }
+
+    // 统计某道具的持有总数（含已装备与背包中的全部实例）
+    public int GetItemCount(int itemId)
+    {
+        int count = 0;
+        foreach (var slot in items)
+        {
+            if (slot.ItemId == itemId)
+                count++;
+        }
+        return count;
+    }
+
+    // 某道具有多少在背包中的空闲副本（未装备，可支配）
+    public int GetItemFreeCount(int itemId)
+    {
+        int count = 0;
+        foreach (var slot in items)
+        {
+            if (slot.ItemId == itemId && slot.HeroId == 0)
+                count++;
         }
         return count;
     }
@@ -333,17 +352,55 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     public int GetEquippedCount(int itemId)
     {
         int count = 0;
-        foreach (var item in itemEquips)
+        foreach (var slot in items)
         {
-            if (item.Value == null)
-                continue;
-            foreach (var v in item.Value)
-            {
-                if (v == itemId)
-                    count++;
-            }
+            if (slot.ItemId == itemId && slot.HeroId != 0)
+                count++;
         }
         return count;
+    }
+
+    // 某英雄当前已装备的物品数量
+    public int GetHeroEquippedCount(int heroId)
+    {
+        int count = 0;
+        foreach (var slot in items)
+        {
+            if (slot.HeroId == heroId)
+                count++;
+        }
+        return count;
+    }
+
+    // 某英雄当前装备的所有物品 id（按装备顺序）
+    public List<int> GetItemIdsOnHero(int heroId)
+    {
+        List<int> ids = new List<int>();
+        foreach (var slot in items)
+        {
+            if (slot.HeroId == heroId)
+                ids.Add(slot.ItemId);
+        }
+        return ids;
+    }
+
+    // 移除指定数量的某道具实例（优先移除背包副本，不足再移除已装备的）；用于合成/消耗
+    private void RemoveItemInstances(int itemId, int count)
+    {
+        // pass 0 只删背包副本，pass 1 删已装备副本
+        for (int pass = 0; pass < 2 && count > 0; pass++)
+        {
+            for (int i = items.Count - 1; i >= 0 && count > 0; i--)
+            {
+                var slot = items[i];
+                if (slot.ItemId != itemId)
+                    continue;
+                if (pass == 0 && slot.HeroId != 0)
+                    continue;
+                items.RemoveAt(i);
+                count--;
+            }
+        }
     }
 
     public void SetBattlePos(int heroId, int pos)
@@ -422,7 +479,9 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
             price = ItemConfig.GetConfig(cardId).Price;
         }
 
-        var count = cards.TryGetValue(cardId, out var owned) ? owned : 0;
+        var count = isHeroCard
+            ? (cards.TryGetValue(cardId, out var owned) ? owned : 0)
+            : GetItemCount(cardId);
         if (sellCount > 0)
             count = Math.Min(sellCount, count);
         AddGold((int)(price * count * GetSellRate()));
@@ -431,13 +490,22 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 
     private void RemoveCard(int cardId, int count)
     {
-        if(cards.ContainsKey(cardId))
+        var isHeroCard = ConfigManager.IsHeroCard(cardId);
+        if (isHeroCard)
         {
-            cards[cardId] -= count;
-            if(cards[cardId] <= 0)
-                cards.Remove(cardId);
-            else
-                return;
+            if(cards.ContainsKey(cardId))
+            {
+                cards[cardId] -= count;
+                if(cards[cardId] <= 0)
+                    cards.Remove(cardId);
+                else
+                    return;
+            }
+        }
+        else
+        {
+            // 物品：逐实例移除（优先背包副本，不足再移除已装备的），移除已装备即同时取消其装备关系
+            RemoveItemInstances(cardId, count);
         }
         for (int i = 0; i < battleCards.Length; i++)
         {
@@ -445,21 +513,6 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
             {
                 battleCards[i] = 0;
                 break;
-            }
-        }
-        if (itemEquips.ContainsKey(cardId))
-        {
-            itemEquips.Remove(cardId);
-        }
-        // 清空指向该装备的槽位
-        foreach (var item in itemEquips)
-        {
-            if (item.Value == null)
-                continue;
-            for (int i = 0; i < item.Value.Length; i++)
-            {
-                if (item.Value[i] == cardId)
-                    item.Value[i] = 0;
             }
         }
     }
@@ -527,13 +580,19 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
                 return true;
             }
         }
-        if (cards.TryGetValue(cardId, out int exp))
+        if (isHero && cards.TryGetValue(cardId, out int exp))
         {
             cards[cardId] = exp + count;
         }
-        else
+        else if (isHero)
         {
             cards[cardId] = count;
+        }
+        else
+        {
+            // 物品：购买 count 件，各占一条实例（初始都在背包）
+            for (int i = 0; i < count; i++)
+                items.Add(new SerializableItemSlot(cardId, 0));
         }
         GameManager.Instance.PlaySound("Sounds/gold");
         ctr.OnSold(this, count);
@@ -599,14 +658,13 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     public List<int> GetItemList(string effectName)
     {
         List<int> itemCardList = new List<int>();
-        foreach (int cardId in cards.Keys)
+        foreach (var slot in items)
         {
-            if(ConfigManager.IsHeroCard(cardId))
+            var itemCfg = ItemConfig.GetConfig(slot.ItemId);
+            if (itemCfg == null || itemCfg.Effect != effectName)
                 continue;
-            var itemCfg = ItemConfig.GetConfig(cardId);
-            if(itemCfg.Effect != effectName)
-                continue;
-            itemCardList.Add(cardId);
+            if (!itemCardList.Contains(slot.ItemId))
+                itemCardList.Add(slot.ItemId);
         }
         return itemCardList;
     }
@@ -614,12 +672,10 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     public int GetItemPAttr(string attrName)
     {
         int attrVal = 0;
-        foreach (int cardId in cards.Keys)
+        foreach (int itemId in GetItemList("pattr"))
         {
-            if(ConfigManager.IsHeroCard(cardId))
-                continue;
-            var itemCfg = ItemConfig.GetConfig(cardId);
-            if(itemCfg.Effect != "pattr")
+            var itemCfg = ItemConfig.GetConfig(itemId);
+            if (itemCfg == null)
                 continue;
             foreach (var bonus in JobLinkManager.ParseBonuses(itemCfg.Attrs))
             {
@@ -632,12 +688,10 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 
     public bool HasItemByEffect(string effectName)
     {
-        foreach (int cardId in cards.Keys)
+        foreach (var slot in items)
         {
-            if(ConfigManager.IsHeroCard(cardId))
-                continue;
-            var itemCfg = ItemConfig.GetConfig(cardId);
-            if(itemCfg.Effect == effectName)
+            var itemCfg = ItemConfig.GetConfig(slot.ItemId);
+            if (itemCfg != null && itemCfg.Effect == effectName)
                 return true;
         }
         return false;
@@ -720,7 +774,6 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 
     private void AutoCheckItem(List<Tuple<int, int>> results)
     {
-        itemEquips.Clear();
         var attrItemList = GetItemList("attr");
 
         if(attrItemList.Count == 0)
@@ -752,7 +805,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
                     if (itemBonuses.Count == 0)
                         continue;
                     var firstAttr = itemBonuses[0];
-                    float score = firstAttr.Value * HeroSelectionTool.GetCardLevel(cards[itemId], false); //乘上等级
+                    float score = firstAttr.Value * HeroSelectionTool.GetCardLevel(GetItemCount(itemId), false); //乘上数量
 
                     if (!string.IsNullOrEmpty(firstAttr.Attr))
                     {
@@ -803,13 +856,16 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         int mark = 0;
         foreach(var item in results)
             mark += HeroSelectionTool.GetPrice(HeroConfig.GetConfig(item.Item1)) * cards[item.Item1];
-        foreach (var item in itemEquips)
+        // 每件已装备在登场英雄身上的物品按价格计入（价格×装备件数）
+        foreach (var slot in items)
         {
-            // 检查英雄ID是否存在于results中
+            if (slot.HeroId == 0)
+                continue;
+            // 检查该英雄是否存在于results中
             bool heroExists = false;
             foreach(var hero in results)
             {
-                if(hero.Item1 == item.Key)
+                if(hero.Item1 == slot.HeroId)
                 {
                     heroExists = true;
                     break;
@@ -817,14 +873,10 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
             }
             if(!heroExists)
                 continue;
-            if (item.Value == null)
+            var itemCfg = ItemConfig.GetConfig(slot.ItemId);
+            if (itemCfg == null)
                 continue;
-            foreach (var equipId in item.Value)
-            {
-                if (equipId == 0)
-                    continue;
-                mark += ItemConfig.GetConfig(equipId).Price * cards[equipId];
-            }
+            mark += itemCfg.Price;
         }
         lastFightMark = mark / 10;
         
@@ -995,16 +1047,16 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 
     public bool HasCard(int cardId)
     {
-        return cards.ContainsKey(cardId);
+        // 英雄查 cards（exp），物品查 items（实例列表）
+        return ConfigManager.IsHeroCard(cardId)
+            ? cards.ContainsKey(cardId)
+            : GetItemCount(cardId) > 0;
     }
 
     // 直接获得一张道具卡（PVE怪物掉落等来源，不走商店购买流程）
     public void AddItemCard(int itemId)
     {
-        if (cards.TryGetValue(itemId, out int count))
-            cards[itemId] = count + 1;
-        else
-            cards[itemId] = 1;
+        items.Add(new SerializableItemSlot(itemId, 0));
         // 进背包自动合成：按 ItemConfig 配置检查该道具是否达到合成需求
         CheckAutoCombine(itemId);
     }
@@ -1015,18 +1067,69 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         var cfg = ItemConfig.GetConfig(itemId);
         if (cfg == null || cfg.CombineId <= 0 || cfg.CombineNeed <= 0)
             return;
-        if (!cards.TryGetValue(itemId, out int srcCount) || srcCount < cfg.CombineNeed)
+        int srcCount = GetItemCount(itemId);
+        if (srcCount < cfg.CombineNeed)
             return;
         int combineCount = srcCount / cfg.CombineNeed;
         int leftCount = srcCount - combineCount * cfg.CombineNeed;
-        if (leftCount > 0)
-            cards[itemId] = leftCount;
-        else
-            cards.Remove(itemId);
-        cards.TryGetValue(cfg.CombineId, out int dstCount);
-        cards[cfg.CombineId] = dstCount + combineCount;
+        // 消耗合成所需数量（优先背包副本），产出目标道具进背包
+        RemoveItemInstances(itemId, srcCount - leftCount);
+        for (int i = 0; i < combineCount; i++)
+            items.Add(new SerializableItemSlot(cfg.CombineId, 0));
         GameLog.Debug(string.Format("背包自动合成：玩家{0} 消耗{1}个道具{2}合成{3}个道具{4}",
             pid, combineCount * cfg.CombineNeed, itemId, combineCount, cfg.CombineId));
+    }
+
+    // 两件物品合成一件（ItemCombineConfig 合成表）：消耗 ItemA/ItemB 各配置数量，产出 ResultId 配置数量进背包
+    // 返回是否成功（材料不足或未找到配方则失败）
+    public bool CombineTwoItems(int itemA, int itemB)
+    {
+        // 找到匹配配方（A+B 或 B+A 均可）
+        ItemCombineConfig rcp = null;
+        foreach (var cfg in ItemCombineConfig.ConfigList)
+        {
+            if ((cfg.ItemA == itemA && cfg.ItemB == itemB) || (cfg.ItemA == itemB && cfg.ItemB == itemA))
+            {
+                rcp = cfg;
+                break;
+            }
+        }
+        if (rcp == null)
+        {
+            GameLog.Warn(string.Format("合成失败：未找到配方 {0}+{1}，玩家{2}", itemA, itemB, pid));
+            return false;
+        }
+        // 材料数量校验：两件都需持有足够数量
+        if (GetItemCount(rcp.ItemA) < rcp.ItemAcount ||
+            GetItemCount(rcp.ItemB) < rcp.ItemBcount)
+        {
+            GameLog.Warn(string.Format("合成失败：材料不足 需要{0}x{1} + {2}x{3}，玩家{4}",
+                rcp.ItemA, rcp.ItemAcount, rcp.ItemB, rcp.ItemBcount, pid));
+            return false;
+        }
+        // 消耗材料
+        ConsumeItemCount(rcp.ItemA, rcp.ItemAcount);
+        ConsumeItemCount(rcp.ItemB, rcp.ItemBcount);
+        // 产出结果
+        AddItemCountDirect(rcp.ResultId, rcp.ResultCount);
+        GameLog.Debug(string.Format("背包合成：玩家{0} 消耗{1}x{2}+{3}x{4} 合成{5}x{6}",
+            pid, rcp.ItemA, rcp.ItemAcount, rcp.ItemB, rcp.ItemBcount, rcp.ResultId, rcp.ResultCount));
+        return true;
+    }
+
+    // 消耗指定数量的物品实例（优先背包副本，不足再移除已装备的），不触发自动合成
+    private void ConsumeItemCount(int itemId, int count)
+    {
+        if (count <= 0)
+            return;
+        RemoveItemInstances(itemId, count);
+    }
+
+    // 直接增加指定数量物品到背包（不触发自动合成检查）
+    private void AddItemCountDirect(int itemId, int count)
+    {
+        for (int i = 0; i < count; i++)
+            items.Add(new SerializableItemSlot(itemId, 0));
     }
 
     public bool HasFriend(int cardId)
@@ -1112,6 +1215,13 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
                         {
                             int[] array = (int[])fieldValue;
                             stringValue = string.Join(",", array);
+                        }
+                        // 物品实例列表：用 wrapper 包一层便于 JsonUtility 顶层序列化
+                        else if (fieldValue is List<SerializableItemSlot>)
+                        {
+                            var wrapper = new ItemSlotListWrapper();
+                            wrapper.list = (List<SerializableItemSlot>)fieldValue;
+                            stringValue = JsonUtility.ToJson(wrapper);
                         }
                         // 对于其他基本类型，直接存储
                         else if (field.FieldType.IsPrimitive || field.FieldType == typeof(string) || field.FieldType == typeof(decimal))
@@ -1264,6 +1374,31 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
                         }
                         field.SetValue(this, array);
                     }
+                    // 物品实例列表：新格式 wrapper JSON；兼容旧存档 dict 格式 "id:count,id:count"
+                    else if (field.FieldType == typeof(List<SerializableItemSlot>))
+                    {
+                        var list = new List<SerializableItemSlot>();
+                        if (stringValue.StartsWith("{\"list\""))
+                        {
+                            var wrapper = JsonUtility.FromJson<ItemSlotListWrapper>(stringValue);
+                            if (wrapper != null && wrapper.list != null)
+                                list = wrapper.list;
+                        }
+                        else
+                        {
+                            string[] entries = stringValue.Split(',');
+                            foreach (string entry in entries)
+                            {
+                                if (string.IsNullOrEmpty(entry))
+                                    continue;
+                                string[] parts = entry.Split(':');
+                                if (parts.Length == 2 && int.TryParse(parts[0], out int id) && int.TryParse(parts[1], out int cnt))
+                                    for (int i = 0; i < cnt; i++)
+                                        list.Add(new SerializableItemSlot(id, 0));
+                            }
+                        }
+                        field.SetValue(this, list);
+                    }
                     // 对于其他基本类型
                     else if (field.FieldType == typeof(int))
                     {
@@ -1297,39 +1432,54 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         }
         // 兼容旧存档：battleCards 统一为9格长度
         EnsureBattleCardsSize();
-        // 兼容旧存档：剔除已下架的道具（401002士兵剑/401003士兵甲已移除），避免UI空引用
+        // 兼容旧存档：旧存档中物品混在 cards，这里把非英雄条目迁移到 items
+        MigrateLegacyItemsToItems();
+        // 兼容旧存档：剔除 items 中配置表里已不存在的道具（401002士兵剑/401003士兵甲已移除），避免UI空引用
         RemoveObsoleteItemCards();
     }
 
-    // 剔除背包中配置表里已不存在的道具（保留英雄卡和有效道具）
+    // 兼容旧存档：把 cards 中混入的物品条目迁移到独立的 items 容器（物品无 exp，纯数量）
+    private void MigrateLegacyItemsToItems()
+    {
+        List<int> itemCardIds = null;
+        foreach (var kv in cards)
+        {
+            if (ConfigManager.IsHeroCard(kv.Key))
+                continue;
+            if (itemCardIds == null)
+                itemCardIds = new List<int>();
+            itemCardIds.Add(kv.Key);
+        }
+        if (itemCardIds == null)
+            return;
+        foreach (var id in itemCardIds)
+        {
+            int count = cards[id];
+            cards.Remove(id);
+            for (int i = 0; i < count; i++)
+                items.Add(new SerializableItemSlot(id, 0));
+            GameLog.Debug($"旧存档迁移：道具 {id} 从 cards 迁移到 items，数量 {count}");
+        }
+    }
+
+    // 剔除 items 中配置表里已不存在的道具（保留有效道具；英雄卡只位于 cards）
     private void RemoveObsoleteItemCards()
     {
-        List<int> invalid = null;
-        foreach (var cardId in cards.Keys)
+        List<SerializableItemSlot> invalid = null;
+        foreach (var slot in items)
         {
-            if (ConfigManager.IsHeroCard(cardId) || ItemConfig.HasConfig(cardId))
+            if (ItemConfig.HasConfig(slot.ItemId))
                 continue;
             if (invalid == null)
-                invalid = new List<int>();
-            invalid.Add(cardId);
+                invalid = new List<SerializableItemSlot>();
+            invalid.Add(slot);
         }
         if (invalid != null)
         {
-            foreach (var id in invalid)
+            foreach (var slot in invalid)
             {
-                cards.Remove(id);
-                GameLog.Debug($"旧存档清理：移除已下架道具 {id}");
-            }
-            // 装备槽位里指向已删道具的记录一并清除
-            foreach (var kv in itemEquips)
-            {
-                if (kv.Value == null)
-                    continue;
-                for (int i = 0; i < kv.Value.Length; i++)
-                {
-                    if (kv.Value[i] != 0 && !ItemConfig.HasConfig(kv.Value[i]))
-                        kv.Value[i] = 0;
-                }
+                items.Remove(slot);
+                GameLog.Debug($"旧存档清理：移除已下架道具 {slot.ItemId}");
             }
         }
     }
@@ -1422,6 +1572,32 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         }
     }
     
+    // 每个英雄最多可装备的物品数（原 3 槽位）
+    private const int MaxEquipSlots = 3;
+
+    // 物品实例数据结构：每件物品一条，ItemId + HeroId(HeroId=0 表示在背包未装备)
+    [System.Serializable]
+    public class SerializableItemSlot
+    {
+        public int ItemId;
+        public int HeroId;
+
+        public SerializableItemSlot() { }
+
+        public SerializableItemSlot(int itemId, int heroId)
+        {
+            ItemId = itemId;
+            HeroId = heroId;
+        }
+    }
+
+    // 物品实例列表的序列化包装（JsonUtility 不支持 List<T> 顶层序列化）
+    [System.Serializable]
+    private class ItemSlotListWrapper
+    {
+        public List<SerializableItemSlot> list = new List<SerializableItemSlot>();
+    }
+
     // 用于JsonUtility序列化的辅助类
     [System.Serializable]
     private class SerializableData
