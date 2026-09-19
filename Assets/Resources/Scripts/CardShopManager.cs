@@ -20,6 +20,7 @@ public class CardShopManager : MonoBehaviour
     private bool[] playerPassed = new bool[8]; // 记录每个玩家是否pass过
     private int passedPlayers = 0; // 记录pass的玩家数量
     private const int SOLD_REMAIN_ROUNDS = 5; // 卡售出后维持的round数
+    private const int RefreshGoldCost = 2; // 刷新商店的金币消耗
     public int[] playerStartGold = new int[8]; // 记录每个玩家开局金币（用于AI跳过判定）
 
     public Button passBtn;
@@ -353,12 +354,26 @@ public class CardShopManager : MonoBehaviour
 
     public bool OnPlayerBuyCard(CardViewControl ctr, PlayerInfo player, int cardId, bool isHero, int price, int count)
     {
+        // AI 买卡失败不弹提示，避免刷屏
+        bool showTip = player != null && !player.isAI;
+
+        if (player.gold < price)
+        {
+            if (showTip)
+                SystemTip.Show("金币不足，无法购买");
+            return false;
+        }
+
         if (player.BuyCard(ctr, cardId, isHero, price, count))
         {
             mySelect.UpdateCards(player);
             OnCardSelected(ctr);
             return true;
         }
+
+        // 金币足够时唯一的失败原因是新英雄卡超出背包上限
+        if (showTip)
+            SystemTip.Show($"英雄卡已满({CombatConst.PlayerMaxHeroCards}张)，无法购买新英雄");
         return false;
     }
 
@@ -400,11 +415,17 @@ public class CardShopManager : MonoBehaviour
         if (nowPlayer.isAI)
             return;
         if (playerPassed[nowPlayer.pid])
+        {
+            SystemTip.Show("你已跳过本回合，无法刷新");
             return;
-        if (nowPlayer.gold < 2)
+        }
+        if (nowPlayer.gold < RefreshGoldCost)
+        {
+            SystemTip.Show($"金币不足，刷新需要{RefreshGoldCost}金币");
             return;
+        }
 
-        nowPlayer.gold -= 2;
+        nowPlayer.gold -= RefreshGoldCost;
         nowPlayer.goldText.text = nowPlayer.gold.ToString();
 
         // 从未售出的卡牌中随机选取6张进行刷新（不足6张则全部刷新）

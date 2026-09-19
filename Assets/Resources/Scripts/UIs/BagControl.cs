@@ -88,22 +88,28 @@ public class BagControl : MonoBehaviour, IPanelEvent
         {
             if (bindPlayer == null || bindPlayer.isAI)
                 return;
-            if (bindPlayer.BuyExp())
+            if (!bindPlayer.BuyExp())
             {
-                UpdateExpView();
-                GameManager.Instance.PlaySound("Sounds/equip");
+                SystemTip.Show($"金币不足，购买经验需要{CombatConst.ExpBuyGoldCost}金币");
+                return;
             }
+            UpdateExpView();
+            GameManager.Instance.PlaySound("Sounds/equip");
         });
         sodLvupBtn.onClick.AddListener(() =>
         {
             if (bindPlayer == null || bindPlayer.isAI)
                 return;
-            if (bindPlayer.SodLvup())
+            if (!bindPlayer.SodLvup())
             {
-                UpdateSodView();
-                UpdateFieldView(); // 升级后补足新解锁的士兵
-                GameManager.Instance.PlaySound("Sounds/equip");
+                SystemTip.Show(bindPlayer.soldierLevel >= CombatConst.SoldierMaxLevel
+                    ? "士兵等级已满"
+                    : $"金币不足，升级士兵需要{CombatConst.SodLvupGoldCost}金币");
+                return;
             }
+            UpdateSodView();
+            UpdateFieldView(); // 升级后补足新解锁的士兵
+            GameManager.Instance.PlaySound("Sounds/equip");
         });
 
         // 5x5布阵图：最上面一行前3格、最后面一行后2格为小兵格，其余可布阵英雄
@@ -562,7 +568,7 @@ public class BagControl : MonoBehaviour, IPanelEvent
         // 使用限制：目标英雄需属于该技能的好友羁绊组（如万民书限定「仁」）
         if (!p1.CanUseItemToHero(heroCardId, itemCardId))
         {
-            ShowTipText($"只能对拥有「{itemCfg.LimitSkillSname}」的英雄使用");
+            SystemTip.Show($"只能对拥有「{itemCfg.LimitSkillSname}」的英雄使用");
             return;
         }
 
@@ -579,7 +585,7 @@ public class BagControl : MonoBehaviour, IPanelEvent
             // 装备到空槽：没有空槽或没有多余副本时失败
             if (!p1.Equip(heroCardId, itemCardId))
             {
-                ShowTipText(p1.GetEquippedCount(itemCardId) >= p1.GetItemCount(itemCardId)
+                SystemTip.Show(p1.GetEquippedCount(itemCardId) >= p1.GetItemCount(itemCardId)
                     ? "没有多余副本可装备" : "装备槽已满，无法装备");
                 return;
             }
@@ -600,7 +606,7 @@ public class BagControl : MonoBehaviour, IPanelEvent
         int count = p1.UnwearAllEquips(heroCardId);
         if (count == 0)
         {
-            ShowTipText("该英雄没有装备");
+            SystemTip.Show("该英雄没有装备");
             return;
         }
 
@@ -613,7 +619,7 @@ public class BagControl : MonoBehaviour, IPanelEvent
     {
         if (itemCardId == 0 || ConfigManager.IsHeroCard(itemCardId))
         {
-            ShowTipText("英雄不可合成");
+            SystemTip.Show("英雄不可合成");
             return;
         }
 
@@ -635,7 +641,7 @@ public class BagControl : MonoBehaviour, IPanelEvent
             var p1 = GameManager.Instance.GetPlayer(bindPlayer.pid);
             if (!p1.CombineTwoItems(recipe.ItemA, recipe.ItemB))
             {
-                ShowTipText("材料不足，无法合成");
+                SystemTip.Show("材料不足，无法合成");
                 return;
             }
 
@@ -775,31 +781,18 @@ public class BagControl : MonoBehaviour, IPanelEvent
         Destroy(cell);
     }
 
-    // 在信息栏短暂显示提示文字（2秒后恢复原信息）
-    private Coroutine tipCoroutine;
-    private void ShowTipText(string msg)
-    {
-        if (tipCoroutine != null)
-            StopCoroutine(tipCoroutine);
-        tipCoroutine = StartCoroutine(ShowTipTextCo(msg));
-    }
-
-    private IEnumerator ShowTipTextCo(string msg)
-    {
-        infoText.text = msg;
-        infoText.color = Color.red;
-        yield return new WaitForSeconds(2f);
-        infoText.color = Color.white;
-        UpdateExpView(); // 恢复原来的信息文本
-    }
-
     public void SetHeroForBattle(int heroId, int pos)
     {
         var p1 = GameManager.Instance.GetPlayer(bindPlayer.pid);
         if(p1.isAI)
             return;
 
-        p1.SetBattlePos(heroId, pos);
+        // 布阵失败（该格被小兵占用/超出上阵上限）给出提示
+        if (!p1.SetBattlePos(heroId, pos, out string failReason))
+        {
+            SystemTip.Show(failReason);
+            return;
+        }
 
         GameManager.Instance.PlaySound("Sounds/equip");
         UpdateFieldView();
@@ -829,7 +822,7 @@ public class BagControl : MonoBehaviour, IPanelEvent
         // 物品仅掉落获得，不出售；仅英雄可出售（整组）
         if (!ConfigManager.IsHeroCard(cardId))
         {
-            ShowTipText("物品不可出售");
+            SystemTip.Show("物品不可出售");
             return;
         }
         p1.SellCard(cardId, 0);

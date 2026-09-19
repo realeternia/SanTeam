@@ -70,6 +70,11 @@ public class CardViewControl : MonoBehaviour, IPointerDownHandler, IPointerUpHan
                     }
                 }
             }
+            else
+            {
+                // 对手(AI)回合：牌面仍可点击查看，但无法购买
+                SystemTip.Show("当前是对手回合，无法购买");
+            }
         });
 
         addButton.gameObject.SetActive(false);

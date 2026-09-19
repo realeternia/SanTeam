@@ -68,6 +68,7 @@
     <Compile Include="Assets\Resources\Scripts\UIs\BagCellPointerForwarder.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\TooltipHero.cs" />
     <Compile Include="Assets\Resources\Scripts\Configs\SystemAttrConfig_s.cs" />
+    <Compile Include="Assets\Resources\Scripts\SystemTip.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffShieldValue.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Missile.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillHitBuffArea.cs" />

@@ -403,14 +403,24 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         }
     }
 
-    public void SetBattlePos(int heroId, int pos)
+    // 布阵：返回是否成功，失败原因写入 failReason（布阵格越界/该格被小兵占用/超出上阵上限）
+    public bool SetBattlePos(int heroId, int pos, out string failReason)
     {
+        failReason = null;
+
         // 可在5x5布阵图的任意格子自由摆放
         if(pos < 0 || pos >= CombatConst.FormationCellCount)
-            return;
+        {
+            GameLog.Warn($"SetBattlePos: 布阵格越界 pos={pos}");
+            failReason = "超出布阵范围";
+            return false;
+        }
         // 目标格已被小兵占用则不可布阵英雄
         if(battleCards[pos] == 500001 || battleCards[pos] == 500002)
-            return;
+        {
+            failReason = "该格已被小兵占用";
+            return false;
+        }
 
         // 目标格已有英雄 = 替换操作（旧英雄回背包），不受上限限制
         bool isReplace = battleCards[pos] > 0 && ConfigManager.IsHeroCard(battleCards[pos]);
@@ -433,7 +443,10 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
                     heroCount++;
             }
             if(heroCount >= GetSlotCount())
-                return;
+            {
+                failReason = $"上阵已满({GetSlotCount()}个)，升级玩家等级可解锁更多格子";
+                return false;
+            }
         }
         for(int i = 0; i < battleCards.Length; i++)
         {
@@ -444,6 +457,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
             }
         }
         battleCards[pos] = heroId;
+        return true;
     }
 
     // 布阵格之间交换单位（英雄/小兵自由交换，数量守恒）
