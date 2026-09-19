@@ -142,6 +142,7 @@
     <Compile Include="Assets\DOTween\Modules\DOTweenModulePhysics2D.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\BaseTooltip.cs" />
     <Compile Include="Assets\SineVFX\TopDownEffects\Scripts\PrefabSpawner.cs" />
+    <Compile Include="Assets\Resources\Scripts\UIs\TooltipHeroEquip.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAttackedShield.cs" />
     <Compile Include="Assets\Resources\Scripts\PO\BuffTime.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\BattleResultCellControl.cs" />

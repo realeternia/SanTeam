@@ -47,6 +47,7 @@ Unity (C#) | JsonUtility | UGUI | TextMeshPro
 - 获取配置：`XxxConfig.GetConfig(id)` / `HasConfig(id)` / `ConfigList`；技能按缩写+等级取：`ConfigManager.GetSkillConfig(sname, lv)`；属性配置按名取：`GetConfigByname(name)`
 - 配置后处理（字段补默认值/联动修正）统一放 `ConfigManager.PostModify()`，如 HeroConfig 数值为 0 时取职业基准值
 - 禁止在配置类（`XxxConfig_s.cs`）中添加业务方法，配置类仅保留数据定义、Load、GetConfig、HasConfig 等基础方法
+- 禁止在配置类（如 `SoldierConfig`）中添加掉落解析/加权随机等业务实现：
 - 禁止在配置类构造器中使用默认参数：新增列必须插入到对应字段/构造参数的位置（保持表列顺序，如 CD 后加触发条件 TriggerCondition），并同步为全部数据行补值，不允许让旧行缺参
 - 战斗中用到的技能/Buff Id 常量放 `CombatConst`（`Combat/CombatConst.cs`），不要在战斗代码里硬编码 Id
 

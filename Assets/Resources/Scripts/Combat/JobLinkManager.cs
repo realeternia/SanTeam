@@ -237,10 +237,10 @@ public static class JobLinkManager
             case "armor":
                 unit.armor += (int)value;
                 break;
-            case "magicRes":
+            case "magicres":
                 unit.magicRes += (int)value;
                 break;
-            case "maxHp":
+            case "hp":
             {
                 var add = (int)value;
                 unit.maxHp += add;
@@ -249,13 +249,13 @@ public static class JobLinkManager
                     unit.heroInfo.SetHpRate(unit.hp, unit.maxHp);
                 break;
             }
-            case "critRate":
+            case "crit":
                 unit.critRate += value;
                 break;
-            case "attackSpeedRate":
+            case "atkspeed":
                 unit.attackSpeedRate += value;
                 break;
-            case "dodgeRate":
+            case "dodge":
                 // 马·闪避
                 unit.dodgeRate += value;
                 break;

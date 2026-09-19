@@ -19,7 +19,6 @@ public class BagCell : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragH
     public Image jobImage;
     public Image[] equipImages; // 最多3件装备槽，需在预制体上按槽位顺序拖入引用
     
-    public Image shieldImage;
     public Button cellButton;
     public BagControl bagControl;
 
@@ -83,7 +82,6 @@ public class BagCell : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragH
 
         // 有副本处于装备中时显示角标
         bool equipped = bagControl.bindPlayer.itemEquips.Values.Any(v => v != null && v.Contains(cardId));
-        shieldImage.gameObject.SetActive(equipped);
 
         expBar.rectTransform.sizeDelta = new Vector2(0, 15);
 

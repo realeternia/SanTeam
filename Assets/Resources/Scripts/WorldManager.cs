@@ -1065,7 +1065,7 @@ public class WorldManager : MonoBehaviour
             if (pairIdx >= 0 && pairIdx < pveFightCount)
             {
                 var p = GameManager.Instance.GetPlayer(match[pairIdx]);
-                var drops = SoldierConfig.GetConfig(dieUnit.soldierId).RollDrops();
+                var drops = RollDrops(SoldierConfig.GetConfig(dieUnit.soldierId));
                 foreach (var itemId in drops)
                 {
                     p.AddItemCard(itemId);
@@ -1115,6 +1115,44 @@ public class WorldManager : MonoBehaviour
         hasWin = player0Idx >= pveFightCount || sideHasUnits[player0Idx * 2];
     }
 
+    // PVE：按掉落配置加权随机一个道具（权重=相对权重，最终只掉落一个；空配置返回空列表）。
+    // 掉落解析属战斗/掉落业务逻辑，不放配置类（配置类仅保留数据定义与基础方法）
+    private static List<int> RollDrops(SoldierConfig cfg)
+    {
+        var result = new List<int>();
+        if (string.IsNullOrEmpty(cfg.Drops))
+            return result;
+        var entries = new List<KeyValuePair<int, int>>();
+        int totalWeight = 0;
+        foreach (var seg in cfg.Drops.Split('|'))
+        {
+            var parts = seg.Split(';');
+            if (parts.Length != 2)
+                continue;
+            int itemId, weight;
+            if (!int.TryParse(parts[0].Trim(), out itemId) || !int.TryParse(parts[1].Trim(), out weight))
+                continue;
+            if (weight <= 0)
+                continue;
+            entries.Add(new KeyValuePair<int, int>(itemId, weight));
+            totalWeight += weight;
+        }
+        if (entries.Count == 0)
+            return result;
+        int roll = SysRandom.Range(0, totalWeight);
+        int acc = 0;
+        foreach (var entry in entries)
+        {
+            acc += entry.Value;
+            if (roll < acc)
+            {
+                result.Add(entry.Key);
+                break;
+            }
+        }
+        return result;
+    }
+
     // PVE：未参战玩家没有战斗过程，战斗结束一起随机获得装备（模拟一轮怪物掉落）
     private void GivePveIdleDrops()
     {
@@ -1126,7 +1164,7 @@ public class WorldManager : MonoBehaviour
             var p = GameManager.Instance.GetPlayer(match[i]);
             foreach (var spawn in pveMonsterSpawns)
             {
-                foreach (var itemId in SoldierConfig.GetConfig(spawn.Item1).RollDrops())
+                foreach (var itemId in RollDrops(SoldierConfig.GetConfig(spawn.Item1)))
                 {
                     p.AddItemCard(itemId);
                     var itemName = ItemConfig.HasConfig(itemId) ? ItemConfig.GetConfig(itemId).Name : itemId.ToString();

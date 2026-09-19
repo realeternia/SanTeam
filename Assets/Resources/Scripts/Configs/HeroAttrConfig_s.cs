@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 namespace CommonConfig
@@ -114,7 +114,6 @@ namespace CommonConfig
             config.Clear();
             config[1] = new HeroAttrConfig(1, "atk", "攻击", "", "", "attratk", false);
             config[2] = new HeroAttrConfig(2, "ap", "法术", "", "", "attrap", false);
-            // 无双强度(Might)已并入攻击(atk)：原序列3 might 行删除，代码层兼容 might 键；源表需同步删行
             config[4] = new HeroAttrConfig(4, "hp", "生命", "", "", "attrhp", false);
             config[5] = new HeroAttrConfig(5, "atkspeed", "攻速", "", "", "attackspeed", false);
             config[6] = new HeroAttrConfig(6, "armor", "护甲", "", "", "attrarmor", false);
@@ -123,16 +122,11 @@ namespace CommonConfig
             config[9] = new HeroAttrConfig(9, "range", "射程", "", "", "attrrange", false);
             config[10] = new HeroAttrConfig(10, "crit", "暴击", "", "", "attrcrit", false);
             config[11] = new HeroAttrConfig(11, "dodge", "闪避", "", "", "attrdodge", false);
-            config[12] = new HeroAttrConfig(12, "maxHp", "生命", "", "", "attrhp", false);
-            config[13] = new HeroAttrConfig(13, "critRate", "暴击", "", "", "attrcrit", false);
-            config[14] = new HeroAttrConfig(14, "attackSpeedRate", "攻速", "", "", "attackspeed", false);
-            config[15] = new HeroAttrConfig(15, "dodgeRate", "闪避", "", "", "attrdodge", false);
-            config[16] = new HeroAttrConfig(16, "magicRes", "魔抗", "", "", "attrmagicshield", false);
+            config[12] = new HeroAttrConfig(12, "mpRegen", "法力回复", "", "", "attrmpgen", false);
+            config[13] = new HeroAttrConfig(13, "hpRegen", "生命回复", "", "", "attrhpgen", false);
             config[17] = new HeroAttrConfig(17, "soldierAtk", "士兵攻", "", "", "attratk", false);
             config[18] = new HeroAttrConfig(18, "soldierHp", "士兵生命", "", "", "attrhp", false);
             config[19] = new HeroAttrConfig(19, "critDamageMulti", "暴伤", "", "", "attrcrit", false);
-            config[20] = new HeroAttrConfig(20, "mpRegen", "法力回复", "", "", "", false);
-            config[21] = new HeroAttrConfig(21, "hpRegen", "生命回复", "", "", "", false);
             config[22] = new HeroAttrConfig(22, "healRate", "治疗强化", "", "", "", false);
             config[23] = new HeroAttrConfig(23, "healedRate", "受治疗", "", "", "", false);
             config[26] = new HeroAttrConfig(26, "auroEffectRate", "光环效果", "", "", "", false);

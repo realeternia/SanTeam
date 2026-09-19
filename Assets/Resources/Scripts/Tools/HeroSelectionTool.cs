@@ -262,7 +262,7 @@ public static class HeroSelectionTool
     }
 
     // 道具属性键解析：四主属性(四维)外，支持护甲/魔抗/回蓝及金铲铲式基础组件的攻速/暴击
-    // 比例属性（attackSpeedRate/critRate）按 Attrs 约定直接配比例（0.1=+10%），不再 ÷100；其余直接按数值
+    // 比例属性（atkspeed/crit）按 Attrs 约定直接配比例（0.1=+10%），不再 ÷100；其余直接按数值
     private static void ApplyItemAttr(AttrInfo attrInfo, string key, float value)
     {
         if (string.IsNullOrEmpty(key) || value == 0)
@@ -282,16 +282,19 @@ public static class HeroSelectionTool
             case "armor":
                 attrInfo.Armor = (int)value;
                 break;
-            case "magicRes":
+            case "magicres":
                 attrInfo.MagicRes = (int)value;
                 break;
             case "mpRegen":
                 attrInfo.MpRegen = value;
                 break;
-            case "attackSpeedRate":
+            case "hpRegen":
+                attrInfo.HpRegen = value;
+                break;
+            case "atkspeed":
                 attrInfo.AttackSpeedRate = value;
                 break;
-            case "critRate":
+            case "crit":
                 attrInfo.CritRate = value;
                 break;
         }

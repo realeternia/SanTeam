@@ -27,13 +27,18 @@ public class TooltipHero : BaseTooltip
     private static GameObject skillRowPrefab;                             // 预制体缓存
     private readonly List<TooltipHeroSkill> skillRows = new List<TooltipHeroSkill>(); // 按需扩容
 
+    // 装备行：每个装备一个 ToolTipHeroEquip.prefab（500x70），英雄身上有装备时显示装备名+图标
+    private const float EquipRowHeight = 60f;
+    private static GameObject equipRowPrefab;   // 预制体缓存
+    private readonly List<TooltipHeroEquip> equipRows = new List<TooltipHeroEquip>(); // 装备行（按需扩容）
+
     protected override void Awake()
     {
         base.Awake();
         CreateAttrControls();
     }
 
-    // 用属性格预制体生成属性控件（2行×2列，最多9格）
+    // 用属性格预制体生成属性控件（2行×2列，最多10格）
     private void CreateAttrControls()
     {
         if (attrPrefab == null)
@@ -44,7 +49,7 @@ public class TooltipHero : BaseTooltip
             return;
         }
 
-        for (int i = 0; i < 9; i++)
+        for (int i = 0; i < 10; i++)
         {
             var go = Instantiate(attrPrefab, rect);
             go.name = "AttrCell" + i;
@@ -161,6 +166,48 @@ public class TooltipHero : BaseTooltip
         return skillRows[index];
     }
 
+    // 取第 index 个装备行（ToolTipHeroEquip.prefab 实例，按需创建扩容，最多=装备数量）
+    private TooltipHeroEquip GetEquipRow(int index)
+    {
+        while (equipRows.Count <= index)
+        {
+            if (equipRowPrefab == null)
+                equipRowPrefab = Resources.Load<GameObject>("Prefabs/ToolTipHeroEquip");
+            if (equipRowPrefab == null)
+            {
+                GameLog.Error("TooltipHero 装备行预制体加载失败: Prefabs/ToolTipHeroEquip");
+                return null;
+            }
+            var go = Instantiate(equipRowPrefab, rect);
+            go.name = "EquipRow" + equipRows.Count;
+            var comp = go.GetComponent<TooltipHeroEquip>();
+            if (comp == null)
+            {
+                GameLog.Error("TooltipHero 装备行预制体缺少 TooltipHeroEquip 组件");
+                Destroy(go);
+                return null;
+            }
+            equipRows.Add(comp);
+        }
+        return equipRows[index];
+    }
+
+    // 基础属性 + 装备加成："11 + 12"（+12 用淡绿），无加成就只显示基础值
+    private static string AppendEquip(int baseVal, int bonus)
+    {
+        if (bonus <= 0)
+            return baseVal.ToString();
+        return baseVal + " + " + SysColor.ColorText(bonus.ToString(), SysColor.UI.NextLv);
+    }
+
+    // 攻速/暴击类比例属性：装备给的是比例（0.1=+10%），显示为 "+20%"
+    private static string AppendEquipSpeed(int baseVal, float bonusRate)
+    {
+        if (bonusRate <= 0)
+            return baseVal.ToString();
+        return baseVal + " + " + SysColor.ColorText(Mathf.RoundToInt(bonusRate * 100) + "%", SysColor.UI.NextLv);
+    }
+
     // 排列技能/好友行：锚定 tooltip 左上角，每行固定高度100，自上而下排列；返回累加后的Y
     private float LayoutRow(TooltipHeroSkill row, float currentY)
     {
@@ -196,17 +243,40 @@ public class TooltipHero : BaseTooltip
 
         // 属性列表：英雄显示全部8项（攻/法/命/攻速/护甲/魔抗/移速/射程，无双已并入攻），道具只显示有效属性
         bool isHero = ConfigManager.IsHeroCard(heroId);
+
+        // 装备加成汇总：英雄已装备物品（最多3槽）的属性总和（攻/法/命/护甲/魔抗/攻速比例）；
+        // 无装备或无玩家上下文（商店/排行榜）时全为0。装备行内容与基础属性数值调整都依赖该汇总
+        var equipIds = new List<int>();
+        int eAtk = 0, eAp = 0, eHp = 0, eArmor = 0, eMagicRes = 0;
+        float eAtkSpeedRate = 0f, eMpRegen = 0f, eHpRegen = 0f;
+        if (player != null && isHero && player.itemEquips.TryGetValue(heroId, out var equipSlots) && equipSlots != null)
+        {
+            foreach (var itemId in equipSlots)
+            {
+                if (itemId == 0)
+                    continue;
+                equipIds.Add(itemId);
+                var ea = HeroSelectionTool.GetCardAttr(player, itemId, 1);
+                eAtk += ea.Atk; eAp += ea.Ap; eHp += ea.Hp;
+                eArmor += ea.Armor; eMagicRes += ea.MagicRes;
+                eAtkSpeedRate += ea.AttackSpeedRate;
+                eMpRegen += ea.MpRegen; eHpRegen += ea.HpRegen;
+            }
+        }
+        bool hasEquip = equipIds.Count > 0;
+
         string[] attrKeys;
         string[] attrVals;
         if (isHero)
         {
             var heroCfg = HeroConfig.GetConfig(heroId);
-            attrKeys = new string[] { "atk", "ap", "hp", "atkspeed", "armor", "magicres", "movespeed", "range" };
+            attrKeys = new string[] { "atk", "atkspeed", "ap", "mpRegen", "hp", "hpRegen", "armor", "magicres", "movespeed", "range" };
             attrVals = new string[]
             {
-                attr.Atk.ToString(), attr.Ap.ToString(), attr.Hp.ToString(),
-                heroCfg.AtkSpeed.ToString(),
-                heroCfg.Armor.ToString(), heroCfg.MagicRes.ToString(),
+                AppendEquip(attr.Atk, eAtk), AppendEquip(attr.Ap, eAp), AppendEquip(attr.Hp, eHp),
+                AppendEquipSpeed(heroCfg.AtkSpeed, eAtkSpeedRate),
+                AppendEquip(heroCfg.Armor, eArmor), AppendEquip(heroCfg.MagicRes, eMagicRes),
+                AppendEquip(0, (int)eMpRegen), AppendEquip(0, (int)eHpRegen),
                 heroCfg.MoveSpeed.ToString(), heroCfg.Range.ToString()
             };
         }
@@ -224,9 +294,10 @@ public class TooltipHero : BaseTooltip
 
         int attrRows = 0;
         int shownAttr = 0;
+        int lastShownRow = -1;
         for (int i = 0; i < attrCells.Count; i++)
         {
-            bool show = i < attrKeys.Length && attrVals[i] != "0";
+            bool show = i < attrKeys.Length;
             attrCells[i].gameObject.SetActive(show);
             if (show)
             {
@@ -235,9 +306,11 @@ public class TooltipHero : BaseTooltip
                 string attrIcon = string.IsNullOrEmpty(attrCfg.Icon) ? "attrhp" : attrCfg.Icon;
                 attrCells[i].SetAttr(attrIcon, attrVals[i]);
                 shownAttr++;
+                lastShownRow = i / 2;
             }
         }
-        attrRows = (shownAttr + 1) / 2;
+        // 按最后一个显示格的所在行计算高度（中间可能有值为0被隐藏的项，不能按显示个数算）
+        attrRows = lastShownRow + 1;
 
         // 英雄名字 + 等级行（仅英雄卡显示，名字按品质上色；等级=卡片等级）
         if (textName != null)
@@ -267,7 +340,7 @@ public class TooltipHero : BaseTooltip
         bool hasDes = !string.IsNullOrEmpty(itemDes);
 
         // 没有任何可显示内容时（如无属性的道具），不弹空 Tip
-        if (shownAttr == 0 && !hasSkill && !hasFriend && !hasDes)
+        if (shownAttr == 0 && !hasSkill && !hasFriend && !hasDes && !hasEquip)
         {
             HideTooltip();
             return;
@@ -311,10 +384,10 @@ public class TooltipHero : BaseTooltip
                             jobFieldCount++;
                     }
                 }
-                // 列表：配置表里所有同职业英雄（不含自己）
+                // 列表：配置表里所有同职业英雄（含自己，与好友组一致）
                 foreach (var cfg in HeroConfig.ConfigList)
                 {
-                    if (cfg.Id != heroId && cfg.Job == heroJob)
+                    if (cfg.Job == heroJob)
                         jobHeroIds.Add(cfg.Id);
                 }
             }
@@ -400,7 +473,31 @@ public class TooltipHero : BaseTooltip
                 idx++;
             }
         }
-        
+
+        // 装备行（每个装备一个 500x70 行）：显示在技能/好友行之后，图标 + 装备名
+        for (int i = 0; i < equipRows.Count; i++)
+            equipRows[i].gameObject.SetActive(false);
+
+        if (hasEquip)
+        {
+            for (int i = 0; i < equipIds.Count; i++)
+            {
+                var row = GetEquipRow(i);
+                if (row == null)
+                    break;
+                row.gameObject.SetActive(true);
+                var itemCfg = ItemConfig.GetConfig(equipIds[i]);
+                row.img.sprite = Resources.Load<Sprite>("Textures/ItemPic/" + itemCfg.Icon);
+                row.textEquip.text = itemCfg.Name + ":" + itemCfg.Des;
+                var rowRt = (RectTransform)row.transform;
+                rowRt.anchorMin = new Vector2(0, 1);
+                rowRt.anchorMax = new Vector2(0, 1);
+                rowRt.pivot = new Vector2(0.5f, 0.5f);
+                rowRt.anchoredPosition = new Vector2(250, -currentY - EquipRowHeight * 0.5f);
+                currentY += EquipRowHeight + spacing;
+            }
+        }
+
         // 调整背景大小
         float height = Mathf.Max(50f, currentY + 10f);
         rect.sizeDelta = new Vector2(500, height);
@@ -472,7 +569,7 @@ public class TooltipHero : BaseTooltip
         if (string.IsNullOrEmpty(key) || value == 0)
             return;
         keys.Add(key);
-        bool isPercent = key == "attackSpeedRate" || key == "critRate";
+        bool isPercent = key == "atkspeed" || key == "crit";
         vals.Add(isPercent ? Mathf.RoundToInt(value * 100) + "%" : value.ToString("0.##"));
     }
 }

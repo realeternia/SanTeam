@@ -12,6 +12,7 @@ public class AttrInfo
     public float AttackSpeedRate; // 攻速比例加成（如 0.1=+10%，乘算 attackSpeed）
     public float CritRate;   // 暴击率（比例，如 0.15=+15%）
     public float MpRegen;    // 法力回复/秒
+    public float HpRegen;    // 生命回复/秒
 
     public int Total
     {
@@ -28,6 +29,7 @@ public class AttrInfo
         AttackSpeedRate += attr.AttackSpeedRate;
         CritRate += attr.CritRate;
         MpRegen += attr.MpRegen;
+        HpRegen += attr.HpRegen;
     }
 
 }
