@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -131,7 +131,7 @@ namespace CommonConfig
         /// </summary>
         public float CD;
         /// <summary>
-        ///技能MP消耗（0=不使用MP，>0则每次行动充能MpCost/3，3次行动满，满才能发动，发动后清空）
+        ///技能MP消耗（0=不使用MP，>0则仅靠法力回复(mpRegen)充能，满才能发动，发动后清空）
         /// </summary>
         public int MpCost;
         /// <summary>
@@ -489,11 +489,11 @@ namespace CommonConfig
             config[2010058] = new SkillConfig(2010058, "背水", "背", "", "40%;30%", "连接", "", 3, 0f, 0f, 0, "", 0f, false, "", 0, 0f, 0f, "", 0, 0.4f, 0, 0.3f, 0, "", "", "", false, 0f, "", 0, 0f, 0f, 0f, 0, "DeathGroupHeal", "", "", 0f, "bei", "", "", "");
             config[2010059] = new SkillConfig(2010059, "背水", "背", "", "50%;35%", "连接", "", 4, 0f, 0f, 0, "", 0f, false, "", 0, 0f, 0f, "", 0, 0.5f, 0, 0.35f, 0, "", "", "", false, 0f, "", 0, 0f, 0f, 0f, 0, "DeathGroupHeal", "", "", 0f, "bei", "", "", "");
             config[2010060] = new SkillConfig(2010060, "背水", "背", "", "60%;40%", "连接", "", 5, 0f, 0f, 0, "", 0f, false, "", 0, 0f, 0f, "", 0, 0.6f, 0, 0.4f, 0, "", "", "", false, 0f, "", 0, 0f, 0f, 0f, 0, "DeathGroupHeal", "", "", 0f, "bei", "", "", "");
-            config[2010061] = new SkillConfig(2010061, "护卫", "护", "给生命比例最低的友方英雄减伤盾，护盾值=自身法术强度的/1", "200%", "连接", "", 1, 1f, 8f, 20, "", 1f, false, "", 0, 80f, 0f, "", 0, 0f, 0, 2f, 0, "", "", "盾", false, 999f, "", 0, 0f, 0f, 0f, 0, "AidBuffLowHp", "sway", "MagicChargeYellow", 0f, "hu", "", "", "");
-            config[2010062] = new SkillConfig(2010062, "护卫", "护", "", "250%", "连接", "", 2, 1f, 8f, 20, "", 1f, false, "", 0, 80f, 0f, "", 0, 0f, 0, 2.5f, 0, "", "", "盾", false, 999f, "", 0, 0f, 0f, 0f, 0, "AidBuffLowHp", "sway", "MagicChargeYellow", 0f, "hu", "", "", "");
-            config[2010063] = new SkillConfig(2010063, "护卫", "护", "", "300%", "连接", "", 3, 1f, 8f, 20, "", 1f, false, "", 0, 80f, 0f, "", 0, 0f, 0, 3f, 0, "", "", "盾", false, 999f, "", 0, 0f, 0f, 0f, 0, "AidBuffLowHp", "sway", "MagicChargeYellow", 0f, "hu", "", "", "");
-            config[2010064] = new SkillConfig(2010064, "护卫", "护", "", "350%", "连接", "", 4, 1f, 8f, 20, "", 1f, false, "", 0, 80f, 0f, "", 0, 0f, 0, 3.5f, 0, "", "", "盾", false, 999f, "", 0, 0f, 0f, 0f, 0, "AidBuffLowHp", "sway", "MagicChargeYellow", 0f, "hu", "", "", "");
-            config[2010065] = new SkillConfig(2010065, "护卫", "护", "", "400%", "连接", "", 5, 1f, 8f, 20, "", 1f, false, "", 0, 80f, 0f, "", 0, 0f, 0, 4f, 0, "", "", "盾", false, 999f, "", 0, 0f, 0f, 0f, 0, "AidBuffLowHp", "sway", "MagicChargeYellow", 0f, "hu", "", "", "");
+            config[2010061] = new SkillConfig(2010061, "护卫", "护", "给生命比例最低的友方英雄减伤盾，护盾值=自身法术强度的/1", "200%", "连接", "", 1, 1f, 8f, 0, "", 1f, false, "", 0, 80f, 0f, "", 0, 0f, 0, 2f, 0, "", "", "盾", false, 999f, "", 0, 0f, 0f, 0f, 0, "AidBuffLowHp", "sway", "MagicChargeYellow", 0f, "hu", "", "", "");
+            config[2010062] = new SkillConfig(2010062, "护卫", "护", "", "250%", "连接", "", 2, 1f, 8f, 0, "", 1f, false, "", 0, 80f, 0f, "", 0, 0f, 0, 2.5f, 0, "", "", "盾", false, 999f, "", 0, 0f, 0f, 0f, 0, "AidBuffLowHp", "sway", "MagicChargeYellow", 0f, "hu", "", "", "");
+            config[2010063] = new SkillConfig(2010063, "护卫", "护", "", "300%", "连接", "", 3, 1f, 8f, 0, "", 1f, false, "", 0, 80f, 0f, "", 0, 0f, 0, 3f, 0, "", "", "盾", false, 999f, "", 0, 0f, 0f, 0f, 0, "AidBuffLowHp", "sway", "MagicChargeYellow", 0f, "hu", "", "", "");
+            config[2010064] = new SkillConfig(2010064, "护卫", "护", "", "350%", "连接", "", 4, 1f, 8f, 0, "", 1f, false, "", 0, 80f, 0f, "", 0, 0f, 0, 3.5f, 0, "", "", "盾", false, 999f, "", 0, 0f, 0f, 0f, 0, "AidBuffLowHp", "sway", "MagicChargeYellow", 0f, "hu", "", "", "");
+            config[2010065] = new SkillConfig(2010065, "护卫", "护", "", "400%", "连接", "", 5, 1f, 8f, 0, "", 1f, false, "", 0, 80f, 0f, "", 0, 0f, 0, 4f, 0, "", "", "盾", false, 999f, "", 0, 0f, 0f, 0f, 0, "AidBuffLowHp", "sway", "MagicChargeYellow", 0f, "hu", "", "", "");
             config[2010066] = new SkillConfig(2010066, "刺甲", "刺", "反弹/1攻击伤害", "20%", "连接", "", 1, 1f, 0f, 0, "", 0f, false, "", 0, 20f, 0f, "", 0, 0.2f, 0, 0f, 0, "", "", "", false, 0f, "", 0, 0f, 0f, 0f, 0, "DefFeedback", "", "SwordHitBlue", 0f, "ci", "", "", "");
             config[2010067] = new SkillConfig(2010067, "刺甲", "刺", "", "30%", "连接", "", 2, 1f, 0f, 0, "", 0f, false, "", 0, 20f, 0f, "", 0, 0.3f, 0, 0f, 0, "", "", "", false, 0f, "", 0, 0f, 0f, 0f, 0, "DefFeedback", "", "SwordHitBlue", 0f, "ci", "", "", "");
             config[2010068] = new SkillConfig(2010068, "刺甲", "刺", "", "40%", "连接", "", 3, 1f, 0f, 0, "", 0f, false, "", 0, 20f, 0f, "", 0, 0.4f, 0, 0f, 0, "", "", "", false, 0f, "", 0, 0f, 0f, 0f, 0, "DefFeedback", "", "SwordHitBlue", 0f, "ci", "", "", "");

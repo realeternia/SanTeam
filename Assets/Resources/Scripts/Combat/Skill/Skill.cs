@@ -110,14 +110,6 @@ public class Skill
         return Time.time < lastUpdateTime + skillCfg.CD;
     }
 
-    // 每次行动（攻击）为技能充能：增加MpCost/3，3次行动充满；达到MpCost后不再增加
-    public void AddActionMp()
-    {
-        if (skillCfg.MpCost <= 0)
-            return;
-        mp = Mathf.Min(mp + skillCfg.MpCost / 3f, skillCfg.MpCost);
-    }
-
     // 法力回复属性（mpRegen）为技能持续充能：正=回复，负=倒扣，范围[0, MpCost]
     public void AddRegenMp(float add)
     {

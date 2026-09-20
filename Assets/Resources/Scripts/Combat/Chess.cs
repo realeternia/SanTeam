@@ -469,7 +469,6 @@ public class Chess : MonoBehaviour
             {
             //    PlayerAnim("jumpspin");
                 attackPoint = 0;
-                AddActionMp(); // 每次攻击行动为技能充能
                 SkillManager.AimTarget(this, targetChess);
                 if (attackRange >= 20)
                 {
@@ -941,15 +940,6 @@ public class Chess : MonoBehaviour
             skillAdd.SetLevel(level);
         skillAdd.isGivenSkill = true;
         skills.Add(skillAdd);
-    }
-
-    // 每次攻击行动，为所有设置了MpCost的技能充能（3次攻击充满）
-    public void AddActionMp()
-    {
-        foreach (var skill in skills)
-        {
-            skill.AddActionMp();
-        }
     }
 
 

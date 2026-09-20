@@ -7,7 +7,9 @@ public class ChessHUD : MonoBehaviour
 {
     public Chess chessUnit;
     public Image healthImg;
+    public Image manaImg;
     private int lastHp;
+    private float manaTimer; // 法力条刷新计时，满1s更新一次（与技能mp充能/回复节奏一致）
 
     void Start()
     {
@@ -16,6 +18,7 @@ public class ChessHUD : MonoBehaviour
         if (chessUnit != null)
         {
             UpdateHealthDisplay();
+            UpdateManaDisplay();
         }
     }
 
@@ -38,6 +41,14 @@ public class ChessHUD : MonoBehaviour
 
         // 更新血条显示
         UpdateHealthDisplay();
+
+        // 法力条每秒更新（与技能mp充能/回复节奏一致）
+        manaTimer += Time.deltaTime;
+        if (manaTimer >= 1f)
+        {
+            manaTimer -= 1f;
+            UpdateManaDisplay();
+        }
     }
 
     public void UpdateHealthDisplay()
@@ -67,5 +78,36 @@ public class ChessHUD : MonoBehaviour
             var wid = chessUnit.isHero ? 70f : 50f;
             healthImg.rectTransform.sizeDelta = new Vector2(chessUnit.hp * wid / chessUnit.maxHp, healthImg.rectTransform.sizeDelta.y);
         }
+    }
+
+    /// <summary>
+    /// 更新法力条显示：manaImg非空且存在消耗MP的技能(MpCost>0)时，显示第一个此类技能的充能进度 Skill.mp/MpCost；无此类技能则隐藏
+    /// </summary>
+    private void UpdateManaDisplay()
+    {
+        if (manaImg == null || chessUnit == null)
+            return;
+
+        Skill mpSkill = null;
+        foreach (var skill in chessUnit.skills)
+        {
+            if (skill.skillCfg.MpCost > 0)
+            {
+                mpSkill = skill;
+                break;
+            }
+        }
+
+        if (mpSkill == null)
+        {
+            if (manaImg.gameObject.activeSelf)
+                manaImg.gameObject.SetActive(false);
+            return;
+        }
+
+        if (!manaImg.gameObject.activeSelf)
+            manaImg.gameObject.SetActive(true);
+        var wid = chessUnit.isHero ? 70f : 50f;
+        manaImg.rectTransform.sizeDelta = new Vector2(mpSkill.mp * wid / mpSkill.skillCfg.MpCost, manaImg.rectTransform.sizeDelta.y);
     }
 }
