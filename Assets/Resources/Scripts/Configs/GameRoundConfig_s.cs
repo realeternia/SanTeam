@@ -202,7 +202,7 @@ namespace CommonConfig
             config[51] = new GameRoundConfig(51, "230年", new int[]{1,2,3}, 52, 25f, 52, 6, 50, 40, 20, 8, 0, "");
             config[52] = new GameRoundConfig(52, "231年", new int[]{1,2,3}, 53, 25f, 53, 6, 50, 40, 20, 8, 0, "");
             config[53] = new GameRoundConfig(53, "232年", new int[]{1,2,3}, 54, 25f, 54, 6, 50, 40, 20, 8, 0, "");
-            config[54] = new GameRoundConfig(54, "233年", new int[]{1,2,3}, 55, 25f, 55, 6, 50, 40, 20, 8, 0, "");
+            config[54] = new GameRoundConfig(54, "233���", new int[]{1,2,3}, 55, 25f, 55, 6, 50, 40, 20, 8, 0, "");
             config[55] = new GameRoundConfig(55, "234年", new int[]{1,2,3}, 56, 25f, 56, 6, 50, 40, 20, 8, 0, "");
             config[56] = new GameRoundConfig(56, "235年", new int[]{1,2,3}, 57, 25f, 57, 6, 50, 40, 20, 8, 0, "");
             config[57] = new GameRoundConfig(57, "236年", new int[]{1}, 58, 25f, 58, 6, 50, 40, 20, 8, 1, "590001;0|590001;12|590001;23");
@@ -249,6 +249,12 @@ namespace CommonConfig
             config[98] = new GameRoundConfig(98, "277年", new int[]{1,2,3}, 99, 45f, 99, 6, 50, 40, 20, 10, 0, "");
             config[99] = new GameRoundConfig(99, "278年", new int[]{1,2,3}, 100, 45f, 100, 6, 50, 40, 20, 10, 0, "");
             config[100] = new GameRoundConfig(100, "279年", new int[]{1,2,3}, 101, 50f, 101, 6, 50, 40, 20, 10, 0, "");
+
+            // 新规则：每回合基础金币为 2,3,4,...,19,20,20,... 到20后不再增长
+            foreach (var kv in config)
+            {
+                kv.Value.RoundGold = Math.Min(20, kv.Key + 1);
+            }
 
             RebuildIndex();
 
