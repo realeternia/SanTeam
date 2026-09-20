@@ -7,6 +7,9 @@ using UnityEngine;
 // 定义一个单独的工具类
 public static class HeroSelectionTool
 {
+    // 星级成长倍率：每升1星 ×1.7（2星=1.7倍，3星=1.7²，以此类推）
+    private const float StarGrowthPerStar = 1.7f;
+
     private static List<Tuple<int, int>> heroPoolCache = new List<Tuple<int, int>>();
 
     // 获取指定阵营的所有英雄ID
@@ -171,8 +174,7 @@ public static class HeroSelectionTool
 
     // 主属性面板（Atk/Ap/Hp 统一计算入口，无双强度已并入 Atk）：
     // HeroConfig 数值列经 ConfigManager.PostModify 写回为“1星带品质面板” = 职业基准×(1+修正%/100) × 品质系数1.15^(Q-1)，
-    // 此处只按星级成长放大：(100 + XP×(lv-1))/100。
-    // XP(AtkP/ApP/HpP) 为每星成长百分比：80=每星+80%(2星≈1.8倍1星)，100=每星翻倍(2星2倍)；品质系数对主属性统一
+    // 此处只按星级成长放大：每星 ×StarGrowthPerStar（2星=1.7倍，3星=1.7²，以此类推），对主属性统一
     public static AttrInfo GetHeroAttr(HeroConfig heroCfg, int lv)
     {
         var attrInfo = new AttrInfo();
@@ -182,16 +184,16 @@ public static class HeroSelectionTool
             return attrInfo;
         }
         int lvGrow = Mathf.Max(1, lv) - 1;
-        attrInfo.Hp = GrowPanel(heroCfg.Hp, heroCfg.HpP, lvGrow);    // 生命独立成长字段
-        attrInfo.Atk = GrowPanel(heroCfg.Atk, heroCfg.AtkP, lvGrow);
-        attrInfo.Ap = GrowPanel(heroCfg.Ap, heroCfg.ApP, lvGrow);
+        attrInfo.Hp = GrowPanel(heroCfg.Hp, lvGrow);    // 生命独立成长字段
+        attrInfo.Atk = GrowPanel(heroCfg.Atk, lvGrow);
+        attrInfo.Ap = GrowPanel(heroCfg.Ap, lvGrow);
         return attrInfo;
     }
 
-    private static int GrowPanel(int panelValue, int growP, int lvGrow)
+    private static int GrowPanel(int panelValue, int lvGrow)
     {
-        // 1星带品质面板 × (100 + 成长P×已升星数)/100
-        return (int)Math.Round(panelValue * (100f + growP * lvGrow) / 100f);
+        // 1星带品质面板 × 1.7^已升星数（乘方式成长）
+        return (int)Math.Round(panelValue * Mathf.Pow(StarGrowthPerStar, lvGrow));
     }
 
     // 1星带品质主属性面板：图鉴/排行/开局发卡/AI判断/卡池排序统一口径（= GetHeroAttr 的 lv=1，即 PostModify 写回值）
