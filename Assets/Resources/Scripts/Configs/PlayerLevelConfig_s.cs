@@ -104,16 +104,18 @@ namespace CommonConfig
         public static void Load()
         {
             config.Clear();
-            // 士兵数量与玩家等级挂钩：步兵1→5、弓兵0→3（10级达最大）；士兵攻防加成由士兵等级(SoldierLevelConfig)决定
+            // 经验曲线调平：在50回合、约20%金币购买经验时，通常达到8级后段至9级。
+            // 累计到各级：4 / 12 / 24 / 44 / 74 / 114 / 164 / 220 / 300。
+            // 保留等级带来的阵容成长：2~9级逐步增加上阵位，10级达到9位。
             config[1] = new PlayerLevelConfig(1, 4, 2, 1, 0);
             config[2] = new PlayerLevelConfig(2, 8, 3, 1, 0);
             config[3] = new PlayerLevelConfig(3, 12, 4, 2, 0);
             config[4] = new PlayerLevelConfig(4, 20, 5, 2, 1);
-            config[5] = new PlayerLevelConfig(5, 40, 6, 3, 1);
-            config[6] = new PlayerLevelConfig(6, 72, 7, 3, 2);
-            config[7] = new PlayerLevelConfig(7, 112, 8, 4, 2);
-            config[8] = new PlayerLevelConfig(8, 160, 9, 4, 3);
-            config[9] = new PlayerLevelConfig(9, 200, 9, 5, 3);
+            config[5] = new PlayerLevelConfig(5, 30, 6, 3, 1);
+            config[6] = new PlayerLevelConfig(6, 40, 7, 3, 2);
+            config[7] = new PlayerLevelConfig(7, 50, 8, 4, 2);
+            config[8] = new PlayerLevelConfig(8, 56, 9, 4, 3);
+            config[9] = new PlayerLevelConfig(9, 80, 9, 5, 3);
             config[10] = new PlayerLevelConfig(10, 0, 9, 5, 3);
 
             RebuildIndex();

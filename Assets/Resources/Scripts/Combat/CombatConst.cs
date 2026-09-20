@@ -117,10 +117,10 @@ public static class CombatConst
     public const int PlayerMaxLevel = 10;
     /// <summary>布阵图总格数(5x5)，上阵上限由 PlayerLevelConfig.SlotCount 控制(最多9)</summary>
     public const int PlayerMaxSlot = FormationCellCount;
-    /// <summary>战斗获胜获得经验（参考金铲铲每回合2经验，节奏放慢一倍后胜利才给满）</summary>
-    public const int BattleWinExp = 2;
-    /// <summary>战斗失败获得经验（失败给一点）</summary>
-    public const int BattleLoseExp = 1;
+    /// <summary>战斗获胜获得经验（胜利给3，失败给2）</summary>
+    public const int BattleWinExp = 3;
+    /// <summary>战斗失败获得经验（失败给2）</summary>
+    public const int BattleLoseExp = 2;
     /// <summary>背包英雄卡上限（最多持有15种不同英雄，重复卡计入经验不占位）</summary>
     public const int PlayerMaxHeroCards = 15;
     // ---- 买经验（预留：金铲铲4金币买4经验，1金币=1经验；UI后续接入） ----
