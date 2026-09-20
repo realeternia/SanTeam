@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -6,55 +6,6 @@ namespace CommonConfig
 {
     public class PlayerLevelConfig
     {
-        /// <summary>
-        ///序列（即玩家等级，1~10，最高10级）
-        /// </summary>
-        public int Id;
-        /// <summary>
-        ///升级所需经验（达到该值升到下一级；满级10级为0）
-        /// </summary>
-        public int ExpToNext;
-        /// <summary>
-        ///上阵格子数（10级后9个格子全解锁）
-        /// </summary>
-        public int SlotCount;
-        /// <summary>
-        ///步兵数量（10级达到最大5）
-        /// </summary>
-        public int MeleeCount;
-        /// <summary>
-        ///弓兵数量（10级达到最大3）
-        /// </summary>
-        public int RangedCount;
-
-
-        public PlayerLevelConfig(int Id, int ExpToNext, int SlotCount, int MeleeCount, int RangedCount)
-        {
-            this.Id = Id;
-            this.ExpToNext = ExpToNext;
-            this.SlotCount = SlotCount;
-            this.MeleeCount = MeleeCount;
-            this.RangedCount = RangedCount;
-
-        }
-
-        public PlayerLevelConfig() { }
-
-        private static Dictionary<int, PlayerLevelConfig> config = new Dictionary<int, PlayerLevelConfig>();
-        public static Dictionary<int, PlayerLevelConfig>.ValueCollection ConfigList
-        {
-            get
-            {
-                return config.Values;
-            }
-        }
-
-        public static void Refresh(Dictionary<int, PlayerLevelConfig> dict)
-        {
-            config.Clear();
-            config = dict;
-            RebuildIndex();
-        }
         public class FieldMetaInfo
         {
             public string fieldName;
@@ -101,22 +52,65 @@ namespace CommonConfig
         private static List<CellMeta> cellMeta = new List<CellMeta>();
         public static List<CellMeta> CellMetas { get { return cellMeta; } }
 
+        /// <summary>
+        ///序列（即玩家等级，1~10，最高10级）
+        /// </summary>
+        public int Id;
+        /// <summary>
+        ///升级所需经验（达到该值升到下一级；满级10级为0）
+        /// </summary>
+        public int ExpToNext;
+        /// <summary>
+        ///上阵格子数（10级后9个格子全解锁）
+        /// </summary>
+        public int SlotCount;
+        /// <summary>
+        ///步兵数量（10级达到最大5）
+        /// </summary>
+        public int MeleeCount;
+        /// <summary>
+        ///弓兵数量（10级达到最大3）
+        /// </summary>
+        public int RangedCount;
+
+
+        public PlayerLevelConfig(int Id, int ExpToNext, int SlotCount, int MeleeCount, int RangedCount)
+        {
+            this.Id = Id;
+            this.ExpToNext = ExpToNext;
+            this.SlotCount = SlotCount;
+            this.MeleeCount = MeleeCount;
+            this.RangedCount = RangedCount;
+        }
+
+        public PlayerLevelConfig() { }
+
+        private static Dictionary<int, PlayerLevelConfig> config = new Dictionary<int, PlayerLevelConfig>();
+        public static Dictionary<int, PlayerLevelConfig>.ValueCollection ConfigList
+        {
+            get { return config.Values; }
+        }
+
+        public static void Refresh(Dictionary<int, PlayerLevelConfig> dict)
+        {
+            config.Clear();
+            config = dict;
+            RebuildIndex();
+        }
+
         public static void Load()
         {
             config.Clear();
-            // 经验曲线调平：在50回合、约20%金币购买经验时，通常达到8级后段至9级。
-            // 累计到各级：4 / 12 / 24 / 44 / 74 / 114 / 164 / 220 / 300。
-            // 保留等级带来的阵容成长：2~9级逐步增加上阵位，10级达到9位。
-            config[1] = new PlayerLevelConfig(1, 4, 2, 1, 0);
-            config[2] = new PlayerLevelConfig(2, 8, 3, 1, 0);
-            config[3] = new PlayerLevelConfig(3, 12, 4, 2, 0);
-            config[4] = new PlayerLevelConfig(4, 20, 5, 2, 1);
-            config[5] = new PlayerLevelConfig(5, 30, 6, 3, 1);
-            config[6] = new PlayerLevelConfig(6, 40, 7, 3, 2);
-            config[7] = new PlayerLevelConfig(7, 50, 8, 4, 2);
-            config[8] = new PlayerLevelConfig(8, 56, 9, 4, 3);
-            config[9] = new PlayerLevelConfig(9, 80, 9, 5, 3);
-            config[10] = new PlayerLevelConfig(10, 0, 9, 5, 3);
+            config[1] = new PlayerLevelConfig(1, 2, 1, 1, 0);
+            config[2] = new PlayerLevelConfig(2, 6, 2, 1, 0);
+            config[3] = new PlayerLevelConfig(3, 10, 3, 2, 0);
+            config[4] = new PlayerLevelConfig(4, 16, 4, 2, 1);
+            config[5] = new PlayerLevelConfig(5, 24, 5, 3, 1);
+            config[6] = new PlayerLevelConfig(6, 36, 6, 3, 2);
+            config[7] = new PlayerLevelConfig(7, 50, 7, 4, 2);
+            config[8] = new PlayerLevelConfig(8, 64, 8, 4, 3);
+            config[9] = new PlayerLevelConfig(9, 88, 9, 5, 3);
+            config[10] = new PlayerLevelConfig(10, 0, 10, 5, 4);
 
             RebuildIndex();
 

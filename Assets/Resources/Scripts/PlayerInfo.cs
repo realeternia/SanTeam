@@ -473,13 +473,6 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         battleCards[toPos] = tmp;
     }
 
-    public float GetSellRate()
-    {
-        if(!HasItemByEffect("sellhigh"))
-            return 0.5f;
-        return .75f;
-    }
-
     // sellCount<=0 表示全部卖出（英雄整组）；物品每格一件，传入1只卖一件
     public void SellCard(int cardId, int sellCount = 0)
     {
@@ -494,7 +487,10 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         var count = cards.TryGetValue(cardId, out var owned) ? owned : 0;
         if (sellCount > 0)
             count = Math.Min(sellCount, count);
-        AddGold((int)(price * count * GetSellRate()));
+        // 卖卡公式：按原价×数量计总，总价<=5 全额返还，否则约返还80%（totalValue - (totalValue-1)/5）
+        var totalValue = price * count;
+        var gold = totalValue <= 5 ? totalValue : totalValue - (totalValue - 1) / 5;
+        AddGold(gold);
         RemoveCard(cardId, count);
     }
 
