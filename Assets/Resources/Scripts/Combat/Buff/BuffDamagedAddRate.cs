@@ -7,15 +7,9 @@ public class BuffDamagedAddRate : Buff
     {
     }
 
-    public override void DuringAttacked(Chess attacker, ref int damageBase, ref float damageMulti, ref string effect)
+    // 受击增伤挂在伤害计算阶段：调整受伤倍率，普攻与技能伤害统一生效（原挂在普攻专属的 DuringAttacked 上，技能伤害不会触发）
+    public override void BeforeCalDamaged(Chess attacker, ref int damageBase, ref float damageMulti, ref string effect, string hurtTag)
     {
-        if (damageBase < 10)
-        {
-            damageBase = 13;
-        }
-        else
-        {
-            damageMulti += skillCfg.Strength;
-        }
+        damageMulti += skillCfg.Strength;
     }
 }

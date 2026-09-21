@@ -24,9 +24,9 @@ public class SkillAttackStunDamage : Skill
     }
 
     // 攻击已眩晕的目标时额外造成50%(SkillDamageRate)伤害
-    public override void DuringAttack(Chess defender, ref int damageBase, ref float damageMulti, ref string effect)
+    public override void BeforeCalDamage(Chess target, SkillConfig castSkillCfg, ref int damageBase, ref float damageMulti, ref string effect, string hurtTag, bool isFeedback)
     {
-        if (string.IsNullOrEmpty(skillCfg.BuffId) || !defender.HasBuff(BuffConfig.GetConfigByNameS(skillCfg.BuffId).Id))
+        if (string.IsNullOrEmpty(skillCfg.BuffId) || !target.HasBuff(BuffConfig.GetConfigByNameS(skillCfg.BuffId).Id))
             return;
         if (skillCfg.SkillDamageRate > 0)
             damageMulti += skillCfg.SkillDamageRate;

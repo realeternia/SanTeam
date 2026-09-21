@@ -31,7 +31,7 @@ public class BuffShield : Buff
         hp = Math.Max(1, hp - damage);
     }
 
-    public override void BeforeCalDamaged(Chess defender, ref int damage, string hurtTag)
+    public override void DuringCalDamage(Chess defender, ref int damage, string hurtTag)
     {
         // 伤害标签为AntiShield(破盾)时绕过护盾直接打血：护盾不吸收该伤害
         if (hurtTag == CombatConst.AntiShieldHurtTag)

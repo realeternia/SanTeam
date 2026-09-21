@@ -27,8 +27,8 @@ public class Skill
     public float mp; // 当前技能MP，战斗开始为0，满值=MpCost
 
     /// <summary>
-    /// 统一技能伤害公式：固定系数(Strength) + 比例系数(SkillDamageRate) × 关联属性(IsMagic映射 ap/atk)
-    /// IsMagic=true→ap 法强(受魔抗减免)；false→atk 攻击(无双已并入，受护甲减免)
+    /// 统一技能伤害公式：IsMagic=true 魔法 = Strength × (100 + ap × (1+SkillDamageRate)) / 100（ap 为百分比加成，ap=0 时伤害=Strength）；
+    /// IsMagic=false 物理 = Strength + atk × (1+SkillDamageRate)。魔抗/护甲减免在 OnSkillDamaged 内处理
     /// </summary>
     public int GetSkillDamage()
     {
@@ -91,10 +91,7 @@ public class Skill
                 return;
             }
 
-            var cdTime = skillCfg.CD;
-            SkillManager.OnCheckCD(owner, skillCfg, ref cdTime);
-
-            lastUpdateTime = Time.time - skillCfg.CD + cdTime;
+            lastUpdateTime = Time.time;
         }
     }
 
@@ -255,11 +252,13 @@ public class Skill
     {
     }
 
-    public virtual void DuringAttack(Chess defender, ref int damageBase, ref float damageMulti, ref string effect)
+    // 伤害计算阶段·攻击方：调整伤害基数与倍率（普攻与技能伤害统一进入；castSkillCfg 为当前施放的技能，null=普攻）
+    public virtual void BeforeCalDamage(Chess target, SkillConfig castSkillCfg, ref int damageBase, ref float damageMulti, ref string effect, string hurtTag, bool isFeedback)
     {
     }
 
-    public virtual void DuringAttacked(Chess attacker, ref int damageBase, ref float damageMulti, ref string effect)
+    // 伤害计算阶段·受击方：调整受伤基数与倍率（普攻与技能伤害统一进入）
+    public virtual void BeforeCalDamaged(Chess caster, SkillConfig castSkillCfg, ref int damageBase, ref float damageMulti, ref string effect, string hurtTag, bool isFeedback)
     {
     }
 
@@ -278,22 +277,7 @@ public class Skill
         
     }
 
-    public virtual void OnCheckCD(SkillConfig checkSkillCfg, ref float cdTime)
-    {
-
-    }
-
     public virtual void OnBeAddBuff(Chess caster, ref int buffId, int checkSkillId, ref float time)
-    {
-        
-    }
-
-    public virtual void BeforeCalDamage(Chess target, SkillConfig checkSkillCfg, ref int damage, string hurtTag, bool isFeedback)
-    {
-        
-    }
-
-    public virtual void BeforeCalDamaged(Chess caster, SkillConfig checkSkillCfg, ref int damage, string hurtTag, bool isFeedback)
     {
         
     }

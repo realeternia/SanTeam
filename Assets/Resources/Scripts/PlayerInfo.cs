@@ -269,7 +269,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         return ConfigManager.HeroHasFriendSkill(heroId, itemCfg.LimitSkillSname);
     }
 
-    public void UseItemToHero(int heroId, int itemId)
+    public bool UseItemToHero(int heroId, int itemId)
     {
         GameLog.Debug($"UseItemToHero {heroId} {itemId}");
 
@@ -280,11 +280,12 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
                 GameLog.Error($"道具使用失败：道具配置不存在 itemId={itemId}");
             else
                 GameLog.Warn($"道具{itemId}限定了使用对象：仅可对拥有技能「{itemCfg.LimitSkillSname}」的英雄使用，heroId={heroId} 不满足，已取消");
-            return;
+            return false;
         }
 
         AddAttrAddon(heroId, HeroSelectionTool.GetCardAttr(this, itemId, 1));
         RemoveCard(itemId, 1);
+        return true;
     }
 
     // 装备到英雄的空槽：没有空槽或没有多余副本时返回false（不替换已有装备）
@@ -773,15 +774,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 
         for(int i = 0; i < results.Count; i++)
         {
-            var heroCfg = HeroConfig.GetConfig(results[i].Item1);
-
-            // 找短板属性：攻/法两主属性（无双强度已在 PostModify 并入 Atk，HeroConfig 数值为 1星带品质面板）
-            int[] heroAttributes = { heroCfg.Ap, heroCfg.Atk };
-
-            int minAttr = heroAttributes.Min();
-            int maxAttr = heroAttributes.Max();
-            var attrDiff = maxAttr - minAttr;
-
+            // 主属性只看 Atk（ap 已改为百分比加成语义，不参与面板短板评估）
             // 每个英雄最多装备3件，逐槽选择最优装备
             for(int slot = 0; slot < 3 && attrItemList.Count > 0; slot++)
             {
@@ -799,28 +792,9 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
                     var firstAttr = itemBonuses[0];
                     float score = firstAttr.Value * HeroSelectionTool.GetCardLevel(GetItemCount(itemId), false); //乘上数量
 
-                    if (!string.IsNullOrEmpty(firstAttr.Attr))
-                    {
-                        bool isMinAttr = false;
-                        bool isMaxAttr = false;
-
-                        if (firstAttr.Attr == "ap" && heroCfg.Ap == minAttr)
-                            isMinAttr = true;
-                        else if (firstAttr.Attr == "atk" && heroCfg.Atk == minAttr)
-                            isMinAttr = true;
-                        else if (firstAttr.Attr == "ap" && heroCfg.Ap == maxAttr)
-                            isMaxAttr = true;
-                        else if (firstAttr.Attr == "atk" && heroCfg.Atk == maxAttr)
-                            isMaxAttr = true;
-
-                        if(HeroSelectionTool.IsMeleeHero(heroCfg))
-                        {
-                            if(isMinAttr && attrDiff > 15)
-                                score *= 1 + attrDiff * .015f;
-                        }
-                        if(isMaxAttr)
-                            score *= 1.2f;
-                    }
+                    // atk 装备按最大属性加权；ap 装备保持基础分（不再按短板高估）
+                    if (firstAttr.Attr == "atk")
+                        score *= 1.2f;
 
                     // 更新最高得分和对应装备ID
                     if (score > maxScore)
@@ -922,6 +896,58 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 
         if (equippedCount > 0)
             GameLog.Info($"AI自动装备：{playerConfig.Name} 装备{equippedCount}件");
+    }
+
+    // AI进商店时自动使用消耗品：背包中未使用的属性消耗品（tpattr）按培养度优先挑英雄使用；只对 AI 生效
+    public void AutoUseItems()
+    {
+        if (!isAI)
+            return;
+
+        var freeItemIds = items
+            .Where(slot => slot.HeroId == 0)
+            .Select(slot => slot.ItemId)
+            .Where(itemId => ItemConfig.HasConfig(itemId) && ItemConfig.GetConfig(itemId).Effect == "tpattr")
+            .ToList();
+
+        if (freeItemIds.Count == 0)
+            return;
+
+        // 候选英雄：全部英雄卡按培养度降序（GetCardLevel 单调于 exp，"等级+exp"等价于按 exp 降序）
+        var heroOrder = GetHeroCardList().OrderByDescending(cardId => cards[cardId]).ToList();
+        if (heroOrder.Count == 0)
+            return;
+
+        int usedCount = 0;
+        foreach (int itemId in freeItemIds)
+        {
+            var itemCfg = ItemConfig.GetConfig(itemId);
+            string mainAttr = itemCfg == null ? "" : itemCfg.MainAttr;
+
+            // 优先挑职业偏好属性匹配且满足使用限制的英雄，其次培养度最高的可用英雄
+            int heroId = heroOrder.Find(h => CanUseItemToHero(h, itemId)
+                                             && (string.IsNullOrEmpty(mainAttr) || IsAttrPreferred(h, mainAttr)));
+            if (heroId == 0)
+                heroId = heroOrder.Find(h => CanUseItemToHero(h, itemId));
+            if (heroId == 0)
+                continue; // 无可用英雄（如万民书限定「仁」且场上没有仁英雄）
+            if (!UseItemToHero(heroId, itemId))
+                continue;
+            usedCount++;
+        }
+
+        if (usedCount > 0)
+            GameLog.Info($"AI自动使用道具：{playerConfig.Name} 使用{usedCount}件");
+    }
+
+    // 英雄职业偏好属性顺序表（EquipAttr）中是否包含该属性，用于消耗品挑选目标英雄
+    private bool IsAttrPreferred(int heroId, string attr)
+    {
+        var heroCfg = HeroConfig.GetConfig(heroId);
+        if (heroCfg == null)
+            return false;
+        var jobCfg = ConfigManager.GetJobConfig(heroCfg.Job);
+        return jobCfg != null && jobCfg.EquipAttr != null && Array.IndexOf(jobCfg.EquipAttr, attr) >= 0;
     }
 
     // 为一件装备挑英雄：第一梯队=培养度最高的3个英雄，第二梯队=第4个往后，两梯队内都按职业偏好属性第1位→第3位比对；

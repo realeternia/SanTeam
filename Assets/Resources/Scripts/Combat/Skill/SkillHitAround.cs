@@ -10,9 +10,9 @@ public class SkillHitAround : Skill
     {
     }
 
-    public override void DuringAttack(Chess defender, ref int damageBase, ref float damageMulti, ref string effect)
+    public override void BeforeCalDamage(Chess target, SkillConfig castSkillCfg, ref int damageBase, ref float damageMulti, ref string effect, string hurtTag, bool isFeedback)
     {
-        if (CheckBurst(defender))
+        if (CheckBurst(target))
             effect = "";
     }
 

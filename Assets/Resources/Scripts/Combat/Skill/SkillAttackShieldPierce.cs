@@ -15,14 +15,18 @@ public class SkillAttackShieldPierce : Skill
     {
     }
 
-    public override void DuringAttack(Chess defender, ref int damageBase, ref float damageMulti, ref string effect)
+    public override void BeforeCalDamage(Chess target, SkillConfig castSkillCfg, ref int damageBase, ref float damageMulti, ref string effect, string hurtTag, bool isFeedback)
     {
+        // 破盾自身的穿透伤害(AntiShield)再进入伤害计算时不重复触发，避免递归
+        if (hurtTag == CombatConst.AntiShieldHurtTag)
+            return;
+
         // 只对有护盾(吸收型，BuffShield)的目标生效
-        var shield = defender.GetBuff(CombatConst.ShieldBuffId) as BuffShield;
+        var shield = target.GetBuff(CombatConst.ShieldBuffId) as BuffShield;
         if (shield == null)
             return;
 
-        if (!CheckBurst(defender))
+        if (!CheckBurst(target))
             return;
 
         owner.PlayerAnim(skillCfg.Action);
@@ -32,6 +36,6 @@ public class SkillAttackShieldPierce : Skill
         // 额外造成%物理伤害（基于攻击基准 atk：士兵的士兵攻击加成系数已折算进 atk；OnSkillDamaged 统一按物理护甲减免一次后绕过护盾打血）
         var attackBase = owner.GetAttr("atk");
         var pierce = Math.Max(1, (int)(attackBase * skillCfg.Strength));
-        defender.OnSkillDamaged(owner, skillId, pierce, false, skillCfg.HurtTag);
+        target.OnSkillDamaged(owner, skillId, pierce, false, skillCfg.HurtTag);
     }
 }

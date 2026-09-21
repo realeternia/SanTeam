@@ -3,7 +3,7 @@ using CommonConfig;
 using UnityEngine;
 
 /// <summary>
-/// 偷袭：战斗开始时，对敌方随机1名英雄造成自身法术强度×SkillDamageRate 的魔法伤害（IsMagic=true 受魔抗减免），
+/// 偷袭：战斗开始时，对敌方随机1名英雄造成 Strength×(100 + ap×(1+SkillDamageRate))/100 的魔法伤害（IsMagic=true 受魔抗减免），
 /// 并有 Rate 概率与其交换位置。每个敌方英雄整场只可能被交换一次（sneakSwapped 标记，防止多名偷袭者重复交换同一目标）。
 /// 对应技能：偷袭高手组特殊连锁「偷」（2010071~2010075）。
 /// </summary>
@@ -27,7 +27,7 @@ public class SkillInitSneakChangePos : Skill
 
         var target = enemyHeroes[SysRandom.Range(0, enemyHeroes.Count)];
 
-        // 造成自身ap×SkillDamageRate 的魔法伤害
+        // 按统一技能伤害公式计算魔法伤害
         var damage = GetSkillDamage();
         target.OnSkillDamaged(owner, skillId, damage);
         EffectManager.PlaySkillEffect(target, skillCfg.HitEffect);

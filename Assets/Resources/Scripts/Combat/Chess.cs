@@ -583,8 +583,7 @@ public class Chess : MonoBehaviour
         var effect = hitEffectName;
         var damageBase = damage;
         var damageMulti = 1f;
-        
-        SkillManager.DuringAttack(this, victim, ref damageBase, ref damageMulti, ref effect);
+
         // 暴击
         if (critRate > 0 && SysRandom.Value < critRate)
         {
@@ -592,20 +591,18 @@ public class Chess : MonoBehaviour
             WorldManager.Instance.AddBattleText("暴!", transform.position, new UnityEngine.Vector2(0, 40), Color.red, 3);
         }
 
-        damage = (int)(damageBase * damageMulti);
-        if (damage > 0)
+       if (victim.dodgeRate > 0 && SysRandom.Value < victim.dodgeRate)
         {
-            if (victim.dodgeRate > 0 && SysRandom.Value < victim.dodgeRate)
-            {
-                damage = 0;
-                WorldManager.Instance.AddBattleText("闪!", victim.transform.position, new UnityEngine.Vector2(0, 40), Color.red, 3);
-            }
-            else
-            {
-                //这里不改数值，只能伤害吸收（普攻无伤害标签、非技能伤害，护盾正常吸收；skillCfg=null 跳过技能修正）
-                SkillManager.BeforeCalDamage(this, victim, null, ref damage, "", false);
-                SkillManager.BeforeCalDamaged(this, victim, null, ref damage, "", false);
-            }
+            damage = 0;
+            WorldManager.Instance.AddBattleText("闪!", victim.transform.position, new UnityEngine.Vector2(0, 40), Color.red, 3);
+        }
+        else
+        {
+            // 伤害计算阶段·统一入口：普攻与技能伤害都进入，调整伤害基数与倍率（增伤/减伤/破甲/连锁等）
+                SkillManager.BeforeCalDamaged(this, victim, null, ref damageBase, ref damageMulti, ref effect, "", false);
+            damage = (int)(damageBase * damageMulti);
+            // 结算阶段·受击方：只做伤害吸收（护盾），不做伤害放大
+                SkillManager.DuringCalDamage(this, victim, null, ref damage, "", false);
         }
 
         if (damage > 0)
@@ -640,9 +637,17 @@ public class Chess : MonoBehaviour
                 damage = Math.Max(1, (int)(damage * CombatConst.ResistMultiplier(GetEffectiveArmor(caster)))); // 物理(atk)：等效护甲减免（攻方破甲可无视守方护甲）
         }
 
-        // 伤害结算前统一入口：攻击方技能修正 + 受击方（护盾吸收 hurtTag + 技能受击修正）
-        SkillManager.BeforeCalDamage(caster, this, skillCfg, ref damage, hurtTag, isFeedback);
-        SkillManager.BeforeCalDamaged(caster, this, skillCfg, ref damage, hurtTag, isFeedback);
+        // 伤害计算阶段·统一入口：普攻与技能伤害都进入，调整伤害基数与倍率（增伤/减伤/破甲/连锁等；跳过当前施放技能自身）
+        var effect = "";
+        var damageBase = damage;
+        var damageMulti = 1f;
+        SkillManager.BeforeCalDamaged(caster, this, skillCfg, ref damageBase, ref damageMulti, ref effect, hurtTag, isFeedback);
+        damage = (int)(damageBase * damageMulti);
+        if (damage <= 0)
+            return; // 减伤把伤害压到0，不再结算（护盾无需吸收）
+
+        // 伤害结算阶段·受击方：只做伤害吸收（护盾），不做伤害放大
+        SkillManager.DuringCalDamage(caster, this, skillCfg, ref damage, hurtTag, isFeedback);
 
         if(hp <= 0)
             return;

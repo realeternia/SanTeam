@@ -6,7 +6,7 @@ using UnityEngine;
 
 /// <summary>
 /// 护卫 · 减伤盾：辅助技能，给生命比例最低的我方英雄施加数值型吸收盾(护盾/盾)。
-/// 护盾容量 = 施法者AP × SkillDamageRate(2.0~4.0，对应200%~400%)；CD 8s；
+/// 护盾容量 = 施法者最大生命 × Strength；CD 8s；
 /// 若在场友方英雄生命均已满则不施放。通过 Skill.CheckAidSkill 由 SkillManager 自动循环施放。
 /// </summary>
 public class SkillAidBuffLowHp : Skill

@@ -71,8 +71,6 @@ public static class SkillManager
                 return new SkillAidShockWave(skillId, owner);
             case "AidSuddenArrow":
                 return new SkillAidSuddenArrow(skillId, owner);
-            case "ModifySkillRateTime":
-                return new SkillModifySkillRateTime(skillId, owner);
             case "BuffExpand":
                 return new SkillBuffExpand(skillId, owner);
             case "BuffExpandPos":
@@ -161,69 +159,44 @@ public static class SkillManager
         }
     }
 
-    public static void OnCheckCD(Chess caster, SkillConfig skillCfg, ref float cdTime)
-    {
-        foreach (var skill in caster.skills)
-        {
-            if(skill.skillId != skillCfg.Id) //防止自己判定自己
-                skill.OnCheckCD(skillCfg, ref cdTime);
-        }
-    }
-
-    public static void DuringAttack(Chess attacker, Chess defender, ref int damageBase, ref float damageMulti, ref string effect)
-    {       
-        foreach(var skill in attacker.skills)
-        {
-            skill.DuringAttack(defender, ref damageBase, ref damageMulti, ref effect);
-
-        }    
-        foreach(var skill in defender.skills)
-        {
-            skill.DuringAttacked(attacker, ref damageBase, ref damageMulti, ref effect);
-
-        }
-        foreach(var buff in attacker.buffs)
-        {
-            buff.DuringAttack(defender, ref damageBase, ref damageMulti, ref effect);
-
-        }   
-        foreach(var buff in defender.buffs)
-        {
-            buff.DuringAttacked(attacker, ref damageBase, ref damageMulti, ref effect);
-        }
-    }
-
     /// <summary>
-    /// 伤害结算前·攻击方修正：技能伤害修正（Skill.BeforeCalDamage）。
-    /// 普攻(Attack)时 skillCfg 传 null 表示非技能伤害，直接跳过
+    /// 伤害计算阶段·统一入口：普攻与技能伤害都进入，调整伤害基数与倍率（增伤/减伤/破甲/连锁等）。
+    /// 普攻(Attack)时 castSkillCfg 传 null；技能伤害时传当前施放技能并跳过该技能自身
     /// </summary>
-    public static void BeforeCalDamage(Chess attacker, Chess defender, SkillConfig skillCfg, ref int damage, string hurtTag, bool isFeedback)
+    public static void BeforeCalDamaged(Chess attacker, Chess defender, SkillConfig castSkillCfg, ref int damageBase, ref float damageMulti, ref string effect, string hurtTag, bool isFeedback)
     {
         foreach (var skill in attacker.skills)
         {
-            if (skillCfg != null && skillCfg.Id == skill.skillId)
+            if (castSkillCfg != null && castSkillCfg.Id == skill.skillId)
                 continue;
-            skill.BeforeCalDamage(defender, skillCfg, ref damage, hurtTag, isFeedback);
+            skill.BeforeCalDamage(defender, castSkillCfg, ref damageBase, ref damageMulti, ref effect, hurtTag, isFeedback);
         }
-    }
-
-    /// <summary>
-    /// 伤害结算前·受击方修正：护盾吸收（Buff.BeforeCalDamaged 按 hurtTag 决定是否吸收，如"AntiShield"绕过护盾打血，普通攻击传空）+ 技能受击修正（Skill.BeforeCalDamaged）。
-    /// 普攻(Attack)时 skillCfg 传 null，只做护盾吸收，跳过技能受击修正
-    /// </summary>
-    public static void BeforeCalDamaged(Chess attacker, Chess defender, SkillConfig skillCfg, ref int damage, string hurtTag, bool isFeedback)
-    {
-        // 护盾吸收（AntiShield 标签时护盾不吸收，直接放行打血）
-        foreach (var buff in defender.buffs)
+        foreach (var buff in attacker.buffs)
         {
-            buff.BeforeCalDamaged(attacker, ref damage, hurtTag);
+            buff.BeforeCalDamage(defender, ref damageBase, ref damageMulti, ref effect, hurtTag);
         }
 
         foreach (var skill in defender.skills)
         {
-            if (skillCfg != null && skillCfg.Id == skill.skillId)
+            if (castSkillCfg != null && castSkillCfg.Id == skill.skillId)
                 continue;
-            skill.BeforeCalDamaged(attacker, skillCfg, ref damage, hurtTag, isFeedback);
+            skill.BeforeCalDamaged(attacker, castSkillCfg, ref damageBase, ref damageMulti, ref effect, hurtTag, isFeedback);
+        }
+        foreach (var buff in defender.buffs)
+        {
+            buff.BeforeCalDamaged(attacker, ref damageBase, ref damageMulti, ref effect, hurtTag);
+        }
+    }
+
+    /// <summary>
+    /// 伤害结算阶段·受击方：只做伤害吸收（护盾 BuffShield），不做伤害放大。
+    /// 普攻(Attack)时 castSkillCfg 传 null；护盾按 hurtTag 决定是否吸收（如"AntiShield"绕过护盾打血）
+    /// </summary>
+    public static void DuringCalDamage(Chess attacker, Chess defender, SkillConfig castSkillCfg, ref int damage, string hurtTag, bool isFeedback)
+    {
+        foreach (var buff in defender.buffs)
+        {
+            buff.DuringCalDamage(attacker, ref damage, hurtTag);
         }
     }
 

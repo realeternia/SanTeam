@@ -10,12 +10,12 @@ public class SkillAttackAddDamage : Skill
     {
     }
 
-    public override void DuringAttack(Chess defender, ref int damageBase, ref float damageMulti, ref string effect)
+    public override void BeforeCalDamage(Chess target, SkillConfig castSkillCfg, ref int damageBase, ref float damageMulti, ref string effect, string hurtTag, bool isFeedback)
     {
-        if(!string.IsNullOrEmpty(skillCfg.BuffId) && !defender.HasBuff(BuffConfig.GetConfigByNameS(skillCfg.BuffId).Id))
+        if(!string.IsNullOrEmpty(skillCfg.BuffId) && !target.HasBuff(BuffConfig.GetConfigByNameS(skillCfg.BuffId).Id))
             return;
 
-        if(CheckBurst(defender))
+        if(CheckBurst(target))
         {
             owner.PlayerAnim(skillCfg.Action);
 

@@ -75,11 +75,11 @@ public static class ConfigManager
             heroCfg.MagicRes = (int)Math.Round(jobCfg.MagicRes * (100f + heroCfg.MagicRes) / 100f);
             heroCfg.HpRegen = (int)Math.Round(jobCfg.HpRegen * (100f + heroCfg.HpRegen) / 100f);
             heroCfg.MpRegen = (int)Math.Round(jobCfg.MpRegen * (100f + heroCfg.MpRegen) / 100f);
+            heroCfg.Ap = (int)Math.Round(jobCfg.Ap * (100f + heroCfg.Ap) / 100f);
             // 主属性（攻击/法术/生命）：写回 = 职业基准×(1+修正%/100) × 品质系数1.15^(Q-1)，即“1星带品质面板”
             // （图鉴/排行/发卡/AI/排序直接读即为此口径）；星级成长保留到运行时按每星 ×1.7 乘
             float qualityFactor = Mathf.Pow(1.23f, Mathf.Max(1, heroCfg.Quality) - 1);
             heroCfg.Atk = (int)Math.Round(jobCfg.Atk * (100f + heroCfg.Atk) / 100f * qualityFactor);
-            heroCfg.Ap = (int)Math.Round(jobCfg.Ap * (100f + heroCfg.Ap) / 100f * qualityFactor);
             heroCfg.Hp = (int)Math.Round(jobCfg.Hp * (100f + heroCfg.Hp) / 100f * qualityFactor);
         }
     }

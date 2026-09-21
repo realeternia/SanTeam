@@ -82,16 +82,19 @@ public class Buff
 
     }
 
-    public virtual void DuringAttack(Chess defender, ref int damageBase, ref float damageMulti, ref string effect)
+    // 伤害计算阶段·攻击方：调整伤害基数与倍率（普攻与技能伤害统一进入）
+    public virtual void BeforeCalDamage(Chess defender, ref int damageBase, ref float damageMulti, ref string effect, string hurtTag)
 
     {
     }
-    public virtual void DuringAttacked(Chess attacker, ref int damageBase, ref float damageMulti, ref string effect)
+    // 伤害计算阶段·受击方：调整受伤基数与倍率（普攻与技能伤害统一进入）
+    public virtual void BeforeCalDamaged(Chess attacker, ref int damageBase, ref float damageMulti, ref string effect, string hurtTag)
 
     {
     }
 
-    public virtual void BeforeCalDamaged(Chess defender, ref int damage, string hurtTag)
+    // 伤害结算阶段·受击方：只做伤害吸收（护盾 BuffShield），不做伤害放大
+    public virtual void DuringCalDamage(Chess defender, ref int damage, string hurtTag)
 
     {
     }

@@ -313,10 +313,7 @@ public static class PlayerAI
             finalBuyCount = Mathf.Clamp((int)Math.Round(playerInfo.gold * 2f / 3f / selectedCard.priceI * saveMood), 1, selectedCard.count);
         }
 
-        if (CardShopManager.Instance.OnPlayerBuyCard(selectedCard, playerInfo, selectedCard.cardId, selectedCard.isHeroCard, selectedCard.priceI * finalBuyCount, finalBuyCount))
-        {
-            AfterBuyCard(playerInfo, selectedCard.cardId, finalBuyCount, strongList);
-        }
+        CardShopManager.Instance.OnPlayerBuyCard(selectedCard, playerInfo, selectedCard.cardId, selectedCard.isHeroCard, selectedCard.priceI * finalBuyCount, finalBuyCount);
 
         return true;
     }
@@ -588,112 +585,5 @@ public static class PlayerAI
                 value *= 1f - Mathf.Min(-diff, 3) * 0.1f;
         }
         return value;
-    }
-
-    public static void AfterBuyCard(PlayerInfo playerInfo, int cardId, int count, List<int> strongList)
-    {
-        if(ConfigManager.IsHeroCard(cardId))
-            return;
-        
-        var itemCfg = ItemConfig.GetConfig(cardId);
-        if (itemCfg.Effect == "tpattr")
-        {
-            // 属性加成走 Attrs：取第一条加成的主属性键（tpattr 消耗品均为 atk/ap 单条配置）
-            var itemBonuses = JobLinkManager.ParseBonuses(itemCfg.Attrs);
-            var itemAttr = itemBonuses.Count > 0 ? itemBonuses[0].Attr : "";
-            List<Tuple<int, float>> needList = new List<Tuple<int, float>>();
-            float totalNeed = 0;
-            
-            foreach (var heroId in strongList)
-            {
-                // 道具使用限制（如万民书只能给拥有「仁」的英雄）：不满足的目标不参与评估
-                if (!playerInfo.CanUseItemToHero(heroId, cardId))
-                    continue;
-
-                var cardLevel = HeroSelectionTool.GetCardLevel(playerInfo.cards[heroId], true);
-                var attr = HeroSelectionTool.GetCardAttr(playerInfo, heroId, cardLevel);
-                
-                var heroCfg = HeroConfig.GetConfig(heroId);
-                
-                // 获取属性值（无双已并入攻击：攻/法 两主属性）
-                int ap = attr.Ap;
-                int atk = attr.Atk;
-
-                // 计算总属性
-                int totalAttr = ap + atk;
-
-                // 找出最弱和最强属性
-                List<Tuple<string, int>> attrValues = new List<Tuple<string, int>>();
-                attrValues.Add(new Tuple<string, int>("ap", ap));
-                attrValues.Add(new Tuple<string, int>("atk", atk));
-
-                // 按属性值排序
-                attrValues.Sort((a, b) => a.Item2.CompareTo(b.Item2));
-
-                // 最弱和最强属性
-                int weakest = attrValues[0].Item2;
-                int strongest = attrValues[1].Item2;
-                string weakestAttr = attrValues[0].Item1;
-                string strongestAttr = attrValues[1].Item1;
-
-                float needValue = 0;
-
-                // 如果物品属性是最弱属性
-                if (itemAttr == weakestAttr)
-                {
-                    needValue = Math.Abs(weakest - strongest);
-                }
-                // 如果物品属性是最强属性
-                else if (itemAttr == strongestAttr)
-                {
-                    if (HeroSelectionTool.IsRangedHero(heroCfg))
-                    {
-                        needValue = strongest - weakest;
-                    }
-                    else // 近战英雄
-                    {
-                        needValue = (strongest - weakest) / 2f;
-                    }
-                }
-                
-                // 需求度乘以总属性/300
-                needValue *= (float)totalAttr / 300f;
-                
-                // 确保需求度不为负数
-                needValue = Math.Max(0.1f, needValue);
-                
-                needList.Add(new Tuple<int, float>(heroId, needValue));
-                totalNeed += needValue;
-            }
-            
-            // 如果所有英雄的需求度都是0，则随机选择一个
-            if (totalNeed <= 0 && needList.Count > 0)
-            {
-                int randomIndex = SysRandom.Range(0, needList.Count);
-                var targetHeroId = needList[randomIndex].Item1;
-                for (int i = 0; i < count; i++)
-                    playerInfo.UseItemToHero(targetHeroId, cardId);
-            }
-            // 否则进行加权随机选择
-            else if (needList.Count > 0)
-            {
-                float randomValue = SysRandom.Range(0, totalNeed);
-                float accumulatedNeed = 0;
-                int targetHeroId = 0;
-                
-                foreach (var item in needList)
-                {
-                    accumulatedNeed += item.Item2;
-                    if (accumulatedNeed >= randomValue)
-                    {
-                        targetHeroId = item.Item1;
-                        break;
-                    }
-                }
-                
-                for (int i = 0; i < count; i++)
-                    playerInfo.UseItemToHero(targetHeroId, cardId);
-            }
-        }
     }
 }

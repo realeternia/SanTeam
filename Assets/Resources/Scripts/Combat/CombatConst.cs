@@ -14,6 +14,8 @@ public static class CombatConst
     // ---- 伤害标签(SkillConfig.HurtTag) ----
     /// <summary>AntiShield：绕过护盾直接打血（破盾类技能，BuffShield 判定该标签不吸收）</summary>
     public const string AntiShieldHurtTag = "AntiShield";
+    /// <summary>LockChain：连锁(BuffLock)传递的伤害标签，避免锁链伤害二次扩散成循环放大</summary>
+    public const string LockChainHurtTag = "LockChain";
 
     // ---- 技能Id ----
     /// <summary>仁德：给与我方前排士兵护盾（技能表 仁 的5级行）</summary>

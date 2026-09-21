@@ -8,9 +8,9 @@ public class BuffShieldValue : Buff
     {
     }
 
-    public override void DuringAttacked(Chess attacker, ref int damageBase, ref float damageMulti, ref string effect)
+    public override void BeforeCalDamaged(Chess attacker, ref int damageBase, ref float damageMulti, ref string effect, string hurtTag)
     {
-        // 减伤盾：恒定按 Strength 减免，不再做攻守属性对比
+        // 减伤盾：恒定按 Strength 减免，不再做攻守属性对比（挂在伤害计算阶段，普攻与技能伤害统一生效）
         var strength = skillCfg.Strength;
         damageMulti -= strength;
         WorldManager.Instance.AddBattleText("抵抗", owner.transform.position, new UnityEngine.Vector2(0, 60), Color.green, 3);

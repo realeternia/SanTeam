@@ -21,9 +21,6 @@ public class SkillAidSuddenArrow : Skill
         if (!CheckBurst(null))
             return false;
 
-        // 关联属性：IsMagic=true 走 ap 法强，否则走 atk 攻击
-        var attrKey = skillCfg.IsMagic ? "ap" : "atk";
-
         //排序，优先给hero，然后优先给属性低的
         unitsInRange.Sort((a, b) =>
         {
@@ -37,7 +34,6 @@ public class SkillAidSuddenArrow : Skill
         var targetUnit = unitsInRange[0];
 
         owner.PlayerAnim(skillCfg.Action);
-        var attrDiff = Math.Max(10, owner.GetAttr(attrKey) - targetUnit.GetAttr(attrKey));
         
         var damage = GetSkillDamage();
         WorldManager.Instance.CreateSpellMissile(owner, targetUnit, owner.transform.position, id, damage, skillCfg.HitEffect);
