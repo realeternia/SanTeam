@@ -313,6 +313,17 @@ public class Chess : MonoBehaviour
                 attackSpeedRate += equipAttr.AttackSpeedRate;
                 critRate += equipAttr.CritRate;
                 mpRegen += equipAttr.MpRegen;
+
+                // 装备技能：ItemConfig.SkillId 按 sname 引用（空=无），此处为该英雄卡添加对应技能（固定1级）
+                var equipCfg = ItemConfig.GetConfig(equipId);
+                if (equipCfg != null && !string.IsNullOrEmpty(equipCfg.SkillId))
+                {
+                    var equipSkillCfg = ConfigManager.GetSkillConfig(equipCfg.SkillId, 1) ?? ConfigManager.GetSkillConfig(equipCfg.SkillId);
+                    if (equipSkillCfg != null)
+                        AddSkill(equipSkillCfg.Id, equipSkillCfg.Id, 1);
+                    else
+                        GameLog.Warn($"装备所属技能未配置：itemId={equipId} SkillId={equipCfg.SkillId}");
+                }
             }
         }
 
