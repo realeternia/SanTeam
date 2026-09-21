@@ -33,9 +33,9 @@ public class Skill
     public int GetSkillDamage()
     {
         if(skillCfg.IsMagic)
-            return (int)(skillCfg.Strength + owner.GetAttr("ap") * skillCfg.SkillDamageRate);
+            return (int)(skillCfg.Strength * (100 + owner.GetAttr("ap") * (1 + skillCfg.SkillDamageRate)) / 100);
         else
-            return (int)(skillCfg.Strength + owner.GetAttr("atk") * skillCfg.SkillDamageRate);
+            return (int)(skillCfg.Strength + owner.GetAttr("atk") * ( 1 + skillCfg.SkillDamageRate));
     }
 
     /// <summary>

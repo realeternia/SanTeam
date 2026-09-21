@@ -50,7 +50,7 @@ public class SkillAidBuffLowHp : Skill
         BuffManager.AddBuff(target, owner, id, shieldId, skillCfg.BuffTime);
         var shield = target.GetBuff(shieldId) as BuffShield;
         if (shield != null)
-            shield.SetHp((int)(owner.ap * skillCfg.SkillDamageRate));
+            shield.SetHp((int)(owner.maxHp * skillCfg.Strength));
 
         EffectManager.PlaySkillEffect(target, skillCfg.HitEffect);
         return true;
