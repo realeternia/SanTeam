@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -204,7 +204,7 @@ namespace CommonConfig
             config[100005] = new HeroConfig(100005, "司马炎", 1, "王", 2, 0, 0, 0, 100, 100, 0, 0, 0, 0, 0, 5, 4, 0, 0, "强", "simayan");
             config[100006] = new HeroConfig(100006, "袁绍", 1, "王", 2, 0, 0, 0, 100, 100, 0, 0, 0, 0, 0, 6, 4, 0, 0, "强", "yuanshao");
             config[101001] = new HeroConfig(101001, "赵云", 1, "士", 4, 0, 0, 0, 100, 100, 0, 0, 0, 0, 0, 1, 8, 0, 0, "强", "zhaoyun");
-            config[101002] = new HeroConfig(101002, "张飞", 1, "枪", 4, 0, 0, 0, 100, 100, 0, 0, 0, 0, 0, 1, 8, 0, 0, "强", "zhangfei");
+            config[101002] = new HeroConfig(101002, "张飞", 1, "枪", 4, 0, 0, 0, 100, 100, 0, 0, 0, 0, 0, 1, 8, 0, 0, "张飞", "zhangfei");
             config[101003] = new HeroConfig(101003, "马超", 1, "马", 4, 0, 0, 0, 100, 100, 0, 0, 0, 0, 0, 1, 8, 0, 0, "强", "machao");
             config[101004] = new HeroConfig(101004, "诸葛亮", 1, "工", 4, 0, 0, 0, 100, 100, 0, 0, 0, 0, 0, 1, 8, 0, 0, "强", "zhugeliang");
             config[101005] = new HeroConfig(101005, "关羽", 1, "车", 4, 0, 0, 0, 100, 100, 0, 0, 0, 0, 0, 1, 8, 0, 0, "强", "guanyu");
@@ -234,7 +234,7 @@ namespace CommonConfig
             config[102006] = new HeroConfig(102006, "夏侯渊", 1, "弓", 3, 0, 0, 0, 100, 100, 0, 0, 0, 0, 0, 2, 6, 0, 0, "强", "xiahouyuan");
             config[102007] = new HeroConfig(102007, "典韦", 1, "戟", 4, 0, 0, 0, 100, 100, 0, 0, 0, 0, 0, 2, 8, 0, 0, "强", "dianwei");
             config[102008] = new HeroConfig(102008, "张郃", 1, "炮", 4, 0, 0, 0, 100, 100, 0, 0, 0, 0, 0, 2, 8, 0, 0, "强", "zhanghe");
-            config[102009] = new HeroConfig(102009, "徐晃", 1, "弩", 3, 0, 0, 0, 100, 100, 0, 0, 0, 0, 0, 2, 6, 0, 0, "强", "xuhuang");
+            config[102009] = new HeroConfig(102009, "徐晃", 1, "弩", 3, 0, 0, 0, 100, 100, 0, 0, 0, 0, 0, 2, 6, 0, 0, "徐晃", "xuhuang");
             config[102010] = new HeroConfig(102010, "荀攸", 1, "棋", 3, 0, 0, 0, 100, 100, 0, 0, 0, 0, 0, 2, 6, 0, 0, "强", "xunyou");
             config[102011] = new HeroConfig(102011, "于禁", 1, "枪", 2, 0, 0, 0, 100, 100, 0, 0, 0, 0, 0, 2, 4, 0, 0, "强", "yujin");
             config[102012] = new HeroConfig(102012, "曹仁", 1, "盾", 3, 0, 0, 0, 100, 100, 0, 0, 0, 0, 0, 2, 6, 0, 0, "强", "caoren");
@@ -302,7 +302,7 @@ namespace CommonConfig
             config[110003] = new HeroConfig(110003, "华佗", 1, "医", 2, 0, 0, 0, 100, 100, 0, 0, 0, 0, 0, 10, 4, 0, 0, "强", "huatuo");
             config[110005] = new HeroConfig(110005, "马腾", 1, "弩", 2, 0, 0, 0, 100, 100, 0, 0, 0, 0, 0, 10, 4, 0, 0, "强", "mateng");
             config[110006] = new HeroConfig(110006, "于吉", 1, "医", 2, 0, 0, 0, 100, 100, 0, 0, 0, 0, 0, 10, 4, 0, 0, "强", "yuji");
-            config[110007] = new HeroConfig(110007, "张角", 1, "工", 3, 0, 0, 0, 100, 100, 0, 0, 0, 0, 0, 10, 6, 0, 0, "强", "zhangjiao");
+            config[110007] = new HeroConfig(110007, "张角", 1, "工", 3, 0, 0, 0, 100, 100, 0, 0, 0, 0, 0, 10, 6, 0, 0, "张角", "zhangjiao");
             config[110008] = new HeroConfig(110008, "张宝", 1, "医", 2, 0, 0, 0, 100, 100, 0, 0, 0, 0, 0, 10, 4, 0, 0, "强", "zhangbao2");
             config[110009] = new HeroConfig(110009, "张梁", 1, "士", 1, 0, 0, 0, 100, 100, 0, 0, 0, 0, 0, 10, 2, 0, 0, "强", "zhangliang");
             config[101024] = new HeroConfig(101024, "孟获", 1, "锤", 3, 0, 0, 0, 100, 100, 0, 0, 0, 0, 0, 1, 6, 0, 0, "强", "menghuo");

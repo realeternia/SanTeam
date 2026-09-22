@@ -19,7 +19,7 @@ public class SkillAttackReboundArrow : Skill
             owner.PlayerAnim(skillCfg.Action);
             WorldManager.Instance.RandomSelect(unitsInRange, skillCfg.TargetCount);
 
-            var reboundDamage = (int)(damage * skillCfg.SkillDamageRate);
+            var reboundDamage = (int)(damage * skillCfg.Strength);
             foreach (var unit in unitsInRange)
                 WorldManager.Instance.CreateSpellMissile(owner, unit, defender.transform.position, id, reboundDamage, owner.hitEffect);
         }
