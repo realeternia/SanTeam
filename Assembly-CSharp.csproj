@@ -61,7 +61,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Resources\Scripts\UIs\PickPanelCellControl.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillHitTeleport.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAttackedTeleport.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidSuddenArrow.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\IconLoader.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\BagCellPointerForwarder.cs" />

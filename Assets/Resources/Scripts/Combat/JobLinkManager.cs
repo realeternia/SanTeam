@@ -268,7 +268,7 @@ public static class JobLinkManager
                 break;
             case "hpRegen":
                 // 医·生命回复
-                unit.hpRegen += (int)value;
+                unit.hpRegen += value;
                 break;
             case "healRate":
                 // 医·治疗强化

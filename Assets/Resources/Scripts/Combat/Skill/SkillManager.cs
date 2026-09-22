@@ -59,8 +59,8 @@ public static class SkillManager
             case "AttackedShadow":
                 return new SkillAttackedShadow(skillId, owner);
 
-            case "HitTeleport":
-                return new SkillHitTeleport(skillId, owner);
+            case "AttackedTeleport":
+                return new SkillAttackedTeleport(skillId, owner);
             case "HitRepeat":
                 return new SkillHitRepeat(skillId, owner);
             case "HitArea":

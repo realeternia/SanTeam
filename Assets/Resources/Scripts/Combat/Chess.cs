@@ -95,7 +95,7 @@ public class Chess : MonoBehaviour
     private float lifeTime;
 
     private float secondTimer; //每秒事件计时，满1s触发一次OnSecond
-    public int hpRegen; //生命回复/秒（正=回复，负=扣减；来源：属性羁绊或复原/药仙技能加成，OnSecond事件结算）
+    public float hpRegen; //生命回复/秒（正=回复，负=扣减；来源：属性羁绊或复原/药仙技能加成，OnSecond事件结算）
     public float mpRegen; //法力回复/秒（为设置了MpCost的技能持续充能，可为负=倒扣，OnSecond事件结算）
 
     // Start is called before the first frame update
