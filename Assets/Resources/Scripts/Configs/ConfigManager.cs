@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using CommonConfig;
 using UnityEngine;
 
@@ -358,9 +359,11 @@ public static class ConfigManager
         return null;
     }
 
-    // 技能完整描述：Lv1 的 Descript 为模板（占位符/1 /2...），用当前等级行 DescriptVal（;分隔）按顺序替换拼出；
-    // 非 Lv1 行 Descript 通常为空（取 Lv1 模板+本级参数）；结构无法用模板表达的技能（如机巧/炮车）各等级行直接填完整 Descript，无占位符时原样返回。
-    // withNext=true 为"当前+下一级"模式：每个参数位后附下一级不同值（括号内、淡绿色，相同则不附），如"自身生命+10%(+20%)"；供职业/好友连接技能档位提示使用
+    // 技能完整描述：Lv1 的 Descript 为模板（占位符/1 /2...），用"当前等级的 DescriptVal"按顺序替换拼出；
+    // DescriptVal 支持 Lv1 填字段引用（动态字段）作为模板：/字段名（如 /StrengthInt、/Range、/Strength、/Rate），
+    // 各级用对应字段值替换（+30 等）。仅需在 Lv1 填字段引用模板，其余等级留空自动推导；也可在某级手动填 DescriptVal（保底，直接使用）。
+    // 结构无法用模板表达的技能（如机巧/炮车）各等级行直接填完整 Descript，无占位符时原样返回。
+    // withNext=true 为"当前+下一级"模式：每个参数位后附下一级不同值（括号内、淡绿色，相同则不附）；供职业/好友连接技能档位提示使用
     public static string GetSkillDescript(SkillConfig cfg, bool withNext = false)
     {
         if (cfg == null)
@@ -370,19 +373,24 @@ public static class ConfigManager
             templateCfg = GetSkillConfig(cfg.Sname, 1) ?? cfg;
         if (templateCfg == null || string.IsNullOrEmpty(templateCfg.Descript))
             return "";
-        // 无参数：模板即完整文案（全同文案/结构兜底技能），下一级没有参数位可比，直接返回
-        if (string.IsNullOrEmpty(cfg.DescriptVal))
-            return templateCfg.Descript;
+        // 当前等级有效的 DescriptVal（Lv1 模板 + 字段引用替换，或手填保底）
+        var curVal = GetLevelDescriptVal(cfg, templateCfg);
+        if (string.IsNullOrEmpty(curVal))
+            return templateCfg.Descript; // 无参数：模板即完整文案（全同文案/结构兜底技能）
 
         string[] nextVals = null;
         if (withNext)
         {
             var nextCfg = GetSkillConfig(cfg.Sname, cfg.Lv + 1);
-            if (nextCfg != null && !string.IsNullOrEmpty(nextCfg.DescriptVal))
-                nextVals = nextCfg.DescriptVal.Split(';');
+            if (nextCfg != null)
+            {
+                var nextVal = GetLevelDescriptVal(nextCfg, templateCfg);
+                if (!string.IsNullOrEmpty(nextVal))
+                    nextVals = nextVal.Split(';');
+            }
         }
 
-        var vals = cfg.DescriptVal.Split(';');
+        var vals = curVal.Split(';');
         var desc = templateCfg.Descript;
         for (int i = 0; i < vals.Length; i++)
         {
@@ -393,5 +401,80 @@ public static class ConfigManager
             desc = desc.Replace("/" + (i + 1), rep);
         }
         return desc;
+    }
+
+    // 取某等级行有效的 DescriptVal：
+    // 1) 非 Lv1 模板行且已手动填写 -> 直接使用（保底）；
+    // 2) 否则用 Lv1 模板的 DescriptVal，把其中 /字段名 动态引用替换为该等级行对应字段值
+    private static string GetLevelDescriptVal(SkillConfig cfg, SkillConfig templateCfg)
+    {
+        bool isTemplateRow = cfg.Lv == templateCfg.Lv; // Lv1 行的 DescriptVal 即字段引用模板
+        if (!isTemplateRow && !string.IsNullOrEmpty(cfg.DescriptVal))
+            return cfg.DescriptVal;
+        if (templateCfg == null || string.IsNullOrEmpty(templateCfg.DescriptVal))
+            return null;
+        return SubstituteFieldRefs(templateCfg.DescriptVal, cfg);
+    }
+
+    // 把 DescriptVal 中的 "/字段名" 动态引用替换为 cfg 对应字段的数值（字段名大小写不敏感）；非字母开头的斜杠(如/1 /2占位)不动
+    private static string SubstituteFieldRefs(string input, SkillConfig cfg)
+    {
+        if (string.IsNullOrEmpty(input))
+            return input;
+        var sb = new StringBuilder();
+        for (int i = 0; i < input.Length;)
+        {
+            if (input[i] == '/' && i + 1 < input.Length && char.IsLetter(input[i + 1]))
+            {
+                int j = i + 1;
+                while (j < input.Length && (char.IsLetterOrDigit(input[j]) || input[j] == '_'))
+                    j++;
+                var fieldName = input.Substring(i + 1, j - i - 1);
+                // 可选百分比修饰符：/字段名% 表示该数字字段按百分比输出（如 strength=0.3 -> 30%）
+                bool pct = i < input.Length && j < input.Length && input[j] == '%';
+                int adv = j + (pct ? 1 : 0);
+                var val = GetFieldRefValue(cfg, fieldName, pct);
+                if (val != null)
+                    sb.Append(val);
+                else
+                    sb.Append('/').Append(fieldName); // 未知字段保持原样
+                i = adv;
+            }
+            else
+            {
+                sb.Append(input[i]);
+                i++;
+            }
+        }
+        return sb.ToString();
+    }
+
+    // 动态字段取值与格式化：Rate/SkillDamageRate 转百分比，其余数值字段按整数字面展示（无小数）
+    private static string GetFieldRefValue(SkillConfig cfg, string fieldName, bool pct)
+    {
+        switch (fieldName.ToLowerInvariant())
+        {
+            case "rate": return PercentText(cfg.Rate);
+            case "skilldamagerate": return PercentText(cfg.SkillDamageRate);
+            case "cd": return pct ? PercentText(cfg.CD) : cfg.CD.ToString("0.##");
+            case "range": return pct ? PercentText(cfg.Range) : cfg.Range.ToString("0.##");
+            case "area": return pct ? PercentText(cfg.Area) : cfg.Area.ToString("0.##");
+            case "strength": return pct ? PercentText(cfg.Strength) : cfg.Strength.ToString("0.##");
+            case "bufftime": return pct ? PercentText(cfg.BuffTime) : cfg.BuffTime.ToString("0.##");
+            case "summontime": return pct ? PercentText(cfg.SummonTime) : cfg.SummonTime.ToString("0.##");
+            case "summonspeed": return pct ? PercentText(cfg.SummonSpeed) : cfg.SummonSpeed.ToString("0.##");
+            case "effectsize": return pct ? PercentText(cfg.EffectSize) : cfg.EffectSize.ToString("0.##");
+            case "attackpointreduce": return pct ? PercentText(cfg.AttackPointReduce) : cfg.AttackPointReduce.ToString("0.##");
+            case "mpcost": return cfg.MpCost.ToString();
+            case "targetcount": return cfg.TargetCount.ToString();
+            case "strengthint": return cfg.StrengthInt.ToString();
+            case "lv": return cfg.Lv.ToString();
+            default: return null;
+        }
+    }
+
+    private static string PercentText(float v)
+    {
+        return (v * 100).ToString("0.##") + "%";
     }
 }
