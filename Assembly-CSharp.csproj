@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <!-- Generated file, do not modify, your changes will be overwritten (use AssetPostprocessor.OnGeneratedCSProject) -->
   <PropertyGroup>
@@ -61,7 +61,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Resources\Scripts\UIs\PickPanelCellControl.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAttackedTeleport.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidSuddenArrow.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\IconLoader.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\BagCellPointerForwarder.cs" />
@@ -103,6 +102,7 @@
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAttackReboundArrow.cs" />
     <Compile Include="Assets\SineVFX\TopDownEffects\Scripts\RampGeneratorTDE.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffCoolDown.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidSelfShieldBoom.cs" />
     <Compile Include="Assets\Epic Toon FX\Scripts\ETFXRotation.cs" />
     <Compile Include="Assets\DOTween\Modules\DOTweenModuleUnityVersion.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillDumb.cs" />
@@ -121,6 +121,7 @@
     <Compile Include="Assets\Resources\Scripts\UIs\SideBarAlphaGradient.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAttackRunCross.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAttackShieldPierce.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAttackedTeleport.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\BattleResultHeroCellControl.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillDeathGroupHeal.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\TooltipFriend.cs" />
@@ -129,19 +130,22 @@
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillHelpAidBuff.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\RankPlayerCellInfo.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidShockWave.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidDrain.cs" />
     <Compile Include="Assets\Resources\Scripts\PO\PanelEvent.cs" />
     <Compile Include="Assets\Resources\Scripts\Configs\SoldierLevelConfig_s.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\HeroInfo.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\FriendLineManager.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffTimeHeal.cs" />
     <Compile Include="Assets\Resources\Scripts\Configs\ItemConfig_s.cs" />
     <Compile Include="Assets\Resources\Scripts\PO\SideInfo.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillInitShieldValue.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidSelfAndLowHp.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffLock.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\PickPanelControl.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\RankPanelManager.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAttackStunDamage.cs" />
     <Compile Include="Assets\DOTween\Modules\DOTweenModulePhysics2D.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\BaseTooltip.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidDrain.cs" />
     <Compile Include="Assets\SineVFX\TopDownEffects\Scripts\PrefabSpawner.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\TooltipHeroEquip.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAttackedShield.cs" />
@@ -168,6 +172,7 @@
     <Compile Include="Assets\Resources\Scripts\Configs\HeroAttrConfig_s.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillBuffExpand.cs" />
     <Compile Include="Assets\Resources\Scripts\Configs\PlayerLevelConfig_s.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillLowHpFullHealShield.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAttackSpeedAttack.cs" />
     <Compile Include="Assets\Resources\Scripts\Configs\ItemCombineConfig_s.cs" />
     <Compile Include="Assets\Epic Toon FX\Scripts\ETFXLightFade.cs" />
