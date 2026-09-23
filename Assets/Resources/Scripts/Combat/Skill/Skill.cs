@@ -252,6 +252,11 @@ public class Skill
     {
     }
 
+    // buff 移除事件：本单位任一 buff 被移除时由 Chess.OnBuffRemoved 派发（如天人守城护盾破爆炸）
+    public virtual void OnBuffRemoved(Chess chess, Buff buff)
+    {
+    }
+
     // 伤害计算阶段·攻击方：调整伤害基数与倍率（普攻与技能伤害统一进入；castSkillCfg 为当前施放的技能，null=普攻）
     public virtual void BeforeCalDamage(Chess target, SkillConfig castSkillCfg, ref int damageBase, ref float damageMulti, ref string effect, string hurtTag, bool isFeedback)
     {

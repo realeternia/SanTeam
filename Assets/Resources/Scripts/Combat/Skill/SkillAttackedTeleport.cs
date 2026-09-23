@@ -16,7 +16,7 @@ public class SkillAttackedTeleport : Skill
     public override void OnAttacked(Chess attacker, int damage)
     {
         // 攻击者距离小于 Range（Lv1=20）时不发动；超过阈值才瞬移反击
-        var dist = WorldManager.Instance.GetDistance(owner.transform.position, attacker.transform.position);
+        var dist = WorldManager.Instance.GetRange(owner.transform.position, attacker.transform.position);
         if (dist > 20 && dist < skillCfg.Range && CheckBurst(attacker))
         {
             owner.PlayerAnim(skillCfg.Action);
@@ -31,6 +31,16 @@ public class SkillAttackedTeleport : Skill
             // 施加眩晕buff，同时给予一次技能伤害
             BuffManager.AddBuff(attacker, owner, id, BuffConfig.GetConfigByNameS(skillCfg.BuffId).Id, skillCfg.BuffTime);
             attacker.OnSkillDamaged(owner, id, GetSkillDamage());
+
+            // 白衣渡江：瞬移反击后给自己施加吸收盾，容量=法强×SkillDamageRate
+            if (skillCfg.SkillDamageRate > 0)
+            {
+                var shieldBuffId = BuffConfig.GetConfigByNameS("盾").Id;
+                BuffManager.AddBuff(owner, owner, id, shieldBuffId, 999f);
+                var shield = owner.GetBuff(shieldBuffId) as BuffShield;
+                if (shield != null)
+                    shield.SetHp((int)(owner.ap * skillCfg.SkillDamageRate));
+            }
         }
     }
 

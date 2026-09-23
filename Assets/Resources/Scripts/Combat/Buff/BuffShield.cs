@@ -2,7 +2,7 @@ using System;
 
 public class BuffShield : Buff
 {
-    private int hp;
+    protected int hp;
 
     public BuffShield(int id, int skillId, Chess caster, Chess target, float lastTime)
      : base(id, skillId, caster, target, lastTime)
@@ -21,7 +21,7 @@ public class BuffShield : Buff
     }
 
     // 直接指定护盾值(默认同阵营护盾机制使用，覆盖按配置计算)
-    public void SetHp(int value)
+    public virtual void SetHp(int value)
     {
         hp = value;
     }

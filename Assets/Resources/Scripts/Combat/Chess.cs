@@ -254,7 +254,7 @@ public class Chess : MonoBehaviour
         if (hpRegen != 0)
         {
             // 生命回复属性：正=回复，负=扣减（可为负=持续扣减）
-            hp = Mathf.Clamp(hp + hpRegen, 0, maxHp);
+            hp = (int)Mathf.Clamp(hp + hpRegen, 0, maxHp);
             OnHpChanged();
             if (hp <= 0)
                 Ondying();
@@ -784,6 +784,13 @@ public class Chess : MonoBehaviour
         buffs.Add(buff);
         buff.OnAdd(this, caster);
         buffTimes.Add(new BuffTime{id = buff.id, time = Time.time});
+    }
+
+    // buff 移除事件分发：参考技能体系，虚方法派发到本单位的各技能（技能覆写 OnBuffRemoved 响应，如天人守城护盾破爆炸）
+    public virtual void OnBuffRemoved(Buff buff)
+    {
+        foreach (var skill in skills)
+            skill.OnBuffRemoved(this, buff);
     }
 
     public void AddColorEffect(Color start, Color end)

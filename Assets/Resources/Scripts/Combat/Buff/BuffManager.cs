@@ -50,6 +50,9 @@ public static class BuffManager
             case "BuffTimeDamage":
                 buff = new BuffTimeDamage(buffId, skillId, caster, target, time);
                 break;
+            case "BuffTimeHeal":
+                buff = new BuffTimeHeal(buffId, skillId, caster, target, time);
+                break;
 
         }
 
@@ -68,7 +71,10 @@ public static class BuffManager
         {
             if(chess.buffs[i].id == buffId)
             {
-                chess.buffs[i].OnRemove(chess);
+                var buff = chess.buffs[i];
+                buff.OnRemove(chess);
+                // buff 移除事件分发：参考技能体系，经 Chess 虚方法派发到各技能（如天人守城护盾破爆炸）
+                chess.OnBuffRemoved(buff);
                 chess.buffs.RemoveAt(i);
                 break;
             }

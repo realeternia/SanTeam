@@ -98,6 +98,15 @@ public static class SkillManager
             case "FactionShield":
                 return new SkillFactionShield(skillId, owner);
 
+            case "InitShieldValue":
+                return new SkillInitShieldValue(skillId, owner);
+            case "AidSelfAndLowHp":
+                return new SkillAidSelfAndLowHp(skillId, owner);
+            case "AidSelfShieldBoom":
+                return new SkillAidSelfShieldBoom(skillId, owner);
+            case "LowHpFullHealShield":
+                return new SkillLowHpFullHealShield(skillId, owner);
+
             case "Dumb":
                 return new SkillDumb(skillId, owner);               
         }
