@@ -17,6 +17,14 @@ public static class CombatConst
     /// <summary>LockChain：连锁(BuffLock)传递的伤害标签，避免锁链伤害二次扩散成循环放大</summary>
     public const string LockChainHurtTag = "LockChain";
 
+    // ---- 伤害类型(SkillConfig.DamageType) ----
+    /// <summary>0=法术：ap 成长，受魔抗减免</summary>
+    public const int DamageTypeMagic = 0;
+    /// <summary>1=物理：atk 成长，受护甲减免</summary>
+    public const int DamageTypeAttack = 1;
+    /// <summary>2=真实：无视抗性，护盾不吸收</summary>
+    public const int DamageTypeReal = 2;
+
     // ---- 技能Id ----
     /// <summary>仁德：给与我方前排士兵护盾（技能表 仁 的5级行）</summary>
     public const int SoldierShieldSkillId = 2090035;

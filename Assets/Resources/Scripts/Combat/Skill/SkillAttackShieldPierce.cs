@@ -7,7 +7,7 @@ using UnityEngine;
 /// <summary>
 /// 破盾：每次攻击对有护盾(吸收型)的目标额外造成%物理伤害（基于攻击基准值），
 /// 携带 HurtTag 标签(如"AntiShield")绕过护盾直接打血（BuffShield 判定该标签不吸收）。
-/// 伤害经 OnSkillDamaged 统一结算：物理(IsMagic=false)受护甲减免一次后打血
+/// 伤害经 OnSkillDamaged 统一结算：物理(DamageType=物理)受护甲减免一次后打血
 /// </summary>
 public class SkillAttackShieldPierce : Skill
 {

@@ -92,7 +92,7 @@ public class SkillHitFireArea : Skill
             var dmg = GetSkillDamage();
             foreach (var unit in unitList)
             {
-                // 百分比魔法伤害：以目标�分比为�分比为伤害，经 OnSkillDamaged 按 IsMagic 受魔抗减免
+                // 百分比魔法伤害：经 OnSkillDamaged 按 DamageType 受抗性减免
                 unit.OnSkillDamaged(owner, skillId, dmg);
             }
 

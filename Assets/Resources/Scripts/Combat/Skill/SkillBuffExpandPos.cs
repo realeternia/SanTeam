@@ -17,9 +17,6 @@ public class SkillBuffExpandPos : Skill
         if(checkSkillId == skillId)
             return; //自己挂的buff，不再连续触发
 
-        if (!TypeMatched(skillCfg, SkillConfig.GetConfig(checkSkillId).IsMagic))
-            return;            
-
         var buffCfg = BuffConfig.GetConfig(buffId); 
         if(!buffCfg.IsPositive)
             return;
@@ -41,9 +38,6 @@ public class SkillBuffExpandPos : Skill
     {
         if(checkSkillId == skillId)
             return; //自己挂的buff，不再连续触发
-
-        if (!TypeMatched(skillCfg, SkillConfig.GetConfig(checkSkillId).IsMagic))
-            return;            
        
         if (CheckBurst(target))
         {

@@ -638,14 +638,16 @@ public class Chess : MonoBehaviour
         if(damage <= 0)
             throw new Exception("伤害值不能小于等于0");
 
-        // 抗性减免（英雄与士兵统一结算，参考金铲铲）：IsMagic=true 法术受魔抗减免；false 物理(atk)受护甲减免
+        // 抗性减免（英雄与士兵统一结算，参考金铲铲）：法术受魔抗减免；物理(atk)受护甲减免；真实伤害无视抗性
         var skillCfg = SkillConfig.GetConfig(skillId);
         if (skillCfg != null)
         {
-            if (skillCfg.IsMagic)
+            if (skillCfg.DamageType == CombatConst.DamageTypeMagic)
                 damage = Math.Max(1, (int)(damage * CombatConst.ResistMultiplier(magicRes))); // 法术：魔抗减免
-            else
+            else if (skillCfg.DamageType == CombatConst.DamageTypeAttack)
                 damage = Math.Max(1, (int)(damage * CombatConst.ResistMultiplier(GetEffectiveArmor(caster)))); // 物理(atk)：等效护甲减免（攻方破甲可无视守方护甲）
+            // DamageType == DamageTypeReal（真实伤害）：不做抗性减免
+
         }
 
         // 伤害计算阶段·统一入口：普攻与技能伤害都进入，调整伤害基数与倍率（增伤/减伤/破甲/连锁等；跳过当前施放技能自身）

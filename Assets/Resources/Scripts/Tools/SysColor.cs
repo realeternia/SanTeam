@@ -44,7 +44,7 @@ public static class SysColor
         return new Color(50 / 255f, 50 / 255f, 50 / 255f, 255 / 255f);
     }
 
-    // 技能属性连接线颜色（法术IsMagic-智谋蓝 / 物理-黄绿）
+    // 技能属性连接线颜色（法术-智谋蓝 / 物理-黄绿）
     public static Color GetSkillAttrColor(bool isMagic)
     {
         return isMagic ? new Color(0.55f, 0.55f, 1f, 0.6f) : new Color(0.7f, 0.8f, 0.3f, 0.6f);

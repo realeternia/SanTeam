@@ -26,23 +26,15 @@ public class Skill
     public float mp; // 当前技能MP，战斗开始为0，满值=MpCost
 
     /// <summary>
-    /// 统一技能伤害公式：IsMagic=true 魔法 = Strength × (100 + ap × (1+Strength2)) / 100（ap 为百分比加成，ap=0 时伤害=Strength）；
-    /// IsMagic=false 物理 = Strength + atk × (1+Strength2)。魔抗/护甲减免在 OnSkillDamaged 内处理
+    /// 统一技能伤害公式：DamageType=0 法术 = Strength × (100 + ap × (1+Strength2)) / 100（ap 为百分比加成，ap=0 时伤害=Strength）；
+    /// DamageType=1/2 物理/真实 = Strength + atk × (1+Strength2)。魔抗/护甲减免在 OnSkillDamaged 内处理（真实伤害无视抗性与护盾）
     /// </summary>
     public int GetSkillDamage()
     {
-        if(skillCfg.IsMagic)
+        if(skillCfg.DamageType == CombatConst.DamageTypeMagic)
             return (int)(skillCfg.Strength * (100 + owner.GetAttr("ap")) / 100);
         else
             return (int)(skillCfg.Strength + owner.GetAttr("atk"));
-    }
-
-    /// <summary>
-    /// 技能类型限定判断：CheckType=0 不限定；1=仅物理；2=仅法术（isMagic 为目标技能是否法术）
-    /// </summary>
-    public static bool TypeMatched(SkillConfig cfg, bool isMagic)
-    {
-        return cfg.CheckType == 0 || cfg.CheckType == (isMagic ? 2 : 1);
     }
 
     public Skill(int id, Chess unit)

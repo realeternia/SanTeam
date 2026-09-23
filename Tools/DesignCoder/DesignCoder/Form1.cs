@@ -357,8 +357,13 @@ namespace DesignCoder
 
             if (scrollColCache.TryGetValue(currentConfigName, out int colIdx))
             {
-                int maxCol = Math.Max(0, dataGridView1.Columns.Count - 1);
-                dataGridView1.FirstDisplayedScrollingColumnIndex = Math.Min(Math.Max(0, colIdx), maxCol);
+                // 缓存索引可能因列结构变更(删列)而指向隐藏列(如 _RowTag_)或冻结列，
+                // FirstDisplayedScrollingColumnIndex 不能设置为不可见列，否则抛 InvalidOperationException
+                int target = Math.Min(Math.Max(0, colIdx), dataGridView1.Columns.Count - 1);
+                while (target > 0 && (!dataGridView1.Columns[target].Visible || dataGridView1.Columns[target].Frozen))
+                    target--;
+                if (dataGridView1.Columns[target].Visible && !dataGridView1.Columns[target].Frozen)
+                    dataGridView1.FirstDisplayedScrollingColumnIndex = target;
             }
         }
 

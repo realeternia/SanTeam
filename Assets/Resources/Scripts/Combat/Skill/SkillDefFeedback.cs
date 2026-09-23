@@ -12,14 +12,12 @@ public class SkillDefFeedback : Skill
 
     public override void OnAttacked(Chess attacker, int damage)
     {
-        DoFeedback(attacker, false, damage); // 普攻固定为物理
+        DoFeedback(attacker, damage);
     }
 
 
-    private void DoFeedback(Chess attacker, bool isMagic, int damage)
+    private void DoFeedback(Chess attacker, int damage)
     {
-        if (!TypeMatched(skillCfg, isMagic))
-            return;
 
         if (skillCfg.Range > 0)
         {
