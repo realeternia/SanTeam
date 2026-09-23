@@ -30,13 +30,10 @@ public class SkillDeathGroupHeal : Skill
                 chess.AddHp(heal);
 
             // 提升目标 20%~40% atk 与 ap
-            if (skillCfg.SkillDamageRate > 0)
-            {
-                chess.atk += (int)(chess.atk * skillCfg.SkillDamageRate);
-                chess.ap += (int)(chess.ap * skillCfg.SkillDamageRate);
-                if (chess.heroInfo != null)
-                    chess.heroInfo.SetAttr(chess.ap, chess.atk);
-            }
+            chess.atk += (int)(chess.atk * skillCfg.Strength);
+            chess.ap += skillCfg.StrengthInt;
+            if (chess.heroInfo != null)
+                chess.heroInfo.SetAttr(chess.ap, chess.atk);
         }
     }
 
