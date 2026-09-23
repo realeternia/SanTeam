@@ -2,7 +2,7 @@ using CommonConfig;
 
 /// <summary>
 /// 国家护盾技能：战斗开始(BattleBegin)时按技能等级(1~5)给自身施加同阵营护盾。
-/// 护盾 = 最大生命 × SkillDamageRate（0.15~0.75，对应配置行 2000001~2000005，同阵营 2~6 人）；
+/// 护盾 = 最大生命 × Strength（0.15~0.75，对应配置行 2000001~2000005，同阵营 2~6 人）；
 /// 主公(王)上阵时护盾比例额外 +KingShieldBonusRate×王数（与旧默认护盾机制一致）。
 /// 技能由 FactionShieldManager 在战斗开始时按同阵营人数授予对应等级，效果统一走 Buff 系统。
 /// </summary>
@@ -21,7 +21,7 @@ public class SkillFactionShield : Skill
             return;
         }
 
-        float rate = skillCfg.SkillDamageRate + CombatConst.KingShieldBonusRate * CountKingOnSide();
+        float rate = skillCfg.Strength + CombatConst.KingShieldBonusRate * CountKingOnSide();
         var shieldHp = (int)(owner.maxHp * rate);
         BuffManager.AddBuff(owner, owner, id, buffCfg.Id, skillCfg.BuffTime);
         var shield = owner.GetBuff(buffCfg.Id) as BuffShield;

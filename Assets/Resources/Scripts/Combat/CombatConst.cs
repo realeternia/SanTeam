@@ -26,7 +26,7 @@ public static class CombatConst
     // ---- 国家护盾机制(同阵营连线，数值参考金铲铲神盾使羁绊) ----
     /// <summary>同阵营英雄数量档位(2/3/4/5/6，对应国家护盾技能 Lv1~5)</summary>
     public static readonly int[] FactionShieldCounts = { 2, 3, 4, 5, 6 };
-    /// <summary>国家护盾技能缩写（技能Id按 Lv 取 SkillConfig 2000001~2000005，护盾=最大生命×SkillDamageRate）</summary>
+    /// <summary>国家护盾技能缩写（技能Id按 Lv 取 SkillConfig 2000001~2000005，护盾=最大生命×Strength）</summary>
     public const string FactionShieldSkillSname = "国";
 
     /// <summary>主公(王/王)上阵：同阵营护盾额外加成（百分比，国家护盾技能内结算）</summary>

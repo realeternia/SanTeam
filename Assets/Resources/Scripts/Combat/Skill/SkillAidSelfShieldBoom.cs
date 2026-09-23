@@ -4,7 +4,7 @@ using CommonConfig;
 /// 天人守城·自套护盾+盾破爆炸（ScriptName = "AidSelfShieldBoom"）：
 /// 辅助技能，循环检查：当自身不存在护盾(BuffId="盾"=300001)时给自己施加护盾，
 /// 护盾容量 = 自身最大生命 × Strength；护盾被移除时经 Chess.OnBuffRemoved 派发到本技能，
-/// 覆写 OnBuffRemoved 响应：对本技能施加的护盾触发爆炸，对周围(Area)范围内敌人造成护盾容量 × SkillDamageRate 伤害。
+/// 覆写 OnBuffRemoved 响应：对本技能施加的护盾触发爆炸，对周围(Area)范围内敌人造成护盾容量 × Strength2 伤害。
 /// 用于曹仁：天人将军坚壁自守，盾破反炸敌军。
 /// </summary>
 public class SkillAidSelfShieldBoom : Skill
@@ -41,7 +41,7 @@ public class SkillAidSelfShieldBoom : Skill
             shield.SetHp(shieldHp);
 
         EffectManager.PlaySkillEffect(owner, skillCfg.HitEffect);
-        GameLog.Debug($"天人守城套盾 技能id={id} 等级={Level} 护盾容量={shieldHp} 爆炸倍率={skillCfg.SkillDamageRate} 爆炸范围={skillCfg.Area}");
+        GameLog.Debug($"天人守城套盾 技能id={id} 等级={Level} 护盾容量={shieldHp} 爆炸倍率={skillCfg.Strength2} 爆炸范围={skillCfg.Area}");
         return true;
     }
 
@@ -52,13 +52,13 @@ public class SkillAidSelfShieldBoom : Skill
             Explode();
     }
 
-    // 盾破爆炸：对周围(Area)范围内敌人造成护盾容量 × SkillDamageRate 伤害
+    // 盾破爆炸：对周围(Area)范围内敌人造成护盾容量 × Strength2 伤害
     private void Explode()
     {
         if (owner == null || owner.hp <= 0)
             return;
 
-        int boomDamage = (int)(lastShieldHp * skillCfg.SkillDamageRate);
+        int boomDamage = (int)(lastShieldHp * skillCfg.Strength2);
         if (boomDamage <= 0)
             return;
 

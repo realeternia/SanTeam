@@ -27,15 +27,15 @@ public class Skill
     public float mp; // 当前技能MP，战斗开始为0，满值=MpCost
 
     /// <summary>
-    /// 统一技能伤害公式：IsMagic=true 魔法 = Strength × (100 + ap × (1+SkillDamageRate)) / 100（ap 为百分比加成，ap=0 时伤害=Strength）；
-    /// IsMagic=false 物理 = Strength + atk × (1+SkillDamageRate)。魔抗/护甲减免在 OnSkillDamaged 内处理
+    /// 统一技能伤害公式：IsMagic=true 魔法 = Strength × (100 + ap × (1+Strength2)) / 100（ap 为百分比加成，ap=0 时伤害=Strength）；
+    /// IsMagic=false 物理 = Strength + atk × (1+Strength2)。魔抗/护甲减免在 OnSkillDamaged 内处理
     /// </summary>
     public int GetSkillDamage()
     {
         if(skillCfg.IsMagic)
-            return (int)(skillCfg.Strength * (100 + owner.GetAttr("ap") * (1 + skillCfg.SkillDamageRate)) / 100);
+            return (int)(skillCfg.Strength * (100 + owner.GetAttr("ap")) / 100);
         else
-            return (int)(skillCfg.Strength + owner.GetAttr("atk") * ( 1 + skillCfg.SkillDamageRate));
+            return (int)(skillCfg.Strength + owner.GetAttr("atk"));
     }
 
     /// <summary>

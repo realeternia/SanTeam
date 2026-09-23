@@ -25,7 +25,7 @@ public class SkillHitArea : Skill
             if (unitsInRange.Count > 0)
             {
                 WorldManager.Instance.RandomSelect(unitsInRange, skillCfg.TargetCount);
-                var damage2 = (int)(damage * skillCfg.SkillDamageRate);
+                var damage2 = (int)(damage * skillCfg.Strength);
                 foreach (var unit in unitsInRange)
                     if (damage2 > 0)
                         unit.OnSkillDamaged(owner, skillId, damage2);

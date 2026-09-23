@@ -12,7 +12,7 @@ public class BuffLock : Buff
         if (hurtTag == CombatConst.LockChainHurtTag)
             return;
 
-        var chainDamage = (int)(damageBase * damageMulti * skillCfg.SkillDamageRate);
+        var chainDamage = (int)(damageBase * damageMulti * skillCfg.Strength);
         if (chainDamage <= 0)
             return; // 伤害被减伤压到0，不再链传，避免 OnSkillDamaged 的伤害<=0 异常
 

@@ -2,7 +2,7 @@ using CommonConfig;
 
 /// <summary>
 /// 受击加护盾（ScriptName = "AttackedShield"）：受到攻击时为自己施加数值型吸收盾，
-/// 护盾容量 = 自身攻击 × SkillDamageRate，护盾 Buff 取技能行 BuffId（"盾"= BuffConfig 301001），持续 BuffTime 秒，
+/// 护盾容量 = 自身攻击 × Strength，护盾 Buff 取技能行 BuffId（"盾"= BuffConfig 301001），持续 BuffTime 秒，
 /// 是否可触发由 Skill.CheckBurst 统一判定（CD、发动概率、MpCost、TriggerCondition 条件如 "hprate&lt;30"）。
 /// 每次触发还会直接给自身叠加生命回复（JobLinkManager.ApplyAttr "hpRegen"），数值取 StrengthInt，可逐次累积。
 /// 使用示例：老当益壮 · 宝刀未老（缩写「壮」，2010106~2010110，生命低于30%受击时给自己 攻击×240%~480% 的护盾，并永久 +生命回复2~6，CD 10s）。
@@ -31,12 +31,12 @@ public class SkillAttackedShield : Skill
         BuffManager.AddBuff(owner, owner, id, shieldCfg.Id, skillCfg.BuffTime);
         var shield = owner.GetBuff(shieldCfg.Id) as BuffShield;
         if (shield != null)
-            shield.SetHp((int)(owner.atk * skillCfg.SkillDamageRate));
+            shield.SetHp((int)(owner.atk * skillCfg.Strength));
 
         // 每次触发叠加生命回复（越老越耐战）
         JobLinkManager.ApplyAttr(owner, "hpRegen", skillCfg.StrengthInt);
 
         EffectManager.PlaySkillEffect(owner, skillCfg.HitEffect);
-        GameLog.Debug($"受击加护盾 技能id={id} 等级={Level} 生命={owner.hp}/{owner.maxHp} 护盾={owner.atk * skillCfg.SkillDamageRate:0} 生命回复+{skillCfg.StrengthInt}");
+        GameLog.Debug($"受击加护盾 技能id={id} 等级={Level} 生命={owner.hp}/{owner.maxHp} 护盾={owner.atk * skillCfg.Strength:0} 生命回复+{skillCfg.StrengthInt}");
     }
 }

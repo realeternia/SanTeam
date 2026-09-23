@@ -7,7 +7,7 @@ using UnityEngine;
 
 /// <summary>
 /// 火攻场：类似HitWall，攻击时在目标位置召唤一个火焰场，持续造成百分比魔法伤害；
-/// 蔓延：若目标位置周围 Area 内已存在火（SummonTag=火，不区分来源，场景中任意火场都算），则按概率(SkillDamageRate)在 Range 范围内随机敌人位置放火，等级越高概率越高
+/// 蔓延：若目标位置周围 Area 内已存在火（SummonTag=火，不区分来源，场景中任意火场都算），则按发动概率(Rate)在 Range 范围内随机敌人位置放火，等级越高概率越高
 /// </summary>
 public class SkillHitFireArea : Skill
 {
@@ -27,10 +27,10 @@ public class SkillHitFireArea : Skill
 
             targetPosList = new List<Vector3>();
 
-            // 蔓延：目标位置周围 Area 内已有火，则按放置概率在 Range 范围内随机敌人位置放火
+            // 蔓延：目标位置周围 Area 内已有火，则按发动概率(Rate)在 Range 范围内随机敌人位置放火
             if (HasFireNear(targetPos))
             {
-                var spreadRate = Mathf.Clamp01(skillCfg.SkillDamageRate);
+                var spreadRate = Mathf.Clamp01(skillCfg.Rate);
                 if (spreadRate > 0 && SysRandom.Value < spreadRate)
                     SpreadFire(targetPos);
             }

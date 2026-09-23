@@ -5,7 +5,7 @@ using UnityEngine;
 
 /// <summary>
 /// 背水：阵亡时，回复我方同组技能(Sname)的在场英雄 20%~60%(Strength)最大生命值，
-/// 并提升其 20%~40%(SkillDamageRate) 的 atk 与 ap。通过 Skill.OnDeath 在 Chess.Ondying 时触发。
+    /// 并按同比例(Strength)提升其 atk、按 StrengthInt 提升其 ap。通过 Skill.OnDeath 在 Chess.Ondying 时触发。
 /// </summary>
 public class SkillDeathGroupHeal : Skill
 {

@@ -32,14 +32,14 @@ public class SkillAttackedTeleport : Skill
             BuffManager.AddBuff(attacker, owner, id, BuffConfig.GetConfigByNameS(skillCfg.BuffId).Id, skillCfg.BuffTime);
             attacker.OnSkillDamaged(owner, id, GetSkillDamage());
 
-            // 白衣渡江：瞬移反击后给自己施加吸收盾，容量=法强×SkillDamageRate
-            if (skillCfg.SkillDamageRate > 0)
+            // 白衣渡江：瞬移反击后给自己施加吸收盾，容量=法强×Strength2
+            if (skillCfg.Strength2 > 0)
             {
                 var shieldBuffId = BuffConfig.GetConfigByNameS("盾").Id;
                 BuffManager.AddBuff(owner, owner, id, shieldBuffId, 999f);
                 var shield = owner.GetBuff(shieldBuffId) as BuffShield;
                 if (shield != null)
-                    shield.SetHp((int)(owner.ap * skillCfg.SkillDamageRate));
+                    shield.SetHp((int)(owner.ap * skillCfg.Strength2));
             }
         }
     }

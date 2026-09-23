@@ -22,9 +22,10 @@ description: 编写《三国卡牌》(金铲铲式)战斗技能与数值配置�
 
 ## 三、伤害公式
 
-统一公式：`GetSkillDamage() = Strength + 关联属性 × SkillDamageRate`
+统一公式：`GetSkillDamage() = Strength + 关联属性 × (1 + Strength2)`
 
-- 魔法技能：`法强(ap) × SkillDamageRate`；武力技能：`武力(atk) × SkillDamageRate`。属性类型由技能类型决定（技/术对应职业主属性）。
+- 魔法技能：`Strength × (100 + ap×(1+Strength2)) / 100`（受魔抗减免）；武力技能：`Strength + atk×(1+Strength2)`。属性类型由技能类型决定（技/术对应职业主属性）。
+- 倍率槽：`Strength` 为主数值/基础伤害；当 `Strength` 被占用（作基础伤害或其它用途）时，倍率系数放入 `Strength2`。
 - 普攻与技能伤害统一经 `SkillManager.DuringCalDamage` 计算，再走受击方 `DuringCalDamaged`。
 
 ## 四、数值设计原则（平衡核心）
@@ -34,7 +35,7 @@ description: 编写《三国卡牌》(金铲铲式)战斗技能与数值配置�
 3. **MP 消耗是主要制约与平衡手段**：高耗蓝技能应换来更高的伤害或更强效果；同强度下耗蓝越高、数值越强，反之亦然。不要把单体与群体技能拉到同一伤害水平，靠耗蓝错开。
 4. **数值成长对照基准技能**：以单体基准技能（如 `强击`，Strength Lv1=60，描述"对目标造成法强/1的魔法伤害"）为参照，逐等级提升伤害。参考模板档位：
    - 单体法术阵（火墙式）：Strength Lv1~5 = 25/40/60/80/110。
-   - 群体/弹射技能：用 `SkillDamageRate`（如 0.4、0.8）+ 目标数 `TargetCount` 控制，使单段伤害低于单体基准。
+   - 群体/弹射技能：用 `Strength` 作伤害倍率（如 0.4、0.8，经 `damage × Strength` 结算）+ 目标数 `TargetCount` 控制，使单段伤害低于单体基准。
 5. 数值全部放进配置行，不在逻辑里写死；调整数值只改 `SkillConfig`，无需改代码。
 
 ## 五、技能说明（Descript）规范

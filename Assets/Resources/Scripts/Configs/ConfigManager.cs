@@ -449,13 +449,13 @@ public static class ConfigManager
         return sb.ToString();
     }
 
-    // 动态字段取值与格式化：Rate/SkillDamageRate 转百分比，其余数值字段按整数字面展示（无小数）
+    // 动态字段取值与格式化：Rate/Strength2 转百分比，其余数值字段按整数字面展示（无小数）
     private static string GetFieldRefValue(SkillConfig cfg, string fieldName, bool pct)
     {
         switch (fieldName.ToLowerInvariant())
         {
             case "rate": return PercentText(cfg.Rate);
-            case "skilldamagerate": return PercentText(cfg.SkillDamageRate);
+            case "strength2": return PercentText(cfg.Strength2);
             case "cd": return pct ? PercentText(cfg.CD) : cfg.CD.ToString("0.##");
             case "range": return pct ? PercentText(cfg.Range) : cfg.Range.ToString("0.##");
             case "area": return pct ? PercentText(cfg.Area) : cfg.Area.ToString("0.##");

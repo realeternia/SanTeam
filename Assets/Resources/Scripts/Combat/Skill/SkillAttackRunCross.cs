@@ -30,7 +30,7 @@ public class SkillAttackRunCross : Skill
             EffectManager.PlaySkillEffect(owner, skillCfg.HitEffect);
 
             owner.StartCoroutine(JumpToPosition(mirrorPos));
-            defender.OnSkillDamaged(owner, skillId, (int)(damage * skillCfg.SkillDamageRate));
+            defender.OnSkillDamaged(owner, skillId, (int)(damage * skillCfg.Strength));
                
         }
     }
