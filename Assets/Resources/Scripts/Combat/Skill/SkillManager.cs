@@ -114,29 +114,6 @@ public static class SkillManager
         throw new System.Exception("Skill not found " + skillCfg.ScriptName);
     }
 
-    public static void CheckAddSkill(Chess chess)
-    {
-        foreach (var skill in chess.skills)
-        {
-            if (!string.IsNullOrEmpty(skill.skillCfg.HelpSkill) && !skill.isGivenSkill)
-            {
-                var unitsInRange = WorldManager.Instance.GetUnitsMySidePosType(chess.side, chess.pos, true, skill.skillCfg.UnitHelpType);
-                unitsInRange.Remove(chess);
-                var helpSkillId = ConfigManager.GetSkillConfig(skill.skillCfg.HelpSkill).Id;
-                foreach (var unit in unitsInRange)
-                {
-                    if (!unit.isHero)
-                        continue;
-                    var targetHeroCfg = HeroConfig.GetConfig(unit.heroId);
-                    var tarJobCfg = ConfigManager.GetJobConfig(targetHeroCfg.Job);
-                    if (skill.skillCfg.HelpSkillJob != "" && !skill.skillCfg.HelpSkillJob.Contains(tarJobCfg.NameS))
-                        continue;
-                    unit.AddSkill(helpSkillId, skill.id);
-                }
-            }
-        }
-    }    
-
     public static void BattleBegin(Chess chess)
     {
         foreach (var skill in chess.skills)
@@ -238,8 +215,6 @@ public static class SkillManager
         {
             if (!skill.IsInCD() && skill.CheckAidSkill())
             {
-                // 辅助技能释放消耗气力（负数=延长冷却，走 Cooldown 统一限制在0~1）
-                attacker.Cooldown(-skill.skillCfg.AttackPointReduce);
                 return true;
             }
         }

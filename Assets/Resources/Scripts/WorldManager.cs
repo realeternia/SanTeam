@@ -116,10 +116,6 @@ public class WorldManager : MonoBehaviour
         SpawnUnitsInRegions();
         GameLog.Debug("[BattleInit] spawn done");
 
-        foreach (var chess in chessList.ToArray()) //防止召唤
-            SkillManager.CheckAddSkill(chess);
-        GameLog.Debug("[BattleInit] checkAddSkill done");
-
         // 兵种连锁：按同职业英雄数量施加职业被动属性加成（自身加成+全队加成，不走技能系统）
         JobLinkManager.ApplyJobLinks();
         GameLog.Debug("[BattleInit] jobLink done");
@@ -1511,27 +1507,6 @@ public class WorldManager : MonoBehaviour
         }   
         return null;
     }
-
-    public List<Chess> GetUnitsMySidePosType(int mySide, int pos, bool isHero, int selectType)
-    {
-        List<Chess> unitsInRange = new List<Chess>();
-        foreach (var chessComponent in chessList)
-        {
-            if (chessComponent != null && chessComponent.hp > 0 && !chessComponent.isShadow)
-            {
-                if (chessComponent.side == mySide && chessComponent.isHero == isHero)
-                {
-                    if(selectType == 1 && pos / CombatConst.FormationGridSize == chessComponent.pos / CombatConst.FormationGridSize)
-                        unitsInRange.Add(chessComponent);
-                    else if(selectType == 2 && ((pos % CombatConst.FormationGridSize) == (chessComponent.pos % CombatConst.FormationGridSize)))
-                        unitsInRange.Add(chessComponent);
-                    else if(selectType == 3)
-                        unitsInRange.Add(chessComponent);
-                }
-            }
-        }
-        return unitsInRange;
-    }    
 
     public void AddBattleText(string text, UnityEngine.Vector3 worldPos, UnityEngine.Vector2 speed, Color color, int duration)
     {

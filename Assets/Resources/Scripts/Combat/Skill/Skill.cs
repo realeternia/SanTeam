@@ -12,7 +12,6 @@ public class Skill
 {
     public int id;
     public Chess owner;
-    public bool isGivenSkill; //别人给的技能
     public SkillConfig skillCfg;
     private float lastUpdateTime; // 上次更新CD的时间
     public bool isBurst;

@@ -207,39 +207,6 @@ public static class ConfigManager
         return 0;
     }
     
-    public static int GetShowHelpSkillId(int heroId, int targetHeroId, int srcPos, int targetPos)
-    {
-        var heroCfg = HeroConfig.GetConfig(heroId);
-        foreach (var skillCfg in GetHeroSkillConfigs(heroCfg))
-        {
-            if (skillCfg.UnitHelpType <= 0)
-                continue;
-
-            var targetHeroCfg = HeroConfig.GetConfig(targetHeroId);
-            var tarJobCfg = ConfigManager.GetJobConfig(targetHeroCfg.Job);
-            var targetHasSkill = false;
-            foreach (var tSkillCfg in GetHeroSkillConfigs(targetHeroCfg))
-            {
-                if (tSkillCfg.Sname == skillCfg.Sname)
-                {
-                    targetHasSkill = true;
-                    break;
-                }
-            }
-            if (targetHasSkill || (skillCfg.HelpSkillJob != "" && !skillCfg.HelpSkillJob.Contains(tarJobCfg.NameS)))
-                continue;
-
-            if (skillCfg.UnitHelpType == 1 && srcPos / 3 == targetPos / 3)
-                return skillCfg.Id;
-            else if (skillCfg.UnitHelpType == 2 && ((srcPos % 3) == (targetPos % 3)))
-                return skillCfg.Id;
-            // else if (skillCfg.UnitHelpType == 3)
-            //     return skill;
-        }
-
-        return 0;
-    }
-
     public static HashSet<int> GetHeroFriendInfo(int heroId)
     {
         if (heroFriendInfoDict.TryGetValue(heroId, out HashSet<int> value))
@@ -464,7 +431,6 @@ public static class ConfigManager
             case "summontime": return pct ? PercentText(cfg.SummonTime) : cfg.SummonTime.ToString("0.##");
             case "summonspeed": return pct ? PercentText(cfg.SummonSpeed) : cfg.SummonSpeed.ToString("0.##");
             case "effectsize": return pct ? PercentText(cfg.EffectSize) : cfg.EffectSize.ToString("0.##");
-            case "attackpointreduce": return pct ? PercentText(cfg.AttackPointReduce) : cfg.AttackPointReduce.ToString("0.##");
             case "mpcost": return cfg.MpCost.ToString();
             case "targetcount": return cfg.TargetCount.ToString();
             case "strengthint": return cfg.StrengthInt.ToString();

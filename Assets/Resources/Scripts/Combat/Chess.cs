@@ -961,7 +961,6 @@ public class Chess : MonoBehaviour
         var skillAdd = SkillManager.CreateSkill(skillId, this);
         if (level > 0)
             skillAdd.SetLevel(level);
-        skillAdd.isGivenSkill = true;
         skills.Add(skillAdd);
     }
 
