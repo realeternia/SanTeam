@@ -24,10 +24,10 @@ public class SkillDeathGroupHeal : Skill
             if (chess.skills.Find(s => s.skillCfg.Sname == sname) == null)
                 continue;
 
-            // 回复目标 20%~60% 最大生命值
+            // 回复目标 20%~60% 最大生命值（视为治疗，吃治疗加成/可被扩散）
             var heal = (int)(chess.maxHp * skillCfg.Strength);
             if (heal > 0)
-                chess.AddHp(heal);
+                owner.HealTarget(chess, skillId, heal, true);
 
             // 提升目标 20%~40% atk 与 ap
             chess.atk += (int)(chess.atk * skillCfg.Strength);

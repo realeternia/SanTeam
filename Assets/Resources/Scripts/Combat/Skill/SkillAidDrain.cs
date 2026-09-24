@@ -28,11 +28,11 @@ public class SkillAidDrain : Skill
         owner.PlayerAnim(skillCfg.Action);
         var damage = GetSkillDamage();
 
-        // 一次性吸血：按本次技能伤害的比例立即回复生命（固定 100% 全额吸血）
+        // 一次性吸血：按本次技能伤害的比例立即回复自身生命（吸血不算治疗，不吃治疗加成）
         var drain = (int)(damage * 1);
         if (drain > 0 && owner.hp < owner.maxHp)
         {
-            owner.HealTarget(owner, skillCfg.Id, drain);
+            owner.HealTarget(owner, skillCfg.Id, drain, false);
             EffectManager.PlaySkillEffect(owner, skillCfg.HitEffect);
         }
 

@@ -49,7 +49,7 @@ public class SkillBuffExpandPos : Skill
                 WorldManager.Instance.RandomSelect(unitsInRange, skillCfg.TargetCount);
 
                 foreach (var unit in unitsInRange)
-                    owner.HealTarget(unit, checkSkillId, addon);
+                    owner.HealTarget(unit, checkSkillId, addon, true); // 扩散是真实治疗，吃治疗加成
             }
         }
     }

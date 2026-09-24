@@ -46,7 +46,8 @@ public class BuffTimeHeal : Buff
                 int heal = Mathf.CeilToInt(chess.maxHp * skillCfg.Strength) + skillCfg.StrengthInt;
                 if (heal > 0)
                 {
-                    chess.AddHp(heal);
+                    // 持续回血不算治疗，不吃治疗加成/不触发治疗扩散（isHeal=false）
+                    (caster ?? chess).HealTarget(chess, skillCfg.Id, heal, false);
                     WorldManager.Instance.AddBattleText("+" + heal.ToString(), chess.transform.position, new Vector2(0, 60), SysColor.Battle.HealColor, 2);
                 }
             }

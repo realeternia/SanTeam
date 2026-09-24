@@ -714,7 +714,8 @@ public class Chess : MonoBehaviour
         return (int)(armor * rate);
     }
 
-    public void AddHp(int addon)
+    // 加血底层：仅 HealTarget 内部调用，禁止 skill/buff 直接加血（统一走 HealTarget 决定是否吃治疗加成）
+    private void AddHp(int addon)
     {
         if(addon <= 0)
             throw new Exception("添加的血量不能小于等于0");
@@ -723,11 +724,16 @@ public class Chess : MonoBehaviour
         OnHpChanged();
     }
 
-    public void HealTarget(Chess target, int checkSkillId, int addon)
+    // 治疗入口：isHeal=true 视为真实治疗（触发治疗扩散 OnHealTarget 挂钩，并套用 healRate/healedRate 加成）；
+    // isHeal=false（如吸血、持续回血等不享受治疗强化的回血）仅落血，不套加成、不扩散。
+    public void HealTarget(Chess target, int checkSkillId, int addon, bool isHeal)
     {
-        SkillManager.OnHealTarget(this, target, checkSkillId, ref addon);
-        // 治疗强化系数（治疗者）与受治疗系数（目标，可为负=减疗）
-        addon = Mathf.RoundToInt(addon * (1f + healRate + target.healedRate));
+        if (isHeal)
+        {
+            SkillManager.OnHealTarget(this, target, checkSkillId, ref addon);
+            // 治疗强化系数（治疗者）与受治疗系数（目标，可为负=减疗）
+            addon = Mathf.RoundToInt(addon * (1f + healRate + target.healedRate));
+        }
         if (addon > 0)
             target.AddHp(addon);
     }
