@@ -70,6 +70,7 @@ namespace DesignCoder
             // 
             this.toolStrip1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(167)))), ((int)(((byte)(184)))), ((int)(((byte)(217)))));
             this.toolStrip1.Font = new System.Drawing.Font("微软雅黑", 10F);
+            this.toolStrip1.ImageScalingSize = new System.Drawing.Size(24, 24);
             this.toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.btnRefresh,
             this.toolStripSeparator1,
@@ -85,7 +86,7 @@ namespace DesignCoder
             this.toolStrip1.Location = new System.Drawing.Point(0, 0);
             this.toolStrip1.Name = "toolStrip1";
             this.toolStrip1.Padding = new System.Windows.Forms.Padding(5, 0, 2, 0);
-            this.toolStrip1.Size = new System.Drawing.Size(1399, 27);
+            this.toolStrip1.Size = new System.Drawing.Size(1399, 36);
             this.toolStrip1.TabIndex = 1;
             this.toolStrip1.Text = "toolStrip1";
             // 
@@ -96,14 +97,14 @@ namespace DesignCoder
             this.btnRefresh.ForeColor = System.Drawing.Color.White;
             this.btnRefresh.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.btnRefresh.Name = "btnRefresh";
-            this.btnRefresh.Size = new System.Drawing.Size(41, 24);
+            this.btnRefresh.Size = new System.Drawing.Size(56, 31);
             this.btnRefresh.Text = "刷新";
             this.btnRefresh.Click += new System.EventHandler(this.btnRefresh_Click);
             // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(6, 27);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(6, 36);
             // 
             // btnSave
             // 
@@ -112,7 +113,7 @@ namespace DesignCoder
             this.btnSave.ForeColor = System.Drawing.Color.White;
             this.btnSave.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.btnSave.Name = "btnSave";
-            this.btnSave.Size = new System.Drawing.Size(41, 24);
+            this.btnSave.Size = new System.Drawing.Size(56, 31);
             this.btnSave.Text = "保存";
             this.btnSave.Click += new System.EventHandler(this.btnSave_Click);
             // 
@@ -123,7 +124,7 @@ namespace DesignCoder
             this.btnNewRow.ForeColor = System.Drawing.Color.White;
             this.btnNewRow.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.btnNewRow.Name = "btnNewRow";
-            this.btnNewRow.Size = new System.Drawing.Size(55, 24);
+            this.btnNewRow.Size = new System.Drawing.Size(76, 31);
             this.btnNewRow.Text = "新增行";
             this.btnNewRow.Click += new System.EventHandler(this.btnNewRow_Click);
             // 
@@ -134,14 +135,14 @@ namespace DesignCoder
             this.btnDeleteRow.ForeColor = System.Drawing.Color.White;
             this.btnDeleteRow.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.btnDeleteRow.Name = "btnDeleteRow";
-            this.btnDeleteRow.Size = new System.Drawing.Size(55, 24);
+            this.btnDeleteRow.Size = new System.Drawing.Size(76, 31);
             this.btnDeleteRow.Text = "删除行";
             this.btnDeleteRow.Click += new System.EventHandler(this.btnDeleteRow_Click);
             // 
             // toolStripSeparator2
             // 
             this.toolStripSeparator2.Name = "toolStripSeparator2";
-            this.toolStripSeparator2.Size = new System.Drawing.Size(6, 27);
+            this.toolStripSeparator2.Size = new System.Drawing.Size(6, 36);
             // 
             // btnBatchFill
             // 
@@ -150,7 +151,7 @@ namespace DesignCoder
             this.btnBatchFill.ForeColor = System.Drawing.Color.White;
             this.btnBatchFill.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.btnBatchFill.Name = "btnBatchFill";
-            this.btnBatchFill.Size = new System.Drawing.Size(69, 24);
+            this.btnBatchFill.Size = new System.Drawing.Size(96, 31);
             this.btnBatchFill.Text = "批量填充";
             this.btnBatchFill.Click += new System.EventHandler(this.btnBatchFill_Click);
             // 
@@ -161,7 +162,7 @@ namespace DesignCoder
             this.btnMultiply.ForeColor = System.Drawing.Color.White;
             this.btnMultiply.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.btnMultiply.Name = "btnMultiply";
-            this.btnMultiply.Size = new System.Drawing.Size(41, 24);
+            this.btnMultiply.Size = new System.Drawing.Size(56, 31);
             this.btnMultiply.Text = "成倍";
             this.btnMultiply.Click += new System.EventHandler(this.btnMultiply_Click);
             // 
@@ -172,7 +173,7 @@ namespace DesignCoder
             this.btnForeColor.ForeColor = System.Drawing.Color.White;
             this.btnForeColor.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.btnForeColor.Name = "btnForeColor";
-            this.btnForeColor.Size = new System.Drawing.Size(55, 24);
+            this.btnForeColor.Size = new System.Drawing.Size(76, 31);
             this.btnForeColor.Text = "前景色";
             this.btnForeColor.Click += new System.EventHandler(this.btnForeColor_Click);
             // 
@@ -183,7 +184,7 @@ namespace DesignCoder
             this.btnBackColor.ForeColor = System.Drawing.Color.White;
             this.btnBackColor.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.btnBackColor.Name = "btnBackColor";
-            this.btnBackColor.Size = new System.Drawing.Size(55, 24);
+            this.btnBackColor.Size = new System.Drawing.Size(76, 31);
             this.btnBackColor.Text = "背景色";
             this.btnBackColor.Click += new System.EventHandler(this.btnBackColor_Click);
             // 
@@ -194,7 +195,7 @@ namespace DesignCoder
             this.btnClearColors.ForeColor = System.Drawing.Color.White;
             this.btnClearColors.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.btnClearColors.Name = "btnClearColors";
-            this.btnClearColors.Size = new System.Drawing.Size(69, 24);
+            this.btnClearColors.Size = new System.Drawing.Size(96, 31);
             this.btnClearColors.Text = "清除颜色";
             this.btnClearColors.Click += new System.EventHandler(this.btnClearColors_Click);
             // 
@@ -203,7 +204,7 @@ namespace DesignCoder
             this.splitContainer1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.splitContainer1.FixedPanel = System.Windows.Forms.FixedPanel.Panel1;
             this.splitContainer1.IsSplitterFixed = true;
-            this.splitContainer1.Location = new System.Drawing.Point(0, 27);
+            this.splitContainer1.Location = new System.Drawing.Point(0, 36);
             this.splitContainer1.Name = "splitContainer1";
             // 
             // splitContainer1.Panel1
@@ -213,7 +214,7 @@ namespace DesignCoder
             // splitContainer1.Panel2
             // 
             this.splitContainer1.Panel2.Controls.Add(this.dataGridView1);
-            this.splitContainer1.Size = new System.Drawing.Size(1399, 974);
+            this.splitContainer1.Size = new System.Drawing.Size(1399, 965);
             this.splitContainer1.SplitterDistance = 180;
             this.splitContainer1.TabIndex = 0;
             // 
@@ -232,7 +233,7 @@ namespace DesignCoder
             this.listView1.Location = new System.Drawing.Point(0, 0);
             this.listView1.MultiSelect = false;
             this.listView1.Name = "listView1";
-            this.listView1.Size = new System.Drawing.Size(180, 974);
+            this.listView1.Size = new System.Drawing.Size(180, 965);
             this.listView1.TabIndex = 0;
             this.listView1.UseCompatibleStateImageBehavior = false;
             this.listView1.View = System.Windows.Forms.View.Details;
@@ -254,7 +255,7 @@ namespace DesignCoder
             this.dataGridView1.RowHeadersWidth = 30;
             this.dataGridView1.RowTemplate.Height = 26;
             this.dataGridView1.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.CellSelect;
-            this.dataGridView1.Size = new System.Drawing.Size(1215, 974);
+            this.dataGridView1.Size = new System.Drawing.Size(1215, 965);
             this.dataGridView1.TabIndex = 0;
             this.dataGridView1.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellClick);
             this.dataGridView1.CellMouseDown += new System.Windows.Forms.DataGridViewCellMouseEventHandler(this.dataGridView1_CellMouseDown);
@@ -269,6 +270,7 @@ namespace DesignCoder
             // contextMenuStrip1
             // 
             this.contextMenuStrip1.Font = new System.Drawing.Font("微软雅黑", 9F);
+            this.contextMenuStrip1.ImageScalingSize = new System.Drawing.Size(24, 24);
             this.contextMenuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.menuAddColLeft,
             this.menuAddColRight,
@@ -279,62 +281,62 @@ namespace DesignCoder
             this.menuMoveColRight,
             this.menuViewDistribution});
             this.contextMenuStrip1.Name = "contextMenuStrip1";
-            this.contextMenuStrip1.Size = new System.Drawing.Size(137, 180);
+            this.contextMenuStrip1.Size = new System.Drawing.Size(171, 244);
             this.contextMenuStrip1.Opening += new System.ComponentModel.CancelEventHandler(this.contextMenuStrip1_Opening);
             // 
             // menuAddColLeft
             // 
             this.menuAddColLeft.Name = "menuAddColLeft";
-            this.menuAddColLeft.Size = new System.Drawing.Size(136, 22);
+            this.menuAddColLeft.Size = new System.Drawing.Size(170, 30);
             this.menuAddColLeft.Text = "左加一列";
             this.menuAddColLeft.Click += new System.EventHandler(this.menuAddColLeft_Click);
             // 
             // menuAddColRight
             // 
             this.menuAddColRight.Name = "menuAddColRight";
-            this.menuAddColRight.Size = new System.Drawing.Size(136, 22);
+            this.menuAddColRight.Size = new System.Drawing.Size(170, 30);
             this.menuAddColRight.Text = "右加一列";
             this.menuAddColRight.Click += new System.EventHandler(this.menuAddColRight_Click);
             // 
             // menuDeleteCol
             // 
             this.menuDeleteCol.Name = "menuDeleteCol";
-            this.menuDeleteCol.Size = new System.Drawing.Size(136, 22);
+            this.menuDeleteCol.Size = new System.Drawing.Size(170, 30);
             this.menuDeleteCol.Text = "删除此列";
             this.menuDeleteCol.Click += new System.EventHandler(this.menuDeleteCol_Click);
             // 
             // menuSetIndex
             // 
             this.menuSetIndex.Name = "menuSetIndex";
-            this.menuSetIndex.Size = new System.Drawing.Size(136, 22);
+            this.menuSetIndex.Size = new System.Drawing.Size(170, 30);
             this.menuSetIndex.Text = "设为索引列";
             this.menuSetIndex.Click += new System.EventHandler(this.menuSetIndex_Click);
             // 
             // menuCancelIndex
             // 
             this.menuCancelIndex.Name = "menuCancelIndex";
-            this.menuCancelIndex.Size = new System.Drawing.Size(136, 22);
+            this.menuCancelIndex.Size = new System.Drawing.Size(170, 30);
             this.menuCancelIndex.Text = "取消索引列";
             this.menuCancelIndex.Click += new System.EventHandler(this.menuCancelIndex_Click);
             // 
             // menuMoveColLeft
             // 
             this.menuMoveColLeft.Name = "menuMoveColLeft";
-            this.menuMoveColLeft.Size = new System.Drawing.Size(136, 22);
+            this.menuMoveColLeft.Size = new System.Drawing.Size(170, 30);
             this.menuMoveColLeft.Text = "左移列";
             this.menuMoveColLeft.Click += new System.EventHandler(this.menuMoveColLeft_Click);
             // 
             // menuMoveColRight
             // 
             this.menuMoveColRight.Name = "menuMoveColRight";
-            this.menuMoveColRight.Size = new System.Drawing.Size(136, 22);
+            this.menuMoveColRight.Size = new System.Drawing.Size(170, 30);
             this.menuMoveColRight.Text = "右移列";
             this.menuMoveColRight.Click += new System.EventHandler(this.menuMoveColRight_Click);
             // 
             // menuViewDistribution
             // 
             this.menuViewDistribution.Name = "menuViewDistribution";
-            this.menuViewDistribution.Size = new System.Drawing.Size(136, 22);
+            this.menuViewDistribution.Size = new System.Drawing.Size(170, 30);
             this.menuViewDistribution.Text = "查看分布";
             this.menuViewDistribution.Click += new System.EventHandler(this.menuViewDistribution_Click);
             // 
@@ -369,6 +371,7 @@ namespace DesignCoder
             // contextMenuStripCell
             // 
             this.contextMenuStripCell.Font = new System.Drawing.Font("微软雅黑", 9F);
+            this.contextMenuStripCell.ImageScalingSize = new System.Drawing.Size(24, 24);
             this.contextMenuStripCell.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.menuDeleteRowCtx,
             this.menuCellBatchFill,
@@ -377,53 +380,53 @@ namespace DesignCoder
             this.menuCellBackColor,
             this.menuCellClearColors});
             this.contextMenuStripCell.Name = "contextMenuStripCell";
-            this.contextMenuStripCell.Size = new System.Drawing.Size(137, 136);
+            this.contextMenuStripCell.Size = new System.Drawing.Size(171, 184);
             // 
             // menuDeleteRowCtx
             // 
             this.menuDeleteRowCtx.Name = "menuDeleteRowCtx";
-            this.menuDeleteRowCtx.Size = new System.Drawing.Size(136, 22);
+            this.menuDeleteRowCtx.Size = new System.Drawing.Size(170, 30);
             this.menuDeleteRowCtx.Text = "删除整行";
             this.menuDeleteRowCtx.Click += new System.EventHandler(this.menuDeleteRowCtx_Click);
             // 
             // menuCellBatchFill
             // 
             this.menuCellBatchFill.Name = "menuCellBatchFill";
-            this.menuCellBatchFill.Size = new System.Drawing.Size(136, 22);
+            this.menuCellBatchFill.Size = new System.Drawing.Size(170, 30);
             this.menuCellBatchFill.Text = "批量填充";
             this.menuCellBatchFill.Click += new System.EventHandler(this.btnBatchFill_Click);
             // 
             // menuCellMultiply
             // 
             this.menuCellMultiply.Name = "menuCellMultiply";
-            this.menuCellMultiply.Size = new System.Drawing.Size(136, 22);
+            this.menuCellMultiply.Size = new System.Drawing.Size(170, 30);
             this.menuCellMultiply.Text = "成倍";
             this.menuCellMultiply.Click += new System.EventHandler(this.btnMultiply_Click);
             // 
             // menuCellForeColor
             // 
             this.menuCellForeColor.Name = "menuCellForeColor";
-            this.menuCellForeColor.Size = new System.Drawing.Size(136, 22);
+            this.menuCellForeColor.Size = new System.Drawing.Size(170, 30);
             this.menuCellForeColor.Text = "设置前景色";
             this.menuCellForeColor.Click += new System.EventHandler(this.btnForeColor_Click);
             // 
             // menuCellBackColor
             // 
             this.menuCellBackColor.Name = "menuCellBackColor";
-            this.menuCellBackColor.Size = new System.Drawing.Size(136, 22);
+            this.menuCellBackColor.Size = new System.Drawing.Size(170, 30);
             this.menuCellBackColor.Text = "设置背景色";
             this.menuCellBackColor.Click += new System.EventHandler(this.btnBackColor_Click);
             // 
             // menuCellClearColors
             // 
             this.menuCellClearColors.Name = "menuCellClearColors";
-            this.menuCellClearColors.Size = new System.Drawing.Size(136, 22);
+            this.menuCellClearColors.Size = new System.Drawing.Size(170, 30);
             this.menuCellClearColors.Text = "清除颜色";
             this.menuCellClearColors.Click += new System.EventHandler(this.btnClearColors_Click);
             // 
             // Form1
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 17F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(11F, 24F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(240)))), ((int)(((byte)(244)))), ((int)(((byte)(248)))));
             this.ClientSize = new System.Drawing.Size(1399, 1001);
