@@ -37,6 +37,15 @@ public class Skill
             return (int)(skillCfg.Strength + owner.GetAttr("atk"));
     }
 
+    /// <summary>
+    /// 统一技能治疗公式（独立于伤害公式）：治疗量 = Strength × (100 + ap) / 100，ap=0 时治疗量=Strength。
+    /// 治疗永远是法术向（ap 成长），不套用物理/真实伤害的 atk 计算，禁止用 GetSkillDamage 充当治疗。
+    /// </summary>
+    public int GetSkillHeal()
+    {
+        return (int)(skillCfg.Strength * (100 + owner.GetAttr("ap")) / 100);
+    }
+
     public Skill(int id, Chess unit)
     {
         this.id = id;

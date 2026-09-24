@@ -83,6 +83,16 @@ public static class SkillManager
                 return new SkillAidDrain(skillId, owner);
             case "AidAura":
                 return new SkillAidAura(skillId, owner);
+            case "AidHealShield":
+                return new SkillAidHealShield(skillId, owner);
+            case "AidRangeHeal":
+                return new SkillAidRangeHeal(skillId, owner);
+            case "AidCurseHeal":
+                return new SkillAidCurseHeal(skillId, owner);
+            case "AidJumpHeal":
+                return new SkillAidJumpHeal(skillId, owner);
+            case "AidAreaHeal":
+                return new SkillAidAreaHeal(skillId, owner);
 
             case "InitAttrChange":
                 return new SkillInitAttrChange(skillId, owner);
