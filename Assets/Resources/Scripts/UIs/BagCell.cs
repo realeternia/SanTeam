@@ -258,7 +258,7 @@ public class BagCell : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragH
         }
         else
         {
-            PanelManager.Instance.GetTooltip<TooltipHero>().ShowTooltip(null, null, cardId, player);
+            PanelManager.Instance.GetTooltip<TooltipItem>()?.ShowTooltip(cardId);
         }
     }
 

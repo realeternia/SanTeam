@@ -15,9 +15,6 @@ public class TooltipHero : BaseTooltip
     private static GameObject attrPrefab;                                           // 属性格预制体缓存
     private readonly List<TooltipHeroAttr> attrCells = new List<TooltipHeroAttr>(); // 属性格（按需生成）
 
-    // 道具描述文本（动态创建，道具卡显示）
-    private TMP_Text textDes;
-
     // 好友连接显示：每组 = 技能图标 + 技能描述(最多2行) + 人员列表(1行)，最多4组
     private const int MaxFriendGroups = 4;
     private readonly List<TooltipHeroSkill> friendRows = new List<TooltipHeroSkill>(); // 好友行（按需扩容）
@@ -72,26 +69,6 @@ public class TooltipHero : BaseTooltip
             rt.anchoredPosition = new Vector2(baseX + 20, y);
             attrCells.Add(cell);
         }
-
-        // 道具描述文本（复用属性格预制体的文字控件，直接挂到 tooltip 下）
-        var desGo = Instantiate(attrPrefab, rect);
-        var desCell = desGo.GetComponent<TooltipHeroAttr>();
-        if (desCell == null || desCell.text == null)
-        {
-            GameLog.Error("TooltipHero 属性格预制体缺少 TooltipHeroAttr 组件或文字控件");
-            Destroy(desGo);
-            return;
-        }
-        textDes = desCell.text;
-        textDes.rectTransform.SetParent(rect, false);
-        var desRt = textDes.rectTransform;
-        desRt.anchorMin = new Vector2(0, 1);
-        desRt.anchorMax = new Vector2(0, 1);
-        desRt.pivot = new Vector2(0, 1);
-        desRt.anchoredPosition = new Vector2(20, 0);
-        desRt.sizeDelta = new Vector2(360, 30);
-        textDes.gameObject.SetActive(false);
-        Destroy(desGo);
 
         // 英雄名字 + 等级行（复用属性格预制体的文字控件，tooltip 最上方，仅英雄卡显示）
         var nameGo = Instantiate(attrPrefab, rect);
@@ -224,6 +201,9 @@ public class TooltipHero : BaseTooltip
         bool hasSkill = skillCfgs != null && skillCfgs.Count > 0;
         bool hasFriend = friendInfo != null && friendInfo.Count > 0;
 
+        // 英雄配置：属性区/名字/职业技能等共用
+        var heroCfg = HeroConfig.GetConfig(heroId);
+
         // 卡片等级：在身上时=卡片等级（可能超5，普通技能显示时截断到5）；商店/排行榜默认1级
         int cardLv = 1;
         // 属性取值与战斗统一：HeroConfig 数值经 PostModify 写回为 1星带品质面板（四主），星级成长走 GetCardAttr
@@ -237,14 +217,13 @@ public class TooltipHero : BaseTooltip
         else
         {
             // 无玩家上下文（如排行榜）：直接显示写回的 1星带品质面板（无双强度已并入 Atk）
-            var heroCfg = HeroConfig.GetConfig(heroId);
             attr = new AttrInfo() { Atk = heroCfg.Atk, Ap = heroCfg.Ap, Hp = heroCfg.Hp };
         }
 
-        // 属性列表：英雄显示全部8项（攻/法/命/攻速/护甲/魔抗/移速/射程，无双已并入攻），道具只显示有效属性
+        // 属性列表：英雄卡专用，显示全部8项（攻/法/命/攻速/护甲/魔抗/移速/射程，无双已并入攻）
         bool isHero = ConfigManager.IsHeroCard(heroId);
 
-        // 装备加成汇总：英雄已装备物品（最多3槽）的属性总和（攻/法/命/护甲/魔抗/攻速比例）；
+        // 装备加成汇总：已装备物品（最多3槽）的属性总和（攻/法/命/护甲/魔抗/攻速比例）；
         // 无装备或无玩家上下文（商店/排行榜）时全为0。装备行内容与基础属性数值调整都依赖该汇总
         var equipIds = new List<int>();
         int eAtk = 0, eAp = 0, eHp = 0, eArmor = 0, eMagicRes = 0;
@@ -266,36 +245,19 @@ public class TooltipHero : BaseTooltip
         }
         bool hasEquip = equipIds.Count > 0;
 
-        string[] attrKeys;
-        string[] attrVals;
-        if (isHero)
+        string[] attrKeys = new string[] { "atk", "atkspeed", "ap", "mpRegen", "hp", "hpRegen", "armor", "magicres", "movespeed", "range" };
+        string[] attrVals = new string[]
         {
-            var heroCfg = HeroConfig.GetConfig(heroId);
-            attrKeys = new string[] { "atk", "atkspeed", "ap", "mpRegen", "hp", "hpRegen", "armor", "magicres", "movespeed", "range" };
-            attrVals = new string[]
-            {
-                AppendEquip(attr.Atk, eAtk),
-                AppendEquipSpeed(heroCfg.AtkSpeed, eAtkSpeedRate),
-                AppendEquip(attr.Ap, eAp),
-                AppendEquip(heroCfg.MpRegen, (int)eMpRegen),
-                AppendEquip(attr.Hp, eHp),
-                AppendEquip(heroCfg.HpRegen, (int)eHpRegen),
-                AppendEquip(heroCfg.Armor, eArmor),
-                AppendEquip(heroCfg.MagicRes, eMagicRes),
-                heroCfg.MoveSpeed.ToString(), heroCfg.Range.ToString()
-            };
-        }
-        else
-        {
-            // 道具只显示配置的有效属性行（Attrs："attr+value,attr+value" 解析，含护甲/魔抗/攻速/暴击/回蓝等扩展属性）
-            var itemCfg = ItemConfig.GetConfig(heroId);
-            var listKeys = new List<string>();
-            var listVals = new List<string>();
-            foreach (var bonus in JobLinkManager.ParseBonuses(itemCfg.Attrs))
-                AddItemAttrRow(bonus.Attr, bonus.Value, listKeys, listVals);
-            attrKeys = listKeys.ToArray();
-            attrVals = listVals.ToArray();
-        }
+            AppendEquip(attr.Atk, eAtk),
+            AppendEquipSpeed(heroCfg.AtkSpeed, eAtkSpeedRate),
+            AppendEquip(attr.Ap, eAp),
+            AppendEquip(heroCfg.MpRegen, (int)eMpRegen),
+            AppendEquip(attr.Hp, eHp),
+            AppendEquip(heroCfg.HpRegen, (int)eHpRegen),
+            AppendEquip(heroCfg.Armor, eArmor),
+            AppendEquip(heroCfg.MagicRes, eMagicRes),
+            heroCfg.MoveSpeed.ToString(), heroCfg.Range.ToString()
+        };
 
         int attrRows = 0;
         int shownAttr = 0;
@@ -317,35 +279,16 @@ public class TooltipHero : BaseTooltip
         // 按最后一个显示格的所在行计算高度（中间可能有值为0被隐藏的项，不能按显示个数算）
         attrRows = lastShownRow + 1;
 
-        // 英雄名字 + 等级行（仅英雄卡显示，名字按品质上色；等级=卡片等级）
+        // 英雄名字 + 等级行（名字按品质上色；等级=卡片等级）
         if (textName != null)
         {
-            if (isHero)
-            {
-                var heroCfg = HeroConfig.GetConfig(heroId);
-                string nameHex = ColorUtility.ToHtmlStringRGB(SysColor.GetQualityColor(heroCfg.Quality));
-                textName.text = "<color=#" + nameHex + ">" + heroCfg.Name + "</color> Lv" + cardLv;
-                textName.gameObject.SetActive(true);
-            }
-            else
-            {
-                textName.gameObject.SetActive(false);
-            }
+            string nameHex = ColorUtility.ToHtmlStringRGB(SysColor.GetQualityColor(heroCfg.Quality));
+            textName.text = "<color=#" + nameHex + ">" + heroCfg.Name + "</color> Lv" + cardLv;
+            textName.gameObject.SetActive(true);
         }
 
-        // 道具卡：显示道具描述（属性区下方）
-        bool isItem = !ConfigManager.IsHeroCard(heroId);
-        string itemDes = null;
-        if (isItem)
-        {
-            var itemCfg = ItemConfig.GetConfig(heroId);
-            if (itemCfg != null)
-                itemDes = itemCfg.Des;
-        }
-        bool hasDes = !string.IsNullOrEmpty(itemDes);
-
-        // 没有任何可显示内容时（如无属性的道具），不弹空 Tip
-        if (shownAttr == 0 && !hasSkill && !hasFriend && !hasDes && !hasEquip)
+        // 没有任何可显示内容时，不弹空 Tip
+        if (shownAttr == 0 && !hasSkill && !hasFriend && !hasEquip)
         {
             HideTooltip();
             return;
@@ -354,19 +297,6 @@ public class TooltipHero : BaseTooltip
         float currentY = 10f + NameRowHeight + 15f + attrRows * AttrRowHeight; // 起始Y位置（名字行 + 属性区下方）
         float spacing = 5f;   // 控件间距
 
-        if (hasDes)
-        {
-            textDes.gameObject.SetActive(true);
-            textDes.text = itemDes;
-            textDes.rectTransform.anchoredPosition = new Vector2(20, -currentY);
-            textDes.rectTransform.sizeDelta = new Vector2(360, textDes.preferredHeight);
-            currentY += textDes.preferredHeight + spacing;
-        }
-        else if (textDes != null)
-        {
-            textDes.gameObject.SetActive(false);
-        }
-        
         // 先隐藏全部技能行，再按需显示（无技能时不残留上次的行）
         for (int i = 0; i < skillRows.Count; i++)
             skillRows[i].gameObject.SetActive(false);
@@ -581,15 +511,5 @@ public class TooltipHero : BaseTooltip
             parts.Add(name);
         }
         return string.Join(" ", parts);
-    }
-
-    // 道具属性行：键值按配置输出，比例属性（攻速/暴击）带 % 后缀，其余直接显示数值
-    private void AddItemAttrRow(string key, float value, List<string> keys, List<string> vals)
-    {
-        if (string.IsNullOrEmpty(key) || value == 0)
-            return;
-        keys.Add(key);
-        bool isPercent = key == "atkspeed" || key == "crit";
-        vals.Add(isPercent ? Mathf.RoundToInt(value * 100) + "%" : value.ToString("0.##"));
     }
 }

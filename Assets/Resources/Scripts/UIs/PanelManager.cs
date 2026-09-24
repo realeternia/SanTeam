@@ -36,7 +36,7 @@ public class PanelManager : MonoBehaviour
     }
 
     // 从 Resources/Prefabs 动态加载并实例化 Tooltip（挂到 tipNode 下，每种只创建一次）
-    // 泛型返回具体类型：填充内容用 GetTooltip<TooltipHero>() / GetTooltip<TooltipFriend>()（能拿到 ShowTooltip），
+    // 泛型返回具体类型：填充内容用 GetTooltip<TooltipHero>() / GetTooltip<TooltipFriend>() / GetTooltip<TooltipItem>()（能拿到 ShowTooltip），
     // 仅隐藏用 GetTooltip<BaseTooltip>()（返回当前缓存的提示，不关心具体类型）
     public T GetTooltip<T>() where T : BaseTooltip
     {
@@ -48,7 +48,7 @@ public class PanelManager : MonoBehaviour
         {
             if (tooltip != null)
                 tooltip.HideTooltip();
-            tooltip = CreateTooltip(typeof(T) == typeof(TooltipFriend) ? "ToolTipFriend" : "ToolTipHero");
+            tooltip = CreateTooltip(typeof(T) == typeof(TooltipFriend) ? "ToolTipFriend" : (typeof(T) == typeof(TooltipItem) ? "ToolTipItem" : "ToolTipHero"));
         }
         return tooltip as T;
     }

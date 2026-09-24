@@ -91,6 +91,7 @@
     <Compile Include="Assets\Resources\Scripts\Tools\SysColor.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\BagControl.cs" />
     <Compile Include="Assets\Resources\Scripts\CardShopManager.cs" />
+    <Compile Include="Assets\Resources\Scripts\UIs\TooltipItem.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillHitWall.cs" />
     <Compile Include="Assets\Resources\Scripts\PlayerInfo.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\CastleHUD.cs" />

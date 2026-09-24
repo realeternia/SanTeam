@@ -114,7 +114,7 @@ public class CardViewControl : MonoBehaviour, IPointerDownHandler, IPointerUpHan
         }
         else
         {
-            PanelManager.Instance.GetTooltip<TooltipHero>()?.ShowTooltip(null, null, cardId, player, true);
+            PanelManager.Instance.GetTooltip<TooltipItem>()?.ShowTooltip(cardId);
         }
     }
 
