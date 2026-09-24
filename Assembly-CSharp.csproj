@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <!-- Generated file, do not modify, your changes will be overwritten (use AssetPostprocessor.OnGeneratedCSProject) -->
   <PropertyGroup>
@@ -146,6 +146,7 @@
     <Compile Include="Assets\DOTween\Modules\DOTweenModulePhysics2D.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\BaseTooltip.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidDrain.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidAura.cs" />
     <Compile Include="Assets\SineVFX\TopDownEffects\Scripts\PrefabSpawner.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\TooltipHeroEquip.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAttackedShield.cs" />

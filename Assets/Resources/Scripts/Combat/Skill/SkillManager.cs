@@ -81,6 +81,8 @@ public static class SkillManager
                 return new SkillModifyShootSpeed(skillId, owner);
             case "AidDrain":
                 return new SkillAidDrain(skillId, owner);
+            case "AidAura":
+                return new SkillAidAura(skillId, owner);
 
             case "InitAttrChange":
                 return new SkillInitAttrChange(skillId, owner);
