@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{7F4C2B8A-3D6E-4A9C-9B1F-5E2D8A4C6B10}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <RootNamespace>BattleSimulator</RootNamespace>
+    <AssemblyName>BattleSimulator</AssemblyName>
+    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
+    <LangVersion>latest</LangVersion>
+    <FileAlignment>512</FileAlignment>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <!-- 游戏战斗源码（链接引用，零修改） -->
+    <Compile Include="..\..\..\Assets\Resources\Scripts\Combat\**\*.cs" Link="Game\Combat\%(RecursiveDir)%(Filename)%(Extension)" />
+    <Compile Include="..\..\..\Assets\Resources\Scripts\Configs\*.cs" Link="Game\Configs\%(Filename)%(Extension)" />
+    <Compile Include="..\..\..\Assets\Resources\Scripts\PO\*.cs" Link="Game\PO\%(Filename)%(Extension)" />
+    <Compile Include="..\..\..\Assets\Resources\Scripts\Tools\SysRandom.cs" Link="Game\Tools\SysRandom.cs" />
+    <Compile Include="..\..\..\Assets\Resources\Scripts\Tools\SysColor.cs" Link="Game\Tools\SysColor.cs" />
+    <Compile Include="..\..\..\Assets\Resources\Scripts\Tools\PlayerBook.cs" Link="Game\Tools\PlayerBook.cs" />
+    <Compile Include="..\..\..\Assets\Resources\Scripts\Tools\HeroSelectionTool.cs" Link="Game\Tools\HeroSelectionTool.cs" />
+    <Compile Include="..\..\..\Assets\Resources\Scripts\Tools\GameLog.cs" Link="Game\Tools\GameLog.cs" />
+    <!-- 模拟器自身源码 -->
+    <Compile Include="UnityStub\**\*.cs" />
+    <Compile Include="Harness\**\*.cs" />
+    <Compile Include="Sim\**\*.cs" />
+    <Compile Include="MainForm.cs" />
+    <Compile Include="Program.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>
