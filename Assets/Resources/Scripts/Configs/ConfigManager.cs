@@ -326,11 +326,10 @@ public static class ConfigManager
         return null;
     }
 
-    // 技能完整描述：Lv1 的 Descript 为模板（占位符/1 /2...），用"当前等级的 DescriptVal"按顺序替换拼出；
-    // DescriptVal 支持 Lv1 填字段引用（动态字段）作为模板：/字段名（如 /StrengthInt、/Range、/Strength、/Rate），
-    // 各级用对应字段值替换（+30 等）。仅需在 Lv1 填字段引用模板，其余等级留空自动推导；也可在某级手动填 DescriptVal（保底，直接使用）。
-    // 结构无法用模板表达的技能（如机巧/炮车）各等级行直接填完整 Descript，无占位符时原样返回。
-    // withNext=true 为"当前+下一级"模式：每个参数位后附下一级不同值（括号内、淡绿色，相同则不附）；供职业/好友连接技能档位提示使用
+    // 技能完整描述：Lv1 的 Descript 为模板（内联 /字段名 动态引用，如 /StrengthInt、/Range、/Area、/Strength、/Rate，
+    // 以及 /linkself-xxx、/linkteam-xxx、/auroattrs-xxx 子字段），引擎把其中动态引用替换为该等级行对应字段值；
+    // 其余等级 Descript 留空时自动回退 Lv1 模板并按本级字段替换；无动态引用的整型文案（结构兜底）原样返回。
+    // withNext=true 为"当前+下一级"模式：每个数值字段后附下一级不同值（括号内、淡绿色，相同则不附）；供职业/好友连接技能档位提示使用
     public static string GetSkillDescript(SkillConfig cfg, bool withNext = false)
     {
         if (cfg == null)
@@ -340,51 +339,14 @@ public static class ConfigManager
             templateCfg = GetSkillConfig(cfg.Sname, 1) ?? cfg;
         if (templateCfg == null || string.IsNullOrEmpty(templateCfg.Descript))
             return "";
-        // 当前等级有效的 DescriptVal（Lv1 模板 + 字段引用替换，或手填保底）
-        var curVal = GetLevelDescriptVal(cfg, templateCfg);
-        if (string.IsNullOrEmpty(curVal))
-            return templateCfg.Descript; // 无参数：模板即完整文案（全同文案/结构兜底技能）
-
-        string[] nextVals = null;
-        if (withNext)
-        {
-            var nextCfg = GetSkillConfig(cfg.Sname, cfg.Lv + 1);
-            if (nextCfg != null)
-            {
-                var nextVal = GetLevelDescriptVal(nextCfg, templateCfg);
-                if (!string.IsNullOrEmpty(nextVal))
-                    nextVals = nextVal.Split(';');
-            }
-        }
-
-        var vals = curVal.Split(';');
-        var desc = templateCfg.Descript;
-        for (int i = 0; i < vals.Length; i++)
-        {
-            var cur = vals[i];
-            var rep = cur;
-            if (nextVals != null && i < nextVals.Length && nextVals[i] != cur)
-                rep = cur + SysColor.ColorText("(" + nextVals[i] + ")", SysColor.UI.NextLv);
-            desc = desc.Replace("/" + (i + 1), rep);
-        }
-        return desc;
+        // 当前等级展示 = 模板(内联字段引用)替换为本级字段值；withNext 时带下一级比较
+        var nextCfg = withNext ? GetSkillConfig(cfg.Sname, cfg.Lv + 1) : null;
+        return SubstituteFieldRefs(templateCfg.Descript, cfg, nextCfg);
     }
 
-    // 取某等级行有效的 DescriptVal：
-    // 1) 非 Lv1 模板行且已手动填写 -> 直接使用（保底）；
-    // 2) 否则用 Lv1 模板的 DescriptVal，把其中 /字段名 动态引用替换为该等级行对应字段值
-    private static string GetLevelDescriptVal(SkillConfig cfg, SkillConfig templateCfg)
-    {
-        bool isTemplateRow = cfg.Lv == templateCfg.Lv; // Lv1 行的 DescriptVal 即字段引用模板
-        if (!isTemplateRow && !string.IsNullOrEmpty(cfg.DescriptVal))
-            return cfg.DescriptVal;
-        if (templateCfg == null || string.IsNullOrEmpty(templateCfg.DescriptVal))
-            return null;
-        return SubstituteFieldRefs(templateCfg.DescriptVal, cfg);
-    }
-
-    // 把 DescriptVal 中的 "/字段名" 动态引用替换为 cfg 对应字段的数值（字段名大小写不敏感）；非字母开头的斜杠(如/1 /2占位)不动
-    private static string SubstituteFieldRefs(string input, SkillConfig cfg)
+    // 把 Descript(内联字段引用)中的 "/字段名" 动态引用替换为 cfg 对应字段的数值（字段名大小写不敏感）；非字母开头的斜杠(如/1 /2)不动
+    // nextCfg != null 时（withNext）：对输出数值的字段，若下一级取值与当前不同，在括号内以淡绿附上下一级值
+    private static string SubstituteFieldRefs(string input, SkillConfig cfg, SkillConfig nextCfg = null)
     {
         if (string.IsNullOrEmpty(input))
             return input;
@@ -402,7 +364,16 @@ public static class ConfigManager
                 int adv = j + (pct ? 1 : 0);
                 var val = GetFieldRefValue(cfg, fieldName, pct);
                 if (val != null)
+                {
                     sb.Append(val);
+                    // withNext：数值字段且下一级取值不同时，附下一级值（括号、淡绿）
+                    if (nextCfg != null && IsNumericField(fieldName))
+                    {
+                        var nextVal = GetFieldRefValue(nextCfg, fieldName, pct);
+                        if (nextVal != null && nextVal != val)
+                            sb.Append(SysColor.ColorText("(" + nextVal + ")", SysColor.UI.NextLv));
+                    }
+                }
                 else
                     sb.Append('/').Append(fieldName); // 未知字段保持原样
                 i = adv;
@@ -414,6 +385,24 @@ public static class ConfigManager
             }
         }
         return sb.ToString();
+    }
+
+    // 输出数值的字段（withNext 括号比较用）；文本类字段(name/type/buffid/auroattrs/linkself/linkteam 整体串)不参与
+    private static bool IsNumericField(string field)
+    {
+        var f = field.ToLowerInvariant();
+        switch (f)
+        {
+            case "rate": case "strength2": case "cd": case "range": case "area":
+            case "strength": case "bufftime": case "summontime": case "summonspeed":
+            case "effectsize": case "mpcost": case "targetcount": case "strengthint":
+            case "summoncount": case "lv":
+                return true;
+            default:
+                return f.StartsWith("auroattrs-", StringComparison.OrdinalIgnoreCase)
+                    || f.StartsWith("linkself-", StringComparison.OrdinalIgnoreCase)
+                    || f.StartsWith("linkteam-", StringComparison.OrdinalIgnoreCase);
+        }
     }
 
     // 动态字段取值与格式化：Rate/Strength2 转百分比，其余数值字段按整数字面展示（无小数）

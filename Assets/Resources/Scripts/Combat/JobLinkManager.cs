@@ -201,7 +201,7 @@ public static class JobLinkManager
 
     /// <summary>
     /// 档位差值文本已移除：职业/好友连接技能档位展示统一走 ConfigManager.GetSkillDescript(cfg, withNext:true)，
-    /// 由 Lv1 模板 + 本级 DescriptVal 拼出当前档描述，每个参数位附下一档不同值（括号内），如"自身生命+10%(+20%)"。
+    /// Lv1 Descript 内联字段引用（如 /linkself-atk）,按本级字段值拼出当前档描述，每个数值字段附下一档不同值（括号内），如"自身生命+10%(+20%)"。
     /// </summary>
 
     // 解析 "attr+value,attr+value" 格式的加成串（职业技能 LinkSelf/LinkTeam 与开局属性技能共用）
