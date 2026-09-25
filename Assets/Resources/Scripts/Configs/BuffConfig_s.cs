@@ -137,6 +137,9 @@ namespace CommonConfig
             config[300004] = new BuffConfig(300004, "伤害提升", "重", "造成的伤害按比例提升", true, "BuffDamageAddRate", "", "", "SparkleAreaWhite", "");
             config[300005] = new BuffConfig(300005, "攻速提升", "快", "攻击速度按比例提升", true, "BuffCoolDown", "", "", "HeartStream", "");
             config[300007] = new BuffConfig(300007, "急救", "愈", "每秒回复一定生命值", true, "BuffTimeHeal", "#00CC00", "#66FF66", "", "");
+            config[300008] = new BuffConfig(300008, "攻击提升", "攻", "按数值提升自身攻击力", true, "BuffAtkAdd", "", "", "", "");
+            config[300009] = new BuffConfig(300009, "汲血快攻", "汲", "攻击时按造成伤害吸血，并提升攻速", true, "BuffSuckHaste", "#FF0000", "#993333", "HeartStream", "");
+            config[300010] = new BuffConfig(300010, "御风疾驰", "翼", "提升攻速与移动速度", true, "BuffHasteMoveSpeed", "", "", "HeartStream", "");
             config[301001] = new BuffConfig(301001, "混乱", "乱", "眩晕，无法行动", false, "BuffNoAction", "", "", "StunnedCirclingStarsSimple", "");
             config[301002] = new BuffConfig(301002, "连锁", "锁", "被攻击时，向范围内同样带连锁的友军传递同比例伤害", false, "BuffLock", "", "", "StunnedLock", "");
             config[301003] = new BuffConfig(301003, "增伤", "伤", "受到的伤害按比例增加", false, "BuffDamagedAddRate", "", "", "StunnedDamageUp", "");

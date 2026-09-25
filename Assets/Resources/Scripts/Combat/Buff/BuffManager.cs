@@ -53,6 +53,15 @@ public static class BuffManager
             case "BuffTimeHeal":
                 buff = new BuffTimeHeal(buffId, skillId, caster, target, time);
                 break;
+            case "BuffAtkAdd":
+                buff = new BuffAtkAdd(buffId, skillId, caster, target, time);
+                break;
+            case "BuffSuckHaste":
+                buff = new BuffSuckHaste(buffId, skillId, caster, target, time);
+                break;
+            case "BuffHasteMoveSpeed":
+                buff = new BuffHasteMoveSpeed(buffId, skillId, caster, target, time);
+                break;
 
         }
 

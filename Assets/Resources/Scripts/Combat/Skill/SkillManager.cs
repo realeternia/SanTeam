@@ -27,6 +27,14 @@ public static class SkillManager
                 return new SkillHelpAidBuff(skillId, owner);
             case "AidBuffLowHp":
                 return new SkillAidBuffLowHp(skillId, owner);
+            case "AidBuffAtk":
+                return new SkillAidBuffAtk(skillId, owner);
+            case "AidBuffHasteSteal":
+                return new SkillAidBuffHasteSteal(skillId, owner);
+            case "AidBuffHasteMoveSpeed":
+                return new SkillAidBuffHasteMoveSpeed(skillId, owner);
+            case "AidBuffArea":
+                return new SkillAidBuffArea(skillId, owner);
             case "AttackShieldPierce":
                 return new SkillAttackShieldPierce(skillId, owner);
             case "AttackArmorPierce":

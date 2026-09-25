@@ -44,11 +44,18 @@ public class MainForm : Form
     private CanvasPanel _canvas;
     private RichTextBox _logBox;   // 最右侧战斗日志（技能施放/伤害，按阵营着色）
 
+    // TabControl：Tab1 选择英雄/配置，Tab2 战况（每格子单位实时属性 + Buff）
+    private TabControl _tabs;
+    private TabPage _tabSetup;
+    private TabPage _tabBattle;
+    private ListView _statusView;
+
     private int _skillLogIdx;      // 技能日志已消费游标
     private int _hitLogIdx;        // 伤害日志已消费游标
 
     private float _speed = 0.5f;   // 默认 0.5x（原 1x 过快，减半）
     private float _stepAcc;        // 速度累计器：支持 0.5x 等非整数档
+    private int _statusTick;       // 战况表刷新节流计数（每 5 帧刷一次，且仅在战况 Tab 激活时）
     private bool _paused = true;
     private bool _battleDone;
 
@@ -81,6 +88,7 @@ public class MainForm : Form
 
         BuildUi();
         LoadLineup();   // 启动读取上次保存的双方阵容与等级（无存档则用默认阵容）
+        _tabs.SelectedIndexChanged += (_s, _e) => { if (_tabs.SelectedIndex == 1) RefreshStatusView(); };
         this.FormClosing += (_s, _e) => SaveLineup();
         _timer = new Timer { Interval = 16 };
         _timer.Tick += (_s, _e) => Tick();
@@ -94,23 +102,55 @@ public class MainForm : Form
     private void BuildUi()
     {
         int left = 10, top = 8, h = 26;
+        const int tabContentH = 196;   // Tab 内容区高度（仅选阵两行：选择控件 + 阵容列表）
         Label lbl;
 
+        // 顶部 TabControl：选阵 / 战况；下方画布 + 日志
+        _tabs = new TabControl { Left = left, Top = 6, Width = ClientSize.Width - 2 * left, Height = tabContentH + 24 };
+        _tabSetup = new TabPage("选择英雄");
+        _tabBattle = new TabPage("战况");
+        _tabs.TabPages.Add(_tabSetup);
+        _tabs.TabPages.Add(_tabBattle);
+        Controls.Add(_tabs);
+
+        // ---- Tab2 战况：每格子单位的实时属性 + Buff 列表 ----
+        _statusView = new ListView
+        {
+            Dock = DockStyle.Fill,
+            View = View.Details,
+            FullRowSelect = true,
+            GridLines = true,
+            BackColor = SDColor.FromArgb(24, 30, 42),
+            ForeColor = SDColor.LightGray,
+            HeaderStyle = ColumnHeaderStyle.Nonclickable,
+            Font = new Font("Microsoft YaHei", 9),
+            BorderStyle = BorderStyle.None,
+        };
+        foreach (var col in new[]
+        {
+            ("名字", 140), ("阵营", 46), ("生命", 96), ("攻击", 60), ("AP", 56),
+            ("护甲", 60), ("魔抗", 60), ("射程", 60), ("攻速", 66), ("蓝回复", 66), ("等级", 46), ("BUFF", 320),
+        })
+            _statusView.Columns.Add(new ColumnHeader { Text = col.Item1, Width = col.Item2 });
+        EnableDoubleBuffer(_statusView);
+        _tabBattle.Controls.Add(_statusView);
+
+        // ---- Tab1 选择英雄：原顶部配置区 ----
         // seed
         lbl = new Label { Text = "seed:", Left = left, Top = top + 5, Width = 40 };
-        Controls.Add(lbl);
+        _tabSetup.Controls.Add(lbl);
         _seedBox = new TextBox { Text = "1", Left = left + 45, Top = top, Width = 60 };
-        Controls.Add(_seedBox);
+        _tabSetup.Controls.Add(_seedBox);
 
         // 每侧小兵数量
         lbl = new Label { Text = "小兵:", Left = left + 115, Top = top + 5, Width = 40 };
-        Controls.Add(lbl);
+        _tabSetup.Controls.Add(lbl);
         _soldierBox = new NumericUpDown { Left = left + 150, Top = top, Width = 56, Minimum = 0, Maximum = 10, Value = 0 };
-        Controls.Add(_soldierBox);
+        _tabSetup.Controls.Add(_soldierBox);
 
         // 英雄下拉选择
         lbl = new Label { Text = "选择英雄:", Left = left + 220, Top = top + 5, Width = 60 };
-        Controls.Add(lbl);
+        _tabSetup.Controls.Add(lbl);
         _heroBox = new ComboBox { Left = left + 280, Top = top, Width = 300, DropDownStyle = ComboBoxStyle.DropDownList };
         foreach (var hid in HeroConfig.ConfigList
                      .Where(c => ConfigManager.IsHeroCard((int)c.Id))
@@ -119,57 +159,58 @@ public class MainForm : Form
             _heroBox.Items.Add(hid);
         if (_heroBox.Items.Count > 0)
             _heroBox.SelectedIndex = 0;
-        Controls.Add(_heroBox);
+        _tabSetup.Controls.Add(_heroBox);
 
         // 加入英雄的等级（1~5，默认1）
         lbl = new Label { Text = "Lv:", Left = left + 584, Top = top + 5, Width = 30 };
-        Controls.Add(lbl);
+        _tabSetup.Controls.Add(lbl);
         _levelBox = new ComboBox { Left = left + 608, Top = top, Width = 52, DropDownStyle = ComboBoxStyle.DropDownList };
         _levelBox.Items.AddRange(new object[] { "1", "2", "3", "4", "5" });
         _levelBox.SelectedIndex = 0;
-        Controls.Add(_levelBox);
+        _tabSetup.Controls.Add(_levelBox);
 
         _toABtn = new Button { Text = "→甲", Left = left + 664, Top = top, Width = 46 };
         _toABtn.Click += (_s, _e) => AddToTeam(_teamAList);
-        Controls.Add(_toABtn);
+        _tabSetup.Controls.Add(_toABtn);
         _toBBtn = new Button { Text = "→乙", Left = left + 714, Top = top, Width = 46 };
         _toBBtn.Click += (_s, _e) => AddToTeam(_teamBList);
-        Controls.Add(_toBBtn);
+        _tabSetup.Controls.Add(_toBBtn);
         _randomABtn = new Button { Text = "随机甲", Left = left + 766, Top = top, Width = 60 };
         _randomABtn.Click += (_s, _e) => { FillRandom(_teamAList); };
-        Controls.Add(_randomABtn);
+        _tabSetup.Controls.Add(_randomABtn);
         _randomBBtn = new Button { Text = "随机乙", Left = left + 830, Top = top, Width = 60 };
         _randomBBtn.Click += (_s, _e) => { FillRandom(_teamBList); };
-        Controls.Add(_randomBBtn);
+        _tabSetup.Controls.Add(_randomBBtn);
         top += h + 4;
 
         // 甲阵容列表
         lbl = new Label { Text = "甲(英雄):", Left = left, Top = top + 5, Width = 70 };
-        Controls.Add(lbl);
+        _tabSetup.Controls.Add(lbl);
         _teamAList = new ListBox { Left = left + 75, Top = top, Width = 380, Height = 150 };
         _teamAList.Items.AddRange(ParseHeroList("101001,101002,103007"));
-        Controls.Add(_teamAList);
+        _tabSetup.Controls.Add(_teamAList);
         _removeABtn = new Button { Text = "移除", Left = left + 460, Top = top, Width = 60 };
         _removeABtn.Click += (_s, _e) => RemoveSelected(_teamAList);
-        Controls.Add(_removeABtn);
+        _tabSetup.Controls.Add(_removeABtn);
 
         // 乙阵容列表
         lbl = new Label { Text = "乙(英雄):", Left = left + 545, Top = top + 5, Width = 70 };
-        Controls.Add(lbl);
+        _tabSetup.Controls.Add(lbl);
         _teamBList = new ListBox { Left = left + 620, Top = top, Width = 380, Height = 150 };
         _teamBList.Items.AddRange(ParseHeroList("102001,102002,102003"));
-        Controls.Add(_teamBList);
+        _tabSetup.Controls.Add(_teamBList);
         _removeBBtn = new Button { Text = "移除", Left = left + 1005, Top = top, Width = 60 };
         _removeBBtn.Click += (_s, _e) => RemoveSelected(_teamBList);
-        Controls.Add(_removeBBtn);
+        _tabSetup.Controls.Add(_removeBBtn);
         top += 154;
 
-        // 控制按钮
-        _startBtn = new Button { Text = "开始", Left = left, Top = top, Width = 70 };
+        // 公用控制按钮（放 Tab 外，任何页都可用）：开始/暂停/重置/速度/状态
+        int ctrlTop = _tabs.Bottom + 4;
+        _startBtn = new Button { Text = "开始", Left = left, Top = ctrlTop, Width = 70 };
         _startBtn.Click += (_s, _e) => StartBattle();
         Controls.Add(_startBtn);
 
-        _pauseBtn = new Button { Text = "暂停", Left = left + 76, Top = top, Width = 70 };
+        _pauseBtn = new Button { Text = "暂停", Left = left + 76, Top = ctrlTop, Width = 70 };
         _pauseBtn.Click += (_s, _e) =>
         {
             _paused = !_paused;
@@ -177,13 +218,13 @@ public class MainForm : Form
         };
         Controls.Add(_pauseBtn);
 
-        _resetBtn = new Button { Text = "重置", Left = left + 152, Top = top, Width = 70 };
+        _resetBtn = new Button { Text = "重置", Left = left + 152, Top = ctrlTop, Width = 70 };
         _resetBtn.Click += (_s, _e) => ResetBattle();
         Controls.Add(_resetBtn);
 
-        lbl = new Label { Text = "速度:", Left = left + 235, Top = top + 5, Width = 45 };
+        lbl = new Label { Text = "速度:", Left = left + 235, Top = ctrlTop + 5, Width = 45 };
         Controls.Add(lbl);
-        _speedBox = new ComboBox { Left = left + 280, Top = top, Width = 60, DropDownStyle = ComboBoxStyle.DropDownList };
+        _speedBox = new ComboBox { Left = left + 280, Top = ctrlTop, Width = 60, DropDownStyle = ComboBoxStyle.DropDownList };
         _speedBox.Items.AddRange(new object[] { "0.5x", "1x", "2x", "4x" });
         _speedBox.SelectedIndex = 0;
         _speedBox.SelectedIndexChanged += (_s, _e) =>
@@ -192,23 +233,23 @@ public class MainForm : Form
         };
         Controls.Add(_speedBox);
 
-        _statusLabel = new Label { Left = left + 360, Top = top + 5, AutoSize = true, ForeColor = SDColor.Gray };
+        _statusLabel = new Label { Left = left + 360, Top = ctrlTop + 5, AutoSize = true, ForeColor = SDColor.Gray };
         Controls.Add(_statusLabel);
-        top += h + 8;
 
         // 画布（左侧战场）+ 右侧日志窗口
         const int logW = 330;
+        int canvasTop = ctrlTop + h + 8;
         int canvasW = Math.Max(400, ClientSize.Width - 2 * left - 16 - logW - 16);
-        _canvas = new CanvasPanel { Left = left, Top = top, Width = canvasW, Height = ClientSize.Height - top - 16 };
+        _canvas = new CanvasPanel { Left = left, Top = canvasTop, Width = canvasW, Height = ClientSize.Height - canvasTop - 16 };
         _canvas.BackColor = SDColor.FromArgb(30, 36, 52);
         Controls.Add(_canvas);
 
         _logBox = new RichTextBox
         {
             Left = left + canvasW + 16,
-            Top = top,
+            Top = canvasTop,
             Width = logW,
-            Height = ClientSize.Height - top - 16,
+            Height = ClientSize.Height - canvasTop - 16,
             ReadOnly = true,
             Multiline = true,
             ScrollBars = RichTextBoxScrollBars.Vertical,
@@ -220,6 +261,68 @@ public class MainForm : Form
             BorderStyle = BorderStyle.FixedSingle,
         };
         Controls.Add(_logBox);
+    }
+
+    // 刷新"战况"Tab：逐行列出全部单位的实时属性与 Buff（甲蓝/乙红；死亡单位整行变灰；护盾 Buff 显示护盾剩余值）
+    private void RefreshStatusView()
+    {
+        if (_statusView == null || ReferenceEquals(_battle, null) || _battle.World == null)
+            return;
+        var list = _battle.World.chessList;
+        if (list == null)
+            return;
+        _statusView.BeginUpdate();
+        _statusView.Items.Clear();
+        foreach (var ch in list)
+        {
+            if (ch == null)
+                continue;
+            bool dead = ch.hp <= 0;   // 死亡单位整行变灰，仍保留显示
+            string name = ch.isHero
+                ? (ch.heroId > 0 && HeroConfig.HasConfig(ch.heroId) ? HeroConfig.GetConfig(ch.heroId).Name : "英雄#" + ch.heroId)
+                : "士兵#" + ch.soldierId;
+            string side = ch.side == 1 ? "甲" : "乙";
+            string hp = ch.hp + "/" + ch.maxHp;
+            string range = ch.attackRange.ToString("0");
+            string aspd = ch.attackSpeed.ToString("0.##");
+            string mpr = ch.mpRegen.ToString("0.##");
+
+            // Buff 列表：BuffConfig.GetConfig(b.id).Name + 剩余秒数；护盾 Buff(BuffShield) 括号内显示护盾剩余值
+            var buffSb = new System.Text.StringBuilder();
+            float now = Time.time;
+            if (ch.buffs != null)
+            {
+                foreach (var b in ch.buffs)
+                {
+                    if (b == null)
+                        continue;
+                    string bname = "?" + b.id;
+                    var bcfg = BuffConfig.GetConfig(b.id);
+                    if (bcfg != null) bname = bcfg.Name;
+                    if (b is BuffShield)
+                        buffSb.Append(bname).Append("(").Append(((BuffShield)b).GetHp().ToString("0")).Append(") ");
+                    else
+                        buffSb.Append(bname).Append("(").Append((b.endTime - now).ToString("0")).Append("s) ");
+                }
+            }
+
+            var item = new ListViewItem(name);
+            item.SubItems.Add(side);
+            item.SubItems.Add(hp);
+            item.SubItems.Add(ch.atk.ToString());
+            item.SubItems.Add(ch.ap.ToString());
+            item.SubItems.Add(ch.armor.ToString());
+            item.SubItems.Add(ch.magicRes.ToString());
+            item.SubItems.Add(range);
+            item.SubItems.Add(aspd);
+            item.SubItems.Add(mpr);
+            item.SubItems.Add(ch.level.ToString());
+            item.SubItems.Add(buffSb.ToString().TrimEnd());
+            item.ForeColor = dead ? SDColor.Gray
+                : (ch.side == 1 ? SDColor.FromArgb(120, 180, 255) : SDColor.FromArgb(255, 150, 120));
+            _statusView.Items.Add(item);
+        }
+        _statusView.EndUpdate();
     }
 
     // 把下拉选中的英雄（按当前等级）加到对应阵容（去重，最多 5 个）
@@ -325,6 +428,7 @@ public class MainForm : Form
         _battle.Setup(teamA, teamB, soldierCount);
         _battle.Start(seed);
         _stepAcc = 0;
+        _statusTick = 0;
         _paused = false;
         _battleDone = false;
         _pauseBtn.Text = "暂停";
@@ -335,6 +439,8 @@ public class MainForm : Form
         _skillLogIdx = 0;
         _hitLogIdx = 0;
         SaveLineup();
+        RefreshStatusView();
+        if (_tabs != null) _tabs.SelectedIndex = 1;   // 进入战斗后切到"战况"Tab
         _canvas.Invalidate();
     }
 
@@ -415,12 +521,15 @@ public class MainForm : Form
         _stepAcc = 0;
         _paused = true;
         _battleDone = false;
+        _statusTick = 0;
         _pauseBtn.Text = "暂停";
         _statusLabel.Text = "已重置，点击开始";
         _statusLabel.ForeColor = SDColor.Gray;
         if (_logBox != null) _logBox.Clear();
         _skillLogIdx = 0;
         _hitLogIdx = 0;
+        if (_tabs != null) _tabs.SelectedIndex = 0;   // 重置后回到"选择英雄"Tab
+        RefreshStatusView();
         _canvas.Invalidate();
     }
 
@@ -441,11 +550,32 @@ public class MainForm : Form
                     + "（时长 " + _battle.BattleTime.ToString("F1") + "s）";
                 _statusLabel.ForeColor = SDColor.Orange;
                 Utf8Console.WriteLine(_battle.GetResultSummary());
+                if (BattleTabActive) RefreshStatusView();   // 结束帧强制刷新最终状态
                 break;
             }
         }
         FlushLog();
+        RefreshStatusViewThrottled();
         _canvas.Invalidate();
+    }
+
+    // 战况表节流刷新：只有当"战况"Tab 激活、且累计够 5 帧才重绘，避免整帧持续 Clear/重建导致卡顿+闪烁
+    private bool BattleTabActive { get { return _tabs != null && _tabs.SelectedIndex == 1; } }
+    private void RefreshStatusViewThrottled()
+    {
+        _statusTick++;
+        if (!BattleTabActive || _statusTick % 5 != 0)
+            return;
+        RefreshStatusView();
+    }
+
+    // 开启列表控件的双缓冲（ListView 默认不开，频繁刷新会闪烁）
+    private static void EnableDoubleBuffer(Control c)
+    {
+        var prop = typeof(Control).GetProperty("DoubleBuffered",
+            System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+        if (prop != null)
+            prop.SetValue(c, true, null);
     }
 
     // ---------- 战斗日志（右侧窗口） ----------

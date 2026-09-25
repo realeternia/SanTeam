@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <!-- Generated file, do not modify, your changes will be overwritten (use AssetPostprocessor.OnGeneratedCSProject) -->
   <PropertyGroup>
@@ -70,6 +70,9 @@
     <Compile Include="Assets\Resources\Scripts\SystemTip.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidJumpHeal.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffShieldValue.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffAtkAdd.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffSuckHaste.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffHasteMoveSpeed.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Missile.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillHitBuffArea.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffNoMove.cs" />
@@ -81,6 +84,10 @@
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillHitBuff.cs" />
     <Compile Include="Assets\Resources\Scripts\WorldManager.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidBuffLowHp.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidBuffAtk.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidBuffHasteSteal.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidBuffHasteMoveSpeed.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidBuffArea.cs" />
     <Compile Include="Assets\Resources\Scripts\GameManager.cs" />
     <Compile Include="Assets\DOTween\Modules\DOTweenModuleAudio.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\ILoopScrollItem.cs" />
