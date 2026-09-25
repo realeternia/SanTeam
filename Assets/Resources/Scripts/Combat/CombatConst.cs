@@ -10,6 +10,8 @@ public static class CombatConst
     public const int ShieldValueBuffId = 300002;
     /// <summary>连锁(BuffLock)</summary>
     public const int LockBuffId = 301002;
+    /// <summary>筑垒(BuffBuildFort)：张昭·筑垒 双防永久强化+死亡原地复活标记</summary>
+    public const int BuildFortBuffId = 300011;
 
     // ---- 伤害标签(SkillConfig.HurtTag) ----
     /// <summary>AntiShield：绕过护盾直接打血（破盾类技能，BuffShield 判定该标签不吸收）</summary>
@@ -29,7 +31,7 @@ public static class CombatConst
     /// <summary>仁德：给与我方前排士兵护盾（技能表 仁 的5级行）</summary>
     public const int SoldierShieldSkillId = 2090035;
     /// <summary>连锁：锁定目标并传递伤害（技能表 锁 的5级行）</summary>
-    public const int LockSkillId = 2030025;
+    public const int LockSkillId = 2020390;
 
     // ---- 国家护盾机制(同阵营连线，数值参考金铲铲神盾使羁绊) ----
     /// <summary>同阵营英雄数量档位(2/3/4/5/6，对应国家护盾技能 Lv1~5)</summary>

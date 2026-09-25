@@ -62,6 +62,12 @@ public static class BuffManager
             case "BuffHasteMoveSpeed":
                 buff = new BuffHasteMoveSpeed(buffId, skillId, caster, target, time);
                 break;
+            case "BuffBuildFort":
+                buff = new BuffBuildFort(buffId, skillId, caster, target, time);
+                break;
+            case "BuffHitStun":
+                buff = new BuffHitStun(buffId, skillId, caster, target, time);
+                break;
 
         }
 

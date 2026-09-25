@@ -55,9 +55,22 @@ description: 编写《三国卡牌》(金铲铲式)战斗技能与数值配置�
 
 - `SkillConfig` 的 `BuffId` 为 `string` 类型，存 `BuffConfig` 的 `NameS` 短名（空字符串表示无 buff）。
 - 技能/Buff 常量归 `CombatConst`；不变的通用技能 Sname（如强击等）命名尽量见名知意。
+  - 例外：某技能**专属**的机制数值/短名（如复活延迟、某项效果 Buff 的短名）就近放对应 Skill/Buff 文件（`public const`），勿堆进 CombatConst；跨文件共享用"主技能类名.常量"引用（如 `SkillSoldierStun.StunBuffNameS`、`BuffBuildFort.ReviveDelay`）。
 
 ## 八、落地后核对清单
 
 - 技能文件已加 `<Compile Include>`（`Assembly-CSharp.csproj`）。
 - 全工程 `Grep` 旧字段/旧 Id 确认无残留引用。
 - 描述各等级数值与实机一一对应，`Descript` 内联的 `/字段名` 与对应字段值一致。
+
+## 九、相职业技能实现经验（本工程落地要点）
+
+- **类名用英文**：技能类与 `ScriptName` 用英文（如 `SkillSoldierShield/SkillSoldierBuff/SkillSoldierFortify/SkillSoldierStun/SkillSoldierArcherBuff/SkillSoldierBless`），不要用拼音（`SkillFujun` 等）。
+- **Sname＝英雄名**：武将专属技能 `Sname` 取英雄名（乱阵→贾诩、抚军→蒋琬……），`Name` 保留技能名；`HeroConfig.Skill1` 挂 Sname。多个技能若同属一英雄（主动+被动）共用 Sname 会与 `ConfigManager` 的 Sname 去重(`PostModify`)、`GetSkillConfig`、`Skill.SetLevel` 冲突——处理见下条。
+- **被动/常驻友军加成优先做 Buff，而非独立被动技能行**：
+  - `Buff` 基类自带 `OnAttack/OnAttacked` 等钩子，且 `SkillManager.OnAttack` 会遍历 `unit.buffs`——给单位挂 Buff 即可让普攻/受击触发效果，无需单独被动技能。
+  - 独立被动技能行若与主动技共用 Sname 会导致 Sname 去重/GetSkillConfig/SetLevel 三处错乱；故先考虑 Buff 方案。
+  - 主动技 `BattleBegin` 按 `skillCfg.BuffId`（配到 config）给友军 `AddBuff(承伤buff, time=999)`，Buff 内读 `skillCfg.Strength/Strength2/StrengthInt` 等做被动行为。
+- **主动技 Rate 勿放带概率的被动**：`Rate=0` 表示必然发动（`CheckBurst` 随机判定）。主动技固定触发就不要填 Rate；被动需要的概率改用独立字段（如 `StrengthInt` 整型百分数，描述用 `/strengthint%`）。
+- **BuffId 一槽只能装一种 buff**：同一技能若既要"主动命中给目标上效果"，又要"BattleBegin 给友军挂承伤/被动 buff"会冲突。做法：把承伤/被动 buff 配到 `skill.BuffId`；主动技自身要施加的 effect 用常量/短名另行引用（如 `StunBuffNameS="乱"`）。
+- **死亡原地复活**：用 `IEnumerator` 协程（骑在 `WorldManager` 上），`Chess.Ondying` 校验 Buff 标记后启动，延迟后经 `SpawnUnitsForRegion` 原地重建（满血，每名至多一次）。

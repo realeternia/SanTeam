@@ -9,7 +9,7 @@ using System.Collections.Generic;
 using CommonConfig;
 using UnityEngine;
 
-public class WorldManager
+public class WorldManager : MonoBehaviour
 {
     public static WorldManager Instance;
 

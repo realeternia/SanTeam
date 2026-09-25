@@ -140,6 +140,8 @@ namespace CommonConfig
             config[300008] = new BuffConfig(300008, "攻击提升", "攻", "按数值提升自身攻击力", true, "BuffAtkAdd", "", "", "", "");
             config[300009] = new BuffConfig(300009, "汲血快攻", "汲", "攻击时按造成伤害吸血，并提升攻速", true, "BuffSuckHaste", "#FF0000", "#993333", "HeartStream", "");
             config[300010] = new BuffConfig(300010, "御风疾驰", "翼", "提升攻速与移动速度", true, "BuffHasteMoveSpeed", "", "", "HeartStream", "");
+            config[300011] = new BuffConfig(300011, "筑垒", "垒", "双防永久强化，死亡后3秒原地复活(仅一次)", true, "BuffBuildFort", "", "", "", "");
+            config[300012] = new BuffConfig(300012, "乱阵", "威", "携带者普攻按概率眩晕目标，眩晕持续/bufftime秒", true, "BuffHitStun", "", "", "", "");
             config[301001] = new BuffConfig(301001, "混乱", "乱", "眩晕，无法行动", false, "BuffNoAction", "", "", "StunnedCirclingStarsSimple", "");
             config[301002] = new BuffConfig(301002, "连锁", "锁", "被攻击时，向范围内同样带连锁的友军传递同比例伤害", false, "BuffLock", "", "", "StunnedLock", "");
             config[301003] = new BuffConfig(301003, "增伤", "伤", "受到的伤害按比例增加", false, "BuffDamagedAddRate", "", "", "StunnedDamageUp", "");

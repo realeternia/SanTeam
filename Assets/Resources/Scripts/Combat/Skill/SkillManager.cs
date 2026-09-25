@@ -127,6 +127,19 @@ public static class SkillManager
             case "LowHpFullHealShield":
                 return new SkillLowHpFullHealShield(skillId, owner);
 
+            case "SoldierShield":
+                return new SkillSoldierShield(skillId, owner);
+            case "SoldierBuff":
+                return new SkillSoldierBuff(skillId, owner);
+            case "SoldierFortify":
+                return new SkillSoldierFortify(skillId, owner);
+            case "SoldierStun":
+                return new SkillSoldierStun(skillId, owner);
+            case "SoldierArcherBuff":
+                return new SkillSoldierArcherBuff(skillId, owner);
+            case "SoldierBless":
+                return new SkillSoldierBless(skillId, owner);
+
             case "Dumb":
                 return new SkillDumb(skillId, owner);               
         }
