@@ -148,6 +148,14 @@ namespace CommonConfig
             config[301004] = new BuffConfig(301004, "减速", "慢", "移动速度与攻击速度降低", false, "BuffSpeedDown", "", "", "SlowAuraYellow", "");
             config[301005] = new BuffConfig(301005, "陷阵", "停", "无法移动", false, "BuffNoMove", "", "", "AuraSoftPurple", "");
             config[301006] = new BuffConfig(301006, "溃败", "败", "持续受到随时间结算的伤害", false, "BuffTimeDamage", "", "", "BloodExplosion", "");
+            config[300013] = new BuffConfig(300013, "减攻", "慑", "降低目标攻击力", false, "BuffAtkDown", "", "", "", "");
+            config[300014] = new BuffConfig(300014, "减疗", "疫", "降低目标受到的治疗效果", false, "BuffHealDown", "", "", "", "");
+            config[300015] = new BuffConfig(300015, "闪避", "闪", "提升闪避几率", true, "BuffEvasion", "", "", "", "");
+            config[300016] = new BuffConfig(300016, "多重箭", "箭", "攻击时额外射出多支箭", true, "BuffMultiShot", "", "", "", "");
+            config[300017] = new BuffConfig(300017, "倍击", "倍", "接下来数次攻击造成加倍伤害", true, "BuffNextAttacksMult", "", "", "", "");
+            config[300018] = new BuffConfig(300018, "减防", "破", "降低目标护甲", false, "BuffArmorDown", "", "", "", "");
+            config[300019] = new BuffConfig(300019, "袭杀", "袭", "攻击增伤并吸血", true, "BuffLifeStealAndDamage", "", "", "", "");
+            config[300020] = new BuffConfig(300020, "减速", "缓", "降低目标移动与攻速", false, "BuffSlowDown", "", "", "", "");
 
             RebuildIndex();
 

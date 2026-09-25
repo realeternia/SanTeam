@@ -68,6 +68,30 @@ public static class BuffManager
             case "BuffHitStun":
                 buff = new BuffHitStun(buffId, skillId, caster, target, time);
                 break;
+            case "BuffAtkDown":
+                buff = new BuffAtkDown(buffId, skillId, caster, target, time);
+                break;
+            case "BuffHealDown":
+                buff = new BuffHealDown(buffId, skillId, caster, target, time);
+                break;
+            case "BuffArmorDown":
+                buff = new BuffArmorDown(buffId, skillId, caster, target, time);
+                break;
+            case "BuffSlowDown":
+                buff = new BuffSlowDown(buffId, skillId, caster, target, time);
+                break;
+            case "BuffEvasion":
+                buff = new BuffEvasion(buffId, skillId, caster, target, time);
+                break;
+            case "BuffMultiShot":
+                buff = new BuffMultiShot(buffId, skillId, caster, target, time);
+                break;
+            case "BuffNextAttacksMult":
+                buff = new BuffNextAttacksMult(buffId, skillId, caster, target, time);
+                break;
+            case "BuffLifeStealAndDamage":
+                buff = new BuffLifeStealAndDamage(buffId, skillId, caster, target, time);
+                break;
 
         }
 

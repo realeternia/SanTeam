@@ -142,6 +142,43 @@ public static class SkillManager
 
             case "Dumb":
                 return new SkillDumb(skillId, owner);               
+
+            case "SkillAidHexField":
+                return new SkillAidHexField(skillId, owner);
+            case "SkillAidQuake":
+                return new SkillAidQuake(skillId, owner);
+            case "SkillAidScorchedEarth":
+                return new SkillAidScorchedEarth(skillId, owner);
+            case "SkillAidEmpower":
+                return new SkillAidEmpower(skillId, owner);
+            case "SkillAidArmorIgnore":
+                return new SkillAidArmorIgnore(skillId, owner);
+            case "SkillAidFrenzy":
+                return new SkillAidFrenzy(skillId, owner);
+            case "SkillAidLastingFocus":
+                return new SkillAidLastingFocus(skillId, owner);
+            case "SkillAidBacklineHunt":
+                return new SkillAidBacklineHunt(skillId, owner);
+            case "SkillAidLifestealStrike":
+                return new SkillAidLifestealStrike(skillId, owner);
+            case "SkillAidVolley":
+                return new SkillAidVolley(skillId, owner);
+            case "SkillAidDance":
+                return new SkillAidDance(skillId, owner);
+            case "SkillAidAssault":
+                return new SkillAidAssault(skillId, owner);
+            case "SkillAidAtkDrain":
+                return new SkillAidAtkDrain(skillId, owner);
+            case "SkillAidScatterShot":
+                return new SkillAidScatterShot(skillId, owner);
+            case "SkillAidArmorShred":
+                return new SkillAidArmorShred(skillId, owner);
+            case "SkillAidBurstShot":
+                return new SkillAidBurstShot(skillId, owner);
+            case "SkillAidGuardian":
+                return new SkillAidGuardian(skillId, owner);
+            case "SkillAidPoisonArrow":
+                return new SkillAidPoisonArrow(skillId, owner);               
         }
 
         throw new System.Exception("Skill not found " + skillCfg.ScriptName);
