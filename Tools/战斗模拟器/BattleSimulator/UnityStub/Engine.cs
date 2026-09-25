@@ -67,7 +67,9 @@ namespace UnityEngine
             {
                 if (_persistentDataPath == null)
                 {
-                    _persistentDataPath = Path.Combine(Path.GetTempPath(), "BattleSimulator");
+                    // 数据根目录 = 模拟器目录（BattleSimulator）；GameLog 在其下生成 Logs/ 战斗日志
+                    _persistentDataPath = Path.GetFullPath(
+                        Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"..\.."));
                     if (!Directory.Exists(_persistentDataPath))
                         Directory.CreateDirectory(_persistentDataPath);
                 }

@@ -13,6 +13,32 @@ using System.Reflection;
 
 namespace UnityEngine
 {
+    // 活动对象注册表：跟踪战斗中的导弹（Missile 组件），供 GDI+ 主窗体绘制
+    internal static class LiveRegistry
+    {
+        public static readonly List<Missile> Missiles = new List<Missile>();
+
+        public static void NotifyCreated(Component comp)
+        {
+            if (comp is Missile m && !Missiles.Contains(m))
+                Missiles.Add(m);
+        }
+
+        public static void NotifyDestroyed(GameObject go)
+        {
+            for (int i = Missiles.Count - 1; i >= 0; i--)
+            {
+                if (Missiles[i] == null || Missiles[i].gameObject == null || Missiles[i].gameObject == go)
+                    Missiles.RemoveAt(i);
+            }
+        }
+
+        public static void Clear()
+        {
+            Missiles.Clear();
+        }
+    }
+
     public class Object
     {
         public string name;
@@ -221,6 +247,7 @@ namespace UnityEngine
             var comp = new T();
             comp._gameObject = go;
             InjectRenderFields(comp);
+            LiveRegistry.NotifyCreated(comp);
             return comp;
         }
 
@@ -229,6 +256,7 @@ namespace UnityEngine
             var comp = (Component)Activator.CreateInstance(type);
             comp._gameObject = go;
             InjectRenderFields(comp);
+            LiveRegistry.NotifyCreated(comp);
             return comp;
         }
 
@@ -290,7 +318,11 @@ namespace UnityEngine
 
         public void SetActive(bool value) { activeSelf = value; }
 
-        internal void SetDestroyed() { _destroyed = true; }
+        internal void SetDestroyed()
+        {
+            _destroyed = true;
+            LiveRegistry.NotifyDestroyed(this);
+        }
 
         public T AddComponent<T>() where T : Component, new()
         {

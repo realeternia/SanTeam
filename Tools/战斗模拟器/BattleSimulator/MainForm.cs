@@ -31,6 +31,7 @@ public class MainForm : Form
 
     // 控件
     private TextBox _seedBox;
+    private NumericUpDown _soldierBox;    // 每侧小兵数量（默认 0）
     private ComboBox _heroBox;            // 英雄下拉（id+名字）
     private Button _toABtn, _toBBtn;      // 添加到甲/乙
     private Button _removeABtn, _removeBBtn;
@@ -41,7 +42,8 @@ public class MainForm : Form
     private Label _statusLabel;
     private CanvasPanel _canvas;
 
-    private float _speed = 1f;
+    private float _speed = 0.5f;   // 默认 0.5x（原 1x 过快，减半）
+    private float _stepAcc;        // 速度累计器：支持 0.5x 等非整数档
     private bool _paused = true;
     private bool _battleDone;
 
@@ -53,6 +55,7 @@ public class MainForm : Form
     private static readonly string SkinDir = Path.GetFullPath(Path.Combine(
         AppDomain.CurrentDomain.BaseDirectory, @"..\..\..\..\..\Assets\Resources\Textures\Skins\"));
     private readonly Dictionary<string, Image> _iconCache = new Dictionary<string, Image>();
+    private readonly Font _dmgFont = new Font("Arial", 19, FontStyle.Bold);   // 伤害飘字字体
 
     // 下拉项：显示 "id 名字"，Tag 存 heroId
     private class HeroItem
@@ -90,10 +93,16 @@ public class MainForm : Form
         _seedBox = new TextBox { Text = "1", Left = left + 45, Top = top, Width = 60 };
         Controls.Add(_seedBox);
 
-        // 英雄下拉选择
-        lbl = new Label { Text = "选择英雄:", Left = left + 118, Top = top + 5, Width = 60 };
+        // 每侧小兵数量
+        lbl = new Label { Text = "小兵:", Left = left + 115, Top = top + 5, Width = 40 };
         Controls.Add(lbl);
-        _heroBox = new ComboBox { Left = left + 178, Top = top, Width = 300, DropDownStyle = ComboBoxStyle.DropDownList };
+        _soldierBox = new NumericUpDown { Left = left + 150, Top = top, Width = 56, Minimum = 0, Maximum = 10, Value = 0 };
+        Controls.Add(_soldierBox);
+
+        // 英雄下拉选择
+        lbl = new Label { Text = "选择英雄:", Left = left + 220, Top = top + 5, Width = 60 };
+        Controls.Add(lbl);
+        _heroBox = new ComboBox { Left = left + 280, Top = top, Width = 300, DropDownStyle = ComboBoxStyle.DropDownList };
         foreach (var hid in HeroConfig.ConfigList
                      .Where(c => ConfigManager.IsHeroCard((int)c.Id))
                      .Select(c => new HeroItem { Id = (int)c.Id, Name = c.Name })
@@ -103,16 +112,16 @@ public class MainForm : Form
             _heroBox.SelectedIndex = 0;
         Controls.Add(_heroBox);
 
-        _toABtn = new Button { Text = "→甲", Left = left + 484, Top = top, Width = 46 };
+        _toABtn = new Button { Text = "→甲", Left = left + 586, Top = top, Width = 46 };
         _toABtn.Click += (_s, _e) => AddToTeam(_teamAList);
         Controls.Add(_toABtn);
-        _toBBtn = new Button { Text = "→乙", Left = left + 534, Top = top, Width = 46 };
+        _toBBtn = new Button { Text = "→乙", Left = left + 636, Top = top, Width = 46 };
         _toBBtn.Click += (_s, _e) => AddToTeam(_teamBList);
         Controls.Add(_toBBtn);
-        _randomABtn = new Button { Text = "随机甲", Left = left + 586, Top = top, Width = 60 };
+        _randomABtn = new Button { Text = "随机甲", Left = left + 688, Top = top, Width = 60 };
         _randomABtn.Click += (_s, _e) => { FillRandom(_teamAList); };
         Controls.Add(_randomABtn);
-        _randomBBtn = new Button { Text = "随机乙", Left = left + 650, Top = top, Width = 60 };
+        _randomBBtn = new Button { Text = "随机乙", Left = left + 752, Top = top, Width = 60 };
         _randomBBtn.Click += (_s, _e) => { FillRandom(_teamBList); };
         Controls.Add(_randomBBtn);
         top += h + 4;
@@ -158,11 +167,11 @@ public class MainForm : Form
         lbl = new Label { Text = "速度:", Left = left + 235, Top = top + 5, Width = 45 };
         Controls.Add(lbl);
         _speedBox = new ComboBox { Left = left + 280, Top = top, Width = 60, DropDownStyle = ComboBoxStyle.DropDownList };
-        _speedBox.Items.AddRange(new object[] { "1x", "2x", "4x" });
+        _speedBox.Items.AddRange(new object[] { "0.5x", "1x", "2x", "4x" });
         _speedBox.SelectedIndex = 0;
         _speedBox.SelectedIndexChanged += (_s, _e) =>
         {
-            _speed = new[] { 1f, 2f, 4f }[_speedBox.SelectedIndex];
+            _speed = new[] { 0.5f, 1f, 2f, 4f }[_speedBox.SelectedIndex];
         };
         Controls.Add(_speedBox);
 
@@ -269,12 +278,15 @@ public class MainForm : Form
             return;
         }
 
-        _battle.Setup(teamA, teamB);
+        int soldierCount = (int)_soldierBox.Value;
+        _battle.Setup(teamA, teamB, soldierCount);
         _battle.Start(seed);
+        _stepAcc = 0;
         _paused = false;
         _battleDone = false;
         _pauseBtn.Text = "暂停";
-        _statusLabel.Text = "战斗进行中… 甲" + teamA.Count + " vs 乙" + teamB.Count;
+        _statusLabel.Text = "战斗进行中… 甲" + teamA.Count + "+" + soldierCount + "兵 vs 乙"
+            + teamB.Count + "+" + soldierCount + "兵";
         _statusLabel.ForeColor = SDColor.LimeGreen;
         _canvas.Invalidate();
     }
@@ -282,6 +294,7 @@ public class MainForm : Form
     private void ResetBattle()
     {
         _battle = new BattleSim();
+        _stepAcc = 0;
         _paused = true;
         _battleDone = false;
         _pauseBtn.Text = "暂停";
@@ -294,9 +307,11 @@ public class MainForm : Form
     {
         if (_paused || _battleDone || _battle == null)
             return;
-        int n = (int)_speed;
-        for (int i = 0; i < n; i++)
+        // 速度累计器：支持 0.5x 等非整数档位（每 16ms 帧累积，满 1 步则推进一次 0.05s）
+        _stepAcc += _speed;
+        while (_stepAcc >= 1f)
         {
+            _stepAcc -= 1f;
             _battle.Step(0.05f);
             if (_battle.IsFinished)
             {
@@ -320,10 +335,13 @@ public class MainForm : Form
             return;
 
         _viewCenter = new PointF(_canvas.Width / 2f, _canvas.Height / 2f + 20);
-        _scale = Math.Min(_canvas.Width, _canvas.Height) / 90f;
+        // 左右战斗：战场 z 向跨度 ±56（112），x 向跨度 ±26（52）
+        _scale = Math.Min(_canvas.Width / 112f, _canvas.Height / 52f);
 
         DrawGrids(g);
         DrawUnits(g);
+        DrawMissiles(g);
+        DrawHitFx(g);
 
         // 飘字（淡出）
         var texts = _battle.World.battleTexts;
@@ -390,14 +408,16 @@ public class MainForm : Form
             {
                 if (chess.isHero)
                 {
-                    float s = 22f;   // 方形边长
+                    float s = 44f;   // 方形边长（头像大一倍）
                     var rect = new RectangleF(sp.X - s / 2, sp.Y - s / 2, s, s);
                     var img = LoadIcon(chess.chessName);
                     if (img != null)
                         g.DrawImage(img, rect);
                     else
                         g.FillRectangle(brush, rect.X, rect.Y, rect.Width, rect.Height);
-                    g.DrawRectangle(border, (int)rect.X, (int)rect.Y, (int)rect.Width, (int)rect.Height);
+                    // 英雄外框用己方阵营色（甲蓝/乙红），2px
+                    using (var sideBorder = new Pen(col, 2f))
+                        g.DrawRectangle(sideBorder, (int)rect.X, (int)rect.Y, (int)rect.Width, (int)rect.Height);
                 }
                 else
                 {
@@ -409,23 +429,106 @@ public class MainForm : Form
 
             // HP 条
             float rate = chess.maxHp > 0 ? (float)chess.hp / chess.maxHp : 0;
-            float bw = chess.isHero ? 22f : 14f, bh = 3;
+            float bw = chess.isHero ? 44f : 14f, bh = 3;
+            float hpY = chess.isHero ? sp.Y - 26 : sp.Y - 13;
             using (var bg = new SolidBrush(SDColor.FromArgb(60, 60, 60)))
             using (var fg = new SolidBrush(SDColor.FromArgb(80, 220, 120)))
             using (var border = new Pen(SDColor.Black, 1))
             {
-                g.FillRectangle(bg, sp.X - bw / 2, sp.Y - 13, bw, bh);
-                g.FillRectangle(fg, sp.X - bw / 2, sp.Y - 13, bw * Math.Max(0, rate), bh);
-                g.DrawRectangle(border, sp.X - bw / 2, sp.Y - 13, bw, bh);
+                g.FillRectangle(bg, sp.X - bw / 2, hpY, bw, bh);
+                g.FillRectangle(fg, sp.X - bw / 2, hpY, bw * Math.Max(0, rate), bh);
+                g.DrawRectangle(border, sp.X - bw / 2, hpY, bw, bh);
             }
         }
     }
 
+    // 绘制导弹：空心小圆圈（无特效）
+    private void DrawMissiles(Graphics g)
+    {
+        using (var pen = new Pen(SDColor.FromArgb(255, 210, 120), 1.5f))
+        {
+            foreach (var m in LiveRegistry.Missiles)
+            {
+                if (m == null || m.gameObject == null)
+                    continue;
+                var sp = WorldToScreen(m.transform.position);
+                float r = 4f;
+                g.DrawEllipse(pen, sp.X - r, sp.Y - r, r * 2, r * 2);
+            }
+        }
+    }
+
+    // 绘制受击反馈：失血伤害数字飘字 + 血滴爆散 + 受击单位身上高亮描边环
+    private void DrawHitFx(Graphics g)
+    {
+        float now = Time.time;
+        SDColor blood = SDColor.FromArgb(235, 40, 40);
+        var alive = _battle.World.chessList;
+        foreach (var f in _battle.HitFx)
+        {
+            float age = now - f.time;
+            if (age < 0f || age > 1.0f)
+                continue;
+
+            // 1) 失血飘字：从受击点朝攻击方方向横飘并淡出（攻击方在左侧则向左、右侧则向右）
+            if (age < 0.8f)
+            {
+                float tt = age / 0.8f;
+                var sp = WorldToScreen(f.pos);
+                float offsetX = f.dirZ * tt * 30f;   // 朝攻击方水平飘
+                float rise = tt * 12f;               // 轻微上浮
+                int a = (int)((1f - tt) * 255);
+                using (var b = new SolidBrush(SDColor.FromArgb(a, 255, 70, 60)))
+                    g.DrawString("-" + f.damage, _dmgFont, b, sp.X - 12 + offsetX, sp.Y - 24 - rise);
+            }
+
+            // 2) 血滴爆散：命中位置向四周喷射多个血点，随寿命外扩、下落、淡出
+            int drops = 12;
+            for (int j = 0; j < drops; j++)
+            {
+                double ang = ((f.id * 31 + j * 57) % 360) * Math.PI / 180.0;
+                float tt = age / 0.55f;          // 血滴寿命 0.55s
+                if (tt > 1f)
+                    continue;
+                float cx = spCenterX(f.pos), cy = spCenterY(f.pos);
+                float dist = tt * 13f;                   // 外扩距离
+                float px = (float)(cx + Math.Cos(ang) * dist);
+                float py = (float)(cy + Math.Sin(ang) * dist + tt * tt * 9f); // 受重力下落
+                float rr = Math.Max(1f, 3.5f * (1f - tt));
+                int a = (int)((1f - tt) * 255);
+                using (var b = new SolidBrush(SDColor.FromArgb(a, blood.R, 60, blood.B)))
+                    g.FillEllipse(b, px - rr, py - rr, rr * 2, rr * 2);
+            }
+
+            // 3) 受击临时图形：命中单位身上一个不断扩大的高亮描边圆环
+            if (age < 0.4f)
+            {
+                Chess ch = null;
+                foreach (var c in alive)
+                {
+                    if (c != null && c.id == f.id && c.hp > 0) { ch = c; break; }
+                }
+                if (ch != null)
+                {
+                    var sp = WorldToScreen(ch.transform.position);
+                    float tt = age / 0.4f;
+                    float ringR = (ch.isHero ? 26f : 12f) * (1f + 0.8f * tt);
+                    int a = (int)((1f - tt) * 255);
+                    using (var pen = new Pen(SDColor.FromArgb(a, 255, 110, 110), 3f))
+                        g.DrawEllipse(pen, sp.X - ringR, sp.Y - ringR, ringR * 2, ringR * 2);
+                }
+            }
+        }
+    }
+
+    private float spCenterX(Vector3 wpos) { return _viewCenter.X + wpos.z * _scale; }
+    private float spCenterY(Vector3 wpos) { return _viewCenter.Y - wpos.x * _scale; }
+
     private PointF WorldToScreen(Vector3 wpos)
     {
-        // 世界 z 向上为屏幕方向（side1 -z 在屏幕上侧）
-        float sx = _viewCenter.X + wpos.x * _scale;
-        float sy = _viewCenter.Y - wpos.z * _scale;
+        // 左右战斗：世界 z → 屏幕 x（side1 在左、side2 在右），世界 x → 屏幕 y
+        float sx = _viewCenter.X + wpos.z * _scale;
+        float sy = _viewCenter.Y - wpos.x * _scale;
         return new PointF(sx, sy);
     }
 

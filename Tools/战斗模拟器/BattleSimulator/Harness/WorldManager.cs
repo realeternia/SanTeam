@@ -535,5 +535,6 @@ public class WorldManager
         hasWin = false;
         chessList.Clear();
         battleTexts.Clear();
+        LiveRegistry.Clear();
     }
 }

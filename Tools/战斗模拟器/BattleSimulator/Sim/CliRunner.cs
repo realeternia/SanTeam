@@ -4,6 +4,7 @@
 // 命令：
 //   help            显示帮助
 //   seed <n>        设置随机种子
+//   soldier <n>     设置每侧小兵数量（默认 0）
 //   a <ids>         设置甲阵容（如 a 101001,102001,103001）
 //   b <ids>         设置乙阵容
 //   clear           清空双方阵容（回退随机）
@@ -38,6 +39,7 @@ public static class CliRunner
         Utf8Console.WriteLine("=== 战斗模拟器 CLI（输入 help 查看命令，quit 退出） ===");
 
         int seed = 1;
+        int soldier = 0;
         List<int> teamA = null, teamB = null;
 
         while (true)
@@ -74,6 +76,16 @@ public static class CliRunner
                             Utf8Console.WriteLine("用法: seed <数字>");
                         break;
 
+                    case "soldier":
+                        if (parts.Length > 1 && int.TryParse(parts[1], out int sl))
+                        {
+                            soldier = Math.Max(0, sl);
+                            Utf8Console.WriteLine("每侧小兵=" + soldier);
+                        }
+                        else
+                            Utf8Console.WriteLine("用法: soldier <0-10>");
+                        break;
+
                     case "a": case "b":
                         if (parts.Length > 1)
                         {
@@ -94,20 +106,20 @@ public static class CliRunner
                         break;
 
                     case "show":
-                        PrintConfig(seed, teamA, teamB);
+                        PrintConfig(seed, teamA, teamB, soldier);
                         break;
 
                     case "rand":
-                        RunBattle(seed, null, null);
+                        RunBattle(seed, null, null, soldier);
                         break;
 
                     case "run":
-                        RunBattle(seed, teamA, teamB);
+                        RunBattle(seed, teamA, teamB, soldier);
                         break;
 
                     case "batch":
                         int n = (parts.Length > 1 && int.TryParse(parts[1], out int bn)) ? bn : 5;
-                        Batch(seed, n);
+                        Batch(seed, n, soldier);
                         break;
 
                     case "hero":
@@ -127,14 +139,15 @@ public static class CliRunner
     }
 
     // 用当前配置跑一场并打印结果（headless 入口也复用此方法）
-    public static void RunBattle(int seed, List<int> teamA, List<int> teamB)
+    public static void RunBattle(int seed, List<int> teamA, List<int> teamB, int soldierCount = 0)
     {
         var a = teamA ?? HeroLineup.PickRandomLineup(0);
         var b = teamB ?? HeroLineup.PickRandomLineup(1);
         var battle = new BattleSim();
-        battle.Setup(a, b);
+        battle.Setup(a, b, soldierCount);
         battle.Start(seed);
-        Utf8Console.WriteLine("seed=" + seed + " 阵容A=" + string.Join(",", a) + " 阵容B=" + string.Join(",", b));
+        Utf8Console.WriteLine("seed=" + seed + " 每侧小兵=" + soldierCount
+            + " 阵容A=" + string.Join(",", a) + " 阵容B=" + string.Join(",", b));
 
         var sw = Stopwatch.StartNew();
         int steps = 0;
@@ -151,7 +164,7 @@ public static class CliRunner
     }
 
     // 随机阵容连打 n 场（seed 递增），输出每场胜负与汇总
-    private static void Batch(int baseSeed, int n)
+    private static void Batch(int baseSeed, int n, int soldierCount = 0)
     {
         int winA = 0, winB = 0, draw = 0;
         for (int i = 0; i < n; i++)
@@ -159,7 +172,7 @@ public static class CliRunner
             var a = HeroLineup.PickRandomLineup(i * 2);
             var b = HeroLineup.PickRandomLineup(i * 2 + 1);
             var battle = new BattleSim();
-            battle.Setup(a, b);
+            battle.Setup(a, b, soldierCount);
             battle.Start(baseSeed + i);
             int steps = 0;
             while (!battle.IsFinished && steps < MaxSteps)
@@ -190,9 +203,10 @@ public static class CliRunner
             Utf8Console.WriteLine(h.Id + " " + h.Name);
     }
 
-    private static void PrintConfig(int seed, List<int> teamA, List<int> teamB)
+    private static void PrintConfig(int seed, List<int> teamA, List<int> teamB, int soldier)
     {
         Utf8Console.WriteLine("seed=" + seed);
+        Utf8Console.WriteLine("每侧小兵=" + soldier);
         Utf8Console.WriteLine("甲: " + (teamA != null ? string.Join(",", teamA) : "(随机)"));
         Utf8Console.WriteLine("乙: " + (teamB != null ? string.Join(",", teamB) : "(随机)"));
     }
@@ -201,6 +215,7 @@ public static class CliRunner
     {
         Utf8Console.WriteLine("命令列表:");
         Utf8Console.WriteLine("  seed <n>        设置随机种子");
+        Utf8Console.WriteLine("  soldier <n>     设置每侧小兵数量（默认 0）");
         Utf8Console.WriteLine("  a <ids>         设置甲阵容，如 a 101001,102001,103001");
         Utf8Console.WriteLine("  b <ids>         设置乙阵容");
         Utf8Console.WriteLine("  clear           清空双方阵容（回退随机）");
