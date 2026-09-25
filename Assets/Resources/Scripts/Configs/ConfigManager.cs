@@ -394,7 +394,7 @@ public static class ConfigManager
             if (input[i] == '/' && i + 1 < input.Length && char.IsLetter(input[i + 1]))
             {
                 int j = i + 1;
-                while (j < input.Length && (char.IsLetterOrDigit(input[j]) || input[j] == '_'))
+                while (j < input.Length && (char.IsLetterOrDigit(input[j]) || input[j] == '_' || input[j] == '-'))
                     j++;
                 var fieldName = input.Substring(i + 1, j - i - 1);
                 // 可选百分比修饰符：/字段名% 表示该数字字段按百分比输出（如 strength=0.3 -> 30%）
@@ -433,10 +433,56 @@ public static class ConfigManager
             case "effectsize": return pct ? PercentText(cfg.EffectSize) : cfg.EffectSize.ToString("0.##");
             case "mpcost": return cfg.MpCost.ToString();
             case "targetcount": return cfg.TargetCount.ToString();
-            case "strengthint": return cfg.StrengthInt.ToString();
+            case "strengthint": return pct ? (cfg.StrengthInt + "%") : cfg.StrengthInt.ToString();
             case "lv": return cfg.Lv.ToString();
-            default: return null;
+            case "name": return cfg.Name ?? "";
+            case "sname": return cfg.Sname ?? "";
+            case "type": return cfg.Type ?? "";
+            case "buffid": return cfg.BuffId ?? "";
+            case "summontag": return cfg.SummonTag ?? "";
+            case "summoncount": return cfg.SummonCount.ToString();
+            case "auroattrs": return cfg.AuroAttrs ?? "";
+            case "linkself": return cfg.LinkSelf ?? "";
+            case "linkteam": return cfg.LinkTeam ?? "";
+            default:
+                // 子字段引用：/字段-属性名（如 /auroattrs-atk、/linkself-armor、/linkteam-mpRegen）展开为其中单个具体属性数值
+                if (fieldName.StartsWith("auroattrs-", StringComparison.OrdinalIgnoreCase))
+                    return GetAttrFieldValue(cfg.AuroAttrs, fieldName.Substring("auroattrs-".Length), pct);
+                if (fieldName.StartsWith("linkself-", StringComparison.OrdinalIgnoreCase))
+                    return GetAttrFieldValue(cfg.LinkSelf, fieldName.Substring("linkself-".Length), pct);
+                if (fieldName.StartsWith("linkteam-", StringComparison.OrdinalIgnoreCase))
+                    return GetAttrFieldValue(cfg.LinkTeam, fieldName.Substring("linkteam-".Length), pct);
+                return null;
         }
+    }
+
+    // 从 "属性名+数值,..." 组合串中取指定属性的单个数值；pct=true 时按百分比输出（如 crit+0.03 -> 3%）
+    private static string GetAttrFieldValue(string attrs, string attrName, bool pct)
+    {
+        if (string.IsNullOrEmpty(attrs) || string.IsNullOrEmpty(attrName))
+            return null;
+        foreach (var rawSeg in attrs.Split(','))
+        {
+            var seg = rawSeg.Trim();
+            int i = 0;
+            while (i < seg.Length && (char.IsLetter(seg[i]) || seg[i] == '_'))
+                i++;
+            if (i == 0 || i >= seg.Length) continue;
+            if (!string.Equals(seg.Substring(0, i), attrName, StringComparison.OrdinalIgnoreCase))
+                continue;
+            var rest = seg.Substring(i).Trim();
+            float sign = 1f;
+            if (rest.StartsWith("-")) { sign = -1f; rest = rest.Substring(1).TrimStart(); }
+            else if (rest.StartsWith("+")) { rest = rest.Substring(1).TrimStart(); }
+            float v;
+            if (!float.TryParse(rest, System.Globalization.NumberStyles.Float,
+                                System.Globalization.CultureInfo.InvariantCulture, out v))
+                return null;
+            v *= sign;
+            if (pct) return (v * 100).ToString("0.##") + "%";
+            return v.ToString("0.##");
+        }
+        return null;
     }
 
     private static string PercentText(float v)

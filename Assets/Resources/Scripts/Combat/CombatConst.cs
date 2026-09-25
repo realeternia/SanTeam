@@ -37,8 +37,8 @@ public static class CombatConst
     /// <summary>国家护盾技能缩写（技能Id按 Lv 取 SkillConfig 2000001~2000005，护盾=最大生命×Strength）</summary>
     public const string FactionShieldSkillSname = "国";
 
-    /// <summary>主公(王/王)上阵：同阵营护盾额外加成（百分比，国家护盾技能内结算）</summary>
-    public const float KingShieldBonusRate = 0.1f;
+    /// <summary>主公(王/王)上阵：同阵营护盾额外加成技能缩写（诸侯职业技能"王"），护盾额外 = 该技能当级 Strength（国家护盾技能内结算）</summary>
+    public const string KingShieldBonusSkillSname = "王";
 
     // ---- 抗性减伤公式（参考金铲铲：实际伤害 = 原伤害 × 100/(100+抗性)） ----
     /// <summary>抗性减伤基准值（减伤% = 抗性/(抗性+基准值)，如50点抗性≈减伤33%）</summary>

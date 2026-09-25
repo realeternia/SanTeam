@@ -3,7 +3,7 @@ using CommonConfig;
 /// <summary>
 /// 国家护盾技能：战斗开始(BattleBegin)时按技能等级(1~5)给自身施加同阵营护盾。
 /// 护盾 = 最大生命 × Strength（0.15~0.75，对应配置行 2000001~2000005，同阵营 2~6 人）；
-/// 主公(王)上阵时护盾比例额外 +KingShieldBonusRate×王数（与旧默认护盾机制一致）。
+/// 主公(王)上阵时护盾比例额外 +诸侯职业技能(王)当级 Strength（与旧默认护盾机制一致）。
 /// 技能由 FactionShieldManager 在战斗开始时按同阵营人数授予对应等级，效果统一走 Buff 系统。
 /// </summary>
 public class SkillFactionShield : Skill
@@ -21,7 +21,7 @@ public class SkillFactionShield : Skill
             return;
         }
 
-        float rate = skillCfg.Strength + CombatConst.KingShieldBonusRate * CountKingOnSide();
+        float rate = skillCfg.Strength + GetKingShieldBonus();
         var shieldHp = (int)(owner.maxHp * rate);
         BuffManager.AddBuff(owner, owner, id, buffCfg.Id, skillCfg.BuffTime);
         var shield = owner.GetBuff(buffCfg.Id) as BuffShield;
@@ -40,5 +40,20 @@ public class SkillFactionShield : Skill
                 count++;
         }
         return count;
+    }
+
+    // 主公(王)上阵：同阵营护盾额外 = 诸侯职业技能(王)对应等级(王数)的 Strength（读取配置，不再硬编码 CombatConst.KingShieldBonusRate）
+    private float GetKingShieldBonus()
+    {
+        int kingCount = CountKingOnSide();
+        if (kingCount <= 0)
+            return 0f;
+        var kingSkill = ConfigManager.GetSkillConfig(CombatConst.KingShieldBonusSkillSname, kingCount);
+        if (kingSkill == null)
+        {
+            GameLog.Error($"诸侯技能配置缺失: Sname={CombatConst.KingShieldBonusSkillSname} Lv={kingCount}");
+            return 0f;
+        }
+        return kingSkill.Strength;
     }
 }

@@ -240,9 +240,24 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         if (count < CombatConst.FriendGoldMinCount)
             return 0;
 
-        int bonus = count * CombatConst.FriendGoldPerMember;
+        int bonus = GetFriendGoldBonus(count);
         GameLog.Debug($"每回合金币：玩家{pid}上阵{count}人，获得{bonus}金");
         return bonus;
+    }
+
+    // 每回合金币 = 生财技能(济)对应等级(济组在场人数)的 StrengthInt（配置驱动，不再硬编码 FriendGoldPerMember）
+    private int GetFriendGoldBonus(int count)
+    {
+        int lv = count - 1; // 济组在场人数→技能等级（2人Lv1…6人Lv5）
+        if (lv < 1) lv = 1;
+        if (lv > 5) lv = 5;
+        var goldCfg = ConfigManager.GetSkillConfig(CombatConst.FriendGoldSkillSname, lv);
+        if (goldCfg == null)
+        {
+            GameLog.Error($"生财技能配置缺失: Sname={CombatConst.FriendGoldSkillSname} Lv={lv}，回退每名+1");
+            return count * CombatConst.FriendGoldPerMember;
+        }
+        return goldCfg.StrengthInt;
     }
 
     public void OnEra(int era)
