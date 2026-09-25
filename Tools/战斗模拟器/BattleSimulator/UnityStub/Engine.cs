@@ -78,6 +78,14 @@ namespace UnityEngine
         }
 
         public static event Action<string, string, LogType> logMessageReceived;
+
+        // headless 复现时重定向数据目录，避免与正在运行的 GUI 实例抢写同一 GameLog 文件
+        public static void SetPersistentDataPath(string path)
+        {
+            _persistentDataPath = Path.GetFullPath(path);
+            if (!Directory.Exists(_persistentDataPath))
+                Directory.CreateDirectory(_persistentDataPath);
+        }
     }
 
     public static class Resources

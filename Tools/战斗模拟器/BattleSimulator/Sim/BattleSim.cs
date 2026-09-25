@@ -5,6 +5,7 @@
 // ============================================================
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using CommonConfig;
 using UnityEngine;
 
@@ -36,10 +37,23 @@ public class BattleSim
         public int damage;      // 本次掉血
         public float time;      // Time.time 命中时刻
         public float dirZ;      // 攻击方向（朝向攻击方，屏幕 x 偏移系数：+1 向右 / -1 向左）
+        public int side;        // 受击方阵营（1/2）
+        public string heroName; // 受击单位名（供日志显示）
+        public string attackerName; // 攻击方名（供"谁攻击谁"日志显示）
+        public int attackerSide;    // 攻击方阵营（1/2），日志按此方着色
+        public string skillName;    // 来源技能名（null=普攻），供日志区分技能/普攻伤害
+        public int shieldAbsorb;    // 本次被护盾吸收的伤害量（>0=有盾抵挡），日志区分"盾降低"与"实际受伤"
     }
 
     public readonly List<HitFxData> HitFx = new List<HitFxData>();
-    private readonly Dictionary<int, float> _hpBefore = new Dictionary<int, float>();
+    private readonly Dictionary<Skill, float> _skillMpBefore = new Dictionary<Skill, float>();
+
+    // 当前活跃战斗实例：订阅 Chess.OnDamageDealt 使用静态活跃实例，避免多实例事件累积
+    private static BattleSim _active;
+    static BattleSim()
+    {
+        Chess.OnDamageDealt += (a, v, d, sk) => { if (_active != null) _active.RecordDamage(a, v, d, sk); };
+    }
 
     // 构造：创建 GameManager（2 玩家）与 WorldManager
     public BattleSim()
@@ -56,11 +70,58 @@ public class BattleSim
         World = new WorldManager();
         WorldManager.Instance = World;
         World.SetupCenters();
+        _active = this;
     }
 
-    // 设置双方上阵英雄，并按固定布阵填 battleCards（士兵 + 英雄）
+    // 由 Chess.OnDamageDealt 事件驱动：每次伤害精确一次，生成飘字/日志数据（不靠血量差分，避免治疗/护盾/多段伤害漏记）
+    private void RecordDamage(Chess attacker, Chess victim, int damage, int skillId)
+    {
+        if (victim == null || attacker == null || damage <= 0)
+            return;
+        float dirZ = attacker.side == 1 ? 1f : -1f;
+
+        string victimName = "士兵#" + (victim.isHero ? victim.heroId : victim.soldierId);
+        if (victim.isHero && victim.heroId > 0 && HeroConfig.HasConfig(victim.heroId))
+            victimName = HeroConfig.GetConfig(victim.heroId).Name;
+
+        string atkName = "士兵#" + (attacker.isHero ? attacker.heroId : attacker.soldierId);
+        if (attacker.isHero && attacker.heroId > 0 && HeroConfig.HasConfig(attacker.heroId))
+            atkName = HeroConfig.GetConfig(attacker.heroId).Name;
+
+        string skillName = null;
+        if (skillId > 0)
+        {
+            var sk = SkillConfig.GetConfig(skillId);
+            if (sk != null) skillName = sk.Name;
+        }
+
+        HitFx.Add(new HitFxData
+        {
+            id = victim.id,
+            pos = victim.transform.position,
+            damage = damage,
+            time = Time.time,
+            dirZ = dirZ,
+            side = victim.side,
+            heroName = victimName,
+            attackerName = atkName,
+            attackerSide = attacker.side,
+            skillName = skillName,
+            shieldAbsorb = victim.lastShieldAbsorb
+        });
+        if (HitFx.Count > 300)
+            HitFx.RemoveRange(0, 150);
+    }
+
+    // 设置双方上阵英雄（含等级），并按固定布阵填 battleCards（士兵 + 英雄）
     // soldierCount：每侧小兵数量（0=纯英雄；优先近战士兵，超出 5 个补远程）
     public void Setup(List<int> heroesA, List<int> heroesB, int soldierCount = 0)
+    {
+        Setup(ToLeveled(heroesA), ToLeveled(heroesB), soldierCount);
+    }
+
+    // 带等级的上阵（heroId, level：1~5）；等级写进 cards 并经 GetBattleCardList → CheckInitAttr(lv) 生效
+    public void Setup(List<(int id, int lv)> heroesA, List<(int id, int lv)> heroesB, int soldierCount = 0)
     {
         _heroCountA = heroesA != null ? heroesA.Count : 0;
         _heroCountB = heroesB != null ? heroesB.Count : 0;
@@ -70,8 +131,16 @@ public class BattleSim
         FillBattleCards(Game.players[1], heroesB, soldierCount);
     }
 
+    // 把纯 id 列表统一转成等级1（旧调用路径）
+    private static List<(int id, int lv)> ToLeveled(List<int> ids)
+    {
+        if (ids == null)
+            return null;
+        return ids.Select(id => (id, 1)).ToList();
+    }
+
     // 按 25 格布阵填 battleCards：前排近战士兵、后排远程士兵、英雄放第10格起
-    private void FillBattleCards(PlayerInfo p, List<int> heroes, int soldierCount)
+    private void FillBattleCards(PlayerInfo p, List<(int id, int lv)> heroes, int soldierCount)
     {
         var cards = p.battleCards;
         Array.Clear(cards, 0, cards.Length);
@@ -87,16 +156,15 @@ public class BattleSim
         {
             for (int i = 0; i < heroes.Count && HeroStartPos + i < cards.Length; i++)
             {
-                int heroId = heroes[i];
+                int heroId = heroes[i].id;
                 if (heroId <= 0 || !ConfigManager.IsHeroCard(heroId))
                 {
                     GameLog.Warn("BattleSim.Setup: 无效英雄 heroId=" + heroId + "，跳过");
                     continue;
                 }
                 cards[HeroStartPos + i] = heroId;
-                // 卡片经验：默认 1（1 星）；已有卡则累加
-                if (!p.cards.ContainsKey(heroId))
-                    p.cards[heroId] = 1;
+                // 卡片经验存等级（1~5）：GetBattleCardList.Item2 会作为 lv 传入 CheckInitAttr 生效
+                p.cards[heroId] = Math.Max(1, Math.Min(5, heroes[i].lv));
             }
         }
     }
@@ -111,10 +179,10 @@ public class BattleSim
         World.Reset();
         World.BattleBegin();
         HitFx.Clear();
-        _hpBefore.Clear();
+        _skillMpBefore.Clear();
     }
 
-    // 单步推进：固定步长 dt=0.05s；通过血量差分检测命中事件
+    // 单步推进：固定步长 dt=0.05s；伤害事件由 Chess.OnDamageDealt 驱动生成飘字/日志
     public void Step(float dt = 0.05f)
     {
         Time.Advance(dt);
@@ -161,33 +229,42 @@ public class BattleSim
             }
         }
 
-        // 血量差分检测：比上一步少 → 这次步内被命中一次（受击/飘血）
+        // 技能施放检测：耗蓝技能发动时 skill.mp 会从满值(MpCost)清空到 0，据此捕获并记录技能名
         foreach (var c in World.chessList)
         {
-            if (c == null)
+            if (c == null || c.hp <= 0)
                 continue;
-            if (c.hp <= 0)
+            foreach (var sk in c.skills)
             {
-                _hpBefore.Remove(c.id);
-                continue;
-            }
-            float prev;
-            if (_hpBefore.TryGetValue(c.id, out prev) && prev > c.hp)
-            {
-                // 攻击方向推断：甲(side1)在左向右攻、乙(side2)在右向左攻；受击者的攻击方在对面
-                float dirZ = (c.side == 1) ? 1f : -1f;
-                HitFx.Add(new HitFxData
+                if (sk == null)
+                    continue;
+                float prevMp;
+                if (!_skillMpBefore.TryGetValue(sk, out prevMp))
                 {
-                    id = c.id,
-                    pos = c.transform.position,
-                    damage = (int)(prev - c.hp),
-                    time = Time.time,
-                    dirZ = dirZ
-                });
-                if (HitFx.Count > 300)
-                    HitFx.RemoveRange(0, 150);
+                    _skillMpBefore[sk] = sk.mp;
+                    continue;
+                }
+                if (prevMp > 1f && sk.mp <= 1f)
+                {
+                    var cfg = SkillConfig.GetConfig(sk.skillId);
+                    var name = cfg != null ? cfg.Name : null;
+                    if (!string.IsNullOrEmpty(name))
+                    {
+                        var heroCfg = HeroConfig.GetConfig(c.isHero ? c.heroId : c.soldierId);
+                        World.SkillFx.Add(new WorldManager.SkillFxData
+                        {
+                            pos = c.transform.position,
+                            name = name,
+                            time = Time.time,
+                            side = c.side,
+                            heroName = heroCfg != null ? heroCfg.Name : ("#" + c.heroId)
+                        });
+                        if (World.SkillFx.Count > 200)
+                            World.SkillFx.RemoveRange(0, 50);
+                    }
+                }
+                _skillMpBefore[sk] = sk.mp;
             }
-            _hpBefore[c.id] = c.hp;
         }
     }
 

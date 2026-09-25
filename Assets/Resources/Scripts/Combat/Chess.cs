@@ -41,6 +41,10 @@ public class Chess : MonoBehaviour
     public float auroEffectRate = 1f; //光环效果加成系数（1=无加成，鼓光环等 AuroAttrs 光环属性效果值乘算）
 
     public int lastDamagedPlayerId = -1;
+    // 本伤害事件中受护盾吸收的伤害量（>0 表示部分/全部被盾抵挡，供战斗模拟器区分"盾降低"与"实际受伤")
+    public int lastShieldAbsorb;
+    // 伤害结算事件：attacker, victim, damage, skillId(0=普攻)。供战斗模拟器精确捕获每次伤害（飘字/日志），避免逐帧血量差分漏记
+    public static event System.Action<Chess, Chess, int, int> OnDamageDealt;
 
     private Vector3? moveDest = null;
     // 上次短程寻路重规划时间(移动目标远距离变化大，定期重算途经点)
@@ -613,19 +617,27 @@ public class Chess : MonoBehaviour
                 SkillManager.BeforeCalDamaged(this, victim, null, ref damageBase, ref damageMulti, ref effect, "", false);
             damage = (int)(damageBase * damageMulti);
             // 结算阶段·受击方：只做伤害吸收（护盾），不做伤害放大
+            victim.lastShieldAbsorb = 0; // 记录本次结算的盾吸收量，供战斗模拟器日志区分
                 SkillManager.DuringCalDamage(this, victim, null, ref damage, "", false);
         }
 
-        if (damage > 0)
+        if (damage > 0 || victim.lastShieldAbsorb > 0)
         {
-            victim.hp -= damage;
-            if (victim != this)
-                victim.lastDamagedPlayerId = playerId;
-            // 记录战斗统计
-            if (isHero)
-                BattleStatManager.AddBattleStat(playerId, heroId, damage, true, victim.isHero);
+            if (damage > 0)
+            {
+                victim.hp -= damage;
+                if (victim != this)
+                {
+                    victim.lastDamagedPlayerId = playerId;
+                }
+                // 记录战斗统计
+                if (isHero)
+                    BattleStatManager.AddBattleStat(playerId, heroId, damage, true, victim.isHero);
 
-            SkillManager.OnAttack(this, victim, damage);
+                SkillManager.OnAttack(this, victim, damage);
+            }
+            var evt = OnDamageDealt;
+            if (evt != null) evt(this, victim, damage, 0);
         }
 
         if(!string.IsNullOrEmpty(effect))
@@ -660,18 +672,27 @@ public class Chess : MonoBehaviour
             return; // 减伤把伤害压到0，不再结算（护盾无需吸收）
 
         // 伤害结算阶段·受击方：只做伤害吸收（护盾），不做伤害放大
+        lastShieldAbsorb = 0; // 记录本次结算的盾吸收量，供战斗模拟器日志区分
         SkillManager.DuringCalDamage(caster, this, skillCfg, ref damage, hurtTag, isFeedback);
 
         if(hp <= 0)
             return;
 
-        hp -= damage;
-        if(caster != this)
-            lastDamagedPlayerId = caster.playerId;
+        if (damage > 0 || lastShieldAbsorb > 0)
+        {
+            if (damage > 0)
+            {
+                hp -= damage;
+                if (caster != this)
+                    lastDamagedPlayerId = caster.playerId;
 
-        // 记录战斗统计
-        if(caster.isHero)
-            BattleStatManager.AddBattleStat(caster.playerId, caster.heroId, damage, false, isHero);            
+                // 记录战斗统计
+                if (caster.isHero)
+                    BattleStatManager.AddBattleStat(caster.playerId, caster.heroId, damage, false, isHero);
+            }
+            var evt = OnDamageDealt;
+            if (evt != null) evt(caster, this, damage, skillId);
+        }
 
         OnHpChanged();
     }
@@ -890,6 +911,21 @@ public class Chess : MonoBehaviour
     public Buff GetBuff(int id)
     {
         return buffs.Find(buff => buff.id == id);
+    }
+
+    // 当前全部护盾剩余值之和（供战斗模拟器在单位上绘制盾圈；>0 表示有盾）
+    public int GetShieldValue()
+    {
+        if (buffs == null || buffs.Count == 0)
+            return 0;
+        int total = 0;
+        for (int i = 0; i < buffs.Count; i++)
+        {
+            var b = buffs[i];
+            if (b is BuffShield)
+                total += ((BuffShield)b).GetHp();
+        }
+        return total;
     }
 
     public bool MoveTo(Vector3 targetPosition, bool isForce = false)

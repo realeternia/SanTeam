@@ -33,6 +33,17 @@ public class WorldManager
     }
     public List<BattleTextData> battleTexts = new List<BattleTextData>();
 
+    // 技能施放飘字数据（供 GDI+ 主窗体绘制技能名与右侧日志，无特效）
+    public class SkillFxData
+    {
+        public Vector3 pos;
+        public string name;
+        public float time;
+        public int side;
+        public string heroName;
+    }
+    public readonly List<SkillFxData> SkillFx = new List<SkillFxData>();
+
     private Transform _center1;
     private Transform _center2;
 
@@ -535,6 +546,7 @@ public class WorldManager
         hasWin = false;
         chessList.Clear();
         battleTexts.Clear();
+        SkillFx.Clear();
         LiveRegistry.Clear();
     }
 }
