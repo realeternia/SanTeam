@@ -158,9 +158,20 @@ public static class CliRunner
     {
         if (world == null)
             return;
+        int heroA = 0, nonHeroA = 0, heroB = 0, nonHeroB = 0;
         foreach (var c in world.chessList)
         {
-            if (c == null || !c.isHero)
+            if (c == null)
+                continue;
+            if (c.side == 1)
+            {
+                if (c.isHero) heroA++; else nonHeroA++;
+            }
+            else
+            {
+                if (c.isHero) heroB++; else nonHeroB++;
+            }
+            if (!c.isHero)
                 continue;
             c.maxHp = (int)(c.maxHp * 5f);
             c.hp = c.maxHp;
@@ -170,6 +181,7 @@ public static class CliRunner
                     sk.mp = sk.skillCfg.MpCost; // 初始 MP 拉满
             }
         }
+        Utf8Console.WriteLine("速测诊断 甲=英雄" + heroA + "/士兵" + nonHeroA + " 乙=英雄" + heroB + "/士兵" + nonHeroB);
     }
 
     // 用当前配置跑一场并打印结果（headless 入口也复用此方法）

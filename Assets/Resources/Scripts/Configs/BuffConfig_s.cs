@@ -160,6 +160,7 @@ namespace CommonConfig
             config[300023] = new BuffConfig(300023, "嘲讽", "嘲", "成为敌对单位强制优先攻击的目标", false, "BuffTaunt", "#00CC00", "#66FF66", "", "");
             config[300024] = new BuffConfig(300024, "生命链接", "链", "与链接方共享伤害与回复", false, "BuffLifeLink", "", "", "", "");
             config[300025] = new BuffConfig(300025, "反伤", "反", "受到伤害时将其中一部分返还给攻击者", false, "BuffReflect", "", "", "", "");
+            config[300026] = new BuffConfig(300026, "卸甲", "卸", "状态期无视目标/strength%护甲；若目标带护盾，对其伤害提升/strength2%", true, "BuffDisarm", "", "", "", "");
             RebuildIndex();
 
         }

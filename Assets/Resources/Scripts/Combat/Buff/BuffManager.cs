@@ -104,6 +104,9 @@ public static class BuffManager
             case "BuffLifeLink":
                 buff = new BuffLifeLink(buffId, skillId, caster, target, time);
                 break;
+            case "BuffDisarm":
+                buff = new BuffDisarm(buffId, skillId, caster, target, time);
+                break;
 
         }
 

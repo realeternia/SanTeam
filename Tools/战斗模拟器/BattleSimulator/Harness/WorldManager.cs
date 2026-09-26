@@ -80,6 +80,7 @@ public class WorldManager : MonoBehaviour
             var center = side == 1 ? _center1 : _center2;
             SpawnSoldiersForSide(p, center, side);
             SpawnHerosForSide(p, center, p.GetBattleCardList(), side);
+            SpawnGongSummonForSide(p, center, side);
         }
     }
 
@@ -113,6 +114,100 @@ public class WorldManager : MonoBehaviour
                 continue;
             SpawnHerosForRegion(p, i, GetFormationCellPos(center, i), cards[i], side);
         }
+    }
+
+    // 工·机巧召唤（复刻游戏源码 WorldManager.SpawnGongSummonForSide）：
+    // 按本侧上阵"工"职业英雄数(1~5)定档，在布阵空格刷召唤单位（近战前排/远程后排）。
+    private void SpawnGongSummonForSide(PlayerInfo p, Transform center, int side)
+    {
+        var units = GetUnitsMySide(side);
+        int gongCount = 0;
+        foreach (var u in units)
+        {
+            if (u == null || !u.isHero || u.hp <= 0) continue;
+            var heroCfg = HeroConfig.GetConfig(u.heroId);
+            var jobCfg = ConfigManager.GetJobConfig(heroCfg.Job);
+            if (jobCfg != null && jobCfg.SkillId == "工") gongCount++;
+        }
+        if (gongCount <= 0)
+            return;
+        var lv = Mathf.Min(gongCount, 5);
+
+        var occupied = new HashSet<int>();
+        foreach (var u in units)
+            if (u != null && u.pos >= 0 && u.pos < CombatConst.FormationCellCount)
+                occupied.Add(u.pos);
+
+        var spawnList = BuildGongSummonList(lv);
+        var img = p != null ? p.imgPath : "";
+        foreach (var item in spawnList)
+        {
+            var cfg = SoldierConfig.GetConfig(item.Item1);
+            // 近战(木牛流马/辅助)站前排row0~1，远程(喷火兽)站后排row3~4
+            int rowMin, rowMax;
+            if (cfg.Range >= 30) { rowMin = 3; rowMax = 4; }
+            else { rowMin = 0; rowMax = 1; }
+
+            for (var c = 0; c < item.Item2; c++)
+            {
+                int pos;
+                if (!TryPickFreePos(occupied, rowMin, rowMax, out pos)
+                    && !TryPickFreePos(occupied, 0, CombatConst.FormationGridSize - 1, out pos))
+                    continue;
+                occupied.Add(pos);
+                SpawnUnitsForRegion(p, item.Item1, pos, GetFormationCellPos(center, pos), side, img);
+            }
+        }
+    }
+
+    // 工·机巧各档位(工英雄数1~5)召唤单位：木牛流马=肉盾(近战前排)，喷火兽=远程火DPS(后排)，辅助=加buff(近战)
+    private static List<Tuple<int, int>> BuildGongSummonList(int lv)
+    {
+        var list = new List<Tuple<int, int>>();
+        switch (lv)
+        {
+            case 1:
+                list.Add(Tuple.Create(502001, 1)); // 木牛流马lv1
+                break;
+            case 2:
+                list.Add(Tuple.Create(502002, 1)); // 木牛流马lv2
+                break;
+            case 3:
+                list.Add(Tuple.Create(502002, 1)); // 木牛流马lv2
+                list.Add(Tuple.Create(502003, 1)); // 喷火兽lv1
+                break;
+            case 4:
+                list.Add(Tuple.Create(502002, 1)); // 木牛流马lv2
+                list.Add(Tuple.Create(502005, 1)); // 喷火兽lv2
+                break;
+            case 5:
+                list.Add(Tuple.Create(502002, 1)); // 木牛流马lv2
+                list.Add(Tuple.Create(502005, 1)); // 喷火兽lv2
+                list.Add(Tuple.Create(502004, 1)); // 机巧辅助
+                break;
+        }
+        return list;
+    }
+
+    // 在指定行范围内挑选一个未被占用的随机布阵格(pos=row*5+col)，范围无空位返回false
+    private bool TryPickFreePos(HashSet<int> occupied, int rowMin, int rowMax, out int pos)
+    {
+        var size = CombatConst.FormationGridSize;
+        var candidates = new List<int>();
+        for (var row = rowMin; row <= rowMax; row++)
+            for (var col = 0; col < size; col++)
+            {
+                var gridPos = row * size + col;
+                if (!occupied.Contains(gridPos))
+                    candidates.Add(gridPos);
+            }
+        if (candidates.Count == 0)
+        {
+            pos = -1;
+            return false;
+        }
+        pos = candidates[SysRandom.Range(0, candidates.Count)];
+        return true;
     }
 
     // 生成士兵单位：从 SoldierConfig 取值逐字段赋值后 Init

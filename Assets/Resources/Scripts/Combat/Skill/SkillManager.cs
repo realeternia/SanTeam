@@ -270,6 +270,14 @@ public static class SkillManager
                 return new SkillAidScorchingRain(skillId, owner);
             case "SkillAidColossalSlam":
                 return new SkillAidColossalSlam(skillId, owner);
+            case "SkillAidDisarmState":
+                return new SkillAidDisarmState(skillId, owner);
+            case "SkillAidCraftBuff":
+                return new SkillAidCraftBuff(skillId, owner);
+            case "SkillAidFireShot":
+                return new SkillAidFireShot(skillId, owner);
+            case "SkillAidDecreeAoe":
+                return new SkillAidDecreeAoe(skillId, owner);
         }
 
         throw new System.Exception("Skill not found " + skillCfg.ScriptName);
