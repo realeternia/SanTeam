@@ -12,6 +12,8 @@ public static class CombatConst
     public const int LockBuffId = 301002;
     /// <summary>筑垒(BuffBuildFort)：张昭·筑垒 双防永久强化+死亡原地复活标记</summary>
     public const int BuildFortBuffId = 300011;
+    /// <summary>嘲讽(BuffTaunt)：携带者成为敌方强制优先攻击的目标</summary>
+    public const int TauntBuffId = 300023;
 
     // ---- 伤害标签(SkillConfig.HurtTag) ----
     /// <summary>AntiShield：绕过护盾直接打血（破盾类技能，BuffShield 判定该标签不吸收）</summary>

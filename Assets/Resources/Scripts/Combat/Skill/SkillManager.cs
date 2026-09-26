@@ -203,6 +203,28 @@ public static class SkillManager
                 return new SkillAidBerserk(skillId, owner);
             case "SkillAidSwapStrike":
                 return new SkillAidSwapStrike(skillId, owner);
+            case "SkillAidBloodyWar":
+                return new SkillAidBloodyWar(skillId, owner);
+            case "SkillAidUnbreakable":
+                return new SkillAidUnbreakable(skillId, owner);
+            case "SkillAidStealBlade":
+                return new SkillAidStealBlade(skillId, owner);
+            case "SkillAidMeteorHammer":
+                return new SkillAidMeteorHammer(skillId, owner);
+            case "SkillAidBarbarianSlam":
+                return new SkillAidBarbarianSlam(skillId, owner);
+            case "SkillAidSevenCharge":
+                return new SkillAidSevenCharge(skillId, owner);
+            case "SkillAidGuardArmy":
+                return new SkillAidGuardArmy(skillId, owner);
+            case "SkillAidTauntSlam":
+                return new SkillAidTauntSlam(skillId, owner);
+            case "SkillAidShieldBurst":
+                return new SkillAidShieldBurst(skillId, owner);
+            case "SkillAidSelfSacrifice":
+                return new SkillAidSelfSacrifice(skillId, owner);
+            case "SkillAidLifeLink":
+                return new SkillAidLifeLink(skillId, owner);
         }
 
         throw new System.Exception("Skill not found " + skillCfg.ScriptName);

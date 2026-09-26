@@ -95,6 +95,12 @@ public static class BuffManager
             case "BuffFrenzy":
                 buff = new BuffFrenzy(buffId, skillId, caster, target, time);
                 break;
+            case "BuffTaunt":
+                buff = new BuffTaunt(buffId, skillId, caster, target, time);
+                break;
+            case "BuffLifeLink":
+                buff = new BuffLifeLink(buffId, skillId, caster, target, time);
+                break;
 
         }
 
