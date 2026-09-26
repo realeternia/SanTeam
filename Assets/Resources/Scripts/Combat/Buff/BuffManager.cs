@@ -107,6 +107,15 @@ public static class BuffManager
             case "BuffDisarm":
                 buff = new BuffDisarm(buffId, skillId, caster, target, time);
                 break;
+            case "BuffHpMpRegen":
+                buff = new BuffHpMpRegen(buffId, skillId, caster, target, time);
+                break;
+            case "BuffHealBoost":
+                buff = new BuffHealBoost(buffId, skillId, caster, target, time);
+                break;
+            case "BuffMultiAttr":
+                buff = new BuffMultiAttr(buffId, skillId, caster, target, time);
+                break;
 
         }
 

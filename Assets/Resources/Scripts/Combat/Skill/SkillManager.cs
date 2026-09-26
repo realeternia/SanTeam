@@ -278,6 +278,14 @@ public static class SkillManager
                 return new SkillAidFireShot(skillId, owner);
             case "SkillAidDecreeAoe":
                 return new SkillAidDecreeAoe(skillId, owner);
+            case "SkillAidBenevolence":
+                return new SkillAidBenevolence(skillId, owner);
+            case "SkillAidImperialGuard":
+                return new SkillAidImperialGuard(skillId, owner);
+            case "SkillAidBalance":
+                return new SkillAidBalance(skillId, owner);
+            case "SkillAidNobleBless":
+                return new SkillAidNobleBless(skillId, owner);
         }
 
         throw new System.Exception("Skill not found " + skillCfg.ScriptName);
