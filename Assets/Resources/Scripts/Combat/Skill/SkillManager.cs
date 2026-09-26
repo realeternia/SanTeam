@@ -178,7 +178,31 @@ public static class SkillManager
             case "SkillAidGuardian":
                 return new SkillAidGuardian(skillId, owner);
             case "SkillAidPoisonArrow":
-                return new SkillAidPoisonArrow(skillId, owner);               
+                return new SkillAidPoisonArrow(skillId, owner);
+            case "SkillAidShadowSplit":
+                return new SkillAidShadowSplit(skillId, owner);
+            case "SkillAidDualLaser":
+                return new SkillAidDualLaser(skillId, owner);
+            case "SkillAidSmashStun":
+                return new SkillAidSmashStun(skillId, owner);
+            case "SkillAidSlashDefend":
+                return new SkillAidSlashDefend(skillId, owner);
+            case "SkillAidBashShield":
+                return new SkillAidBashShield(skillId, owner);
+            case "SkillAidExecute":
+                return new SkillAidExecute(skillId, owner);
+            case "SkillAidRandomCombo":
+                return new SkillAidRandomCombo(skillId, owner);
+            case "SkillAidHasteStrike":
+                return new SkillAidHasteStrike(skillId, owner);
+            case "SkillAidMarkTarget":
+                return new SkillAidMarkTarget(skillId, owner);
+            case "SkillAidDoubleShot":
+                return new SkillAidDoubleShot(skillId, owner);
+            case "SkillAidBerserk":
+                return new SkillAidBerserk(skillId, owner);
+            case "SkillAidSwapStrike":
+                return new SkillAidSwapStrike(skillId, owner);
         }
 
         throw new System.Exception("Skill not found " + skillCfg.ScriptName);

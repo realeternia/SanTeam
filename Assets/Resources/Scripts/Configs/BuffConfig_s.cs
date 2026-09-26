@@ -156,7 +156,7 @@ namespace CommonConfig
             config[300018] = new BuffConfig(300018, "减防", "破", "降低目标护甲", false, "BuffArmorDown", "", "", "", "");
             config[300019] = new BuffConfig(300019, "袭杀", "袭", "攻击增伤并吸血", true, "BuffLifeStealAndDamage", "", "", "", "");
             config[300020] = new BuffConfig(300020, "减速", "缓", "降低目标移动与攻速", false, "BuffSlowDown", "", "", "", "");
-
+            config[300022] = new BuffConfig(300022, "狂暴", "狂", "造成的伤害提升，但自身受到的伤害也提升（双刃）", true, "BuffFrenzy", "", "", "", "");
             RebuildIndex();
 
         }

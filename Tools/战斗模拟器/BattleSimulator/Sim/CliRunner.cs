@@ -13,6 +13,7 @@
 //   rand            随机双阵容打一场
 //   batch <n>       随机阵容连打 n 场（seed 递增，输出汇总）
 //   hero [关键字]   列出英雄 id 与名字（可过滤）
+//   testmp <0|1>    测试模式速测：英雄初始技能MP拉满+生命×5（0关/1开）
 //   quit / exit     退出
 // ============================================================
 using System;
@@ -40,6 +41,7 @@ public static class CliRunner
 
         int seed = 1;
         int soldier = 0;
+        int testMp = 0;
         List<int> teamA = null, teamB = null;
 
         while (true)
@@ -86,6 +88,16 @@ public static class CliRunner
                             Utf8Console.WriteLine("用法: soldier <0-10>");
                         break;
 
+                    case "testmp":
+                        if (parts.Length > 1 && int.TryParse(parts[1], out int tm))
+                        {
+                            testMp = Math.Max(0, tm);
+                            Utf8Console.WriteLine("测试模式速测=" + (testMp > 0 ? "开启(技能MP拉满+生命×5)" : "关闭"));
+                        }
+                        else
+                            Utf8Console.WriteLine("用法: testmp <0关/1开>  速测：英雄技能MP拉满+生命×5");
+                        break;
+
                     case "a": case "b":
                         if (parts.Length > 1)
                         {
@@ -106,20 +118,20 @@ public static class CliRunner
                         break;
 
                     case "show":
-                        PrintConfig(seed, teamA, teamB, soldier);
+                        PrintConfig(seed, teamA, teamB, soldier, testMp);
                         break;
 
                     case "rand":
-                        RunBattle(seed, null, null, soldier);
+                        RunBattle(seed, null, null, soldier, testMp);
                         break;
 
                     case "run":
-                        RunBattle(seed, teamA, teamB, soldier);
+                        RunBattle(seed, teamA, teamB, soldier, testMp);
                         break;
 
                     case "batch":
                         int n = (parts.Length > 1 && int.TryParse(parts[1], out int bn)) ? bn : 5;
-                        Batch(seed, n, soldier);
+                        Batch(seed, n, soldier, testMp);
                         break;
 
                     case "hero":
@@ -138,14 +150,41 @@ public static class CliRunner
         }
     }
 
+    // 测试模式速测：不改落盘配置，仅对当前战斗运行时生效。
+    // 1) 所有英雄初始技能 MP 直接拉满（无需等待 mpRegen 攒蓝），保证开局即可施放；
+    // 2) 所有英雄初始生命 ×5（提高存活、延长战斗，给技能触发留足时间）。
+    // 应在 battle.Reset/BattleBegin 之后、主循环 Step 之前调用。
+    private static void ApplyQuickTest(WorldManager world)
+    {
+        if (world == null)
+            return;
+        foreach (var c in world.chessList)
+        {
+            if (c == null || !c.isHero)
+                continue;
+            c.maxHp = (int)(c.maxHp * 5f);
+            c.hp = c.maxHp;
+            foreach (var sk in c.skills)
+            {
+                if (sk != null && sk.skillCfg != null && sk.skillCfg.MpCost > 0)
+                    sk.mp = sk.skillCfg.MpCost; // 初始 MP 拉满
+            }
+        }
+    }
+
     // 用当前配置跑一场并打印结果（headless 入口也复用此方法）
-    public static void RunBattle(int seed, List<int> teamA, List<int> teamB, int soldierCount = 0)
+    public static void RunBattle(int seed, List<int> teamA, List<int> teamB, int soldierCount = 0, int testMp = 0)
     {
         var a = teamA ?? HeroLineup.PickRandomLineup(0);
         var b = teamB ?? HeroLineup.PickRandomLineup(1);
         var battle = new BattleSim();
         battle.Setup(a, b, soldierCount);
         battle.Start(seed);
+        if (testMp > 0)
+        {
+            ApplyQuickTest(battle.World);
+            Utf8Console.WriteLine("测试模式：英雄初始技能MP拉满 + 生命×5");
+        }
         Utf8Console.WriteLine("seed=" + seed + " 每侧小兵=" + soldierCount
             + " 阵容A=" + string.Join(",", a) + " 阵容B=" + string.Join(",", b));
 
@@ -164,7 +203,7 @@ public static class CliRunner
     }
 
     // 随机阵容连打 n 场（seed 递增），输出每场胜负与汇总
-    private static void Batch(int baseSeed, int n, int soldierCount = 0)
+    private static void Batch(int baseSeed, int n, int soldierCount = 0, int testMp = 0)
     {
         int winA = 0, winB = 0, draw = 0;
         for (int i = 0; i < n; i++)
@@ -174,6 +213,8 @@ public static class CliRunner
             var battle = new BattleSim();
             battle.Setup(a, b, soldierCount);
             battle.Start(baseSeed + i);
+            if (testMp > 0)
+                ApplyQuickTest(battle.World);
             int steps = 0;
             while (!battle.IsFinished && steps < MaxSteps)
             {
@@ -203,10 +244,11 @@ public static class CliRunner
             Utf8Console.WriteLine(h.Id + " " + h.Name);
     }
 
-    private static void PrintConfig(int seed, List<int> teamA, List<int> teamB, int soldier)
+    private static void PrintConfig(int seed, List<int> teamA, List<int> teamB, int soldier, int testMp)
     {
         Utf8Console.WriteLine("seed=" + seed);
         Utf8Console.WriteLine("每侧小兵=" + soldier);
+        Utf8Console.WriteLine("测试模式速测=" + (testMp > 0 ? "开启(英雄技能MP拉满+生命×5)" : "关闭"));
         Utf8Console.WriteLine("甲: " + (teamA != null ? string.Join(",", teamA) : "(随机)"));
         Utf8Console.WriteLine("乙: " + (teamB != null ? string.Join(",", teamB) : "(随机)"));
     }
@@ -216,6 +258,7 @@ public static class CliRunner
         Utf8Console.WriteLine("命令列表:");
         Utf8Console.WriteLine("  seed <n>        设置随机种子");
         Utf8Console.WriteLine("  soldier <n>     设置每侧小兵数量（默认 0）");
+        Utf8Console.WriteLine("  testmp <0|1>    测试模式速测：英雄初始技能MP拉满+生命×5（0关/1开）");
         Utf8Console.WriteLine("  a <ids>         设置甲阵容，如 a 101001,102001,103001");
         Utf8Console.WriteLine("  b <ids>         设置乙阵容");
         Utf8Console.WriteLine("  clear           清空双方阵容（回退随机）");

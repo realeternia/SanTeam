@@ -92,6 +92,9 @@ public static class BuffManager
             case "BuffLifeStealAndDamage":
                 buff = new BuffLifeStealAndDamage(buffId, skillId, caster, target, time);
                 break;
+            case "BuffFrenzy":
+                buff = new BuffFrenzy(buffId, skillId, caster, target, time);
+                break;
 
         }
 

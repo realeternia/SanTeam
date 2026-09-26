@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -193,6 +193,8 @@ namespace CommonConfig
             config.Clear();
             config[500001] = new SoldierConfig(500001, "小兵", 1, 24, 130, 15, 0, 0, 10, 12, 0, 0f, false, 1f, 1f, new int[0], "UnitBing", "SwordHitBlue", "", "");
             config[500002] = new SoldierConfig(500002, "远程小兵", 1, 17, 90, 15, 0, 0, 7, 35, 15, 1.5f, false, .8f, .65f, new int[0], "UnitBing2", "BulletExplosionFire", "", "");
+            config[500003] = new SoldierConfig(500003, "弓手", 1, 18, 100, 15, 0, 0, 10, 26, 15, 1.5f, false, .8f, .65f, new int[0], "UnitBing2", "BulletExplosionFire", "", "");
+            config[500004] = new SoldierConfig(500004, "弩手", 1, 25, 115, 14, 0, 0, 7, 16, 18, 1.2f, false, .8f, .65f, new int[0], "UnitBing2", "BulletExplosionFire", "", "");
             config[501001] = new SoldierConfig(501001, "法术场", 1, 0, 9999, 15, 0, 0, 0, 0, 0, 0f, true, 0f, 0f, new int[0], "UnitSpell", "", "", "");
             config[501002] = new SoldierConfig(501002, "关羽影子", 1, 2, 2, 15, 0, 0, 10, 17, 0, 0f, false, 0f, 0f, new int[0], "UnitHero", "SwordHitYellowCritical", "", "");
             config[502001] = new SoldierConfig(502001, "木牛流马lv1", 1, 12, 420, 12, 10, 8, 6, 9, 0, 0f, false, 0f, 0f, new int[0], "UnitBing", "SwordHitBlue", "", "");
