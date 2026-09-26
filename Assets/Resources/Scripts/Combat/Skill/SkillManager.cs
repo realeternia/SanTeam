@@ -225,6 +225,28 @@ public static class SkillManager
                 return new SkillAidSelfSacrifice(skillId, owner);
             case "SkillAidLifeLink":
                 return new SkillAidLifeLink(skillId, owner);
+            case "SkillAidJudgement":
+                return new SkillAidJudgement(skillId, owner);
+            case "SkillAidLastStrategy":
+                return new SkillAidLastStrategy(skillId, owner);
+            case "SkillAidSweeping":
+                return new SkillAidSweeping(skillId, owner);
+            case "SkillAidQuietPlot":
+                return new SkillAidQuietPlot(skillId, owner);
+            case "SkillAidLethalGambit":
+                return new SkillAidLethalGambit(skillId, owner);
+            case "SkillAidSilverTongue":
+                return new SkillAidSilverTongue(skillId, owner);
+            case "SkillAidEnduranceStrike":
+                return new SkillAidEnduranceStrike(skillId, owner);
+            case "SkillAidCutSupply":
+                return new SkillAidCutSupply(skillId, owner);
+            case "SkillAidPoisonWine":
+                return new SkillAidPoisonWine(skillId, owner);
+            case "SkillAidUsurpPressure":
+                return new SkillAidUsurpPressure(skillId, owner);
+            case "SkillAidArrogantWord":
+                return new SkillAidArrogantWord(skillId, owner);
         }
 
         throw new System.Exception("Skill not found " + skillCfg.ScriptName);
