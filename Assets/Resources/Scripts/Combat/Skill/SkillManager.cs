@@ -79,10 +79,6 @@ public static class SkillManager
                 return new SkillAidShockWave(skillId, owner);
             case "AidSuddenArrow":
                 return new SkillAidSuddenArrow(skillId, owner);
-            case "BuffExpand":
-                return new SkillBuffExpand(skillId, owner);
-            case "BuffExpandPos":
-                return new SkillBuffExpandPos(skillId, owner);                
             case "ModifyBuffTime":
                 return new SkillModifyBuffTime(skillId, owner);
             case "ModifyShootSpeed":

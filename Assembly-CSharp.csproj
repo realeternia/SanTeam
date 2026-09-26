@@ -123,7 +123,6 @@
     <Compile Include="Assets\Resources\Scripts\Combat\JobLinkManager.cs" />
     <Compile Include="Assets\Resources\Scripts\Configs\ConfigManager.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffDamageAddRate.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillBuffExpandPos.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillHitRepeat.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillFactionShield.cs" />
     <Compile Include="Assets\SineVFX\TopDownEffects\Scripts\SineUIControllerTopDownEffects.cs" />
@@ -200,7 +199,6 @@
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffManager.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\ChessHUD.cs" />
     <Compile Include="Assets\Resources\Scripts\Configs\HeroAttrConfig_s.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillBuffExpand.cs" />
     <Compile Include="Assets\Resources\Scripts\Configs\PlayerLevelConfig_s.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillLowHpFullHealShield.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAttackSpeedAttack.cs" />
@@ -224,7 +222,6 @@
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillInitAttrChange.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillInitEnemyRandomBuff.cs" />
     <Compile Include="Assets\DOTween\Modules\DOTweenModuleEPOOutline.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffSpeedDown.cs" />
     <Compile Include="Assets\Resources\Scripts\Tools\BGMPlayer.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAttackedShadow.cs" />
     <Compile Include="Assets\Resources\Scripts\Effect\GlowBeamController.cs" />

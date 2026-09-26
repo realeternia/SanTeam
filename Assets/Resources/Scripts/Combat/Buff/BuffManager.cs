@@ -44,9 +44,6 @@ public static class BuffManager
             case "BuffDamagedAddRate":
                 buff = new BuffDamagedAddRate(buffId, skillId, caster, target, time);
                 break;
-            case "BuffSpeedDown":
-                buff = new BuffSpeedDown(buffId, skillId, caster, target, time);
-                break;
             case "BuffTimeDamage":
                 buff = new BuffTimeDamage(buffId, skillId, caster, target, time);
                 break;

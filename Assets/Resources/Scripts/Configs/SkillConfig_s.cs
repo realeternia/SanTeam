@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿using System;
+﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -1078,46 +1078,6 @@ namespace CommonConfig
             config[2021049] = new SkillConfig(2021049, "名门", "袁绍", "", "术", 4, 0f, 8f, 14, "", 0, "", 80f, 0f, "", 0, 44f, 27f, 0, "名", false, 9f, "", 0, 0f, 0f, 0f, 0, "SkillAidNobleBless", "sway", "MagicChargeYellow", 0f, "yuanshao", "", "", "");
             config[2021050] = new SkillConfig(2021050, "名门", "袁绍", "", "术", 5, 0f, 8f, 14, "", 0, "", 80f, 0f, "", 0, 50f, 30f, 0, "名", false, 10f, "", 0, 0f, 0f, 0f, 0, "SkillAidNobleBless", "sway", "MagicChargeYellow", 0f, "yuanshao", "", "", "");
 
-            config[2030041] = new SkillConfig(2030041, "威震", "威", "攻击时混乱周围目标", "", 1, 0.2f, 5f, 20, "", 0, "", 20f, 0f, "castUnit", 3, 0f, 0f, 0, "乱", false, 1.5f, "", 0, 0f, 0f, 0f, 0, "HitBuffArea", "spin", "MagicNovaYellow", 0f, "", "", "", "");
-            config[2030042] = new SkillConfig(2030042, "威震", "威", "", "", 2, 0.2f, 5f, 20, "", 0, "", 20f, 0f, "castUnit", 3, 0f, 0f, 0, "乱", false, 1.5f, "", 0, 0f, 0f, 0f, 0, "HitBuffArea", "spin", "MagicNovaYellow", 0f, "", "", "", "");
-            config[2030043] = new SkillConfig(2030043, "威震", "威", "", "", 3, 0.2f, 5f, 20, "", 0, "", 20f, 0f, "castUnit", 3, 0f, 0f, 0, "乱", false, 1.5f, "", 0, 0f, 0f, 0f, 0, "HitBuffArea", "spin", "MagicNovaYellow", 0f, "", "", "", "");
-            config[2030044] = new SkillConfig(2030044, "威震", "威", "", "", 4, 0.2f, 5f, 20, "", 0, "", 20f, 0f, "castUnit", 3, 0f, 0f, 0, "乱", false, 1.5f, "", 0, 0f, 0f, 0f, 0, "HitBuffArea", "spin", "MagicNovaYellow", 0f, "", "", "", "");
-            config[2030045] = new SkillConfig(2030045, "威震", "威", "", "", 5, 0.2f, 5f, 20, "", 0, "", 20f, 0f, "castUnit", 3, 0f, 0f, 0, "乱", false, 1.5f, "", 0, 0f, 0f, 0f, 0, "HitBuffArea", "spin", "MagicNovaYellow", 0f, "", "", "", "");
-            config[2030051] = new SkillConfig(2030051, "击破", "泼", "攻击几率使目标增伤40%", "", 1, 0.4f, 2f, 20, "", 0, "", 0f, 0f, "", 0, 0.4f, 0f, 0, "伤", false, 3f, "", 0, 0f, 0f, 0f, 0, "HitBuff", "jump", "SoftFireBigRed", 0f, "", "", "", "");
-            config[2030052] = new SkillConfig(2030052, "击破", "泼", "", "", 2, 0.4f, 2f, 20, "", 0, "", 0f, 0f, "", 0, 0.4f, 0f, 0, "伤", false, 3f, "", 0, 0f, 0f, 0f, 0, "HitBuff", "jump", "SoftFireBigRed", 0f, "", "", "", "");
-            config[2030053] = new SkillConfig(2030053, "击破", "泼", "", "", 3, 0.4f, 2f, 20, "", 0, "", 0f, 0f, "", 0, 0.4f, 0f, 0, "伤", false, 3f, "", 0, 0f, 0f, 0f, 0, "HitBuff", "jump", "SoftFireBigRed", 0f, "", "", "", "");
-            config[2030054] = new SkillConfig(2030054, "击破", "泼", "", "", 4, 0.4f, 2f, 20, "", 0, "", 0f, 0f, "", 0, 0.4f, 0f, 0, "伤", false, 3f, "", 0, 0f, 0f, 0f, 0, "HitBuff", "jump", "SoftFireBigRed", 0f, "", "", "", "");
-            config[2030055] = new SkillConfig(2030055, "击破", "泼", "", "", 5, 0.4f, 2f, 20, "", 0, "", 0f, 0f, "", 0, 0.4f, 0f, 0, "伤", false, 3f, "", 0, 0f, 0f, 0f, 0, "HitBuff", "jump", "SoftFireBigRed", 0f, "", "", "", "");
-            config[2030061] = new SkillConfig(2030061, "延缓", "缓", "攻击几率使目标减速30%", "", 1, 0.4f, 3f, 20, "", 0, "", 0f, 0f, "", 0, 0.3f, 0f, 0, "慢", false, 5f, "", 0, 0f, 0f, 0f, 0, "HitBuff", "sway", "MagicNovaYellow", 0f, "", "", "", "");
-            config[2030062] = new SkillConfig(2030062, "延缓", "缓", "", "", 2, 0.4f, 3f, 20, "", 0, "", 0f, 0f, "", 0, 0.3f, 0f, 0, "慢", false, 5f, "", 0, 0f, 0f, 0f, 0, "HitBuff", "sway", "MagicNovaYellow", 0f, "", "", "", "");
-            config[2030063] = new SkillConfig(2030063, "延缓", "缓", "", "", 3, 0.4f, 3f, 20, "", 0, "", 0f, 0f, "", 0, 0.3f, 0f, 0, "慢", false, 5f, "", 0, 0f, 0f, 0f, 0, "HitBuff", "sway", "MagicNovaYellow", 0f, "", "", "", "");
-            config[2030064] = new SkillConfig(2030064, "延缓", "缓", "", "", 4, 0.4f, 3f, 20, "", 0, "", 0f, 0f, "", 0, 0.3f, 0f, 0, "慢", false, 5f, "", 0, 0f, 0f, 0f, 0, "HitBuff", "sway", "MagicNovaYellow", 0f, "", "", "", "");
-            config[2030065] = new SkillConfig(2030065, "延缓", "缓", "", "", 5, 0.4f, 3f, 20, "", 0, "", 0f, 0f, "", 0, 0.3f, 0f, 0, "慢", false, 5f, "", 0, 0f, 0f, 0f, 0, "HitBuff", "sway", "MagicNovaYellow", 0f, "", "", "", "");
-            config[2030071] = new SkillConfig(2030071, "陷阵", "陷", "攻击几率使目标陷阵", "", 1, 0.4f, 3f, 20, "", 0, "", 0f, 0f, "", 0, 0f, 0f, 0, "停", false, 4f, "", 0, 0f, 0f, 0f, 0, "HitBuff", "sway", "MagicNovaYellow", 0f, "", "", "", "");
-            config[2030072] = new SkillConfig(2030072, "陷阵", "陷", "", "", 2, 0.4f, 3f, 20, "", 0, "", 0f, 0f, "", 0, 0f, 0f, 0, "停", false, 4f, "", 0, 0f, 0f, 0f, 0, "HitBuff", "sway", "MagicNovaYellow", 0f, "", "", "", "");
-            config[2030073] = new SkillConfig(2030073, "陷阵", "陷", "", "", 3, 0.4f, 3f, 20, "", 0, "", 0f, 0f, "", 0, 0f, 0f, 0, "停", false, 4f, "", 0, 0f, 0f, 0f, 0, "HitBuff", "sway", "MagicNovaYellow", 0f, "", "", "", "");
-            config[2030074] = new SkillConfig(2030074, "陷阵", "陷", "", "", 4, 0.4f, 3f, 20, "", 0, "", 0f, 0f, "", 0, 0f, 0f, 0, "停", false, 4f, "", 0, 0f, 0f, 0f, 0, "HitBuff", "sway", "MagicNovaYellow", 0f, "", "", "", "");
-            config[2030075] = new SkillConfig(2030075, "陷阵", "陷", "", "", 5, 0.4f, 3f, 20, "", 0, "", 0f, 0f, "", 0, 0f, 0f, 0, "停", false, 4f, "", 0, 0f, 0f, 0f, 0, "HitBuff", "sway", "MagicNovaYellow", 0f, "", "", "", "");
-            config[2030081] = new SkillConfig(2030081, "溃散", "溃", "攻击几率使目标溃败", "", 1, 0.4f, 4f, 20, "", 0, "", 0f, 0f, "", 0, 0.1f, 0f, 0, "败", false, 5.2f, "", 0, 0f, 0f, 0f, 0, "HitBuff", "sway", "MagicNovaYellow", 0f, "", "", "", "");
-            config[2030082] = new SkillConfig(2030082, "溃散", "溃", "", "", 2, 0.4f, 4f, 20, "", 0, "", 0f, 0f, "", 0, 0.1f, 0f, 0, "败", false, 5.2f, "", 0, 0f, 0f, 0f, 0, "HitBuff", "sway", "MagicNovaYellow", 0f, "", "", "", "");
-            config[2030083] = new SkillConfig(2030083, "溃散", "溃", "", "", 3, 0.4f, 4f, 20, "", 0, "", 0f, 0f, "", 0, 0.1f, 0f, 0, "败", false, 5.2f, "", 0, 0f, 0f, 0f, 0, "HitBuff", "sway", "MagicNovaYellow", 0f, "", "", "", "");
-            config[2030084] = new SkillConfig(2030084, "溃散", "溃", "", "", 4, 0.4f, 4f, 20, "", 0, "", 0f, 0f, "", 0, 0.1f, 0f, 0, "败", false, 5.2f, "", 0, 0f, 0f, 0f, 0, "HitBuff", "sway", "MagicNovaYellow", 0f, "", "", "", "");
-            config[2030085] = new SkillConfig(2030085, "溃散", "溃", "", "", 5, 0.4f, 4f, 20, "", 0, "", 0f, 0f, "", 0, 0.1f, 0f, 0, "败", false, 5.2f, "", 0, 0f, 0f, 0f, 0, "HitBuff", "sway", "MagicNovaYellow", 0f, "", "", "", "");
-            config[2080051] = new SkillConfig(2080051, "蔓延小", "筵", "技能负面状态概率扩散", "智技up", 1, 0.5f, 3f, 0, "", 0, "", 30f, 0f, "", 2, 0f, 0f, 0, "", false, 0f, "", 0, 0f, 0f, 0f, 0, "BuffExpand", "", "", 0f, "", "", "", "");
-            config[2080052] = new SkillConfig(2080052, "蔓延小", "筵", "", "智技up", 2, 0.5f, 3f, 0, "", 0, "", 30f, 0f, "", 2, 0f, 0f, 0, "", false, 0f, "", 0, 0f, 0f, 0f, 0, "BuffExpand", "", "", 0f, "", "", "", "");
-            config[2080053] = new SkillConfig(2080053, "蔓延小", "筵", "", "智技up", 3, 0.5f, 3f, 0, "", 0, "", 30f, 0f, "", 2, 0f, 0f, 0, "", false, 0f, "", 0, 0f, 0f, 0f, 0, "BuffExpand", "", "", 0f, "", "", "", "");
-            config[2080054] = new SkillConfig(2080054, "蔓延小", "筵", "", "智技up", 4, 0.5f, 3f, 0, "", 0, "", 30f, 0f, "", 2, 0f, 0f, 0, "", false, 0f, "", 0, 0f, 0f, 0f, 0, "BuffExpand", "", "", 0f, "", "", "", "");
-            config[2080055] = new SkillConfig(2080055, "蔓延小", "筵", "", "智技up", 5, 0.5f, 3f, 0, "", 0, "", 30f, 0f, "", 2, 0f, 0f, 0, "", false, 0f, "", 0, 0f, 0f, 0f, 0, "BuffExpand", "", "", 0f, "", "", "", "");
-            config[2080071] = new SkillConfig(2080071, "同调小", "碉", "技能正面状态扩散", "智技up", 1, 0.5f, 3f, 0, "", 0, "", 30f, 0f, "", 2, 0f, 0f, 0, "", false, 0f, "", 0, 0f, 0f, 0f, 0, "BuffExpandPos", "", "", 0f, "", "", "", "");
-            config[2080072] = new SkillConfig(2080072, "同调小", "碉", "", "智技up", 2, 0.5f, 3f, 0, "", 0, "", 30f, 0f, "", 2, 0f, 0f, 0, "", false, 0f, "", 0, 0f, 0f, 0f, 0, "BuffExpandPos", "", "", 0f, "", "", "", "");
-            config[2080073] = new SkillConfig(2080073, "同调小", "碉", "", "智技up", 3, 0.5f, 3f, 0, "", 0, "", 30f, 0f, "", 2, 0f, 0f, 0, "", false, 0f, "", 0, 0f, 0f, 0f, 0, "BuffExpandPos", "", "", 0f, "", "", "", "");
-            config[2080074] = new SkillConfig(2080074, "同调小", "碉", "", "智技up", 4, 0.5f, 3f, 0, "", 0, "", 30f, 0f, "", 2, 0f, 0f, 0, "", false, 0f, "", 0, 0f, 0f, 0f, 0, "BuffExpandPos", "", "", 0f, "", "", "", "");
-            config[2080075] = new SkillConfig(2080075, "同调小", "碉", "", "智技up", 5, 0.5f, 3f, 0, "", 0, "", 30f, 0f, "", 2, 0f, 0f, 0, "", false, 0f, "", 0, 0f, 0f, 0f, 0, "BuffExpandPos", "", "", 0f, "", "", "", "");
-            config[2080081] = new SkillConfig(2080081, "炽热", "炽", "提升本方火焰持续时间", "智技up", 1, 0f, 0f, 0, "", 0, "", 0f, 0f, "", 0, 0f, 0f, 0, "", false, 0f, "火", 0, 3f, 0f, 0f, 0, "Dumb", "", "", 0f, "", "", "", "");
-            config[2080082] = new SkillConfig(2080082, "炽热", "炽", "", "智技up", 2, 0f, 0f, 0, "", 0, "", 0f, 0f, "", 0, 0f, 0f, 0, "", false, 0f, "火", 0, 3f, 0f, 0f, 0, "Dumb", "", "", 0f, "", "", "", "");
-            config[2080083] = new SkillConfig(2080083, "炽热", "炽", "", "智技up", 3, 0f, 0f, 0, "", 0, "", 0f, 0f, "", 0, 0f, 0f, 0, "", false, 0f, "火", 0, 3f, 0f, 0f, 0, "Dumb", "", "", 0f, "", "", "", "");
-            config[2080084] = new SkillConfig(2080084, "炽热", "炽", "", "智技up", 4, 0f, 0f, 0, "", 0, "", 0f, 0f, "", 0, 0f, 0f, 0, "", false, 0f, "火", 0, 3f, 0f, 0f, 0, "Dumb", "", "", 0f, "", "", "", "");
-            config[2080085] = new SkillConfig(2080085, "炽热", "炽", "", "智技up", 5, 0f, 0f, 0, "", 0, "", 0f, 0f, "", 0, 0f, 0f, 0, "", false, 0f, "火", 0, 3f, 0f, 0f, 0, "Dumb", "", "", 0f, "", "", "", "");
             config[2090001] = new SkillConfig(2090001, "速射", "速射", "箭矢飞行速度提升", "道具", 1, 0f, 0f, 0, "", 1, "", 0f, 0f, "", 0, 2.5f, 0f, 0, "", false, 0f, "", 0, 0f, 0f, 0f, 0, "ModifyShootSpeed", "", "", 0f, "", "", "", "");
 
             RebuildIndex();

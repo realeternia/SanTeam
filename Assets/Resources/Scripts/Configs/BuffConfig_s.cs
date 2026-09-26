@@ -145,7 +145,6 @@ namespace CommonConfig
             config[301001] = new BuffConfig(301001, "混乱", "乱", "眩晕，无法行动", false, "BuffNoAction", "", "", "StunnedCirclingStarsSimple", "");
             config[301002] = new BuffConfig(301002, "连锁", "锁", "被攻击时，向范围内同样带连锁的友军传递同比例伤害", false, "BuffLock", "", "", "StunnedLock", "");
             config[301003] = new BuffConfig(301003, "增伤", "伤", "受到的伤害按比例增加", false, "BuffDamagedAddRate", "", "", "StunnedDamageUp", "");
-            config[301004] = new BuffConfig(301004, "减速", "慢", "移动速度与攻击速度降低", false, "BuffSpeedDown", "", "", "SlowAuraYellow", "");
             config[301005] = new BuffConfig(301005, "陷阵", "停", "无法移动", false, "BuffNoMove", "", "", "AuraSoftPurple", "");
             config[301006] = new BuffConfig(301006, "溃败", "败", "持续受到随时间结算的伤害", false, "BuffTimeDamage", "", "", "BloodExplosion", "");
             config[300013] = new BuffConfig(300013, "减攻", "慑", "降低目标攻击力", false, "BuffAtkDown", "", "", "", "");
