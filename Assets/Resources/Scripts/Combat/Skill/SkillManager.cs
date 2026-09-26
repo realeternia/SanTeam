@@ -247,6 +247,29 @@ public static class SkillManager
                 return new SkillAidUsurpPressure(skillId, owner);
             case "SkillAidArrogantWord":
                 return new SkillAidArrogantWord(skillId, owner);
+
+            case "SkillAidSlowStrike":
+                return new SkillAidSlowStrike(skillId, owner);
+            case "SkillAidVengefulStance":
+                return new SkillAidVengefulStance(skillId, owner);
+            case "SkillAidIronGuard":
+                return new SkillAidIronGuard(skillId, owner);
+            case "SkillAidArmorBreak":
+                return new SkillAidArmorBreak(skillId, owner);
+            case "SkillAidSweepingAoe":
+                return new SkillAidSweepingAoe(skillId, owner);
+            case "SkillAidDiveCleave":
+                return new SkillAidDiveCleave(skillId, owner);
+            case "SkillAidBerserkCleave":
+                return new SkillAidBerserkCleave(skillId, owner);
+            case "SkillAidThrust":
+                return new SkillAidThrust(skillId, owner);
+            case "SkillAidChargeImpale":
+                return new SkillAidChargeImpale(skillId, owner);
+            case "SkillAidScorchingRain":
+                return new SkillAidScorchingRain(skillId, owner);
+            case "SkillAidColossalSlam":
+                return new SkillAidColossalSlam(skillId, owner);
         }
 
         throw new System.Exception("Skill not found " + skillCfg.ScriptName);

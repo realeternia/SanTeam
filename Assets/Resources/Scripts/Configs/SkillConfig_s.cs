@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿using System;
+﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -949,6 +949,84 @@ namespace CommonConfig
             config[2020853] = new SkillConfig(2020853, "傲言", "许攸", "", "术", 3, 0f, 4.5f, 12, "", 0, "", 40f, 0f, "", 0, 0.16f, 66f, 0, "伤", false, 5f, "", 0, 0f, 0f, 0f, 0, "SkillAidArrogantWord", "sway", "MagicChargeYellow", 0f, "xuyou", "", "", "");
             config[2020854] = new SkillConfig(2020854, "傲言", "许攸", "", "术", 4, 0f, 4.5f, 12, "", 0, "", 40f, 0f, "", 0, 0.20f, 92f, 0, "伤", false, 5f, "", 0, 0f, 0f, 0f, 0, "SkillAidArrogantWord", "sway", "MagicChargeYellow", 0f, "xuyou", "", "", "");
             config[2020855] = new SkillConfig(2020855, "傲言", "许攸", "", "术", 5, 0f, 4.5f, 12, "", 0, "", 40f, 0f, "", 0, 0.25f, 128f, 0, "伤", false, 5f, "", 0, 0f, 0f, 0f, 0, "SkillAidArrogantWord", "sway", "MagicChargeYellow", 0f, "xuyou", "", "", "");
+
+            // ===== 马谡·守势 2020901~2020905（SkillAidSlowStrike）=====
+            config[2020901] = new SkillConfig(2020901, "守势", "马谡", "守势，对目标造成/strength法术伤害并使其减速/strength2%，持续/bufftime秒", "术", 1, 0f, 6f, 13, "", 0, "", 50f, 0f, "", 0, 30f, 0.45f, 0, "缓", true, 3f, "", 0, 0f, 0f, 0f, 0, "SkillAidSlowStrike", "sway", "MagicNovaYellow", 0f, "masu", "", "", "");
+            config[2020902] = new SkillConfig(2020902, "守势", "马谡", "", "术", 2, 0f, 6f, 13, "", 0, "", 50f, 0f, "", 0, 45f, 0.50f, 0, "缓", true, 3f, "", 0, 0f, 0f, 0f, 0, "SkillAidSlowStrike", "sway", "MagicNovaYellow", 0f, "masu", "", "", "");
+            config[2020903] = new SkillConfig(2020903, "守势", "马谡", "", "术", 3, 0f, 6f, 13, "", 0, "", 50f, 0f, "", 0, 65f, 0.50f, 0, "缓", true, 4f, "", 0, 0f, 0f, 0f, 0, "SkillAidSlowStrike", "sway", "MagicNovaYellow", 0f, "masu", "", "", "");
+            config[2020904] = new SkillConfig(2020904, "守势", "马谡", "", "术", 4, 0f, 6f, 13, "", 0, "", 50f, 0f, "", 0, 90f, 0.55f, 0, "缓", true, 4f, "", 0, 0f, 0f, 0f, 0, "SkillAidSlowStrike", "sway", "MagicNovaYellow", 0f, "masu", "", "", "");
+            config[2020905] = new SkillConfig(2020905, "守势", "马谡", "", "术", 5, 0f, 6f, 13, "", 0, "", 50f, 0f, "", 0, 120f, 0.55f, 0, "缓", true, 4f, "", 0, 0f, 0f, 0f, 0, "SkillAidSlowStrike", "sway", "MagicNovaYellow", 0f, "masu", "", "", "");
+
+            // ===== 张辽·威震 2020906~2020910（SkillAidVengefulStance）=====
+            config[2020906] = new SkillConfig(2020906, "威震", "张辽", "威震逍遥津，获得威震状态持续/bufftime秒：期间普攻有/strengthint%几率眩晕目标，并把受到伤害的/strength%反还给攻击者", "术", 1, 0f, 7f, 16, "", 0, "", 0f, 0f, "", 0, 0.15f, 0f, 40, "威", false, 5f, "", 0, 0f, 0f, 0f, 0, "SkillAidVengefulStance", "sway", "MagicChargeYellow", 0f, "zhangliao", "", "", "");
+            config[2020907] = new SkillConfig(2020907, "威震", "张辽", "", "术", 2, 0f, 7f, 16, "", 0, "", 0f, 0f, "", 0, 0.20f, 0f, 45, "威", false, 5f, "", 0, 0f, 0f, 0f, 0, "SkillAidVengefulStance", "sway", "MagicChargeYellow", 0f, "zhangliao", "", "", "");
+            config[2020908] = new SkillConfig(2020908, "威震", "张辽", "", "术", 3, 0f, 7f, 16, "", 0, "", 0f, 0f, "", 0, 0.25f, 0f, 50, "威", false, 6f, "", 0, 0f, 0f, 0f, 0, "SkillAidVengefulStance", "sway", "MagicChargeYellow", 0f, "zhangliao", "", "", "");
+            config[2020909] = new SkillConfig(2020909, "威震", "张辽", "", "术", 4, 0f, 7f, 16, "", 0, "", 0f, 0f, "", 0, 0.30f, 0f, 55, "威", false, 6f, "", 0, 0f, 0f, 0f, 0, "SkillAidVengefulStance", "sway", "MagicChargeYellow", 0f, "zhangliao", "", "", "");
+            config[2020910] = new SkillConfig(2020910, "威震", "张辽", "", "术", 5, 0f, 7f, 16, "", 0, "", 0f, 0f, "", 0, 0.35f, 0f, 60, "威", false, 7f, "", 0, 0f, 0f, 0f, 0, "SkillAidVengefulStance", "sway", "MagicChargeYellow", 0f, "zhangliao", "", "", "");
+
+            // ===== 于禁·铁壁 2020911~2020915（SkillAidIronGuard）=====
+            config[2020911] = new SkillConfig(2020911, "铁壁", "于禁", "竖壁清野，为自身附加/strength%减伤盾持续/bufftime秒，嘲讽/area范围内敌人并对其造成/strength2法术伤害", "术", 1, 0f, 9f, 15, "", 0, "", 40f, 20f, "", 0, 0.20f, 10f, 0, "硬", false, 4f, "", 0, 0f, 0f, 0f, 0, "SkillAidIronGuard", "sway", "MagicNovaYellow", 0f, "yujin", "", "", "");
+            config[2020912] = new SkillConfig(2020912, "铁壁", "于禁", "", "术", 2, 0f, 9f, 15, "", 0, "", 40f, 20f, "", 0, 0.24f, 15f, 0, "硬", false, 4f, "", 0, 0f, 0f, 0f, 0, "SkillAidIronGuard", "sway", "MagicNovaYellow", 0f, "yujin", "", "", "");
+            config[2020913] = new SkillConfig(2020913, "铁壁", "于禁", "", "术", 3, 0f, 9f, 15, "", 0, "", 40f, 20f, "", 0, 0.28f, 22f, 0, "硬", false, 5f, "", 0, 0f, 0f, 0f, 0, "SkillAidIronGuard", "sway", "MagicNovaYellow", 0f, "yujin", "", "", "");
+            config[2020914] = new SkillConfig(2020914, "铁壁", "于禁", "", "术", 4, 0f, 9f, 15, "", 0, "", 40f, 20f, "", 0, 0.32f, 30f, 0, "硬", false, 5f, "", 0, 0f, 0f, 0f, 0, "SkillAidIronGuard", "sway", "MagicNovaYellow", 0f, "yujin", "", "", "");
+            config[2020915] = new SkillConfig(2020915, "铁壁", "于禁", "", "术", 5, 0f, 9f, 15, "", 0, "", 40f, 20f, "", 0, 0.36f, 42f, 0, "硬", false, 5f, "", 0, 0f, 0f, 0f, 0, "SkillAidIronGuard", "sway", "MagicNovaYellow", 0f, "yujin", "", "", "");
+
+            // ===== 孙坚·破阵 2020916~2020920（SkillAidArmorBreak）=====
+            config[2020916] = new SkillConfig(2020916, "破阵", "孙坚", "江东猛虎，对/area范围内的敌人造成/strength法术伤害并削减其护甲/strength2点，持续/bufftime秒", "术", 1, 0f, 7f, 14, "", 0, "", 40f, 24f, "", 0, 25f, 25f, 0, "破", true, 4f, "", 0, 0f, 0f, 0f, 0, "SkillAidArmorBreak", "sway", "MagicNovaBlue", 0f, "sunjian", "", "", "");
+            config[2020917] = new SkillConfig(2020917, "破阵", "孙坚", "", "术", 2, 0f, 7f, 14, "", 0, "", 40f, 24f, "", 0, 38f, 30f, 0, "破", true, 4f, "", 0, 0f, 0f, 0f, 0, "SkillAidArmorBreak", "sway", "MagicNovaBlue", 0f, "sunjian", "", "", "");
+            config[2020918] = new SkillConfig(2020918, "破阵", "孙坚", "", "术", 3, 0f, 7f, 14, "", 0, "", 40f, 24f, "", 0, 55f, 38f, 0, "破", true, 5f, "", 0, 0f, 0f, 0f, 0, "SkillAidArmorBreak", "sway", "MagicNovaBlue", 0f, "sunjian", "", "", "");
+            config[2020919] = new SkillConfig(2020919, "破阵", "孙坚", "", "术", 4, 0f, 7f, 14, "", 0, "", 40f, 24f, "", 0, 78f, 46f, 0, "破", true, 5f, "", 0, 0f, 0f, 0f, 0, "SkillAidArmorBreak", "sway", "MagicNovaBlue", 0f, "sunjian", "", "", "");
+            config[2020920] = new SkillConfig(2020920, "破阵", "孙坚", "", "术", 5, 0f, 7f, 14, "", 0, "", 40f, 24f, "", 0, 105f, 55f, 0, "破", true, 5f, "", 0, 0f, 0f, 0f, 0, "SkillAidArmorBreak", "sway", "MagicNovaBlue", 0f, "sunjian", "", "", "");
+
+            // ===== 张绣·枪出如龙 2020921~2020925（SkillAidSweepingAoe）=====
+            config[2020921] = new SkillConfig(2020921, "枪出如龙", "张绣", "枪出如龙，对/area范围内的敌人造成/strength法术伤害", "术", 1, 0f, 6f, 14, "", 0, "", 40f, 24f, "", 0, 30f, 0f, 0, "", false, 0f, "", 0, 0f, 0f, 0f, 0, "SkillAidSweepingAoe", "sway", "AuraSoftPurple", 0f, "zhangxiu", "", "", "");
+            config[2020922] = new SkillConfig(2020922, "枪出如龙", "张绣", "", "术", 2, 0f, 6f, 14, "", 0, "", 40f, 24f, "", 0, 45f, 0f, 0, "", false, 0f, "", 0, 0f, 0f, 0f, 0, "SkillAidSweepingAoe", "sway", "AuraSoftPurple", 0f, "zhangxiu", "", "", "");
+            config[2020923] = new SkillConfig(2020923, "枪出如龙", "张绣", "", "术", 3, 0f, 6f, 14, "", 0, "", 40f, 24f, "", 0, 65f, 0f, 0, "", false, 0f, "", 0, 0f, 0f, 0f, 0, "SkillAidSweepingAoe", "sway", "AuraSoftPurple", 0f, "zhangxiu", "", "", "");
+            config[2020924] = new SkillConfig(2020924, "枪出如龙", "张绣", "", "术", 4, 0f, 6f, 14, "", 0, "", 40f, 24f, "", 0, 90f, 0f, 0, "", false, 0f, "", 0, 0f, 0f, 0f, 0, "SkillAidSweepingAoe", "sway", "AuraSoftPurple", 0f, "zhangxiu", "", "", "");
+            config[2020925] = new SkillConfig(2020925, "枪出如龙", "张绣", "", "术", 5, 0f, 6f, 14, "", 0, "", 40f, 24f, "", 0, 120f, 0f, 0, "", false, 0f, "", 0, 0f, 0f, 0f, 0, "SkillAidSweepingAoe", "sway", "AuraSoftPurple", 0f, "zhangxiu", "", "", "");
+
+            // ===== 魏延·背水 2020926~2020930（SkillAidDiveCleave）=====
+            config[2020926] = new SkillConfig(2020926, "背水", "魏延", "背水一战，对/area范围内的敌人造成/strength法术伤害并降低其治疗/strengthint%，持续/bufftime秒", "术", 1, 0f, 7f, 15, "", 0, "", 40f, 24f, "", 0, 28f, 0f, 20, "疫", true, 4f, "", 0, 0f, 0f, 0f, 0, "SkillAidDiveCleave", "sway", "SoftFireBigRed", 0f, "weiyan", "", "", "");
+            config[2020927] = new SkillConfig(2020927, "背水", "魏延", "", "术", 2, 0f, 7f, 15, "", 0, "", 40f, 24f, "", 0, 42f, 0f, 20, "疫", true, 4f, "", 0, 0f, 0f, 0f, 0, "SkillAidDiveCleave", "sway", "SoftFireBigRed", 0f, "weiyan", "", "", "");
+            config[2020928] = new SkillConfig(2020928, "背水", "魏延", "", "术", 3, 0f, 7f, 15, "", 0, "", 40f, 24f, "", 0, 60f, 0f, 25, "疫", true, 5f, "", 0, 0f, 0f, 0f, 0, "SkillAidDiveCleave", "sway", "SoftFireBigRed", 0f, "weiyan", "", "", "");
+            config[2020929] = new SkillConfig(2020929, "背水", "魏延", "", "术", 4, 0f, 7f, 15, "", 0, "", 40f, 24f, "", 0, 85f, 0f, 25, "疫", true, 5f, "", 0, 0f, 0f, 0f, 0, "SkillAidDiveCleave", "sway", "SoftFireBigRed", 0f, "weiyan", "", "", "");
+            config[2020930] = new SkillConfig(2020930, "背水", "魏延", "", "术", 5, 0f, 7f, 15, "", 0, "", 40f, 24f, "", 0, 115f, 0f, 30, "疫", true, 5f, "", 0, 0f, 0f, 0f, 0, "SkillAidDiveCleave", "sway", "SoftFireBigRed", 0f, "weiyan", "", "", "");
+
+            // ===== 典韦·恶来 2020931~2020935（SkillAidBerserkCleave）=====
+            config[2020931] = new SkillConfig(2020931, "恶来", "典韦", "古之恶来，对自身/area范围内的敌人造成/strength法术伤害，并进入狂暴状态使自身增伤与受击加深/strength2%，持续/bufftime秒", "术", 1, 0f, 8f, 16, "", 0, "", 40f, 20f, "", 0, 35f, 0.15f, 0, "狂", false, 5f, "", 0, 0f, 0f, 0f, 0, "SkillAidBerserkCleave", "sway", "MagicChargeYellow", 0f, "dianwei", "", "", "");
+            config[2020932] = new SkillConfig(2020932, "恶来", "典韦", "", "术", 2, 0f, 8f, 16, "", 0, "", 40f, 20f, "", 0, 52f, 0.20f, 0, "狂", false, 5f, "", 0, 0f, 0f, 0f, 0, "SkillAidBerserkCleave", "sway", "MagicChargeYellow", 0f, "dianwei", "", "", "");
+            config[2020933] = new SkillConfig(2020933, "恶来", "典韦", "", "术", 3, 0f, 8f, 16, "", 0, "", 40f, 20f, "", 0, 75f, 0.25f, 0, "狂", false, 6f, "", 0, 0f, 0f, 0f, 0, "SkillAidBerserkCleave", "sway", "MagicChargeYellow", 0f, "dianwei", "", "", "");
+            config[2020934] = new SkillConfig(2020934, "恶来", "典韦", "", "术", 4, 0f, 8f, 16, "", 0, "", 40f, 20f, "", 0, 105f, 0.30f, 0, "狂", false, 6f, "", 0, 0f, 0f, 0f, 0, "SkillAidBerserkCleave", "sway", "MagicChargeYellow", 0f, "dianwei", "", "", "");
+            config[2020935] = new SkillConfig(2020935, "恶来", "典韦", "", "术", 5, 0f, 8f, 16, "", 0, "", 40f, 20f, "", 0, 145f, 0.35f, 0, "狂", false, 7f, "", 0, 0f, 0f, 0f, 0, "SkillAidBerserkCleave", "sway", "MagicChargeYellow", 0f, "dianwei", "", "", "");
+
+            // ===== 曹真·虎豹 2020936~2020940（SkillAidThrust）=====
+            config[2020936] = new SkillConfig(2020936, "虎豹", "曹真", "虎豹骑突刺，对目标造成/strength法术伤害", "术", 1, 0f, 6f, 12, "", 0, "", 50f, 0f, "", 0, 45f, 0f, 0, "", false, 0f, "", 0, 0f, 0f, 0f, 0, "SkillAidThrust", "sway", "MagicNovaYellow", 0f, "caozhen", "", "", "");
+            config[2020937] = new SkillConfig(2020937, "虎豹", "曹真", "", "术", 2, 0f, 6f, 12, "", 0, "", 50f, 0f, "", 0, 65f, 0f, 0, "", false, 0f, "", 0, 0f, 0f, 0f, 0, "SkillAidThrust", "sway", "MagicNovaYellow", 0f, "caozhen", "", "", "");
+            config[2020938] = new SkillConfig(2020938, "虎豹", "曹真", "", "术", 3, 0f, 6f, 12, "", 0, "", 50f, 0f, "", 0, 92f, 0f, 0, "", false, 0f, "", 0, 0f, 0f, 0f, 0, "SkillAidThrust", "sway", "MagicNovaYellow", 0f, "caozhen", "", "", "");
+            config[2020939] = new SkillConfig(2020939, "虎豹", "曹真", "", "术", 4, 0f, 6f, 12, "", 0, "", 50f, 0f, "", 0, 128f, 0f, 0, "", false, 0f, "", 0, 0f, 0f, 0f, 0, "SkillAidThrust", "sway", "MagicNovaYellow", 0f, "caozhen", "", "", "");
+            config[2020940] = new SkillConfig(2020940, "虎豹", "曹真", "", "术", 5, 0f, 6f, 12, "", 0, "", 50f, 0f, "", 0, 172f, 0f, 0, "", false, 0f, "", 0, 0f, 0f, 0f, 0, "SkillAidThrust", "sway", "MagicNovaYellow", 0f, "caozhen", "", "", "");
+
+            // ===== 孙策·破阵冲阵 2020941~2020945（SkillAidChargeImpale）=====
+            config[2020941] = new SkillConfig(2020941, "破阵冲阵", "孙策", "小霸王掣枪直撞，对前方穿透路径上的敌人造成/strength法术伤害", "术", 1, 0f, 9f, 17, "", 0, "", 60f, 20f, "", 0, 40f, 0f, 0, "", false, 0f, "", 0, 0f, 0f, 0f, 0, "SkillAidChargeImpale", "sway", "MagicChargeYellow", 0f, "sunce", "", "", "");
+            config[2020942] = new SkillConfig(2020942, "破阵冲阵", "孙策", "", "术", 2, 0f, 9f, 17, "", 0, "", 60f, 20f, "", 0, 60f, 0f, 0, "", false, 0f, "", 0, 0f, 0f, 0f, 0, "SkillAidChargeImpale", "sway", "MagicChargeYellow", 0f, "sunce", "", "", "");
+            config[2020943] = new SkillConfig(2020943, "破阵冲阵", "孙策", "", "术", 3, 0f, 9f, 17, "", 0, "", 60f, 20f, "", 0, 85f, 0f, 0, "", false, 0f, "", 0, 0f, 0f, 0f, 0, "SkillAidChargeImpale", "sway", "MagicChargeYellow", 0f, "sunce", "", "", "");
+            config[2020944] = new SkillConfig(2020944, "破阵冲阵", "孙策", "", "术", 4, 0f, 9f, 17, "", 0, "", 60f, 20f, "", 0, 120f, 0f, 0, "", false, 0f, "", 0, 0f, 0f, 0f, 0, "SkillAidChargeImpale", "sway", "MagicChargeYellow", 0f, "sunce", "", "", "");
+            config[2020945] = new SkillConfig(2020945, "破阵冲阵", "孙策", "", "术", 5, 0f, 9f, 17, "", 0, "", 60f, 20f, "", 0, 160f, 0f, 0, "", false, 0f, "", 0, 0f, 0f, 0f, 0, "SkillAidChargeImpale", "sway", "MagicChargeYellow", 0f, "sunce", "", "", "");
+
+            // ===== 蒋钦·江河 2020946~2020950（SkillAidScorchingRain）=====
+            config[2020946] = new SkillConfig(2020946, "江河", "蒋钦", "江河倾泻，对/area范围内的敌人造成/strength法术伤害并使其每秒流失/strength2点生命，持续/bufftime秒", "术", 1, 0f, 7f, 15, "", 0, "", 40f, 24f, "", 0, 22f, 3f, 0, "", false, 4f, "", 0, 0f, 0f, 0f, 0, "SkillAidScorchingRain", "sway", "SoftFireBigRed", 0f, "jiangqing", "", "", "");
+            config[2020947] = new SkillConfig(2020947, "江河", "蒋钦", "", "术", 2, 0f, 7f, 15, "", 0, "", 40f, 24f, "", 0, 32f, 4f, 0, "", false, 4f, "", 0, 0f, 0f, 0f, 0, "SkillAidScorchingRain", "sway", "SoftFireBigRed", 0f, "jiangqing", "", "", "");
+            config[2020948] = new SkillConfig(2020948, "江河", "蒋钦", "", "术", 3, 0f, 7f, 15, "", 0, "", 40f, 24f, "", 0, 46f, 6f, 0, "", false, 5f, "", 0, 0f, 0f, 0f, 0, "SkillAidScorchingRain", "sway", "SoftFireBigRed", 0f, "jiangqing", "", "", "");
+            config[2020949] = new SkillConfig(2020949, "江河", "蒋钦", "", "术", 4, 0f, 7f, 15, "", 0, "", 40f, 24f, "", 0, 64f, 8f, 0, "", false, 5f, "", 0, 0f, 0f, 0f, 0, "SkillAidScorchingRain", "sway", "SoftFireBigRed", 0f, "jiangqing", "", "", "");
+            config[2020950] = new SkillConfig(2020950, "江河", "蒋钦", "", "术", 5, 0f, 7f, 15, "", 0, "", 40f, 24f, "", 0, 88f, 11f, 0, "", false, 5f, "", 0, 0f, 0f, 0f, 0, "SkillAidScorchingRain", "sway", "SoftFireBigRed", 0f, "jiangqing", "", "", "");
+
+            // ===== 文丑·陷阵怒吼 2020951~2020955（SkillAidColossalSlam）=====
+            config[2020951] = new SkillConfig(2020951, "陷阵怒吼", "文丑", "河北声威，对/area范围内的敌人造成/strength法术伤害，并额外造成其最大生命/strength2%的伤害", "术", 1, 0f, 8f, 18, "", 0, "", 40f, 24f, "", 0, 80f, 0.08f, 0, "", false, 0f, "", 0, 0f, 0f, 0f, 0, "SkillAidColossalSlam", "sway", "MagicNovaBlue", 0f, "wenchou", "", "", "");
+            config[2020952] = new SkillConfig(2020952, "陷阵怒吼", "文丑", "", "术", 2, 0f, 8f, 18, "", 0, "", 40f, 24f, "", 0, 110f, 0.10f, 0, "", false, 0f, "", 0, 0f, 0f, 0f, 0, "SkillAidColossalSlam", "sway", "MagicNovaBlue", 0f, "wenchou", "", "", "");
+            config[2020953] = new SkillConfig(2020953, "陷阵怒吼", "文丑", "", "术", 3, 0f, 8f, 18, "", 0, "", 40f, 24f, "", 0, 145f, 0.12f, 0, "", false, 0f, "", 0, 0f, 0f, 0f, 0, "SkillAidColossalSlam", "sway", "MagicNovaBlue", 0f, "wenchou", "", "", "");
+            config[2020954] = new SkillConfig(2020954, "陷阵怒吼", "文丑", "", "术", 4, 0f, 8f, 18, "", 0, "", 40f, 24f, "", 0, 185f, 0.14f, 0, "", false, 0f, "", 0, 0f, 0f, 0f, 0, "SkillAidColossalSlam", "sway", "MagicNovaBlue", 0f, "wenchou", "", "", "");
+            config[2020955] = new SkillConfig(2020955, "陷阵怒吼", "文丑", "", "术", 5, 0f, 8f, 18, "", 0, "", 40f, 24f, "", 0, 235f, 0.16f, 0, "", false, 0f, "", 0, 0f, 0f, 0f, 0, "SkillAidColossalSlam", "sway", "MagicNovaBlue", 0f, "wenchou", "", "", "");
+
             config[2030041] = new SkillConfig(2030041, "威震", "威", "攻击时混乱周围目标", "", 1, 0.2f, 5f, 20, "", 0, "", 20f, 0f, "castUnit", 3, 0f, 0f, 0, "乱", false, 1.5f, "", 0, 0f, 0f, 0f, 0, "HitBuffArea", "spin", "MagicNovaYellow", 0f, "", "", "", "");
             config[2030042] = new SkillConfig(2030042, "威震", "威", "", "", 2, 0.2f, 5f, 20, "", 0, "", 20f, 0f, "castUnit", 3, 0f, 0f, 0, "乱", false, 1.5f, "", 0, 0f, 0f, 0f, 0, "HitBuffArea", "spin", "MagicNovaYellow", 0f, "", "", "", "");
             config[2030043] = new SkillConfig(2030043, "威震", "威", "", "", 3, 0.2f, 5f, 20, "", 0, "", 20f, 0f, "castUnit", 3, 0f, 0f, 0, "乱", false, 1.5f, "", 0, 0f, 0f, 0f, 0, "HitBuffArea", "spin", "MagicNovaYellow", 0f, "", "", "", "");

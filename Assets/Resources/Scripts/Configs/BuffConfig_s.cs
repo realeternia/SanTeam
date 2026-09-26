@@ -159,6 +159,7 @@ namespace CommonConfig
             config[300022] = new BuffConfig(300022, "狂暴", "狂", "造成的伤害提升，但自身受到的伤害也提升（双刃）", true, "BuffFrenzy", "", "", "", "");
             config[300023] = new BuffConfig(300023, "嘲讽", "嘲", "成为敌对单位强制优先攻击的目标", false, "BuffTaunt", "#00CC00", "#66FF66", "", "");
             config[300024] = new BuffConfig(300024, "生命链接", "链", "与链接方共享伤害与回复", false, "BuffLifeLink", "", "", "", "");
+            config[300025] = new BuffConfig(300025, "反伤", "反", "受到伤害时将其中一部分返还给攻击者", false, "BuffReflect", "", "", "", "");
             RebuildIndex();
 
         }

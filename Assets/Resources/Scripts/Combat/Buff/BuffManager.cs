@@ -68,6 +68,9 @@ public static class BuffManager
             case "BuffHitStun":
                 buff = new BuffHitStun(buffId, skillId, caster, target, time);
                 break;
+            case "BuffReflect":
+                buff = new BuffReflect(buffId, skillId, caster, target, time);
+                break;
             case "BuffAtkDown":
                 buff = new BuffAtkDown(buffId, skillId, caster, target, time);
                 break;
