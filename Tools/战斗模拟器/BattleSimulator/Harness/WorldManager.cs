@@ -309,6 +309,8 @@ public class WorldManager : MonoBehaviour
             GameLog.Error("WorldManager.BattleBegin: GameManager.Instance.players 为空");
             return;
         }
+        // 复刻游戏启动时 GameManager 调用的 InitFriend：构建好友关系/特殊连锁字典（friendRdData 在 harness 为空，仅落地静态 HeroFriendConfig）
+        ConfigManager.InitFriend();
         for (int i = 0; i < players.Length; i++)
             players[i].OnBattleBegin();
 

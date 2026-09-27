@@ -163,6 +163,8 @@ namespace CommonConfig
             config[300027] = new BuffConfig(300027, "仁政", "仁", "提升生命回复/strength点/秒、法力回复/strength2点/秒", true, "BuffHpMpRegen", "#00CC00", "#66FF66", "", "");
             config[300028] = new BuffConfig(300028, "护驾", "护", "受到的回复效果提升/strength%", true, "BuffHealBoost", "", "", "", "");
             config[300029] = new BuffConfig(300029, "名门", "名", "提升攻击/strength点、护甲与魔抗/strength2点", true, "BuffMultiAttr", "", "", "", "");
+            config[300030] = new BuffConfig(300030, "望族", "望", "提升/strength点护甲、/strength2点魔抗，每3秒衰减1/5，15秒后归零", true, "BuffDecayDef", "", "", "", "");
+            config[300031] = new BuffConfig(300031, "兼资", "兼", "攻击叠层：每层提升/strength攻击、/strength2法术强度，持续攻击刷新，停手后层数清零", true, "BuffStackBuf", "", "", "", "");
             RebuildIndex();
 
         }

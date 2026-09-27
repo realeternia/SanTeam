@@ -101,6 +101,8 @@ public static class CombatConst
     // ---- 好友连锁·特殊 ----
     /// <summary>好友特殊(关联助益)技能起始等级（默认没有该技能=0级，每多一个好友+1级）</summary>
     public const int FriendSpecialBaseLevel = 0;
+    /// <summary>名门望族·门阀双防衰减间隔(秒)：每跳衰减初始加成1/5，共5跳、15秒归零</summary>
+    public const float FriendDecayInterval = 3f;
 
     // ---- 布阵图(5x5) ----
     // 布阵图坐标(索引 0~24, 行优先)：

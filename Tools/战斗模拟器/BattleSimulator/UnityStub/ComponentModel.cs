@@ -446,9 +446,12 @@ namespace UnityEngine
 
         public Transform Find(string name)
         {
-            // 桩：找不到就返回一个虚拟子节点，供 GetComponent 拿哑组件
-            var dummy = ComponentFactory.Create<Transform>(new GameObject("dummy"));
-            return dummy;
+            // 桩：找不到就返回一个虚拟子节点，供 GetComponent 拿哑组件。
+            // 好友连线特效(FriendLineManager.CreateFriendLine)需要挂 GlowBeamController，这里直接附上哑组件避免空引用崩溃。
+            var dummyGo = new GameObject("dummy");
+            if (dummyGo.GetComponent<GlowBeamController>() == null)
+                dummyGo.AddComponent<GlowBeamController>();
+            return dummyGo.transform;
         }
 
         public void Translate(Vector3 translation)

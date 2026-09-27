@@ -113,6 +113,12 @@ public static class BuffManager
             case "BuffMultiAttr":
                 buff = new BuffMultiAttr(buffId, skillId, caster, target, time);
                 break;
+            case "BuffDecayDef":
+                buff = new BuffDecayDef(buffId, skillId, caster, target, time);
+                break;
+            case "BuffStackBuf":
+                buff = new BuffStackBuf(buffId, skillId, caster, target, time);
+                break;
 
         }
 

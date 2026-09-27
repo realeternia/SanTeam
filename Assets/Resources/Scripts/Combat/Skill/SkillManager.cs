@@ -282,6 +282,23 @@ public static class SkillManager
                 return new SkillAidBalance(skillId, owner);
             case "SkillAidNobleBless":
                 return new SkillAidNobleBless(skillId, owner);
+
+            case "InitNoEquipAttr":
+                return new SkillInitNoEquipAttr(skillId, owner);
+            case "InitMpFill":
+                return new SkillInitMpFill(skillId, owner);
+            case "InitDecayDef":
+                return new SkillInitDecayDef(skillId, owner);
+            case "AttackStackBuffer":
+                return new SkillAttackStackBuffer(skillId, owner);
+            case "AidSelfShield":
+                return new SkillAidSelfShield(skillId, owner);
+            case "AttackMpGain":
+                return new SkillAttackMpGain(skillId, owner);
+            case "KillGain":
+                return new SkillKillGain(skillId, owner);
+            case "InitSoldierBuff":
+                return new SkillInitSoldierBuff(skillId, owner);
         }
 
         throw new System.Exception("Skill not found " + skillCfg.ScriptName);
