@@ -20,7 +20,7 @@ public static class SysColor
         return ArmsLevelColors[ArmsLevelColors.Length - 1];
     }
 
-    // 英雄品质色（1普通-白 2优秀-绿 3精良-蓝 4史诗-紫）
+    // 英雄品质色（1普通-白 2优秀-绿 3精良-蓝 4史诗-金）
     public static Color GetQualityColor(int quality)
     {
         switch (quality)
@@ -28,7 +28,7 @@ public static class SysColor
             case 1: return new Color(255 / 255f, 255 / 255f, 255 / 255f); // 普通-白
             case 2: return new Color(30 / 255f, 255 / 255f, 0 / 255f);    // 优秀-绿
             case 3: return new Color(0 / 255f, 112 / 255f, 221 / 255f);   // 精良-蓝
-            case 4: return new Color(0 / 255f, 112 / 255f, 221 / 255f);   // 精良-蓝
+            case 4: return new Color(255 / 255f, 215 / 255f, 0 / 255f);   // 史诗-金
             case 5: return new Color(255 / 255f, 0 / 255f, 0 / 255f);   // 史诗-红
             default: return new Color(255 / 255f, 255 / 255f, 255 / 255f); // 普通-白
         }

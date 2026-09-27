@@ -44,7 +44,7 @@ namespace CommonConfig
             {"Name", new FieldMetaInfo("名字", "string", 0)},
             {"Lv", new FieldMetaInfo("等级", "int", 60)},
             {"Job", new FieldMetaInfo("职业", "string", 0)},
-            {"Quality", new FieldMetaInfo("品质：1普通 2优秀 3精良 4史诗", "int", 60, "4:#FF00FF,3:#3333FF,2:#33CC33,1:#666666")},
+            {"Quality", new FieldMetaInfo("品质：1普通 2优秀 3精良 4史诗", "int", 60, "4:#FFD700,3:#3333FF,2:#33CC33,1:#666666")},
             {"Atk", new FieldMetaInfo("攻击（0=职业基准，>0与职业相加）", "int", 60, "95-100:#FF9900,90-94:#995500,80-89:#33CC33")},
             {"Ap", new FieldMetaInfo("法术强度（0=职业基准，>0与职业相加）", "int", 60, "95-100:#FF9900,90-94:#995500,80-89:#33CC33")},
             {"Hp", new FieldMetaInfo("生命", "int", 60)},

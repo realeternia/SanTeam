@@ -29,7 +29,8 @@ public class SkillAidPoisonArrow : Skill
         // 附加持续中毒Buff（"败"，每秒dot读自身 skillCfg.Strength）
         BuffManager.AddBuff(target, owner, id, BuffConfig.GetConfigByNameS("败").Id, skillCfg.BuffTime);
 
-        EffectManager.PlaySkillEffect(target, skillCfg.HitEffect);
+        if (!string.IsNullOrEmpty(skillCfg.HitEffect))
+            EffectManager.PlaySkillEffect(target, skillCfg.HitEffect);
         return true;
     }
 }

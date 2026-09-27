@@ -28,7 +28,17 @@ public static class EffectManager
 
     public static GameObject PlaySkillEffect(Chess sourceChess, string effect, float time = 1.3f)
     {
+        if (string.IsNullOrEmpty(effect))
+        {
+            GameLog.Warn("PlaySkillEffect 特效名为空，跳过播放");
+            return null;
+        }
         var hitPrefab = Resources.Load<GameObject>("Prefabs/Effect/" + effect);
+        if (hitPrefab == null)
+        {
+            GameLog.Warn("PlaySkillEffect 特效资源不存在: " + effect);
+            return null;
+        }
         GameLog.Debug("PlaySkillEffect: " + effect);
 
         GameObject hitEffect = UnityEngine.Object.Instantiate(hitPrefab, sourceChess.transform.position, hitPrefab.transform.rotation);
