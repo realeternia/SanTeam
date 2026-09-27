@@ -8,9 +8,13 @@ public class TooltipItem : BaseTooltip
 {
     private const float NameRowHeight = 40f;   // 道具名行高
     private const float AttrRowHeight = 40f;   // 属性行高（一行两个）
+    private const float SkillRowHeight = 100f; // 技能行高（复用 ToolTipHeroSkill）
 
     private static GameObject attrPrefab;                                           // 属性格预制体缓存（复用英雄属性格 ToolTipHeroAttr）
     private readonly List<TooltipHeroAttr> attrCells = new List<TooltipHeroAttr>(); // 属性格（按需生成）
+
+    private static GameObject skillRowPrefab;   // 技能行预制体缓存（复用 ToolTipHeroSkill）
+    private TooltipHeroSkill skillRow;          // 技能行（有技能的物品显示）
 
     private TMP_Text textName; // 道具名（第一行，按品质上色）
     private TMP_Text textDes;  // 描述（第三部分，纯文字，自动换行）
@@ -96,6 +100,24 @@ public class TooltipItem : BaseTooltip
         desRt.sizeDelta = new Vector2(460, 30);
         textDes.gameObject.SetActive(false);
         Destroy(desGo);
+
+        // 技能行（第3.5部分，仅技能物品显示）：复用英雄技能行 ToolTipHeroSkill
+        if (skillRowPrefab == null)
+            skillRowPrefab = Resources.Load<GameObject>("Prefabs/ToolTipHeroSkill");
+        if (skillRowPrefab == null)
+        {
+            GameLog.Error("TooltipItem 技能行预制体加载失败: Prefabs/ToolTipHeroSkill");
+            return;
+        }
+        var skillGo = Instantiate(skillRowPrefab, rect);
+        skillRow = skillGo.GetComponent<TooltipHeroSkill>();
+        if (skillRow == null)
+        {
+            GameLog.Error("TooltipItem 技能行预制体缺少 TooltipHeroSkill 组件");
+            Destroy(skillGo);
+            return;
+        }
+        skillRow.gameObject.SetActive(false);
     }
 
     public void ShowTooltip(int itemId)
@@ -139,10 +161,35 @@ public class TooltipItem : BaseTooltip
         // 按最后一个显示格的所在行计算高度（中间可能跳过无效项，不能按显示个数算）
         int attrRows = lastShownRow + 1;
 
-        // 第三部分：描述（属性区下方，纯文字，高度自适应首选高度）
-        bool hasDes = !string.IsNullOrEmpty(itemCfg.Des);
+        // 第三部分（技能行）：属性区与描述之间，仅对有技能效果的物品显示
         float currentY = 10f + NameRowHeight + 15f + attrRows * AttrRowHeight;
         const float spacing = 5f;
+        bool hasSkill = !string.IsNullOrEmpty(itemCfg.SkillId) && skillRow != null;
+        if (hasSkill)
+        {
+            var skillCfg = ConfigManager.GetSkillConfig(itemCfg.SkillId, 1);
+            if (skillCfg == null)
+            {
+                GameLog.Warn("TooltipItem 物品技能不存在 sname=" + itemCfg.SkillId);
+                hasSkill = false;
+            }
+            else
+            {
+                skillRow.gameObject.SetActive(true);
+                skillRow.SetSkill(skillCfg.Name + ConfigManager.GetSkillDescript(skillCfg), skillCfg.Icon, 1);
+                var rt = (RectTransform)skillRow.transform;
+                rt.anchorMin = new Vector2(0, 1);
+                rt.anchorMax = new Vector2(0, 1);
+                rt.pivot = new Vector2(0, 1);
+                rt.anchoredPosition = new Vector2(15, -currentY);
+                currentY += SkillRowHeight + spacing;
+            }
+        }
+        if (!hasSkill && skillRow != null)
+            skillRow.gameObject.SetActive(false);
+
+        // 第四部分：描述（技能行/属性区下方，纯文字，高度自适应首选高度）
+        bool hasDes = !string.IsNullOrEmpty(itemCfg.Des);
         if (hasDes)
         {
             textDes.gameObject.SetActive(true);
@@ -157,7 +204,7 @@ public class TooltipItem : BaseTooltip
         }
 
         // 没有任何可显示内容时不弹空 Tip
-        if (shownAttr == 0 && !hasDes)
+        if (shownAttr == 0 && !hasDes && !hasSkill)
         {
             HideTooltip();
             return;

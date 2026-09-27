@@ -1264,9 +1264,14 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
             GameLog.Warn(string.Format("合成失败：未找到配方 {0}+{1}，玩家{2}", itemA, itemB, pid));
             return false;
         }
-        // 材料数量校验：两件都需持有足够数量
-        if (GetItemCount(rcp.ItemA) < rcp.ItemAcount ||
-            GetItemCount(rcp.ItemB) < rcp.ItemBcount)
+        // 材料数量校验：同物合成（ItemA==ItemB）时需叠加两边的数量，否则只判一份会只扣一份即可合成
+        bool enough;
+        if (rcp.ItemA == rcp.ItemB)
+            enough = GetItemCount(rcp.ItemA) >= rcp.ItemAcount + rcp.ItemBcount;
+        else
+            enough = GetItemCount(rcp.ItemA) >= rcp.ItemAcount &&
+                     GetItemCount(rcp.ItemB) >= rcp.ItemBcount;
+        if (!enough)
         {
             GameLog.Warn(string.Format("合成失败：材料不足 需要{0}x{1} + {2}x{3}，玩家{4}",
                 rcp.ItemA, rcp.ItemAcount, rcp.ItemB, rcp.ItemBcount, pid));

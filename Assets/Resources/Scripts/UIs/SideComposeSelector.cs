@@ -108,9 +108,11 @@ public class SideComposeSelector : MonoBehaviour
             .ToList();
     }
 
-    // 配方是否可合成：两个材料（未装备的可用副本）数量都满足配置需求
+    // 配方是否可合成：同物合成（ItemA==ItemB）需叠加两边的数量，否则两种材料各判一份
     bool CanCombine(PlayerInfo player, ItemCombineConfig rcp)
     {
+        if (rcp.ItemA == rcp.ItemB)
+            return player.GetItemFreeCount(rcp.ItemA) >= rcp.ItemAcount + rcp.ItemBcount;
         return player.GetItemFreeCount(rcp.ItemA) >= rcp.ItemAcount
             && player.GetItemFreeCount(rcp.ItemB) >= rcp.ItemBcount;
     }

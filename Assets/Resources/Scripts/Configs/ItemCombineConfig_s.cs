@@ -121,8 +121,8 @@ namespace CommonConfig
             config[7] = new ItemCombineConfig(7, 402007, 1, 402004, 1, 400012, 1); // 羽扇+斗篷 → 道德经(ap+magicres)
             config[8] = new ItemCombineConfig(8, 402003, 1, 402004, 1, 400013, 1); // 檀木弓+斗篷 → 赤兔马(atkspeed+magicres)
             config[9] = new ItemCombineConfig(9, 402008, 1, 402005, 1, 400014, 1); // 名马+葫芦 → 的卢马(hp+hpRegen)（hpRegen 无专属品质1材料，就近取葫芦）
-            config[10] = new ItemCombineConfig(10, 402003, 1, 402005, 1, 402009, 1); // 檀木弓+葫芦 → 李广弓(atkspeed+mpRegen)
-            config[11] = new ItemCombineConfig(11, 402008, 1, 402003, 1, 402010, 1); // 名马+檀木弓 → 养由基弓(atkspeed+hp)
+            config[10] = new ItemCombineConfig(10, 402003, 1, 402005, 1, 400042, 1); // 檀木弓+葫芦 → 李广弓(atkspeed+mpRegen)
+            config[11] = new ItemCombineConfig(11, 402008, 1, 402003, 1, 400041, 1); // 名马+檀木弓 → 养由基弓(atkspeed+hp)
             // 补全：保证每个品质1材料（402001~402008）都至少有4条合成路径（当前每样各5条）
             config[12] = new ItemCombineConfig(12, 402002, 1, 402003, 1, 400016, 1); // 皮革甲+檀木弓 → 飞羽甲(armor+atkspeed)
             config[13] = new ItemCombineConfig(13, 402002, 1, 402004, 1, 400017, 1); // 皮革甲+斗篷 → 明光铠(armor+magicres)
