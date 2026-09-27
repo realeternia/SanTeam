@@ -353,10 +353,12 @@ public static class ConfigManager
         var sb = new StringBuilder();
         for (int i = 0; i < input.Length;)
         {
-            if (input[i] == '/' && i + 1 < input.Length && char.IsLetter(input[i + 1]))
+            if (input[i] == '/' && i + 1 < input.Length && IsAsciiLetter(input[i + 1]))
             {
                 int j = i + 1;
-                while (j < input.Length && (char.IsLetterOrDigit(input[j]) || input[j] == '_' || input[j] == '-'))
+                // 字段名仅允许 ASCII 字符（字母/数字/_/-）。不能用 char.IsLetterOrDigit，否则中文字符（Unicode 字母）会被误并入字段名，
+                // 导致 "/strength法术伤害" 被解析成 fieldName="strength法术伤害" 而查不到字段、原样输出
+                while (j < input.Length && IsFieldNameChar(input[j]))
                     j++;
                 var fieldName = input.Substring(i + 1, j - i - 1);
                 // 可选百分比修饰符：/字段名% 表示该数字字段按百分比输出（如 strength=0.3 -> 30%）
@@ -385,6 +387,18 @@ public static class ConfigManager
             }
         }
         return sb.ToString();
+    }
+
+    // ASCII 字母（a-z/A-Z）。字段名首字符必须是 ASCII 字母，不能用 char.IsLetter，否则中文（Unicode 字母）会被误判为字段起始
+    private static bool IsAsciiLetter(char c)
+    {
+        return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z');
+    }
+
+    // 字段名合法字符：ASCII 字母/数字/_/-（不含中文）
+    private static bool IsFieldNameChar(char c)
+    {
+        return IsAsciiLetter(c) || (c >= '0' && c <= '9') || c == '_' || c == '-';
     }
 
     // 输出数值的字段（withNext 括号比较用）；文本类字段(name/type/buffid/auroattrs/linkself/linkteam 整体串)不参与
