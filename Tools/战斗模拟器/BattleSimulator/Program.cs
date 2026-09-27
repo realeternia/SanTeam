@@ -42,6 +42,7 @@ static class Program
             // headless：解析可选参数 seed/soldier/a/b，未指定则随机阵容 + seed 1
             int seed = 1, soldier = 0, testMp = 0;
             List<int> teamA = null, teamB = null;
+            var equips = new List<EquipSpec>();
             for (int i = 0; i < args.Length; i++)
             {
                 if (i + 1 >= args.Length)
@@ -51,8 +52,20 @@ static class Program
                 else if (args[i] == "--test-mp" && int.TryParse(args[i + 1], out int tm)) testMp = Math.Max(0, tm);
                 else if (args[i] == "--a") teamA = HeroLineup.ParseHeroList(args[i + 1]);
                 else if (args[i] == "--b") teamB = HeroLineup.ParseHeroList(args[i + 1]);
+                else if (args[i] == "--equip")
+                {
+                    // 格式 pid:heroId:itemId，可重复；pid 0=甲 1=乙
+                    var parts = args[i + 1].Split(':');
+                    if (parts.Length == 3 && int.TryParse(parts[0], out int pid) && int.TryParse(parts[1], out int h) && int.TryParse(parts[2], out int it))
+                        equips.Add(new EquipSpec(pid, h, it));
+                    else
+                        GameLog.Warn("--equip 格式应为 pid:heroId:itemId，忽略: " + args[i + 1]);
+                }
             }
-            CliRunner.RunBattle(seed, teamA, teamB, soldier, testMp);
+            string eqDesc = string.Join(",", equips.Select(e => e.pid + ":" + e.heroId + ":" + e.itemId));
+            if (equips.Count > 0)
+                Console.WriteLine("装备注入: " + eqDesc);
+            CliRunner.RunBattle(seed, teamA, teamB, soldier, testMp, equips);
             return;
         }
 

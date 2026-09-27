@@ -173,6 +173,17 @@ public class BattleSim
         }
     }
 
+    // 装备注入（容器层测试钩子）：给指定玩家的英雄卡绑定一件道具（含其武器技能），BattleBegin 时随 GetItemIdsOnHero 生效
+    public void EquipItem(int pid, int heroId, int itemId)
+    {
+        if (pid < 0 || pid >= Game.players.Length)
+        {
+            GameLog.Warn("EquipItem: pid=" + pid + " 越界，忽略");
+            return;
+        }
+        Game.players[pid].items.Add(new SerializableItemSlot { ItemId = itemId, HeroId = heroId });
+    }
+
     // 开始一场新战斗：重置随机种子/时间/协程/统计 → BattleBegin
     public void Start(int seed)
     {

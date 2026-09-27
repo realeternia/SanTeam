@@ -136,3 +136,17 @@ public class SerializableItemSlot
     public int ItemId;
     public int HeroId; // 0 = 在背包未装备，非 0 = 装备在该英雄上
 }
+
+// 装备注入测试结构（容器层）：给指定玩家(pid)的英雄(heroId)绑定一件道具(itemId，含其武器技能)
+public struct EquipSpec
+{
+    public int pid;
+    public int heroId;
+    public int itemId;
+    public EquipSpec(int pid, int heroId, int itemId)
+    {
+        this.pid = pid;
+        this.heroId = heroId;
+        this.itemId = itemId;
+    }
+}

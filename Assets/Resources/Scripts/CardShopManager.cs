@@ -178,7 +178,7 @@ public class CardShopManager : MonoBehaviour
                 if (shopCfg.Id > 3)
                 {
                     var existingTuple = heroIds[existingIndex];
-                    heroIds[existingIndex] = new Tuple<int, int>(existingTuple.Item1, existingTuple.Item2 + 1);
+                    heroIds[existingIndex] = new Tuple<int, int>(existingTuple.Item1, Mathf.Min(existingTuple.Item2 + 1, 2)); // 同一英雄卡最多2张
                 }
 
                 continue;
@@ -202,6 +202,7 @@ public class CardShopManager : MonoBehaviour
                 }
             }
 
+            count = Mathf.Min(count, 2); // 商店同一英雄卡最多出售2张
             heroIds.Add(new Tuple<int, int>(heroId, count));
             totalUnique++;
         }
@@ -565,7 +566,7 @@ public class CardShopManager : MonoBehaviour
             if (count == 1)
                 count = Math.Max(1, shopCfg.MultiPriceTotal / 3 / cardPrice);
         }
-        return count;
+        return Mathf.Min(count, 2); // 同一英雄卡最多2张
     }
 
     // 获取一张卡的相邻卡：英雄卡在3列网格中算上下左右，道具卡在一行中算左右

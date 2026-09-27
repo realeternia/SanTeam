@@ -52,7 +52,7 @@ public static class SkillManager
                 return new SkillAttackSpeedAttack(skillId, owner);
             case "AttackReboundArrow":
                 return new SkillAttackReboundArrow(skillId, owner);
-            case "ReduceDamageRate":
+            case "DefReduceDamageRate":
                 return new SkillDefReduceDamageRate(skillId, owner);
             case "HitBuff":
                 return new SkillHitBuff(skillId, owner);

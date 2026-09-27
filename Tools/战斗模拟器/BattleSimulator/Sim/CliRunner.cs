@@ -185,12 +185,18 @@ public static class CliRunner
     }
 
     // 用当前配置跑一场并打印结果（headless 入口也复用此方法）
-    public static void RunBattle(int seed, List<int> teamA, List<int> teamB, int soldierCount = 0, int testMp = 0)
+    // equips：装备注入列表 (pid, heroId, itemId)，在战斗开始前绑定到对应英雄
+    public static void RunBattle(int seed, List<int> teamA, List<int> teamB, int soldierCount = 0, int testMp = 0, List<EquipSpec> equips = null)
     {
         var a = teamA ?? HeroLineup.PickRandomLineup(0);
         var b = teamB ?? HeroLineup.PickRandomLineup(1);
         var battle = new BattleSim();
         battle.Setup(a, b, soldierCount);
+        if (equips != null)
+        {
+            foreach (var eq in equips)
+                battle.EquipItem(eq.pid, eq.heroId, eq.itemId);
+        }
         battle.Start(seed);
         if (testMp > 0)
         {
@@ -208,6 +214,26 @@ public static class CliRunner
             steps++;
         }
         sw.Stop();
+
+        // 容器层诊断：打印每位英雄实际持有的装备技能（209xxx 道具技能段），用于验证武器技能是否正确授予
+        if (battle.World != null && battle.World.chessList != null)
+        {
+            foreach (var c in battle.World.chessList)
+            {
+                if (c == null || !c.isHero || c.skills == null)
+                    continue;
+                foreach (var sk in c.skills)
+                {
+                    if (sk == null || sk.skillId < 2090000 || sk.skillId >= 2100000)
+                        continue;
+                    var skName = "";
+                    if (SkillConfig.HasConfig(sk.skillId))
+                        skName = SkillConfig.GetConfig(sk.skillId).Name;
+                    Utf8Console.WriteLine("[装备技能] " + (c.side == 1 ? "甲" : "乙") + " 武将" + c.heroId
+                        + " 授予 " + skName + "(" + (int)sk.skillId + ")");
+                }
+            }
+        }
 
         string result = !battle.IsFinished ? "平局(步数上限)" : (battle.HasWin ? "甲胜" : "乙胜");
         Utf8Console.WriteLine("结果: " + result + " | 墙钟 " + (sw.ElapsedMilliseconds / 1000.0).ToString("F1") + "s 步数 " + steps);

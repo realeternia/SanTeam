@@ -134,6 +134,23 @@ namespace CommonConfig
             config[19] = new ItemCombineConfig(19, 402004, 1, 402005, 1, 400023, 1); // 斗篷+葫芦 → 鹤氅(magicres+mpRegen)
             config[20] = new ItemCombineConfig(20, 402004, 1, 402008, 1, 400024, 1); // 斗篷+名马 → 绝影(hp+magicres)
             config[21] = new ItemCombineConfig(21, 402001, 1, 402005, 1, 400025, 1); // 长刀+葫芦 → 古锭刀(atk+mpRegen)
+            // 补齐 7 条缺失的不同材料组合（与 1~21 合构成完整的 28 种不同配对）
+            config[22] = new ItemCombineConfig(22, 402001, 1, 402003, 1, 400026, 1); // 长刀+檀木弓 → 淬毒长弓(atk+atkspeed)
+            config[23] = new ItemCombineConfig(23, 402001, 1, 402004, 1, 400027, 1); // 长刀+斗篷 → 破军玄刀(atk+magicres)
+            config[24] = new ItemCombineConfig(24, 402002, 1, 402005, 1, 400028, 1); // 皮革甲+葫芦 → 活力玄甲(armor+mpRegen)
+            config[25] = new ItemCombineConfig(25, 402006, 1, 402007, 1, 400029, 1); // 护手+羽扇 → 灵犀扇(crit+ap)
+            config[26] = new ItemCombineConfig(26, 402006, 1, 402008, 1, 400030, 1); // 护手+名马 → 赤纹蹄印(crit+hp)
+            config[27] = new ItemCombineConfig(27, 402006, 1, 402005, 1, 400031, 1); // 护手+葫芦 → 聚灵护手(crit+mpRegen)
+            config[28] = new ItemCombineConfig(28, 402007, 1, 402003, 1, 400032, 1); // 羽扇+檀木弓 → 追风羽扇(ap+atkspeed)
+            // 8 条两个相同材料合成 → 聚焦单属性品质2（ItemA==ItemB，需同 id 2 件；AI自动合成里按两份数量校验）
+            config[29] = new ItemCombineConfig(29, 402001, 1, 402001, 1, 400033, 1); // 长刀+长刀 → 双股剑(atk+40)
+            config[30] = new ItemCombineConfig(30, 402002, 1, 402002, 1, 400034, 1); // 皮革甲+皮革甲 → 重装玄甲(armor+40)
+            config[31] = new ItemCombineConfig(31, 402003, 1, 402003, 1, 400035, 1); // 檀木弓+檀木弓 → 连环弩(atkspeed+30%)
+            config[32] = new ItemCombineConfig(32, 402004, 1, 402004, 1, 400036, 1); // 斗篷+斗篷 → 玄光法袍(magicres+40)
+            config[33] = new ItemCombineConfig(33, 402005, 1, 402005, 1, 400037, 1); // 葫芦+葫芦 → 玉京葫芦(mpRegen+4)
+            config[34] = new ItemCombineConfig(34, 402006, 1, 402006, 1, 400038, 1); // 护手+护手 → 风雷双护手(crit+35%)
+            config[35] = new ItemCombineConfig(35, 402007, 1, 402007, 1, 400039, 1); // 羽扇+羽扇 → 鹤骨羽扇(ap+25)
+            config[36] = new ItemCombineConfig(36, 402008, 1, 402008, 1, 400040, 1); // 名马+名马 → 天外飞驹(hp+500)
             RebuildIndex();
         }
 
