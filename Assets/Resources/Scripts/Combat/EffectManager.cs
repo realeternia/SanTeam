@@ -6,6 +6,22 @@ using CommonConfig;
 public static class EffectManager
 {
 
+    // 通过 EffectConfig 解析特效资源路径（相对 Resources）：配置存省略 Prefabs/ 前缀的路径（如 Effect/xxx），
+    // 这里统一补全；缺失时回退到 Prefabs/Effect 目录。外部引用仍传特效名（HitEffect 值），由这里统一解析。
+    private static string ResolveEffectPath(string effectName)
+    {
+        if (!string.IsNullOrEmpty(effectName))
+        {
+            var cfg = EffectConfig.GetConfigByname(effectName);
+            if (cfg != null && !string.IsNullOrEmpty(cfg.EffPath))
+                return "Prefabs/" + cfg.EffPath;
+        }
+        if (string.IsNullOrEmpty(effectName))
+            return "Prefabs/Effect/";
+        GameLog.Warn("EffectManager 未在EffectConfig中配置特效[" + effectName + "]，回退 Prefabs/Effect 目录加载");
+        return "Prefabs/Effect/" + effectName;
+    }
+
     public static void PlayHitEffect(Chess sourceChess, Chess targetChess, string effectName)
     {
         // if (sourceChess.isHero)
@@ -16,7 +32,7 @@ public static class EffectManager
         //         GameManager.Instance.PlaySound("Sounds/sword");
         // }
         // 播放粒子特效
-        var hitPrefab = Resources.Load<GameObject>("Prefabs/Effect/" + effectName);
+        var hitPrefab = Resources.Load<GameObject>(ResolveEffectPath(effectName));
         GameObject hitEffect = UnityEngine.Object.Instantiate(hitPrefab, targetChess.transform.position, Quaternion.identity);
         // 设置特效的父对象为目标单位，使其跟随目标移动
         hitEffect.transform.parent = targetChess.transform;
@@ -33,7 +49,7 @@ public static class EffectManager
             GameLog.Warn("PlaySkillEffect 特效名为空，跳过播放");
             return null;
         }
-        var hitPrefab = Resources.Load<GameObject>("Prefabs/Effect/" + effect);
+        var hitPrefab = Resources.Load<GameObject>(ResolveEffectPath(effect));
         if (hitPrefab == null)
         {
             GameLog.Warn("PlaySkillEffect 特效资源不存在: " + effect);
@@ -53,7 +69,7 @@ public static class EffectManager
 
     public static GameObject PlayPosSkillEffect(Chess sourceChess, Vector3 sourcePos, float size, string effect, float time = 1.3f)
     {
-        var hitPrefab = Resources.Load<GameObject>("Prefabs/Effect/" + effect);
+        var hitPrefab = Resources.Load<GameObject>(ResolveEffectPath(effect));
         GameLog.Debug("PlayPosSkillEffect: " + effect);
 
         GameObject hitEffect = UnityEngine.Object.Instantiate(hitPrefab, sourcePos, hitPrefab.transform.rotation);
@@ -69,7 +85,7 @@ public static class EffectManager
 
     public static GameObject PlayBuffEffect(Chess sourceChess, string effect)
     {
-        var hitPrefab = Resources.Load<GameObject>("Prefabs/Effect/" + effect);
+        var hitPrefab = Resources.Load<GameObject>(ResolveEffectPath(effect));
         GameLog.Debug("PlayBuffEffect: " + effect);
 
         GameObject hitEffect = UnityEngine.Object.Instantiate(hitPrefab, sourceChess.transform.position, hitPrefab.transform.rotation);

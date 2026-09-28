@@ -25,6 +25,27 @@ public class Missile : MonoBehaviour
         this.size = size;
     }
 
+    // 通过 EffectConfig 解析导弹资源路径（相对 Resources）：配置存省略 Prefabs/ 前缀的路径，这里统一补全；
+    // 优先取配置的导弹路径，缺失回退特效路径，再回退 Prefabs/Missile 目录
+    private static string ResolveMissilePath(string effectName)
+    {
+        if (!string.IsNullOrEmpty(effectName))
+        {
+            var cfg = EffectConfig.GetConfigByname(effectName);
+            if (cfg != null)
+            {
+                if (!string.IsNullOrEmpty(cfg.MissilePath))
+                    return "Prefabs/" + cfg.MissilePath;
+                if (!string.IsNullOrEmpty(cfg.EffPath))
+                    return "Prefabs/" + cfg.EffPath;
+            }
+        }
+        if (string.IsNullOrEmpty(effectName))
+            return "Prefabs/Missile/";
+        GameLog.Warn("Missile 未在EffectConfig中配置特效[" + effectName + "]，回退 Prefabs/Missile 目录加载");
+        return "Prefabs/Missile/" + effectName;
+    }
+
     public void SetSkillInfo(int skillId, int damage)
     {
         this.skillId = skillId;        
@@ -33,7 +54,7 @@ public class Missile : MonoBehaviour
 
     public void MoveToDirection(Vector3 targetPos, float time, float missileSpeed)
     {
-        var missilePrefab = Resources.Load<GameObject>("Prefabs/Missile/" + effectName);
+        var missilePrefab = Resources.Load<GameObject>(ResolveMissilePath(effectName));
         if (missilePrefab == null)
             missilePrefab = Resources.Load<GameObject>("Prefabs/Effect/" + effectName);
         GameObject missileEffect = Instantiate(missilePrefab, transform.position, missilePrefab.transform.rotation, transform);
@@ -58,7 +79,7 @@ public class Missile : MonoBehaviour
 
     public void MoveToTarget(Chess target, float missileSpeed, float missileHight)
     {
-        var missilePrefab = Resources.Load<GameObject>("Prefabs/Missile/" + effectName);
+        var missilePrefab = Resources.Load<GameObject>(ResolveMissilePath(effectName));
         if (missilePrefab == null)
             missilePrefab = Resources.Load<GameObject>("Prefabs/Effect/" + effectName);
 

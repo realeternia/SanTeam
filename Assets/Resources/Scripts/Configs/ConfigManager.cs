@@ -40,6 +40,7 @@ public static class ConfigManager
         HeroAttrConfig.Load();
         SystemAttrConfig.Load();
         ItemCombineConfig.Load();
+        EffectConfig.Load();
 
         ConfigManager.PostModify();      
 
