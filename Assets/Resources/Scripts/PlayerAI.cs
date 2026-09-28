@@ -139,7 +139,7 @@ public static class PlayerAI
                 hasSameCard = true;
             }
 
-            // 随着回合推进，AI 会更偏好“累计目标费”附近的卡牌：例 0.2 * 回合 = 目标费，2费最优，其次 1~3费，再次更高费
+            // 随着回合推进，AI 会更偏好“累计目标费”附近的卡牌：使用 sqrt(year) 映射使得 10->~3, 30->~5, 60->~8
             score *= 1f + GetBuyCostBias(pickCard.priceI, year, playerConfig);
 
             if (pickCard.isHeroCard)
@@ -300,7 +300,7 @@ public static class PlayerAI
         }
         else
         {
-            sb.AppendLine("未选��任何卡片");
+            sb.AppendLine("未选中任何卡片");
         }      
         GameLog.Debug(sb.ToString());                
 
@@ -328,41 +328,44 @@ public static class PlayerAI
 
     private static float GetBuyCostBias(int cardPrice, int year, PlayerConfig cfg)
     {
-        if (cardPrice <= 0 || cfg == null)
+        if (cardPrice <= 0 || cfg == null || year <= 0)
             return 0f;
 
-        float accumulatedBias = Mathf.Max(0f, cfg.AccumulatedCostBias) * Mathf.Max(0, year);
-        int targetCost = Mathf.Max(1, Mathf.RoundToInt(accumulatedBias));
-        if (targetCost <= 0)
-            return 0f;
+        // Use sqrt(year) mapping so: sqrt(10)~3.16, sqrt(30)~5.48, sqrt(60)~7.75
+        float accumulated = Mathf.Max(0f, cfg.AccumulatedCostBias) * Mathf.Sqrt(year);
+        int targetCost = Mathf.Max(1, Mathf.RoundToInt(accumulated));
 
         if (cardPrice == targetCost)
-            return 1.0f;
+            return 1.0f; // highest boost for exact target
 
-        int midTierCap = Mathf.Max(3, targetCost + 1);
-        if (cardPrice <= Mathf.Min(3, midTierCap))
-            return 0.55f;
-        if (cardPrice <= midTierCap + 1)
-            return 0.2f;
+        // mid tier (near target) still favored
+        int lower = Math.Max(1, targetCost - 1);
+        int upper = targetCost + 1;
+        if (cardPrice >= lower && cardPrice <= upper)
+            return 0.6f;
 
-        return -0.5f * Mathf.Max(0, cardPrice - (midTierCap + 1));
+        // slightly lower costs acceptable
+        if (cardPrice < lower)
+            return 0.25f;
+
+        // higher costs penalized progressively
+        return -0.4f * (cardPrice - upper);
     }
 
     private static float GetSellCostBias(int cardPrice, int year, PlayerConfig cfg)
     {
-        if (cardPrice <= 0 || cfg == null)
+        if (cardPrice <= 0 || cfg == null || year <= 0)
             return 0f;
 
-        float accumulatedBias = Mathf.Max(0f, cfg.AccumulatedCostBias) * Mathf.Max(0, year);
-        int targetCost = Mathf.Max(1, Mathf.RoundToInt(accumulatedBias));
-        if (targetCost <= 0)
-            return 0f;
+        float accumulated = Mathf.Max(0f, cfg.AccumulatedCostBias) * Mathf.Sqrt(year);
+        int targetCost = Mathf.Max(1, Mathf.RoundToInt(accumulated));
 
+        // Prefer selling cards that are low relative to targetCost
         if (cardPrice <= targetCost)
-            return -0.6f - Mathf.Max(0, targetCost - cardPrice) * 0.2f;
-        if (cardPrice <= Mathf.Max(3, targetCost + 1))
-            return -0.2f;
-        return 0.2f;
+            return -0.6f - Mathf.Max(0, targetCost - cardPrice) * 0.25f;
+        if (cardPrice <= targetCost + 1)
+            return -0.25f;
+        return 0.2f; // high-cost cards are less likely to be sold
     }
 
     // 找最该卖的英雄卡：按"阵容价值"升序（价格×羁绊贡献），保护正在组的国家/职业/好友拼图
@@ -637,4 +640,3 @@ public static class PlayerAI
         return value;
     }
 }
-
