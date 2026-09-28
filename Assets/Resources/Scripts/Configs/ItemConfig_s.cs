@@ -157,7 +157,7 @@ namespace CommonConfig
             config[400011] = new ItemConfig(400011, "易经", "法强+10，法力回复+2", 2, "attr", "ap+10,mpRegen+2", "ap", "浩然", "", false, 0, 0, "yijing");
             config[400012] = new ItemConfig(400012, "道德经", "法强+15，魔法抗性+30", 2, "attr", "ap+15,magicres+30", "ap", "玄妙", "", false, 0, 0, "daode");
             config[400013] = new ItemConfig(400013, "赤兔马", "攻速+15%，魔法抗性+30", 2, "attr", "atkspeed+0.15,magicres+30", "atkspeed", "绝尘", "", false, 0, 0, "chitu");
-            config[400014] = new ItemConfig(400014, "的卢马", "生命+250，生命回复+2", 2, "attr", "hp+250,hpRegen+2", "hp", "磐石", "", false, 0, 0, "dilu");
+            config[400014] = new ItemConfig(400014, "的卢马", "生命+250，生命回复+2", 2, "attr", "hp+250,hpRegen+2", "hp", "磐石", "", false, 0, 0, "ma5");
             config[400015] = new ItemConfig(400015, "长生镜", "生命+150", 1, "attr", "hp+150", "hp", "", "", false, 0, 0, "jingzi");
             config[400016] = new ItemConfig(400016, "飞羽甲", "护甲+30，攻速+15%", 2, "attr", "armor+30,atkspeed+0.15", "armor", "疾风", "", false, 0, 0, "jia3");
             config[400017] = new ItemConfig(400017, "明光铠", "护甲+30，魔抗+30", 2, "attr", "armor+30,magicres+30", "armor", "铁壁", "", false, 0, 0, "jia2");
