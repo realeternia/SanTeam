@@ -139,6 +139,9 @@ public static class PlayerAI
                 hasSameCard = true;
             }
 
+            // 随着回合推进，AI 会更偏好“累计目标费”附近的卡牌：例 0.2 * 回合 = 目标费，2费最优，其次 1~3费，再次更高费
+            score *= 1f + GetBuyCostBias(pickCard.priceI, year, playerConfig);
+
             if (pickCard.isHeroCard)
             {
                 if (!hasSameCard && heroCardCount >= playerInfo.GetSlotCount() + playerConfig.Cardherolimit)
@@ -297,7 +300,7 @@ public static class PlayerAI
         }
         else
         {
-            sb.AppendLine("未选中任何卡片");
+            sb.AppendLine("未选��任何卡片");
         }      
         GameLog.Debug(sb.ToString());                
 
@@ -323,6 +326,45 @@ public static class PlayerAI
         return true;
     }
 
+    private static float GetBuyCostBias(int cardPrice, int year, PlayerConfig cfg)
+    {
+        if (cardPrice <= 0 || cfg == null)
+            return 0f;
+
+        float accumulatedBias = Mathf.Max(0f, cfg.AccumulatedCostBias) * Mathf.Max(0, year);
+        int targetCost = Mathf.Max(1, Mathf.RoundToInt(accumulatedBias));
+        if (targetCost <= 0)
+            return 0f;
+
+        if (cardPrice == targetCost)
+            return 1.0f;
+
+        int midTierCap = Mathf.Max(3, targetCost + 1);
+        if (cardPrice <= Mathf.Min(3, midTierCap))
+            return 0.55f;
+        if (cardPrice <= midTierCap + 1)
+            return 0.2f;
+
+        return -0.5f * Mathf.Max(0, cardPrice - (midTierCap + 1));
+    }
+
+    private static float GetSellCostBias(int cardPrice, int year, PlayerConfig cfg)
+    {
+        if (cardPrice <= 0 || cfg == null)
+            return 0f;
+
+        float accumulatedBias = Mathf.Max(0f, cfg.AccumulatedCostBias) * Mathf.Max(0, year);
+        int targetCost = Mathf.Max(1, Mathf.RoundToInt(accumulatedBias));
+        if (targetCost <= 0)
+            return 0f;
+
+        if (cardPrice <= targetCost)
+            return -0.6f - Mathf.Max(0, targetCost - cardPrice) * 0.2f;
+        if (cardPrice <= Mathf.Max(3, targetCost + 1))
+            return -0.2f;
+        return 0.2f;
+    }
+
     // 找最该卖的英雄卡：按"阵容价值"升序（价格×羁绊贡献），保护正在组的国家/职业/好友拼图
     public static Tuple<int, int> FindWeakCard(PlayerInfo playerInfo)
     {
@@ -346,7 +388,10 @@ public static class PlayerAI
                 continue; //主公核心不删
 
             var heroCfg = HeroConfig.GetConfig(cardId);
-            sortDataList.Add(new Tuple<int, float, int>(cardId, GetLineupValue(ctx, heroCfg), HeroSelectionTool.GetPrice(heroCfg)));
+            var price = HeroSelectionTool.GetPrice(heroCfg);
+            float value = GetLineupValue(ctx, heroCfg);
+            value *= 1f + GetSellCostBias(price, GameManager.Instance.year, playerInfo.playerConfig);
+            sortDataList.Add(new Tuple<int, float, int>(cardId, value, price));
         }
 
         if (sortDataList.Count == 0)
@@ -592,3 +637,4 @@ public static class PlayerAI
         return value;
     }
 }
+
