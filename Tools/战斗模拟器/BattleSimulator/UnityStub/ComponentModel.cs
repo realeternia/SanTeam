@@ -400,6 +400,22 @@ namespace UnityEngine
 
         public Vector3 localScale { get { return _localScale; } set { _localScale = value; } }
 
+        // 世界缩放（含父级叠加），模拟 Unity lossyScale
+        public Vector3 lossyScale
+        {
+            get
+            {
+                Vector3 s = _localScale;
+                Transform p = _parent;
+                while (p != null)
+                {
+                    s = new Vector3(s.x * p._localScale.x, s.y * p._localScale.y, s.z * p._localScale.z);
+                    p = p._parent;
+                }
+                return s;
+            }
+        }
+
         public Transform parent
         {
             get { return _parent; }
