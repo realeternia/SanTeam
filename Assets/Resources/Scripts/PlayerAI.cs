@@ -89,6 +89,11 @@ public static class PlayerAI
         if (affordableCards.Count == 0)
             return false;
 
+        // 商店不卖道具：只考虑英雄卡
+        affordableCards = affordableCards.Where(card => card.isHeroCard).ToList();
+        if (affordableCards.Count == 0)
+            return false;
+
         bool hasSameCard = false;
         Tuple<int, int> weakHeroCard = null;
         var heroCardCount = playerInfo.GetHeroCardList().Count;
@@ -139,8 +144,9 @@ public static class PlayerAI
                 hasSameCard = true;
             }
 
-            // 随着回合推进，AI 会更偏好“累计目标费”附近的卡牌：使用 sqrt(year) 映射使得 10->~3, 30->~5, 60->~8
-            score *= 1f + GetBuyCostBias(pickCard.priceI, year, playerConfig);
+            // 计算并记录买卡的价格偏好 bias
+            float buyBias = GetBuyCostBias(pickCard.priceI, year, playerConfig);
+            score *= 1f + buyBias;
 
             if (pickCard.isHeroCard)
             {
@@ -183,32 +189,8 @@ public static class PlayerAI
                 if (ConfigManager.IsKingHero(heroCfg.Id) && ctx.GetSideCount(heroCfg.Side) >= 1)
                     score *= Mathf.Max(1f, playerConfig.Findmasterrate);
             }
-            else
-            {
-                if (heroCardCount < 3)
-                    continue;
 
-                var itemCfg = ItemConfig.GetConfig(pickCard.cardId);
-                var itemCount = playerInfo.GetItemList("attr").Count;
-
-                if (itemCfg.Effect == "attr" && !hasSameCard)
-                {
-                    if (playerInfo.gold > 60 && year >= 8)
-                        score *= 1.5f;
-                    else if (heroCardCount >= 3)
-                    {
-                        if (itemCount == 0)
-                            score *= 4;
-                        else if (itemCount < 3)
-                            score *= 1 + (3 - itemCount) * 0.6f;
-                    }
-                }
-                else if (itemCfg.Effect == "tpattr" && year <= 8)
-                {
-                    score *= .5f;
-                }                
-            }
-
+            // 如果不是已拥有的同卡，根据拥有人数惩罚热门卡
             if (!hasSameCard)
             {
                 //获取现在拥有这张卡牌的玩家人数
@@ -261,11 +243,14 @@ public static class PlayerAI
         //日志打印scoredCards和selectedCard
 
         var sb = new StringBuilder();
-        sb.AppendLine($"{playerInfo.playerNameText.text} 选卡 scoredCards数量: {scoredCards.Count}");
+        float accumulated = Mathf.Max(0f, playerConfig.AccumulatedCostBias) * Mathf.Sqrt(year);
+        int targetCost = Math.Max(1, Mathf.RoundToInt(accumulated));
+        sb.AppendLine($"{playerInfo.playerNameText.text} 选卡 scoredCards数量: {scoredCards.Count}, targetCost:{targetCost}, accumulated:{accumulated:F2}");
         for (int i = 0; i < scoredCards.Count; i++)
         {
             var card = scoredCards[i];
-            sb.AppendLine($"  [{i+1}] 卡片ID: {card.card.cardId}, 名称: {card.card.cardName.text}, 分数: {card.score}, 价格: {card.card.priceI}");
+            float cardBuyBias = GetBuyCostBias(card.card.priceI, year, playerConfig);
+            sb.AppendLine($"  [{i+1}] 卡片ID: {card.card.cardId}, 名称: {card.card.cardName.text}, 分数: {card.score}, 价格: {card.card.priceI}, buyBias: {cardBuyBias:F2}");
         }
 
         // 聪明度越高候选池越窄（只在最优的几张里挑）；越低越宽（更容易随机到次优卡）
@@ -381,7 +366,13 @@ public static class PlayerAI
             if (!ConfigManager.IsHeroCard(cardId))
                 continue;
 
-            if (HeroSelectionTool.GetCardLevel(cards[cardId], true) >= 4) //4级以上卡不删了
+            // 尽量不卖高星卡（保护3星及以上）
+            int cardLevel = HeroSelectionTool.GetCardLevel(cards[cardId], true);
+            if (cardLevel >= 3) // 3级及以上视为未来潜力，跳过
+                continue;
+
+            // 如果已有多张并且已经接近升星（如2级且有2张及以上），也尽量保护
+            if (cards[cardId] >= 2 && cardLevel >= 2)
                 continue;
 
             if (playerInfo.playerConfig.InitCards != null && playerInfo.playerConfig.InitCards.Contains(cardId))
@@ -393,12 +384,28 @@ public static class PlayerAI
             var heroCfg = HeroConfig.GetConfig(cardId);
             var price = HeroSelectionTool.GetPrice(heroCfg);
             float value = GetLineupValue(ctx, heroCfg);
-            value *= 1f + GetSellCostBias(price, GameManager.Instance.year, playerInfo.playerConfig);
+            float sellBias = GetSellCostBias(price, GameManager.Instance.year, playerInfo.playerConfig);
+            value *= 1f + sellBias;
             sortDataList.Add(new Tuple<int, float, int>(cardId, value, price));
         }
 
         if (sortDataList.Count == 0)
             return null;
+
+        // 记录 debug：列出候选的卖卡及其计算值
+        var sb = new StringBuilder();
+        sb.AppendLine($"{playerInfo.playerNameText.text} 卖卡候选数: {sortDataList.Count}");
+        foreach (var t in sortDataList)
+        {
+            int id = t.Item1;
+            var cfg = HeroConfig.GetConfig(id);
+            int lvl = HeroSelectionTool.GetCardLevel(cards[id], true);
+            int cnt = cards[id];
+            float price = t.Item3;
+            float sellBias = GetSellCostBias((int)price, GameManager.Instance.year, playerInfo.playerConfig);
+            sb.AppendLine($"  卡ID:{id}, 名称:{cfg.Name}, 等级:{lvl}, 数量:{cnt}, 价格:{price}, 价值:{t.Item2:F2}, sellBias:{sellBias:F2}");
+        }
+        GameLog.Debug(sb.ToString());
 
         sortDataList.Sort((a, b) => a.Item2.CompareTo(b.Item2)); // 价值升序，最弱在前
         var weakest = sortDataList[0];
