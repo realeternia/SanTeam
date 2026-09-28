@@ -73,6 +73,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     public int battleSide;
 
     public bool nextSkip = false; //下一轮skip
+    public int aiShopSellCount = 0; //本商店阶段（一回合）AI 已自动卖卡次数，达到 CombatConst.AiMaxSellPerShop 后不再自动卖卡
     [CustomSerializeField]
     public int sodatk = 0; //士兵atk强化
     [CustomSerializeField]

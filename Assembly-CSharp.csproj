@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <!-- Generated file, do not modify, your changes will be overwritten (use AssetPostprocessor.OnGeneratedCSProject) -->
   <PropertyGroup>
@@ -274,7 +274,6 @@
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidFrenzy.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidHealShield.cs" />
     <Compile Include="Assets\Resources\Scripts\Configs\ForceConfig_s.cs" />
-    <Compile Include="Assets\Resources\Scripts\Configs\EffectConfig_s.cs" />
     <Compile Include="Assets\Resources\Scripts\Tools\HeroSelectionTool.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidBenevolence.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\LoopScrollRect.cs" />
@@ -324,6 +323,7 @@
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffDamagedAddRate.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\BagFieldUnitControl.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidSweeping.cs" />
+    <Compile Include="Assets\Resources\Scripts\Configs\EffectConfig_s.cs" />
     <Compile Include="Assets\Epic Toon FX\Scripts\ETFXPitchRandomizer.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillSoldierArcherBuff.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidNobleBless.cs" />

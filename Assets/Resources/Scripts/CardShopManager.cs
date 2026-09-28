@@ -655,6 +655,10 @@ public class CardShopManager : MonoBehaviour
         for(int i = 0; i < 8; i++)
             GameManager.Instance.GetPlayer(i).RoundGold(roundGold);
 
+        // 每回合商店阶段重置 AI 卖卡次数（限制 AI 卖旧买新零成本换卡的次数，防止金币不消耗）
+        for (int i = 0; i < 8; i++)
+            GameManager.Instance.GetPlayer(i).aiShopSellCount = 0;
+
         SortPlayersByScore();
 
         // AI进商店：先把背包里的材料装备随机两两合成高级装备，再给英雄穿装备、自动使用消耗品（三方法内部只对 AI 生效）

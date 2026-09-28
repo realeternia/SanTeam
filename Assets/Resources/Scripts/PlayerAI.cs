@@ -302,8 +302,13 @@ public static class PlayerAI
         GameLog.Debug(sb.ToString());                
 
         hasSameCard = cards.ContainsKey(selectedCard.cardId);
-        if (selectedCard.isHeroCard && heroCardCount >= playerInfo.GetSlotCount() + playerConfig.Cardherolimit && !hasSameCard && weakHeroCard != null)
+        // 卖旧买新受次数限制：每个商店阶段最多自动卖 CombatConst.AiMaxSellPerShop 次，防止低价卡全额返还导致零成本换卡、金币永不消耗
+        if (selectedCard.isHeroCard && heroCardCount >= playerInfo.GetSlotCount() + playerConfig.Cardherolimit && !hasSameCard && weakHeroCard != null
+            && playerInfo.aiShopSellCount < CombatConst.AiMaxSellPerShop)
+        {
             playerInfo.SellCard(weakHeroCard.Item1); //卖掉最弱的卡
+            playerInfo.aiShopSellCount++;
+        }
 
         var finalBuyCount = 1;
         if (selectedCard.count > 0)

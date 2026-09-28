@@ -139,6 +139,8 @@ public static class CombatConst
     public const int BattleLoseExp = 2;
     /// <summary>背包英雄卡上限（最多持有15种不同英雄，重复卡计入经验不占位）</summary>
     public const int PlayerMaxHeroCards = 15;
+    /// <summary>AI 每个商店阶段（一回合）最多自动卖卡次数（限制"卖旧买新"零成本换卡的次数）</summary>
+    public const int AiMaxSellPerShop = 3;
     // ---- 买经验（预留：金铲铲4金币买4经验，1金币=1经验；UI后续接入） ----
     /// <summary>购买经验所需金币</summary>
     public const int ExpBuyGoldCost = 4;
