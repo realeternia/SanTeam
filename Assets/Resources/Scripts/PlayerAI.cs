@@ -157,7 +157,16 @@ public static class PlayerAI
 
             if (pickCard.isHeroCard)
             {
-                if (!hasSameCard && heroCardCount >= playerInfo.GetSlotCount() + playerConfig.Cardherolimit)
+                var heroCfg = HeroConfig.GetConfig(pickCard.cardId);
+                bool strongExempt = heroCfg.Quality == 4; // 品质4强卡豁免软上限：超限也照常买入
+                // 软上限：非强卡新卡超限时按超出张数概率拒买（每超1张 AiOverLimitRejectPerCard%）
+                if (!hasSameCard && !strongExempt
+                    && heroCardCount >= playerInfo.GetSlotCount() + playerConfig.Cardherolimit
+                    && SysRandom.Range(0, 100) < (heroCardCount - (playerInfo.GetSlotCount() + playerConfig.Cardherolimit)) * CombatConst.AiOverLimitRejectPerCard)
+                    continue;
+                // 非强卡超限未拒：只能通过卖旧买新换入
+                if (!hasSameCard && !strongExempt
+                    && heroCardCount >= playerInfo.GetSlotCount() + playerConfig.Cardherolimit)
                 {
                     if (weakHeroCard == null) //没有可以换的卡
                         continue;
@@ -168,7 +177,6 @@ public static class PlayerAI
                     if (year > 8 && pickCard.priceI < weakHeroCard.Item2 + year - 8)
                         continue; //新卡价格还不如旧卡，没必要换
                 }
-                var heroCfg = HeroConfig.GetConfig(pickCard.cardId);
                 if (playerConfig.Pickside != 0) //单阵营流：硬过滤非本阵营卡
                 {
                     if (heroCfg.Side != playerConfig.Pickside)
@@ -177,12 +185,9 @@ public static class PlayerAI
                         score *= playerConfig.Findmasterrate;
                 }
 
-                // 近战/远程与羁绊统计均按“新增英雄”计算：重复卡（升星）只吃同卡与强度分
+                // 近战/远程与羁绊统计均按"新增英雄"计算：重复卡（升星）只吃同卡分
                 bool isNewHero = !strongList.Contains(pickCard.cardId);
-                int ownCount = cards.TryGetValue(pickCard.cardId, out var own) ? own : 0;
 
-                // 强度分：品质/面板/升星进度（强度因子）——硬实力直观，不吃聪明度折扣
-                score *= 1f + playerConfig.PowerFactor * GetPowerMetric(heroCfg, ownCount);
                 // 国家：推进或达成同阵营护盾档位(2/3/4/5/6人→Lv1~5)；聪明度越低越看不清羁绊价值
                 score *= 1f + playerConfig.SideFactor * GetSideGain(ctx, heroCfg, isNewHero) * smart;
                 // 职业：推进或达成职业连锁档位(1/2/3/4/5人→Lv1~5)
@@ -298,7 +303,9 @@ public static class PlayerAI
 
         hasSameCard = cards.ContainsKey(selectedCard.cardId);
         // 卖旧买新受次数限制：每个商店阶段最多自动卖 CombatConst.AiMaxSellPerShop 次，防止低价卡全额返还导致零成本换卡、金币永不消耗
+        // 软上限：品质4强卡豁免（超限直接买，不强制卖弱）；非强卡超限且未被拒买时才卖旧买新
         if (selectedCard.isHeroCard && heroCardCount >= playerInfo.GetSlotCount() + playerConfig.Cardherolimit && !hasSameCard && weakHeroCard != null
+            && HeroConfig.GetConfig(selectedCard.cardId).Quality != 4
             && playerInfo.aiShopSellCount < CombatConst.AiMaxSellPerShop)
         {
             playerInfo.SellCard(weakHeroCard.Item1); //卖掉最弱的卡
@@ -488,16 +495,6 @@ public static class PlayerAI
         int curHigh = curCfg.Quality3Rate + curCfg.Quality4Rate;
         int nextHigh = nextCfg.Quality3Rate + nextCfg.Quality4Rate;
         return Mathf.Clamp((nextHigh - curHigh) / 20f, -1f, 1f);
-    }
-
-    // 强度分：品质(1~4) + 主属性面板(1星带品质，240为强卡基准) + 升星进度
-    private static float GetPowerMetric(HeroConfig heroCfg, int ownCount)
-    {
-        float quality = (heroCfg.Quality - 1) / 3f;
-        var rankAttr = HeroSelectionTool.GetRankAttr(heroCfg);
-        float panel = Mathf.Clamp((rankAttr.Atk + rankAttr.Ap) / 240f, 0f, 1.5f);
-        float star = Mathf.Clamp(HeroSelectionTool.GetCardLevel(ownCount, true), 0, 5) / 5f;
-        return 0.45f * quality + 0.4f * panel + 0.15f * star;
     }
 
     // 该阵营是否参与同阵营护盾（野=10 不参与，不参与则无国家收益）
