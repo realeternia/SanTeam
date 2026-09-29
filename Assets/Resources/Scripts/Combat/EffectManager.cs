@@ -37,17 +37,15 @@ public static class EffectManager
         return 1f;
     }
 
-    // 统一挂载逻辑：特效挂到任意父节点下，世界缩放始终等于表 Scale、世界Y偏移等于表 OffsetY，
-    // 与父节点缩放无关（通过 lossyScale 反向补偿），保证特效大小/高度在所有挂载场景一致
+    // 统一挂载逻辑：特效挂到任意父节点下，视觉始终等比例且大小稳定。
+    // 父节点多为非等比缩放（如单位根缩放 10/5/10），若按各轴分别补偿会产生非均匀 localScale，
+    // 会拉伸本地空间粒子/广告板导致变形，故统一按父级 X 轴（足迹缩放）做标量补偿，保证特效不变形。
     private static GameObject MountEffect(GameObject effect, Transform parent, Vector3 worldScale, float worldOffsetY)
     {
         var parentScale = parent.lossyScale;
-        var targetScale = new Vector3(
-            parentScale.x != 0 ? worldScale.x / parentScale.x : 1f,
-            parentScale.y != 0 ? worldScale.y / parentScale.y : 1f,
-            parentScale.z != 0 ? worldScale.z / parentScale.z : 1f);
+        float factor = parentScale.x != 0 ? worldScale.x / parentScale.x : 1f;
         effect.transform.parent = parent;
-        effect.transform.localScale = targetScale;
+        effect.transform.localScale = new Vector3(factor, factor, factor);
         var pos = effect.transform.localPosition;
         effect.transform.localPosition = new Vector3(pos.x, parentScale.y != 0 ? worldOffsetY / parentScale.y : worldOffsetY, pos.z);
         return effect;
