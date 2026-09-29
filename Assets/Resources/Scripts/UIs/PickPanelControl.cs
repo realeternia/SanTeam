@@ -42,21 +42,15 @@ public class PickPanelControl : MonoBehaviour
         });
         finBtn.onClick.AddListener(() =>
         {
-            HeroSelectionTool.SetBanList(GetBanList());
-
-            // 新游戏ban阶段结束进入，存档一次
-            GameManager.Instance.SaveToFile();
-
-            PanelManager.Instance.ShowShop();
-            PanelManager.Instance.HidePick();
+            FinishLikePhase();
         });
         okBtn.onClick.AddListener(() =>
         {
             refreshBtn.gameObject.SetActive(false); // ok后，不能再refresh
             foreach (var cell in cellControls)
-                cell.canBan = true;
+                cell.canLike = true;
 
-            StartCoroutine(AllPlayerBans());
+            StartCoroutine(AllPlayerLikes());
             okBtn.gameObject.SetActive(false);
         });
 
@@ -117,8 +111,8 @@ public class PickPanelControl : MonoBehaviour
         
     }
 
-    // 玩家轮流ban
-    private IEnumerator AllPlayerBans()
+    // 玩家轮流点赞
+    private IEnumerator AllPlayerLikes()
     {
         // 等待1秒
         yield return new WaitForSeconds(.3f);
@@ -127,9 +121,9 @@ public class PickPanelControl : MonoBehaviour
         {
             var pid = (i % 7) + 1;
             var player = GameManager.Instance.GetPlayer(pid);
-            if (player.banCount > 0)
+            if (player.likeCount > 0)
             {
-                PlayerAI.CheckBan(player, cellControls);
+                PlayerAI.CheckLike(player, cellControls);
                 yield return new WaitForSeconds(SysRandom.Range(0.1f, 0.3f));
             }
         }
@@ -138,17 +132,31 @@ public class PickPanelControl : MonoBehaviour
 
     }    
 
-    private List<int> GetBanList()
+    // like阶段结束：把全部玩家（人类+AI）点赞的卡牌写入收藏池（8玩家×2张共16张），
+    // 收藏池会在每次刷新卡牌时有 LikeCardRefreshRate 概率重新刷出一张
+    private void FinishLikePhase()
     {
-        List<int> banList = new List<int>();
+        HeroSelectionTool.SetLikePool(GetLikePool());
+
+        // 新游戏like阶段结束进入，存档一次
+        GameManager.Instance.SaveToFile();
+
+        PanelManager.Instance.ShowShop();
+        PanelManager.Instance.HidePick();
+    }
+
+    // 收集全部玩家点赞的卡牌（likeState > 0）
+    private List<int> GetLikePool()
+    {
+        List<int> likeList = new List<int>();
         foreach (var cell in cellControls)
         {
-            if (cell.banState > 0)
+            if (cell.likeState > 0)
             {
-                banList.Add(cell.heroId);
+                likeList.Add(cell.heroId);
             }
         }
-        return banList;
+        return likeList;
     }
 
 
@@ -237,7 +245,7 @@ public class PickPanelControl : MonoBehaviour
 
                 cellControl.bgImg.GetComponent<Image>().color = SysColor.GetSideColor(heroCfg.Side);
 
-                // 默认隐藏禁止图标
+                // 默认隐藏点赞图标
                 cellControl.forbidImg.gameObject.SetActive(false);
             }
         }

@@ -17,7 +17,6 @@ public class RankCellInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandle
     public TMP_Text heroLeadShip;
     public TMP_Text heroHp;
     public TMP_Text heroPrice;
-    public Button loveBtn;
 
     public int heroId;
     public int str;
@@ -37,19 +36,6 @@ public class RankCellInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandle
         heroLeadShip.raycastTarget = false;
         heroHp.raycastTarget = false;
         heroPrice.raycastTarget = false;
-
-        loveBtn.onClick.AddListener(() =>
-        {
-            if (Profile.Instance.cardLoves.Contains(heroId))
-                Profile.Instance.cardLoves.Remove(heroId);
-            else if(Profile.Instance.cardLoves.Count < 5)
-                Profile.Instance.cardLoves.Add(heroId);
-            else
-                return;
-
-            Profile.Instance.SaveTextFile();
-            UpdateLoveBtn();
-        });
     }
 
     public void Init(HeroConfig heroConfig)
@@ -83,10 +69,6 @@ public class RankCellInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandle
         leadShip = heroConfig.Atk;
         hp = heroConfig.Hp;
         price = HeroSelectionTool.GetPrice(heroConfig);
-        if (ConfigManager.IsKingHero(heroConfig.Id))
-            loveBtn.gameObject.SetActive(false);
-        else
-            loveBtn.gameObject.SetActive(true); // 复用池中单元格时恢复被隐藏的按钮
 
         var bg = GetComponent<Image>();
         bg.color = SysColor.GetSideColor(heroConfig.Side);
@@ -104,8 +86,6 @@ public class RankCellInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandle
         heroLeadShip.text = leadShip.ToString();
         heroPrice.text = price.ToString();
         heroHp.text = hp.ToString();
-
-        UpdateLoveBtn(); // 复用池中单元格时刷新收藏图标
     }
 
     public void BindData(object data)
@@ -127,7 +107,6 @@ public class RankCellInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandle
 
     public void OnPointerUp(PointerEventData eventData)
     {
-        PanelManager.Instance.GetTooltip<BaseTooltip>()?.HideTooltip();
     }
 
     public void OnPointerDown(PointerEventData eventData)
@@ -158,14 +137,6 @@ public class RankCellInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandle
         {
             PanelManager.Instance.GetTooltip<TooltipHero>()?.ShowTooltip(skillCfgs, friendInfo, heroId);
         }
-    }
-
-    private void UpdateLoveBtn()
-    {
-        if (Profile.Instance.cardLoves.Contains(heroId))
-            loveBtn.GetComponent<Image>().sprite = Resources.Load<Sprite>("Textures/love");
-        else
-            loveBtn.GetComponent<Image>().sprite = Resources.Load<Sprite>("Textures/loveoff");
     }
 
     // Update is called once per frame

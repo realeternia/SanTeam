@@ -96,12 +96,29 @@ public static class HeroSelectionTool
         return result;
     }
 
-    public static void SetBanList(List<int> banList)
+    // like阶段收藏池：8名玩家（人类+AI）各点赞2张，共16张；商店刷新时按 LikeCardRefreshRate 概率从中随机出一张
+    private static List<int> likeHeroPool = new List<int>();
+
+    // like阶段结束写入收藏池（收集全部玩家点赞的卡牌）
+    public static void SetLikePool(List<int> likeList)
     {
-        heroPoolCache.RemoveAll(hero => banList.Contains(hero.Item1));
+        likeHeroPool = likeList == null ? new List<int>() : new List<int>(likeList);
     }
 
-    // 刷牌：先按GameRoundConfig品质概率roll出品质，再从该品质的英雄池随机选一张（ban 已在池中剔除）
+    public static bool HasLikedHero()
+    {
+        return likeHeroPool.Count > 0;
+    }
+
+    // 从收藏池随机出一张卡（池空返回0）
+    public static int GetRandomLikedHeroId()
+    {
+        if (likeHeroPool.Count == 0)
+            return 0;
+        return likeHeroPool[SysRandom.Range(0, likeHeroPool.Count)];
+    }
+
+    // 刷牌：先按GameRoundConfig品质概率roll出品质，再从该品质的英雄池随机选一张
     public static int GetRandomHeroIdByQuality(GameRoundConfig shopCfg)
     {
         int quality = RollQuality(shopCfg);

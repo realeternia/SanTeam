@@ -289,15 +289,5 @@ public class GameManager : MonoBehaviour
             foreach (var hero in sideHeroList)
                 heroIds.Add(hero.Id);
         }
-
-        // 心仪卡牌必定进入英雄池
-        if (Profile.Instance.cardLoves != null)
-        {
-            foreach (var loveId in Profile.Instance.cardLoves)
-            {
-                if (!heroIds.Contains(loveId) && HeroConfig.HasConfig(loveId))
-                    heroIds.Add(loveId);
-            }
-        }
     }
 }

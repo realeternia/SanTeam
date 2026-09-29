@@ -78,6 +78,10 @@ public static class CombatConst
     /// <summary>近战/远程士兵射程判定阈值</summary>
     public const float MeleeRange = 30f;
 
+    // ---- 收藏卡(likecard)机制 ----
+    /// <summary>刷新卡牌时从收藏池中随机出一张的概率(%)，收藏池=like阶段全部玩家点赞，共16张，存于 HeroSelectionTool</summary>
+    public const int LikeCardRefreshRate = 5;
+
     // ---- 连线(武将关系) ----
     /// <summary>连线好友数量档位(2/3/4/5/6，对应连线技能 Lv1~5)</summary>
     public static readonly int[] FriendLineCounts = { 2, 3, 4, 5, 6 };

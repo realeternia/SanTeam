@@ -12,19 +12,19 @@ public class PickPanelCellControl : MonoBehaviour
     public Image heroImg;
     public Image jobImg;
     public TMP_Text heroName;
-    public Image forbidImg;
-    public Button banBtn;
+    public Image forbidImg; // 点赞标记图（运行时会替换为红心 Textures/love，原字段名保留以兼容prefab引用）
+    public Button banBtn;   // 点赞按钮（原ban按钮，字段名保留以兼容prefab引用）
     public int heroId;
-    public bool canBan = false;    
+    public bool canLike = false;    
 
-    public int banState; //0，不ban，非0，玩家对应的ban
+    public int likeState; //0，未点赞，非0，玩家对应的点赞（pid+1）
 
     // Start is called before the first frame update
     void Start()
     {
         banBtn.onClick.AddListener(() =>
         {
-            BanBtnClick();
+            LikeBtnClick();
         });
 
         // 设置forbidImg不阻挡鼠标点击
@@ -39,38 +39,35 @@ public class PickPanelCellControl : MonoBehaviour
     {
     }
 
-    public void SetBan(int pid)
+    public void SetLike(int pid)
     {
-        if(!canBan)
+        if(!canLike)
             return;
-        if(banState > 0)
-            return;
-
-        if(ConfigManager.IsKingHero(heroId)) //主公不能ban
+        if(likeState > 0)
             return;
 
-        banState = pid + 1;
+        if(ConfigManager.IsKingHero(heroId)) //主公不能点赞
+            return;
+
+        likeState = pid + 1;
         var player = GameManager.Instance.GetPlayer(pid);
-        player.banCount--;
+        player.likeCount--;
         forbidImg.color = player.lineColor;
-        heroName.color = Color.gray;
-
+        forbidImg.sprite = Resources.Load<Sprite>("Textures/love"); // 点赞显示红心
         forbidImg.gameObject.SetActive(true);
     }
 
-    private void BanBtnClick()
+    private void LikeBtnClick()
     {
-        if(banState == 0 && GameManager.Instance.GetPlayer(0).banCount > 0)
+        if(likeState == 0 && GameManager.Instance.GetPlayer(0).likeCount > 0)
         {
-            SetBan(0);
+            SetLike(0);
         }
-        else if(banState == 1) //只能解封自己的
+        else if(likeState == 1) //只能取消自己的点赞
         {
-            banState = 0;
-            GameManager.Instance.GetPlayer(0).banCount++;
+            likeState = 0;
+            GameManager.Instance.GetPlayer(0).likeCount++;
             forbidImg.gameObject.SetActive(false);
-            heroName.color = Color.white;
-
         }
         
     }

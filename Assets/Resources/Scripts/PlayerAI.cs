@@ -11,56 +11,63 @@ using System.Text;
 
 public static class PlayerAI
 {
-    public static void CheckBan(PlayerInfo playerInfo, List<PickPanelCellControl> cellControls)
+    // like阶段：AI 按 playerConfig 的品质偏好 + 低价区间(5~10金) 选取卡牌点赞，共点赞 likeCount 张（默认2张，选不同卡）
+    // （点赞只是把该卡选入收藏池，不移动/移除英雄池；收藏池会以 LikeCardRefreshRate 概率在商店刷新中重新出现）
+    public static void CheckLike(PlayerInfo playerInfo, List<PickPanelCellControl> cellControls)
     {
         var playerConfig = playerInfo.playerConfig;
         var pid = playerInfo.pid;
 
-        // 根据playerConfig的配置过滤可ban的英雄
-        List<PickPanelCellControl> availableBans = new List<PickPanelCellControl>();
-
-        // 首先筛选出未被ban且不是主公的英雄
-        foreach (var cell in cellControls)
+        // 每个玩家可赞 likeCount 张（默认2张），尽量选不同卡
+        int remain = playerInfo.likeCount;
+        while (remain > 0)
         {
-            if (cell.banState > 0 || ConfigManager.IsKingHero(cell.heroId))
-                continue;
-
-            var heroConfig = HeroConfig.GetConfig(cell.heroId);
-            // 检查阵营限制
-            if (playerConfig.Pickside > 0 && playerConfig.Pickside == heroConfig.Side)
-                continue;
-
-            // 强弱卡改按品质判定：强卡=品质4；弱卡=品质1/2
-            // Banstrongcard：只允许 ban 品质4（强卡）
-            if (playerConfig.Banstrongcard && heroConfig.Quality != 4)
-                continue;
-            // Banweakcard：只允许 ban 品质1/2（弱卡），品质3/4 视为强卡不参与
-            if (playerConfig.Banweakcard && heroConfig.Quality >= 3)
-                continue;
-            availableBans.Add(cell);            
-        }
-
-        // 从目标列表中随机选择一个进行ban
-        if (availableBans.Count > 0)
-        {
-            int randomIndex = SysRandom.Range(0, availableBans.Count);
-            availableBans[randomIndex].SetBan(pid);
-        }
-        else
-        {
-            // 如果没有满足所有条件的卡牌，选择一张满足基本条件的卡牌
-            List<PickPanelCellControl> basicAvailableCells = new List<PickPanelCellControl>();
+            // 根据playerConfig的配置过滤可点赞的英雄（只选未被该玩家赞过的卡）
+            List<PickPanelCellControl> availableLikes = new List<PickPanelCellControl>();
             foreach (var cell in cellControls)
             {
-                if (cell.banState == 0 && !ConfigManager.IsKingHero(cell.heroId))
-                    basicAvailableCells.Add(cell);
+                if (cell.likeState > 0 || ConfigManager.IsKingHero(cell.heroId))
+                    continue;
+
+                var heroConfig = HeroConfig.GetConfig(cell.heroId);
+                // 检查阵营限制
+                if (playerConfig.Pickside > 0 && playerConfig.Pickside == heroConfig.Side)
+                    continue;
+
+                // AI 一般只选 5~10 金的卡
+                var price = HeroSelectionTool.GetPrice(heroConfig);
+                if (price < 5 || price > 10)
+                    continue;
+
+                availableLikes.Add(cell);
             }
-            
-            if (basicAvailableCells.Count > 0)
+
+            // 从目标列表中随机选择一个进行点赞
+            if (availableLikes.Count > 0)
             {
-                int randomIndex = SysRandom.Range(0, basicAvailableCells.Count);
-                basicAvailableCells[randomIndex].SetBan(pid);
+                int randomIndex = SysRandom.Range(0, availableLikes.Count);
+                availableLikes[randomIndex].SetLike(pid);
             }
+            else
+            {
+                // 如果没有满足所有条件的卡牌，选择一张满足基本条件的卡牌
+                List<PickPanelCellControl> basicAvailableCells = new List<PickPanelCellControl>();
+                foreach (var cell in cellControls)
+                {
+                    if (cell.likeState == 0 && !ConfigManager.IsKingHero(cell.heroId))
+                        basicAvailableCells.Add(cell);
+                }
+                if (basicAvailableCells.Count > 0)
+                {
+                    int randomIndex = SysRandom.Range(0, basicAvailableCells.Count);
+                    basicAvailableCells[randomIndex].SetLike(pid);
+                }
+            }
+
+            // 本轮是否成功点掉一张：likeCount 已被 SetLike 自减
+            if (playerInfo.likeCount >= remain)
+                break; // 没点出去（无可用卡），避免死循环
+            remain = playerInfo.likeCount;
         }
     }
 

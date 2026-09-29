@@ -300,8 +300,8 @@ public class WorldManager : MonoBehaviour
         }
         else
         {
-            GameManager.Instance.GetPlayer(0).banCount = 1;
-            GameManager.Instance.GetPlayer(1).banCount = 2;
+            GameManager.Instance.GetPlayer(0).likeCount = 2;
+            GameManager.Instance.GetPlayer(1).likeCount = 2;
             var center1 = mapConfig.SideCenters != null && mapConfig.SideCenters.Length > 0 ? mapConfig.SideCenters[0] : null;
             var center2 = mapConfig.SideCenters != null && mapConfig.SideCenters.Length > 1 ? mapConfig.SideCenters[1] : null;
 

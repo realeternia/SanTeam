@@ -160,7 +160,7 @@ public class CardShopManager : MonoBehaviour
         List<Tuple<int, int>> heroIds = new List<Tuple<int, int>>();
         int TOTAL_HERO_CARDS = 15;        
         // hero card
-        // 防死循环：卡池中某品质（第一回合恒为品质1）人数可能被ban到少于15张，
+        // 防死循环：卡池中某品质（第一回合恒为品质1）人数可能不足15张，
         // 原 for+i-- 命中重复卡会原地打转永不前进，导致点"结束"进商店时卡死。
         // 改为 while + 尝试上限：能凑满15张就凑满，凑不满则生成已有的全部不重复卡后结束。
         int totalUnique = 0;                       // 已生成的不同英雄卡数量
@@ -169,7 +169,7 @@ public class CardShopManager : MonoBehaviour
         while (totalUnique < TOTAL_HERO_CARDS && attempt < maxAttempts)
         {
             attempt++;
-            var heroId = HeroSelectionTool.GetRandomHeroIdByQuality(shopCfg);
+            var heroId = GetRandomShopHeroId(shopCfg);
             if (heroId == 0)
                 break; // 卡池为空，无法再生成，跳出避免死循环
             var existingIndex = heroIds.FindIndex(x => x.Item1 == heroId);
@@ -530,8 +530,8 @@ public class CardShopManager : MonoBehaviour
 
         if (ctr.isHeroCard)
         {
-            // 按当前品质概率随机刷新，允许重复
-            var heroId = HeroSelectionTool.GetRandomHeroIdByQuality(shopCfg);
+            // 按当前品质概率随机刷新，允许重复；每张卡有 LikeCardRefreshRate 概率替换为收藏卡
+            var heroId = GetRandomShopHeroId(shopCfg);
             var heroPrice = HeroSelectionTool.GetPrice(HeroConfig.GetConfig(heroId));
             newCtr.Init(heroId, true, GetMultiCount(heroPrice, shopCfg), year);
         }
@@ -547,6 +547,19 @@ public class CardShopManager : MonoBehaviour
         cardViews[index] = newCtr;
 
         Destroy(ctr.gameObject);
+    }
+
+    // 刷新卡位出卡：先按 LikeCardRefreshRate 概率从收藏池随机出一张（收藏池=like阶段全部玩家点赞，8玩家×2张共16张，存于 HeroSelectionTool），
+    // 未命中（或收藏池空）则按 GameRoundConfig 品质概率随机出一张
+    private int GetRandomShopHeroId(GameRoundConfig shopCfg)
+    {
+        if (SysRandom.Range(0, 100) < CombatConst.LikeCardRefreshRate)
+        {
+            var likeId = HeroSelectionTool.GetRandomLikedHeroId();
+            if (likeId != 0)
+                return likeId;
+        }
+        return HeroSelectionTool.GetRandomHeroIdByQuality(shopCfg);
     }
 
     // 与初始刷牌一致的卡牌数量计算逻辑
