@@ -12,7 +12,7 @@ public static class EffectManager
     {
         if (!string.IsNullOrEmpty(effectName))
         {
-            var cfg = EffectConfig.GetConfigByname(effectName);
+            var cfg = EffectConfig.GetConfigByName(effectName);
             if (cfg != null && !string.IsNullOrEmpty(cfg.EffPath))
                 return "Prefabs/" + cfg.EffPath;
         }
@@ -64,7 +64,7 @@ public static class EffectManager
         // }
         // 播放粒子特效
         var hitPrefab = Resources.Load<GameObject>(ResolveEffectPath(effectName));
-        var cfg = EffectConfig.GetConfigByname(effectName);
+        var cfg = EffectConfig.GetConfigByName(effectName);
         float scale = GetScale(effectName, cfg, hitPrefab != null ? hitPrefab.transform.localScale.x : 1f);
         float offsetY = GetOffsetY(effectName, cfg);
         GameObject hitEffect = UnityEngine.Object.Instantiate(hitPrefab, targetChess.transform.position, Quaternion.identity);
@@ -88,7 +88,7 @@ public static class EffectManager
         }
         GameLog.Debug("PlaySkillEffect: " + effect);
 
-        var cfg = EffectConfig.GetConfigByname(effect);
+        var cfg = EffectConfig.GetConfigByName(effect);
         float scale = GetScale(effect, cfg, hitPrefab.transform.localScale.x);
         float offsetY = GetOffsetY(effect, cfg);
         GameObject hitEffect = UnityEngine.Object.Instantiate(hitPrefab, sourceChess.transform.position, hitPrefab.transform.rotation);
@@ -103,7 +103,7 @@ public static class EffectManager
         var hitPrefab = Resources.Load<GameObject>(ResolveEffectPath(effect));
         GameLog.Debug("PlayPosSkillEffect: " + effect);
 
-        var cfg = EffectConfig.GetConfigByname(effect);
+        var cfg = EffectConfig.GetConfigByName(effect);
         float scale = GetScale(effect, cfg, size);
         float offsetY = GetOffsetY(effect, cfg);
         GameObject hitEffect = UnityEngine.Object.Instantiate(hitPrefab, sourcePos, hitPrefab.transform.rotation);
@@ -119,7 +119,7 @@ public static class EffectManager
         var hitPrefab = Resources.Load<GameObject>(ResolveEffectPath(effect));
         GameLog.Debug("PlayBuffEffect: " + effect);
 
-        var cfg = EffectConfig.GetConfigByname(effect);
+        var cfg = EffectConfig.GetConfigByName(effect);
         float scale = GetScale(effect, cfg, hitPrefab != null ? hitPrefab.transform.localScale.x : 1f);
         float offsetY = GetOffsetY(effect, cfg);
         GameObject hitEffect = UnityEngine.Object.Instantiate(hitPrefab, sourceChess.transform.position, hitPrefab.transform.rotation);

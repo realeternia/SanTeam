@@ -79,6 +79,7 @@
     <Compile Include="Assets\Resources\Scripts\Combat\Missile.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillHitBuffArea.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffNoMove.cs" />
+    <Compile Include="Assets\Resources\Scripts\Test\EffectTestInit.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidDance.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillHitAround.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillModifyShootSpeed.cs" />
@@ -321,9 +322,9 @@
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidEmpower.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\RankCellInfo.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffDamagedAddRate.cs" />
+    <Compile Include="Assets\Resources\Scripts\Configs\EffectConfig_s.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\BagFieldUnitControl.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidSweeping.cs" />
-    <Compile Include="Assets\Resources\Scripts\Configs\EffectConfig_s.cs" />
     <Compile Include="Assets\Epic Toon FX\Scripts\ETFXPitchRandomizer.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillSoldierArcherBuff.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidNobleBless.cs" />

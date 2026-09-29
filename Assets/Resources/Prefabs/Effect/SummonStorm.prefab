@@ -1,18 +1,17 @@
 %YAML 1.1
-%TAG !u! tag:yousandi.cn,2023:
+%TAG !u! tag:unity3d.com,2011:
 --- !u!1 &1017551651662897860
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 1017551651662897915}
   - component: {fileID: 1017551651662897913}
   - component: {fileID: 1017551651662897914}
   m_Layer: 0
-  m_HasEditorInfo: 1
   m_Name: OuterShadow_01
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4863,10 +4862,6 @@ ParticleSystemRenderer:
   m_ReflectionProbeUsage: 0
   m_RayTracingMode: 0
   m_RayTraceProcedural: 0
-  m_virtualGeometry: 0
-  m_virtualGeometryShadow: 0
-  m_ShadingRate: 0
-  m_ForceDisableGRD: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -4930,13 +4925,12 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 1977613695801617291}
   - component: {fileID: 1977613695801617293}
   - component: {fileID: 1977613695801617290}
   m_Layer: 0
-  m_HasEditorInfo: 1
   m_Name: Embers_01
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -9711,10 +9705,6 @@ ParticleSystemRenderer:
   m_ReflectionProbeUsage: 0
   m_RayTracingMode: 0
   m_RayTraceProcedural: 0
-  m_virtualGeometry: 0
-  m_virtualGeometryShadow: 0
-  m_ShadingRate: 0
-  m_ForceDisableGRD: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -9778,13 +9768,12 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 5882814824502331126}
   - component: {fileID: 5882814824502331124}
   - component: {fileID: 5882814824502331125}
   m_Layer: 0
-  m_HasEditorInfo: 1
   m_Name: Explosion_GroundBlack_01
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -14617,10 +14606,6 @@ ParticleSystemRenderer:
   m_ReflectionProbeUsage: 0
   m_RayTracingMode: 0
   m_RayTraceProcedural: 0
-  m_virtualGeometry: 0
-  m_virtualGeometryShadow: 0
-  m_ShadingRate: 0
-  m_ForceDisableGRD: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -14684,13 +14669,12 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 5882814824513766366}
   - component: {fileID: 5882814824513766364}
   - component: {fileID: 5882814824513766365}
   m_Layer: 0
-  m_HasEditorInfo: 1
   m_Name: Explosion_LightImpact_01
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -19523,10 +19507,6 @@ ParticleSystemRenderer:
   m_ReflectionProbeUsage: 0
   m_RayTracingMode: 0
   m_RayTraceProcedural: 0
-  m_virtualGeometry: 0
-  m_virtualGeometryShadow: 0
-  m_ShadingRate: 0
-  m_ForceDisableGRD: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -19590,13 +19570,12 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 5882814824663697427}
   - component: {fileID: 5882814824663697425}
   - component: {fileID: 5882814824663697426}
   m_Layer: 0
-  m_HasEditorInfo: 1
   m_Name: Explosion_Smoke_01
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -24429,10 +24408,6 @@ ParticleSystemRenderer:
   m_ReflectionProbeUsage: 0
   m_RayTracingMode: 0
   m_RayTraceProcedural: 0
-  m_virtualGeometry: 0
-  m_virtualGeometryShadow: 0
-  m_ShadingRate: 0
-  m_ForceDisableGRD: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -24496,11 +24471,10 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 5882814824784313204}
   m_Layer: 0
-  m_HasEditorInfo: 1
   m_Name: Indicator
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -24517,7 +24491,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.15, y: 0.15, z: 0.15}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 9026426625631464056}
@@ -24531,13 +24505,12 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 5882814824937951822}
   - component: {fileID: 5882814824937951820}
   - component: {fileID: 5882814824937951821}
   m_Layer: 0
-  m_HasEditorInfo: 1
   m_Name: ExplosionAndBeam_Control
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -29413,10 +29386,6 @@ ParticleSystemRenderer:
   m_ReflectionProbeUsage: 0
   m_RayTracingMode: 0
   m_RayTraceProcedural: 0
-  m_virtualGeometry: 0
-  m_virtualGeometryShadow: 0
-  m_ShadingRate: 0
-  m_ForceDisableGRD: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -29480,13 +29449,12 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 5882814825175712618}
   - component: {fileID: 5882814825175712616}
   - component: {fileID: 5882814825175712617}
   m_Layer: 0
-  m_HasEditorInfo: 1
   m_Name: Explosion_GroundEmissive_01
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -34319,10 +34287,6 @@ ParticleSystemRenderer:
   m_ReflectionProbeUsage: 0
   m_RayTracingMode: 0
   m_RayTraceProcedural: 0
-  m_virtualGeometry: 0
-  m_virtualGeometryShadow: 0
-  m_ShadingRate: 0
-  m_ForceDisableGRD: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -34386,13 +34350,12 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 5882814825184907241}
   - component: {fileID: 5882814825184907247}
   - component: {fileID: 5882814825184907240}
   m_Layer: 0
-  m_HasEditorInfo: 1
   m_Name: LightningStrike_01
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -39252,10 +39215,6 @@ ParticleSystemRenderer:
   m_ReflectionProbeUsage: 0
   m_RayTracingMode: 0
   m_RayTraceProcedural: 0
-  m_virtualGeometry: 0
-  m_virtualGeometryShadow: 0
-  m_ShadingRate: 0
-  m_ForceDisableGRD: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -39319,13 +39278,12 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 5882814825220657924}
   - component: {fileID: 5882814825220657946}
   - component: {fileID: 5882814825220657947}
   m_Layer: 0
-  m_HasEditorInfo: 1
   m_Name: Explosion_Smoke_02
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -44158,10 +44116,6 @@ ParticleSystemRenderer:
   m_ReflectionProbeUsage: 0
   m_RayTracingMode: 0
   m_RayTraceProcedural: 0
-  m_virtualGeometry: 0
-  m_virtualGeometryShadow: 0
-  m_ShadingRate: 0
-  m_ForceDisableGRD: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -44225,13 +44179,12 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 5882814825435537587}
   - component: {fileID: 5882814825435537585}
   - component: {fileID: 5882814825435537586}
   m_Layer: 0
-  m_HasEditorInfo: 1
   m_Name: Indicator_Emissive_02
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -49073,10 +49026,6 @@ ParticleSystemRenderer:
   m_ReflectionProbeUsage: 0
   m_RayTracingMode: 0
   m_RayTraceProcedural: 0
-  m_virtualGeometry: 0
-  m_virtualGeometryShadow: 0
-  m_ShadingRate: 0
-  m_ForceDisableGRD: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -49140,13 +49089,12 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 5882814825547416290}
   - component: {fileID: 5882814825547416288}
   - component: {fileID: 5882814825547416289}
   m_Layer: 0
-  m_HasEditorInfo: 1
   m_Name: Explosion_LightImpact_02
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -53979,10 +53927,6 @@ ParticleSystemRenderer:
   m_ReflectionProbeUsage: 0
   m_RayTracingMode: 0
   m_RayTraceProcedural: 0
-  m_virtualGeometry: 0
-  m_virtualGeometryShadow: 0
-  m_ShadingRate: 0
-  m_ForceDisableGRD: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -54046,13 +53990,12 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 5882814825619643252}
   - component: {fileID: 5882814825619643210}
   - component: {fileID: 5882814825619643211}
   m_Layer: 0
-  m_HasEditorInfo: 1
   m_Name: Indicator_Shadow_01
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -58894,10 +58837,6 @@ ParticleSystemRenderer:
   m_ReflectionProbeUsage: 0
   m_RayTracingMode: 0
   m_RayTraceProcedural: 0
-  m_virtualGeometry: 0
-  m_virtualGeometryShadow: 0
-  m_ShadingRate: 0
-  m_ForceDisableGRD: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -58961,13 +58900,12 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 5882814825644173538}
   - component: {fileID: 5882814825644173536}
   - component: {fileID: 5882814825644173537}
   m_Layer: 0
-  m_HasEditorInfo: 1
   m_Name: Explosion_Lightning_01
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -63800,10 +63738,6 @@ ParticleSystemRenderer:
   m_ReflectionProbeUsage: 0
   m_RayTracingMode: 0
   m_RayTraceProcedural: 0
-  m_virtualGeometry: 0
-  m_virtualGeometryShadow: 0
-  m_ShadingRate: 0
-  m_ForceDisableGRD: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -63867,11 +63801,10 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 5882814825712509881}
   m_Layer: 0
-  m_HasEditorInfo: 1
   m_Name: SummonStorm
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -63901,11 +63834,10 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 5882814826278786489}
   m_Layer: 0
-  m_HasEditorInfo: 1
   m_Name: Effect
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -63922,7 +63854,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.1, y: 0.1, z: 0.1}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1977613695801617291}
@@ -63936,13 +63868,12 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 9026426625631464056}
   - component: {fileID: 9026426625631464058}
   - component: {fileID: 9026426625631464059}
   m_Layer: 0
-  m_HasEditorInfo: 1
   m_Name: Indicator_Emissive_01
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -68784,10 +68715,6 @@ ParticleSystemRenderer:
   m_ReflectionProbeUsage: 0
   m_RayTracingMode: 0
   m_RayTraceProcedural: 0
-  m_virtualGeometry: 0
-  m_virtualGeometryShadow: 0
-  m_ShadingRate: 0
-  m_ForceDisableGRD: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:

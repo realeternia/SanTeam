@@ -1,17 +1,16 @@
 %YAML 1.1
-%TAG !u! tag:yousandi.cn,2023:
+%TAG !u! tag:unity3d.com,2011:
 --- !u!1 &4721644871937375217
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 5067970919515586314}
   - component: {fileID: 2995193427318008955}
   m_Layer: 0
-  m_HasEditorInfo: 1
   m_Name: NukeMissileFires
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -63,15 +62,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 417376, guid: 25a78a965241d084996f23857207e95f, type: 3}
       propertyPath: m_LocalScale.x
-      value: 0.7
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 417376, guid: 25a78a965241d084996f23857207e95f, type: 3}
       propertyPath: m_LocalScale.y
-      value: 0.7
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 417376, guid: 25a78a965241d084996f23857207e95f, type: 3}
       propertyPath: m_LocalScale.z
-      value: 0.7
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 417376, guid: 25a78a965241d084996f23857207e95f, type: 3}
       propertyPath: m_LocalPosition.x
@@ -295,15 +294,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 417376, guid: 25a78a965241d084996f23857207e95f, type: 3}
       propertyPath: m_LocalScale.x
-      value: 0.7
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 417376, guid: 25a78a965241d084996f23857207e95f, type: 3}
       propertyPath: m_LocalScale.y
-      value: 0.7
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 417376, guid: 25a78a965241d084996f23857207e95f, type: 3}
       propertyPath: m_LocalScale.z
-      value: 0.7
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 417376, guid: 25a78a965241d084996f23857207e95f, type: 3}
       propertyPath: m_LocalPosition.x

@@ -31,7 +31,7 @@ public class Missile : MonoBehaviour
     {
         if (!string.IsNullOrEmpty(effectName))
         {
-            var cfg = EffectConfig.GetConfigByname(effectName);
+            var cfg = EffectConfig.GetConfigByName(effectName);
             if (cfg != null)
             {
                 if (!string.IsNullOrEmpty(cfg.MissilePath))
@@ -60,9 +60,9 @@ public class Missile : MonoBehaviour
         GameObject missileEffect = Instantiate(missilePrefab, transform.position, missilePrefab.transform.rotation, transform);
         transform.rotation = Quaternion.LookRotation(targetPos - transform.position);
         transform.position += new Vector3(0f, 2f, 0f);
-        // 世界缩放统一走 EffectConfig.Scale，与挂点无关；未配置时回退 size × prefab 根缩放
-        var cfg = EffectConfig.GetConfigByname(effectName);
-        float scale = cfg != null && cfg.Scale > 0 ? cfg.Scale : size * missilePrefab.transform.localScale.x;
+        // 世界缩放统一走 EffectConfig.MissileScale，与挂点无关；未配置时回退 size × prefab 根缩放
+        var cfg = EffectConfig.GetConfigByName(effectName);
+        float scale = cfg != null && cfg.MissileScale > 0 ? cfg.MissileScale : size * missilePrefab.transform.localScale.x;
         transform.localScale = new Vector3(scale, scale, scale);
 
         if(missileEffect.TryGetComponent(out MissileComp missileComp))
@@ -88,9 +88,9 @@ public class Missile : MonoBehaviour
 
         GameObject missileEffect = Instantiate(missilePrefab, transform.position, Quaternion.identity, transform);
         transform.position += new Vector3(0f, 5f, 0f);
-        // 世界缩放统一走 EffectConfig.Scale，与挂点无关；未配置时回退 prefab 根缩放
-        var cfg = EffectConfig.GetConfigByname(effectName);
-        float scale = cfg != null && cfg.Scale > 0 ? cfg.Scale : missilePrefab.transform.localScale.x;
+        // 世界缩放统一走 EffectConfig.MissileScale，与挂点无关；未配置时回退 prefab 根缩放
+        var cfg = EffectConfig.GetConfigByName(effectName);
+        float scale = cfg != null && cfg.MissileScale > 0 ? cfg.MissileScale : missilePrefab.transform.localScale.x;
         missileEffect.transform.localScale = new Vector3(scale, scale, scale);
 
         if(missileEffect.TryGetComponent(out MissileComp missileComp))
