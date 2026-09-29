@@ -62,6 +62,7 @@ public class Missile : MonoBehaviour
         transform.position += new Vector3(0f, 2f, 0f);
         // 世界缩放统一走 EffectConfig.MissileScale，与挂点无关；父级多为非等比缩放，按 X 轴统一标量补偿，避免粒子拉伸变形；未配置时回退 size × prefab 根缩放
         var cfg = EffectConfig.GetConfigByName(effectName);
+        EffectManager.ApplyTint(missileEffect, cfg);
         float scale = cfg != null && cfg.MissileScale > 0 ? cfg.MissileScale : size * missilePrefab.transform.localScale.x;
         float parentScale = transform.parent != null ? transform.parent.lossyScale.x : 1f;
         transform.localScale = new Vector3(
@@ -94,6 +95,7 @@ public class Missile : MonoBehaviour
         transform.position += new Vector3(0f, 5f, 0f);
         // 世界缩放统一走 EffectConfig.MissileScale，与挂点无关；父级多为非等比缩放，按 X 轴统一标量补偿，避免粒子拉伸变形；未配置时回退 prefab 根缩放
         var cfg = EffectConfig.GetConfigByName(effectName);
+        EffectManager.ApplyTint(missileEffect, cfg);
         float scale = cfg != null && cfg.MissileScale > 0 ? cfg.MissileScale : missilePrefab.transform.localScale.x;
         float parentScale = missileEffect.transform.parent != null ? missileEffect.transform.parent.lossyScale.x : 1f;
         missileEffect.transform.localScale = new Vector3(

@@ -51,6 +51,24 @@ public static class EffectManager
         return effect;
     }
 
+    // 配置了变色（TintColor）时，自动挂染色脚本并设置目标颜色
+    public static void ApplyTint(GameObject effect, EffectConfig cfg)
+    {
+        if (effect == null || cfg == null || string.IsNullOrEmpty(cfg.TintColor))
+            return;
+        if (EffectTintColor.TryParseHex(cfg.TintColor, out var color))
+        {
+            var tint = effect.GetComponent<EffectTintColor>();
+            if (tint == null)
+                tint = effect.AddComponent<EffectTintColor>();
+            tint.SetTint(color);
+        }
+        else
+        {
+            GameLog.Warn("EffectManager 变色配置无效: " + cfg.Name + " TintColor=" + cfg.TintColor);
+        }
+    }
+
     public static void PlayHitEffect(Chess sourceChess, Chess targetChess, string effectName)
     {
         // if (sourceChess.isHero)
@@ -67,6 +85,7 @@ public static class EffectManager
         float offsetY = GetOffsetY(effectName, cfg);
         GameObject hitEffect = UnityEngine.Object.Instantiate(hitPrefab, targetChess.transform.position, Quaternion.identity);
         MountEffect(hitEffect, targetChess.transform, new Vector3(scale, scale, scale), offsetY);
+        ApplyTint(hitEffect, cfg);
         // 可以添加代码设置特效的生命周期，例如几秒钟后自动销毁
         UnityEngine.Object.Destroy(hitEffect, 1.3f);
     }
@@ -91,6 +110,7 @@ public static class EffectManager
         float offsetY = GetOffsetY(effect, cfg);
         GameObject hitEffect = UnityEngine.Object.Instantiate(hitPrefab, sourceChess.transform.position, hitPrefab.transform.rotation);
         MountEffect(hitEffect, sourceChess.transform, new Vector3(scale, scale, scale), offsetY);
+        ApplyTint(hitEffect, cfg);
         // 可以添加代码设置特效的生命周期，例如几秒钟后自动销毁
         UnityEngine.Object.Destroy(hitEffect, time);
         return hitEffect;
@@ -106,6 +126,7 @@ public static class EffectManager
         float offsetY = GetOffsetY(effect, cfg);
         GameObject hitEffect = UnityEngine.Object.Instantiate(hitPrefab, sourcePos, hitPrefab.transform.rotation);
         MountEffect(hitEffect, sourceChess.transform, new Vector3(scale, scale, scale), offsetY);
+        ApplyTint(hitEffect, cfg);
         // 可以添加代码设置特效的生命周期，例如几秒钟后自动销毁
         UnityEngine.Object.Destroy(hitEffect, time);
 
@@ -122,6 +143,7 @@ public static class EffectManager
         float offsetY = GetOffsetY(effect, cfg);
         GameObject hitEffect = UnityEngine.Object.Instantiate(hitPrefab, sourceChess.transform.position, hitPrefab.transform.rotation);
         MountEffect(hitEffect, sourceChess.transform, new Vector3(scale, scale, scale), offsetY);
+        ApplyTint(hitEffect, cfg);
 
         return hitEffect;
 

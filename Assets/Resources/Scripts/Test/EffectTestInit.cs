@@ -33,6 +33,7 @@ public class EffectTestInit : MonoBehaviour
         var paths = new List<string>();
         var isMissileList = new List<bool>();
         var scaleList = new List<float>();
+        var tintList = new List<string>();
         foreach (var cfg in EffectConfig.ConfigList)
         {
             if (!string.IsNullOrEmpty(cfg.MissilePath))
@@ -40,6 +41,7 @@ public class EffectTestInit : MonoBehaviour
                 paths.Add("Prefabs/" + cfg.MissilePath);
                 isMissileList.Add(true);
                 scaleList.Add(cfg.MissileScale);
+                tintList.Add(cfg.TintColor);
             }
         }
         foreach (var cfg in EffectConfig.ConfigList)
@@ -49,6 +51,7 @@ public class EffectTestInit : MonoBehaviour
                 paths.Add("Prefabs/" + cfg.EffPath);
                 isMissileList.Add(false);
                 scaleList.Add(cfg.Scale);
+                tintList.Add(cfg.TintColor);
             }
         }
 
@@ -65,13 +68,13 @@ public class EffectTestInit : MonoBehaviour
                 (col - (cols - 1) * 0.5f) * spacingX,
                 0f,
                 (row - (rows - 1) * 0.5f) * spacingZ);
-            CreateItem(paths[i], pos, isMissileList[i], scaleList[i]);
+            CreateItem(paths[i], pos, isMissileList[i], scaleList[i], tintList[i]);
         }
 
         GameLog.Info("EffectTestInit 创建特效/导弹共 " + total + " 个");
     }
 
-    private void CreateItem(string resPath, Vector3 pos, bool isMissile, float scale)
+    private void CreateItem(string resPath, Vector3 pos, bool isMissile, float scale, string tintHex)
     {
         var prefab = Resources.Load<GameObject>(resPath);
         if (prefab == null)
@@ -84,6 +87,21 @@ public class EffectTestInit : MonoBehaviour
         go.transform.localScale = Vector3.one * scale;
         // 统一挂在 EffectTestInit 下，保持世界位置
         go.transform.SetParent(transform, true);
+        // 配置了变色时自动挂染色脚本
+        if (!string.IsNullOrEmpty(tintHex))
+        {
+            if (EffectTintColor.TryParseHex(tintHex, out var color))
+            {
+                var tint = go.GetComponent<EffectTintColor>();
+                if (tint == null)
+                    tint = go.AddComponent<EffectTintColor>();
+                tint.SetTint(color);
+            }
+            else
+            {
+                GameLog.Warn("EffectTestInit 变色配置无效: " + resPath + " TintColor=" + tintHex);
+            }
+        }
         // 测试时循环播放，便于持续观察
         foreach (var ps in go.GetComponentsInChildren<ParticleSystem>(true))
         {

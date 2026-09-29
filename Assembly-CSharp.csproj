@@ -284,6 +284,7 @@
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidTauntSlam.cs" />
     <Compile Include="Assets\Resources\Scripts\Tools\SysRandom.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidScorchingRain.cs" />
+    <Compile Include="Assets\Resources\Scripts\Effect\EffectTintColor.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidLastStrategy.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\CombatConst.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\SideComposeItem.cs" />
