@@ -29,7 +29,7 @@ public class SkillAidJudgement : Skill
         if (magicStub != null)
             EffectManager.PlayPosSkillEffect(magicStub, pos, skillCfg.EffectSize, skillCfg.HitEffect, summonTime);
 
-        owner.StartCoroutine(ThunderField(pos));
+        owner.StartCasting(id, ThunderField(pos));
         return true;
     }
 
@@ -39,8 +39,12 @@ public class SkillAidJudgement : Skill
         var endTime = Time.time + skillCfg.BuffTime;
         while (Time.time < endTime)
         {
-            if (owner == null || owner.hp <= 0)
+            // 被打断/死亡：castingSkillId 被 BreakCasting 置0，结束法阵
+            if (owner == null || owner.hp <= 0 || owner.castingSkillId != id)
                 yield break;
+
+            // 引导期间每跳持续播放施法动作
+            owner.PlayerAnim(skillCfg.Action);
 
             var unitList = WorldManager.Instance.GetUnitsInRange(pos, skillCfg.Area, owner.side, true);
             var skillDamage = GetSkillDamage();

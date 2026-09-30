@@ -95,6 +95,10 @@ public class Chess : MonoBehaviour
     public List<BuffTime> buffTimes = new List<BuffTime>(); //记录最近20s的buff记录
     public int noMoveCount = 0;
     public int noActionCount = 0;
+    /// <summary>引导状态：当前正在持续施法(引导)的技能Id，0=未施法。&gt;0 时该单位无法移动/普攻，且会被晕眩/死亡打断</summary>
+    public int castingSkillId = 0;
+    // 当前引导协程引用（供 BreakCasting 停止）
+    private Coroutine castingCoroutine = null;
 
     public Renderer rend;
     public Material material;
@@ -468,7 +472,8 @@ public class Chess : MonoBehaviour
 
     private void MoveAndFight(float deltaTime)
     {
-        if (noActionCount > 0)
+        // 眩晕(noActionCount>0)或引导中(castingSkillId>0)都无法移动/普攻
+        if (noActionCount > 0 || castingSkillId > 0)
             return;
 
         // 每3秒重新寻找目标
@@ -727,6 +732,9 @@ public class Chess : MonoBehaviour
 
     public void Ondying()
     {
+        // 显式打断持续施法(引导)：死亡时随 GameObject 销毁协程自停，此处清理引导状态并输出日志
+        BreakCasting();
+
         // 张昭·筑垒：被筑垒的士兵死亡后，延迟原地复活（满血，筑垒双防随 buffs.Clear 移除），每名士兵至多一次
         if (!isHero && buildFortArmed && !buildFortRevived)
         {
@@ -747,6 +755,51 @@ public class Chess : MonoBehaviour
 
         if ((side == 1 || side == 2 && !isShadow ))
             GameManager.Instance.PlaySound("Sounds/tnt", 7);
+    }
+
+    /// <summary>
+    /// 开启持续施法(引导)：记录 castingSkillId 并运行引导协程。
+    /// 协程体需在每段 yield 后校验 owner.castingSkillId == id，若不匹配（被打断/死亡/换技能）即提前退出；
+    /// 引导自然跑完或被打断时清空 castingSkillId。
+    /// </summary>
+    public void StartCasting(int skillId, IEnumerator coroutine)
+    {
+        // 若已在引导其它技能，先打断旧的再开始新的
+        if (castingSkillId > 0)
+            BreakCasting();
+
+        castingSkillId = skillId;
+        GameLog.Debug("StartCasting 开始引导 skillId=" + skillId + " id=" + id);
+        castingCoroutine = StartCoroutine(CastingTrack(skillId, coroutine));
+    }
+
+    // 引导跟踪协程：手动逐段推进内部协程（兼容 Unity 与 headless 桩协程运行时，二者都按每段 yield 推进），
+    // 内部协程跑完后（自然结束或协程体内被置0后 return）清理引导状态。
+    private IEnumerator CastingTrack(int skillId, IEnumerator coroutine)
+    {
+        while (coroutine.MoveNext())
+            yield return coroutine.Current;
+        // 仅当仍是该技能引导时复位（若已被 BreakCasting 置0则无需复位，避免覆盖打断标记）
+        if (castingSkillId == skillId)
+            castingSkillId = 0;
+        castingCoroutine = null;
+    }
+
+    /// <summary>
+    /// 打断当前持续施法(引导)：停止引导协程并清空引导状态。晕眩(BuffNoAction)、死亡等调此打断。
+    /// </summary>
+    public void BreakCasting()
+    {
+        if (castingSkillId > 0)
+        {
+            GameLog.Debug("BreakCasting 打断引导 skillId=" + castingSkillId + " id=" + id);
+            castingSkillId = 0;
+        }
+        if (castingCoroutine != null)
+        {
+            StopCoroutine(castingCoroutine);
+            castingCoroutine = null;
+        }
     }
 
     // 筑垒复活协程：延迟 BuffBuildFort.ReviveDelay 后在原地满血重建士兵（骑在 WorldManager 上，不受筑垒者存活影响）

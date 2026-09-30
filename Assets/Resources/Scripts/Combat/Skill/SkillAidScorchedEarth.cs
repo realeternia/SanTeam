@@ -45,7 +45,7 @@ public class SkillAidScorchedEarth : Skill
             EffectManager.PlayPosSkillEffect(magicStub, pos, skillCfg.EffectSize, skillCfg.HitEffect, summonTime);
         }
 
-        owner.StartCoroutine(DelayDamage(GetSummonTime()));
+        owner.StartCasting(id, DelayDamage(GetSummonTime()));
         return true;
     }
 
@@ -54,8 +54,12 @@ public class SkillAidScorchedEarth : Skill
         var term = (int)Math.Floor(summonTime / skillCfg.SummonHitInterval);
         for (int i = 0; i < term; i++)
         {
-            if (owner == null || owner.hp <= 0)
+            // 被打断/死亡：castingSkillId 被 BreakCasting 置0，结束法阵
+            if (owner == null || owner.hp <= 0 || owner.castingSkillId != id)
                 yield break;
+
+            // 引导期间每跳持续播放施法动作
+            owner.PlayerAnim(skillCfg.Action);
 
             var unitList = new List<Chess>();
             foreach (var pos in targetPosList)

@@ -214,7 +214,7 @@ public class BattleSim
         const float MeleeCloseDist = 10f;   // 近战贴身判定距离
         foreach (var c in World.chessList)
         {
-            if (c == null || c.hp <= 0 || !c.isHero || c.attackRange <= 0 || c.attackRange >= 20)
+            if (c == null || c.hp <= 0 || !c.isHero || c.attackRange <= 0 || c.attackRange >= 20 || c.castingSkillId > 0)
                 continue;
             Chess target = null;
             float best = float.MaxValue;
