@@ -24,7 +24,7 @@ public class SkillHitRegion : Skill
             //创建一个hitEffect
             EffectManager.PlayPosSkillEffect(magicStub, targetPos, skillCfg.EffectSize, skillCfg.HitEffect, summonTime);
 
-            owner.StartCoroutine(DelayDamage(summonTime));
+            owner.StartCasting(id, DelayDamage(summonTime));
         }
     }
 
@@ -33,8 +33,12 @@ public class SkillHitRegion : Skill
         var term = (int) System.Math.Floor(summonTime / skillCfg.SummonHitInterval);
         for (int i = 0; i < term; i++)
         {
-            if(owner == null || owner.hp <= 0)
+            // 被打断/死亡：castingSkillId 被 BreakCasting 置0，结束法阵
+            if(owner == null || owner.hp <= 0 || owner.castingSkillId != id)
                 yield break;
+
+            // 引导期间每跳持续播放施法动作
+            owner.PlayerAnim(skillCfg.Action);
 
             var unitsInRange = WorldManager.Instance.GetUnitsInRange(targetPos, skillCfg.Area, owner.side, true);
             if (unitsInRange.Count > 0)

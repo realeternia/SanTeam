@@ -9,6 +9,8 @@ public class BuffNoAction : Buff
     {
         base.OnAdd(chess, caster);
         owner.noActionCount++;
+        // 眩晕会打断目标当前的持续施法(引导)
+        owner.BreakCasting();
     }
 
     public override void OnRemove(Chess chess)

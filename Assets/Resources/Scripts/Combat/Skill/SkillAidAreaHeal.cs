@@ -25,7 +25,7 @@ public class SkillAidAreaHeal : Skill
         var magicStub = SummonMagicField(center, out var summonTime);
         EffectManager.PlayPosSkillEffect(magicStub, center, skillCfg.EffectSize, skillCfg.HitEffect, summonTime);
 
-        owner.StartCoroutine(AreaHeal(center, summonTime));
+        owner.StartCasting(id, AreaHeal(center, summonTime));
         return true;
     }
 
@@ -38,8 +38,12 @@ public class SkillAidAreaHeal : Skill
         {
             yield return new WaitForSeconds(interval);
 
-            if (owner == null || owner.hp <= 0)
+            // 被打断/死亡：castingSkillId 被 BreakCasting 置0，结束治疗领域
+            if (owner == null || owner.hp <= 0 || owner.castingSkillId != id)
                 yield break;
+
+            // 引导期间每跳持续播放施法动作
+            owner.PlayerAnim(skillCfg.Action);
 
             // 领域内全部友方英雄（含自身），每跳回复一次（独立治疗公式）
             var units = WorldManager.Instance.GetUnitsInRange(center, skillCfg.Area, owner.side, false)
