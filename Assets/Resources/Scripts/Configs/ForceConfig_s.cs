@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -40,7 +40,7 @@ namespace CommonConfig
 
         private static Dictionary<string, FieldMetaInfo> fieldMeta = new Dictionary<string, FieldMetaInfo>()
         {
-            {"Id", new FieldMetaInfo("势力Id（对应 HeroConfig.Side：1魏 2蜀 3吴 4晋 5群 6神 10野）", "int", 60)},
+            {"Id", new FieldMetaInfo("势力Id（对应 HeroConfig.Side：1蜀 2魏 3吴 4董 5晋 6袁 10野）", "int", 60)},
             {"Name", new FieldMetaInfo("势力名", "string", 0)},
             {"Colorstr", new FieldMetaInfo("势力主色（十六进制，如#284600，用于阵营背景/图标）", "string", 0)},
             {"KingId", new FieldMetaInfo("主公英雄Id（HeroConfig.Id，无主公为0）", "int", 60)},
@@ -54,7 +54,7 @@ namespace CommonConfig
         public static List<CellMeta> CellMetas { get { return cellMeta; } }
 
         /// <summary>
-        ///势力Id（对应 HeroConfig.Side：1魏 2蜀 3吴 4晋 5群 6神 10野）
+        ///势力Id（对应 HeroConfig.Side：1蜀 2魏 3吴 4董 5晋 6袁 10野）
         /// </summary>
         public int Id;
         /// <summary>
@@ -107,8 +107,9 @@ namespace CommonConfig
         public static void Load()
         {
             config.Clear();
-            config[1] = new ForceConfig(1, "魏国", "#284600", 100001, "side1", true);
-            config[2] = new ForceConfig(2, "蜀国", "#002364", 100002, "side2", true);
+            // 势力名与主公/英雄阵营必须一致：1蜀(刘备 100001)、2魏(曹操 100002)、3吴(孙权)、4董(董卓)、5晋(司马炎)、6袁(袁绍)
+            config[1] = new ForceConfig(1, "蜀国", "#284600", 100001, "side1", true);
+            config[2] = new ForceConfig(2, "魏国", "#002364", 100002, "side2", true);
             config[3] = new ForceConfig(3, "吴国", "#640000", 100003, "side3", true);
             config[4] = new ForceConfig(4, "董侯", "#1E646E", 100004, "side4", true);
             config[5] = new ForceConfig(5, "晋国", "#5A326E", 100005, "side5", true);

@@ -34,7 +34,12 @@ public class PanelManager : MonoBehaviour
         // Tooltip 按需创建：首次经 GetTooltip() 实例化并挂到 tipNode 下，调用入口统一走 PanelManager
         // 配置了调试阵容时跳过选牌面板，由 WorldManager 直接开战
         if (GameManager.Instance != null && GameManager.Instance.HasDebugLineup())
+        {
+            // 根节点本身是满屏遮罩图，正常流程由面板开关（ChangePanelCount）在无面板时关掉；
+            // 调试流程不经过任何面板，这里直接关掉，否则整块遮罩会盖住战斗画面
+            gameObject.SetActive(false);
             return;
+        }
         ShowPick();
     }
 

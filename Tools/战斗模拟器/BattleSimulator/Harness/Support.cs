@@ -112,18 +112,6 @@ public class LaserBeamController : MonoBehaviour
     }
 }
 
-// 特效染色（Effect/EffectTintColor.cs 未编译）：仅 EffectManager.ApplyTint 使用，空实现
-public class EffectTintColor : MonoBehaviour
-{
-    public static bool TryParseHex(string hex, out Color color)
-    {
-        color = Color.white;
-        return !string.IsNullOrEmpty(hex);
-    }
-
-    public void SetTint(Color color) { }
-}
-
 // 城堡 HUD：仅 WorldManager.CreateCastleHUD 使用（未编译，无头空类）
 public class CastleHUD : MonoBehaviour
 {

@@ -35,6 +35,10 @@ public static class CombatConst
     /// <summary>连锁：锁定目标并传递伤害（技能表 锁 的5级行）</summary>
     public const int LockSkillId = 2020390;
 
+    // ---- 技能初始MP ----
+    /// <summary>战斗开始时技能MP是否直接拉满（默认打开；关闭则所有技能按常规从0开始充能）</summary>
+    public static bool FullMpAtBattleBegin = true;
+
     // ---- 国家护盾机制(同阵营连线，数值参考金铲铲神盾使羁绊) ----
     /// <summary>同阵营英雄数量档位(2/3/4/5/6，对应国家护盾技能 Lv1~5)</summary>
     public static readonly int[] FactionShieldCounts = { 2, 3, 4, 5, 6 };

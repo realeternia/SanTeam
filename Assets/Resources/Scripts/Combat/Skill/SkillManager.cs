@@ -310,6 +310,14 @@ public static class SkillManager
         {
             skill.BattleBegin();
         }
+
+        // 战斗开始技能MP拉满（CombatConst.FullMpAtBattleBegin，默认打开）：放在各技能 BattleBegin 之后，
+        // 覆盖技能自身的开局充能（如运筹），并让 BattleBegin 期间新增的技能同样满魔法
+        if (CombatConst.FullMpAtBattleBegin)
+        {
+            foreach (var skill in chess.skills)
+                skill.mp = skill.skillCfg.MpCost;
+        }
     }
 
     public static void OnDeath(Chess chess)

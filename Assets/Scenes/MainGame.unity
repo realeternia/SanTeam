@@ -1615,7 +1615,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 669127b462055714b854550b78a0d3aa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  cardLoves: 
 --- !u!4 &596088743
 Transform:
   m_ObjectHideFlags: 0
@@ -2684,6 +2683,8 @@ MonoBehaviour:
   friendRdData: []
   heroIds: 
   year: 0
+  debugHeroesSide1: 808e0100
+  debugHeroesSide2: 8e8a0100
 --- !u!114 &1788356929
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2697,7 +2698,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   uiCamera: {fileID: 1590568463}
-  isDebug: 1
   Units: {fileID: 891716375}
   gridCellSize: 3
   heroInfoGroup: {fileID: 1019877982}

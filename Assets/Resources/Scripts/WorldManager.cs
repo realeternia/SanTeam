@@ -64,6 +64,13 @@ public class WorldManager : MonoBehaviour
         // 延迟2秒等场景/配置就绪
         yield return new WaitForSeconds(2f);
         ConfigManager.Init();
+        // 调试阵容跳过了选牌/商店流程，year 不会被商店阶段累加（GameManager.year 初始为0），
+        // 这里兜底为第1回合，否则 BattleBegin 里 GameRoundConfig.GetConfig(0) 会取不到配置
+        if (GameManager.Instance.year <= 0)
+        {
+            GameManager.Instance.year = 1;
+            GameLog.Info("调试阵容：跳过选牌/商店流程，回合数兜底为第1回合");
+        }
         BattleBegin();
     }
 

@@ -61,9 +61,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\SineVFX\TopDownEffects\Scripts\Editor\CustomRampGeneratorEditor.cs" />
+    <Compile Include="Assets\Editor\DebugLineupWindow.cs" />
     <Compile Include="Assets\Editor\EffectPrefabScaleFixer.cs" />
     <Compile Include="Assets\Editor\IconLoaderEditor.cs" />
-    <Compile Include="Assets\Editor\GameManagerEditor.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\DOTween\Editor\DOTweenEditor.dll" />
