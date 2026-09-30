@@ -2683,8 +2683,8 @@ MonoBehaviour:
   friendRdData: []
   heroIds: 
   year: 0
-  debugHeroesSide1: 808e0100
-  debugHeroesSide2: 8e8a0100
+  debugHeroesSide1: 
+  debugHeroesSide2: 
 --- !u!114 &1788356929
 MonoBehaviour:
   m_ObjectHideFlags: 0

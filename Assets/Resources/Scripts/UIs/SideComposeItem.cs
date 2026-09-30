@@ -57,9 +57,30 @@ public class SideComposeItem : MonoBehaviour
 
         if (itemDesc != null)
         {
-            bool hasDesc = !string.IsNullOrEmpty(resultCfg.Des);
+            // 描述 + 结果道具技能描述（技能描述以 lime 色拼接；材料不足置灰时随整体灰）
+            string desc = resultCfg.Des;
+            if (!string.IsNullOrEmpty(resultCfg.SkillId))
+            {
+                var skillCfg = ConfigManager.GetSkillConfig(resultCfg.SkillId, 1);
+                if (skillCfg == null)
+                {
+                    GameLog.Warn($"SideComposeItem.SetData: 合成结果技能不存在 sname={resultCfg.SkillId}");
+                }
+                else
+                {
+                    string skillDesc = ConfigManager.GetSkillDescript(skillCfg);
+                    if (!string.IsNullOrEmpty(skillDesc))
+                    {
+                        if (canCombine)
+                            skillDesc = SysColor.ColorText(skillDesc, SysColor.UI.SkillDesc);
+                        desc = string.IsNullOrEmpty(desc) ? skillDesc : desc + "\n" + skillDesc;
+                    }
+                }
+            }
+
+            bool hasDesc = !string.IsNullOrEmpty(desc);
             itemDesc.gameObject.SetActive(hasDesc);
-            itemDesc.text = hasDesc ? resultCfg.Des : "";
+            itemDesc.text = hasDesc ? desc : "";
             itemDesc.color = canCombine ? Color.white : SysColor.Theme.DisabledTextColor;
         }
 

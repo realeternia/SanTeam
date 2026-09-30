@@ -145,6 +145,7 @@ public static class SysColor
         public static readonly Color CheckBtnNormal = new Color(0.15f, 0.15f, 0.15f, 1f);
 
         public static readonly Color NextLv = new Color(0.4f, 1f, 0.4f); // 技能说明下一档差值-淡绿
+        public static readonly Color SkillDesc = new Color(0.55f, 1f, 0.35f); // 技能描述-lime
     }
 
     public static class Battle
