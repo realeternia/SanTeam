@@ -1,8 +1,8 @@
-using CommonConfig;
+﻿using CommonConfig;
 using UnityEngine;
 
 /// <summary>
-/// 马谡·守势：对目标造成 /strength 法术伤害，并使其减速（Buff "缓"，Strength2 减速率，时长 bufftime）
+/// 马谡·守势：对目标造成 /strength 法术伤害，并使其减速（Buff "缓"，Strength3 减速率，时长 bufftime）
 /// </summary>
 public class SkillAidSlowStrike : Skill
 {

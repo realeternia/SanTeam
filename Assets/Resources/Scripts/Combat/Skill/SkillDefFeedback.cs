@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using CommonConfig;
@@ -29,7 +29,7 @@ public class SkillDefFeedback : Skill
 
         if (CheckBurst(attacker))
         {
-            var damageBack = (int)(damage * skillCfg.Strength);
+            var damageBack = (int)(damage * skillCfg.Strength2);
             attacker.OnSkillDamaged(owner, skillId, damageBack, true);
             EffectManager.PlaySkillEffect(attacker, skillCfg.HitEffect);
 

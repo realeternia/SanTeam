@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using CommonConfig;
 using UnityEngine;
@@ -26,7 +26,7 @@ public class SkillHitRepeat : Skill
             yield return new WaitForSeconds(0.3f);
             if (defender != null && defender.hp > 0)
             {
-                var d = (int)(damage * skillCfg.Strength);
+                var d = (int)(damage * skillCfg.Strength2);
                 defender.OnSkillDamaged(owner, skillId, d);
                 EffectManager.PlaySkillEffect(defender, skillCfg.HitEffect);
                 WorldManager.Instance.AddBattleText(d.ToString() + "!", defender.transform.position, new UnityEngine.Vector2(0, 60), Color.red, 3);

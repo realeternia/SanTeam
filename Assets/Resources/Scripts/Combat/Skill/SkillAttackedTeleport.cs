@@ -1,11 +1,11 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using CommonConfig;
 using UnityEngine;
 
 /// <summary>
 /// 埋伏：被攻击时，若攻击者距离超过技能距离阈值(Range，随等级提升)则瞬移近身，
-/// 施加眩晕buff("乱")，同时给予一次技能伤害(Strength，随等级提升)
+/// 施加眩晕buff("乱")，同时给予一次技能伤害(Strength2，随等级提升)
 /// </summary>
 public class SkillAttackedTeleport : Skill
 {
@@ -32,14 +32,14 @@ public class SkillAttackedTeleport : Skill
             BuffManager.AddBuff(attacker, owner, id, BuffConfig.GetConfigByNameS(skillCfg.BuffId).Id, skillCfg.BuffTime);
             attacker.OnSkillDamaged(owner, id, GetSkillDamage());
 
-            // 白衣渡江：瞬移反击后给自己施加吸收盾，容量=法强×Strength2
-            if (skillCfg.Strength2 > 0)
+            // 白衣渡江：瞬移反击后给自己施加吸收盾，容量=法强×Strength3
+            if (skillCfg.Strength3 > 0)
             {
                 var shieldBuffId = BuffConfig.GetConfigByNameS("盾").Id;
                 BuffManager.AddBuff(owner, owner, id, shieldBuffId, 999f);
                 var shield = owner.GetBuff(shieldBuffId) as BuffShield;
                 if (shield != null)
-                    shield.SetHp((int)(owner.ap * skillCfg.Strength2));
+                    shield.SetHp((int)(owner.ap * skillCfg.Strength3));
             }
         }
     }

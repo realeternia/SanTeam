@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using CommonConfig;
 using UnityEngine;
 
@@ -28,8 +28,8 @@ public class SkillAidShadowSplit : Skill
         Vector2 randomDir = SysRandom.InsideUnitCircle.normalized;
         Vector3 randomPosition = owner.transform.position + new Vector3(randomDir.x, 0, randomDir.y) * skillCfg.Range;
         var shadow = SummonUnit(randomPosition, CombatConst.SoldierShadow, HeroConfig.GetConfig(owner.heroId).Icon);
-        shadow.atk = (int)(owner.atk * skillCfg.Strength2);
-        shadow.maxHp = (int)(owner.maxHp * skillCfg.Strength2);
+        shadow.atk = (int)(owner.atk * skillCfg.Strength3);
+        shadow.maxHp = (int)(owner.maxHp * skillCfg.Strength3);
         shadow.hp = shadow.maxHp;
 
         owner.PlayerAnim(skillCfg.Action);

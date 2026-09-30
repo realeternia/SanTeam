@@ -358,7 +358,7 @@ public static class ConfigManager
             {
                 int j = i + 1;
                 // 字段名仅允许 ASCII 字符（字母/数字/_/-）。不能用 char.IsLetterOrDigit，否则中文字符（Unicode 字母）会被误并入字段名，
-                // 导致 "/strength法术伤害" 被解析成 fieldName="strength法术伤害" 而查不到字段、原样输出
+                // 导致 "/damagestrength法术伤害" 被解析成 fieldName="damagestrength法术伤害" 而查不到字段、原样输出
                 while (j < input.Length && IsFieldNameChar(input[j]))
                     j++;
                 var fieldName = input.Substring(i + 1, j - i - 1);
@@ -409,7 +409,7 @@ public static class ConfigManager
         switch (f)
         {
             case "rate": case "strength2": case "cd": case "range": case "area":
-            case "strength": case "bufftime": case "summontime": case "summonspeed":
+            case "damagestrength": case "healstrength": case "strength3": case "bufftime": case "summontime": case "summonspeed":
             case "effectsize": case "mpcost": case "targetcount": case "strengthint":
             case "summoncount": case "lv":
                 return true;
@@ -420,17 +420,19 @@ public static class ConfigManager
         }
     }
 
-    // 动态字段取值与格式化：Rate/Strength2 转百分比，其余数值字段按整数字面展示（无小数）
+    // 动态字段取值与格式化：Rate/Strength2/Strength3 按百分比输出，其余数值字段按整数字面展示（无小数）
     private static string GetFieldRefValue(SkillConfig cfg, string fieldName, bool pct)
     {
         switch (fieldName.ToLowerInvariant())
         {
             case "rate": return PercentText(cfg.Rate);
-            case "strength2": return PercentText(cfg.Strength2);
+            case "strength2": return pct ? PercentText(cfg.Strength2) : cfg.Strength2.ToString("0.##");
+            case "strength3": return PercentText(cfg.Strength3);
             case "cd": return pct ? PercentText(cfg.CD) : cfg.CD.ToString("0.##");
             case "range": return pct ? PercentText(cfg.Range) : cfg.Range.ToString("0.##");
             case "area": return pct ? PercentText(cfg.Area) : cfg.Area.ToString("0.##");
-            case "strength": return pct ? PercentText(cfg.Strength) : cfg.Strength.ToString("0.##");
+            case "damagestrength": return pct ? PercentText(cfg.DamageStrength) : cfg.DamageStrength.ToString("0.##");
+            case "healstrength": return pct ? PercentText(cfg.HealStrength) : cfg.HealStrength.ToString("0.##");
             case "bufftime": return pct ? PercentText(cfg.BuffTime) : cfg.BuffTime.ToString("0.##");
             case "summontime": return pct ? PercentText(cfg.SummonTime) : cfg.SummonTime.ToString("0.##");
             case "summonspeed": return pct ? PercentText(cfg.SummonSpeed) : cfg.SummonSpeed.ToString("0.##");

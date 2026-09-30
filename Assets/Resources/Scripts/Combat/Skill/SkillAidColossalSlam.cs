@@ -1,4 +1,4 @@
-using CommonConfig;
+﻿using CommonConfig;
 using UnityEngine;
 
 /// <summary>
@@ -25,7 +25,7 @@ public class SkillAidColossalSlam : Skill
         var units = WorldManager.Instance.GetUnitsInRange(owner.transform.position, skillCfg.Area, owner.side, true);
         foreach (var u in units)
         {
-            var total = baseDamage + (int)(skillCfg.Strength2 * u.maxHp);
+            var total = baseDamage + (int)(skillCfg.Strength3 * u.maxHp);
             if (total > 0)
                 u.OnSkillDamaged(owner, id, total);
         }

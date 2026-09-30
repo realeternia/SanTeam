@@ -1,4 +1,4 @@
-public class BuffLock : Buff
+﻿public class BuffLock : Buff
 {
     public BuffLock(int id, int skillId, Chess caster, Chess target, float lastTime)
      : base(id, skillId, caster, target, lastTime)
@@ -12,7 +12,7 @@ public class BuffLock : Buff
         if (hurtTag == CombatConst.LockChainHurtTag)
             return;
 
-        var chainDamage = (int)(damageBase * damageMulti * skillCfg.Strength);
+        var chainDamage = (int)(damageBase * damageMulti * skillCfg.Strength2);
         if (chainDamage <= 0)
             return; // 伤害被减伤压到0，不再链传，避免 OnSkillDamaged 的伤害<=0 异常
 

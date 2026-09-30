@@ -1,10 +1,10 @@
-using System.Linq;
+﻿using System.Linq;
 using CommonConfig;
 using UnityEngine;
 
 /// <summary>
-/// 荀彧·兵精：每次主动释放对一名未祝福士兵大祝福(优先近战)：回复全部生命 + 攻击+X%(Strength)、
-/// 护甲+StrengthInt、魔抗+Strength2 大幅提升；每名士兵整场合仅祝福一次(BlessedByXunYu 标记)。
+/// 荀彧·兵精：每次主动释放对一名未祝福士兵大祝福(优先近战)：回复全部生命 + 攻击+X%(Strength2)、
+/// 护甲+StrengthInt、魔抗+Strength3 大幅提升；每名士兵整场合仅祝福一次(BlessedByXunYu 标记)。
 /// </summary>
 public class SkillSoldierBless : Skill
 {
@@ -27,9 +27,9 @@ public class SkillSoldierBless : Skill
             target.blessedByXunYu = true;
             if (target.hp < target.maxHp)
                 owner.HealTarget(target, skillId, target.maxHp - target.hp, false);
-            target.atk += (int)(target.atk * skillCfg.Strength);
+            target.atk += (int)(target.atk * skillCfg.Strength2);
             target.armor += skillCfg.StrengthInt;
-            target.magicRes += (int)skillCfg.Strength2;
+            target.magicRes += (int)skillCfg.Strength3;
             EffectManager.PlaySkillEffect(target, skillCfg.HitEffect);
         }
         return true;

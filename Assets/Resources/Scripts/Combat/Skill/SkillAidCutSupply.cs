@@ -3,7 +3,7 @@ using CommonConfig;
 using UnityEngine;
 
 /// <summary>
-/// 程昱·断粮（术）：对目标造成 /strength 法术伤害，并使其每秒流失 /strength2 生命（持续 dot），持续 bufftime 秒。
+/// 程昱·断粮（术）：对目标造成 /damagestrength 法术伤害，并使其每秒流失 /strength3 生命（持续 dot），持续 bufftime 秒。
 /// </summary>
 public class SkillAidCutSupply : Skill
 {
@@ -26,7 +26,7 @@ public class SkillAidCutSupply : Skill
         if (GetSkillDamage() > 0)
             target.OnSkillDamaged(owner, skillId, GetSkillDamage());
 
-        var secDamage = (int)skillCfg.Strength2;
+        var secDamage = (int)skillCfg.Strength3;
         if (secDamage > 0)
             owner.StartCoroutine(DotTicks(target, secDamage));
 

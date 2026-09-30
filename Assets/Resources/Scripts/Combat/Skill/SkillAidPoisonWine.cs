@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using CommonConfig;
 using UnityEngine;
 
@@ -27,7 +27,7 @@ public class SkillAidPoisonWine : Skill
         if (GetSkillDamage() > 0)
             target.OnSkillDamaged(owner, skillId, GetSkillDamage());
 
-        var secDamage = (int)skillCfg.Strength2;
+        var secDamage = (int)skillCfg.Strength3;
         if (secDamage > 0)
             owner.StartCoroutine(DotTicks(target, secDamage));
 

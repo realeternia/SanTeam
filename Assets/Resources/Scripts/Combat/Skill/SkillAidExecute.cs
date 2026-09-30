@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using CommonConfig;
 using UnityEngine;
 
@@ -22,7 +22,7 @@ public class SkillAidExecute : Skill
             return false;
 
         if ((int)(target.HpRate * 100f) < skillCfg.StrengthInt)
-            target.OnSkillDamaged(owner, id, (int)(GetSkillDamage() * skillCfg.Strength2));
+            target.OnSkillDamaged(owner, id, (int)(GetSkillDamage() * skillCfg.Strength3));
         else
             target.OnSkillDamaged(owner, id, GetSkillDamage());
 

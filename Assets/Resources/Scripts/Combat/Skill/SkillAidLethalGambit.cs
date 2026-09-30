@@ -1,4 +1,4 @@
-using CommonConfig;
+﻿using CommonConfig;
 using UnityEngine;
 
 /// <summary>
@@ -27,7 +27,7 @@ public class SkillAidLethalGambit : Skill
             target.OnSkillDamaged(owner, skillId, GetSkillDamage());
         if (target.hp > 0 && (int)(target.HpRate * 100f) < skillCfg.StrengthInt)
         {
-            var strike = (int)((target.maxHp - target.hp) * skillCfg.Strength2);
+            var strike = (int)((target.maxHp - target.hp) * skillCfg.Strength3);
             if (strike > 0)
                 target.OnSkillDamaged(owner, skillId, strike);
         }

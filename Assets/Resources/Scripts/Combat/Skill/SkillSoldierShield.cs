@@ -1,11 +1,11 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using CommonConfig;
 using UnityEngine;
 
 /// <summary>
 /// 蒋琬·抚军：战斗开始(BattleBegin)给本侧近战士兵全员套护盾；每次主动释放额外给1名近战士兵套盾。
-/// 护盾 = 最大生命 × Strength（25/35/50/70/95%），复用 BuffShield。
+/// 护盾 = 最大生命 × Strength2（25/35/50/70/95%），复用 BuffShield。
 /// </summary>
 public class SkillSoldierShield : Skill
 {
@@ -39,7 +39,7 @@ public class SkillSoldierShield : Skill
         BuffManager.AddBuff(s, owner, id, buffId, skillCfg.BuffTime);
         var shield = s.GetBuff(buffId) as BuffShield;
         if (shield != null)
-            shield.SetHp((int)(s.maxHp * skillCfg.Strength));
+            shield.SetHp((int)(s.maxHp * skillCfg.Strength2));
     }
 
     // 本侧存活近战士兵（近战判定沿用 CombatConst.MeleeRange）

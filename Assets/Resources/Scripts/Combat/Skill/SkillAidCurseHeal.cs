@@ -31,7 +31,7 @@ public class SkillAidCurseHeal : Skill
 
         owner.PlayerAnim(skillCfg.Action);
 
-        // 对敌人挂"败"：持续受到法术伤害（伤害由 BuffTimeDamage 按 Strength 结算）
+        // 对敌人挂"败"：持续受到法术伤害（伤害由 BuffTimeDamage 按 DamageStrength 结算）
         BuffManager.AddBuff(target, owner, id, BuffConfig.GetConfigByNameS(skillCfg.BuffId).Id, skillCfg.BuffTime);
         EffectManager.PlaySkillEffect(target, skillCfg.HitEffect);
 

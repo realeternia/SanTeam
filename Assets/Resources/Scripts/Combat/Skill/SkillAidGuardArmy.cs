@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using CommonConfig;
 using UnityEngine;
 
@@ -38,7 +38,7 @@ public class SkillAidGuardArmy : Skill
         BuffManager.AddBuff(lowest, owner, id, shieldId, skillCfg.BuffTime);
         var sh = lowest.GetBuff(shieldId) as BuffShield;
         if (sh != null)
-            sh.SetHp((int)(lowest.maxHp * skillCfg.Strength));
+            sh.SetHp((int)(lowest.maxHp * skillCfg.Strength2));
 
         // 嘲讽：自身挂嘲讽标记，使敌人优先攻击自己
         BuffManager.AddBuff(owner, owner, id, BuffConfig.GetConfigByNameS("嘲").Id, skillCfg.BuffTime);

@@ -1,8 +1,8 @@
-using CommonConfig;
+﻿using CommonConfig;
 using UnityEngine;
 
 /// <summary>
-/// 文鸯·追袭：短时间吸血+增伤（"袭"Buff，读自身 skillCfg.Strength/Strength2）
+/// 文鸯·追袭：短时间吸血+增伤（"袭"Buff，读自身 skillCfg.Strength2/Strength3）
 /// </summary>
 public class SkillAidLifestealStrike : Skill
 {

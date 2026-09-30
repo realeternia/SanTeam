@@ -1,4 +1,4 @@
-using CommonConfig;
+﻿using CommonConfig;
 using UnityEngine;
 
 /// <summary>
@@ -12,12 +12,12 @@ public class SkillAidDisarmState : Skill
     {
     }
 
-    /// <summary>攻击侧护甲修正：-Strength → 等效护甲×(1-Strength)，实现无视 x% 护甲</summary>
+    /// <summary>攻击侧护甲修正：-Strength2 → 等效护甲×(1-Strength2)，实现无视 x% 护甲</summary>
     public override float GetArmorDelta(bool isAttackerSide)
     {
         if (!isAttackerSide)
             return 0f;
-        return -skillCfg.Strength;
+        return -skillCfg.Strength2;
     }
 
     public override bool CheckAidSkill()

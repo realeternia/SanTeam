@@ -1,9 +1,9 @@
-using System;
+﻿using System;
 using CommonConfig;
 using UnityEngine;
 
 /// <summary>
-/// 王双·流星锤：抛物范围 AOE，对目标及范围内最多 TargetCount 名敌人各造成法术伤害（GetArmorDelta=-1 无视护甲），对带护盾敌人额外造成 ×Strength2 破盾伤害。
+/// 王双·流星锤：抛物范围 AOE，对目标及范围内最多 TargetCount 名敌人各造成法术伤害（GetArmorDelta=-1 无视护甲），对带护盾敌人额外造成 ×Strength3 破盾伤害。
 /// </summary>
 public class SkillAidMeteorHammer : Skill
 {
@@ -40,7 +40,7 @@ public class SkillAidMeteorHammer : Skill
             // 对带护盾敌人额外造成破盾伤害
             if ((u.GetBuff(CombatConst.ShieldBuffId) as BuffShield) != null)
             {
-                var extra = Math.Max(1, (int)(dmg * skillCfg.Strength2));
+                var extra = Math.Max(1, (int)(dmg * skillCfg.Strength3));
                 u.OnSkillDamaged(owner, id, extra, false, CombatConst.AntiShieldHurtTag);
             }
         }

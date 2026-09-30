@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using CommonConfig;
 using UnityEngine;
@@ -19,7 +19,7 @@ public class SkillAttackReboundArrow : Skill
             owner.PlayerAnim(skillCfg.Action);
             WorldManager.Instance.RandomSelect(unitsInRange, skillCfg.TargetCount);
 
-            var reboundDamage = (int)(damage * skillCfg.Strength);
+            var reboundDamage = (int)(damage * skillCfg.Strength2);
             foreach (var unit in unitsInRange)
                 WorldManager.Instance.CreateSpellMissile(owner, unit, defender.transform.position, id, reboundDamage, owner.hitEffect);
         }

@@ -1,8 +1,8 @@
-using CommonConfig;
+﻿using CommonConfig;
 using UnityEngine;
 
 /// <summary>
-/// 马腾·腾驾：降低目标攻击并提升自身攻击（"慑"减攻读 Strength2，"攻"加攻读 Strength）
+/// 马腾·腾驾：降低目标攻击并提升自身攻击（"慑"减攻读 Strength3，"攻"加攻读 Strength2）
 /// </summary>
 public class SkillAidAtkDrain : Skill
 {

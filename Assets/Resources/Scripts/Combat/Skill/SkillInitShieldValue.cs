@@ -1,9 +1,9 @@
-using CommonConfig;
+﻿using CommonConfig;
 
 /// <summary>
 /// 疑城·开场减伤盾（ScriptName = "InitShieldValue"）：
 /// 战斗开始时给自己施加减伤盾（BuffId="硬"=BuffShieldValue 300002），
-/// 持续 BuffTime 秒，减伤比例 = 技能 Strength2（如 0.3 = 减免30%伤害；Strength 为主数值槽，比例类参数放 Strength2）。
+/// 持续 BuffTime 秒，减伤比例 = 技能 Strength3（如 0.3 = 减免30%伤害；Strength2 为主数值槽，比例类参数放 Strength3）。
 /// 用于徐盛：开场15秒百分比减伤盾。
 /// </summary>
 public class SkillInitShieldValue : Skill
@@ -22,6 +22,6 @@ public class SkillInitShieldValue : Skill
         }
 
         BuffManager.AddBuff(owner, owner, id, buffCfg.Id, skillCfg.BuffTime);
-        GameLog.Debug($"开场减伤盾 技能id={id} 等级={Level} 减伤={skillCfg.Strength2 * 100:0}% 持续={skillCfg.BuffTime}s");
+        GameLog.Debug($"开场减伤盾 技能id={id} 等级={Level} 减伤={skillCfg.Strength3 * 100:0}% 持续={skillCfg.BuffTime}s");
     }
 }

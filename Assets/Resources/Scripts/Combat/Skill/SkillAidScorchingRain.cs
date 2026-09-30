@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using CommonConfig;
 using UnityEngine;
 
@@ -23,7 +23,7 @@ public class SkillAidScorchingRain : Skill
 
         var skillDamage = GetSkillDamage();
         var units = WorldManager.Instance.GetUnitsInRange(owner.transform.position, skillCfg.Area, owner.side, true);
-        var secDamage = (int)skillCfg.Strength2;
+        var secDamage = (int)skillCfg.Strength3;
         foreach (var u in units)
         {
             if (skillDamage > 0)

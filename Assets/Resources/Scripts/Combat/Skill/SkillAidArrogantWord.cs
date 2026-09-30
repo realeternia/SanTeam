@@ -1,4 +1,4 @@
-using CommonConfig;
+﻿using CommonConfig;
 using UnityEngine;
 
 /// <summary>
@@ -23,12 +23,12 @@ public class SkillAidArrogantWord : Skill
 
         owner.PlayerAnim(skillCfg.Action);
 
-        // 直接伤害走统一公式（Strength 为主数值/伤害槽，受施法者属性成长）
+        // 直接伤害走统一公式（Strength2 为主数值/伤害槽，受施法者属性成长）
         var burst = GetSkillDamage();
         if (burst > 0)
             target.OnSkillDamaged(owner, skillId, burst);
 
-        // 易伤 Buff "伤"：受击倍率增量读 skillCfg.Strength2
+        // 易伤 Buff "伤"：受击倍率增量读 skillCfg.Strength3
         BuffManager.AddBuff(target, owner, id, BuffConfig.GetConfigByNameS("伤").Id, skillCfg.BuffTime);
 
         EffectManager.PlaySkillEffect(target, skillCfg.HitEffect);

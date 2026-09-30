@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using CommonConfig;
 using UnityEngine;
@@ -53,11 +53,11 @@ public class SkillAidImperialGuard : Skill
         // 传送至身边（参照 SkillAttackedTeleport 瞬移路径）
         lowest.MoveTo(owner.transform.position + new Vector3(0, 0, 6f), true);
 
-        // 套盾：强度 = 目标最大生命 × Strength2
+        // 套盾：强度 = 目标最大生命 × Strength3
         BuffManager.AddBuff(lowest, owner, id, shieldCfg.Id, skillCfg.BuffTime);
         var sh = lowest.GetBuff(shieldCfg.Id) as BuffShield;
         if (sh != null)
-            sh.SetHp((int)(lowest.maxHp * skillCfg.Strength2));
+            sh.SetHp((int)(lowest.maxHp * skillCfg.Strength3));
         else
             GameLog.Warn("SkillAidImperialGuard: 护盾Buff类型异常，无法设置护盾值");
 

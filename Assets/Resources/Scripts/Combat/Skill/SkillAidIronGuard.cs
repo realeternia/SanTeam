@@ -1,8 +1,8 @@
-using CommonConfig;
+﻿using CommonConfig;
 using UnityEngine;
 
 /// <summary>
-/// 于禁·铁壁：为自身附加减伤盾（Buff "硬"，减伤比例取 Strength2）bufftime 秒；对 /area 范围内敌人附加嘲讽（Buff "嘲"）
+/// 于禁·铁壁：为自身附加减伤盾（Buff "硬"，减伤比例取 Strength3）bufftime 秒；对 /area 范围内敌人附加嘲讽（Buff "嘲"）
 /// 并对范围内敌人造成轻量 /strength 法术伤害（走统一公式 GetSkillDamage）。嘲讽短名"嘲"为技能专属常量。
 /// </summary>
 public class SkillAidIronGuard : Skill

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using CommonConfig;
 using UnityEngine;
 
@@ -36,7 +36,7 @@ public class SkillAidArmorIgnore : Skill
         // 对有护盾(吸收型，BuffShield)的目标额外造成基于攻击基准的破盾伤害，绕过护盾直接打血
         if ((target.GetBuff(CombatConst.ShieldBuffId) as BuffShield) != null)
         {
-            var extra = Math.Max(1, (int)(owner.GetAttr("atk") * skillCfg.Strength));
+            var extra = Math.Max(1, (int)(owner.GetAttr("atk") * skillCfg.Strength2));
             target.OnSkillDamaged(owner, skillId, extra, false, CombatConst.AntiShieldHurtTag);
         }
         return true;

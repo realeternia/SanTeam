@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using CommonConfig;
 using UnityEngine;
 
@@ -36,7 +36,7 @@ public class SkillAidSevenCharge : Skill
         BuffManager.AddBuff(owner, owner, id, shieldId, skillCfg.BuffTime);
         var sh = owner.GetBuff(shieldId) as BuffShield;
         if (sh != null)
-            sh.SetHp((int)(owner.maxHp * skillCfg.Strength2));
+            sh.SetHp((int)(owner.maxHp * skillCfg.Strength3));
 
         EffectManager.PlaySkillEffect(owner, skillCfg.HitEffect);
         return true;

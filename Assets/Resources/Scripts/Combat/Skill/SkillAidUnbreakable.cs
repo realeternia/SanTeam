@@ -1,4 +1,4 @@
-using CommonConfig;
+﻿using CommonConfig;
 using UnityEngine;
 
 /// <summary>
@@ -23,10 +23,10 @@ public class SkillAidUnbreakable : Skill
         BuffManager.AddBuff(owner, owner, id, shieldId, skillCfg.BuffTime);
         var sh = owner.GetBuff(shieldId) as BuffShield;
         if (sh != null)
-            sh.SetHp((int)(owner.maxHp * skillCfg.Strength));
+            sh.SetHp((int)(owner.maxHp * skillCfg.Strength2));
 
         // 回复生命（护盾之外的实体回复）
-        int heal = (int)(owner.maxHp * skillCfg.Strength2);
+        int heal = (int)(owner.maxHp * skillCfg.Strength3);
         if (heal > 0)
             owner.HealTarget(owner, id, heal, true);
 

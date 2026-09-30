@@ -1,8 +1,8 @@
-using System.Linq;
+﻿using System.Linq;
 using CommonConfig;
 
 /// <summary>
-/// 沮授·强弓：每次主动释放，本侧弓兵攻击+X%(Strength)、攻速+Y%(Strength2)，并强化自身攻击与攻速，永久可叠加。
+/// 沮授·强弓：每次主动释放，本侧弓兵攻击+X%(Strength2)、攻速+Y%(Strength3)，并强化自身攻击与攻速，永久可叠加。
 /// </summary>
 public class SkillSoldierArcherBuff : Skill
 {
@@ -16,8 +16,8 @@ public class SkillSoldierArcherBuff : Skill
             return false;
         owner.PlayerAnim(skillCfg.Action);
 
-        var atkPct = skillCfg.Strength;
-        var spdPct = skillCfg.Strength2;
+        var atkPct = skillCfg.Strength2;
+        var spdPct = skillCfg.Strength3;
         foreach (var s in WorldManager.Instance.GetUnitsMySide(owner.side).Where(x => !x.isHero && x.attackRange >= CombatConst.MeleeRange))
         {
             s.atk += (int)(s.atk * atkPct);

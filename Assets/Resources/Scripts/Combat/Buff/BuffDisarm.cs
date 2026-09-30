@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using CommonConfig;
 using UnityEngine;
 
@@ -16,10 +16,10 @@ public class BuffDisarm : Buff
 
     public override void BeforeCalDamage(Chess defender, ref int damageBase, ref float damageMulti, ref string effect, string hurtTag)
     {
-        // 目标带吸收型护盾(BuffShield)时，对其伤害额外放大 Strength2
+        // 目标带吸收型护盾(BuffShield)时，对其伤害额外放大 Strength3
         if (defender != null && defender.GetBuff(CombatConst.ShieldBuffId) != null)
         {
-            damageMulti *= (1f + skillCfg.Strength2);
+            damageMulti *= (1f + skillCfg.Strength3);
         }
     }
 }

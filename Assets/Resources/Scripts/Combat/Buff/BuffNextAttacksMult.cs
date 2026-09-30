@@ -1,5 +1,5 @@
-/// <summary>
-/// 倍击数次 Buff：自带 3 次倍击次数，每次造成伤害前按 Strength 成倍提升伤害倍率，
+﻿/// <summary>
+/// 倍击数次 Buff：自带 3 次倍击次数，每次造成伤害前按 Strength2 成倍提升伤害倍率，
 /// 次数用尽后恢复正常伤害输出。
 /// </summary>
 public class BuffNextAttacksMult : Buff
@@ -15,7 +15,7 @@ public class BuffNextAttacksMult : Buff
     {
         if (charges > 0)
         {
-            damageMulti *= skillCfg.Strength;
+            damageMulti *= skillCfg.Strength2;
             charges--;
         }
     }

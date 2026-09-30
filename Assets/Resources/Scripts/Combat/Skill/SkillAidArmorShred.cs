@@ -1,9 +1,9 @@
-using CommonConfig;
+﻿using CommonConfig;
 using UnityEngine;
 
 /// <summary>
 /// 夏侯渊·猎鹰（ScriptName = "BowXiaHouYuan"）：
-/// 单体大额伤害，并给目标施加减防Buff（"破"），减防数值读 skillCfg.Strength2。
+/// 单体大额伤害，并给目标施加减防Buff（"破"），减防数值读 skillCfg.Strength3。
 /// </summary>
 public class SkillAidArmorShred : Skill
 {
@@ -25,8 +25,8 @@ public class SkillAidArmorShred : Skill
 
         target.OnSkillDamaged(owner, skillId, GetSkillDamage());
 
-        // 给目标挂减防Buff（"破"，减防比例读 skillCfg.Strength2）
-        if (skillCfg.Strength2 > 0)
+        // 给目标挂减防Buff（"破"，减防比例读 skillCfg.Strength3）
+        if (skillCfg.Strength3 > 0)
             BuffManager.AddBuff(target, owner, id, BuffConfig.GetConfigByNameS("破").Id, skillCfg.BuffTime);
         return true;
     }
