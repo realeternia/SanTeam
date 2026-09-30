@@ -30,9 +30,6 @@ public static class PlayerAI
                     continue;
 
                 var heroConfig = HeroConfig.GetConfig(cell.heroId);
-                // 检查阵营限制
-                if (playerConfig.Pickside > 0 && playerConfig.Pickside == heroConfig.Side)
-                    continue;
 
                 // AI 一般只选 5~10 金的卡
                 var price = HeroSelectionTool.GetPrice(heroConfig);
@@ -134,7 +131,7 @@ public static class PlayerAI
             // 如果已经拥有该卡片，增加分数
             if (cards.ContainsKey(pickCard.cardId))
             {
-                score *= playerConfig.sameCardRate;
+                score *= playerConfig.SameCardRate;
 
                 if (year < 8)
                 {
@@ -177,29 +174,21 @@ public static class PlayerAI
                     if (year > 8 && pickCard.priceI < weakHeroCard.Item2 + year - 8)
                         continue; //新卡价格还不如旧卡，没必要换
                 }
-                if (playerConfig.Pickside != 0) //单阵营流：硬过滤非本阵营卡
-                {
-                    if (heroCfg.Side != playerConfig.Pickside)
-                        continue;
-                    if (ConfigManager.IsKingHero(pickCard.cardId)) //主公卡一定要拿
-                        score *= playerConfig.Findmasterrate;
-                }
-
                 // 近战/远程与羁绊统计均按"新增英雄"计算：重复卡（升星）只吃同卡分
                 bool isNewHero = !strongList.Contains(pickCard.cardId);
 
-                // 国家：推进或达成同阵营护盾档位(2/3/4/5/6人→Lv1~5)；聪明度越低越看不清羁绊价值
-                score *= 1f + playerConfig.SideFactor * GetSideGain(ctx, heroCfg, isNewHero) * smart;
-                // 职业：推进或达成职业连锁档位(1/2/3/4/5人→Lv1~5)
-                score *= 1f + playerConfig.JobFactor * GetJobGain(ctx, heroCfg, isNewHero) * smart;
-                // 好友：连线档位(2~6人)/特殊连锁组进度/每回合金币组
-                score *= 1f + playerConfig.FriendFactor * GetFriendGain(ctx, pickCard.cardId) * smart;
-                // 远近搭配：缺哪类补哪类，同类堆多则扣分
+                // 羁绊信任固定倍率：命中即加成。friend Bias 最大、job 次之、force(强卡/国家护盾)最小
+                // force：候选卡所属势力命中 LikeForce 时，按推进同阵营护盾档位(2/3/4/5/6人→Lv1~5)计
+                if (LikeHasForce(playerConfig.LikeForce, heroCfg.Side))
+                    score *= 1f + CombatConst.ForceBias * GetForceGain(ctx, heroCfg, isNewHero);
+                // job：候选卡所属职业命中 LikeJob 时，按推进或达成职业连锁档位(1/2/3/4/5人→Lv1~5)计
+                if (LikeHasJob(playerConfig.LikeJob, heroCfg))
+                    score *= 1f + CombatConst.JobChainBias * GetJobGain(ctx, heroCfg, isNewHero);
+                // friend：候选卡所属好友组命中 LikeFriend 时，按连线档位(2~6人)/特殊连锁组进度/每回合金币组计
+                if (LikeHasFriend(playerConfig.LikeFriend, pickCard.cardId))
+                    score *= 1f + CombatConst.FriendBias * GetFriendGain(ctx, pickCard.cardId);
+                // 远近搭配：缺哪类补哪类，同类堆多则扣分（保留聪明度折扣）
                 score *= 1f + playerConfig.BalanceFactor * GetBalanceGain(ctx, heroCfg, isNewHero) * smart;
-
-                // 主公：同阵营已有基础时优先拿下（国家护盾叠主公加成）
-                if (ConfigManager.IsKingHero(heroCfg.Id) && ctx.GetSideCount(heroCfg.Side) >= 1)
-                    score *= Mathf.Max(1f, playerConfig.Findmasterrate);
             }
 
             // 如果不是已拥有的同卡，根据拥有人数惩罚热门卡
@@ -505,6 +494,14 @@ public static class PlayerAI
     }
 
     // 国家档位收益：加这张新英雄后能否推进/达成同阵营护盾档位(2/3/4/5/6人→Lv1~5)；重复卡不改变上阵人数
+    // force 命中度：品质4强卡直接命中(1)，否则按推进同阵营护盾档位计（SideFactor 已并入 force 信任）
+    private static float GetForceGain(AiContext ctx, HeroConfig heroCfg, bool isNewHero)
+    {
+        if (heroCfg.Quality == 4)
+            return 1f;
+        return GetSideGain(ctx, heroCfg, isNewHero);
+    }
+
     private static float GetSideGain(AiContext ctx, HeroConfig heroCfg, bool isNewHero)
     {
         if (!isNewHero || !IsShieldSide(heroCfg.Side))
@@ -616,6 +613,47 @@ public static class PlayerAI
         return Mathf.Clamp(advantage, -3f, 3f) / 3f; // -1~1
     }
 
+    // LikeForce 命中判定：候选卡所属势力(side)是否在喜欢的势力Id列表内
+    private static bool LikeHasForce(int[] likeForce, int side)
+    {
+        if (likeForce == null || likeForce.Length == 0)
+            return false;
+        return System.Array.IndexOf(likeForce, side) >= 0;
+    }
+
+    // LikeJob 命中判定：候选卡职业缩写(JobConfig.NameS) 映射回 JobConfig.Id 后是否在喜欢的职业Id列表内
+    private static bool LikeHasJob(int[] likeJob, HeroConfig heroCfg)
+    {
+        if (likeJob == null || likeJob.Length == 0)
+            return false;
+        int jobId = 0;
+        foreach (var jobCfg in JobConfig.ConfigList)
+        {
+            if (jobCfg.NameS == heroCfg.Job)
+            {
+                jobId = jobCfg.Id;
+                break;
+            }
+        }
+        return jobId != 0 && System.Array.IndexOf(likeJob, jobId) >= 0;
+    }
+
+    // LikeFriend 命中判定：候选卡的任一好友组(HeroFriendConfig.Id)是否在喜欢的好友组Id列表内
+    private static bool LikeHasFriend(int[] likeFriend, int heroId)
+    {
+        if (likeFriend == null || likeFriend.Length == 0)
+            return false;
+        var relIds = ConfigManager.GetHeroFriendInfo(heroId);
+        if (relIds == null)
+            return false;
+        foreach (var relId in relIds)
+        {
+            if (System.Array.IndexOf(likeFriend, relId) >= 0)
+                return true;
+        }
+        return false;
+    }
+
     // 英雄的阵容价值：价格 × (1 + 阵营/职业/好友羁绊贡献)，贡献越高越不该卖
     private static float GetLineupValue(AiContext ctx, HeroConfig heroCfg)
     {
@@ -635,9 +673,16 @@ public static class PlayerAI
         }
         float friendContrib = Mathf.Min(friendCount, 5) / 5f;
 
-        float value = price * (1f + ctx.cfg.SideFactor * sideContrib
-                                  + ctx.cfg.JobFactor * jobContrib
-                                  + ctx.cfg.FriendFactor * friendContrib);
+        // 羁绊信任固定倍率与选卡评分一致：命中即按 Bias×贡献计价。force(强卡/护盾)最小、job 次之、friend 最大
+        float forceContrib = heroCfg.Quality == 4 ? 1f : sideContrib;
+        float syn = 0f;
+        if (LikeHasForce(ctx.cfg.LikeForce, heroCfg.Side))
+            syn += CombatConst.ForceBias * forceContrib;
+        if (LikeHasJob(ctx.cfg.LikeJob, heroCfg))
+            syn += CombatConst.JobChainBias * jobContrib;
+        if (LikeHasFriend(ctx.cfg.LikeFriend, heroCfg.Id))
+            syn += CombatConst.FriendBias * friendContrib;
+        float value = price * (1f + syn);
 
         // 近战/远程搭配：已堆多的一类更容易被卖（与选卡评分里的平衡逻辑一致）
         if (ctx.meleeCount + ctx.rangedCount >= 3)

@@ -147,6 +147,10 @@ public static class CombatConst
     public const int AiMaxSellPerShop = 3;
     /// <summary>软上限：英雄卡数超限(>上阵格+Cardherolimit)时，非强卡新卡每多囤1张的拒买概率(%)；品质4强卡豁免直接买</summary>
     public const int AiOverLimitRejectPerCard = 35;
+    /// <summary>羁绊信任固定倍率（每档）：friend(2-6)好友连线加成最大、job(0-4)职业次之、force(0-2)强卡/国家护盾加成最小</summary>
+    public const float FriendBias = 0.8f;
+    public const float JobChainBias = 0.6f;
+    public const float ForceBias = 0.4f;
     // ---- 买经验（预留：金铲铲4金币买4经验，1金币=1经验；UI后续接入） ----
     /// <summary>购买经验所需金币</summary>
     public const int ExpBuyGoldCost = 4;
