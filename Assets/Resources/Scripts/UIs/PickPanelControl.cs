@@ -58,7 +58,6 @@ public class PickPanelControl : MonoBehaviour
         okBtn.gameObject.SetActive(false);
         refreshBtn.gameObject.SetActive(false);
 
-        StartCoroutine(DelaySetMode());
         PanelManager.Instance.ShowPick();
         if(GameManager.Instance.IsGameSaveExist())
         {
@@ -97,12 +96,6 @@ public class PickPanelControl : MonoBehaviour
             RefreshBtnClick();
         }
 
-    }
-
-    IEnumerator DelaySetMode()
-    {
-        yield return new WaitForSeconds(0.1f);
-        WorldManager.Instance.isDebug = false;
     }
 
     // Update is called once per frame

@@ -32,6 +32,9 @@ public class PanelManager : MonoBehaviour
     {
         // 面板已改为动态加载，开局先创建选牌面板（其 Start 会继续走游戏初始化流程）
         // Tooltip 按需创建：首次经 GetTooltip() 实例化并挂到 tipNode 下，调用入口统一走 PanelManager
+        // 配置了调试阵容时跳过选牌面板，由 WorldManager 直接开战
+        if (GameManager.Instance != null && GameManager.Instance.HasDebugLineup())
+            return;
         ShowPick();
     }
 

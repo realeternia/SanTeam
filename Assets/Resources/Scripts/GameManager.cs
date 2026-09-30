@@ -32,6 +32,18 @@ public class GameManager : MonoBehaviour
     public List<int> heroIds;
     public int year;
 
+    // 调试阵容：配置任一方武将后，进入游戏直接开战（跳过选牌/商店流程），列表留空则走正常对局流程。
+    // 仅用于开发调试，通过 GameManager 的自定义 Inspector 配置（见 Assets/Editor/GameManagerEditor.cs）。
+    [HideInInspector] public List<int> debugHeroesSide1 = new List<int>(); // 左侧(1号位)武将ID，按顺序摆入布阵格
+    [HideInInspector] public List<int> debugHeroesSide2 = new List<int>(); // 右侧(2号位)武将ID，按顺序摆入布阵格
+
+    /// <summary>是否配置了调试阵容（任一方填入武将即视为调试开局）</summary>
+    public bool HasDebugLineup()
+    {
+        return (debugHeroesSide1 != null && debugHeroesSide1.Count > 0)
+            || (debugHeroesSide2 != null && debugHeroesSide2.Count > 0);
+    }
+
     private void Awake()
     {
         Instance = this;

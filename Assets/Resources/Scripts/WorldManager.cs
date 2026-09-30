@@ -12,7 +12,6 @@ public class WorldManager : MonoBehaviour
 {
     public static WorldManager Instance;
     public Camera uiCamera;
-    public bool isDebug = true; //自动判定的，不要改
     public GameObject Units;
     public int gridCellSize = 3; // 每个格子的实际大小(米)
 
@@ -57,14 +56,15 @@ public class WorldManager : MonoBehaviour
     }
 
     IEnumerator DebugBattleBeginCheck()
-    {      
-        // 延迟2秒
+    {
+        // 判定统一走 GameManager：配置了调试阵容才直接开战，否则走正常的选牌→商店→战斗流程
+        if (GameManager.Instance == null || !GameManager.Instance.HasDebugLineup())
+            yield break;
+
+        // 延迟2秒等场景/配置就绪
         yield return new WaitForSeconds(2f);
         ConfigManager.Init();
-        if(isDebug)
-        {
-            BattleBegin();
-        }
+        BattleBegin();
     }
 
     public void BattleBegin()
@@ -250,7 +250,7 @@ public class WorldManager : MonoBehaviour
             }
         }
 
-        if (!isDebug)
+        if (!GameManager.Instance.HasDebugLineup())
         {
             int[] match = GetMatch();
             if (isPveRound)
@@ -300,20 +300,33 @@ public class WorldManager : MonoBehaviour
         }
         else
         {
+            // 调试阵容：玩家0占1号位、玩家1占2号位，武将取自 GameManager 配置的调试列表
             GameManager.Instance.GetPlayer(0).likeCount = 2;
             GameManager.Instance.GetPlayer(1).likeCount = 2;
             var center1 = mapConfig.SideCenters != null && mapConfig.SideCenters.Length > 0 ? mapConfig.SideCenters[0] : null;
             var center2 = mapConfig.SideCenters != null && mapConfig.SideCenters.Length > 1 ? mapConfig.SideCenters[1] : null;
 
-            var heroList = new List<int> { 103007 };
-            for (int i = 0; i < heroList.Count && center1 != null; i++)
-                SpawnHerosForRegion(GameManager.Instance.GetPlayer(0), i, GetFormationCellPos(center1, i), new System.Tuple<int, int>(heroList[i], 1), 1);
-
-            heroList = new List<int> { 101020, 101020 };
-            for (int i = 0; i < heroList.Count && center2 != null; i++)
-                SpawnHerosForRegion(GameManager.Instance.GetPlayer(1), i, GetFormationCellPos(center2, i), new System.Tuple<int, int>(heroList[i], 1), 2);
+            SpawnDebugHeroes(GameManager.Instance.GetPlayer(0), center1, GameManager.Instance.debugHeroesSide1, 1);
+            SpawnDebugHeroes(GameManager.Instance.GetPlayer(1), center2, GameManager.Instance.debugHeroesSide2, 2);
         }
 
+    }
+
+    // 调试阵容：按配置顺序把武将依次摆入布阵格(格0开始)，等级固定1级
+    private void SpawnDebugHeroes(PlayerInfo p, Transform center, List<int> heroIds, int side)
+    {
+        if (center == null || heroIds == null)
+            return;
+        for (int i = 0; i < heroIds.Count && i < CombatConst.FormationCellCount; i++)
+        {
+            int heroId = heroIds[i];
+            if (heroId <= 0 || !ConfigManager.IsHeroCard(heroId) || !HeroConfig.HasConfig(heroId))
+            {
+                GameLog.Error($"调试阵容非法武将ID: {heroId}(side{side})");
+                continue;
+            }
+            SpawnHerosForRegion(p, i, GetFormationCellPos(center, i), new System.Tuple<int, int>(heroId, 1), side);
+        }
     }
 
     // 计算布阵图中第pos格(0~24)的世界坐标：row=pos/5 从上到下，col=pos%5 从左到右
