@@ -118,8 +118,8 @@ public static class SkillManager
                 return new SkillInitShieldValue(skillId, owner);
             case "AidSelfAndLowHp":
                 return new SkillAidSelfAndLowHp(skillId, owner);
-            case "AidSelfShieldBoom":
-                return new SkillAidSelfShieldBoom(skillId, owner);
+            case "SkillAidDefStack":
+                return new SkillAidDefStack(skillId, owner);
             case "LowHpFullHealShield":
                 return new SkillLowHpFullHealShield(skillId, owner);
 

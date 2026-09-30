@@ -119,6 +119,9 @@ public static class BuffManager
             case "BuffStackBuf":
                 buff = new BuffStackBuf(buffId, skillId, caster, target, time);
                 break;
+            case "BuffDefStack":
+                buff = new BuffDefStack(buffId, skillId, caster, target, time);
+                break;
 
         }
 
