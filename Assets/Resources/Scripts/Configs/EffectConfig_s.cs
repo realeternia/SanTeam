@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -211,6 +211,8 @@ namespace CommonConfig
             config[10314] = new EffectConfig(10314, "SwordHitYellowCritical", "黄色暴击剑击特效", "Effect/SwordHitYellowCritical", "", 5f, 1f, 5f, 1f, "#FFFF00");
             // 段 10320：SwordHitBlue（独立模型，非 Critical 组）
             config[10320] = new EffectConfig(10320, "SwordHitBlue", "蓝色剑击特效", "Effect/SwordHitBlue", "", 5f, 1f, 5f, 1f, "");
+            // 段 10330：LaserImpactSpark（技能激光命中火花，复用剑击粒子形态 + 缩小 + 青色染色）
+            config[10330] = new EffectConfig(10330, "LaserImpactSpark", "激光命中火花特效", "Effect/SwordHitBlue", "", 2f, 1f, 5f, 1f, "#00D5FF");
 
             RebuildIndex();
 

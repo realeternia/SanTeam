@@ -207,6 +207,7 @@
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidBurstShot.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillKillGain.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidBalance.cs" />
+    <Compile Include="Assets\Resources\Scripts\Effect\LaserBeamController.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAttackStunDamage.cs" />
     <Compile Include="Assets\DOTween\Modules\DOTweenModulePhysics2D.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidSevenCharge.cs" />
@@ -343,6 +344,7 @@
     <None Include="Assets\DOTween\DOTween.XML" />
     <None Include="Assets\Epic Toon FX\Prefabs\Combat\Combat FX.txt" />
     <None Include="Assets\SineVFX\TopDownEffects\Shaders\DissolveParticleAdvanced.shader" />
+    <None Include="Assets\Shaders\LaserBeamShader.shader" />
     <None Include="Assets\SineVFX\TopDownEffects\Shaders\Crystal.shader" />
     <None Include="Assets\SineVFX\TopDownEffects\Shaders\DissolveParticleSimple.shader" />
     <None Include="Assets\TextMesh Pro\Shaders\TMP_Bitmap.shader" />

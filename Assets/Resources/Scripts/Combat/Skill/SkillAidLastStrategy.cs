@@ -5,8 +5,10 @@ using CommonConfig;
 using UnityEngine;
 
 /// <summary>
-/// 郭嘉·遗计（术）：释放持续穿透激光，持续 bufftime 秒，每秒对路径上所有敌人造成 /strength 法术伤害。
-/// 施法期间自身进入引导状态(挂 noActionCount)，无法移动/普攻；当前目标死亡自动切换新的最前方敌人继续照射。
+/// 郭嘉·遗计（术）：释放持续穿透激光（LaserBeamController，固定长度=Range），持续 bufftime 秒，
+/// 每秒对激光路径上所有敌人造成 /strength 法术伤害。
+/// 施法期间自身进入引导状态(挂 noActionCount)，无法移动/普攻；当前目标死亡自动切换新的最前方敌人，
+/// 激光会缓慢转向新目标而非瞬间对准。
 /// </summary>
 public class SkillAidLastStrategy : Skill
 {
@@ -36,56 +38,47 @@ public class SkillAidLastStrategy : Skill
     IEnumerator LaserChannel()
     {
         var endTime = Time.time + Math.Max(0.1f, skillCfg.BuffTime);
-        var halfWidth = skillCfg.Area * 0.5f;
         var skillDamage = GetSkillDamage();
 
-        // 起始目标锁敌方当前难缠目标，死亡后切最前方的存活敌人
+        // 起始目标锁敌方最前方的存活敌人，死亡后切最前方的存活敌人
         Chess cur = FirstFrontEnemy();
         if (cur == null)
             cur = FirstEnemy();
+
+        // 激光视觉：以自身为发射源，固定长度=施法距离，命中判定宽度=Area（命中列表同样由控制器给出）
+        var beam = LaserBeamController.Spawn(owner, cur, skillCfg.Range, skillCfg.Area);
 
         while (Time.time < endTime)
         {
             if (owner == null || owner.hp <= 0)
                 break;
 
-            // 当前照射目标死亡/消失时，切换新的前方敌人
+            // 当前照射目标死亡/消失时，切换新的前方敌人（激光缓慢转向新目标）
             if (cur == null || cur.hp <= 0)
             {
                 cur = FirstEnemy();
                 if (cur == null)
                     break;
+                if (beam != null)
+                    beam.SetTarget(cur);
             }
 
-            float ox = owner.transform.position.x;
-            float oz = owner.transform.position.z;
-            // 激光方向（指向当前目标，y 轴忽略，使用 xz 平面方向）
-            float tx = cur.transform.position.x - ox;
-            float tz = cur.transform.position.z - oz;
-            float len = (float)Math.Sqrt(tx * tx + tz * tz);
-            if (len < 0.001f)
-                len = 1f;
-            float px = tx / len;
-            float pz = tz / len;
-
-            var enemies = WorldManager.Instance.GetAllEnemys(owner.side);
-            foreach (var e in enemies)
+            if (beam != null)
             {
-                if (e == null || e.hp <= 0 || e == owner)
-                    continue;
-                float ex = e.transform.position.x - ox;
-                float ez = e.transform.position.z - oz;
-                // 处于激光方向前方(正投影)且垂直距离在激光半宽内的敌人受击
-                float proj = ex * px + ez * pz;
-                if (proj < 0f)
-                    continue;
-                float perp = (float)Math.Sqrt(Math.Max(0f, ex * ex + ez * ez - proj * proj));
-                if (perp <= halfWidth && skillDamage > 0)
-                    e.OnSkillDamaged(owner, skillId, skillDamage);
+                foreach (var e in beam.GetHitUnits())
+                {
+                    if (skillDamage > 0)
+                        e.OnSkillDamaged(owner, skillId, skillDamage);
+                    // 命中粒子：每次结算在受击目标处播一次火花
+                    beam.PlayImpact(e);
+                }
             }
 
             yield return new WaitForSeconds(1f);
         }
+
+        if (beam != null)
+            beam.Dispose();
 
         owner.noActionCount--;
     }

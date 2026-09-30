@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 3576305114303544279}
   - component: {fileID: 2995076103429983857}
   - component: {fileID: 5304250268779337315}
-  - component: {fileID: 6484189599777781762}
+  - component: {fileID: 202107920955558203}
   m_Layer: 0
   m_Name: Beam
   m_TagString: Untagged
@@ -63,7 +63,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: e3482f8f6a3a27140a27f4c4ba7529b9, type: 2}
+  - {fileID: 2100000, guid: 2f424b062dd34f6f90a90b59797ae314, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -106,7 +106,7 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &6484189599777781762
+--- !u!114 &202107920955558203
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -115,24 +115,20 @@ MonoBehaviour:
   m_GameObject: {fileID: 6135053224585414806}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5bf8b44aa42a6b847b5a5dd4d06a4fd5, type: 3}
+  m_Script: {fileID: 11500000, guid: ce5dbe53f6e82d242b3904e806de7ee3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   beamColor: {r: 1, g: 1, b: 1, a: 1}
-  glowColor: {r: 0, g: 1, b: 1, a: 1}
-  beamWidth: 1
+  glowColor: {r: 1, g: 0.11022415, b: 0, a: 1}
+  beamWidth: 0.68
   glowIntensity: 3
   scrollSpeed: 1
   opacity: 0.8
   beamTexture: {fileID: 0}
   noiseScale: 3
-  parentTransform: {fileID: 0}
+  parentTransform: {fileID: 4653717068974505268}
   source: {fileID: 0}
   target: {fileID: 0}
-  length: 40
-  hitWidth: 20
-  turnSpeed: 120
-  crossScale: 0.3
 --- !u!1 &7265022039476696281
 GameObject:
   m_ObjectHideFlags: 0
@@ -143,7 +139,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4653717068974505268}
   m_Layer: 0
-  m_Name: LaserLine
+  m_Name: FriendLink
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

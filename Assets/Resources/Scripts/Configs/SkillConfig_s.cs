@@ -832,11 +832,11 @@ namespace CommonConfig
             config[2020603] = new SkillConfig(2020603, "分兵", "关羽", "", "术", 3, 0f, 6f, 18, "", 0, "", 60f, 25f, "", 1, 80f, 0.35f, 0, "", false, 0f, "", 1, 0f, 0f, 0f, 0, "SkillAidShadowSplit", "saw", "MagicChargeYellow", 0f, "", "", "", "");
             config[2020604] = new SkillConfig(2020604, "分兵", "关羽", "", "术", 4, 0f, 6f, 18, "", 0, "", 60f, 25f, "", 1, 110f, 0.40f, 0, "", false, 0f, "", 1, 0f, 0f, 0f, 0, "SkillAidShadowSplit", "saw", "MagicChargeYellow", 0f, "", "", "", "");
             config[2020605] = new SkillConfig(2020605, "分兵", "关羽", "", "术", 5, 0f, 6f, 18, "", 0, "", 60f, 25f, "", 1, 150f, 0.45f, 0, "", false, 0f, "", 1, 0f, 0f, 0f, 0, "SkillAidShadowSplit", "saw", "MagicChargeYellow", 0f, "", "", "", "");
-            config[2020606] = new SkillConfig(2020606, "流光", "姜维", "对前方释放/targetcount道激光，每道对路径上的敌人造成/strength法术伤害", "术", 1, 0f, 5f, 18, "", 0, "", 60f, 20f, "", 2, 40f, 0f, 0, "", false, 0f, "", 0, 0f, 0f, 0f, 0, "SkillAidDualLaser", "throw", "MagicChargeYellow", 0f, "", "", "", "");
-            config[2020607] = new SkillConfig(2020607, "流光", "姜维", "", "术", 2, 0f, 5f, 18, "", 0, "", 60f, 20f, "", 2, 65f, 0f, 0, "", false, 0f, "", 0, 0f, 0f, 0f, 0, "SkillAidDualLaser", "throw", "MagicChargeYellow", 0f, "", "", "", "");
-            config[2020608] = new SkillConfig(2020608, "流光", "姜维", "", "术", 3, 0f, 5f, 18, "", 0, "", 60f, 20f, "", 2, 90f, 0f, 0, "", false, 0f, "", 0, 0f, 0f, 0f, 0, "SkillAidDualLaser", "throw", "MagicChargeYellow", 0f, "", "", "", "");
-            config[2020609] = new SkillConfig(2020609, "流光", "姜维", "", "术", 4, 0f, 5f, 18, "", 0, "", 60f, 20f, "", 2, 125f, 0f, 0, "", false, 0f, "", 0, 0f, 0f, 0f, 0, "SkillAidDualLaser", "throw", "MagicChargeYellow", 0f, "", "", "", "");
-            config[2020610] = new SkillConfig(2020610, "流光", "姜维", "", "术", 5, 0f, 5f, 18, "", 0, "", 60f, 20f, "", 2, 170f, 0f, 0, "", false, 0f, "", 0, 0f, 0f, 0f, 0, "SkillAidDualLaser", "throw", "MagicChargeYellow", 0f, "", "", "", "");
+            config[2020606] = new SkillConfig(2020606, "流光", "姜维", "对前方释放/targetcount道激光，每道对路径上的敌人造成/strength法术伤害", "术", 1, 0f, 5f, 18, "", 0, "", 100f, 20f, "", 2, 40f, 0f, 0, "", false, 0f, "", 0, 0f, 0f, 0f, 0, "SkillAidDualLaser", "throw", "MagicChargeYellow", 0f, "", "", "", "");
+            config[2020607] = new SkillConfig(2020607, "流光", "姜维", "", "术", 2, 0f, 5f, 18, "", 0, "", 100f, 20f, "", 2, 65f, 0f, 0, "", false, 0f, "", 0, 0f, 0f, 0f, 0, "SkillAidDualLaser", "throw", "MagicChargeYellow", 0f, "", "", "", "");
+            config[2020608] = new SkillConfig(2020608, "流光", "姜维", "", "术", 3, 0f, 5f, 18, "", 0, "", 100f, 20f, "", 2, 90f, 0f, 0, "", false, 0f, "", 0, 0f, 0f, 0f, 0, "SkillAidDualLaser", "throw", "MagicChargeYellow", 0f, "", "", "", "");
+            config[2020609] = new SkillConfig(2020609, "流光", "姜维", "", "术", 4, 0f, 5f, 18, "", 0, "", 100f, 20f, "", 2, 125f, 0f, 0, "", false, 0f, "", 0, 0f, 0f, 0f, 0, "SkillAidDualLaser", "throw", "MagicChargeYellow", 0f, "", "", "", "");
+            config[2020610] = new SkillConfig(2020610, "流光", "姜维", "", "术", 5, 0f, 5f, 18, "", 0, "", 100f, 20f, "", 2, 170f, 0f, 0, "", false, 0f, "", 0, 0f, 0f, 0f, 0, "SkillAidDualLaser", "throw", "MagicChargeYellow", 0f, "", "", "", "");
             config[2020611] = new SkillConfig(2020611, "歼灭", "夏侯惇", "对目标造成/strength法术伤害并眩晕/bufftime秒", "术", 1, 0f, 6f, 14, "", 0, "", 50f, 0f, "", 0, 40f, 0f, 0, "乱", true, 1.2f, "", 0, 0f, 0f, 0f, 0, "SkillAidSmashStun", "jumpspin", "MagicNovaBlue", 0f, "", "", "", "");
             config[2020612] = new SkillConfig(2020612, "歼灭", "夏侯惇", "", "术", 2, 0f, 6f, 14, "", 0, "", 50f, 0f, "", 0, 60f, 0f, 0, "乱", true, 1.4f, "", 0, 0f, 0f, 0f, 0, "SkillAidSmashStun", "jumpspin", "MagicNovaBlue", 0f, "", "", "", "");
             config[2020613] = new SkillConfig(2020613, "歼灭", "夏侯惇", "", "术", 3, 0f, 6f, 14, "", 0, "", 50f, 0f, "", 0, 85f, 0f, 0, "乱", true, 1.6f, "", 0, 0f, 0f, 0f, 0, "SkillAidSmashStun", "jumpspin", "MagicNovaBlue", 0f, "", "", "", "");
@@ -1103,64 +1103,33 @@ namespace CommonConfig
             config[2021049] = new SkillConfig(2021049, "名门", "袁绍", "", "术", 4, 0f, 8f, 14, "", 0, "", 80f, 0f, "", 0, 44f, 27f, 0, "名", false, 9f, "", 0, 0f, 0f, 0f, 0, "SkillAidNobleBless", "sway", "MagicChargeYellow", 0f, "", "", "", "");
             config[2021050] = new SkillConfig(2021050, "名门", "袁绍", "", "术", 5, 0f, 8f, 14, "", 0, "", 80f, 0f, "", 0, 50f, 30f, 0, "名", false, 10f, "", 0, 0f, 0f, 0f, 0, "SkillAidNobleBless", "sway", "MagicChargeYellow", 0f, "", "", "", "");
             config[2090001] = new SkillConfig(2090001, "速射", "速射", "箭矢飞行速度提升", "道具", 1, 0f, 0f, 0, "", 1, "", 0f, 0f, "", 0, 2.5f, 0f, 0, "", false, 0f, "", 0, 0f, 0f, 0f, 0, "ModifyShootSpeed", "", "", 0f, "", "", "", "");
-            // ============ 装备技能（Type=道具，穿戴时按 Sname 以 1 级注册到英雄，机械复用现有脚本） ============
-            // 破甲：攻击无视目标30%护甲（复用 AttackArmorPierce，通过 GetArmorDelta 对攻击方折算）
             config[2090002] = new SkillConfig(2090002, "破甲", "破甲", "攻击无视目标30%护甲", "道具", 1, 1f, 0f, 0, "", 1, "", 0f, 0f, "", 0, 0.3f, 0f, 0, "", false, 0f, "", 0, 0f, 0f, 0f, 0, "AttackArmorPierce", "spin", "", 0f, "", "", "", "");
-            // 坚壁：受到的伤害降低20%（复用 DefReduceDamageRate，等效伤害×(1-0.2)）
             config[2090003] = new SkillConfig(2090003, "坚壁", "坚壁", "受到的伤害降低20%", "道具", 1, 1f, 0f, 0, "", 1, "", 0f, 0f, "", 0, 0.2f, 0f, 0, "", false, 0f, "", 0, 0f, 0f, 0f, 0, "DefReduceDamageRate", "", "", 0f, "", "", "", "");
-            // 疾射：箭矢飞行速度提升100%（复用 ModifyShootSpeed）
             config[2090004] = new SkillConfig(2090004, "疾射", "疾射", "箭矢飞行速度提升100%", "道具", 1, 0f, 0f, 0, "", 1, "", 0f, 0f, "", 0, 2.0f, 0f, 0, "", false, 0f, "", 0, 0f, 0f, 0f, 0, "ModifyShootSpeed", "", "", 0f, "", "", "", "");
-            // 回气：普攻50%几率回复首个有蓝耗技能50%蓝量（复用 AttackMpGain）
             config[2090005] = new SkillConfig(2090005, "回气", "回气", "普攻50%几率回复首个技能50%蓝量", "道具", 1, 0.5f, 0f, 0, "", 1, "", 0f, 0f, "", 0, 0.5f, 0f, 0, "", false, 0f, "", 0, 0f, 0f, 0f, 0, "AttackMpGain", "", "", 0f, "", "", "", "");
-            // 玄盾：战斗开始获得30%减伤盾，持续12秒（复用 InitShieldValue，Buff="硬"=BuffShieldValue 300002）
             config[2090006] = new SkillConfig(2090006, "玄盾", "玄盾", "战斗开始获得30%减伤盾，持续12秒", "道具", 1, 0f, 0f, 0, "", 1, "", 0f, 0f, "", 0, 0.3f, 0f, 0, "硬", false, 12f, "", 0, 0f, 0f, 0f, 0, "InitShieldValue", "", "", 0f, "", "", "", "");
-            // 会心：普攻附带攻击力50%的魔法伤害（复用 AttackMagicDamage，独立法术结算受魔抗减免）
             config[2090007] = new SkillConfig(2090007, "会心", "会心", "普攻附带攻击力50%的魔法伤害", "道具", 1, 0f, 0f, 0, "", 1, "", 0f, 0f, "", 0, 0.5f, 0f, 0, "", false, 0f, "", 0, 0f, 0f, 0f, 0, "AttackMagicDamage", "", "", 0f, "", "", "", "");
-            // 悟道：战斗开始法术强度+15（复用 InitAttrChange，LinkSelf 开局加属性）
             config[2090008] = new SkillConfig(2090008, "悟道", "悟道", "战斗开始法术强度+15", "道具", 1, 0f, 0f, 0, "", 1, "", 0f, 0f, "", 0, 0f, 0f, 0, "", false, 0f, "", 0, 0f, 0f, 0f, 0, "InitAttrChange", "sway", "", 0f, "", "ap+15", "", "");
-            // 体魄：战斗开始生命上限+300（复用 InitAttrChange）
             config[2090009] = new SkillConfig(2090009, "体魄", "体魄", "战斗开始生命上限+300", "道具", 1, 0f, 0f, 0, "", 1, "", 0f, 0f, "", 0, 0f, 0f, 0, "", false, 0f, "", 0, 0f, 0f, 0f, 0, "InitAttrChange", "sway", "", 0f, "", "hp+300", "", "");
-            // 追风：普攻额外造成30点伤害（复用 AttackAddDamage）
             config[2090010] = new SkillConfig(2090010, "追风", "追风", "普攻额外造成30点伤害", "道具", 1, 1f, 0f, 0, "", 1, "", 0f, 0f, "", 0, 0f, 0f, 30, "", false, 0f, "", 0, 0f, 0f, 0f, 0, "AttackAddDamage", "sway", "", 0f, "", "", "", "");
-            // 枭雄：击杀敌人后攻击永久+8并回复10%生命（复用 KillGain）
             config[2090011] = new SkillConfig(2090011, "枭雄", "枭雄", "击杀敌人后攻击永久+8并回复10%生命", "道具", 1, 0f, 0f, 0, "", 1, "", 0f, 0f, "", 0, 8f, 0.1f, 0, "", false, 0f, "", 0, 0f, 0f, 0f, 0, "KillGain", "", "", 0f, "", "", "", "");
-            // ============ 装备技能 第二批（2090012~2090021，双属性高级装备，继续复用现有脚本） ============
-            // 破盾：攻击有护盾的目标时额外造成50%攻击的物理伤害，并绕过护盾直接打血（复用 AttackShieldPierce，HurtTag=AntiShield）
             config[2090012] = new SkillConfig(2090012, "破盾", "破盾", "攻击有护盾目标时额外造成50%攻击伤害并绕过护盾", "道具", 1, 1f, 0f, 0, "", 1, "AntiShield", 0f, 0f, "", 0, 0.5f, 0f, 0, "", false, 0f, "", 0, 0f, 0f, 0f, 0, "AttackShieldPierce", "spin", "", 0f, "", "", "", "");
-            // 骁勇：普攻额外造成40点伤害（复用 AttackAddDamage）
             config[2090013] = new SkillConfig(2090013, "骁勇", "骁勇", "普攻额外造成40点伤害", "道具", 1, 1f, 0f, 0, "", 1, "", 0f, 0f, "", 0, 0f, 0f, 40, "", false, 0f, "", 0, 0f, 0f, 0f, 0, "AttackAddDamage", "sway", "", 0f, "", "", "", "");
-            // 谋定：自身受到的增益Buff持续时间+30%（复用 ModifyBuffTime）
             config[2090014] = new SkillConfig(2090014, "谋定", "谋定", "自身增益Buff持续时间+30%", "道具", 1, 0f, 0f, 0, "", 1, "", 0f, 0f, "", 0, 0.3f, 0f, 0, "", false, 0f, "", 0, 0f, 0f, 0f, 0, "ModifyBuffTime", "", "", 0f, "", "", "", "");
-            // 文润：战斗开始获得25%减伤盾，持续10秒（复用 InitShieldValue）
             config[2090015] = new SkillConfig(2090015, "文润", "文润", "战斗开始获得25%减伤盾，持续10秒", "道具", 1, 0f, 0f, 0, "", 1, "", 0f, 0f, "", 0, 0.25f, 0f, 0, "硬", false, 10f, "", 0, 0f, 0f, 0f, 0, "InitShieldValue", "", "", 0f, "", "", "", "");
-            // 浩然：普攻70%几率回复首个技能50%蓝量（复用 AttackMpGain）
             config[2090016] = new SkillConfig(2090016, "浩然", "浩然", "普攻70%几率回复首个技能50%蓝量", "道具", 1, 0.7f, 0f, 0, "", 1, "", 0f, 0f, "", 0, 0.5f, 0f, 0, "", false, 0f, "", 0, 0f, 0f, 0f, 0, "AttackMpGain", "", "", 0f, "", "", "", "");
-            // 玄妙：普攻附带攻击力40%的魔法伤害（复用 AttackMagicDamage）
             config[2090017] = new SkillConfig(2090017, "玄妙", "玄妙", "普攻附带攻击力40%的魔法伤害", "道具", 1, 0f, 0f, 0, "", 1, "", 0f, 0f, "", 0, 0.4f, 0f, 0, "", false, 0f, "", 0, 0f, 0f, 0f, 0, "AttackMagicDamage", "", "", 0f, "", "", "", "");
-            // 绝尘：箭矢飞行速度提升80%（复用 ModifyShootSpeed）
             config[2090018] = new SkillConfig(2090018, "绝尘", "绝尘", "箭矢飞行速度提升80%", "道具", 1, 0f, 0f, 0, "", 1, "", 0f, 0f, "", 0, 1.8f, 0f, 0, "", false, 0f, "", 0, 0f, 0f, 0f, 0, "ModifyShootSpeed", "", "", 0f, "", "", "", "");
-            // 磐石：受到的伤害降低15%（复用 DefReduceDamageRate）
             config[2090019] = new SkillConfig(2090019, "磐石", "磐石", "受到的伤害降低15%", "道具", 1, 1f, 0f, 0, "", 1, "", 0f, 0f, "", 0, 0.15f, 0f, 0, "", false, 0f, "", 0, 0f, 0f, 0f, 0, "DefReduceDamageRate", "", "", 0f, "", "", "", "");
-            // 疾风：攻击无视目标25%护甲（复用 AttackArmorPierce）
             config[2090020] = new SkillConfig(2090020, "疾风", "疾风", "攻击无视目标25%护甲", "道具", 1, 1f, 0f, 0, "", 1, "", 0f, 0f, "", 0, 0.25f, 0f, 0, "", false, 0f, "", 0, 0f, 0f, 0f, 0, "AttackArmorPierce", "spin", "", 0f, "", "", "", "");
-            // 凶威：击杀敌人后攻击永久+6并回复8%生命（复用 KillGain）
             config[2090021] = new SkillConfig(2090021, "凶威", "凶威", "击杀敌人后攻击永久+6并回复8%生命", "道具", 1, 0f, 0f, 0, "", 1, "", 0f, 0f, "", 0, 6f, 0.08f, 0, "", false, 0f, "", 0, 0f, 0f, 0f, 0, "KillGain", "", "", 0f, "", "", "", "");
-            // ============ 装备技能 第三批（2090022~2090029，剩余高级装备分诊：有技能者） ============
-            // 铁壁：受到的伤害降低20%（复用 DefReduceDamageRate）
             config[2090022] = new SkillConfig(2090022, "铁壁", "铁壁", "受到的伤害降低20%", "道具", 1, 1f, 0f, 0, "", 1, "", 0f, 0f, "", 0, 0.2f, 0f, 0, "", false, 0f, "", 0, 0f, 0f, 0f, 0, "DefReduceDamageRate", "", "", 0f, "", "", "", "");
-            // 玄武：战斗开始获得25%减伤盾，持续10秒（复用 InitShieldValue）
             config[2090023] = new SkillConfig(2090023, "玄武", "玄武", "战斗开始获得25%减伤盾，持续10秒", "道具", 1, 0f, 0f, 0, "", 1, "", 0f, 0f, "", 0, 0.25f, 0f, 0, "硬", false, 10f, "", 0, 0f, 0f, 0f, 0, "InitShieldValue", "", "", 0f, "", "", "", "");
-            // 贯日：普攻额外造成35点伤害（复用 AttackAddDamage）
             config[2090024] = new SkillConfig(2090024, "贯日", "贯日", "普攻额外造成35点伤害", "道具", 1, 1f, 0f, 0, "", 1, "", 0f, 0f, "", 0, 0f, 0f, 35, "", false, 0f, "", 0, 0f, 0f, 0f, 0, "AttackAddDamage", "sway", "", 0f, "", "", "", "");
-            // 凝气：普攻65%几率回复首个技能50%蓝量（复用 AttackMpGain）
             config[2090025] = new SkillConfig(2090025, "凝气", "凝气", "普攻65%几率回复首个技能50%蓝量", "道具", 1, 0.65f, 0f, 0, "", 1, "", 0f, 0f, "", 0, 0.5f, 0f, 0, "", false, 0f, "", 0, 0f, 0f, 0f, 0, "AttackMpGain", "", "", 0f, "", "", "", "");
-            // 影遁：自身增益Buff持续时间+30%（复用 ModifyBuffTime）
             config[2090026] = new SkillConfig(2090026, "影遁", "影遁", "自身增益Buff持续时间+30%", "道具", 1, 0f, 0f, 0, "", 1, "", 0f, 0f, "", 0, 0.3f, 0f, 0, "", false, 0f, "", 0, 0f, 0f, 0f, 0, "ModifyBuffTime", "", "", 0f, "", "", "", "");
-            // 破军：攻击无视目标30%护甲（复用 AttackArmorPierce）
             config[2090027] = new SkillConfig(2090027, "破军", "破军", "攻击无视目标30%护甲", "道具", 1, 1f, 0f, 0, "", 1, "", 0f, 0f, "", 0, 0.3f, 0f, 0, "", false, 0f, "", 0, 0f, 0f, 0f, 0, "AttackArmorPierce", "spin", "", 0f, "", "", "", "");
-            // 灵犀：普攻附带攻击力45%的魔法伤害（复用 AttackMagicDamage）
             config[2090028] = new SkillConfig(2090028, "灵犀", "灵犀", "普攻附带攻击力45%的魔法伤害", "道具", 1, 0f, 0f, 0, "", 1, "", 0f, 0f, "", 0, 0.45f, 0f, 0, "", false, 0f, "", 0, 0f, 0f, 0f, 0, "AttackMagicDamage", "", "", 0f, "", "", "", "");
-            // 迅羽：箭矢飞行速度提升90%（复用 ModifyShootSpeed）
             config[2090029] = new SkillConfig(2090029, "迅羽", "迅羽", "箭矢飞行速度提升90%", "道具", 1, 0f, 0f, 0, "", 1, "", 0f, 0f, "", 0, 1.9f, 0f, 0, "", false, 0f, "", 0, 0f, 0f, 0f, 0, "ModifyShootSpeed", "", "", 0f, "", "", "", "");
 
             RebuildIndex();
