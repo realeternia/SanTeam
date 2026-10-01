@@ -1,4 +1,4 @@
-﻿using CommonConfig;
+using CommonConfig;
 using UnityEngine;
 
 /// <summary>
@@ -19,6 +19,7 @@ public class SkillAidArmorBreak : Skill
             return false;
 
         owner.PlayerAnim(skillCfg.Action);
+        PlayAreaEffect(owner.transform.position);
 
         var armorDownBuffCfg = BuffConfig.GetConfigByNameS(skillCfg.BuffId);
         var skillDamage = GetSkillDamage();

@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using CommonConfig;
 using UnityEngine;
 
@@ -27,7 +27,7 @@ public class SkillAidJudgement : Skill
         var pos = target.transform.position;
         var magicStub = SummonMagicField(pos, out var summonTime);
         if (magicStub != null)
-            EffectManager.PlayPosSkillEffect(magicStub, pos, skillCfg.EffectSize, skillCfg.HitEffect, summonTime);
+            EffectManager.PlayPosSkillEffect(magicStub, pos, skillCfg.Area, skillCfg.AreaEffect, summonTime);
 
         owner.StartCasting(id, ThunderField(pos));
         return true;

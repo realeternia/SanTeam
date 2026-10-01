@@ -1,4 +1,4 @@
-﻿using CommonConfig;
+using CommonConfig;
 using UnityEngine;
 
 /// <summary>
@@ -19,6 +19,7 @@ public class SkillAidSweepingAoe : Skill
             return false;
 
         owner.PlayerAnim(skillCfg.Action);
+        PlayAreaEffect(owner.transform.position);
 
         var skillDamage = GetSkillDamage();
         var units = WorldManager.Instance.GetUnitsInRange(owner.transform.position, skillCfg.Area, owner.side, true);

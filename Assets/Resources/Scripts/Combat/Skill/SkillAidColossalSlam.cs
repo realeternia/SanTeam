@@ -20,6 +20,7 @@ public class SkillAidColossalSlam : Skill
             return false;
 
         owner.PlayerAnim(skillCfg.Action);
+        PlayAreaEffect(owner.transform.position);
 
         var baseDamage = GetSkillDamage();
         var units = WorldManager.Instance.GetUnitsInRange(owner.transform.position, skillCfg.Area, owner.side, true);

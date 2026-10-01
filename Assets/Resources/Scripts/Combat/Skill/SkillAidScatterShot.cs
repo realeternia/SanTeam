@@ -1,4 +1,4 @@
-﻿using CommonConfig;
+using CommonConfig;
 using UnityEngine;
 
 /// <summary>
@@ -23,6 +23,7 @@ public class SkillAidScatterShot : Skill
             return false;
 
         owner.PlayerAnim(skillCfg.Action);
+        PlayAreaEffect(target.transform.position);
 
         var targets = WorldManager.Instance.GetUnitsInRange(target.transform.position, skillCfg.Area, owner.side, true);
         WorldManager.Instance.RandomSelect(targets, skillCfg.TargetCount);

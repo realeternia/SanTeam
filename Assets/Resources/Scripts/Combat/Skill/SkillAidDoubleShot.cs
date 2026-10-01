@@ -21,6 +21,7 @@ public class SkillAidDoubleShot : Skill
         if (!CheckBurst(target))
             return false;
 
+        PlayAreaEffect(target.transform.position);
         var list = WorldManager.Instance.GetUnitsInRange(target.transform.position, skillCfg.Area, owner.side, true);
         WorldManager.Instance.RandomSelect(list, skillCfg.TargetCount);
         foreach (var u in list)

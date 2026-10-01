@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using CommonConfig;
 using UnityEngine;
 
@@ -19,6 +19,7 @@ public class SkillAidBashShield : Skill
         if (!CheckBurst(target))
             return false;
 
+        PlayAreaEffect(owner.transform.position);
         var list = WorldManager.Instance.GetUnitsInRange(owner.transform.position, skillCfg.Area, owner.side, true);
         WorldManager.Instance.RandomSelect(list, skillCfg.TargetCount);
         foreach (var u in list)

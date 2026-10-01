@@ -31,6 +31,7 @@ public class SkillAidQuietPlot : Skill
             BuffManager.AddBuff(u, owner, id, yiBuffId, skillCfg.BuffTime);
         }
 
+        PlayAreaEffect(owner.transform.position);
         EffectManager.PlaySkillEffect(target, skillCfg.HitEffect);
         return true;
     }

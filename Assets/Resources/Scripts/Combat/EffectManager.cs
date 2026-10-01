@@ -116,13 +116,29 @@ public static class EffectManager
         return hitEffect;
     }
 
-    public static GameObject PlayPosSkillEffect(Chess sourceChess, Vector3 sourcePos, float size, string effect, float time = 1.3f)
+    /// <summary>
+    /// 对地/范围特效：在指定位置播放范围特效，缩放 = EffectConfig.Scale × (area / AreaEffectBaseRadius)，
+    /// 即施法范围越大特效越大（area&lt;=0 时不做额外缩放）。范围技能统一经 Skill.PlayAreaEffect 调用。
+    /// </summary>
+    public static GameObject PlayPosSkillEffect(Chess sourceChess, Vector3 sourcePos, float area, string effect, float time = 1.3f)
     {
+        if (string.IsNullOrEmpty(effect))
+        {
+            GameLog.Warn("PlayPosSkillEffect 特效名为空，跳过播放");
+            return null;
+        }
         var hitPrefab = Resources.Load<GameObject>(ResolveEffectPath(effect));
+        if (hitPrefab == null)
+        {
+            GameLog.Warn("PlayPosSkillEffect 特效资源不存在: " + effect);
+            return null;
+        }
         GameLog.Debug("PlayPosSkillEffect: " + effect);
 
         var cfg = EffectConfig.GetConfigByName(effect);
-        float scale = GetScale(effect, cfg, size);
+        float baseScale = GetScale(effect, cfg, hitPrefab.transform.localScale.x);
+        float extra = (area > 0f && CombatConst.AreaEffectBaseRadius > 0f) ? area / CombatConst.AreaEffectBaseRadius : 1f;
+        float scale = baseScale * extra;
         float offsetY = GetOffsetY(effect, cfg);
         GameObject hitEffect = UnityEngine.Object.Instantiate(hitPrefab, sourcePos, hitPrefab.transform.rotation);
         MountEffect(hitEffect, sourceChess.transform, new Vector3(scale, scale, scale), offsetY);

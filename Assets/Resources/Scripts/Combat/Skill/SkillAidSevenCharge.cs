@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using CommonConfig;
 using UnityEngine;
 
@@ -38,6 +38,7 @@ public class SkillAidSevenCharge : Skill
         if (sh != null)
             sh.SetHp((int)(owner.maxHp * skillCfg.Strength2[0]));
 
+        PlayAreaEffect(target.transform.position);
         EffectManager.PlaySkillEffect(owner, skillCfg.HitEffect);
         return true;
     }

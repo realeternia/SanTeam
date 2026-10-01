@@ -42,7 +42,7 @@ public class SkillAidScorchedEarth : Skill
         foreach (var pos in targetPosList)
         {
             var magicStub = SummonMagicField(pos, out var summonTime);
-            EffectManager.PlayPosSkillEffect(magicStub, pos, skillCfg.EffectSize, skillCfg.HitEffect, summonTime);
+            EffectManager.PlayPosSkillEffect(magicStub, pos, skillCfg.Area, skillCfg.AreaEffect, summonTime);
         }
 
         owner.StartCasting(id, DelayDamage(GetSummonTime()));

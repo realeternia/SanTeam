@@ -23,7 +23,7 @@ public class SkillAidAreaHeal : Skill
 
         var center = owner.transform.position;
         var magicStub = SummonMagicField(center, out var summonTime);
-        EffectManager.PlayPosSkillEffect(magicStub, center, skillCfg.EffectSize, skillCfg.HitEffect, summonTime);
+        EffectManager.PlayPosSkillEffect(magicStub, center, skillCfg.Area, skillCfg.AreaEffect, summonTime);
 
         owner.StartCasting(id, AreaHeal(center, summonTime));
         return true;

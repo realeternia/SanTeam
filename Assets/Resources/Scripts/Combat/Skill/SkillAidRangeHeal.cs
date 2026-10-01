@@ -42,6 +42,7 @@ public class SkillAidRangeHeal : Skill
             .FindAll(x => x.isHero && x.hp < x.maxHp);
 
         var heal = GetSkillHeal();
+        PlayAreaEffect(center.transform.position);
         foreach (var unit in healTargets)
         {
             if (heal > 0)

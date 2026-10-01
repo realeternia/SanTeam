@@ -23,6 +23,7 @@ public class SkillAidIronGuard : Skill
             return false;
 
         owner.PlayerAnim(skillCfg.Action);
+        PlayAreaEffect(owner.transform.position);
 
         // 自身减伤盾（"硬"）
         var shieldBuffCfg = BuffConfig.GetConfigByNameS(skillCfg.BuffId);

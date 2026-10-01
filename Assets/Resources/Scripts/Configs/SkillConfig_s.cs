@@ -1,4 +1,4 @@
-﻿using System;
+﻿﻿﻿﻿﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -72,7 +72,7 @@ namespace CommonConfig
             {"ScriptName", new FieldMetaInfo("脚本名", "string", 124)},
             {"Action", new FieldMetaInfo("动作", "string", 0)},
             {"HitEffect", new FieldMetaInfo("hit", "string", 0)},
-            {"EffectSize", new FieldMetaInfo("size", "float", 60)},
+            {"AreaEffect", new FieldMetaInfo("范围特效(仅范围技能用,按Area缩放)", "string", 0)},
             {"Icon", new FieldMetaInfo("图标", "string", 0)},
             {"LinkSelf", new FieldMetaInfo("连接英雄加成", "string", 231)},
             {"LinkTeam", new FieldMetaInfo("我方其他英雄加成", "string", 155)},
@@ -213,9 +213,9 @@ namespace CommonConfig
         /// </summary>
         public string HitEffect;
         /// <summary>
-        ///size
+        ///范围特效（仅范围技能使用，视觉缩放 = EffectConfig.Scale × Area / CombatConst.AreaEffectBaseRadius）
         /// </summary>
-        public float EffectSize;
+        public string AreaEffect;
         /// <summary>
         ///图标
         /// </summary>
@@ -234,7 +234,7 @@ namespace CommonConfig
         public string AuroAttrs;
 
 
-        public SkillConfig(int Id, string Name, string Sname, string Descript, string Type, int Lv, float Rate, float CD, int MpCost, string TriggerCondition, int DamageType, string HurtTag, float Range, float Area, string TargetType, int TargetCount, float DamageStrength, float HealStrength, float[] Strength2, float[] StrengthBuff1, string BuffId, bool NegBuff, float BuffTime, string SummonTag, int SummonCount, float SummonTime, float SummonHitInterval, float SummonSpeed, int ItemId, string ScriptName, string Action, string HitEffect, float EffectSize, string Icon, string LinkSelf, string LinkTeam, string AuroAttrs)
+        public SkillConfig(int Id, string Name, string Sname, string Descript, string Type, int Lv, float Rate, float CD, int MpCost, string TriggerCondition, int DamageType, string HurtTag, float Range, float Area, string TargetType, int TargetCount, float DamageStrength, float HealStrength, float[] Strength2, float[] StrengthBuff1, string BuffId, bool NegBuff, float BuffTime, string SummonTag, int SummonCount, float SummonTime, float SummonHitInterval, float SummonSpeed, int ItemId, string ScriptName, string Action, string HitEffect, string AreaEffect, string Icon, string LinkSelf, string LinkTeam, string AuroAttrs)
         {
             this.Id = Id;
             this.Name = Name;
@@ -272,7 +272,7 @@ namespace CommonConfig
             this.ScriptName = ScriptName;
             this.Action = Action;
             this.HitEffect = HitEffect;
-            this.EffectSize = EffectSize;
+            this.AreaEffect = AreaEffect;
             this.Icon = Icon;
             this.LinkSelf = LinkSelf;
             this.LinkTeam = LinkTeam;

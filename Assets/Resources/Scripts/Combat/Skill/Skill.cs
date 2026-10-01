@@ -326,6 +326,19 @@ public class Skill
         return magicStub;
     }
 
+    /// <summary>
+    /// 播放范围特效（范围技能统一入口）：在 pos 处播 skillCfg.AreaEffect，缩放按 skillCfg.Area 相对基准半径放大。
+    /// AreaEffect 未配置时静默跳过（范围施法可以没有视觉表现）。
+    /// </summary>
+    protected GameObject PlayAreaEffect(Vector3 pos, float time = 1.3f)
+    {
+        if (string.IsNullOrEmpty(skillCfg.AreaEffect))
+            return null;
+        if (time <= 0f)
+            time = skillCfg.SummonTime > 0f ? skillCfg.SummonTime : 1.3f;
+        return EffectManager.PlayPosSkillEffect(owner, pos, skillCfg.Area, skillCfg.AreaEffect, time);
+    }
+
     public float GetSummonTime()
     {
         return skillCfg.SummonTime;

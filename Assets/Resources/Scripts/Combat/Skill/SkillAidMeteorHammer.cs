@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using CommonConfig;
 using UnityEngine;
 
@@ -45,6 +45,7 @@ public class SkillAidMeteorHammer : Skill
             }
         }
 
+        PlayAreaEffect(target.transform.position);
         EffectManager.PlaySkillEffect(target, skillCfg.HitEffect);
         return true;
     }

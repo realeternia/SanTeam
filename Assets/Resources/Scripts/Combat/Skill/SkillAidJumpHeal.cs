@@ -61,6 +61,7 @@ public class SkillAidJumpHeal : Skill
 
             if (currentHeal > 0)
                 owner.HealTarget(current, skillId, currentHeal, true);
+            PlayAreaEffect(current.transform.position);
             EffectManager.PlaySkillEffect(current, skillCfg.HitEffect);
             GameLog.Debug($"妖疗 技能id={id} 等级={Level} 第{i + 1}跳 治疗={currentHeal} 目标={current.heroId}");
             healedList.Add(current);

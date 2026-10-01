@@ -45,7 +45,7 @@ public class SkillHitWall : Skill
             
             foreach(var pos in targetPosList)
             {
-                EffectManager.PlayPosSkillEffect(magicStub, pos, skillCfg.EffectSize, skillCfg.HitEffect, summonTime);
+                EffectManager.PlayPosSkillEffect(magicStub, pos, skillCfg.Area, skillCfg.AreaEffect, summonTime);
             }
             owner.StartCoroutine(DelayDamage(summonTime));
         }

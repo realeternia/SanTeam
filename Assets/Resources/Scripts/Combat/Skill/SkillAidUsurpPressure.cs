@@ -1,4 +1,4 @@
-﻿using CommonConfig;
+using CommonConfig;
 using UnityEngine;
 
 /// <summary>
@@ -31,6 +31,7 @@ public class SkillAidUsurpPressure : Skill
             BuffManager.AddBuff(u, owner, id, tingBuffId, skillCfg.BuffTime);
         }
 
+        PlayAreaEffect(owner.transform.position);
         EffectManager.PlaySkillEffect(target, skillCfg.HitEffect);
         return true;
     }

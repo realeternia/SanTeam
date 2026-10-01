@@ -238,9 +238,15 @@ namespace CommonConfig
         }
 
         private static Dictionary<string, int> idxName = new Dictionary<string, int>();
+        /// <summary>按特效名取配置；名字未配置时返回 null（由调用方回退加载并记日志，不抛异常）</summary>
         public static EffectConfig GetConfigByName(string val)
         {
-            return GetConfig(idxName[val]);
+            if (string.IsNullOrEmpty(val))
+                return null;
+            int id;
+            if (idxName.TryGetValue(val, out id))
+                return GetConfig(id);
+            return null;
         }
 
 

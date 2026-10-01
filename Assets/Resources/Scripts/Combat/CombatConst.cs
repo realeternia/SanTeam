@@ -1,4 +1,4 @@
-﻿/// <summary>
+/// <summary>
 /// 战斗常量：战斗相关的技能/Buff Id 与机制数值统一在此维护
 /// </summary>
 public static class CombatConst
@@ -77,6 +77,10 @@ public static class CombatConst
     public const int SoldierMagicField = 501001;
     /// <summary>影子(501002)：分兵/影技能召唤的分身</summary>
     public const int SoldierShadow = 501002;
+
+    // ---- 范围特效 ----
+    /// <summary>范围特效缩放基准半径：EffectConfig.Scale 对应的半径，实际缩放 = Scale × Area / 本值</summary>
+    public const float AreaEffectBaseRadius = 10f;
 
     // ---- 其他 ----
     /// <summary>近战/远程士兵射程判定阈值</summary>

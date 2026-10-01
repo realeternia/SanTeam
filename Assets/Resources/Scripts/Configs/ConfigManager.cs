@@ -410,7 +410,7 @@ public static class ConfigManager
         {
             case "rate": case "cd": case "range": case "area":
             case "damagestrength": case "healstrength": case "bufftime": case "summontime": case "summonspeed":
-            case "effectsize": case "mpcost": case "targetcount":
+            case "mpcost": case "targetcount":
             case "summoncount": case "lv":
                 return true;
             default:
@@ -437,7 +437,6 @@ public static class ConfigManager
             case "bufftime": return pct ? PercentText(cfg.BuffTime) : cfg.BuffTime.ToString("0.##");
             case "summontime": return pct ? PercentText(cfg.SummonTime) : cfg.SummonTime.ToString("0.##");
             case "summonspeed": return pct ? PercentText(cfg.SummonSpeed) : cfg.SummonSpeed.ToString("0.##");
-            case "effectsize": return pct ? PercentText(cfg.EffectSize) : cfg.EffectSize.ToString("0.##");
             case "mpcost": return cfg.MpCost.ToString();
             case "targetcount": return cfg.TargetCount.ToString();
             case "lv": return cfg.Lv.ToString();
