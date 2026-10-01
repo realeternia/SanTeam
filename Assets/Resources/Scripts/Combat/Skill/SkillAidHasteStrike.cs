@@ -27,6 +27,7 @@ public class SkillAidHasteStrike : Skill
         BuffManager.AddBuff(owner, owner, id, hasteId, skillCfg.BuffTime);
 
         owner.PlayerAnim(skillCfg.Action);
+        EffectManager.PlaySkillEffect(target, skillCfg.HitEffect);
         return true;
     }
 }

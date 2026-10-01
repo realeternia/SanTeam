@@ -1,4 +1,4 @@
-﻿using CommonConfig;
+using CommonConfig;
 using UnityEngine;
 
 /// <summary>
@@ -19,6 +19,7 @@ public class SkillAidLastingFocus : Skill
             return false;
 
         owner.PlayerAnim(skillCfg.Action);
+        EffectManager.PlaySkillEffect(owner, skillCfg.HitEffect);
         owner.attackSpeedRate += skillCfg.Strength2[0];
         return true;
     }

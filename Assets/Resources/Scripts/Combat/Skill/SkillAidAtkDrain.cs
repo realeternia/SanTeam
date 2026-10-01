@@ -1,4 +1,4 @@
-﻿using CommonConfig;
+using CommonConfig;
 using UnityEngine;
 
 /// <summary>
@@ -24,6 +24,7 @@ public class SkillAidAtkDrain : Skill
             return false;
 
         owner.PlayerAnim(skillCfg.Action);
+        EffectManager.PlaySkillEffect(target, skillCfg.HitEffect);
         BuffManager.AddBuff(target, owner, id, BuffConfig.GetConfigByNameS("慑").Id, skillCfg.BuffTime);
         BuffManager.AddBuff(owner, owner, id, BuffConfig.GetConfigByNameS("攻").Id, skillCfg.BuffTime);
         return true;

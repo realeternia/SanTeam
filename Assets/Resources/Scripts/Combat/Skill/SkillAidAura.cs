@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using CommonConfig;
 using UnityEngine;
@@ -30,6 +30,7 @@ public class SkillAidAura : Skill
         }
 
         owner.PlayerAnim(skillCfg.Action);
+        EffectManager.PlaySkillEffect(owner, skillCfg.HitEffect);
         return true;
     }
 }

@@ -31,6 +31,9 @@ namespace DesignCoder
             this.btnForeColor = new System.Windows.Forms.ToolStripButton();
             this.btnBackColor = new System.Windows.Forms.ToolStripButton();
             this.btnClearColors = new System.Windows.Forms.ToolStripButton();
+            this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
+            this.searchBox = new System.Windows.Forms.ToolStripTextBox();
+            this.btnSearch = new System.Windows.Forms.ToolStripButton();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.listView1 = new System.Windows.Forms.ListView();
             this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
@@ -82,7 +85,10 @@ namespace DesignCoder
             this.btnMultiply,
             this.btnForeColor,
             this.btnBackColor,
-            this.btnClearColors});
+            this.btnClearColors,
+            this.toolStripSeparator3,
+            this.searchBox,
+            this.btnSearch});
             this.toolStrip1.Location = new System.Drawing.Point(0, 0);
             this.toolStrip1.Name = "toolStrip1";
             this.toolStrip1.Padding = new System.Windows.Forms.Padding(5, 0, 2, 0);
@@ -198,6 +204,31 @@ namespace DesignCoder
             this.btnClearColors.Size = new System.Drawing.Size(96, 31);
             this.btnClearColors.Text = "清除颜色";
             this.btnClearColors.Click += new System.EventHandler(this.btnClearColors_Click);
+            // 
+            // toolStripSeparator3
+            // 
+            this.toolStripSeparator3.Name = "toolStripSeparator3";
+            this.toolStripSeparator3.Size = new System.Drawing.Size(6, 36);
+            // 
+            // searchBox
+            // 
+            this.searchBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.searchBox.Font = new System.Drawing.Font("微软雅黑", 10F);
+            this.searchBox.Name = "searchBox";
+            this.searchBox.Size = new System.Drawing.Size(160, 36);
+            this.searchBox.ToolTipText = "输入文本后按回车定位到匹配的单元格（再次回车继续查找下一个）";
+            this.searchBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.searchBox_KeyDown);
+            // 
+            // btnSearch
+            // 
+            this.btnSearch.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.btnSearch.Font = new System.Drawing.Font("微软雅黑", 10F);
+            this.btnSearch.ForeColor = System.Drawing.Color.White;
+            this.btnSearch.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.btnSearch.Name = "btnSearch";
+            this.btnSearch.Size = new System.Drawing.Size(56, 31);
+            this.btnSearch.Text = "定位";
+            this.btnSearch.Click += new System.EventHandler(this.btnSearch_Click);
             // 
             // splitContainer1
             // 
@@ -465,6 +496,9 @@ namespace DesignCoder
         private System.Windows.Forms.ToolStripButton btnForeColor;
         private System.Windows.Forms.ToolStripButton btnBackColor;
         private System.Windows.Forms.ToolStripButton btnClearColors;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
+        private System.Windows.Forms.ToolStripTextBox searchBox;
+        private System.Windows.Forms.ToolStripButton btnSearch;
         private System.Windows.Forms.SplitContainer splitContainer1;
         private System.Windows.Forms.ListView listView1;
         private System.Windows.Forms.ColumnHeader columnHeader1;

@@ -38,6 +38,7 @@ public static class BatchSimRunner
     {
         public int Id;
         public string Name;
+        public string Job;              // 职业（仅武将行，物品行为"-"）
         public int Quality;             // 卡片品质（仅武将行，物品行为0）
         public int Appear, Win, Loss, Draw;
         public float Rate { get { return Appear > 0 ? (float)Win / Appear : 0f; } }
@@ -137,15 +138,16 @@ public static class BatchSimRunner
             RecordTeam(teamA, 1, winner, heroStats);
             RecordTeam(teamB, 2, winner, heroStats);
             foreach (var e in equips)
-                RecordOne(itemStats, e.itemId, ItemName(e.itemId), 0, e.side, winner);
+                RecordOne(itemStats, e.itemId, ItemName(e.itemId), "-", 0, e.side, winner);
 
             if (onProgress != null)
                 onProgress(round + 1, rounds);
         }
 
-        var heroRows = Sort(heroStats);
-        var itemRows = Sort(itemStats);
-        string report = BuildReport(opt, rounds, winA, winB, draw, heroRows, itemRows);
+        var heroRows = Sort(heroStats.Values);
+        var itemRows = Sort(itemStats.Values);
+        var jobRows = AggregateByJob(heroRows);
+        string report = BuildReport(opt, rounds, winA, winB, draw, heroRows, itemRows, jobRows);
 
         string dir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "sim_reports");
         Directory.CreateDirectory(dir);
@@ -160,15 +162,15 @@ public static class BatchSimRunner
         Dictionary<int, StatRow> stats)
     {
         foreach (var h in team)
-            RecordOne(stats, h.id, HeroName(h.id), HeroQuality(h.id), side, winner);
+            RecordOne(stats, h.id, HeroName(h.id), HeroJob(h.id), HeroQuality(h.id), side, winner);
     }
 
-    private static void RecordOne(Dictionary<int, StatRow> stats, int id, string name, int quality, int side, int winner)
+    private static void RecordOne(Dictionary<int, StatRow> stats, int id, string name, string job, int quality, int side, int winner)
     {
         StatRow row;
         if (!stats.TryGetValue(id, out row))
         {
-            row = new StatRow { Id = id, Name = name, Quality = quality };
+            row = new StatRow { Id = id, Name = name, Job = job, Quality = quality };
             stats[id] = row;
         }
         row.Appear++;
@@ -177,17 +179,38 @@ public static class BatchSimRunner
         else row.Loss++;
     }
 
-    private static List<StatRow> Sort(Dictionary<int, StatRow> stats)
+    private static List<StatRow> Sort(IEnumerable<StatRow> stats)
     {
-        return stats.Values
+        return stats
             .OrderByDescending(r => r.Rate)
             .ThenByDescending(r => r.Appear)
             .ThenBy(r => r.Id)
             .ToList();
     }
 
+    // 按职业聚合：把各武将行的出场/胜负累加到所属职业（合并出场场次后的加权胜率）
+    private static List<StatRow> AggregateByJob(List<StatRow> heroRows)
+    {
+        var map = new Dictionary<string, StatRow>();
+        foreach (var h in heroRows)
+        {
+            string job = string.IsNullOrEmpty(h.Job) ? "-" : h.Job;
+            StatRow r;
+            if (!map.TryGetValue(job, out r))
+            {
+                r = new StatRow { Id = 0, Name = job, Job = job, Quality = 0 };
+                map[job] = r;
+            }
+            r.Appear += h.Appear;
+            r.Win += h.Win;
+            r.Loss += h.Loss;
+            r.Draw += h.Draw;
+        }
+        return Sort(map.Values);
+    }
+
     private static string BuildReport(Options opt, int rounds, int winA, int winB, int draw,
-        List<StatRow> heroRows, List<StatRow> itemRows)
+        List<StatRow> heroRows, List<StatRow> itemRows, List<StatRow> jobRows)
     {
         var sb = new StringBuilder();
         sb.AppendLine("==================================================");
@@ -211,6 +234,11 @@ public static class BatchSimRunner
         AppendRows(sb, heroRows);
         sb.AppendLine();
 
+        sb.AppendLine("【职业胜率】按胜率降序（该职业全部英雄的出场/胜负合并统计）");
+        sb.AppendLine(JobHeader());
+        AppendJobRows(sb, jobRows);
+        sb.AppendLine();
+
         sb.AppendLine("【物品胜率】按胜率降序（仅随机装备开启时有数据）");
         sb.AppendLine(Header());
         AppendRows(sb, itemRows);
@@ -221,8 +249,8 @@ public static class BatchSimRunner
 
     private static string Header()
     {
-        return string.Format("{0,4}  {1,8}  {2,-10}  {3,4}  {4,6}  {5,6}  {6,6}  {7,6}  {8,8}",
-            "排名", "ID", "名字", "品质", "出场", "胜", "负", "平", "胜率");
+        return string.Format("{0,4}  {1,8}  {2,-10}  {3,-6}  {4,4}  {5,6}  {6,6}  {7,6}  {8,6}  {9,8}",
+            "排名", "ID", "名字", "职业", "品质", "出场", "胜", "负", "平", "胜率");
     }
 
     private static void AppendRows(StringBuilder sb, List<StatRow> rows)
@@ -235,8 +263,29 @@ public static class BatchSimRunner
         int rank = 1;
         foreach (var r in rows)
         {
-            sb.AppendLine(string.Format("{0,4}  {1,8}  {2,-10}  {3,4}  {4,6}  {5,6}  {6,6}  {7,6}  {8,8:P1}",
-                rank++, r.Id, r.Name, r.Quality > 0 ? r.Quality.ToString() : "-", r.Appear, r.Win, r.Loss, r.Draw, r.Rate));
+            sb.AppendLine(string.Format("{0,4}  {1,8}  {2,-10}  {3,-6}  {4,4}  {5,6}  {6,6}  {7,6}  {8,6}  {9,8:P1}",
+                rank++, r.Id, r.Name, string.IsNullOrEmpty(r.Job) ? "-" : r.Job,
+                r.Quality > 0 ? r.Quality.ToString() : "-", r.Appear, r.Win, r.Loss, r.Draw, r.Rate));
+        }
+    }
+
+    private static string JobHeader()
+    {
+        return string.Format("{0,-10}  {1,8}  {2,8}  {3,8}  {4,8}  {5,8}",
+            "职业", "出场", "胜", "负", "平", "胜率");
+    }
+
+    private static void AppendJobRows(StringBuilder sb, List<StatRow> rows)
+    {
+        if (rows.Count == 0)
+        {
+            sb.AppendLine("(无数据)");
+            return;
+        }
+        foreach (var r in rows)
+        {
+            sb.AppendLine(string.Format("{0,-10}  {1,8}  {2,8}  {3,8}  {4,8}  {5,8:P1}",
+                r.Name, r.Appear, r.Win, r.Loss, r.Draw, r.Rate));
         }
     }
 
@@ -251,6 +300,16 @@ public static class BatchSimRunner
     {
         var cfg = HeroConfig.GetConfig(heroId);
         return cfg != null ? cfg.Quality : 1;
+    }
+
+    // 职业名：HeroConfig.Job 为职业缩写（如"王"），取 JobConfig 全称（如"诸侯"）；取不到则用缩写本身
+    private static string HeroJob(int heroId)
+    {
+        var cfg = HeroConfig.GetConfig(heroId);
+        if (cfg == null || string.IsNullOrEmpty(cfg.Job))
+            return "-";
+        var jobCfg = ConfigManager.GetJobConfig(cfg.Job);
+        return jobCfg != null ? jobCfg.Name : cfg.Job;
     }
 
     // 卡片等级：品质1~2 = 设定等级；品质3~4 = 设定等级-1（最低1级）

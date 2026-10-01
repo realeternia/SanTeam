@@ -20,6 +20,7 @@ public class SkillAidBerserk : Skill
         BuffManager.AddBuff(owner, owner, id, frenzyId, skillCfg.BuffTime);
 
         owner.PlayerAnim(skillCfg.Action);
+        EffectManager.PlaySkillEffect(owner, skillCfg.HitEffect);
         return true;
     }
 }

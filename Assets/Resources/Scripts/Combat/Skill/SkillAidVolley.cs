@@ -19,6 +19,7 @@ public class SkillAidVolley : Skill
             return false;
 
         owner.PlayerAnim(skillCfg.Action);
+        EffectManager.PlaySkillEffect(owner, skillCfg.HitEffect);
         BuffManager.AddBuff(owner, owner, id, BuffConfig.GetConfigByNameS("箭").Id, skillCfg.BuffTime);
         BuffManager.AddBuff(owner, owner, id, BuffConfig.GetConfigByNameS("闪").Id, skillCfg.BuffTime);
         return true;

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using CommonConfig;
 using UnityEngine;
 
@@ -30,6 +30,7 @@ public class SkillAidArmorIgnore : Skill
             return false;
 
         owner.PlayerAnim(skillCfg.Action);
+        EffectManager.PlaySkillEffect(target, skillCfg.HitEffect);
 
         target.OnSkillDamaged(owner, skillId, GetSkillDamage());
 

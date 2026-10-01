@@ -27,6 +27,7 @@ public class SkillAidExecute : Skill
             target.OnSkillDamaged(owner, id, GetSkillDamage());
 
         owner.PlayerAnim(skillCfg.Action);
+        EffectManager.PlaySkillEffect(target, skillCfg.HitEffect);
         return true;
     }
 }

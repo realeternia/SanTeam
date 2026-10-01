@@ -32,6 +32,11 @@ namespace DesignCoder
         private HashSet<string> modifiedConfigs = new HashSet<string>();
         private string copiedCellValue = null;
 
+        // 搜索状态：关键字变化时从表头下方重新开始，关键字不变时循环定位到下一个匹配
+        private string lastSearchText = null;
+        private int lastSearchRow = -1;
+        private int lastSearchCol = -1;
+
         // 枚举列自动配色序列（按枚举值取色，可自行调整顺序/颜色；规则里显式写"值:标签:#颜色"可覆盖）
         private static readonly Color[] EnumPalette = new Color[]
         {
@@ -752,6 +757,90 @@ namespace DesignCoder
             }
             SyncCellMetasToConfig();
             MarkCurrentConfigModified();
+        }
+
+        private void btnSearch_Click(object sender, EventArgs e)
+        {
+            DoSearch();
+        }
+
+        private void searchBox_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+                e.Handled = true;
+                e.SuppressKeyPress = true;   // 屏蔽回车提示音
+                DoSearch();
+            }
+        }
+
+        // 在当前表中查找包含关键字的单元格；关键字不变时不断回车可循环定位到下一个匹配
+        private void DoSearch()
+        {
+            if (currentConfig == null || dataGridView1 == null) return;
+
+            int rowCount = dataGridView1.Rows.Count;
+            int colCount = dataGridView1.Columns.Count;
+            if (rowCount <= HeaderRowCount || colCount == 0) return;
+
+            string keyword = searchBox.Text != null ? searchBox.Text.Trim() : "";
+            if (keyword.Length == 0)
+            {
+                MessageBox.Show("请输入要查找的文本", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            // 关键字变化时重置搜索起点（表头下方第一格之前），保证从头查找
+            if (!string.Equals(keyword, lastSearchText, StringComparison.Ordinal))
+            {
+                lastSearchText = keyword;
+                lastSearchRow = HeaderRowCount - 1;
+                lastSearchCol = int.MaxValue;
+            }
+
+            int dataRowCount = rowCount - HeaderRowCount;
+            int total = dataRowCount * colCount;
+
+            // 上次命中的线性序号（按数据行主序编号），未命中过则为 -1
+            int lastIndex = -1;
+            if (lastSearchRow >= HeaderRowCount && lastSearchCol < colCount)
+                lastIndex = (lastSearchRow - HeaderRowCount) * colCount + lastSearchCol;
+
+            for (int step = 1; step <= total; step++)
+            {
+                int idx = (int)(((long)lastIndex + step) % total);
+                int rowIdx = HeaderRowCount + idx / colCount;
+                int colIdx = idx % colCount;
+
+                if (!dataGridView1.Columns[colIdx].Visible) continue;
+
+                var cell = dataGridView1.Rows[rowIdx].Cells[colIdx];
+                string text = cell.Value != null ? cell.Value.ToString() : "";
+                if (text.IndexOf(keyword, StringComparison.OrdinalIgnoreCase) >= 0)
+                {
+                    lastSearchRow = rowIdx;
+                    lastSearchCol = colIdx;
+                    GotoCell(rowIdx, colIdx);
+                    return;
+                }
+            }
+
+            MessageBox.Show(string.Format("未找到包含\"{0}\"的单元格", keyword), "定位", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+        // 选中目标单元格并滚动到可视区域
+        private void GotoCell(int rowIdx, int colIdx)
+        {
+            var cell = dataGridView1.Rows[rowIdx].Cells[colIdx];
+            dataGridView1.CurrentCell = cell;
+
+            if (rowIdx < dataGridView1.FirstDisplayedScrollingRowIndex ||
+                rowIdx >= dataGridView1.FirstDisplayedScrollingRowIndex + dataGridView1.DisplayedRowCount(true))
+            {
+                dataGridView1.FirstDisplayedScrollingRowIndex = rowIdx;
+            }
+
+            dataGridView1.Focus();
         }
 
         private string ShowInputDialog(string title, string prompt)

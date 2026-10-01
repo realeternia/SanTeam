@@ -1,4 +1,4 @@
-﻿using CommonConfig;
+using CommonConfig;
 using UnityEngine;
 
 /// <summary>
@@ -24,6 +24,7 @@ public class SkillAidVengefulStance : Skill
             return false;
 
         owner.PlayerAnim(skillCfg.Action);
+        EffectManager.PlaySkillEffect(owner, skillCfg.HitEffect);
 
         // 威震"威"（眩晕）
         var weiBuffCfg = BuffConfig.GetConfigByNameS(skillCfg.BuffId);

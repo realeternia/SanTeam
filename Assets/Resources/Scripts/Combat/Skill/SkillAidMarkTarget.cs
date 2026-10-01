@@ -27,6 +27,7 @@ public class SkillAidMarkTarget : Skill
         BuffManager.AddBuff(target, owner, id, markId, skillCfg.BuffTime);
 
         owner.PlayerAnim(skillCfg.Action);
+        EffectManager.PlaySkillEffect(target, skillCfg.HitEffect);
         return true;
     }
 }

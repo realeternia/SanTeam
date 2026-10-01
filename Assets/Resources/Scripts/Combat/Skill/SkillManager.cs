@@ -293,6 +293,8 @@ public static class SkillManager
                 return new SkillAttackStackBuffer(skillId, owner);
             case "AidSelfShield":
                 return new SkillAidSelfShield(skillId, owner);
+            case "AidShieldValue":
+                return new SkillAidShieldValue(skillId, owner);
             case "AttackMpGain":
                 return new SkillAttackMpGain(skillId, owner);
             case "KillGain":

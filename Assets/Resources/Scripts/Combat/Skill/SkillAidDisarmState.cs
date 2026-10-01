@@ -1,4 +1,4 @@
-﻿using CommonConfig;
+using CommonConfig;
 using UnityEngine;
 
 /// <summary>
@@ -29,6 +29,7 @@ public class SkillAidDisarmState : Skill
             return false;
 
         owner.PlayerAnim(skillCfg.Action);
+        EffectManager.PlaySkillEffect(owner, skillCfg.HitEffect);
 
         var disarmBuffCfg = BuffConfig.GetConfigByNameS(skillCfg.BuffId);
         if (disarmBuffCfg != null)

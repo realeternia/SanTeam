@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using CommonConfig;
 using UnityEngine;
 
@@ -18,6 +18,7 @@ public class SkillAidEmpower : Skill
             return false;
 
         owner.PlayerAnim(skillCfg.Action);
+        EffectManager.PlaySkillEffect(owner, skillCfg.HitEffect);
 
         BuffManager.AddBuff(owner, owner, id, BuffConfig.GetConfigByNameS("倍").Id, skillCfg.BuffTime);
         return true;

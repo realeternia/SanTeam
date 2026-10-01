@@ -29,6 +29,7 @@ public class SkillAidSwapStrike : Skill
         target.transform.position = tempPos;
 
         owner.PlayerAnim(skillCfg.Action);
+        EffectManager.PlaySkillEffect(target, skillCfg.HitEffect);
         return true;
     }
 }

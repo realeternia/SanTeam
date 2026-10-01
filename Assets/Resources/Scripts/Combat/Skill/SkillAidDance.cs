@@ -29,6 +29,7 @@ public class SkillAidDance : Skill
         owner.transform.position += dir * 15f;
 
         owner.PlayerAnim(skillCfg.Action);
+        EffectManager.PlaySkillEffect(owner, skillCfg.HitEffect);
         return true;
     }
 }
