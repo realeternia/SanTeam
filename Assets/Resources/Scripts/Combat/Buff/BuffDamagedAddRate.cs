@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 public class BuffDamagedAddRate : Buff
 {
@@ -11,6 +11,7 @@ public class BuffDamagedAddRate : Buff
     // 约定：DamageStrength 为伤害基值（仅伤害/治疗/DOT 使用），其余数值一律读 StrengthBuff1[k]
     public override void BeforeCalDamaged(Chess attacker, ref int damageBase, ref float damageMulti, ref string effect, string hurtTag)
     {
-        damageMulti += skillCfg.StrengthBuff1[0];
+        // StrengthBuff1 为压缩数组（只存非零值）：空数组表示无受击增伤加成（如"冲锋"2010006~2010010）
+        damageMulti += skillCfg.StrengthBuff1.Length > 0 ? skillCfg.StrengthBuff1[0] : 0f;
     }
 }

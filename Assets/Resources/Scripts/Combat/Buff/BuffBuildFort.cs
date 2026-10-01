@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 /// <summary>
 /// 筑垒（张昭·筑垒）：对被加持的士兵永久强化双防（护甲/魔抗，数值只加一次，Buff被移除时还原），
@@ -21,8 +21,9 @@ public class BuffBuildFort : Buff
     public override void OnAdd(Chess chess, Chess caster)
     {
         base.OnAdd(chess, caster);
-        armorDiff = (int)skillCfg.StrengthBuff1[0];
-        magicResDiff = (int)skillCfg.StrengthBuff1[1];
+        // StrengthBuff1 为压缩数组（只存非零值）：长度不足时该值按 0 处理（缺失即无该加成）
+        armorDiff = skillCfg.StrengthBuff1.Length > 0 ? (int)skillCfg.StrengthBuff1[0] : 0;
+        magicResDiff = skillCfg.StrengthBuff1.Length > 1 ? (int)skillCfg.StrengthBuff1[1] : 0;
         chess.armor += armorDiff;
         chess.magicRes += magicResDiff;
         chess.buildFortArmed = true;      // 已武装筑垒：死亡可原地复活

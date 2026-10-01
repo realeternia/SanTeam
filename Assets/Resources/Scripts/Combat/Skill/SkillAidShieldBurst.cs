@@ -1,4 +1,4 @@
-﻿using CommonConfig;
+using CommonConfig;
 
 /// <summary>
 /// 李典·武卫：自套护盾+盾破爆裂（ScriptName = "SkillAidShieldBurst"）：
@@ -42,11 +42,18 @@ public class SkillAidShieldBurst : Skill
         return true;
     }
 
-    // buff 移除事件：仅响应本技能施加的护盾被移除（盾破触发爆裂，不依赖技能CD轮询）
+    // buff 移除事件：仅响应本技能施加的护盾"被击破"时爆裂（自然到期不触发）
     public override void OnBuffRemoved(Chess chess, Buff buff)
     {
-        if (buff.skillCfg != null && buff.skillCfg.Id == id)
-            Explode();
+        if (buff == null || buff.skillCfg == null || buff.skillCfg.Id != id)
+            return;
+
+        // 自然到期时护盾仍有剩余值（>0），只有被打空吞噬成 0 才算被击破
+        var shield = buff as BuffShield;
+        if (shield == null || shield.GetHp() > 0)
+            return;
+
+        Explode();
     }
 
     // 盾破爆裂：对周围(Area)范围内敌人造成护盾容量 × Strength2[1] 伤害

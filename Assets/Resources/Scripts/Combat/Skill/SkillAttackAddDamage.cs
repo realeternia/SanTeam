@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using CommonConfig;
@@ -20,7 +20,8 @@ public class SkillAttackAddDamage : Skill
             owner.PlayerAnim(skillCfg.Action);
 
             damageBase += (int)skillCfg.DamageStrength;
-            if(skillCfg.Strength2[0] > 0)
+            // Strength2 为压缩数组（只存非零值）：空数组表示仅加固定伤害、无额外倍率（如道具"追风/骁勇/贯日"）
+            if (skillCfg.Strength2.Length > 0 && skillCfg.Strength2[0] > 0)
                 damageMulti += skillCfg.Strength2[0];
             effect = skillCfg.HitEffect;
         }
