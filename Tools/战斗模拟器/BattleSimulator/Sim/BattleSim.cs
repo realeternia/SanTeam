@@ -35,6 +35,9 @@ public class BattleSim
     public bool EnableFriendLine = true;
     public bool EnableJobLink = true;
 
+    // 小兵等级（1~30，决定小兵攻防加成），在 BattleBegin 生成单位前写入两个玩家
+    public int SoldierLevel = 6;
+
     // 受击事件（供 GUI 绘制飘血与受击临时图形）。由血量差分检测生成，不改游戏源码。
     public class HitFxData
     {
@@ -178,27 +181,33 @@ public class BattleSim
         }
     }
 
-    // 上阵（前后排站位）：近战英雄站前排（贴近敌方）、远程英雄站后排，避免远程被顶在阵型最前。
-    // 布阵格按"离敌方由近到远"排序后，近战从最前格开始占，远程从最后格开始占（英雄数≤25，不会交叠）。
-    public void SetupByRole(List<(int id, int lv)> heroesA, List<(int id, int lv)> heroesB)
+    // 上阵（前后排站位）：小兵（全近战）占最前排，近战英雄接着站前排（贴近敌方）、远程英雄站后排，避免远程被顶在阵型最前。
+    // 布阵格按"离敌方由近到远"排序后，近战从最前格开始占，远程从最后格开始占（总数≤25，不会交叠）。
+    public void SetupByRole(List<(int id, int lv)> heroesA, List<(int id, int lv)> heroesB, int soldierCount = 0)
     {
         _heroCountA = heroesA != null ? heroesA.Count : 0;
         _heroCountB = heroesB != null ? heroesB.Count : 0;
-        _soldierCount = 0;
-        FillBattleCardsByRole(Game.players[0], heroesA, 1);
-        FillBattleCardsByRole(Game.players[1], heroesB, 2);
+        _soldierCount = soldierCount;
+        FillBattleCardsByRole(Game.players[0], heroesA, 1, soldierCount);
+        FillBattleCardsByRole(Game.players[1], heroesB, 2, soldierCount);
     }
 
-    private void FillBattleCardsByRole(PlayerInfo p, List<(int id, int lv)> heroes, int side)
+    // soldierCount：每侧小兵数量，全部使用近战士兵，占最前排（贴敌）
+    private void FillBattleCardsByRole(PlayerInfo p, List<(int id, int lv)> heroes, int side, int soldierCount)
     {
         var cards = p.battleCards;
         Array.Clear(cards, 0, cards.Length);
-        if (heroes == null)
-            return;
 
         var order = World.GetFormationPosOrderFrontToBack(side);   // 前→后
         int frontIdx = 0;
         int backIdx = order.Count - 1;
+
+        // 小兵（全近战）：从最前排依次占用
+        for (int s = 0; s < soldierCount && frontIdx <= backIdx; s++)
+            cards[order[frontIdx++]] = MeleeSoldierId;
+
+        if (heroes == null)
+            return;
 
         foreach (var hero in heroes)
         {
@@ -239,6 +248,9 @@ public class BattleSim
         CoroutineRunner.Clear();
         BattleStatManager.Clear();
         World.Reset();
+        // 小兵等级需在 BattleBegin 生成单位前写入（士兵攻防加成按 PlayerInfo.soldierLevel 取 SoldierLevelConfig）
+        Game.players[0].soldierLevel = SoldierLevel;
+        Game.players[1].soldierLevel = SoldierLevel;
         // 把本场羁绊开关同步到 harness（BattleBegin 内生效），结束后复位为默认全开
         WorldManager.EnableJobLinks = EnableJobLink;
         WorldManager.EnableFriendLines = EnableFriendLine;

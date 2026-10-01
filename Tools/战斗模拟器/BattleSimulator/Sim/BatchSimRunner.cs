@@ -23,7 +23,9 @@ public static class BatchSimRunner
     public class Options
     {
         public int HeroCount = 5;       // 每侧武将数量
-        public int Quality1Level = 5;   // 品质1卡片的等级；品质每高1档等级-1（品质2=设定-1、品质3=设定-2…最低1级）
+        public int SoldierCount = 4;    // 每侧小兵数量（全部近战士兵，占最前排）
+        public int SoldierLevel = 6;    // 小兵等级（1~30，决定小兵攻防加成）
+        public int Quality1Level = 5;   // 设定等级：品质1~2 用该等级，品质3~4 用该等级-1
         public bool EnableFaction;      // 国家加成
         public bool EnableFriend;       // 好友加成
         public bool EnableJob;          // 职业加成
@@ -94,11 +96,12 @@ public static class BatchSimRunner
 
             var battle = new BattleSim
             {
+                SoldierLevel = Math.Max(1, opt.SoldierLevel),
                 EnableFactionShield = opt.EnableFaction,
                 EnableFriendLine = opt.EnableFriend,
                 EnableJobLink = opt.EnableJob,
             };
-            battle.SetupByRole(teamA, teamB);
+            battle.SetupByRole(teamA, teamB, Math.Max(0, opt.SoldierCount));
 
             // 随机装备：每个武将一件随机 400 段道具（pid 0=甲 1=乙）
             var equips = new List<EquipRecord>();
@@ -190,9 +193,10 @@ public static class BatchSimRunner
         sb.AppendLine("==================================================");
         sb.AppendLine("战斗模拟器 · 批量模拟报告");
         sb.AppendLine("生成时间: " + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
-        sb.AppendLine("每侧武将数量: " + opt.HeroCount + "    品质1等级: " + opt.Quality1Level
-            + "（品质2=" + Math.Max(1, opt.Quality1Level - 1) + "级, 品质3=" + Math.Max(1, opt.Quality1Level - 2)
-            + "级, 品质4=" + Math.Max(1, opt.Quality1Level - 3) + "级）");
+        sb.AppendLine("每侧武将数量: " + opt.HeroCount + "    每侧小兵数量: " + opt.SoldierCount
+            + "（近战）    小兵等级: " + opt.SoldierLevel);
+        sb.AppendLine("设定等级: " + opt.Quality1Level
+            + "（品质1~2=" + opt.Quality1Level + "级, 品质3~4=" + Math.Max(1, opt.Quality1Level - 1) + "级）");
         sb.AppendLine("国家加成: " + OnOff(opt.EnableFaction)
             + "    好友加成: " + OnOff(opt.EnableFriend)
             + "    职业加成: " + OnOff(opt.EnableJob));
@@ -249,10 +253,11 @@ public static class BatchSimRunner
         return cfg != null ? cfg.Quality : 1;
     }
 
-    // 卡片等级 = 品质1等级 - (品质-1)：品质1=设定等级、品质2=设定-1、品质3=设定-2…最低1级
+    // 卡片等级：品质1~2 = 设定等级；品质3~4 = 设定等级-1（最低1级）
     private static int LevelForQuality(int heroId, int quality1Level)
     {
-        return Math.Max(1, quality1Level - (HeroQuality(heroId) - 1));
+        int q = HeroQuality(heroId);
+        return Math.Max(1, q <= 2 ? quality1Level : quality1Level - 1);
     }
 
     private static string ItemName(int itemId)
