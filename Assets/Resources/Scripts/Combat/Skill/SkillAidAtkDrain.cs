@@ -2,7 +2,7 @@
 using UnityEngine;
 
 /// <summary>
-/// 马腾·腾驾：降低目标攻击并提升自身攻击（"慑"减攻读 Strength3，"攻"加攻读 Strength2）
+/// 马腾·腾驾：降低目标攻击并提升自身攻击（"慑"BuffAtkDown 与"攻"BuffAtkAdd 均读 StrengthBuff1[0]）
 /// </summary>
 public class SkillAidAtkDrain : Skill
 {

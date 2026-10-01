@@ -19,7 +19,7 @@ public class SkillAidLastingFocus : Skill
             return false;
 
         owner.PlayerAnim(skillCfg.Action);
-        owner.attackSpeedRate += skillCfg.Strength2;
+        owner.attackSpeedRate += skillCfg.Strength2[0];
         return true;
     }
 }

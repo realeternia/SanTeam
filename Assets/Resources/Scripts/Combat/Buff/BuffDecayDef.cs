@@ -1,7 +1,7 @@
 ﻿using System;
 
 /// <summary>
-/// 望族（名门望族·门阀）：开局双防强化，随时间衰减。OnAdd 增加 skillCfg.StrengthBuff1 点护甲、skillCfg.StrengthBuff2 点魔抗；
+/// 望族（名门望族·门阀）：开局双防强化，随时间衰减。OnAdd 增加 skillCfg.StrengthBuff1[0] 点护甲、skillCfg.StrengthBuff1[1] 点魔抗；
 /// DecayOnce() 每跳减去初始加成 1/5（共5跳，15秒归零）；OnRemove 还原剩余加成。
 /// 衰减节奏由施放技能 SkillInitDecayDef 的协程驱动。
 /// </summary>
@@ -21,8 +21,8 @@ public class BuffDecayDef : Buff
     public override void OnAdd(Chess chess, Chess caster)
     {
         base.OnAdd(chess, caster);
-        armorBonus = skillCfg.StrengthBuff1;
-        magicResBonus = skillCfg.StrengthBuff2;
+        armorBonus = skillCfg.StrengthBuff1[0];
+        magicResBonus = skillCfg.StrengthBuff1[1];
         armorStep = armorBonus / jumpsRemain;
         magicResStep = magicResBonus / jumpsRemain;
         chess.armor += (int)armorBonus;

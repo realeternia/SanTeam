@@ -1,8 +1,8 @@
-using CommonConfig;
+﻿using CommonConfig;
 using UnityEngine;
 
 /// <summary>
-/// 张松·舌辩（术）：对目标造成 /strength 法术伤害，并大幅减速（Buff "缓"，幅度取 /strength2，时长 bufftime）。
+/// 张松·舌辩（术）：对目标造成 /damagestrength 法术伤害，并大幅减速（Buff "缓"，减速比例由 BuffSlowDown 读 StrengthBuff1[0]，时长 bufftime）。
 /// </summary>
 public class SkillAidSilverTongue : Skill
 {

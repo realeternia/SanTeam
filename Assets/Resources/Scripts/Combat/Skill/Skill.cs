@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using CommonConfig;
@@ -26,8 +26,8 @@ public class Skill
     public float mp; // 当前技能MP，战斗开始为0，满值=MpCost
 
     /// <summary>
-    /// 统一技能伤害公式：DamageType=0 法术 = DamageStrength × (100 + ap × (1+Strength3)) / 100（ap 为百分比加成，ap=0 时伤害=DamageStrength）；
-    /// DamageType=1/2 物理/真实 = DamageStrength + atk × (1+Strength3)。魔抗/护甲减免在 OnSkillDamaged 内处理（真实伤害无视抗性与护盾）
+    /// 统一技能伤害公式：DamageType=0 法术 = DamageStrength × (100 + ap) / 100（ap 为百分比加成，ap=0 时伤害=DamageStrength）；
+    /// DamageType=1/2 物理/真实 = DamageStrength + atk。魔抗/护甲减免在 OnSkillDamaged 内处理（真实伤害无视抗性与护盾）
     /// </summary>
     public int GetSkillDamage()
     {

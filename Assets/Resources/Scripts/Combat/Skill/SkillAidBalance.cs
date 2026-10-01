@@ -5,7 +5,7 @@ using UnityEngine;
 
 /// <summary>
 /// 孙权·制衡：为范围内最多 TargetCount 名友军英雄永久随机提升一项属性（直接改字段，不走 Buff 不还原）：
-/// 攻击/AP 提升 Strength2 点，护甲/魔抗提升 Strength3 点。
+/// 攻击/AP 提升 Strength2[0] 点，护甲/魔抗提升 Strength2[1] 点。
 /// </summary>
 public class SkillAidBalance : Skill
 {
@@ -30,27 +30,27 @@ public class SkillAidBalance : Skill
 
         foreach (var u in allies)
         {
-            // 四选一随机：攻击/ap 走 Strength2，护甲/魔抗走 Strength3
+            // 四选一随机：攻击/ap 走 Strength2[0]，护甲/魔抗走 Strength2[1]
             var r = SysRandom.Value;
             if (r < 0.25f)
             {
-                u.atk += (int)skillCfg.Strength2;
-                GameLog.Info("制衡：" + GetHeroName(owner) + " 为 " + GetHeroName(u) + " 永久提升攻击 " + (int)skillCfg.Strength2);
+                u.atk += (int)skillCfg.Strength2[0];
+                GameLog.Info("制衡：" + GetHeroName(owner) + " 为 " + GetHeroName(u) + " 永久提升攻击 " + (int)skillCfg.Strength2[0]);
             }
             else if (r < 0.5f)
             {
-                u.ap += (int)skillCfg.Strength2;
-                GameLog.Info("制衡：" + GetHeroName(owner) + " 为 " + GetHeroName(u) + " 永久提升AP " + (int)skillCfg.Strength2);
+                u.ap += (int)skillCfg.Strength2[0];
+                GameLog.Info("制衡：" + GetHeroName(owner) + " 为 " + GetHeroName(u) + " 永久提升AP " + (int)skillCfg.Strength2[0]);
             }
             else if (r < 0.75f)
             {
-                u.armor += (int)skillCfg.Strength3;
-                GameLog.Info("制衡：" + GetHeroName(owner) + " 为 " + GetHeroName(u) + " 永久提升护甲 " + (int)skillCfg.Strength3);
+                u.armor += (int)skillCfg.Strength2[1];
+                GameLog.Info("制衡：" + GetHeroName(owner) + " 为 " + GetHeroName(u) + " 永久提升护甲 " + (int)skillCfg.Strength2[1]);
             }
             else
             {
-                u.magicRes += (int)skillCfg.Strength3;
-                GameLog.Info("制衡：" + GetHeroName(owner) + " 为 " + GetHeroName(u) + " 永久提升魔抗 " + (int)skillCfg.Strength3);
+                u.magicRes += (int)skillCfg.Strength2[1];
+                GameLog.Info("制衡：" + GetHeroName(owner) + " 为 " + GetHeroName(u) + " 永久提升魔抗 " + (int)skillCfg.Strength2[1]);
             }
             EffectManager.PlaySkillEffect(u, skillCfg.HitEffect);
         }

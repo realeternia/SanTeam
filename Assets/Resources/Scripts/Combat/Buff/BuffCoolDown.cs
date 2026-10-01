@@ -11,7 +11,7 @@ public class BuffCoolDown : Buff
     public override void OnAdd(Chess chess, Chess caster)
     {
         base.OnAdd(chess, caster);
-        attackSpeedRateDiff = skillCfg.StrengthBuff1;
+        attackSpeedRateDiff = skillCfg.StrengthBuff1[0];
         chess.attackSpeedRate += attackSpeedRateDiff;
     }
 

@@ -1,8 +1,8 @@
-using CommonConfig;
+﻿using CommonConfig;
 using UnityEngine;
 
 /// <summary>
-/// 曹真·虎豹：对目标造成 /strength 法术伤害，不附加任何 buff（低费单体补刀）
+/// 曹真·虎豹：对目标造成 /damagestrength 法术伤害，不附加任何 buff（低费单体补刀）
 /// </summary>
 public class SkillAidThrust : Skill
 {

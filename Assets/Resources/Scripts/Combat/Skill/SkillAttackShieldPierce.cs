@@ -35,7 +35,7 @@ public class SkillAttackShieldPierce : Skill
 
         // 额外造成%物理伤害（基于攻击基准 atk：士兵的士兵攻击加成系数已折算进 atk；OnSkillDamaged 统一按物理护甲减免一次后绕过护盾打血）
         var attackBase = owner.GetAttr("atk");
-        var pierce = Math.Max(1, (int)(attackBase * skillCfg.Strength2));
+        var pierce = Math.Max(1, (int)(attackBase * skillCfg.Strength2[0]));
         target.OnSkillDamaged(owner, skillId, pierce, false, skillCfg.HurtTag);
     }
 }

@@ -1,7 +1,7 @@
 ﻿using System;
 
 /// <summary>
-/// 攻击力提升：按技能 Strength2 数值提升自身攻击力（atk += Strength2），移除时还原。
+/// 攻击力提升：按技能 StrengthBuff1[0] 数值提升自身攻击力（atk += StrengthBuff1[0]），移除时还原。
 /// 用于洛神（甄宓）给友军加攻击力。
 /// </summary>
 public class BuffAtkAdd : Buff
@@ -16,7 +16,7 @@ public class BuffAtkAdd : Buff
     public override void OnAdd(Chess chess, Chess caster)
     {
         base.OnAdd(chess, caster);
-        atkDiff = (int)skillCfg.StrengthBuff1;
+        atkDiff = (int)skillCfg.StrengthBuff1[0];
         chess.atk += atkDiff;
     }
 

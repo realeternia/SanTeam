@@ -1,7 +1,7 @@
 ﻿using System;
 
 /// <summary>
-/// 御风疾驰：按 Strength2 提升攻速，并按 Strength3 提升移动速度。
+/// 御风疾驰：按 StrengthBuff1[0] 提升攻速，并按 StrengthBuff1[1] 提升移动速度。
 /// 用于鼓舞（小乔）给数名友军的攻速+移速组合 buff。
 /// </summary>
 public class BuffHasteMoveSpeed : Buff
@@ -17,10 +17,10 @@ public class BuffHasteMoveSpeed : Buff
     public override void OnAdd(Chess chess, Chess caster)
     {
         base.OnAdd(chess, caster);
-        attackSpeedRateDiff = skillCfg.StrengthBuff1;
+        attackSpeedRateDiff = skillCfg.StrengthBuff1[0];
         chess.attackSpeedRate += attackSpeedRateDiff;
 
-        moveSpeedDiff = chess.moveSpeed * skillCfg.StrengthBuff2;
+        moveSpeedDiff = chess.moveSpeed * skillCfg.StrengthBuff1[1];
         chess.moveSpeed += moveSpeedDiff;
     }
 

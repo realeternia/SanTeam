@@ -1,10 +1,10 @@
-﻿using System.Collections;
+using System.Collections;
 using CommonConfig;
 using UnityEngine;
 
 /// <summary>
-/// 李儒·鸩酒（术）：对目标造成 /strength 法术伤害，使其持续中毒每秒 /strength2 伤害（持续 dot），
-/// 并降低其受治疗 /strengthint%（Buff "疫"，时长 bufftime），双毒并施。
+/// 李儒·鸩酒（术）：对目标造成 /damagestrength 法术伤害，使其持续中毒每秒 /strength2-1 伤害（持续 dot），
+/// 并降低其受治疗（Buff "疫"，时长 bufftime），双毒并施。
 /// </summary>
 public class SkillAidPoisonWine : Skill
 {
@@ -27,7 +27,7 @@ public class SkillAidPoisonWine : Skill
         if (GetSkillDamage() > 0)
             target.OnSkillDamaged(owner, skillId, GetSkillDamage());
 
-        var secDamage = (int)skillCfg.Strength3;
+        var secDamage = (int)skillCfg.Strength2[0];
         if (secDamage > 0)
             owner.StartCoroutine(DotTicks(target, secDamage));
 

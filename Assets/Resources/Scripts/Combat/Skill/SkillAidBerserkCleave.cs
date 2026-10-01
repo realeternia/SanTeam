@@ -2,7 +2,7 @@
 using UnityEngine;
 
 /// <summary>
-/// 典韦·恶来：对自身 /area 范围内敌人各造成 /strength 法术伤害，并进入狂暴状态（Buff "狂"，Strength3 双刃±，时长 bufftime）
+/// 典韦·恶来：对自身 /area 范围内敌人各造成 /damagestrength 法术伤害，并进入狂暴状态（Buff "狂"，双刃±由 BuffFrenzy 读 StrengthBuff1[0]，时长 bufftime）
 /// </summary>
 public class SkillAidBerserkCleave : Skill
 {

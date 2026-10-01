@@ -12,11 +12,11 @@ public class SkillDefReduceDamageRate : Skill
         if (isFeedback)
             return;
 
-        // 触发条件(TriggerCondition，如 hprate<50)满足且发动概率命中时，按技能档位减免伤害（等效伤害 ×(1-Strength2)）
+        // 触发条件(TriggerCondition，如 hprate<50)满足且发动概率命中时，按技能档位减免伤害（等效伤害 ×(1-Strength2[0])）
         if (CheckBurst(caster))
         {
             WorldManager.Instance.AddBattleText("抵抗", owner.transform.position, new UnityEngine.Vector2(0, 60), Color.red, 3);
-            damageMulti *= 1 - skillCfg.Strength2;
+            damageMulti *= 1 - skillCfg.Strength2[0];
         }
     }
 }

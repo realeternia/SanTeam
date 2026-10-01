@@ -1,9 +1,9 @@
-﻿using CommonConfig;
+using CommonConfig;
 using UnityEngine;
 
 /// <summary>
-/// 钟会·敛翼（术）：对目标造成 /strength 法术伤害；目标生命低于 /strengthint% 时，
-/// 额外追加其已损生命 /strength2% 的斩杀伤害。
+/// 钟会·敛翼（术）：对目标造成 /damagestrength 法术伤害；目标生命低于 /strength2-2% 时，
+/// 额外追加其已损生命 /strength2-1% 的斩杀伤害。
 /// </summary>
 public class SkillAidLethalGambit : Skill
 {
@@ -25,9 +25,9 @@ public class SkillAidLethalGambit : Skill
 
         if (GetSkillDamage() > 0)
             target.OnSkillDamaged(owner, skillId, GetSkillDamage());
-        if (target.hp > 0 && (int)(target.HpRate * 100f) < skillCfg.StrengthInt)
+        if (target.hp > 0 && (int)(target.HpRate * 100f) < (int)skillCfg.Strength2[1])
         {
-            var strike = (int)((target.maxHp - target.hp) * skillCfg.Strength3);
+            var strike = (int)((target.maxHp - target.hp) * skillCfg.Strength2[0]);
             if (strike > 0)
                 target.OnSkillDamaged(owner, skillId, strike);
         }

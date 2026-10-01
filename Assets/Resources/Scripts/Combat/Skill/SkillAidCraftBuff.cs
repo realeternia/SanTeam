@@ -5,7 +5,7 @@ using UnityEngine;
 
 /// <summary>
 /// 黄月英·巧工：给我方两名不同英雄直接永久提升属性（不走 buff、战斗内不还原）：
-/// 生命比例最低的我方英雄 atk += Strength2（攻击）；另一名（生命次低、与前一名不同）armor += Strength3（护甲）。
+/// 生命比例最低的我方英雄 atk += Strength2[0]（攻击）；另一名（生命次低、与前一名不同）armor += Strength2[1]（护甲）。
 /// 若我方仅剩 1 名英雄，则只施加攻击增益。
 /// </summary>
 public class SkillAidCraftBuff : Skill
@@ -33,17 +33,17 @@ public class SkillAidCraftBuff : Skill
 
         // 目标1：生命最低的我方英雄，永久提升攻击
         var atkTarget = allies[0];
-        atkTarget.atk += (int)skillCfg.Strength2;
+        atkTarget.atk += (int)skillCfg.Strength2[0];
         EffectManager.PlaySkillEffect(atkTarget, skillCfg.HitEffect);
-        GameLog.Info("巧工：" + GetHeroName(owner) + " 为 " + GetHeroName(atkTarget) + " 永久提升攻击 " + (int)skillCfg.Strength2);
+        GameLog.Info("巧工：" + GetHeroName(owner) + " 为 " + GetHeroName(atkTarget) + " 永久提升攻击 " + (int)skillCfg.Strength2[0]);
 
         // 目标2：另一名（若存在）永久提升护甲
         if (allies.Count >= 2)
         {
             var armorTarget = allies[1];
-            armorTarget.armor += (int)skillCfg.Strength3;
+            armorTarget.armor += (int)skillCfg.Strength2[1];
             EffectManager.PlaySkillEffect(armorTarget, skillCfg.HitEffect);
-            GameLog.Info("巧工：" + GetHeroName(owner) + " 为 " + GetHeroName(armorTarget) + " 永久提升护甲 " + (int)skillCfg.Strength3);
+            GameLog.Info("巧工：" + GetHeroName(owner) + " 为 " + GetHeroName(armorTarget) + " 永久提升护甲 " + (int)skillCfg.Strength2[1]);
         }
         else
         {

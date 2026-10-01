@@ -1,8 +1,8 @@
-using CommonConfig;
+﻿using CommonConfig;
 using UnityEngine;
 
 /// <summary>
-/// 杜预·发火：对当前目标造成 /strength 法术伤害，纯单体、不带任何 buff/dot（低费单体补刀）。
+/// 杜预·发火：对当前目标造成 /damagestrength 法术伤害，纯单体、不带任何 buff/dot（低费单体补刀）。
 /// </summary>
 public class SkillAidFireShot : Skill
 {

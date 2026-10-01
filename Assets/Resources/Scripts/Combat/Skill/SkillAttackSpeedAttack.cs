@@ -16,7 +16,7 @@ public class SkillAttackSpeedAttack : Skill
             owner.PlayerAnim(skillCfg.Action);
 
             // Cooldown 参数为冷却百分比（1=完全冷却），最大不超过1
-            owner.Cooldown(skillCfg.Strength2);
+            owner.Cooldown(skillCfg.Strength2[0]);
         }
     }
 }

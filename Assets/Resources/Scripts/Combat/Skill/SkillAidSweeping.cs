@@ -1,9 +1,9 @@
-using CommonConfig;
+﻿using CommonConfig;
 using UnityEngine;
 
 /// <summary>
-/// 荀攸·连环（术）：对目标连续弹出最多 targetcount 段法术伤害（每段 /strength），
-/// 并减速（Buff "缓"，时长 bufftime，减速幅度取 /strength2）牵制敌人。
+/// 荀攸·连环（术）：对目标连续弹出最多 targetcount 段法术伤害（每段 /damagestrength），
+/// 并减速（Buff "缓"，时长 bufftime，减速幅度由 BuffSlowDown 读 StrengthBuff1[0]）牵制敌人。
 /// </summary>
 public class SkillAidSweeping : Skill
 {

@@ -1,10 +1,10 @@
-using System.Collections;
+﻿using System.Collections;
 using CommonConfig;
 using UnityEngine;
 
 /// <summary>
 /// 妖咒（ScriptName = "AidCurseHeal"）：辅助技能，对当前目标挂"败"（溃败·每秒法术伤害，由 BuffTimeDamage 结算），
-/// 同时起协程按相同节奏（每秒一跳）按 StrengthInt 百分比把治疗能力（GetSkillHeal，与 DOT 伤害解耦）折算成每跳治疗，
+/// 同时起协程按相同节奏（每秒一跳）按 Strength2[0] 百分比把治疗能力（GetSkillHeal，与 DOT 伤害解耦）折算成每跳治疗，
 /// 回复自身 Range 内生命比例最低的友方英雄（仅英雄，不给士兵；无人受伤则跳过）。
 /// 用于于吉：妖道符水，以敌之血养己之众。
 /// </summary>
@@ -42,9 +42,9 @@ public class SkillAidCurseHeal : Skill
 
     private IEnumerator HealOverTime(Chess cursed)
     {
-        // 治疗量基准为独立治疗公式 GetSkillHeal()，再按 StrengthInt 百分比折算每跳治疗（与 DOT 伤害公式解耦）
+        // 治疗量基准为独立治疗公式 GetSkillHeal()，再按 Strength2[0] 百分比折算每跳治疗（与 DOT 伤害公式解耦）
         var healBase = GetSkillHeal();
-        var healPerTick = (int)(healBase * skillCfg.StrengthInt / 100f);
+        var healPerTick = (int)(healBase * (int)skillCfg.Strength2[0] / 100f);
         var term = Mathf.Max(1, Mathf.FloorToInt(skillCfg.BuffTime / TickInterval));
 
         for (var i = 0; i < term; i++)

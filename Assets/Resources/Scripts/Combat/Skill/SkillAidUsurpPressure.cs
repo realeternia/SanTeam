@@ -1,8 +1,8 @@
-using CommonConfig;
+﻿using CommonConfig;
 using UnityEngine;
 
 /// <summary>
-/// 司马昭·篡逆（术）：对自身 "area 范围内敌人各造成 /strength 法术伤害，
+/// 司马昭·篡逆（术）：对自身 "area 范围内敌人各造成 /damagestrength 法术伤害，
 /// 并将其定身无法移动（Buff "停"，时长 bufftime），锁住敌方阵线。
 /// </summary>
 public class SkillAidUsurpPressure : Skill

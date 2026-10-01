@@ -3,7 +3,7 @@ using CommonConfig;
 using UnityEngine;
 
 /// <summary>
-/// 李严·护军：为生命比例最低的友军套 /strength% 最大生命的护盾，并嘲讽其 Area 范围内敌人转移到自己身上（自身挂 BuffTaunt）。
+/// 李严·护军：为生命比例最低的友军套 /strength2-1% 最大生命的护盾，并嘲讽其 Area 范围内敌人转移到自己身上（自身挂 BuffTaunt）。
 /// </summary>
 public class SkillAidGuardArmy : Skill
 {
@@ -38,7 +38,7 @@ public class SkillAidGuardArmy : Skill
         BuffManager.AddBuff(lowest, owner, id, shieldId, skillCfg.BuffTime);
         var sh = lowest.GetBuff(shieldId) as BuffShield;
         if (sh != null)
-            sh.SetHp((int)(lowest.maxHp * skillCfg.Strength2));
+            sh.SetHp((int)(lowest.maxHp * skillCfg.Strength2[0]));
 
         // 嘲讽：自身挂嘲讽标记，使敌人优先攻击自己
         BuffManager.AddBuff(owner, owner, id, BuffConfig.GetConfigByNameS("嘲").Id, skillCfg.BuffTime);

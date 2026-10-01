@@ -21,8 +21,8 @@ public class SkillAidExecute : Skill
         if (!CheckBurst(target))
             return false;
 
-        if ((int)(target.HpRate * 100f) < skillCfg.StrengthInt)
-            target.OnSkillDamaged(owner, id, (int)(GetSkillDamage() * skillCfg.Strength3));
+        if ((int)(target.HpRate * 100f) < (int)skillCfg.Strength2[1])
+            target.OnSkillDamaged(owner, id, (int)(GetSkillDamage() * skillCfg.Strength2[0]));
         else
             target.OnSkillDamaged(owner, id, GetSkillDamage());
 

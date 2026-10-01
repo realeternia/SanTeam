@@ -3,7 +3,7 @@ using CommonConfig;
 using UnityEngine;
 
 /// <summary>
-/// 赵云·七进七出：对目标及范围内最多 TargetCount 名敌人各造成一次法术伤害，并为自己附加 /strength2% 最大生命护盾。
+/// 赵云·七进七出：对目标及范围内最多 TargetCount 名敌人各造成一次法术伤害，并为自己附加 /strength2-1% 最大生命护盾。
 /// </summary>
 public class SkillAidSevenCharge : Skill
 {
@@ -36,7 +36,7 @@ public class SkillAidSevenCharge : Skill
         BuffManager.AddBuff(owner, owner, id, shieldId, skillCfg.BuffTime);
         var sh = owner.GetBuff(shieldId) as BuffShield;
         if (sh != null)
-            sh.SetHp((int)(owner.maxHp * skillCfg.Strength3));
+            sh.SetHp((int)(owner.maxHp * skillCfg.Strength2[0]));
 
         EffectManager.PlaySkillEffect(owner, skillCfg.HitEffect);
         return true;

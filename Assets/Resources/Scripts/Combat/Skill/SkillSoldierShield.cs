@@ -39,7 +39,7 @@ public class SkillSoldierShield : Skill
         BuffManager.AddBuff(s, owner, id, buffId, skillCfg.BuffTime);
         var shield = s.GetBuff(buffId) as BuffShield;
         if (shield != null)
-            shield.SetHp((int)(s.maxHp * skillCfg.Strength2));
+            shield.SetHp((int)(s.maxHp * skillCfg.Strength2[0]));
     }
 
     // 本侧存活近战士兵（近战判定沿用 CombatConst.MeleeRange）

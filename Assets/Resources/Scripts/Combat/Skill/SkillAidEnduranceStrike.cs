@@ -1,8 +1,8 @@
-using CommonConfig;
+﻿using CommonConfig;
 using UnityEngine;
 
 /// <summary>
-/// 司马懿·隐忍（术）：对目标造成高额 /strength 法术伤害，将其拉拽到自己身侧（强制位移 xz 平面），
+/// 司马懿·隐忍（术）：对目标造成高额 /damagestrength 法术伤害，将其拉拽到自己身侧（强制位移 xz 平面），
 /// 并眩晕（Buff "乱"，时长 bufftime）2 秒，把核心敌人拖入己阵围杀。
 /// </summary>
 public class SkillAidEnduranceStrike : Skill

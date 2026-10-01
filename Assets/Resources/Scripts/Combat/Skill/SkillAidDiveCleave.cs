@@ -1,8 +1,8 @@
-using CommonConfig;
+﻿using CommonConfig;
 using UnityEngine;
 
 /// <summary>
-/// 魏延·背水：对自身 /area 范围内敌人各造成 /strength 法术伤害，并降低其治疗（Buff "疫"，StrengthInt 减疗%，时长 bufftime）
+/// 魏延·背水：对自身 /area 范围内敌人各造成 /damagestrength 法术伤害，并降低其治疗（Buff "疫"，减疗值取 Strength2 末位非零值，时长 bufftime）
 /// </summary>
 public class SkillAidDiveCleave : Skill
 {

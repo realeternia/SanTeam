@@ -4,8 +4,8 @@ using CommonConfig;
 using UnityEngine;
 
 /// <summary>
-/// 背水：阵亡时，回复我方同组技能(Sname)的在场英雄 20%~60%(Strength2)最大生命值，
-    /// 并按同比例(Strength2)提升其 atk、按 StrengthInt 提升其 ap。通过 Skill.OnDeath 在 Chess.Ondying 时触发。
+/// 背水：阵亡时，回复我方同组技能(Sname)的在场英雄 20%~60%(Strength2[0])最大生命值，
+    /// 并按同比例(Strength2[0])提升其 atk、按 Strength2[2] 提升其 ap。通过 Skill.OnDeath 在 Chess.Ondying 时触发。
 /// </summary>
 public class SkillDeathGroupHeal : Skill
 {
@@ -25,13 +25,13 @@ public class SkillDeathGroupHeal : Skill
                 continue;
 
             // 回复目标 20%~60% 最大生命值（视为治疗，吃治疗加成/可被扩散）
-            var heal = (int)(chess.maxHp * skillCfg.Strength2);
+            var heal = (int)(chess.maxHp * skillCfg.Strength2[0]);
             if (heal > 0)
                 owner.HealTarget(chess, skillId, heal, true);
 
             // 提升目标 20%~40% atk 与 ap
-            chess.atk += (int)(chess.atk * skillCfg.Strength2);
-            chess.ap += skillCfg.StrengthInt;
+            chess.atk += (int)(chess.atk * skillCfg.Strength2[0]);
+            chess.ap += (int)skillCfg.Strength2[1];
             if (chess.heroInfo != null)
                 chess.heroInfo.SetAttr(chess.ap, chess.atk);
         }

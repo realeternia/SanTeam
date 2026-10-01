@@ -4,7 +4,7 @@ using UnityEngine;
 
 /// <summary>
 /// 忠勇·自+友军护盾（ScriptName = "AidSelfAndLowHp"）：
-/// 辅助技能，给自己施加一个吸收盾（容量=自身最大生命×Strength2），
+/// 辅助技能，给自己施加一个吸收盾（容量=自身最大生命×Strength2[0]），
 /// 同时给附近(Range内)生命比例最低的一名友方英雄也施加一个吸收盾。
 /// 若附近无友方英雄则只给自己加盾。通过 Skill.CheckAidSkill 由 SkillManager 循环施放。
 /// 用于周仓：挨打时本能举盾，顺带护住身旁同袍。
@@ -21,7 +21,7 @@ public class SkillAidSelfAndLowHp : Skill
             return false;
 
         var shieldId = BuffConfig.GetConfigByNameS(skillCfg.BuffId).Id;
-        var shieldHp = (int)(owner.maxHp * skillCfg.Strength2);
+        var shieldHp = (int)(owner.maxHp * skillCfg.Strength2[0]);
 
         owner.PlayerAnim(skillCfg.Action);
 

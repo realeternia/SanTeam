@@ -1,9 +1,9 @@
-using System;
+﻿using System;
 using CommonConfig;
 using UnityEngine;
 
 /// <summary>
-/// 张梁·妖术：与生命比例最低的友军建立生命链接（双方各挂 BuffLifeLink），链接期间双方按 /strength2 比例共享伤害。
+/// 张梁·妖术：与生命比例最低的友军建立生命链接（双方各挂 BuffLifeLink），链接期间双方按 /strengthbuff1-1 比例共享伤害。
 /// </summary>
 public class SkillAidLifeLink : Skill
 {

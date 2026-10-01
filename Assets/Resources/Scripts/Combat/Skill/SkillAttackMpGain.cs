@@ -3,7 +3,7 @@ using CommonConfig;
 using UnityEngine;
 
 /// <summary>
-/// 儒雅（儒将风范）：攻击命中时按 skillCfg.Rate 概率回复自身首个有蓝耗主动技能 MpCost × skillCfg.Strength2 的法力。
+/// 儒雅（儒将风范）：攻击命中时按 skillCfg.Rate 概率回复自身首个有蓝耗主动技能 MpCost × skillCfg.Strength2[0] 的法力。
 /// 对应技能：儒雅。
 /// </summary>
 public class SkillAttackMpGain : Skill
@@ -31,7 +31,7 @@ public class SkillAttackMpGain : Skill
         if (active == null)
             return;
 
-        var gain = active.skillCfg.MpCost * skillCfg.Strength2;
+        var gain = active.skillCfg.MpCost * skillCfg.Strength2[0];
         active.mp = Mathf.Min(active.skillCfg.MpCost, active.mp + gain);
         GameLog.Debug($"儒雅 武将{owner.heroId} 攻击回蓝{gain} 至{(int)active.mp}/{active.skillCfg.MpCost}");
     }

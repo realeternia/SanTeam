@@ -3,8 +3,8 @@ using UnityEngine;
 
 /// <summary>
 /// 刘晔·卸甲：为自身附加卸甲状态（Buff "卸" BuffDisarm）bufftime 秒；
-/// 状态期物理攻击无视目标 /strength% 护甲（GetArmorDelta 挂钩 GetEffectiveArmor 折算），
-/// 且目标带吸收型护盾时对其伤害提升 /strength2（BuffDisarm.BeforeCalDamage 放大）。
+/// 状态期物理攻击无视目标 /strength2-1% 护甲（GetArmorDelta 挂钩 GetEffectiveArmor 折算），
+/// 且目标带吸收型护盾时对其伤害提升 /strengthbuff1-1%（BuffDisarm.BeforeCalDamage 放大）。
 /// </summary>
 public class SkillAidDisarmState : Skill
 {
@@ -17,7 +17,7 @@ public class SkillAidDisarmState : Skill
     {
         if (!isAttackerSide)
             return 0f;
-        return -skillCfg.Strength2;
+        return -skillCfg.Strength2[0];
     }
 
     public override bool CheckAidSkill()

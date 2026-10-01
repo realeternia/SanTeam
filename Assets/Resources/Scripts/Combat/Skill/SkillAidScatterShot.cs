@@ -4,7 +4,7 @@ using UnityEngine;
 /// <summary>
 /// 黄忠·乱射（ScriptName = "BowHuangZhong"）：
 /// 区域多目标箭雨，对目标周围(Area)范围内敌人附加暴击加成伤害。
-/// 每目标伤害 = 基础技能伤害 × (1 + Strength3)。
+/// 每目标伤害 = 基础技能伤害 × (1 + Strength2[0])。
 /// </summary>
 public class SkillAidScatterShot : Skill
 {
@@ -29,7 +29,7 @@ public class SkillAidScatterShot : Skill
 
         foreach (var t in targets)
         {
-            var dmg = GetSkillDamage() + (int)(GetSkillDamage() * skillCfg.Strength3);
+            var dmg = GetSkillDamage() + (int)(GetSkillDamage() * skillCfg.Strength2[0]);
             WorldManager.Instance.CreateSpellMissile(owner, t, owner.transform.position, id, dmg, owner.hitEffect);
         }
         return true;

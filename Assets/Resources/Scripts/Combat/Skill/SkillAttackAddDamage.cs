@@ -19,9 +19,9 @@ public class SkillAttackAddDamage : Skill
         {
             owner.PlayerAnim(skillCfg.Action);
 
-            damageBase += skillCfg.StrengthInt;
-            if(skillCfg.Strength2 > 0)
-                damageMulti += skillCfg.Strength2;
+            damageBase += (int)skillCfg.DamageStrength;
+            if(skillCfg.Strength2[0] > 0)
+                damageMulti += skillCfg.Strength2[0];
             effect = skillCfg.HitEffect;
         }
     }

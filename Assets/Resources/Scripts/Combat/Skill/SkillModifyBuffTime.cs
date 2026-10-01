@@ -24,7 +24,7 @@ public class SkillModifyBuffTime : Skill
         if (!string.IsNullOrEmpty(skillCfg.BuffId) && buffId != BuffConfig.GetConfigByNameS(skillCfg.BuffId).Id) //为强化id
             return;
 
-        time *= (1 + skillCfg.Strength2);
+        time *= (1 + skillCfg.Strength2[0]);
         WorldManager.Instance.AddBattleText(skillCfg.Name, owner.transform.position, new UnityEngine.Vector2(0, 60), SysColor.BattleText.SkillName, 3);
     }
 

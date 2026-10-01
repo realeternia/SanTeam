@@ -2,7 +2,7 @@
 using UnityEngine;
 
 /// <summary>
-/// 马谡·守势：对目标造成 /strength 法术伤害，并使其减速（Buff "缓"，Strength3 减速率，时长 bufftime）
+/// 马谡·守势：对目标造成 /damagestrength 法术伤害，并使其减速（Buff "缓"，减速比例由 BuffSlowDown 读 StrengthBuff1[0]，时长 bufftime）
 /// </summary>
 public class SkillAidSlowStrike : Skill
 {

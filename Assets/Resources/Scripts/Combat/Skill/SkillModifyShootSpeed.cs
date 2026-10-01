@@ -12,7 +12,7 @@ public class SkillModifyShootSpeed : Skill
 
     public override void BattleBegin()
     {
-        owner.missileSpeed = (int)(owner.missileSpeed * skillCfg.Strength2);
+        owner.missileSpeed = (int)(owner.missileSpeed * skillCfg.Strength2[0]);
     }
   
 }
