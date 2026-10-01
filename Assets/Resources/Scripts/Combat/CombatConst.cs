@@ -21,6 +21,15 @@ public static class CombatConst
     /// <summary>LockChain：连锁(BuffLock)传递的伤害标签，避免锁链伤害二次扩散成循环放大</summary>
     public const string LockChainHurtTag = "LockChain";
 
+    /// <summary>
+    /// 是否派生伤害：连锁(LockChain)/破盾(AntiShield)这类由其他伤害二次派生的伤害。
+    /// 派生伤害不得再生出派生伤害（连锁/生命链接/破盾），否则两种机制会互相触发形成无限递归
+    /// </summary>
+    public static bool IsDerivedHurtTag(string hurtTag)
+    {
+        return hurtTag == LockChainHurtTag || hurtTag == AntiShieldHurtTag;
+    }
+
     // ---- 伤害类型(SkillConfig.DamageType) ----
     /// <summary>0=法术：ap 成长，受魔抗减免</summary>
     public const int DamageTypeMagic = 0;

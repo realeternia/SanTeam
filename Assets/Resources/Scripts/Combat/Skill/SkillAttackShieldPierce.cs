@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using CommonConfig;
@@ -17,8 +17,9 @@ public class SkillAttackShieldPierce : Skill
 
     public override void BeforeCalDamage(Chess target, SkillConfig castSkillCfg, ref int damageBase, ref float damageMulti, ref string effect, string hurtTag, bool isFeedback)
     {
-        // 破盾自身的穿透伤害(AntiShield)再进入伤害计算时不重复触发，避免递归
-        if (hurtTag == CombatConst.AntiShieldHurtTag)
+        // 派生伤害（破盾自身 AntiShield、连锁链传 LockChain）再进入伤害计算时不重复触发，
+        // 否则破盾与连锁会互相触发形成无限递归
+        if (CombatConst.IsDerivedHurtTag(hurtTag))
             return;
 
         // 只对有护盾(吸收型，BuffShield)的目标生效

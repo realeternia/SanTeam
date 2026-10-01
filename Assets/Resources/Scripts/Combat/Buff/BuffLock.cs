@@ -1,4 +1,4 @@
-﻿public class BuffLock : Buff
+public class BuffLock : Buff
 {
     public BuffLock(int id, int skillId, Chess caster, Chess target, float lastTime)
      : base(id, skillId, caster, target, lastTime)
@@ -6,10 +6,10 @@
     }
 
     // 连锁挂在伤害计算阶段（原挂在普攻专属的 OnAttacked 上，技能伤害不会触发）；普攻与技能伤害统一生效；
-    // 带 LockChain 标签的链传伤害不再二次扩散，避免锁链循环放大
+    // 派生伤害（链传 LockChain、破盾 AntiShield 等）不再二次扩散，避免与其它派生伤害互相触发形成死循环
     public override void BeforeCalDamaged(Chess attacker, ref int damageBase, ref float damageMulti, ref string effect, string hurtTag)
     {
-        if (hurtTag == CombatConst.LockChainHurtTag)
+        if (CombatConst.IsDerivedHurtTag(hurtTag))
             return;
 
         var chainDamage = (int)(damageBase * damageMulti * skillCfg.StrengthBuff1[0]);
