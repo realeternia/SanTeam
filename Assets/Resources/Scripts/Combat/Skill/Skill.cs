@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using CommonConfig;
@@ -23,7 +23,7 @@ public class Skill
 
     public int skillId{ get{ return skillCfg.Id; } }
 
-    public float mp; // 当前技能MP，战斗开始为0，满值=MpCost
+    public float mp; // 当前技能MP，开局按 SkillConfig.StartMpRate 填充（默认0=从0充能），满值=MpCost
 
     /// <summary>
     /// 统一技能伤害公式：DamageType=0 法术 = DamageStrength × (100 + ap) / 100（ap 为百分比加成，ap=0 时伤害=DamageStrength）；
@@ -44,6 +44,21 @@ public class Skill
     public int GetSkillHeal()
     {
         return (int)(skillCfg.HealStrength * (100 + owner.GetAttr("ap")) / 100);
+    }
+
+    /// <summary>
+    /// 统一护盾公式（除国家护盾外，所有套盾技能统一走此公式，随法强成长）：
+    /// 护盾量 = Strength2[idx] × (100 + ap) / 100，ap=0 时护盾量 = Strength2[idx]（配置中直接写基础值）。
+    /// 下标越界/配置为空返回 0，不回退到最大生命或攻击比例。
+    /// </summary>
+    public int GetSkillShield(int idx = 0)
+    {
+        if (skillCfg == null || skillCfg.Strength2 == null || idx < 0 || idx >= skillCfg.Strength2.Length)
+            return 0;
+        var v = skillCfg.Strength2[idx];
+        if (v <= 0f)
+            return 0;
+        return Mathf.Max(1, (int)(v * (100 + owner.GetAttr("ap")) / 100f));
     }
 
     public Skill(int id, Chess unit)
@@ -231,6 +246,17 @@ public class Skill
     public virtual void BattleBegin()
     {
 
+    }
+
+    /// <summary>
+    /// 开局初始MP：按 SkillConfig.StartMpRate（开局MP比例，默认0）填充，mp = MpCost × StartMpRate（上限 MpCost）。
+    /// 由 SkillManager.BattleBegin 在各技能 BattleBegin 之后统一调用；MpCost=0 的技能不受MP限制，无需填充。
+    /// </summary>
+    public void InitStartMp()
+    {
+        if (skillCfg == null || skillCfg.MpCost <= 0 || skillCfg.StartMpRate <= 0f)
+            return;
+        mp = Mathf.Clamp(skillCfg.MpCost * skillCfg.StartMpRate, 0f, skillCfg.MpCost);
     }
 
     // 死亡时触发（Chess.Ondying 调用）

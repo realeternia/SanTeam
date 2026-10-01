@@ -3,7 +3,7 @@ using CommonConfig;
 using UnityEngine;
 
 /// <summary>
-/// 程普·横扫：对自身范围（Area）内若干敌人（TargetCount）各造成魔法伤害，并给自身挂护盾"盾"（护盾值 = 最大生命 × strength2）
+/// 程普·横扫：对自身范围（Area）内若干敌人（TargetCount）各造成魔法伤害，并给自身挂护盾"盾"（护盾值 = Strength2[0] × (100+法强)/100，随法强成长）
 /// </summary>
 public class SkillAidBashShield : Skill
 {
@@ -29,7 +29,7 @@ public class SkillAidBashShield : Skill
         BuffManager.AddBuff(owner, owner, id, shieldId, skillCfg.BuffTime);
         var sh = owner.GetBuff(shieldId) as BuffShield;
         if (sh != null)
-            sh.SetHp((int)(owner.maxHp * skillCfg.Strength2[0]));
+            sh.SetHp(GetSkillShield(0));
 
         owner.PlayerAnim(skillCfg.Action);
         return true;

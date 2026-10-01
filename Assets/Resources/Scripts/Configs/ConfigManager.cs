@@ -439,6 +439,7 @@ public static class ConfigManager
             case "summontime": return pct ? PercentText(cfg.SummonTime) : cfg.SummonTime.ToString("0.##");
             case "summonspeed": return pct ? PercentText(cfg.SummonSpeed) : cfg.SummonSpeed.ToString("0.##");
             case "mpcost": return cfg.MpCost.ToString();
+            case "startmprate": return pct ? PercentText(cfg.StartMpRate) : cfg.StartMpRate.ToString("0.##");
             case "targetcount": return cfg.TargetCount.ToString();
             case "lv": return cfg.Lv.ToString();
             case "name": return cfg.Name ?? "";

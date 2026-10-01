@@ -26,7 +26,7 @@ public class SkillAidShieldBurst : Skill
         if (!CheckBurst(null))
             return false;
 
-        var shieldHp = (int)(skillCfg.Strength2[0] * (owner.GetAttr("ap") + 100) / 100f);
+        var shieldHp = GetSkillShield(0);
 
         owner.PlayerAnim(skillCfg.Action);
 

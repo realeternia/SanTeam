@@ -44,9 +44,13 @@ public static class CombatConst
     /// <summary>连锁：锁定目标并传递伤害（技能表 锁 的5级行）</summary>
     public const int LockSkillId = 2020390;
 
+    // ---- 护盾克制 ----
+    /// <summary>飞斧(许褚)：对拥有吸收盾(BuffShield)的目标造成的伤害倍率</summary>
+    public const float ShockWaveShieldDamageMulti = 2f;
+
     // ---- 技能初始MP ----
-    /// <summary>战斗开始时技能MP是否直接拉满（默认打开；关闭则所有技能按常规从0开始充能）</summary>
-    public static bool FullMpAtBattleBegin = true;
+    /// <summary>战斗开始时技能MP是否直接拉满（默认关闭；开启则所有技能从满MP开局，关闭则按常规从0开始充能）</summary>
+    public static bool FullMpAtBattleBegin = false;
 
     // ---- 国家护盾机制(同阵营连线，数值参考金铲铲神盾使羁绊) ----
     /// <summary>同阵营英雄数量档位(2/3/4/5/6，对应国家护盾技能 Lv1~5)</summary>

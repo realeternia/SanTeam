@@ -16,6 +16,8 @@ public class Missile : MonoBehaviour
 
     public int skillId;
     public int skillDamage;
+    /// <summary>每目标伤害倍率回调（可空）：命中单个目标时按该目标计算伤害系数，用于"对特定目标伤害翻倍"类技能（如飞斧对带盾目标）</summary>
+    public Func<Chess, float> perTargetDamageMulti;
 
     public void Init(Chess sourceChess, float size, string effectName)
     {
@@ -235,7 +237,11 @@ public class Missile : MonoBehaviour
         }
         else
         {
-            target.OnSkillDamaged(owner, skillId, skillDamage);
+            // 按目标计算伤害倍率（如飞斧对带盾目标翻倍），未配置回调时用原始伤害
+            var damage = perTargetDamageMulti != null
+                ? Mathf.Max(1, (int)(skillDamage * perTargetDamageMulti(target)))
+                : skillDamage;
+            target.OnSkillDamaged(owner, skillId, damage);
             EffectManager.PlaySkillEffect(target, hitEffectName);
         }
     }

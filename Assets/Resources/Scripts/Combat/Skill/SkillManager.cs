@@ -313,8 +313,12 @@ public static class SkillManager
             skill.BattleBegin();
         }
 
-        // 战斗开始技能MP拉满（CombatConst.FullMpAtBattleBegin，默认打开）：放在各技能 BattleBegin 之后，
-        // 覆盖技能自身的开局充能（如运筹），并让 BattleBegin 期间新增的技能同样满魔法
+        // 开局初始MP（SkillConfig.StartMpRate，默认0=从0充能）：放在各技能 BattleBegin 之后，
+        // 覆盖技能自身的开局充能（如运筹），并让 BattleBegin 期间新增的技能同样生效
+        foreach (var skill in chess.skills)
+            skill.InitStartMp();
+
+        // 全局调试开关（CombatConst.FullMpAtBattleBegin，默认关闭）：开启时无视 StartMpRate，所有技能直接满MP
         if (CombatConst.FullMpAtBattleBegin)
         {
             foreach (var skill in chess.skills)
@@ -378,12 +382,17 @@ public static class SkillManager
 
     /// <summary>
     /// 伤害结算阶段·受击方：只做伤害吸收（护盾 BuffShield），不做伤害放大。
-    /// 普攻(Attack)时 castSkillCfg 传 null；护盾按 hurtTag 决定是否吸收（如"AntiShield"绕过护盾打血）
+    /// 普攻(Attack)时 castSkillCfg 传 null；护盾按 hurtTag 决定是否吸收（如"AntiShield"绕过护盾打血）；
+    /// 真实伤害(DamageType=2)同样无视护盾吸收（护盾不吸收真实伤害）
     /// </summary>
     public static void DuringCalDamage(Chess attacker, Chess defender, SkillConfig castSkillCfg, ref int damage, string hurtTag, bool isFeedback)
     {
+        var isRealDamage = castSkillCfg != null && castSkillCfg.DamageType == CombatConst.DamageTypeReal;
         foreach (var buff in defender.buffs)
         {
+            // 真实伤害：跳过吸收型护盾(BuffShield)，其余 buff 照常结算
+            if (isRealDamage && buff is BuffShield)
+                continue;
             buff.DuringCalDamage(attacker, ref damage, hurtTag);
         }
     }
