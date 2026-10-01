@@ -16,7 +16,7 @@ public class BuffAtkAdd : Buff
     public override void OnAdd(Chess chess, Chess caster)
     {
         base.OnAdd(chess, caster);
-        atkDiff = (int)skillCfg.Strength2;
+        atkDiff = (int)skillCfg.StrengthBuff1;
         chess.atk += atkDiff;
     }
 

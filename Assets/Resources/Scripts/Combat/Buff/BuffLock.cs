@@ -12,7 +12,7 @@
         if (hurtTag == CombatConst.LockChainHurtTag)
             return;
 
-        var chainDamage = (int)(damageBase * damageMulti * skillCfg.Strength2);
+        var chainDamage = (int)(damageBase * damageMulti * skillCfg.StrengthBuff1);
         if (chainDamage <= 0)
             return; // 伤害被减伤压到0，不再链传，避免 OnSkillDamaged 的伤害<=0 异常
 

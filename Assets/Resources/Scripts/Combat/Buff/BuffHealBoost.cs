@@ -15,7 +15,7 @@ public class BuffHealBoost : Buff
     public override void OnAdd(Chess chess, Chess caster)
     {
         base.OnAdd(chess, caster);
-        healedRateDiff = skillCfg.Strength2;
+        healedRateDiff = skillCfg.StrengthBuff1;
         chess.healedRate += healedRateDiff;
     }
 

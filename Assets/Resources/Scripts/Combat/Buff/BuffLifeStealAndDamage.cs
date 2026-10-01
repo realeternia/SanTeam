@@ -11,11 +11,11 @@ public class BuffLifeStealAndDamage : Buff
 
     public override void BeforeCalDamage(Chess defender, ref int damageBase, ref float damageMulti, ref string effect, string hurtTag)
     {
-        damageMulti += skillCfg.Strength2;
+        damageMulti += skillCfg.StrengthBuff1;
     }
 
     public override void OnAttack(Chess defender, int damage)
     {
-        owner.HealTarget(owner, skillCfg.Id, (int)(damage * skillCfg.Strength3), false);
+        owner.HealTarget(owner, skillCfg.Id, (int)(damage * skillCfg.StrengthBuff2), false);
     }
 }

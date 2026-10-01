@@ -14,7 +14,7 @@ public class BuffArmorDown : Buff
     public override void OnAdd(Chess chess, Chess caster)
     {
         base.OnAdd(chess, caster);
-        diff = (int)skillCfg.Strength3;
+        diff = (int)skillCfg.StrengthBuff2;
         chess.armor -= diff;
     }
 

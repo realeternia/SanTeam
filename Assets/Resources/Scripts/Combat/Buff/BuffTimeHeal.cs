@@ -43,7 +43,7 @@ public class BuffTimeHeal : Buff
 
             if (chess.hp < chess.maxHp)
             {
-                int heal = Mathf.CeilToInt(chess.maxHp * skillCfg.Strength2) + skillCfg.StrengthInt;
+                int heal = Mathf.CeilToInt(chess.maxHp * skillCfg.StrengthBuff1) + skillCfg.StrengthInt;
                 if (heal > 0)
                 {
                     // 持续回血不算治疗，不吃治疗加成/不触发治疗扩散（isHeal=false）

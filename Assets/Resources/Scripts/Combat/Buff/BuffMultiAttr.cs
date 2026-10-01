@@ -1,7 +1,7 @@
 ﻿using System;
 
 /// <summary>
-/// 名门（袁绍·名门）：祝福一员大将，提升攻击 skillCfg.Strength2 点、护甲与魔抗 skillCfg.Strength3 点，移除时还原。
+/// 名门（袁绍·名门）：祝福一员大将，提升攻击 skillCfg.StrengthBuff1 点、护甲与魔抗 skillCfg.StrengthBuff2 点，移除时还原。
 /// </summary>
 public class BuffMultiAttr : Buff
 {
@@ -17,9 +17,9 @@ public class BuffMultiAttr : Buff
     public override void OnAdd(Chess chess, Chess caster)
     {
         base.OnAdd(chess, caster);
-        atkDiff = (int)skillCfg.Strength2;
-        armorDiff = (int)skillCfg.Strength3;
-        magicResDiff = (int)skillCfg.Strength3;
+        atkDiff = (int)skillCfg.StrengthBuff1;
+        armorDiff = (int)skillCfg.StrengthBuff2;
+        magicResDiff = (int)skillCfg.StrengthBuff2;
         chess.atk += atkDiff;
         chess.armor += armorDiff;
         chess.magicRes += magicResDiff;

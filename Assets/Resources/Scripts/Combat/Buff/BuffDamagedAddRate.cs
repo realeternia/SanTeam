@@ -11,6 +11,6 @@ public class BuffDamagedAddRate : Buff
     // 约定：DamageStrength 为伤害基值（仅伤害/治疗/DOT 使用），非伤害主数值放 Strength2，比例/次数值放 Strength3
     public override void BeforeCalDamaged(Chess attacker, ref int damageBase, ref float damageMulti, ref string effect, string hurtTag)
     {
-        damageMulti += skillCfg.Strength3;
+        damageMulti += skillCfg.StrengthBuff2;
     }
 }

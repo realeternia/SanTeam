@@ -15,12 +15,12 @@ public class BuffFrenzy : Buff
     // 增伤：出手结算阶段
     public override void BeforeCalDamage(Chess defender, ref int damageBase, ref float damageMulti, ref string effect, string hurtTag)
     {
-        damageMulti += skillCfg.Strength3;
+        damageMulti += skillCfg.StrengthBuff2;
     }
 
     // 受击加深：受击结算阶段
     public override void BeforeCalDamaged(Chess attacker, ref int damageBase, ref float damageMulti, ref string effect, string hurtTag)
     {
-        damageMulti += skillCfg.Strength3;
+        damageMulti += skillCfg.StrengthBuff2;
     }
 }

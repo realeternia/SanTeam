@@ -1,4 +1,4 @@
-﻿using CommonConfig;
+using CommonConfig;
 
 /// <summary>
 /// 偷渡阴平·残血急救+护盾（ScriptName = "LowHpFullHealShield"）：
@@ -34,6 +34,6 @@ public class SkillLowHpFullHealShield : Skill
             shield.SetHp((int)(owner.maxHp * skillCfg.Strength3));
 
         EffectManager.PlaySkillEffect(owner, skillCfg.HitEffect);
-        GameLog.Debug($"偷渡阴平触发 技能id={id} 等级={Level} 每秒回血={skillCfg.Strength2 * 100:0}%+{skillCfg.StrengthInt} 护盾={skillCfg.Strength3 * 100:0}% 持续={skillCfg.BuffTime}s 冷却={skillCfg.CD}s");
+        GameLog.Debug($"偷渡阴平触发 技能id={id} 等级={Level} 每秒回血={skillCfg.StrengthBuff1 * 100:0}%+{skillCfg.StrengthInt} 护盾={skillCfg.Strength3 * 100:0}% 持续={skillCfg.BuffTime}s 冷却={skillCfg.CD}s");
     }
 }

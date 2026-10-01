@@ -19,7 +19,7 @@ public class BuffDisarm : Buff
         // 目标带吸收型护盾(BuffShield)时，对其伤害额外放大 Strength3
         if (defender != null && defender.GetBuff(CombatConst.ShieldBuffId) != null)
         {
-            damageMulti *= (1f + skillCfg.Strength3);
+            damageMulti *= (1f + skillCfg.StrengthBuff2);
         }
     }
 }

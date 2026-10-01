@@ -29,6 +29,6 @@ public class SkillInitEnemyRandomBuff : Skill
 
         var target = candidates[SysRandom.Range(0, candidates.Count)];
         BuffManager.AddBuff(target, owner, id, buffCfg.Id, skillCfg.BuffTime);
-        GameLog.Debug($"开局随机敌方Buff 技能id={id} 等级={Level} Buff={buffCfg.NameS} 目标英雄={target.heroId} 强度={skillCfg.Strength3 * 100:0}% 持续={skillCfg.BuffTime}s");
+        GameLog.Debug($"开局随机敌方Buff 技能id={id} 等级={Level} Buff={buffCfg.NameS} 目标英雄={target.heroId} 强度={skillCfg.StrengthBuff2 * 100:0}% 持续={skillCfg.BuffTime}s");
     }
 }

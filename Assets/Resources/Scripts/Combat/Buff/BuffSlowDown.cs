@@ -14,15 +14,15 @@ public class BuffSlowDown : Buff
     public override void OnAdd(Chess chess, Chess caster)
     {
         base.OnAdd(chess, caster);
-        moveDiff = chess.moveSpeed * skillCfg.Strength3;
+        moveDiff = chess.moveSpeed * skillCfg.StrengthBuff2;
         chess.moveSpeed -= moveDiff;
-        chess.attackSpeedRate -= skillCfg.Strength3;
+        chess.attackSpeedRate -= skillCfg.StrengthBuff2;
     }
 
     public override void OnRemove(Chess chess)
     {
         chess.moveSpeed += moveDiff;
-        chess.attackSpeedRate += skillCfg.Strength3;
+        chess.attackSpeedRate += skillCfg.StrengthBuff2;
         base.OnRemove(chess);
     }
 }

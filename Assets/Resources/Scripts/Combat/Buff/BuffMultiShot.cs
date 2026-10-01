@@ -11,7 +11,7 @@ public class BuffMultiShot : Buff
 
     public override void OnAttack(Chess defender, int damage)
     {
-        int extra = (int)skillCfg.Strength2;
+        int extra = (int)skillCfg.StrengthBuff1;
         if (extra > 0)
         {
             var enemies = WorldManager.Instance.GetUnitsInRange(defender.transform.position, skillCfg.Range, owner.side, true);

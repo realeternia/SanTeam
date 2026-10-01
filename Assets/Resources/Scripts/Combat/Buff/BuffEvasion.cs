@@ -13,7 +13,7 @@ public class BuffEvasion : Buff
 
     public override void BeforeCalDamaged(Chess attacker, ref int damageBase, ref float damageMulti, ref string effect, string hurtTag)
     {
-        if (SysRandom.Value < skillCfg.Strength3)
+        if (SysRandom.Value < skillCfg.StrengthBuff2)
         {
             damageMulti = 0;
             WorldManager.Instance.AddBattleText("闪避", owner.transform.position, new UnityEngine.Vector2(0, 60), Color.green, 3);

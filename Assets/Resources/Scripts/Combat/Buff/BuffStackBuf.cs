@@ -1,7 +1,7 @@
 ﻿using System;
 
 /// <summary>
-/// 兼资（出将入相·兼资）：攻击叠层。每层 AddStack() 提升 skillCfg.Strength2 点攻击、skillCfg.Strength3 点法术强度；
+/// 兼资（出将入相·兼资）：攻击叠层。每层 AddStack() 提升 skillCfg.StrengthBuff1 点攻击、skillCfg.StrengthBuff2 点法术强度；
 /// 持续攻击刷新 4 秒窗口，停手时层数清零（BuffTime 到期自动移除）。OnRemove 按最终 stack 总量还原。
 /// </summary>
 public class BuffStackBuf : Buff
@@ -25,15 +25,15 @@ public class BuffStackBuf : Buff
         stack++;
         if (owner != null)
         {
-            owner.atk += (int)skillCfg.Strength2;
-            owner.ap += (int)skillCfg.Strength3;
+            owner.atk += (int)skillCfg.StrengthBuff1;
+            owner.ap += (int)skillCfg.StrengthBuff2;
         }
     }
 
     public override void OnRemove(Chess chess)
     {
         base.OnRemove(chess);
-        chess.atk -= (int)skillCfg.Strength2 * stack;
-        chess.ap -= (int)skillCfg.Strength3 * stack;
+        chess.atk -= (int)skillCfg.StrengthBuff1 * stack;
+        chess.ap -= (int)skillCfg.StrengthBuff2 * stack;
     }
 }

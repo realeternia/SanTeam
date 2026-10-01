@@ -17,10 +17,10 @@ public class BuffHasteMoveSpeed : Buff
     public override void OnAdd(Chess chess, Chess caster)
     {
         base.OnAdd(chess, caster);
-        attackSpeedRateDiff = skillCfg.Strength2;
+        attackSpeedRateDiff = skillCfg.StrengthBuff1;
         chess.attackSpeedRate += attackSpeedRateDiff;
 
-        moveSpeedDiff = chess.moveSpeed * skillCfg.Strength3;
+        moveSpeedDiff = chess.moveSpeed * skillCfg.StrengthBuff2;
         chess.moveSpeed += moveSpeedDiff;
     }
 

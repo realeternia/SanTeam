@@ -16,7 +16,7 @@ public class BuffSuckHaste : Buff
     public override void OnAdd(Chess chess, Chess caster)
     {
         base.OnAdd(chess, caster);
-        attackSpeedRateDiff = skillCfg.Strength3;
+        attackSpeedRateDiff = skillCfg.StrengthBuff2;
         chess.attackSpeedRate += attackSpeedRateDiff;
     }
 
@@ -28,6 +28,6 @@ public class BuffSuckHaste : Buff
 
     public override void OnAttack(Chess defender, int damage)
     {
-        owner.HealTarget(owner, skillCfg.Id, (int)(damage * skillCfg.Strength2), false); // 吸血不算治疗，不吃治疗加成
+        owner.HealTarget(owner, skillCfg.Id, (int)(damage * skillCfg.StrengthBuff1), false); // 吸血不算治疗，不吃治疗加成
     }
 }

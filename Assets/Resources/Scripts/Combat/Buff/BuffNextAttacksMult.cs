@@ -15,7 +15,7 @@ public class BuffNextAttacksMult : Buff
     {
         if (charges > 0)
         {
-            damageMulti *= skillCfg.Strength2;
+            damageMulti *= skillCfg.StrengthBuff1;
             charges--;
         }
     }

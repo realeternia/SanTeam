@@ -17,8 +17,8 @@ public class BuffTimeDamage : Buff
         base.OnAdd(chess, caster);
         // 与 Skill.GetSkillDamage 保持一致：魔法 = DamageStrength × (100 + ap × (1+Strength3)) / 100；物理/真实 = DamageStrength + atk × (1+Strength3)
         damage = skillCfg.DamageType == CombatConst.DamageTypeMagic
-            ? skillCfg.DamageStrength * (100 + caster.GetAttr("ap") * (1 + skillCfg.Strength3)) / 100
-            : skillCfg.DamageStrength + caster.GetAttr("atk") * (1 + skillCfg.Strength3);
+            ? skillCfg.DamageStrength * (100 + caster.GetAttr("ap") * (1 + skillCfg.StrengthBuff2)) / 100
+            : skillCfg.DamageStrength + caster.GetAttr("atk") * (1 + skillCfg.StrengthBuff2);
         
         // 启动伤害协程
         damageCoroutine = chess.StartCoroutine(DamageOverTime(chess, caster));

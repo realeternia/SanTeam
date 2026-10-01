@@ -411,6 +411,7 @@ public static class ConfigManager
             case "rate": case "strength2": case "cd": case "range": case "area":
             case "damagestrength": case "healstrength": case "strength3": case "bufftime": case "summontime": case "summonspeed":
             case "effectsize": case "mpcost": case "targetcount": case "strengthint":
+            case "strengthbuff1": case "strengthbuff2":
             case "summoncount": case "lv":
                 return true;
             default:
@@ -428,6 +429,8 @@ public static class ConfigManager
             case "rate": return PercentText(cfg.Rate);
             case "strength2": return pct ? PercentText(cfg.Strength2) : cfg.Strength2.ToString("0.##");
             case "strength3": return PercentText(cfg.Strength3);
+            case "strengthbuff1": return pct ? PercentText(cfg.StrengthBuff1) : cfg.StrengthBuff1.ToString("0.##");
+            case "strengthbuff2": return pct ? PercentText(cfg.StrengthBuff2) : cfg.StrengthBuff2.ToString("0.##");
             case "cd": return pct ? PercentText(cfg.CD) : cfg.CD.ToString("0.##");
             case "range": return pct ? PercentText(cfg.Range) : cfg.Range.ToString("0.##");
             case "area": return pct ? PercentText(cfg.Area) : cfg.Area.ToString("0.##");

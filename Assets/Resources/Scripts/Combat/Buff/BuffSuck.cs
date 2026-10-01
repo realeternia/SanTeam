@@ -8,7 +8,7 @@
     public override void OnAttack(Chess defender, int damage)
     {
         GameLog.Debug("Suck " + damage.ToString());
-        owner.HealTarget(owner, skillCfg.Id, (int)(damage * skillCfg.Strength2), false); // 吸血不算治疗，不吃治疗加成
+        owner.HealTarget(owner, skillCfg.Id, (int)(damage * skillCfg.StrengthBuff1), false); // 吸血不算治疗，不吃治疗加成
         EffectManager.PlaySkillEffect(owner, skillCfg.HitEffect);
     }
 }
