@@ -1,9 +1,9 @@
-using System.Linq;
+﻿using System.Linq;
 using CommonConfig;
 using UnityEngine;
 
 /// <summary>
-/// 贾诩·乱阵：战斗开始给本侧近战士兵附加普攻眩晕 Buff(BuffHitStun，按 StrengthInt 概率眩晕)；
+/// 贾诩·乱阵：战斗开始给本侧近战士兵附加普攻眩晕 Buff(BuffHitStun，按 Strength2[0] 概率眩晕)；
 /// 每次主动释放对目标造成法术伤害并眩晕。
 /// </summary>
 public class SkillSoldierStun : Skill
@@ -17,7 +17,7 @@ public class SkillSoldierStun : Skill
 
     public override void BattleBegin()
     {
-        // 开局给本侧近战士兵附加普攻眩晕 Buff(BuffHitStun，由乱阵 BuffId="威" 配置承伤 Buff)：带该 Buff 的士兵普攻按 StrengthInt(百分数) 概率眩晕目标
+        // 开局给本侧近战士兵附加普攻眩晕 Buff(BuffHitStun，由乱阵 BuffId="威" 配置承伤 Buff)：带该 Buff 的士兵普攻按 Strength2[0](百分数) 概率眩晕目标
         var carrierCfg = BuffConfig.GetConfigByNameS(skillCfg.BuffId);
         if (carrierCfg == null)
         {

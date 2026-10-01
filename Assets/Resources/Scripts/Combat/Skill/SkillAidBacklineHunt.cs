@@ -1,4 +1,4 @@
-using CommonConfig;
+﻿using CommonConfig;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -38,7 +38,7 @@ public class SkillAidBacklineHunt : Skill
             return false;
 
         owner.PlayerAnim(skillCfg.Action);
-        int dmg = GetSkillDamage() + (int)(GetSkillDamage() * skillCfg.Strength);
+        int dmg = GetSkillDamage() + (int)(GetSkillDamage() * skillCfg.Strength2[0]);
         WorldManager.Instance.CreateSpellMissile(owner, back, owner.transform.position, id, dmg, owner.hitEffect);
         return true;
     }

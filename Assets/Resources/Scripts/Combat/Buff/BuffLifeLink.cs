@@ -1,5 +1,5 @@
-/// <summary>
-/// 生命链接（BuffLifeLink）：张梁与生命最低的友军建立链接，双方按 skillCfg.Strength2 比例共享受到的伤害。
+﻿/// <summary>
+/// 生命链接（BuffLifeLink）：张梁与生命最低的友军建立链接，双方按 skillCfg.StrengthBuff1[0] 比例共享受到的伤害。
 /// 挂在受击侧 BeforeCalDamaged：链接方持链时，把一部分伤害转移给张梁承担。
 /// </summary>
 public class BuffLifeLink : Buff
@@ -15,7 +15,7 @@ public class BuffLifeLink : Buff
         if (hurtTag == CombatConst.LockChainHurtTag || caster == null || caster == owner || caster.hp <= 0)
             return;
 
-        var shareDamage = (int)(damageBase * damageMulti * skillCfg.Strength2);
+        var shareDamage = (int)(damageBase * damageMulti * skillCfg.StrengthBuff1[0]);
         if (shareDamage <= 0)
             return;
 

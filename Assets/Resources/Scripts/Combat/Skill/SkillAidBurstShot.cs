@@ -1,10 +1,10 @@
-using CommonConfig;
+﻿using CommonConfig;
 using UnityEngine;
 
 /// <summary>
 /// 太史慈·连珠（ScriptName = "BowTaiShiCi"）：
 /// 朝前方多发箭矢，距离越近伤害越高。
-/// 每目标近度 near = max(0, 1 - dist/Range)，伤害 = 基础技能伤害 × (1 + Strength2 × near)。
+/// 每目标近度 near = max(0, 1 - dist/Range)，伤害 = 基础技能伤害 × (1 + Strength2[0] × near)。
 /// </summary>
 public class SkillAidBurstShot : Skill
 {
@@ -31,7 +31,7 @@ public class SkillAidBurstShot : Skill
         {
             var dist = Vector3.Distance(owner.transform.position, t.transform.position);
             var near = Mathf.Max(0f, 1f - dist / skillCfg.Range);
-            var dmg = GetSkillDamage() + (int)(GetSkillDamage() * skillCfg.Strength2 * near);
+            var dmg = GetSkillDamage() + (int)(GetSkillDamage() * skillCfg.Strength2[0] * near);
             WorldManager.Instance.CreateSpellMissile(owner, t, owner.transform.position, id, dmg, owner.hitEffect);
         }
         return true;

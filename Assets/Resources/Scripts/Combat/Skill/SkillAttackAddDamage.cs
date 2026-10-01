@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using CommonConfig;
@@ -19,9 +19,9 @@ public class SkillAttackAddDamage : Skill
         {
             owner.PlayerAnim(skillCfg.Action);
 
-            damageBase += skillCfg.StrengthInt;
-            if(skillCfg.Strength > 0)
-                damageMulti += skillCfg.Strength;
+            damageBase += (int)skillCfg.DamageStrength;
+            if(skillCfg.Strength2[0] > 0)
+                damageMulti += skillCfg.Strength2[0];
             effect = skillCfg.HitEffect;
         }
     }

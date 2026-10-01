@@ -1,5 +1,5 @@
-/// <summary>
-/// 减速 Buff：按 Strength2 降低携带者的移动速度（moveSpeed 百分比）与攻速比例（attackSpeedRate），
+﻿/// <summary>
+/// 减速 Buff：按 StrengthBuff1[0] 降低携带者的移动速度（moveSpeed 百分比）与攻速比例（attackSpeedRate），
 /// Buff 移除时原样加回，恢复原有移速与攻速。
 /// </summary>
 public class BuffSlowDown : Buff
@@ -14,15 +14,15 @@ public class BuffSlowDown : Buff
     public override void OnAdd(Chess chess, Chess caster)
     {
         base.OnAdd(chess, caster);
-        moveDiff = chess.moveSpeed * skillCfg.Strength2;
+        moveDiff = chess.moveSpeed * skillCfg.StrengthBuff1[0];
         chess.moveSpeed -= moveDiff;
-        chess.attackSpeedRate -= skillCfg.Strength2;
+        chess.attackSpeedRate -= skillCfg.StrengthBuff1[0];
     }
 
     public override void OnRemove(Chess chess)
     {
         chess.moveSpeed += moveDiff;
-        chess.attackSpeedRate += skillCfg.Strength2;
+        chess.attackSpeedRate += skillCfg.StrengthBuff1[0];
         base.OnRemove(chess);
     }
 }

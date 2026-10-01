@@ -31,6 +31,7 @@ public class SkillAidTauntSlam : Skill
         // 嘲讽：自身挂嘲讽标记
         BuffManager.AddBuff(owner, owner, id, BuffConfig.GetConfigByNameS("嘲").Id, skillCfg.BuffTime);
 
+        PlayAreaEffect(owner.transform.position);
         EffectManager.PlaySkillEffect(owner, skillCfg.HitEffect);
         return true;
     }

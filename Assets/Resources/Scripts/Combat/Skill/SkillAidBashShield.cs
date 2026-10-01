@@ -19,6 +19,7 @@ public class SkillAidBashShield : Skill
         if (!CheckBurst(target))
             return false;
 
+        PlayAreaEffect(owner.transform.position);
         var list = WorldManager.Instance.GetUnitsInRange(owner.transform.position, skillCfg.Area, owner.side, true);
         WorldManager.Instance.RandomSelect(list, skillCfg.TargetCount);
         foreach (var u in list)
@@ -28,7 +29,7 @@ public class SkillAidBashShield : Skill
         BuffManager.AddBuff(owner, owner, id, shieldId, skillCfg.BuffTime);
         var sh = owner.GetBuff(shieldId) as BuffShield;
         if (sh != null)
-            sh.SetHp((int)(owner.maxHp * skillCfg.Strength2));
+            sh.SetHp((int)(owner.maxHp * skillCfg.Strength2[0]));
 
         owner.PlayerAnim(skillCfg.Action);
         return true;

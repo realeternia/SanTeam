@@ -327,7 +327,7 @@ public static class ConfigManager
         return null;
     }
 
-    // 技能完整描述：Lv1 的 Descript 为模板（内联 /字段名 动态引用，如 /StrengthInt、/Range、/Area、/Strength、/Rate，
+    // 技能完整描述：Lv1 的 Descript 为模板（内联 /字段名 动态引用，如 /strength2-1、/strengthbuff1-2、/damagestrength、/range、/rate，
     // 以及 /linkself-xxx、/linkteam-xxx、/auroattrs-xxx 子字段），引擎把其中动态引用替换为该等级行对应字段值；
     // 其余等级 Descript 留空时自动回退 Lv1 模板并按本级字段替换；无动态引用的整型文案（结构兜底）原样返回。
     // withNext=true 为"当前+下一级"模式：每个数值字段后附下一级不同值（括号内、淡绿色，相同则不附）；供职业/好友连接技能档位提示使用
@@ -358,7 +358,7 @@ public static class ConfigManager
             {
                 int j = i + 1;
                 // 字段名仅允许 ASCII 字符（字母/数字/_/-）。不能用 char.IsLetterOrDigit，否则中文字符（Unicode 字母）会被误并入字段名，
-                // 导致 "/strength法术伤害" 被解析成 fieldName="strength法术伤害" 而查不到字段、原样输出
+                // 导致 "/damagestrength法术伤害" 被解析成 fieldName="damagestrength法术伤害" 而查不到字段、原样输出
                 while (j < input.Length && IsFieldNameChar(input[j]))
                     j++;
                 var fieldName = input.Substring(i + 1, j - i - 1);
@@ -408,36 +408,37 @@ public static class ConfigManager
         var f = field.ToLowerInvariant();
         switch (f)
         {
-            case "rate": case "strength2": case "cd": case "range": case "area":
-            case "strength": case "bufftime": case "summontime": case "summonspeed":
-            case "effectsize": case "mpcost": case "targetcount": case "strengthint":
+            case "rate": case "cd": case "range": case "area":
+            case "damagestrength": case "healstrength": case "bufftime": case "summontime": case "summonspeed":
+            case "mpcost": case "targetcount":
             case "summoncount": case "lv":
                 return true;
             default:
-                return f.StartsWith("auroattrs-", StringComparison.OrdinalIgnoreCase)
+                // 数值槽下标引用：/strength2-N、/strengthbuff1-N（N 从1开始）
+                return f.StartsWith("strength2-", StringComparison.OrdinalIgnoreCase)
+                    || f.StartsWith("strengthbuff1-", StringComparison.OrdinalIgnoreCase)
+                    || f.StartsWith("auroattrs-", StringComparison.OrdinalIgnoreCase)
                     || f.StartsWith("linkself-", StringComparison.OrdinalIgnoreCase)
                     || f.StartsWith("linkteam-", StringComparison.OrdinalIgnoreCase);
         }
     }
 
-    // 动态字段取值与格式化：Rate/Strength2 转百分比，其余数值字段按整数字面展示（无小数）
+    // 动态字段取值与格式化：占位符后跟 % 时按百分比输出（×100 带 %），否则按字面值输出（点数/秒数等）
     private static string GetFieldRefValue(SkillConfig cfg, string fieldName, bool pct)
     {
         switch (fieldName.ToLowerInvariant())
         {
             case "rate": return PercentText(cfg.Rate);
-            case "strength2": return PercentText(cfg.Strength2);
             case "cd": return pct ? PercentText(cfg.CD) : cfg.CD.ToString("0.##");
             case "range": return pct ? PercentText(cfg.Range) : cfg.Range.ToString("0.##");
             case "area": return pct ? PercentText(cfg.Area) : cfg.Area.ToString("0.##");
-            case "strength": return pct ? PercentText(cfg.Strength) : cfg.Strength.ToString("0.##");
+            case "damagestrength": return pct ? PercentText(cfg.DamageStrength) : cfg.DamageStrength.ToString("0.##");
+            case "healstrength": return pct ? PercentText(cfg.HealStrength) : cfg.HealStrength.ToString("0.##");
             case "bufftime": return pct ? PercentText(cfg.BuffTime) : cfg.BuffTime.ToString("0.##");
             case "summontime": return pct ? PercentText(cfg.SummonTime) : cfg.SummonTime.ToString("0.##");
             case "summonspeed": return pct ? PercentText(cfg.SummonSpeed) : cfg.SummonSpeed.ToString("0.##");
-            case "effectsize": return pct ? PercentText(cfg.EffectSize) : cfg.EffectSize.ToString("0.##");
             case "mpcost": return cfg.MpCost.ToString();
             case "targetcount": return cfg.TargetCount.ToString();
-            case "strengthint": return pct ? (cfg.StrengthInt + "%") : cfg.StrengthInt.ToString();
             case "lv": return cfg.Lv.ToString();
             case "name": return cfg.Name ?? "";
             case "sname": return cfg.Sname ?? "";
@@ -449,6 +450,11 @@ public static class ConfigManager
             case "linkself": return cfg.LinkSelf ?? "";
             case "linkteam": return cfg.LinkTeam ?? "";
             default:
+                // 数值槽下标引用：/strength2-N、/strengthbuff1-N（N 从1开始，1=第一个非零值）
+                if (fieldName.StartsWith("strength2-", StringComparison.OrdinalIgnoreCase))
+                    return GetSlotRefValue(cfg.Strength2, fieldName.Substring("strength2-".Length), pct);
+                if (fieldName.StartsWith("strengthbuff1-", StringComparison.OrdinalIgnoreCase))
+                    return GetSlotRefValue(cfg.StrengthBuff1, fieldName.Substring("strengthbuff1-".Length), pct);
                 // 子字段引用：/字段-属性名（如 /auroattrs-atk、/linkself-armor、/linkteam-mpRegen）展开为其中单个具体属性数值
                 if (fieldName.StartsWith("auroattrs-", StringComparison.OrdinalIgnoreCase))
                     return GetAttrFieldValue(cfg.AuroAttrs, fieldName.Substring("auroattrs-".Length), pct);
@@ -487,6 +493,15 @@ public static class ConfigManager
             return v.ToString("0.##");
         }
         return null;
+    }
+
+    // 数值槽下标引用取值：suffix 为 "-N" 中的 N（从1开始）；越界/非法返回 null（占位符原样输出）
+    private static string GetSlotRefValue(float[] arr, string suffix, bool pct)
+    {
+        int n;
+        if (arr == null || !int.TryParse(suffix, out n) || n < 1 || n > arr.Length)
+            return null;
+        return pct ? PercentText(arr[n - 1]) : arr[n - 1].ToString("0.##");
     }
 
     private static string PercentText(float v)

@@ -2,7 +2,7 @@ using CommonConfig;
 using UnityEngine;
 
 /// <summary>
-/// 陈群·律令：对自身 /area 范围内所有敌人造成 /strength 法术伤害，并为其挂减疗（Buff "疫"，StrengthInt 减疗%）bufftime 秒。
+/// 陈群·律令：对自身 /area 范围内所有敌人造成 /damagestrength 法术伤害，并为其挂减疗（Buff "疫"，减疗值取 Strength2 末位非零值）bufftime 秒。
 /// </summary>
 public class SkillAidDecreeAoe : Skill
 {
@@ -19,6 +19,7 @@ public class SkillAidDecreeAoe : Skill
             return false;
 
         owner.PlayerAnim(skillCfg.Action);
+        PlayAreaEffect(owner.transform.position);
 
         var healDownBuffCfg = BuffConfig.GetConfigByNameS(skillCfg.BuffId);
         var skillDamage = GetSkillDamage();

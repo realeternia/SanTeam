@@ -1,4 +1,4 @@
-using CommonConfig;
+﻿using CommonConfig;
 using UnityEngine;
 
 /// <summary>
@@ -40,7 +40,7 @@ public class SkillAidHealShield : Skill
 
         owner.PlayerAnim(skillCfg.Action);
 
-        // 治疗：独立治疗公式（Strength × ap 加成），不套用伤害公式
+        // 治疗：独立治疗公式（Strength2 × ap 加成），不套用伤害公式
         var heal = GetSkillHeal();
         // 溢出：治疗量超出目标生命缺口的差额，转为护盾容量（按技能基础治疗量估算）
         var overflow = Mathf.Max(0, heal - (target.maxHp - target.hp));

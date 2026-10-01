@@ -49,7 +49,7 @@ public class SkillHitFireArea : Skill
     {
         targetPosList.Add(pos);
         var magicStub = SummonMagicField(pos, out var summonTime);
-        EffectManager.PlayPosSkillEffect(magicStub, pos, skillCfg.EffectSize, skillCfg.HitEffect, summonTime);
+        EffectManager.PlayPosSkillEffect(magicStub, pos, skillCfg.Area, skillCfg.AreaEffect, summonTime);
     }
 
     // 判断目标位置周围 Area 内是否有火（场景中任意 SummonTag 相同的火场，不区分是否本技能所放）

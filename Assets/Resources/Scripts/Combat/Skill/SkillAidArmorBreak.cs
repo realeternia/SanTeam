@@ -2,7 +2,7 @@ using CommonConfig;
 using UnityEngine;
 
 /// <summary>
-/// 孙坚·破阵：对自身 /area 范围内敌人各造成 /strength 法术伤害，并削减其护甲（Buff "破"，Strength2，时长 bufftime）
+/// 孙坚·破阵：对自身 /area 范围内敌人各造成 /damagestrength 法术伤害，并削减其护甲（Buff "破"，减防值由 BuffArmorDown 读 StrengthBuff1[0]，时长 bufftime）
 /// </summary>
 public class SkillAidArmorBreak : Skill
 {
@@ -19,6 +19,7 @@ public class SkillAidArmorBreak : Skill
             return false;
 
         owner.PlayerAnim(skillCfg.Action);
+        PlayAreaEffect(owner.transform.position);
 
         var armorDownBuffCfg = BuffConfig.GetConfigByNameS(skillCfg.BuffId);
         var skillDamage = GetSkillDamage();

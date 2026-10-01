@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using CommonConfig;
@@ -9,7 +9,7 @@ public class SkillAttackedShadow : Skill
     private int count;
     public SkillAttackedShadow(int id, Chess unit) : base(id, unit)
     {
-        count = skillCfg.StrengthInt;
+        count = (int)skillCfg.Strength2[2];
     }
 
     public override void OnAttacked(Chess attacker, int damage)
@@ -19,8 +19,8 @@ public class SkillAttackedShadow : Skill
             Vector2 randomDir = SysRandom.InsideUnitCircle.normalized;
             Vector3 randomPosition = owner.transform.position + new Vector3(randomDir.x, 0, randomDir.y) * skillCfg.Range;
             var shadowUnit = SummonUnit(randomPosition, CombatConst.SoldierShadow, HeroConfig.GetConfig(owner.heroId).Icon);
-            shadowUnit.atk = (int)(owner.atk * skillCfg.Strength);
-            shadowUnit.maxHp = (int)(owner.maxHp * skillCfg.Strength);
+            shadowUnit.atk = (int)(owner.atk * skillCfg.Strength2[0]);
+            shadowUnit.maxHp = (int)(owner.maxHp * skillCfg.Strength2[0]);
             shadowUnit.hp = (int)(shadowUnit.maxHp * owner.HpRate);
             shadowUnit.material.SetFloat("_SecondTexSize", 2f);
             shadowUnit.material.SetTexture("_SecondTex", Resources.Load<Texture>("Textures/SkillPic/" + skillCfg.Icon));

@@ -24,6 +24,7 @@ public class SkillAidQuake : Skill
             return false;
 
         owner.PlayerAnim(skillCfg.Action);
+        PlayAreaEffect(target.transform.position);
 
         var units = WorldManager.Instance.GetUnitsInRange(target.transform.position, skillCfg.Area, owner.side, true);
         WorldManager.Instance.RandomSelect(units, skillCfg.TargetCount);

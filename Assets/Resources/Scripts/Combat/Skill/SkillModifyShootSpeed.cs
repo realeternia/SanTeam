@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using CommonConfig;
@@ -12,7 +12,7 @@ public class SkillModifyShootSpeed : Skill
 
     public override void BattleBegin()
     {
-        owner.missileSpeed = (int)(owner.missileSpeed * skillCfg.Strength);
+        owner.missileSpeed = (int)(owner.missileSpeed * skillCfg.Strength2[0]);
     }
   
 }

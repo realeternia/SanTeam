@@ -1,7 +1,7 @@
-using System;
+﻿using System;
 
 /// <summary>
-/// 汲血快攻：攻击时按造成伤害的 Strength 比例吸血，并按 Strength2 提升攻速。
+/// 汲血快攻：攻击时按造成伤害的 StrengthBuff1[0] 比例吸血，并按 StrengthBuff1[1] 提升攻速。
 /// 用于离间（貂蝉）给单名友军的吸血+攻速组合 buff。
 /// </summary>
 public class BuffSuckHaste : Buff
@@ -16,7 +16,7 @@ public class BuffSuckHaste : Buff
     public override void OnAdd(Chess chess, Chess caster)
     {
         base.OnAdd(chess, caster);
-        attackSpeedRateDiff = skillCfg.Strength2;
+        attackSpeedRateDiff = skillCfg.StrengthBuff1[1];
         chess.attackSpeedRate += attackSpeedRateDiff;
     }
 
@@ -28,6 +28,6 @@ public class BuffSuckHaste : Buff
 
     public override void OnAttack(Chess defender, int damage)
     {
-        owner.HealTarget(owner, skillCfg.Id, (int)(damage * skillCfg.Strength), false); // 吸血不算治疗，不吃治疗加成
+        owner.HealTarget(owner, skillCfg.Id, (int)(damage * skillCfg.StrengthBuff1[0]), false); // 吸血不算治疗，不吃治疗加成
     }
 }

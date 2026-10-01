@@ -1,9 +1,9 @@
-using CommonConfig;
+﻿using CommonConfig;
 using UnityEngine;
 
 /// <summary>
 /// 反伤 Buff（短名"反"，BuffConfig 300025）：持有者受到伤害（物理/魔法来源均进入，钩子为 DuringCalDamage）
-/// 时，把伤害的 /strength（skillCfg.Strength 反伤比）比例返还给攻击者。
+/// 时，把伤害的 skillCfg.StrengthBuff1[0]（反伤比）比例返还给攻击者。
 /// 防环：攻击者非自身才反伤；若攻击者也携带反伤 BuffReflect 则该伤害不再返还，
 /// 避免两个带反伤单位互相反弹导致无限递归。
 /// </summary>
@@ -26,7 +26,7 @@ public class BuffReflect : Buff
         if (attacker.buffs.Exists(b => b is BuffReflect))
             return;
 
-        int reflectDamage = (int)(damage * skillCfg.Strength);
+        int reflectDamage = (int)(damage * skillCfg.StrengthBuff1[0]);
         if (reflectDamage > 0)
             attacker.OnSkillDamaged(owner, skillCfg.Id, reflectDamage);
     }

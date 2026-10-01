@@ -42,10 +42,10 @@ public static class CombatConst
     // ---- 国家护盾机制(同阵营连线，数值参考金铲铲神盾使羁绊) ----
     /// <summary>同阵营英雄数量档位(2/3/4/5/6，对应国家护盾技能 Lv1~5)</summary>
     public static readonly int[] FactionShieldCounts = { 2, 3, 4, 5, 6 };
-    /// <summary>国家护盾技能缩写（技能Id按 Lv 取 SkillConfig 2000001~2000005，护盾=最大生命×Strength）</summary>
+    /// <summary>国家护盾技能缩写（技能Id按 Lv 取 SkillConfig 2000001~2000005，护盾=最大生命×Strength2）</summary>
     public const string FactionShieldSkillSname = "国";
 
-    /// <summary>主公(王/王)上阵：同阵营护盾额外加成技能缩写（诸侯职业技能"王"），护盾额外 = 该技能当级 Strength（国家护盾技能内结算）</summary>
+    /// <summary>主公(王/王)上阵：同阵营护盾额外加成技能缩写（诸侯职业技能"王"），护盾额外 = 该技能当级 Strength2（国家护盾技能内结算）</summary>
     public const string KingShieldBonusSkillSname = "王";
 
     // ---- 抗性减伤公式（参考金铲铲：实际伤害 = 原伤害 × 100/(100+抗性)） ----
@@ -77,6 +77,10 @@ public static class CombatConst
     public const int SoldierMagicField = 501001;
     /// <summary>影子(501002)：分兵/影技能召唤的分身</summary>
     public const int SoldierShadow = 501002;
+
+    // ---- 范围特效 ----
+    /// <summary>范围特效缩放基准半径：EffectConfig.Scale 对应的半径，实际缩放 = Scale × Area / 本值</summary>
+    public const float AreaEffectBaseRadius = 10f;
 
     // ---- 其他 ----
     /// <summary>近战/远程士兵射程判定阈值</summary>

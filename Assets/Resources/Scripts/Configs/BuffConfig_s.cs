@@ -136,6 +136,7 @@ namespace CommonConfig
             config[300003] = new BuffConfig(300003, "吸血", "吸", "攻击时按造成伤害的一定比例回复生命", true, "BuffSuck", "#FF0000", "#993333", "", "");
             config[300004] = new BuffConfig(300004, "伤害提升", "重", "造成的伤害按比例提升", true, "BuffDamageAddRate", "", "", "SparkleAreaWhite", "");
             config[300005] = new BuffConfig(300005, "攻速提升", "快", "攻击速度按比例提升", true, "BuffCoolDown", "", "", "HeartStream", "");
+            config[300006] = new BuffConfig(300006, "据守", "守", "获得临时双防，期间每次受击再叠一层双防，状态结束后临时双防消失", true, "BuffDefStack", "", "", "", "");
             config[300007] = new BuffConfig(300007, "急救", "愈", "每秒回复一定生命值", true, "BuffTimeHeal", "#00CC00", "#66FF66", "", "");
             config[300008] = new BuffConfig(300008, "攻击提升", "攻", "按数值提升自身攻击力", true, "BuffAtkAdd", "", "", "", "");
             config[300009] = new BuffConfig(300009, "汲血快攻", "汲", "攻击时按造成伤害吸血，并提升攻速", true, "BuffSuckHaste", "#FF0000", "#993333", "HeartStream", "");

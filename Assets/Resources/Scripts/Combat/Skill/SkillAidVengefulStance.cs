@@ -1,9 +1,9 @@
-using CommonConfig;
+﻿using CommonConfig;
 using UnityEngine;
 
 /// <summary>
-/// 张辽·威震：为自身附加威震状态（Buff "威" BuffHitStun，普攻按 StrengthInt% 概率眩晕）bufftime 秒，
-/// 并同时为自身附加反伤（Buff "反" BuffReflect，受到伤害时把 Strength 比例反还给攻击者）。
+/// 张辽·威震：为自身附加威震状态（Buff "威" BuffHitStun，普攻按 Strength2[0]% 概率眩晕）bufftime 秒，
+/// 并同时为自身附加反伤（Buff "反" BuffReflect，受到伤害时把 Strength2 比例反还给攻击者）。
 /// 反伤短名"反"为技能专属常量。
 /// </summary>
 public class SkillAidVengefulStance : Skill

@@ -2,7 +2,7 @@ using CommonConfig;
 using UnityEngine;
 
 /// <summary>
-/// 张绣·枪出如龙：对自身 /area 范围内敌人各造成 /strength 法术伤害，不附加任何 buff
+/// 张绣·枪出如龙：对自身 /area 范围内敌人各造成 /damagestrength 法术伤害，不附加任何 buff
 /// </summary>
 public class SkillAidSweepingAoe : Skill
 {
@@ -19,6 +19,7 @@ public class SkillAidSweepingAoe : Skill
             return false;
 
         owner.PlayerAnim(skillCfg.Action);
+        PlayAreaEffect(owner.transform.position);
 
         var skillDamage = GetSkillDamage();
         var units = WorldManager.Instance.GetUnitsInRange(owner.transform.position, skillCfg.Area, owner.side, true);

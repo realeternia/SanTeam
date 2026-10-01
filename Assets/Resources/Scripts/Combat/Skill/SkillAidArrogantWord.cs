@@ -1,8 +1,8 @@
-using CommonConfig;
+﻿using CommonConfig;
 using UnityEngine;
 
 /// <summary>
-/// 许攸·傲言（术）：对目标造成 /strength2 法术伤害，并使其受到伤害提升 /strength%
+/// 许攸·傲言（术）：对目标造成 /damagestrength 法术伤害（走统一公式 GetSkillDamage），并使其受到伤害提升 /strengthbuff1-1%
 /// （Buff "伤"，时长 bufftime），配合队友集火。
 /// </summary>
 public class SkillAidArrogantWord : Skill
@@ -23,12 +23,12 @@ public class SkillAidArrogantWord : Skill
 
         owner.PlayerAnim(skillCfg.Action);
 
-        // 直接法术伤害基数在 Strength2，受施法者法强成长
-        var burst = (int)(skillCfg.Strength2 * (100 + owner.GetAttr("ap")) / 100);
+        // 直接伤害走统一公式（Strength2 为主数值/伤害槽，受施法者属性成长）
+        var burst = GetSkillDamage();
         if (burst > 0)
             target.OnSkillDamaged(owner, skillId, burst);
 
-        // 易伤 Buff "伤"：受击倍率增量读 skillCfg.Strength
+        // 易伤 Buff "伤"：受击倍率增量读 skillCfg.Strength2[1]
         BuffManager.AddBuff(target, owner, id, BuffConfig.GetConfigByNameS("伤").Id, skillCfg.BuffTime);
 
         EffectManager.PlaySkillEffect(target, skillCfg.HitEffect);

@@ -3,7 +3,7 @@ using CommonConfig;
 using UnityEngine;
 
 /// <summary>
-/// 法正·明断（术）：对目标位置"area 范围降下雷阵，持续 bufftime 秒，每秒对其中敌人造成 /strength 法术伤害。
+/// 法正·明断（术）：对目标位置"area 范围降下雷阵，持续 bufftime 秒，每秒对其中敌人造成 /damagestrength 法术伤害。
 /// 仿张角落雷/陆逊火海：召唤法术场(可视化) + 协程每秒对范围内敌人结算一次。
 /// </summary>
 public class SkillAidJudgement : Skill
@@ -27,7 +27,7 @@ public class SkillAidJudgement : Skill
         var pos = target.transform.position;
         var magicStub = SummonMagicField(pos, out var summonTime);
         if (magicStub != null)
-            EffectManager.PlayPosSkillEffect(magicStub, pos, skillCfg.EffectSize, skillCfg.HitEffect, summonTime);
+            EffectManager.PlayPosSkillEffect(magicStub, pos, skillCfg.Area, skillCfg.AreaEffect, summonTime);
 
         owner.StartCasting(id, ThunderField(pos));
         return true;

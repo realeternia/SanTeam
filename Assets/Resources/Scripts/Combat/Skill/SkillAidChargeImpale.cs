@@ -1,8 +1,8 @@
-using CommonConfig;
+﻿using CommonConfig;
 using UnityEngine;
 
 /// <summary>
-/// 孙策·破阵冲阵：沿正前方直线（Range 距离、Area 宽度走廊）对路径上敌人各造成 /strength 法术伤害。
+/// 孙策·破阵冲阵：沿正前方直线（Range 距离、Area 宽度走廊）对路径上敌人各造成 /damagestrength 法术伤害。
 /// 采用方向投影 + 垂直距离判定；每条走廊内每个敌人只结算一次（遍历一次天然去重，不重复命中）。
 /// </summary>
 public class SkillAidChargeImpale : Skill

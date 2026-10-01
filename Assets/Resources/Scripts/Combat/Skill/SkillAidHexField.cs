@@ -39,6 +39,7 @@ public class SkillAidHexField : Skill
             BuffManager.AddBuff(u, owner, id, yiBuffId, skillCfg.BuffTime);
         }
 
+        PlayAreaEffect(target.transform.position);
         EffectManager.PlaySkillEffect(target, skillCfg.HitEffect);
         return true;
     }

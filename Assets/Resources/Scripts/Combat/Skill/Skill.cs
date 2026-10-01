@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using CommonConfig;
@@ -26,24 +26,24 @@ public class Skill
     public float mp; // 当前技能MP，战斗开始为0，满值=MpCost
 
     /// <summary>
-    /// 统一技能伤害公式：DamageType=0 法术 = Strength × (100 + ap × (1+Strength2)) / 100（ap 为百分比加成，ap=0 时伤害=Strength）；
-    /// DamageType=1/2 物理/真实 = Strength + atk × (1+Strength2)。魔抗/护甲减免在 OnSkillDamaged 内处理（真实伤害无视抗性与护盾）
+    /// 统一技能伤害公式：DamageType=0 法术 = DamageStrength × (100 + ap) / 100（ap 为百分比加成，ap=0 时伤害=DamageStrength）；
+    /// DamageType=1/2 物理/真实 = DamageStrength + atk。魔抗/护甲减免在 OnSkillDamaged 内处理（真实伤害无视抗性与护盾）
     /// </summary>
     public int GetSkillDamage()
     {
         if(skillCfg.DamageType == CombatConst.DamageTypeMagic)
-            return (int)(skillCfg.Strength * (100 + owner.GetAttr("ap")) / 100);
+            return (int)(skillCfg.DamageStrength * (100 + owner.GetAttr("ap")) / 100);
         else
-            return (int)(skillCfg.Strength + owner.GetAttr("atk"));
+            return (int)(skillCfg.DamageStrength + owner.GetAttr("atk"));
     }
 
     /// <summary>
-    /// 统一技能治疗公式（独立于伤害公式）：治疗量 = Strength × (100 + ap) / 100，ap=0 时治疗量=Strength。
+    /// 统一技能治疗公式（独立于伤害公式）：治疗量 = HealStrength × (100 + ap) / 100，ap=0 时治疗量=HealStrength。
     /// 治疗永远是法术向（ap 成长），不套用物理/真实伤害的 atk 计算，禁止用 GetSkillDamage 充当治疗。
     /// </summary>
     public int GetSkillHeal()
     {
-        return (int)(skillCfg.Strength * (100 + owner.GetAttr("ap")) / 100);
+        return (int)(skillCfg.HealStrength * (100 + owner.GetAttr("ap")) / 100);
     }
 
     public Skill(int id, Chess unit)
@@ -291,8 +291,8 @@ public class Skill
     /// 护甲修正增量：物理伤害结算时，对受击方护甲的倍率增量（最终倍率 = 1 + Σ各技能增量；0=不改变护甲）。
     /// 多个技能按加法叠加：破甲类(攻击方, isAttackerSide=true)返回负值（如 -0.3 → 护甲×0.7，完全无视=返回-1）；
     /// 加甲类(受击方, isAttackerSide=false)返回正值（如 0.2 → 护甲×1.2）。
-    /// 注意：不能把"Strength 即生效"做进默认实现，否则扇(ModifyBuffTime)/速射(ModifyShootSpeed)等
-    /// 无关技能因 Strength>0 会让持有者凭空获得护甲加成，必须显式覆写。
+    /// 注意：不能把"DamageStrength 即生效"做进默认实现，否则扇(ModifyBuffTime)/速射(ModifyShootSpeed)等
+    /// 无关技能因 DamageStrength>0 会让持有者凭空获得护甲加成，必须显式覆写。
     /// </summary>
     public virtual float GetArmorDelta(bool isAttackerSide)
     {
@@ -324,6 +324,19 @@ public class Skill
         summonTime = GetSummonTime();
         magicStub.SetLifeTime(summonTime);
         return magicStub;
+    }
+
+    /// <summary>
+    /// 播放范围特效（范围技能统一入口）：在 pos 处播 skillCfg.AreaEffect，缩放按 skillCfg.Area 相对基准半径放大。
+    /// AreaEffect 未配置时静默跳过（范围施法可以没有视觉表现）。
+    /// </summary>
+    protected GameObject PlayAreaEffect(Vector3 pos, float time = 1.3f)
+    {
+        if (string.IsNullOrEmpty(skillCfg.AreaEffect))
+            return null;
+        if (time <= 0f)
+            time = skillCfg.SummonTime > 0f ? skillCfg.SummonTime : 1.3f;
+        return EffectManager.PlayPosSkillEffect(owner, pos, skillCfg.Area, skillCfg.AreaEffect, time);
     }
 
     public float GetSummonTime()

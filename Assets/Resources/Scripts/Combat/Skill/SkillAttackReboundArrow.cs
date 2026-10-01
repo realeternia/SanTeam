@@ -1,4 +1,4 @@
-using System.Collections;
+﻿﻿using System.Collections;
 using System.Collections.Generic;
 using CommonConfig;
 using UnityEngine;
@@ -19,7 +19,7 @@ public class SkillAttackReboundArrow : Skill
             owner.PlayerAnim(skillCfg.Action);
             WorldManager.Instance.RandomSelect(unitsInRange, skillCfg.TargetCount);
 
-            var reboundDamage = (int)(damage * skillCfg.Strength);
+            var reboundDamage = (int)(damage * skillCfg.Strength2[0]);
             // 弱攻击按倍率向下取整为0时不弹射，避免生成0伤害导弹（0伤害导弹结算会触发异常）
             if (reboundDamage <= 0)
                 return;

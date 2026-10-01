@@ -1,11 +1,11 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using CommonConfig;
 using UnityEngine;
 
 /// <summary>
 /// 袁绍·名门：祝福我方生命比例最高的一员大将（最肉主力），附加"名门"Buff：
-/// 攻击提升 Strength 点、护甲与魔抗提升 Strength2 点。
+/// 攻击提升 StrengthBuff1[0] 点、护甲与魔抗提升 StrengthBuff1[1] 点（"名门"BuffMultiAttr）。
 /// </summary>
 public class SkillAidNobleBless : Skill
 {

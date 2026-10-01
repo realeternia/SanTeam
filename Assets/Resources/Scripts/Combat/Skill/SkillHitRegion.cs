@@ -22,7 +22,7 @@ public class SkillHitRegion : Skill
             var magicStub = SummonMagicField(targetPos, out var summonTime);
 
             //创建一个hitEffect
-            EffectManager.PlayPosSkillEffect(magicStub, targetPos, skillCfg.EffectSize, skillCfg.HitEffect, summonTime);
+            EffectManager.PlayPosSkillEffect(magicStub, targetPos, skillCfg.Area, skillCfg.AreaEffect, summonTime);
 
             owner.StartCasting(id, DelayDamage(summonTime));
         }

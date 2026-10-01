@@ -3,7 +3,7 @@ using CommonConfig;
 using UnityEngine;
 
 /// <summary>
-/// 蒋钦·江河：对自身 /area 范围内敌人各造成 /strength 法术伤害，并使其每秒流失 /strength2 生命（持续 dot，bufftime 秒）
+/// 蒋钦·江河：对自身 /area 范围内敌人各造成 /damagestrength 法术伤害，并使其每秒流失 /strength2-1 点生命（持续 dot，bufftime 秒）
 /// </summary>
 public class SkillAidScorchingRain : Skill
 {
@@ -20,10 +20,11 @@ public class SkillAidScorchingRain : Skill
             return false;
 
         owner.PlayerAnim(skillCfg.Action);
+        PlayAreaEffect(owner.transform.position);
 
         var skillDamage = GetSkillDamage();
         var units = WorldManager.Instance.GetUnitsInRange(owner.transform.position, skillCfg.Area, owner.side, true);
-        var secDamage = (int)skillCfg.Strength2;
+        var secDamage = (int)skillCfg.Strength2[0];
         foreach (var u in units)
         {
             if (skillDamage > 0)

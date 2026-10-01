@@ -35,6 +35,7 @@ public class SkillAidBarbarianSlam : Skill
             }
         }
 
+        PlayAreaEffect(owner.transform.position);
         EffectManager.PlaySkillEffect(owner, skillCfg.HitEffect);
         return true;
     }

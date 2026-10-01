@@ -3,7 +3,7 @@ using UnityEngine;
 
 /// <summary>
 /// 乱阵·普攻眩晕 Buff：由乱阵(BattleBegin)挂在本侧近战士兵身上。
-/// 带此 Buff 的士兵普攻时，按乱阵配置 StrengthInt(百分数) 概率眩晕目标(乱BuffNoAction)，眩晕时长取乱阵 BuffTime。
+/// 带此 Buff 的士兵普攻时，按乱阵配置 Strength2[0]（比例）概率眩晕目标(乱BuffNoAction)，眩晕时长取乱阵 BuffTime。
 /// </summary>
 public class BuffHitStun : Buff
 {
@@ -14,7 +14,7 @@ public class BuffHitStun : Buff
 
     public override void OnAttack(Chess defender, int damage)
     {
-        if (SysRandom.Value >= skillCfg.StrengthInt * 0.01f)
+        if (SysRandom.Value >= skillCfg.Strength2[0])
             return;
         var stunBuffCfg = BuffConfig.GetConfigByNameS(SkillSoldierStun.StunBuffNameS);
         if (stunBuffCfg == null)
