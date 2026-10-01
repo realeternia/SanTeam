@@ -44,7 +44,7 @@ public class SkillAidCurseHeal : Skill
     {
         // 治疗量基准为独立治疗公式 GetSkillHeal()，再按 Strength2[0] 百分比折算每跳治疗（与 DOT 伤害公式解耦）
         var healBase = GetSkillHeal();
-        var healPerTick = (int)(healBase * (int)skillCfg.Strength2[0] / 100f);
+        var healPerTick = (int)(healBase * skillCfg.Strength2[0]);
         var term = Mathf.Max(1, Mathf.FloorToInt(skillCfg.BuffTime / TickInterval));
 
         for (var i = 0; i < term; i++)

@@ -25,7 +25,7 @@ public class SkillAidLethalGambit : Skill
 
         if (GetSkillDamage() > 0)
             target.OnSkillDamaged(owner, skillId, GetSkillDamage());
-        if (target.hp > 0 && (int)(target.HpRate * 100f) < (int)skillCfg.Strength2[1])
+        if (target.hp > 0 && target.HpRate < skillCfg.Strength2[1])
         {
             var strike = (int)((target.maxHp - target.hp) * skillCfg.Strength2[0]);
             if (strike > 0)
