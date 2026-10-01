@@ -2,13 +2,11 @@ using CommonConfig;
 
 /// <summary>
 /// 李典·武卫：自套护盾+盾破爆裂（ScriptName = "SkillAidShieldBurst"）：
-/// 循环检查：当自身不存在护盾("盾"=300001)且技能就绪时给自己套盾，护盾量 = 自身最大生命 × Strength2[0]；
-/// 护盾被移除时经 Chess.OnBuffRemoved 派发到本技能，对周围(Area)范围内敌人造成护盾容量 × Strength2[1] 爆裂伤害。
+/// 循环检查：当自身不存在护盾("盾"=300001)且技能就绪时给自己套盾，护盾量 = Strength2[0] × (100+法强)/100（随法强成长）；
+/// 护盾被移除时经 Chess.OnBuffRemoved 派发到本技能，对周围(Area)范围内敌人造成 GetSkillDamage() 爆裂伤害。
 /// </summary>
 public class SkillAidShieldBurst : Skill
 {
-    private int lastShieldHp; // 最近一次施加的护盾容量，用于爆裂伤害计算
-
     public SkillAidShieldBurst(int id, Chess unit) : base(id, unit)
     {
     }
@@ -28,8 +26,7 @@ public class SkillAidShieldBurst : Skill
         if (!CheckBurst(null))
             return false;
 
-        var shieldHp = (int)(owner.maxHp * skillCfg.Strength2[0]);
-        lastShieldHp = shieldHp;
+        var shieldHp = (int)(skillCfg.Strength2[0] * (owner.GetAttr("ap") + 100) / 100f);
 
         owner.PlayerAnim(skillCfg.Action);
 
@@ -56,13 +53,13 @@ public class SkillAidShieldBurst : Skill
         Explode();
     }
 
-    // 盾破爆裂：对周围(Area)范围内敌人造成护盾容量 × Strength2[1] 伤害
+    // 盾破爆裂：对周围(Area)范围内敌人造成技能伤害
     private void Explode()
     {
         if (owner == null || owner.hp <= 0)
             return;
 
-        int boomDamage = (int)(lastShieldHp * skillCfg.Strength2[1]);
+        int boomDamage = GetSkillDamage();
         if (boomDamage <= 0)
             return;
 
