@@ -43,6 +43,7 @@ public class MainForm : Form
     private Label _statusLabel;
     private CanvasPanel _canvas;
     private RichTextBox _logBox;   // 最右侧战斗日志（技能施放/伤害，按阵营着色）
+    private MenuStrip _menu;       // 顶部菜单（批量模拟入口）
 
     // TabControl：Tab1 选择英雄/配置，Tab2 战况（每格子单位实时属性 + Buff）
     private TabControl _tabs;
@@ -86,6 +87,9 @@ public class MainForm : Form
         Height = 800;
         _battle = new BattleSim();
 
+        BuildMenu();                 // 顶部菜单，占用顶部高度，故下方内容整体下移菜单高度
+        Height = 800 + _menu.Height;
+
         BuildUi();
         LoadLineup();   // 启动读取上次保存的双方阵容与等级（无存档则用默认阵容）
         _tabs.SelectedIndexChanged += (_s, _e) => { if (_tabs.SelectedIndex == 1) RefreshStatusView(); };
@@ -99,6 +103,32 @@ public class MainForm : Form
     }
 
     // ---------- UI ----------
+    // 顶部菜单：批量模拟（无界面连打 N 轮，输出各武将/各物品胜率报告到日志文件）
+    private void BuildMenu()
+    {
+        _menu = new MenuStrip { Dock = DockStyle.Top };
+        var simMenu = new ToolStripMenuItem("模拟");
+        simMenu.DropDownItems.Add("批量模拟战斗…", null, (s, e) => OpenBatchSim());
+        _menu.Items.Add(simMenu);
+        MainMenuStrip = _menu;
+        Controls.Add(_menu);
+    }
+
+    // 打开批量模拟参数窗口；期间暂停主界面战斗循环，避免与批量模拟抢占随机/时间等静态状态
+    private void OpenBatchSim()
+    {
+        _timer.Stop();
+        try
+        {
+            using (var dlg = new BatchSimForm())
+                dlg.ShowDialog(this);
+        }
+        finally
+        {
+            _timer.Start();
+        }
+    }
+
     private void BuildUi()
     {
         int left = 10, top = 8, h = 26;
@@ -106,7 +136,7 @@ public class MainForm : Form
         Label lbl;
 
         // 顶部 TabControl：选阵 / 战况；下方画布 + 日志
-        _tabs = new TabControl { Left = left, Top = 6, Width = ClientSize.Width - 2 * left, Height = tabContentH + 24 };
+        _tabs = new TabControl { Left = left, Top = 6 + _menu.Height, Width = ClientSize.Width - 2 * left, Height = tabContentH + 24 };
         _tabSetup = new TabPage("选择英雄");
         _tabBattle = new TabPage("战况");
         _tabs.TabPages.Add(_tabSetup);

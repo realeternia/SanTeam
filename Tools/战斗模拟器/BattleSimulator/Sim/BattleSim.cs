@@ -30,6 +30,11 @@ public class BattleSim
     private int _heroCountB;
     private int _soldierCount;
 
+    // 羁绊开关（默认全开）：批量模拟器按需关闭 国家护盾/好友连线/职业连锁
+    public bool EnableFactionShield = true;
+    public bool EnableFriendLine = true;
+    public bool EnableJobLink = true;
+
     // 受击事件（供 GUI 绘制飘血与受击临时图形）。由血量差分检测生成，不改游戏源码。
     public class HitFxData
     {
@@ -167,9 +172,51 @@ public class BattleSim
                     continue;
                 }
                 cards[HeroStartPos + i] = heroId;
-                // 卡片经验存等级（1~5）：GetBattleCardList.Item2 会作为 lv 传入 CheckInitAttr 生效
-                p.cards[heroId] = Math.Max(1, Math.Min(5, heroes[i].lv));
+                // cards 存的是卡数经验，需用等级反查经验值，GetBattleCardList 再经 GetCardLevel 还原为等级 lv 传入 CheckInitAttr
+                p.cards[heroId] = HeroSelectionTool.GetCardExpByLevel(heroes[i].lv);
             }
+        }
+    }
+
+    // 上阵（前后排站位）：近战英雄站前排（贴近敌方）、远程英雄站后排，避免远程被顶在阵型最前。
+    // 布阵格按"离敌方由近到远"排序后，近战从最前格开始占，远程从最后格开始占（英雄数≤25，不会交叠）。
+    public void SetupByRole(List<(int id, int lv)> heroesA, List<(int id, int lv)> heroesB)
+    {
+        _heroCountA = heroesA != null ? heroesA.Count : 0;
+        _heroCountB = heroesB != null ? heroesB.Count : 0;
+        _soldierCount = 0;
+        FillBattleCardsByRole(Game.players[0], heroesA, 1);
+        FillBattleCardsByRole(Game.players[1], heroesB, 2);
+    }
+
+    private void FillBattleCardsByRole(PlayerInfo p, List<(int id, int lv)> heroes, int side)
+    {
+        var cards = p.battleCards;
+        Array.Clear(cards, 0, cards.Length);
+        if (heroes == null)
+            return;
+
+        var order = World.GetFormationPosOrderFrontToBack(side);   // 前→后
+        int frontIdx = 0;
+        int backIdx = order.Count - 1;
+
+        foreach (var hero in heroes)
+        {
+            int heroId = hero.id;
+            if (heroId <= 0 || !ConfigManager.IsHeroCard(heroId))
+            {
+                GameLog.Warn("BattleSim.SetupByRole: 无效英雄 heroId=" + heroId + "，跳过");
+                continue;
+            }
+            if (frontIdx > backIdx)
+            {
+                GameLog.Warn("BattleSim.SetupByRole: 布阵格不足，跳过英雄 " + heroId);
+                continue;
+            }
+            bool ranged = HeroSelectionTool.IsRangedHero(HeroConfig.GetConfig(heroId));
+            int pos = ranged ? order[backIdx--] : order[frontIdx++];
+            cards[pos] = heroId;
+            p.cards[heroId] = HeroSelectionTool.GetCardExpByLevel(hero.lv);
         }
     }
 
@@ -192,7 +239,14 @@ public class BattleSim
         CoroutineRunner.Clear();
         BattleStatManager.Clear();
         World.Reset();
+        // 把本场羁绊开关同步到 harness（BattleBegin 内生效），结束后复位为默认全开
+        WorldManager.EnableJobLinks = EnableJobLink;
+        WorldManager.EnableFriendLines = EnableFriendLine;
+        WorldManager.EnableFactionShields = EnableFactionShield;
         World.BattleBegin();
+        WorldManager.EnableJobLinks = true;
+        WorldManager.EnableFriendLines = true;
+        WorldManager.EnableFactionShields = true;
         HitFx.Clear();
         _skillMpBefore.Clear();
     }

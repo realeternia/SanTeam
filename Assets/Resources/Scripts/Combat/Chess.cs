@@ -669,8 +669,14 @@ public class Chess : MonoBehaviour
 
     public void OnSkillDamaged(Chess caster, int skillId, int damage, bool isFeedback = false, string hurtTag = "")
     {
-        if(damage <= 0)
-            throw new Exception("伤害值不能小于等于0");
+        // 伤害<=0 视为本次不结算（如技能倍率向下取整为0、减伤压到0）：
+        // 记录日志后直接返回，避免抛出异常中断整场战斗（批量模拟会因单场异常终止）
+        if (damage <= 0)
+        {
+            GameLog.Error("OnSkillDamaged 收到非正伤害(" + damage + ")，技能id=" + skillId
+                + "，施法者heroId=" + (caster != null ? caster.heroId.ToString() : "null") + "，已跳过结算");
+            return;
+        }
 
         // 抗性减免（英雄与士兵统一结算，参考金铲铲）：法术受魔抗减免；物理(atk)受护甲减免；真实伤害无视抗性
         var skillCfg = SkillConfig.GetConfig(skillId);

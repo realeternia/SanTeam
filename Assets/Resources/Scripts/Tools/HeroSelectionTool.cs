@@ -235,6 +235,14 @@ public static class HeroSelectionTool
         return MaxHeroCardLevel;
     }
 
+    // 卡片等级(Lv1~5)对应的最小累计卡数(经验值)，即 GetCardLevel 的逆映射：1→1 / 2→4 / 3→8 / 4→13 / 5→20。
+    // 供布阵/模拟器把"等级"正确写回 PlayerInfo.cards（cards 存的是卡数经验，不是等级本身）。
+    public static int GetCardExpByLevel(int level)
+    {
+        int lv = Mathf.Clamp(level, 1, MaxHeroCardLevel);
+        return cardHeroExp[lv - 1];
+    }
+
     public static float GetExpRate(int exp, bool isHero)
     {
         if(!isHero)

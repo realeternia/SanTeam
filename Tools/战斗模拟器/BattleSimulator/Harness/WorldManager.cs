@@ -23,6 +23,11 @@ public class WorldManager : MonoBehaviour
     public bool gameFinish;
     public bool hasWin;
 
+    // 羁绊开关（默认全开，仅批量模拟器按需在开战前关闭；不影响战斗逻辑本身）
+    public static bool EnableJobLinks = true;        // 职业连锁
+    public static bool EnableFriendLines = true;     // 好友连线（默认连线 + 特殊连锁）
+    public static bool EnableFactionShields = true;  // 国家护盾
+
     // 飘字数据（供 GDI+ 主窗体绘制，无特效）
     public class BattleTextData
     {
@@ -93,6 +98,30 @@ public class WorldManager : MonoBehaviour
         Vector3 right = Vector3.ProjectOnPlane(center.right, Vector3.up).normalized;
         float half = (CombatConst.FormationGridSize - 1) * 0.5f;
         return center.position + forward * (row - half) * 13f + right * (col - half) * 13f;
+    }
+
+    // 返回本侧布阵格 pos 按"离敌方由近到远"（前→后）排序：
+    // 用两侧 center 的世界坐标算距离动态判定前后（本 harness 中 center.forward 指向敌方，
+    // 即 row 越大越靠前；与游戏内 row0=最前的约定相反，故不写死 row 方向）。
+    public List<int> GetFormationPosOrderFrontToBack(int side)
+    {
+        var result = new List<int>();
+        for (int pos = 0; pos < CombatConst.FormationCellCount; pos++)
+            result.Add(pos);
+
+        var myCenter = side == 1 ? _center1 : _center2;
+        var foeCenter = side == 1 ? _center2 : _center1;
+        if (myCenter == null || foeCenter == null)
+            return result;
+
+        result.Sort((x, y) =>
+        {
+            float dx = Vector3.Distance(GetFormationCellPos(myCenter, x), foeCenter.position);
+            float dy = Vector3.Distance(GetFormationCellPos(myCenter, y), foeCenter.position);
+            int c = dx.CompareTo(dy);
+            return c != 0 ? c : x.CompareTo(y);   // 同距按 pos 保证确定性
+        });
+        return result;
     }
 
     // 生成一个势力的5个小兵：按布阵面板中小兵摆放位置生成(近战500001/远程500002)
@@ -316,10 +345,15 @@ public class WorldManager : MonoBehaviour
 
         SpawnUnitsInRegions();
 
-        JobLinkManager.ApplyJobLinks();
-        FriendLineManager.ApplyFriendLines();
-        FriendLineManager.ApplyFriendSpecialSkills();
-        FactionShieldManager.ApplyFactionShields();
+        if (EnableJobLinks)
+            JobLinkManager.ApplyJobLinks();
+        if (EnableFriendLines)
+        {
+            FriendLineManager.ApplyFriendLines();
+            FriendLineManager.ApplyFriendSpecialSkills();
+        }
+        if (EnableFactionShields)
+            FactionShieldManager.ApplyFactionShields();
 
         foreach (var chess in chessList.ToArray())
         {

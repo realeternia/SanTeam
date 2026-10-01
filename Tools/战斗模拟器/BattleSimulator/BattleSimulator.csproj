@@ -58,6 +58,7 @@
     <Compile Include="Harness\**\*.cs" />
     <Compile Include="Sim\**\*.cs" />
     <Compile Include="MainForm.cs" />
+    <Compile Include="BatchSimForm.cs" />
     <Compile Include="Program.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

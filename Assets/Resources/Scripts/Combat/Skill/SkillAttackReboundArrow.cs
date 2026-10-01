@@ -20,6 +20,9 @@ public class SkillAttackReboundArrow : Skill
             WorldManager.Instance.RandomSelect(unitsInRange, skillCfg.TargetCount);
 
             var reboundDamage = (int)(damage * skillCfg.Strength);
+            // 弱攻击按倍率向下取整为0时不弹射，避免生成0伤害导弹（0伤害导弹结算会触发异常）
+            if (reboundDamage <= 0)
+                return;
             foreach (var unit in unitsInRange)
                 WorldManager.Instance.CreateSpellMissile(owner, unit, defender.transform.position, id, reboundDamage, owner.hitEffect);
         }
