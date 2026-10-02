@@ -42,9 +42,12 @@ public static class BatchSimRunner
         public int Quality;             // 卡片品质（仅武将行，物品行为0）
         public int Appear, Win, Loss, Draw;
         public float HeroDamageTotal;   // 对敌方英雄造成的累计伤害（用于场均）
+        public float MagicDamageTotal;  // 造成的累计法术伤害（DamageType=法术，任意目标）
         public float Rate { get { return Appear > 0 ? (float)Win / Appear : 0f; } }
         // 场均对英雄伤害 = 累计伤害 / 出场场次
         public float AvgHeroDamage { get { return Appear > 0 ? HeroDamageTotal / Appear : 0f; } }
+        // 场均法术伤害 = 累计法术伤害 / 出场场次
+        public float AvgMagicDamage { get { return Appear > 0 ? MagicDamageTotal / Appear : 0f; } }
     }
 
     // 一件随机装备的绑定记录（harness 桩仅提供二元 ValueTuple，故用结构体）
@@ -55,8 +58,11 @@ public static class BatchSimRunner
         public int side;
     }
 
-    // 本场累积：攻击方 heroId -> 对敌方英雄造成的伤害（由 Chess.OnDamageDealt 驱动，仅统计"英雄打英雄"）
+    // 本场累积（由 Chess.OnDamageDealt 驱动，攻击方必须是英雄）：
+    // _heroDamageToHero：对敌方英雄造成的伤害（英雄打英雄）
+    // _magicDamage：造成的法术伤害（SkillConfig.DamageType=法术，任意目标）
     private static Dictionary<int, float> _heroDamageToHero;
+    private static Dictionary<int, float> _magicDamage;
 
     static BatchSimRunner()
     {
@@ -64,28 +70,43 @@ public static class BatchSimRunner
         {
             if (_heroDamageToHero == null || a == null || v == null || d <= 0)
                 return;
-            if (!a.isHero || !v.isHero)
+            if (!a.isHero)
                 return;
-            float cur;
-            _heroDamageToHero.TryGetValue(a.heroId, out cur);
-            _heroDamageToHero[a.heroId] = cur + d;
+            if (v.isHero)
+            {
+                float cur;
+                _heroDamageToHero.TryGetValue(a.heroId, out cur);
+                _heroDamageToHero[a.heroId] = cur + d;
+            }
+            if (sk > 0)
+            {
+                var cfg = SkillConfig.GetConfig(sk);
+                if (cfg != null && cfg.DamageType == CombatConst.DamageTypeMagic)
+                {
+                    float cur;
+                    _magicDamage.TryGetValue(a.heroId, out cur);
+                    _magicDamage[a.heroId] = cur + d;
+                }
+            }
         };
     }
 
-    // 把本场"英雄打英雄"的伤害累加到各武将行（用于场均伤害）
-    private static void AddHeroDamage(Dictionary<int, StatRow> stats, List<(int id, int lv)> team,
-        Dictionary<int, float> roundDamage)
+    // 把本场伤害累加到各武将行（对英雄伤害 / 法术伤害）
+    private static void AddRoundDamage(Dictionary<int, StatRow> stats, List<(int id, int lv)> team,
+        Dictionary<int, float> toHero, Dictionary<int, float> magic)
     {
-        if (roundDamage == null)
+        if (toHero == null)
             return;
         foreach (var h in team)
         {
-            float v;
-            if (!roundDamage.TryGetValue(h.id, out v))
-                continue;
             StatRow row;
-            if (stats.TryGetValue(h.id, out row))
+            if (!stats.TryGetValue(h.id, out row))
+                continue;
+            float v;
+            if (toHero.TryGetValue(h.id, out v))
                 row.HeroDamageTotal += v;
+            if (magic != null && magic.TryGetValue(h.id, out v))
+                row.MagicDamageTotal += v;
         }
     }
 
@@ -160,6 +181,7 @@ public static class BatchSimRunner
             }
 
             _heroDamageToHero = new Dictionary<int, float>();
+            _magicDamage = new Dictionary<int, float>();
             battle.Start(seed);
             int steps = 0;
             while (!battle.IsFinished && steps < MaxSteps)
@@ -168,7 +190,9 @@ public static class BatchSimRunner
                 steps++;
             }
             var roundHeroDamage = _heroDamageToHero;
+            var roundMagicDamage = _magicDamage;
             _heroDamageToHero = null;   // 本场结束，停止累积
+            _magicDamage = null;
 
             int winner = !battle.IsFinished ? 0 : (battle.HasWin ? 1 : 2);   // 0=平局
             if (winner == 1) winA++;
@@ -177,8 +201,8 @@ public static class BatchSimRunner
 
             RecordTeam(teamA, 1, winner, heroStats);
             RecordTeam(teamB, 2, winner, heroStats);
-            AddHeroDamage(heroStats, teamA, roundHeroDamage);
-            AddHeroDamage(heroStats, teamB, roundHeroDamage);
+            AddRoundDamage(heroStats, teamA, roundHeroDamage, roundMagicDamage);
+            AddRoundDamage(heroStats, teamB, roundHeroDamage, roundMagicDamage);
             foreach (var e in equips)
                 RecordOne(itemStats, e.itemId, ItemName(e.itemId), "-", 0, e.side, winner);
 
@@ -271,7 +295,7 @@ public static class BatchSimRunner
         sb.AppendLine("总胜负: 甲胜 " + winA + " / 乙胜 " + winB + " / 平局 " + draw);
         sb.AppendLine();
 
-        sb.AppendLine("【武将胜率】按胜率降序（胜率 = 胜场 / 出场场次；场均伤害 = 对敌方英雄造成的伤害 / 出场场次）");
+        sb.AppendLine("【武将胜率】按胜率降序（胜率 = 胜场 / 出场场次；场均伤害 = 对敌方英雄造成的伤害 / 出场场次；场均法术伤害 = 造成的法术伤害(任意目标) / 出场场次）");
         sb.AppendLine(HeroHeader());
         AppendHeroRows(sb, heroRows);
         sb.AppendLine();
@@ -313,8 +337,8 @@ public static class BatchSimRunner
 
     private static string HeroHeader()
     {
-        return string.Format("{0,4}  {1,8}  {2,-10}  {3,-6}  {4,4}  {5,6}  {6,6}  {7,6}  {8,6}  {9,8}  {10,10}",
-            "排名", "ID", "名字", "职业", "品质", "出场", "胜", "负", "平", "胜率", "场均伤害");
+        return string.Format("{0,4}  {1,8}  {2,-10}  {3,-6}  {4,4}  {5,6}  {6,6}  {7,6}  {8,6}  {9,8}  {10,10}  {11,12}",
+            "排名", "ID", "名字", "职业", "品质", "出场", "胜", "负", "平", "胜率", "场均伤害", "场均法术伤害");
     }
 
     private static void AppendHeroRows(StringBuilder sb, List<StatRow> rows)
@@ -327,9 +351,9 @@ public static class BatchSimRunner
         int rank = 1;
         foreach (var r in rows)
         {
-            sb.AppendLine(string.Format("{0,4}  {1,8}  {2,-10}  {3,-6}  {4,4}  {5,6}  {6,6}  {7,6}  {8,6}  {9,8:P1}  {10,10:N0}",
+            sb.AppendLine(string.Format("{0,4}  {1,8}  {2,-10}  {3,-6}  {4,4}  {5,6}  {6,6}  {7,6}  {8,6}  {9,8:P1}  {10,10:N0}  {11,12:N0}",
                 rank++, r.Id, r.Name, string.IsNullOrEmpty(r.Job) ? "-" : r.Job,
-                r.Quality > 0 ? r.Quality.ToString() : "-", r.Appear, r.Win, r.Loss, r.Draw, r.Rate, r.AvgHeroDamage));
+                r.Quality > 0 ? r.Quality.ToString() : "-", r.Appear, r.Win, r.Loss, r.Draw, r.Rate, r.AvgHeroDamage, r.AvgMagicDamage));
         }
     }
 
