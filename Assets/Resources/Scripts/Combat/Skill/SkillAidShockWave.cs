@@ -12,6 +12,9 @@ using UnityEngine;
 /// </summary>
 public class SkillAidShockWave : Skill
 {
+    /// <summary>对拥有吸收盾(BuffShield)且未破盾的目标造成的伤害倍率</summary>
+    private const float ShieldDamageMulti = 2f;
+
     public SkillAidShockWave(int id, Chess unit) : base(id, unit)
     {
     }
@@ -46,6 +49,6 @@ public class SkillAidShockWave : Skill
         if (target == null)
             return 1f;
         var shield = target.GetBuff(CombatConst.ShieldBuffId) as BuffShield;
-        return shield != null && shield.GetHp() > 0 ? CombatConst.ShockWaveShieldDamageMulti : 1f;
+        return shield != null && shield.GetHp() > 0 ? ShieldDamageMulti : 1f;
     }
 }

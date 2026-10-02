@@ -3,7 +3,7 @@ using CommonConfig;
 using UnityEngine;
 
 /// <summary>
-/// 庞德·抬棺：怒喝嘲讽自身 Area 范围内敌人攻击自己（挂 BuffTaunt），并对这群敌人各造成一次法术伤害。
+/// 庞德·抬棺：怒喝嘲讽自身 Area 范围内敌人攻击自己（把这些敌人的当前目标改为自己），并对这群敌人各造成一次法术伤害。
 /// </summary>
 public class SkillAidTauntSlam : Skill
 {
@@ -28,8 +28,8 @@ public class SkillAidTauntSlam : Skill
             e.OnSkillDamaged(owner, id, GetSkillDamage());
         }
 
-        // 嘲讽：自身挂嘲讽标记
-        BuffManager.AddBuff(owner, owner, id, BuffConfig.GetConfigByNameS("嘲").Id, skillCfg.BuffTime);
+        // 嘲讽：把范围内敌人的当前目标改到自己身上
+        TauntEnemies(skillCfg.Area);
 
         PlayAreaEffect(owner.transform.position);
         EffectManager.PlaySkillEffect(owner, skillCfg.HitEffect);

@@ -25,7 +25,15 @@ public class SkillSoldierFortify : Skill
             var target = soldiers.OrderBy(x => x.HpRate).First();
             if (target.hp < target.maxHp)
                 owner.HealTarget(target, skillId, target.maxHp - target.hp, false);
-            BuffManager.AddBuff(target, owner, id, CombatConst.BuildFortBuffId, 999f);
+
+            // 筑垒 Buff 由 SkillConfig.BuffId 指定（短名"垒"→BuffBuildFort），不在战斗代码硬编码 BuffId
+            var fortCfg = BuffConfig.GetConfigByNameS(skillCfg.BuffId);
+            if (fortCfg == null)
+            {
+                GameLog.Error($"SkillSoldierFortify: 未找到筑垒Buff短名：{skillCfg.BuffId} 技能id={id}");
+                return false;
+            }
+            BuffManager.AddBuff(target, owner, id, fortCfg.Id, 999f);
             EffectManager.PlaySkillEffect(target, skillCfg.HitEffect);
         }
         return true;

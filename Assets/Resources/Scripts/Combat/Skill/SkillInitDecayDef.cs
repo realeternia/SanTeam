@@ -9,6 +9,9 @@ using UnityEngine;
 /// </summary>
 public class SkillInitDecayDef : Skill
 {
+    /// <summary>双防衰减间隔(秒)：每跳衰减初始加成1/5，共5跳、15秒归零</summary>
+    private const float DecayInterval = 3f;
+
     public SkillInitDecayDef(int id, Chess unit) : base(id, unit)
     {
     }
@@ -29,7 +32,7 @@ public class SkillInitDecayDef : Skill
     {
         for (var i = 0; i < 5; i++)
         {
-            yield return new WaitForSeconds(CombatConst.FriendDecayInterval);
+            yield return new WaitForSeconds(DecayInterval);
             if (owner == null || owner.hp <= 0)
                 yield break;
             var buff = owner.GetBuff(buffId) as BuffDecayDef;

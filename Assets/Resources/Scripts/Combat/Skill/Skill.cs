@@ -370,4 +370,32 @@ public class Skill
         return skillCfg.SummonTime;
     }
 
+    /// <summary>
+    /// 嘲讽（统一入口，供各嘲讽类技能复用）：把 pos 周围 area 半径内所有存活敌方单位的当前锁定目标强制改为 taunter，
+    /// 并重置其索敌计时(Chess.LockTarget)。嘲讽不再进入 FindTarget 打分，只在释放瞬间改一次目标朝向，
+    /// 之后由对方常规索敌接管(3秒)。area&lt;=0 表示全地图。返回被嘲讽的敌人数量。
+    /// </summary>
+    protected int TauntEnemies(Chess taunter, Vector3 pos, float area)
+    {
+        if (taunter == null || taunter.hp <= 0)
+            return 0;
+
+        var enemies = WorldManager.Instance.GetUnitsInRange(pos, area, taunter.side, true);
+        int count = 0;
+        foreach (var e in enemies)
+        {
+            if (e == null || e.hp <= 0)
+                continue;
+            e.LockTarget(taunter);
+            count++;
+        }
+        return count;
+    }
+
+    // 嘲讽自身周围 area 半径内的敌人（最常用形态）
+    protected int TauntEnemies(float area)
+    {
+        return TauntEnemies(owner, owner.transform.position, area);
+    }
+
 }

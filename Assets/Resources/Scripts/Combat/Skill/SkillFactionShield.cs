@@ -8,6 +8,9 @@
 /// </summary>
 public class SkillFactionShield : Skill
 {
+    /// <summary>主公(王)上阵时，提供额外护盾加成的诸侯职业技能缩写（技能Id按 Lv 取 SkillConfig，护盾额外 = 该技能当级 Strength2[0]）</summary>
+    private const string KingSkillSname = "王";
+
     public SkillFactionShield(int id, Chess unit) : base(id, unit)
     {
     }
@@ -42,16 +45,16 @@ public class SkillFactionShield : Skill
         return count;
     }
 
-    // 主公(王)上阵：同阵营护盾额外 = 诸侯职业技能(王)对应等级(王数)的 Strength2[0]（读取配置，不再硬编码 CombatConst.KingShieldBonusRate）
+    // 主公(王)上阵：同阵营护盾额外 = 诸侯职业技能(王)对应等级(王数)的 Strength2[0]（读配置，不硬编码）
     private float GetKingShieldBonus()
     {
         int kingCount = CountKingOnSide();
         if (kingCount <= 0)
             return 0f;
-        var kingSkill = ConfigManager.GetSkillConfig(CombatConst.KingShieldBonusSkillSname, kingCount);
+        var kingSkill = ConfigManager.GetSkillConfig(KingSkillSname, kingCount);
         if (kingSkill == null)
         {
-            GameLog.Error($"诸侯技能配置缺失: Sname={CombatConst.KingShieldBonusSkillSname} Lv={kingCount}");
+            GameLog.Error($"诸侯技能配置缺失: Sname={KingSkillSname} Lv={kingCount}");
             return 0f;
         }
         return kingSkill.Strength2[0];

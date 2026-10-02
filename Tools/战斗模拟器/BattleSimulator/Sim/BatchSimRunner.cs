@@ -41,7 +41,10 @@ public static class BatchSimRunner
         public string Job;              // 职业（仅武将行，物品行为"-"）
         public int Quality;             // 卡片品质（仅武将行，物品行为0）
         public int Appear, Win, Loss, Draw;
+        public float HeroDamageTotal;   // 对敌方英雄造成的累计伤害（用于场均）
         public float Rate { get { return Appear > 0 ? (float)Win / Appear : 0f; } }
+        // 场均对英雄伤害 = 累计伤害 / 出场场次
+        public float AvgHeroDamage { get { return Appear > 0 ? HeroDamageTotal / Appear : 0f; } }
     }
 
     // 一件随机装备的绑定记录（harness 桩仅提供二元 ValueTuple，故用结构体）
@@ -50,6 +53,40 @@ public static class BatchSimRunner
         public int heroId;
         public int itemId;
         public int side;
+    }
+
+    // 本场累积：攻击方 heroId -> 对敌方英雄造成的伤害（由 Chess.OnDamageDealt 驱动，仅统计"英雄打英雄"）
+    private static Dictionary<int, float> _heroDamageToHero;
+
+    static BatchSimRunner()
+    {
+        Chess.OnDamageDealt += (a, v, d, sk) =>
+        {
+            if (_heroDamageToHero == null || a == null || v == null || d <= 0)
+                return;
+            if (!a.isHero || !v.isHero)
+                return;
+            float cur;
+            _heroDamageToHero.TryGetValue(a.heroId, out cur);
+            _heroDamageToHero[a.heroId] = cur + d;
+        };
+    }
+
+    // 把本场"英雄打英雄"的伤害累加到各武将行（用于场均伤害）
+    private static void AddHeroDamage(Dictionary<int, StatRow> stats, List<(int id, int lv)> team,
+        Dictionary<int, float> roundDamage)
+    {
+        if (roundDamage == null)
+            return;
+        foreach (var h in team)
+        {
+            float v;
+            if (!roundDamage.TryGetValue(h.id, out v))
+                continue;
+            StatRow row;
+            if (stats.TryGetValue(h.id, out row))
+                row.HeroDamageTotal += v;
+        }
     }
 
     // 执行批量模拟，返回报告文件路径；onProgress(已完成轮数, 总轮数)
@@ -122,6 +159,7 @@ public static class BatchSimRunner
                 }
             }
 
+            _heroDamageToHero = new Dictionary<int, float>();
             battle.Start(seed);
             int steps = 0;
             while (!battle.IsFinished && steps < MaxSteps)
@@ -129,6 +167,8 @@ public static class BatchSimRunner
                 battle.Step(StepDt);
                 steps++;
             }
+            var roundHeroDamage = _heroDamageToHero;
+            _heroDamageToHero = null;   // 本场结束，停止累积
 
             int winner = !battle.IsFinished ? 0 : (battle.HasWin ? 1 : 2);   // 0=平局
             if (winner == 1) winA++;
@@ -137,6 +177,8 @@ public static class BatchSimRunner
 
             RecordTeam(teamA, 1, winner, heroStats);
             RecordTeam(teamB, 2, winner, heroStats);
+            AddHeroDamage(heroStats, teamA, roundHeroDamage);
+            AddHeroDamage(heroStats, teamB, roundHeroDamage);
             foreach (var e in equips)
                 RecordOne(itemStats, e.itemId, ItemName(e.itemId), "-", 0, e.side, winner);
 
@@ -229,9 +271,9 @@ public static class BatchSimRunner
         sb.AppendLine("总胜负: 甲胜 " + winA + " / 乙胜 " + winB + " / 平局 " + draw);
         sb.AppendLine();
 
-        sb.AppendLine("【武将胜率】按胜率降序（胜率 = 胜场 / 出场场次）");
-        sb.AppendLine(Header());
-        AppendRows(sb, heroRows);
+        sb.AppendLine("【武将胜率】按胜率降序（胜率 = 胜场 / 出场场次；场均伤害 = 对敌方英雄造成的伤害 / 出场场次）");
+        sb.AppendLine(HeroHeader());
+        AppendHeroRows(sb, heroRows);
         sb.AppendLine();
 
         sb.AppendLine("【职业胜率】按胜率降序（该职业全部英雄的出场/胜负合并统计）");
@@ -266,6 +308,28 @@ public static class BatchSimRunner
             sb.AppendLine(string.Format("{0,4}  {1,8}  {2,-10}  {3,-6}  {4,4}  {5,6}  {6,6}  {7,6}  {8,6}  {9,8:P1}",
                 rank++, r.Id, r.Name, string.IsNullOrEmpty(r.Job) ? "-" : r.Job,
                 r.Quality > 0 ? r.Quality.ToString() : "-", r.Appear, r.Win, r.Loss, r.Draw, r.Rate));
+        }
+    }
+
+    private static string HeroHeader()
+    {
+        return string.Format("{0,4}  {1,8}  {2,-10}  {3,-6}  {4,4}  {5,6}  {6,6}  {7,6}  {8,6}  {9,8}  {10,10}",
+            "排名", "ID", "名字", "职业", "品质", "出场", "胜", "负", "平", "胜率", "场均伤害");
+    }
+
+    private static void AppendHeroRows(StringBuilder sb, List<StatRow> rows)
+    {
+        if (rows.Count == 0)
+        {
+            sb.AppendLine("(无数据)");
+            return;
+        }
+        int rank = 1;
+        foreach (var r in rows)
+        {
+            sb.AppendLine(string.Format("{0,4}  {1,8}  {2,-10}  {3,-6}  {4,4}  {5,6}  {6,6}  {7,6}  {8,6}  {9,8:P1}  {10,10:N0}",
+                rank++, r.Id, r.Name, string.IsNullOrEmpty(r.Job) ? "-" : r.Job,
+                r.Quality > 0 ? r.Quality.ToString() : "-", r.Appear, r.Win, r.Loss, r.Draw, r.Rate, r.AvgHeroDamage));
         }
     }
 

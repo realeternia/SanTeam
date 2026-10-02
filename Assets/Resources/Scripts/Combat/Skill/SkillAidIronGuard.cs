@@ -1,15 +1,12 @@
-﻿using CommonConfig;
+using CommonConfig;
 using UnityEngine;
 
 /// <summary>
-/// 于禁·铁壁：为自身附加减伤盾（Buff "硬"，减伤比例由 BuffShieldValue 读 StrengthBuff1[0]）bufftime 秒；对 /area 范围内敌人附加嘲讽（Buff "嘲"）
-/// 并对范围内敌人造成轻量 /damagestrength 法术伤害（走统一公式 GetSkillDamage）。嘲讽短名"嘲"为技能专属常量。
+/// 于禁·铁壁：为自身附加减伤盾（Buff "硬"，减伤比例由 BuffShieldValue 读 StrengthBuff1[0]）bufftime 秒；
+/// 嘲讽 /area 范围内敌人（把它们的当前目标改到自己身上），并对其造成轻量 /damagestrength 法术伤害（走统一公式 GetSkillDamage）。
 /// </summary>
 public class SkillAidIronGuard : Skill
 {
-    /// <summary>嘲讽 Buff 短名</summary>
-    public const string TauntBuffNameS = "嘲";
-
     public SkillAidIronGuard(int id, Chess unit) : base(id, unit)
     {
     }
@@ -32,18 +29,15 @@ public class SkillAidIronGuard : Skill
         else
             GameLog.Error("SkillAidIronGuard: 未找到减伤盾Buff短名：" + skillCfg.BuffId);
 
-        var tauntBuffCfg = BuffConfig.GetConfigByNameS(TauntBuffNameS);
-        var microDamage = GetSkillDamage();
+        // 嘲讽：把范围内敌人的当前目标改到自己身上
+        TauntEnemies(skillCfg.Area);
 
+        var microDamage = GetSkillDamage();
         var units = WorldManager.Instance.GetUnitsInRange(owner.transform.position, skillCfg.Area, owner.side, true);
         foreach (var u in units)
         {
             if (microDamage > 0)
                 u.OnSkillDamaged(owner, id, microDamage);
-            if (tauntBuffCfg != null)
-                BuffManager.AddBuff(u, owner, id, tauntBuffCfg.Id, skillCfg.BuffTime);
-            else
-                GameLog.Error("SkillAidIronGuard: 未找到嘲讽Buff短名：" + TauntBuffNameS);
         }
 
         return true;

@@ -1,6 +1,7 @@
 /// <summary>
-/// 嘲讽（BuffTaunt）：持有者成为敌对单位强制优先攻击的目标。
-/// 本身不产生属性效果，仅作为标记。索敌逻辑在 Chess.FindTarget 中读取该标记，把带嘲讽的存活单位作为最高优先级锁定目标。
+/// 嘲讽标记（BuffTaunt）：仅作视觉/状态标记，本身不产生属性效果。
+/// 嘲讽的索敌效果不再由 Chess.FindTarget 读取，而是由嘲讽类技能在释放瞬间调用 Skill.TauntEnemies
+/// 把范围内敌人的当前目标直接改为嘲讽者（详见 Skill.cs）。
 /// </summary>
 public class BuffTaunt : Buff
 {

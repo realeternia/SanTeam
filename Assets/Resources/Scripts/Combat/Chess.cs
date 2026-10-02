@@ -434,16 +434,6 @@ public class Chess : MonoBehaviour
             return;
         }
 
-        // 嘲讽：若存在带嘲讽标记(BuffTaunt)的存活敌人，强制优先锁定其中距离最近者
-        var tauntTargets = validTargets.Where(
-            v => v.chess.hp > 0 && v.chess.HasBuff(CombatConst.TauntBuffId)).ToList();
-        if (tauntTargets.Count > 0)
-        {
-            tauntTargets.Sort((a, b) => a.distance.CompareTo(b.distance));
-            targetChess = tauntTargets[0].chess;
-            return;
-        }
-
         // 按距离排序
         validTargets.Sort((a, b) => a.distance.CompareTo(b.distance));
 

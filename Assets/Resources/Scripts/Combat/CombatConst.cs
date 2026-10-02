@@ -6,14 +6,6 @@ public static class CombatConst
     // ---- BuffId ----
     /// <summary>护盾(BuffShield)</summary>
     public const int ShieldBuffId = 300001;
-    /// <summary>减伤盾(BuffShieldValue)</summary>
-    public const int ShieldValueBuffId = 300002;
-    /// <summary>连锁(BuffLock)</summary>
-    public const int LockBuffId = 301002;
-    /// <summary>筑垒(BuffBuildFort)：张昭·筑垒 双防永久强化+死亡原地复活标记</summary>
-    public const int BuildFortBuffId = 300011;
-    /// <summary>嘲讽(BuffTaunt)：携带者成为敌方强制优先攻击的目标</summary>
-    public const int TauntBuffId = 300023;
 
     // ---- 伤害标签(SkillConfig.HurtTag) ----
     /// <summary>AntiShield：绕过护盾直接打血（破盾类技能，BuffShield 判定该标签不吸收）</summary>
@@ -38,16 +30,6 @@ public static class CombatConst
     /// <summary>2=真实：无视抗性，护盾不吸收</summary>
     public const int DamageTypeReal = 2;
 
-    // ---- 技能Id ----
-    /// <summary>仁德：给与我方前排士兵护盾（技能表 仁 的5级行）</summary>
-    public const int SoldierShieldSkillId = 2090035;
-    /// <summary>连锁：锁定目标并传递伤害（技能表 锁 的5级行）</summary>
-    public const int LockSkillId = 2020390;
-
-    // ---- 护盾克制 ----
-    /// <summary>飞斧(许褚)：对拥有吸收盾(BuffShield)的目标造成的伤害倍率</summary>
-    public const float ShockWaveShieldDamageMulti = 2f;
-
     // ---- 技能初始MP ----
     /// <summary>战斗开始时技能MP是否直接拉满（默认关闭；开启则所有技能从满MP开局，关闭则按常规从0开始充能）</summary>
     public static bool FullMpAtBattleBegin = false;
@@ -57,9 +39,6 @@ public static class CombatConst
     public static readonly int[] FactionShieldCounts = { 2, 3, 4, 5, 6 };
     /// <summary>国家护盾技能缩写（技能Id按 Lv 取 SkillConfig 2000001~2000005，护盾=最大生命×Strength2）</summary>
     public const string FactionShieldSkillSname = "国";
-
-    /// <summary>主公(王/王)上阵：同阵营护盾额外加成技能缩写（诸侯职业技能"王"），护盾额外 = 该技能当级 Strength2（国家护盾技能内结算）</summary>
-    public const string KingShieldBonusSkillSname = "王";
 
     // ---- 抗性减伤公式（参考金铲铲：实际伤害 = 原伤害 × 100/(100+抗性)） ----
     /// <summary>抗性减伤基准值（减伤% = 抗性/(抗性+基准值)，如50点抗性≈减伤33%）</summary>
@@ -103,11 +82,17 @@ public static class CombatConst
 
     // ---- 范围特效 ----
     /// <summary>范围特效缩放基准半径：EffectConfig.Scale 对应的半径，实际缩放 = Scale × Area / 本值</summary>
-    public const float AreaEffectBaseRadius = 10f;
+    public const float AreaEffectBaseRadius = 15f;
+
+    // ---- 卡牌属性成长 ----
+    /// <summary>星级成长倍率：每升1星 ×本值（乘方式，Lv1=×1.0、Lv2=×1.7、Lv3=×1.7²…），作用于 Atk/Ap/Hp</summary>
+    public const float StarGrowthPerStar = 1.7f;
+    /// <summary>品质系数：每提升1档品质 ×本值（1.30^(Q-1)，Q1=×1.0、Q2=×1.40、Q3=×1.96…），仅作用于 Atk/Hp</summary>
+    public const float QualityAttrFactor = 1.30f;
 
     // ---- 其他 ----
     /// <summary>近战/远程士兵射程判定阈值</summary>
-    public const float MeleeRange = 30f;
+    public const float MeleeRange = 25f;
 
     // ---- 收藏卡(likecard)机制 ----
     /// <summary>刷新卡牌时从收藏池中随机出一张的概率(%)，收藏池=like阶段全部玩家点赞，共16张，存于 HeroSelectionTool</summary>
@@ -125,19 +110,9 @@ public static class CombatConst
     /// <summary>好友·每回合金币技能的最少上阵人数（1人不成团，默认2人起生效）</summary>
     public const int FriendGoldMinCount = 2;
 
-    // ---- 战斗开始获得道具（InitAddItemChance） ----
-    /// <summary>上一局战斗失败时，战斗开始获得道具技能的发动概率倍率（+50%）</summary>
-    public const float InitAddItemLoseRateBonus = 1.5f;
-
-    // ---- 兵种连锁 ----
-    /// <summary>兵种默认技能起始等级（默认兵种技能1级，每多一个同兵种英雄+1级）</summary>
-    public const int JobLinkBaseLevel = 1;
-
     // ---- 好友连锁·特殊 ----
     /// <summary>好友特殊(关联助益)技能起始等级（默认没有该技能=0级，每多一个好友+1级）</summary>
     public const int FriendSpecialBaseLevel = 0;
-    /// <summary>名门望族·门阀双防衰减间隔(秒)：每跳衰减初始加成1/5，共5跳、15秒归零</summary>
-    public const float FriendDecayInterval = 3f;
 
     // ---- 布阵图(5x5) ----
     // 布阵图坐标(索引 0~24, 行优先)：
@@ -156,12 +131,6 @@ public static class CombatConst
     public static readonly int[] SoldierRangedCells = { 20, 22, 24 };
     /// <summary>英雄自动布阵占用的格(中间3x3区域，最多9格)</summary>
     public static readonly int[] HeroCells = { 6, 7, 8, 11, 12, 13, 16, 17, 18 };
-
-    /// <summary>判断布阵格是否被小兵占用(小兵格不可布阵英雄)</summary>
-    public static bool IsSoldierCell(int pos)
-    {
-        return System.Array.IndexOf(SoldierMeleeCells, pos) >= 0 || System.Array.IndexOf(SoldierRangedCells, pos) >= 0;
-    }
 
     // ---- 玩家等级体系（参考金铲铲，节奏放慢一倍） ----
     /// <summary>玩家最高等级（10级后9个上阵格全解锁）</summary>
@@ -193,7 +162,4 @@ public static class CombatConst
     public const int SoldierMaxLevel = 30;
     /// <summary>士兵升级所需金币</summary>
     public const int SodLvupGoldCost = 5;
-    /// <summary>士兵最大数量：步兵5、弓兵3（10级玩家达成）</summary>
-    public const int SoldierMaxMeleeCount = 5;
-    public const int SoldierMaxRangedCount = 3;
 }
