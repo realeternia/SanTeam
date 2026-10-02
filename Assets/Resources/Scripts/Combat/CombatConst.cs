@@ -85,6 +85,16 @@ public static class CombatConst
     /// <summary>短程寻路最大搜索深度(格)，超过预算取最接近目标的一步继续推进</summary>
     public const int MovePathMaxDepth = 6;
 
+    // ---- 单位间距松弛(位置级硬约束：射程内/被位移后的单位同样互斥，防止堆叠) ----
+    /// <summary>单位占位半径兜底值(米)：取不到实际模型尺寸时使用</summary>
+    public const float DefaultUnitRadius = 3f;
+    /// <summary>单位间距余量(米)：最小中心距 = 两单位占位半径之和 + 该余量</summary>
+    public const float UnitSpacingPadding = 1.5f;
+    /// <summary>单位间距邻居查询半径(米)：需覆盖最大单位直径+余量(英雄直径10米)，供邻居扫描</summary>
+    public const float UnitSpacingQueryMeters = 15f;
+    /// <summary>单位间距松弛每 tick 单次最大位移(米)：逐步推开，避免瞬移抖动</summary>
+    public const float UnitSpacingMaxStep = 0.5f;
+
     // ---- 技能召唤物(士兵Id) ----
     /// <summary>法术场(501001)：技能场/火攻场/火墙的召唤物载体（类型用 SummonTag 区分，如"火"/"雷"）</summary>
     public const int SoldierMagicField = 501001;

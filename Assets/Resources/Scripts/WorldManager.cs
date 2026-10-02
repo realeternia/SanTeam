@@ -1468,6 +1468,25 @@ public class WorldManager : MonoBehaviour
         return result;
     }
 
+    /// <summary>
+    /// 获取指定范围内的所有存活单位(不分敌我，排除影子)，供单位间距松弛等需要全邻居的场景
+    /// </summary>
+    public List<Chess> GetUnitsInRangeAll(Vector3 wPos, float range)
+    {
+        Vector2Int center = WorldToGridPosition(wPos, true);
+        List<Chess> unitsInRange = new List<Chess>();
+        foreach (var chessComponent in chessList)
+        {
+            if (chessComponent == null || chessComponent.hp <= 0 || chessComponent.isShadow)
+                continue;
+
+            Vector2Int chessPos = WorldToGridPosition(chessComponent.transform.position, true);
+            if (range == 0 || Vector2Int.Distance(center, chessPos) <= range)
+                unitsInRange.Add(chessComponent);
+        }
+        return unitsInRange;
+    }
+
     public void RandomSelect(List<Chess> unitsInRange, int limit)
     {
         if(limit < 0)

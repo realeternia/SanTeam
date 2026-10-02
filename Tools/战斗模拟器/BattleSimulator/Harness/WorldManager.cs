@@ -463,6 +463,22 @@ public class WorldManager : MonoBehaviour
         return result;
     }
 
+    // 获取指定范围内的所有存活单位(不分敌我，排除影子)：供单位间距松弛等全邻居场景
+    public List<Chess> GetUnitsInRangeAll(Vector3 wPos, float range)
+    {
+        Vector2Int center = WorldToGridPosition(wPos, true);
+        var unitsInRange = new List<Chess>();
+        foreach (var chessComponent in chessList)
+        {
+            if (chessComponent == null || chessComponent.hp <= 0 || chessComponent.isShadow)
+                continue;
+            Vector2Int chessPos = WorldToGridPosition(chessComponent.transform.position, true);
+            if (range == 0 || Vector2Int.Distance(center, chessPos) <= range)
+                unitsInRange.Add(chessComponent);
+        }
+        return unitsInRange;
+    }
+
     // 随机保留 limit 个（用 SysRandom 保证可复现）
     public void RandomSelect(List<Chess> unitsInRange, int limit)
     {
@@ -538,12 +554,13 @@ public class WorldManager : MonoBehaviour
         missile.MoveToTarget(targetChess, Mathf.Max(sourceChess.missileSpeed, 14), sourceChess.missileHight);
     }
 
-    public void CreateSpellMissile(Chess sourceChess, Vector3 targetPos, float time, float speed, float size, int skillId, int damage, string effectName)
+    public void CreateSpellMissile(Chess sourceChess, Vector3 targetPos, float time, float speed, float size, int skillId, int damage, string effectName, Func<Chess, float> perTargetDamageMulti = null)
     {
         Missile missilePrefab = Resources.Load<Missile>("Prefabs/MissileCom");
         var missile = UnityEngine.Object.Instantiate<Missile>(missilePrefab, sourceChess.transform.position, Quaternion.identity, Units.transform);
         missile.Init(sourceChess, size, effectName);
         missile.SetSkillInfo(skillId, damage);
+        missile.perTargetDamageMulti = perTargetDamageMulti;
         missile.MoveToDirection(targetPos, time, speed);
     }
 

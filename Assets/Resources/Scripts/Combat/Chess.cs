@@ -54,6 +54,8 @@ public class Chess : MonoBehaviour
     public static event System.Action<Chess, Chess, int, int> OnDamageDealt;
 
     private Vector3? moveDest = null;
+    // 本 tick 是否已通过寻路移动过(移动单位由移动互斥力控制间距，未移动的走位置级间距松弛，避免重复施加)
+    private bool movedThisTick;
     // 上次短程寻路重规划时间(移动目标远距离变化大，定期重算途经点)
     private float moveDestPlanTime = -1f;
     // 单位侧向错位方向(±1，按id奇偶分边)：拥挤时叠加横向分量打散同向队列，独行不偏移
@@ -61,6 +63,16 @@ public class Chess : MonoBehaviour
     // 地面基准高度与微调偏移：贴脸单位按id微调y错开(0/0.15/0.3三档)，避免模型重叠z-fighting闪面
     public float baseY;
     public float heightOffset;
+
+    /// <summary>单位占位半径(米)：按模型水平缩放估算(英雄scale10→半径5米)，士兵随等级放大；供单位间距计算</summary>
+    public float UnitRadius
+    {
+        get
+        {
+            var s = transform.localScale;
+            return Mathf.Max(CombatConst.DefaultUnitRadius, Mathf.Max(s.x, s.z) * 0.5f);
+        }
+    }
 
     // 是否正在使用偏移路径
     public int hp = 100;
@@ -252,6 +264,11 @@ public class Chess : MonoBehaviour
         }
 
         MoveAndFight(deltaTime);
+
+        // 单位间距松弛：射程内/引导/眩晕等已停止移动的单位同样执行，防止围拢堆叠、位移后叠点
+        // (本 tick 已移动的单位走移动互斥力，跳过此处避免重复施加)
+        if (!movedThisTick)
+            ResolveUnitSpacing();
 
         if (dieAfterLifeTime)
         {
@@ -472,6 +489,8 @@ public class Chess : MonoBehaviour
 
     private void MoveAndFight(float deltaTime)
     {
+        movedThisTick = false;
+
         // 眩晕(noActionCount>0)或引导中(castingSkillId>0)都无法移动/普攻
         if (noActionCount > 0 || castingSkillId > 0)
             return;
@@ -561,6 +580,7 @@ public class Chess : MonoBehaviour
                 return;
 
             transform.position = nextPosition;
+            movedThisTick = true;
         }
     }
 
@@ -586,9 +606,9 @@ public class Chess : MonoBehaviour
     private Vector3 GetSeparationPush()
     {
         Vector3 push = Vector3.zero;
-        // 获取半径4格(约12米)内敌我双方单位，再按米级距离过滤
-        var nearUnits = WorldManager.Instance.GetUnitsInRange(transform.position, 4f, side, true);
-        nearUnits.AddRange(WorldManager.Instance.GetUnitsInRange(transform.position, 4f, side, false));
+        // 获取单位尺寸尺度内的敌我双方单位，再按米级距离过滤(范围需覆盖最大单位直径，否则重叠不触发)
+        var nearUnits = WorldManager.Instance.GetUnitsInRange(transform.position, CombatConst.UnitSpacingQueryMeters, side, true);
+        nearUnits.AddRange(WorldManager.Instance.GetUnitsInRange(transform.position, CombatConst.UnitSpacingQueryMeters, side, false));
         foreach (var other in nearUnits)
         {
             if (other == this || other == targetChess || other.hp <= 0 || other.isShadow)
@@ -606,6 +626,49 @@ public class Chess : MonoBehaviour
             push += offset / dist * strength;
         }
         return push;
+    }
+
+    // 单位间距松弛(位置级硬约束)：与过近单位沿连线各退一步(本方法负责自身那一半)，
+    // 每 tick 执行，覆盖射程内/引导/眩晕/被位移后等所有状态，避免单位围拢成一坨或位移后叠点。
+    private void ResolveUnitSpacing()
+    {
+        // 静止召唤物(法术场等 moveSpeed=0)、影子不参与；被强制位移中(noMoveCount>0)交由位移协程控制，避免互相打架
+        if (moveSpeed <= 0 || isShadow || noMoveCount > 0)
+            return;
+
+        var nearUnits = WorldManager.Instance.GetUnitsInRangeAll(transform.position, CombatConst.UnitSpacingQueryMeters);
+        Vector3 push = Vector3.zero;
+        Vector3 self = transform.position;
+        foreach (var other in nearUnits)
+        {
+            if (other == this || other.hp <= 0 || other.isShadow || other.moveSpeed <= 0)
+                continue;
+            // 与自身目标(及以自身为目标的单位)不互斥：否则会被推出攻击距离，来回抖动
+            if (other == targetChess || other.targetChess == this)
+                continue;
+
+            Vector3 offset = self - other.transform.position;
+            offset.y = 0;
+            float dist = offset.magnitude;
+            float minDist = UnitRadius + other.UnitRadius + CombatConst.UnitSpacingPadding;
+            if (dist >= minDist)
+                continue;
+            // 完全重合时按 id 奇偶分边给一个固定方向，避免除零且能分开
+            if (dist < 0.01f)
+                offset = new Vector3(laneBias, 0f, 0f);
+            push += offset.normalized * ((minDist - dist) * 0.5f);
+        }
+
+        if (push.sqrMagnitude < 0.0001f)
+            return;
+        // 限制单 tick 位移，逐步推开，避免瞬移抖动
+        if (push.magnitude > CombatConst.UnitSpacingMaxStep)
+            push = push.normalized * CombatConst.UnitSpacingMaxStep;
+
+        Vector3 next = self + push;
+        if (WorldManager.Instance.CheckPositionBlocked(this, next))
+            return; // 推开方向踩墙则本次不动，等下次重规划
+        transform.position = next;
     }
 
     // 攻击目标

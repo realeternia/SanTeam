@@ -7,6 +7,8 @@ using UnityEngine;
 
 /// <summary>
 /// 许褚·飞斧：向目标位置扔出飞斧，造成范围法术伤害；对拥有吸收盾(BuffShield)的目标造成 2 倍伤害。
+/// 飞斧伤害由飞行中的导弹逐个命中目标结算，故"对盾翻倍"通过 Missile 的每目标伤害倍率回调实现
+/// （施法者自身技能无法在 BeforeCalDamage 中修改自己的伤害：伤害计算阶段会跳过当前施放技能自身）。
 /// </summary>
 public class SkillAidShockWave : Skill
 {
@@ -29,7 +31,7 @@ public class SkillAidShockWave : Skill
 
         owner.PlayerAnim(skillCfg.Action);
         var damage = GetSkillDamage(); // 固定系数 + 比例系数×关联属性
-        WorldManager.Instance.CreateSpellMissile(owner, targetPos, GetSummonTime(), skillCfg.SummonSpeed, skillCfg.Area, skillCfg.Id, damage, skillCfg.HitEffect);
+        WorldManager.Instance.CreateSpellMissile(owner, targetPos, GetSummonTime(), skillCfg.SummonSpeed, skillCfg.Area, skillCfg.Id, damage, skillCfg.HitEffect, ShieldTargetDamageMulti);
 
         GameLog.Debug("SkillAidShockWave id=" + id.ToString() + " damage=" + damage.ToString());
 
@@ -37,16 +39,13 @@ public class SkillAidShockWave : Skill
     }
 
     /// <summary>
-    /// 伤害计算阶段·攻击方：飞斧命中拥有吸收盾(BuffShield)的目标时伤害 ×2（对盾克制），
-    /// 只作用于本技能(飞斧)造成的伤害，不影响其他来源。
+    /// 每目标伤害倍率：目标携带吸收盾(BuffShield)且护盾未破时，飞斧伤害 ×2（对盾克制），否则原伤害。
     /// </summary>
-    public override void BeforeCalDamage(Chess target, SkillConfig castSkillCfg, ref int damageBase, ref float damageMulti, ref string effect, string hurtTag, bool isFeedback)
+    private float ShieldTargetDamageMulti(Chess target)
     {
-        if (castSkillCfg == null || castSkillCfg.Sname != skillCfg.Sname || target == null)
-            return;
-
+        if (target == null)
+            return 1f;
         var shield = target.GetBuff(CombatConst.ShieldBuffId) as BuffShield;
-        if (shield != null && shield.GetHp() > 0)
-            damageMulti *= CombatConst.ShockWaveShieldDamageMulti;
+        return shield != null && shield.GetHp() > 0 ? CombatConst.ShockWaveShieldDamageMulti : 1f;
     }
 }
