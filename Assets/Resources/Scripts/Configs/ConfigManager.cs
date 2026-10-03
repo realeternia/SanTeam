@@ -69,6 +69,10 @@ public static class ConfigManager
                 GameLog.Error(string.Format("ConfigManager.PostModify: 英雄[{0}]职业[{1}]缺少 JobConfig，无法写回基准属性", heroCfg.Name, heroCfg.Job));
                 continue;
             }
+
+            // 法术倍率：英雄配置为0时继承职业值，非0时用英雄值覆盖（法系 扇/相/棋/鼓/琴/医 职业值为1.5）
+            float magicRate = Mathf.Approximately(heroCfg.MagicRate, 0f) ? jobCfg.MagicRate : heroCfg.MagicRate;
+
             // 次级面板（移速/射程/攻速/护甲/魔抗/生命回复/魔法回复）：写回 = 职业基准×(1+修正%/100)，不乘品质系数
             heroCfg.MoveSpeed = (int)Math.Round(jobCfg.MoveSpeed * (100f + heroCfg.MoveSpeed) / 100f);
             heroCfg.Range = (int)Math.Round(jobCfg.Range * (100f + heroCfg.Range) / 100f);
@@ -80,20 +84,18 @@ public static class ConfigManager
             heroCfg.Ap = (int)Math.Round(jobCfg.Ap * (100f + heroCfg.Ap) / 100f);
             // 主属性（攻击/生命）：写回 = 职业基准×(1+修正%/100) × 品质系数CombatConst.QualityAttrFactor^(Q-1)，即“1星带品质面板”
             // （图鉴/排行/发卡/AI/排序直接读即为此口径）；星级成长保留到运行时按每星 CombatConst.StarGrowthPerStar 乘
-            // 注：法术(Ap) 不乘品质系数（保持次级面板口径），仅攻击/生命参与品质加成
+            // 注：法术(Ap) 不乘品质系数（保持次级面板口径），仅攻击/生命参与品质加成；攻击再 ÷ 法术倍率 MagicRate（法系乘1.5下调攻击），生命不参与
             float qualityFactor = Mathf.Pow(CombatConst.QualityAttrFactor, Mathf.Max(1, heroCfg.Quality) - 1);
-            heroCfg.Atk = (int)Math.Round(jobCfg.Atk * (100f + heroCfg.Atk) / 100f * qualityFactor);
+            heroCfg.Atk = (int)Math.Round(jobCfg.Atk * (100f + heroCfg.Atk) / 100f * qualityFactor / magicRate);
             heroCfg.Hp = (int)Math.Round(jobCfg.Hp * (100f + heroCfg.Hp) / 100f * qualityFactor);
-        }
 
-        // 英雄专属技能（HeroConfig.Skill1 指向的技能缩写）的伤害/治疗基值修正，共两项，写回配置后
-        // 战场结算(Skill.GetSkillDamage/GetSkillHeal、DOT)与技能tips(GetSkillDescript)自动统一：
-        //   ①品质：× CombatConst.QualitySkillFactor^(Q-1)，即 Q1=×1、Q2=×1.3、Q3=×1.69、Q4=×2.197
-        //   ②MP消耗：× MpCost/CombatConst.SkillMpStandard（基准MpCost=100，钳制到[SkillMpFactorMin,SkillMpFactorMax]），
-        //      MP消耗越高、释放越慢，则单次伤害/治疗越高，反之越低
-        // 技能数值行按 Sname 唯一归属一名英雄；职业兵种技能/好友连锁技能/道具技能的 Sname 非英雄名，不参与该修正。
-        foreach (var heroCfg in HeroConfig.ConfigList)
-        {
+            // 英雄专属技能（HeroConfig.Skill1 指向的技能缩写）的伤害/治疗基值修正，共三项，写回配置后
+            // 战场结算(Skill.GetSkillDamage/GetSkillHeal、DOT)与技能tips(GetSkillDescript)自动统一：
+            //   ①品质：× CombatConst.QualitySkillFactor^(Q-1)，即 Q1=×1、Q2=×1.3、Q3=×1.69、Q4=×2.197
+            //   ②MP消耗：× MpCost/CombatConst.SkillMpStandard（基准MpCost=100，钳制到[SkillMpFactorMin,SkillMpFactorMax]），
+            //      MP消耗越高、释放越慢，则单次伤害/治疗越高，反之越低
+            //   ③法术倍率：× MagicRate（法系技能更强，与英雄攻击÷MagicRate对冲）
+            // 技能数值行按 Sname 唯一归属一名英雄；职业兵种技能/好友连锁技能/道具技能的 Sname 非英雄名，不参与该修正。
             if (string.IsNullOrEmpty(heroCfg.Skill1))
                 continue;
             float qualitySkillFactor = Mathf.Pow(CombatConst.QualitySkillFactor, Mathf.Max(1, heroCfg.Quality) - 1);
@@ -103,7 +105,7 @@ public static class ConfigManager
                     continue;
                 float mpFactor = Mathf.Clamp(skillCfg.MpCost / CombatConst.SkillMpStandard,
                     CombatConst.SkillMpFactorMin, CombatConst.SkillMpFactorMax);
-                float factor = qualitySkillFactor * mpFactor;
+                float factor = qualitySkillFactor * mpFactor * magicRate;
                 skillCfg.DamageStrength *= factor;
                 skillCfg.HealStrength *= factor;
             }
