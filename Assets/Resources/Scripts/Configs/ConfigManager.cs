@@ -85,6 +85,26 @@ public static class ConfigManager
             heroCfg.Atk = (int)Math.Round(jobCfg.Atk * (100f + heroCfg.Atk) / 100f * qualityFactor);
             heroCfg.Hp = (int)Math.Round(jobCfg.Hp * (100f + heroCfg.Hp) / 100f * qualityFactor);
         }
+
+        // 英雄专属技能（HeroConfig.Skill1 指向的技能缩写）的伤害/治疗基值按品质修正：
+        // DamageStrength/HealStrength × CombatConst.QualitySkillFactor^(Q-1)，即 Q1=×1、Q2=×1.3、Q3=×1.69、Q4=×2.197。
+        // 技能数值行按 Sname 唯一归属一名英雄，写回配置后战场结算(Skill.GetSkillDamage/GetSkillHeal、DOT)与技能tips(GetSkillDescript)自动统一；
+        // 职业兵种技能/好友连锁技能/道具技能的 Sname 非英雄名，不参与该修正。
+        foreach (var heroCfg in HeroConfig.ConfigList)
+        {
+            if (string.IsNullOrEmpty(heroCfg.Skill1))
+                continue;
+            float skillFactor = Mathf.Pow(CombatConst.QualitySkillFactor, Mathf.Max(1, heroCfg.Quality) - 1);
+            if (Mathf.Approximately(skillFactor, 1f))
+                continue;
+            foreach (var skillCfg in SkillConfig.ConfigList)
+            {
+                if (skillCfg.Sname != heroCfg.Skill1)
+                    continue;
+                skillCfg.DamageStrength *= skillFactor;
+                skillCfg.HealStrength *= skillFactor;
+            }
+        }
     }
 
     public static void InitFriend()

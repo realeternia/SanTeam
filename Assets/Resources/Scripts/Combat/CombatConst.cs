@@ -89,6 +89,8 @@ public static class CombatConst
     public const float StarGrowthPerStar = 1.7f;
     /// <summary>品质系数：每提升1档品质 ×本值（1.30^(Q-1)，Q1=×1.0、Q2=×1.40、Q3=×1.96…），仅作用于 Atk/Hp</summary>
     public const float QualityAttrFactor = 1.30f;
+    /// <summary>技能品质系数：英雄专属技能的 DamageStrength/HealStrength 每提升1档品质 ×本值（^(Q-1)：Q1=×1.0、Q2=×1.3、Q3=×1.69、Q4=×2.197）</summary>
+    public const float QualitySkillFactor = 1.30f;
 
     // ---- 其他 ----
     /// <summary>近战/远程士兵射程判定阈值</summary>

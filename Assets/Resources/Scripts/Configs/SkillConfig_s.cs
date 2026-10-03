@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿using System;
+﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -60,7 +60,7 @@ namespace CommonConfig
             {"DamageStrength", new FieldMetaInfo("技能强度（恒定,伤害/DOT基值专用）", "float", 60)},
             {"HealStrength", new FieldMetaInfo("技能治疗基值（恒定,治疗专用）", "float", 60)},
             {"Strength2", new FieldMetaInfo("数值槽（数组，压缩存非零值；下标1基引用，如 /strength2-1）", "float[]", 60)},
-            {"StrengthBuff1", new FieldMetaInfo("Buff数值槽（数组，压缩存非零值；下标1基引用，如 /strengthbuff1-1）", "float[]", 60)},
+            {"StrengthBuff1", new FieldMetaInfo("Buff数值槽（数组，压缩存非零值；下标1基引用，如 /strengthbuff1-1）", "float[]", 77)},
             {"BuffId", new FieldMetaInfo("BuffId", "string", 0)},
             {"NegBuff", new FieldMetaInfo("是否针对负面buff", "bool", 0)},
             {"BuffTime", new FieldMetaInfo("Buff持续", "float", 60)},
@@ -964,6 +964,11 @@ namespace CommonConfig
             config[2021028] = new SkillConfig(2021028, "敛翼", "钟会", "", "术", 3, 0f, 4.5f, 12, 0f, "", 0, "", 40f, 0f, "", 0, 300f, 0f, new float[]{0.20f,0.35f}, new float[0], "", false, 0f, "", 0, 0f, 0f, 0f, 0, "SkillAidLethalGambit", "sway", "MagicChargeYellow", "", "", "", "", "");
             config[2021029] = new SkillConfig(2021029, "敛翼", "钟会", "", "术", 4, 0f, 4.5f, 12, 0f, "", 0, "", 40f, 0f, "", 0, 400f, 0f, new float[]{0.24f,0.35f}, new float[0], "", false, 0f, "", 0, 0f, 0f, 0f, 0, "SkillAidLethalGambit", "sway", "MagicChargeYellow", "", "", "", "", "");
             config[2021030] = new SkillConfig(2021030, "敛翼", "钟会", "", "术", 5, 0f, 4.5f, 12, 0f, "", 0, "", 40f, 0f, "", 0, 550f, 0f, new float[]{0.28f,0.4f}, new float[0], "", false, 0f, "", 0, 0f, 0f, 0f, 0, "SkillAidLethalGambit", "sway", "MagicChargeYellow", "", "", "", "", "");
+            config[2021031] = new SkillConfig(2021031, "强击", "强", "对目标造成法强/damagestrength的魔法伤害", "技", 1, 1f, 1f, 12, 0f, "", 0, "", 30f, 0f, "", 1, 60f, 0f, new float[0], new float[0], "", false, 0f, "", 0, 0f, 0f, 0f, 0, "AidSuddenArrow", "throw", "BulletExplosionBlue", "", "", "", "", "");
+            config[2021032] = new SkillConfig(2021032, "强击", "强", "", "技", 2, 1f, 1f, 12, 0f, "", 0, "", 30f, 0f, "", 1, 120f, 0f, new float[0], new float[0], "", false, 0f, "", 0, 0f, 0f, 0f, 0, "AidSuddenArrow", "throw", "BulletExplosionBlue", "", "", "", "", "");
+            config[2021033] = new SkillConfig(2021033, "强击", "强", "", "技", 3, 1f, 1f, 12, 0f, "", 0, "", 30f, 0f, "", 1, 180f, 0f, new float[0], new float[0], "", false, 0f, "", 0, 0f, 0f, 0f, 0, "AidSuddenArrow", "throw", "BulletExplosionBlue", "", "", "", "", "");
+            config[2021034] = new SkillConfig(2021034, "强击", "强", "", "技", 4, 1f, 1f, 12, 0f, "", 0, "", 30f, 0f, "", 1, 240f, 0f, new float[0], new float[0], "", false, 0f, "", 0, 0f, 0f, 0f, 0, "AidSuddenArrow", "throw", "BulletExplosionBlue", "", "", "", "", "");
+            config[2021035] = new SkillConfig(2021035, "强击", "强", "", "技", 5, 1f, 1f, 12, 0f, "", 0, "", 30f, 0f, "", 1, 300f, 0f, new float[0], new float[0], "", false, 0f, "", 0, 0f, 0f, 0f, 0, "AidSuddenArrow", "throw", "BulletExplosionBlue", "", "", "", "", "");
             config[2020806] = new SkillConfig(2020806, "舌辩", "张松", "对目标造成/damagestrength法术伤害并大幅减速，持续/bufftime秒", "术", 1, 0f, 4f, 10, 0f, "", 0, "", 40f, 0f, "", 0, 120f, 0f, new float[0], new float[]{0.45f}, "缓", false, 3f, "", 0, 0f, 0f, 0f, 0, "SkillAidSilverTongue", "sway", "AuraSoftPurple", "", "", "", "", "");
             config[2020807] = new SkillConfig(2020807, "舌辩", "张松", "", "术", 2, 0f, 4f, 10, 0f, "", 0, "", 40f, 0f, "", 0, 170f, 0f, new float[0], new float[]{0.45f}, "缓", false, 3f, "", 0, 0f, 0f, 0f, 0, "SkillAidSilverTongue", "sway", "AuraSoftPurple", "", "", "", "", "");
             config[2020808] = new SkillConfig(2020808, "舌辩", "张松", "", "术", 3, 0f, 4f, 10, 0f, "", 0, "", 40f, 0f, "", 0, 220f, 0f, new float[0], new float[]{0.45f}, "缓", false, 4f, "", 0, 0f, 0f, 0f, 0, "SkillAidSilverTongue", "sway", "AuraSoftPurple", "", "", "", "", "");
