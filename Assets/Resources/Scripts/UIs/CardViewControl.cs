@@ -145,7 +145,7 @@ public class CardViewControl : MonoBehaviour, IPointerDownHandler, IPointerUpHan
 
             // 卡面只显示职业兵种技能图标，个人技能(Skill1)不在卡面显示
             var jobCfg = ConfigManager.GetJobConfig(heroCfg.Job);
-            var jobSkillCfg = jobCfg != null ? ConfigManager.GetSkillConfig(jobCfg.SkillId) : null;
+            var jobSkillCfg = jobCfg != null ? ConfigManager.GetSkillConfig(jobCfg.NameS) : null;
             for (int i = 0; i < heroJobImage.Length; i++)
             {
                 bool show = i == 0 && jobSkillCfg != null && !string.IsNullOrEmpty(jobSkillCfg.Icon);

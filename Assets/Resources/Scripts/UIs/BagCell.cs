@@ -68,7 +68,7 @@ public class BagCell : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragH
 
         itemImage.sprite = Resources.Load<Sprite>("Textures/SkinsBig/" + heroCfg.Icon);
 
-        // 显示职业图标：取职业技能（GetHeroSkillConfigs 第一项为 JobConfig.SkillId）的图标
+        // 显示职业图标：取职业技能（GetHeroSkillConfigs 第一项为 JobConfig.NameS）的图标
         if (jobImage != null)
         {
             var skillCfgs = ConfigManager.GetHeroSkillConfigs(heroCfg);

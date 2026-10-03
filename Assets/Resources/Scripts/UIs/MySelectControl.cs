@@ -189,8 +189,8 @@ public class MySelectControl : MonoBehaviour
                 Kind = BondKind.Job,
                 Name = jobCfg.Name,
                 Level = kv.Value.Count,
-                Icon = GetSkillIcon(jobCfg.SkillId),
-                SkillId = jobCfg.SkillId,
+                Icon = GetSkillIcon(jobCfg.NameS),
+                SkillId = jobCfg.NameS,
                 HeroIds = jobAllHeroes.TryGetValue(kv.Key, out var all) ? all : kv.Value,
                 Player = checkPlayer,
             });

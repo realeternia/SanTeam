@@ -4,7 +4,7 @@ using UnityEngine;
 
 /// <summary>
 /// 兵种连锁（金铲铲式职业羁绊）：战斗开始时统计本侧同职业英雄数量，
-/// 按 SkillConfig 职业技能行（Sname=JobConfig.SkillId）触发羁绊效果。档位：上阵 1/2/3/4/5 人对应职业技能 Lv1~5 行。
+/// 按 SkillConfig 职业技能行（Sname=JobConfig.NameS）触发羁绊效果。档位：上阵 1/2/3/4/5 人对应职业技能 Lv1~5 行。
 /// 效果分两类：
 /// 1. 属性加成（不走技能系统）：按 LinkSelf/LinkTeam/AuroAttrs 施加被动属性
 ///    - LinkSelf：连接英雄（该职业每个英雄自身）获得的属性；其中 soldierAtk/soldierHp 例外，按乘法系数施加给本侧全部士兵
@@ -155,7 +155,7 @@ public static class JobLinkManager
     private static void SetJobSkillLevel(List<Chess> heroes, string job, int lv)
     {
         var jobCfg = ConfigManager.GetJobConfig(job);
-        var sname = jobCfg != null ? jobCfg.SkillId : null;
+        var sname = jobCfg != null ? jobCfg.NameS : null;
         if (string.IsNullOrEmpty(sname))
             return;
         foreach (var hero in heroes)
@@ -177,7 +177,7 @@ public static class JobLinkManager
     public static SkillConfig GetTierConfig(string job, int fieldCount)
     {
         var jobCfg = ConfigManager.GetJobConfig(job);
-        var sname = jobCfg != null ? jobCfg.SkillId : null;
+        var sname = jobCfg != null ? jobCfg.NameS : null;
         if (string.IsNullOrEmpty(sname))
             return null;
 

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -297,7 +297,7 @@ namespace CommonConfig
             config[106005] = new HeroConfig(106005, "许攸", 1, "扇", 2, 0, 0, 0, 100, 100, 0, 0, 0, 0, 0, 6, 4, 0, 0, "许攸", "xuyou");
             config[106006] = new HeroConfig(106006, "高览", 1, "弓", 1, 0, 0, 0, 100, 100, 0, 0, 0, 0, 0, 6, 2, 0, 0, "高览", "gaolan");
             config[106007] = new HeroConfig(106007, "沮授", 1, "相", 2, 0, 0, 0, 100, 100, 0, 0, 0, 0, 0, 6, 4, 0, 0, "沮授", "jushou");
-            config[106008] = new HeroConfig(106008, "郭图", 1, "棋", 1, 0, 0, 0, 100, 100, 0, 0, 0, 0, 0, 6, 2, 0, 0, "强", "guotu");
+            config[106008] = new HeroConfig(106008, "郭图", 1, "棋", 1, 0, 0, 0, 100, 100, 0, 0, 0, 0, 0, 6, 2, 0, 0, "郭图", "guotu");
             config[110002] = new HeroConfig(110002, "张任", 1, "弓", 2, 0, 0, 0, 100, 100, 0, 0, 0, 0, 0, 10, 4, 0, 0, "张任", "zhangren");
             config[110003] = new HeroConfig(110003, "华佗", 1, "医", 2, 0, 0, 0, 100, 100, 0, 0, 0, 0, 0, 10, 4, 0, 0, "华佗", "huatuo");
             config[110005] = new HeroConfig(110005, "马腾", 1, "弩", 2, 0, 0, 0, 100, 100, 0, 0, 0, 0, 0, 10, 4, 0, 0, "马腾", "mateng");

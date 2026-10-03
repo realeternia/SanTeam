@@ -355,9 +355,9 @@ public class TooltipHero : BaseTooltip
                     int jobLv = isShopCard || player == null ? 1 : Mathf.Max(1, jobFieldCount);
                     var jobCfg = ConfigManager.GetJobConfig(heroJob);
                     string effect = "";
-                    if (jobCfg != null && !string.IsNullOrEmpty(jobCfg.SkillId))
+                    if (jobCfg != null && !string.IsNullOrEmpty(jobCfg.NameS))
                     {
-                        var jobSkillCfg = ConfigManager.GetSkillConfig(jobCfg.SkillId, jobLv);
+                        var jobSkillCfg = ConfigManager.GetSkillConfig(jobCfg.NameS, jobLv);
                         if (jobSkillCfg != null)
                             effect = ConfigManager.GetSkillDescript(jobSkillCfg, true);
                     }

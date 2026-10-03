@@ -380,7 +380,7 @@ public class WorldManager : MonoBehaviour
             if (u == null || !u.isHero || u.hp <= 0) continue;
             var heroCfg = HeroConfig.GetConfig(u.heroId);
             var jobCfg = ConfigManager.GetJobConfig(heroCfg.Job);
-            if (jobCfg != null && jobCfg.SkillId == "工") gongCount++;
+            if (jobCfg != null && jobCfg.NameS == "工") gongCount++;
         }
         if (gongCount <= 0)
             return;

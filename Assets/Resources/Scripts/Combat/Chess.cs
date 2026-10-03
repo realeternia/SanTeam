@@ -165,7 +165,7 @@ public class Chess : MonoBehaviour
 
             var heroCfg = HeroConfig.GetConfig(heroId);
             var jobCfg = ConfigManager.GetJobConfig(heroCfg.Job);
-            var jobSkillSname = jobCfg != null ? jobCfg.SkillId : "";
+            var jobSkillSname = jobCfg != null ? jobCfg.NameS : "";
             var playerInfo = GameManager.Instance.GetPlayer(playerId);
             // 初始化技能：默认取1级行创建，随后按来源修正等级——
             // 个人技能(Skill1)等级 = 卡片等级（超出技能配置最高等级行时按最高等级行生效）；兵种技能为占位技能(Dumb)，职业被动加成由 JobLinkManager 按同职业英雄数直接施加；
