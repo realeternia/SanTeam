@@ -15,13 +15,9 @@ public class BuffTimeDamage : Buff
     public override void OnAdd(Chess chess, Chess caster)
     {
         base.OnAdd(chess, caster);
-        // 与 Skill.GetSkillDamage 保持一致：魔法 = DamageStrength × (100 + ap) / 100；物理/真实 = DamageStrength + atk，再乘以 StrengthBuff1[0] 加成
-        // StrengthBuff1 为压缩数组（只存非零值）：空数组表示无属性加成（如"妖咒"的"败"）
-        float attrBonus = skillCfg.StrengthBuff1.Length > 0 ? skillCfg.StrengthBuff1[0] : 0f;
-        damage = skillCfg.DamageType == CombatConst.DamageTypeMagic
-            ? skillCfg.DamageStrength * (100 + caster.GetAttr("ap") * (1 + attrBonus)) / 100
-            : skillCfg.DamageStrength + caster.GetAttr("atk") * (1 + attrBonus);
-        
+        // 统一走技能伤害公式 Skill.GetSkillDamage（与技能伤害同式）；属性主体取施加者 caster，首次关联时快照，无 Skill 侧等级联动
+        damage = Skill.GetSkillDamage(skillCfg, caster ?? chess);
+
         // 启动伤害协程
         damageCoroutine = chess.StartCoroutine(DamageOverTime(chess, caster));
     }

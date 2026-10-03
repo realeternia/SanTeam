@@ -31,10 +31,22 @@ public class Skill
     /// </summary>
     public int GetSkillDamage()
     {
-        if(skillCfg.DamageType == CombatConst.DamageTypeMagic)
-            return (int)(skillCfg.DamageStrength * (100 + owner.GetAttr("ap")) / 100);
+        return GetSkillDamage(skillCfg, owner);
+    }
+
+    /// <summary>
+    /// 统一技能伤害公式（静态重载，供 Buff 等无 Skill 实例处复用，按传入配置与属性主体计算）：
+    /// DamageType=0 法术 = DamageStrength × (100 + ap) / 100；DamageType=1/2 物理/真实 = DamageStrength + atk。
+    /// 配置或属性主体为空时返回 0。
+    /// </summary>
+    public static int GetSkillDamage(SkillConfig cfg, Chess attrOwner)
+    {
+        if (cfg == null || attrOwner == null)
+            return 0;
+        if (cfg.DamageType == CombatConst.DamageTypeMagic)
+            return (int)(cfg.DamageStrength * (100 + attrOwner.GetAttr("ap")) / 100);
         else
-            return (int)(skillCfg.DamageStrength + owner.GetAttr("atk"));
+            return (int)(cfg.DamageStrength + attrOwner.GetAttr("atk"));
     }
 
     /// <summary>
@@ -43,7 +55,18 @@ public class Skill
     /// </summary>
     public int GetSkillHeal()
     {
-        return (int)(skillCfg.HealStrength * (100 + owner.GetAttr("ap")) / 100);
+        return GetSkillHeal(skillCfg, owner);
+    }
+
+    /// <summary>
+    /// 统一技能治疗公式（静态重载，供 Buff 等无 Skill 实例处复用）：治疗量 = HealStrength × (100 + ap) / 100。
+    /// 配置或属性主体为空时返回 0。
+    /// </summary>
+    public static int GetSkillHeal(SkillConfig cfg, Chess attrOwner)
+    {
+        if (cfg == null || attrOwner == null)
+            return 0;
+        return (int)(cfg.HealStrength * (100 + attrOwner.GetAttr("ap")) / 100);
     }
 
     /// <summary>
