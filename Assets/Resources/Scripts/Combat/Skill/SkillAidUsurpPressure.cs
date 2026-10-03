@@ -21,7 +21,7 @@ public class SkillAidUsurpPressure : Skill
 
         owner.PlayerAnim(skillCfg.Action);
 
-        var units = WorldManager.Instance.GetUnitsInRange(owner.transform.position, skillCfg.Area, owner.side, true);
+        var units = WorldManager.Instance.GetEnemyInRange(owner.transform.position, skillCfg.Area, owner.side);
         var skillDamage = GetSkillDamage();
         var tingBuffId = BuffConfig.GetConfigByNameS("停").Id;
         foreach (var u in units)

@@ -32,7 +32,7 @@ public class SkillAidChargeImpale : Skill
         var halfWidth = skillCfg.Area * 0.5f;
         var skillDamage = GetSkillDamage();
 
-        var units = WorldManager.Instance.GetUnitsInRange(owner.transform.position, skillCfg.Range, owner.side, true);
+        var units = WorldManager.Instance.GetEnemyInRange(owner.transform.position, skillCfg.Range, owner.side);
         foreach (var u in units)
         {
             if (u == owner || u.hp <= 0)

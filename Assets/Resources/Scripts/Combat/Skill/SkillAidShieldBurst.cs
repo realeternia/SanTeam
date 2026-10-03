@@ -64,7 +64,7 @@ public class SkillAidShieldBurst : Skill
             return;
 
         float radius = skillCfg.Area;
-        var enemies = WorldManager.Instance.GetUnitsInRange(owner.transform.position, radius, owner.side, true);
+        var enemies = WorldManager.Instance.GetEnemyInRange(owner.transform.position, radius, owner.side);
 
         foreach (var enemy in enemies)
         {

@@ -20,7 +20,7 @@ public class SkillAidGuardArmy : Skill
             return false;
 
         // 找生命比例最低的友军
-        var allies = WorldManager.Instance.GetUnitsInRange(owner.transform.position, 0f, owner.side, false);
+        var allies = WorldManager.Instance.GetMySideInRange(owner.transform.position, 0f, owner.side);
         Chess lowest = null;
         foreach (var a in allies)
         {

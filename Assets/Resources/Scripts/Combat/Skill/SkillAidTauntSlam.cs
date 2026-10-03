@@ -20,7 +20,7 @@ public class SkillAidTauntSlam : Skill
 
         owner.PlayerAnim(skillCfg.Action);
 
-        var enemies = WorldManager.Instance.GetUnitsInRange(owner.transform.position, skillCfg.Area, owner.side, true);
+        var enemies = WorldManager.Instance.GetEnemyInRange(owner.transform.position, skillCfg.Area, owner.side);
         foreach (var e in enemies)
         {
             if (e == null || e.hp <= 0)

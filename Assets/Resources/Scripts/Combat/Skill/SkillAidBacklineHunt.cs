@@ -1,4 +1,4 @@
-﻿using CommonConfig;
+using CommonConfig;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -16,7 +16,7 @@ public class SkillAidBacklineHunt : Skill
     /// </summary>
     public override bool CheckAidSkill()
     {
-        var enemies = WorldManager.Instance.GetUnitsInRange(owner.transform.position, skillCfg.Range, owner.side, true);
+        var enemies = WorldManager.Instance.GetEnemyInRange(owner.transform.position, skillCfg.Range, owner.side);
         Chess back = null;
         float md = -1f;
         if (enemies != null)

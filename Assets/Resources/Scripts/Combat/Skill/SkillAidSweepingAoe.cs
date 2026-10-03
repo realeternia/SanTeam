@@ -22,7 +22,7 @@ public class SkillAidSweepingAoe : Skill
         PlayAreaEffect(owner.transform.position);
 
         var skillDamage = GetSkillDamage();
-        var units = WorldManager.Instance.GetUnitsInRange(owner.transform.position, skillCfg.Area, owner.side, true);
+        var units = WorldManager.Instance.GetEnemyInRange(owner.transform.position, skillCfg.Area, owner.side);
         foreach (var u in units)
         {
             if (skillDamage > 0)

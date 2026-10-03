@@ -1,4 +1,4 @@
-﻿using CommonConfig;
+using CommonConfig;
 using UnityEngine;
 
 /// <summary>
@@ -23,7 +23,7 @@ public class SkillAidColossalSlam : Skill
         PlayAreaEffect(owner.transform.position);
 
         var baseDamage = GetSkillDamage();
-        var units = WorldManager.Instance.GetUnitsInRange(owner.transform.position, skillCfg.Area, owner.side, true);
+        var units = WorldManager.Instance.GetEnemyInRange(owner.transform.position, skillCfg.Area, owner.side);
         foreach (var u in units)
         {
             var total = baseDamage + (int)(skillCfg.Strength2[0] * u.maxHp);

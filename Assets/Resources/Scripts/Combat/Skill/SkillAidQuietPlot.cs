@@ -21,7 +21,7 @@ public class SkillAidQuietPlot : Skill
 
         owner.PlayerAnim(skillCfg.Action);
 
-        var units = WorldManager.Instance.GetUnitsInRange(owner.transform.position, skillCfg.Area, owner.side, true);
+        var units = WorldManager.Instance.GetEnemyInRange(owner.transform.position, skillCfg.Area, owner.side);
         var skillDamage = GetSkillDamage();
         var yiBuffId = BuffConfig.GetConfigByNameS("疫").Id;
         foreach (var u in units)

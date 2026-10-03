@@ -32,7 +32,7 @@ public class SkillAidSelfAndLowHp : Skill
             selfShield.SetHp(shieldHp);
 
         // 找附近生命比例最低的友军
-        var units = WorldManager.Instance.GetUnitsInRange(owner.transform.position, skillCfg.Range, owner.side, false)
+        var units = WorldManager.Instance.GetMySideInRange(owner.transform.position, skillCfg.Range, owner.side)
             .FindAll(x => x != owner && x.isHero && x.IsInFight());
 
         Chess target = null;

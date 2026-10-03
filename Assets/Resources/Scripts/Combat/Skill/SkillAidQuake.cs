@@ -26,7 +26,7 @@ public class SkillAidQuake : Skill
         owner.PlayerAnim(skillCfg.Action);
         PlayAreaEffect(target.transform.position);
 
-        var units = WorldManager.Instance.GetUnitsInRange(target.transform.position, skillCfg.Area, owner.side, true);
+        var units = WorldManager.Instance.GetEnemyInRange(target.transform.position, skillCfg.Area, owner.side);
         WorldManager.Instance.RandomSelect(units, skillCfg.TargetCount);
 
         var huanBuffId = BuffConfig.GetConfigByNameS("缓").Id; // 减速Buff

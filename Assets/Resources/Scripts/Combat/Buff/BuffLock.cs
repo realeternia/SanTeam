@@ -16,7 +16,7 @@ public class BuffLock : Buff
         if (chainDamage <= 0)
             return; // 伤害被减伤压到0，不再链传，避免 OnSkillDamaged 的伤害<=0 异常
 
-        var unitList = WorldManager.Instance.GetUnitsInRange(owner.transform.position, skillCfg.Area, caster.side, true);
+        var unitList = WorldManager.Instance.GetEnemyInRange(owner.transform.position, skillCfg.Area, caster.side);
         GameLog.Debug("连锁目标数量: " + unitList.Count);
         foreach (var unit in unitList)
         {

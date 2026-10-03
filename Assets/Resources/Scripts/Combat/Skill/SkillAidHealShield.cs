@@ -1,4 +1,4 @@
-﻿using CommonConfig;
+using CommonConfig;
 using UnityEngine;
 
 /// <summary>
@@ -17,7 +17,7 @@ public class SkillAidHealShield : Skill
     public override bool CheckAidSkill()
     {
         // 找范围内生命比例最低的友方英雄（含自身），全部满血则不施放
-        var units = WorldManager.Instance.GetUnitsInRange(owner.transform.position, skillCfg.Range, owner.side, false)
+        var units = WorldManager.Instance.GetMySideInRange(owner.transform.position, skillCfg.Range, owner.side)
             .FindAll(x => x.isHero && x.IsInFight());
 
         Chess target = null;

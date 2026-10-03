@@ -399,7 +399,8 @@ public class WorldManager : MonoBehaviour
         return Vector2Int.Distance(pos1a, pos2a);
     }
 
-    public List<Chess> GetUnitsInRange(Vector3 wPos, float range, int mySide, bool findEnemy)
+    // 获取指定范围内的敌方存活单位(排除影子)
+    public List<Chess> GetEnemyInRange(Vector3 wPos, float range, int mySide)
     {
         Vector2Int center = WorldToGridPosition(wPos, true);
         var unitsInRange = new List<Chess>();
@@ -410,16 +411,8 @@ public class WorldManager : MonoBehaviour
                 Vector2Int chessPos = WorldToGridPosition(chessComponent.transform.position, true);
                 if (Vector2Int.Distance(center, chessPos) <= range || range == 0)
                 {
-                    if (findEnemy)
-                    {
-                        if (IsEnemy(chessComponent.side, mySide))
-                            unitsInRange.Add(chessComponent);
-                    }
-                    else
-                    {
-                        if (!IsEnemy(chessComponent.side, mySide))
-                            unitsInRange.Add(chessComponent);
-                    }
+                    if (IsEnemy(chessComponent.side, mySide))
+                        unitsInRange.Add(chessComponent);
                 }
             }
         }
@@ -491,7 +484,7 @@ public class WorldManager : MonoBehaviour
         }
     }
 
-    public List<Chess> GetUnitsMySide(Vector3 wPos, float range, int mySide)
+    public List<Chess> GetMySideInRange(Vector3 wPos, float range, int mySide)
     {
         Vector2Int center = WorldToGridPosition(wPos, true);
         var unitsInRange = new List<Chess>();

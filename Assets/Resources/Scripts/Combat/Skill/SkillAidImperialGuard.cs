@@ -34,7 +34,7 @@ public class SkillAidImperialGuard : Skill
             return false;
         }
 
-        var allies = WorldManager.Instance.GetUnitsInRange(owner.transform.position, skillCfg.Range, owner.side, false)
+        var allies = WorldManager.Instance.GetMySideInRange(owner.transform.position, skillCfg.Range, owner.side)
             .FindAll(x => x != owner && x.isHero && x.IsInFight());
 
         if (allies.Count == 0)

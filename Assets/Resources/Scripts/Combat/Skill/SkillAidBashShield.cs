@@ -20,7 +20,7 @@ public class SkillAidBashShield : Skill
             return false;
 
         PlayAreaEffect(owner.transform.position);
-        var list = WorldManager.Instance.GetUnitsInRange(owner.transform.position, skillCfg.Area, owner.side, true);
+        var list = WorldManager.Instance.GetEnemyInRange(owner.transform.position, skillCfg.Area, owner.side);
         WorldManager.Instance.RandomSelect(list, skillCfg.TargetCount);
         foreach (var u in list)
             u.OnSkillDamaged(owner, id, GetSkillDamage());

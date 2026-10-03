@@ -25,7 +25,7 @@ public class SkillAidScatterShot : Skill
         owner.PlayerAnim(skillCfg.Action);
         PlayAreaEffect(target.transform.position);
 
-        var targets = WorldManager.Instance.GetUnitsInRange(target.transform.position, skillCfg.Area, owner.side, true);
+        var targets = WorldManager.Instance.GetEnemyInRange(target.transform.position, skillCfg.Area, owner.side);
         WorldManager.Instance.RandomSelect(targets, skillCfg.TargetCount);
 
         foreach (var t in targets)

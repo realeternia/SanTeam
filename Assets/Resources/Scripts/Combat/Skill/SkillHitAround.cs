@@ -1,4 +1,4 @@
-﻿using System.Buffers;
+using System.Buffers;
 using System.Collections;
 using System.Collections.Generic;
 using CommonConfig;
@@ -29,7 +29,7 @@ public class SkillHitAround : Skill
             var hitEffect = EffectManager.PlaySkillEffect(defender, skillCfg.HitEffect);
             hitEffect.transform.forward = (targetPos - startPos).normalized;
 
-            var unitsInRange = WorldManager.Instance.GetUnitsInRange(startPos, skillCfg.Range, owner.side, true);
+            var unitsInRange = WorldManager.Instance.GetEnemyInRange(startPos, skillCfg.Range, owner.side);
             unitsInRange.Remove(defender);
             
             // 筛选startPos到targetPos方向，左右各60°开角内的单位

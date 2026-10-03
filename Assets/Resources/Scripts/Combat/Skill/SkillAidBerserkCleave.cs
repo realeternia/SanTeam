@@ -28,7 +28,7 @@ public class SkillAidBerserkCleave : Skill
             GameLog.Error("SkillAidBerserkCleave: 未找到狂暴Buff短名：" + skillCfg.BuffId);
 
         var skillDamage = GetSkillDamage();
-        var units = WorldManager.Instance.GetUnitsInRange(owner.transform.position, skillCfg.Area, owner.side, true);
+        var units = WorldManager.Instance.GetEnemyInRange(owner.transform.position, skillCfg.Area, owner.side);
         foreach (var u in units)
         {
             if (skillDamage > 0)

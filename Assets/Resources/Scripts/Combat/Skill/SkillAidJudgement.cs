@@ -46,7 +46,7 @@ public class SkillAidJudgement : Skill
             // 引导期间每跳持续播放施法动作
             owner.PlayerAnim(skillCfg.Action);
 
-            var unitList = WorldManager.Instance.GetUnitsInRange(pos, skillCfg.Area, owner.side, true);
+            var unitList = WorldManager.Instance.GetEnemyInRange(pos, skillCfg.Area, owner.side);
             var skillDamage = GetSkillDamage();
             foreach (var unit in unitList)
             {

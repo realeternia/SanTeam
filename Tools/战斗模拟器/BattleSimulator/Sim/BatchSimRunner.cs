@@ -297,7 +297,7 @@ public static class BatchSimRunner
 
         sb.AppendLine("【武将胜率】按胜率降序（胜率 = 胜场 / 出场场次；场均伤害 = 对敌方英雄造成的伤害 / 出场场次；场均法术伤害 = 造成的法术伤害(任意目标) / 出场场次）");
         sb.AppendLine(HeroHeader());
-        AppendHeroRows(sb, heroRows);
+        AppendHeroRows(sb, heroRows, opt.Quality1Level);
         sb.AppendLine();
 
         sb.AppendLine("【职业胜率】按胜率降序（该职业全部英雄的出场/胜负合并统计）");
@@ -337,11 +337,11 @@ public static class BatchSimRunner
 
     private static string HeroHeader()
     {
-        return string.Format("{0,4}  {1,8}  {2,-10}  {3,-6}  {4,4}  {5,6}  {6,6}  {7,6}  {8,6}  {9,8}  {10,10}  {11,12}",
-            "排名", "ID", "名字", "职业", "品质", "出场", "胜", "负", "平", "胜率", "场均伤害", "场均法术伤害");
+        return string.Format("{0,4}  {1,8}  {2,-10}  {3,-6}  {4,4}  {5,4}  {6,6}  {7,6}  {8,6}  {9,6}  {10,8}  {11,10}  {12,12}",
+            "排名", "ID", "名字", "职业", "品质", "等级", "出场", "胜", "负", "平", "胜率", "场均伤害", "场均法术伤害");
     }
 
-    private static void AppendHeroRows(StringBuilder sb, List<StatRow> rows)
+    private static void AppendHeroRows(StringBuilder sb, List<StatRow> rows, int quality1Level)
     {
         if (rows.Count == 0)
         {
@@ -351,9 +351,11 @@ public static class BatchSimRunner
         int rank = 1;
         foreach (var r in rows)
         {
-            sb.AppendLine(string.Format("{0,4}  {1,8}  {2,-10}  {3,-6}  {4,4}  {5,6}  {6,6}  {7,6}  {8,6}  {9,8:P1}  {10,10:N0}  {11,12:N0}",
+            sb.AppendLine(string.Format("{0,4}  {1,8}  {2,-10}  {3,-6}  {4,4}  {5,4}  {6,6}  {7,6}  {8,6}  {9,6}  {10,8:P1}  {11,10:N0}  {12,12:N0}",
                 rank++, r.Id, r.Name, string.IsNullOrEmpty(r.Job) ? "-" : r.Job,
-                r.Quality > 0 ? r.Quality.ToString() : "-", r.Appear, r.Win, r.Loss, r.Draw, r.Rate, r.AvgHeroDamage, r.AvgMagicDamage));
+                r.Quality > 0 ? r.Quality.ToString() : "-",
+                LevelForQuality(r.Id, quality1Level),
+                r.Appear, r.Win, r.Loss, r.Draw, r.Rate, r.AvgHeroDamage, r.AvgMagicDamage));
         }
     }
 

@@ -61,7 +61,7 @@ public class SkillHitFireArea : Skill
     // 在 Range 范围内随机敌人位置放火
     private void SpreadFire(Vector3 center)
     {
-        var enemies = WorldManager.Instance.GetUnitsInRange(center, skillCfg.Area, owner.side, true);
+        var enemies = WorldManager.Instance.GetEnemyInRange(center, skillCfg.Area, owner.side);
         if (enemies.Count <= 0)
             return;
         WorldManager.Instance.RandomSelect(enemies, Math.Max(1, skillCfg.TargetCount));
@@ -84,7 +84,7 @@ public class SkillHitFireArea : Skill
             var unitList = new List<Chess>();
             foreach (var pos in targetPosList)
             {
-                var unitsInRange = WorldManager.Instance.GetUnitsInRange(pos, skillCfg.Area * 1.5f, owner.side, true);
+                var unitsInRange = WorldManager.Instance.GetEnemyInRange(pos, skillCfg.Area * 1.5f, owner.side);
                 WorldManager.Instance.RandomSelect(unitsInRange, skillCfg.TargetCount);
                 foreach (var unit in unitsInRange)
                 {

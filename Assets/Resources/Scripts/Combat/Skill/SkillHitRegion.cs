@@ -40,7 +40,7 @@ public class SkillHitRegion : Skill
             // 引导期间每跳持续播放施法动作
             owner.PlayerAnim(skillCfg.Action);
 
-            var unitsInRange = WorldManager.Instance.GetUnitsInRange(targetPos, skillCfg.Area, owner.side, true);
+            var unitsInRange = WorldManager.Instance.GetEnemyInRange(targetPos, skillCfg.Area, owner.side);
             if (unitsInRange.Count > 0)
             {
                 WorldManager.Instance.RandomSelect(unitsInRange, skillCfg.TargetCount);

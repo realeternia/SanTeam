@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using CommonConfig;
 using UnityEngine;
 
@@ -55,7 +55,7 @@ public class SkillAidCurseHeal : Skill
                 yield break;
 
             // 找 Range 内生命比例最低的友方英雄（仅英雄，不给士兵）
-            var units = WorldManager.Instance.GetUnitsInRange(owner.transform.position, skillCfg.Range, owner.side, false)
+            var units = WorldManager.Instance.GetMySideInRange(owner.transform.position, skillCfg.Range, owner.side)
                 .FindAll(x => x.isHero && x.hp < x.maxHp);
 
             Chess lowest = null;

@@ -26,7 +26,7 @@ public class SkillAidSelfSacrifice : Skill
 
         // 为所有友军附加减伤盾（"硬"=BuffShieldValue，按最大生命比例，需用护盾型容量收敛，此处给固定减伤盾）
         int shieldHardId = BuffConfig.GetConfigByNameS("硬").Id;
-        var allies = WorldManager.Instance.GetUnitsInRange(owner.transform.position, 0f, owner.side, false);
+        var allies = WorldManager.Instance.GetMySideInRange(owner.transform.position, 0f, owner.side);
         foreach (var ally in allies)
         {
             if (ally == null || ally.hp <= 0)

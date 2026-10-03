@@ -46,7 +46,7 @@ public class SkillAidAreaHeal : Skill
             owner.PlayerAnim(skillCfg.Action);
 
             // 领域内全部友方英雄（含自身），每跳回复一次（独立治疗公式）
-            var units = WorldManager.Instance.GetUnitsInRange(center, skillCfg.Area, owner.side, false)
+            var units = WorldManager.Instance.GetMySideInRange(center, skillCfg.Area, owner.side)
                 .FindAll(x => x.isHero && x.hp < x.maxHp);
 
             var heal = GetSkillHeal();

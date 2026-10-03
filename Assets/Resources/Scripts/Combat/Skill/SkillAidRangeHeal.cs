@@ -16,7 +16,7 @@ public class SkillAidRangeHeal : Skill
     public override bool CheckAidSkill()
     {
         // 第一步：在助战射程内选治疗中心（生命比例最低的友方英雄）
-        var units = WorldManager.Instance.GetUnitsInRange(owner.transform.position, skillCfg.Range, owner.side, false)
+        var units = WorldManager.Instance.GetMySideInRange(owner.transform.position, skillCfg.Range, owner.side)
             .FindAll(x => x.isHero && x.IsInFight() && x.hp < x.maxHp);
 
         Chess center = null;
@@ -38,7 +38,7 @@ public class SkillAidRangeHeal : Skill
         owner.PlayerAnim(skillCfg.Action);
 
         // 第二步：以治疗中心为圆心，治疗范围内全部友方英雄
-        var healTargets = WorldManager.Instance.GetUnitsInRange(center.transform.position, skillCfg.Area, owner.side, false)
+        var healTargets = WorldManager.Instance.GetMySideInRange(center.transform.position, skillCfg.Area, owner.side)
             .FindAll(x => x.isHero && x.hp < x.maxHp);
 
         var heal = GetSkillHeal();

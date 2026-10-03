@@ -22,7 +22,7 @@ public class SkillAidDoubleShot : Skill
             return false;
 
         PlayAreaEffect(target.transform.position);
-        var list = WorldManager.Instance.GetUnitsInRange(target.transform.position, skillCfg.Area, owner.side, true);
+        var list = WorldManager.Instance.GetEnemyInRange(target.transform.position, skillCfg.Area, owner.side);
         WorldManager.Instance.RandomSelect(list, skillCfg.TargetCount);
         foreach (var u in list)
             u.OnSkillDamaged(owner, id, GetSkillDamage());

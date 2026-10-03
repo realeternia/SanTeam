@@ -1,4 +1,4 @@
-﻿using CommonConfig;
+using CommonConfig;
 using UnityEngine;
 
 /// <summary>
@@ -24,7 +24,7 @@ public class SkillAidBurstShot : Skill
 
         owner.PlayerAnim(skillCfg.Action);
 
-        var targets = WorldManager.Instance.GetUnitsInRange(owner.transform.position, skillCfg.Range, owner.side, true);
+        var targets = WorldManager.Instance.GetEnemyInRange(owner.transform.position, skillCfg.Range, owner.side);
         WorldManager.Instance.RandomSelect(targets, skillCfg.TargetCount);
 
         foreach (var t in targets)

@@ -380,7 +380,7 @@ public class Skill
         if (taunter == null || taunter.hp <= 0)
             return 0;
 
-        var enemies = WorldManager.Instance.GetUnitsInRange(pos, area, taunter.side, true);
+        var enemies = WorldManager.Instance.GetEnemyInRange(pos, area, taunter.side);
         int count = 0;
         foreach (var e in enemies)
         {

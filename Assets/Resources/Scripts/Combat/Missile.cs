@@ -193,7 +193,7 @@ public class Missile : MonoBehaviour
 
             if (timePast - lastCheckTime >= 0.2f)
             {
-                var unitsInRange = WorldManager.Instance.GetUnitsInRange(currentPos, detectArea, owner.side, true);
+                var unitsInRange = WorldManager.Instance.GetEnemyInRange(currentPos, detectArea, owner.side);
                 unitsInRange.RemoveAll(x => checkedList.Contains(x) || x.hp <= 0); //每个单位结算一次
                 if (unitsInRange.Count > 0)
                 {

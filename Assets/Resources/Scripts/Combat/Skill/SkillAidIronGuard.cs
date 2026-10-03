@@ -33,7 +33,7 @@ public class SkillAidIronGuard : Skill
         TauntEnemies(skillCfg.Area);
 
         var microDamage = GetSkillDamage();
-        var units = WorldManager.Instance.GetUnitsInRange(owner.transform.position, skillCfg.Area, owner.side, true);
+        var units = WorldManager.Instance.GetEnemyInRange(owner.transform.position, skillCfg.Area, owner.side);
         foreach (var u in units)
         {
             if (microDamage > 0)

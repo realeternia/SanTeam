@@ -64,7 +64,7 @@ public class SkillAidScorchedEarth : Skill
             var unitList = new List<Chess>();
             foreach (var pos in targetPosList)
             {
-                var unitsInRange = WorldManager.Instance.GetUnitsInRange(pos, skillCfg.Area * 1.5f, owner.side, true);
+                var unitsInRange = WorldManager.Instance.GetEnemyInRange(pos, skillCfg.Area * 1.5f, owner.side);
                 WorldManager.Instance.RandomSelect(unitsInRange, skillCfg.TargetCount);
 
                 foreach (var unit in unitsInRange)

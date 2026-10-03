@@ -1,4 +1,4 @@
-﻿﻿using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using CommonConfig;
 using UnityEngine;
@@ -11,7 +11,7 @@ public class SkillAttackReboundArrow : Skill
 
     public override void OnAttack(Chess defender, int damage)
     {
-        var unitsInRange = WorldManager.Instance.GetUnitsInRange(defender.transform.position, skillCfg.Range, owner.side, true);
+        var unitsInRange = WorldManager.Instance.GetEnemyInRange(defender.transform.position, skillCfg.Range, owner.side);
         unitsInRange.Remove(defender);
 
         if (unitsInRange.Count > 0 && CheckBurst(defender))

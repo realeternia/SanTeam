@@ -24,7 +24,7 @@ public class SkillAidDecreeAoe : Skill
         var healDownBuffCfg = BuffConfig.GetConfigByNameS(skillCfg.BuffId);
         var skillDamage = GetSkillDamage();
 
-        var units = WorldManager.Instance.GetUnitsInRange(owner.transform.position, skillCfg.Area, owner.side, true);
+        var units = WorldManager.Instance.GetEnemyInRange(owner.transform.position, skillCfg.Area, owner.side);
         foreach (var u in units)
         {
             if (skillDamage > 0)

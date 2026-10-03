@@ -1,4 +1,4 @@
-﻿using System.Linq;
+using System.Linq;
 using CommonConfig;
 using UnityEngine;
 
@@ -18,10 +18,17 @@ public class SkillSoldierBless : Skill
             return false;
         owner.PlayerAnim(skillCfg.Action);
 
-        var alive = WorldManager.Instance.GetUnitsMySide(owner.side)
+        // 祝福优先同侧(battleSide)士兵，无同侧目标再退到跨侧友军(alley)士兵
+        var pool = WorldManager.Instance.GetMySideInRange(owner.transform.position, 0f, owner.side)
             .Where(x => !x.isHero && x.hp > 0 && !x.blessedByXunYu).ToList();
-        var melee = alive.Where(x => x.attackRange < CombatConst.MeleeRange).ToList();
-        var target = melee.Count > 0 ? melee[0] : (alive.Count > 0 ? alive[0] : null);
+        if (pool.Count == 0)
+        {
+            pool = WorldManager.Instance.GetUnitsInRangeAll(owner.transform.position, 0f)
+                .Where(x => !x.isHero && x.hp > 0 && !x.blessedByXunYu
+                    && !WorldManager.Instance.IsEnemy(x.side, owner.side)).ToList();
+        }
+        var melee = pool.Where(x => x.attackRange < CombatConst.MeleeRange).ToList();
+        var target = melee.Count > 0 ? melee[0] : (pool.Count > 0 ? pool[0] : null);
         if (target != null)
         {
             target.blessedByXunYu = true;

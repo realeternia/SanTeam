@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using CommonConfig;
 using UnityEngine;
@@ -14,7 +14,7 @@ public class SkillAttackSpinAttack : Skill
         if(CheckBurst(defender))
         {
             owner.PlayerAnim(skillCfg.Action);
-            var unitsInRange = WorldManager.Instance.GetUnitsInRange(owner.transform.position, skillCfg.Range, owner.side, true);
+            var unitsInRange = WorldManager.Instance.GetEnemyInRange(owner.transform.position, skillCfg.Range, owner.side);
             unitsInRange.Remove(defender);
             WorldManager.Instance.RandomSelect(unitsInRange, skillCfg.TargetCount);
             foreach(var unit in unitsInRange)

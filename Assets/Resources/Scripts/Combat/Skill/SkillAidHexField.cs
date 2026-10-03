@@ -25,7 +25,7 @@ public class SkillAidHexField : Skill
 
         owner.PlayerAnim(skillCfg.Action);
 
-        var units = WorldManager.Instance.GetUnitsInRange(target.transform.position, skillCfg.Area, owner.side, true);
+        var units = WorldManager.Instance.GetEnemyInRange(target.transform.position, skillCfg.Area, owner.side);
         WorldManager.Instance.RandomSelect(units, skillCfg.TargetCount);
 
         var shenBuffId = BuffConfig.GetConfigByNameS("慑").Id; // 减攻Buff

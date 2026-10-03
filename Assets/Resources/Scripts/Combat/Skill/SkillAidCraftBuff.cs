@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using CommonConfig;
 using UnityEngine;
@@ -20,7 +20,7 @@ public class SkillAidCraftBuff : Skill
             return false;
 
         // 我方英雄列表（排除自身，需在战斗中）
-        var allies = WorldManager.Instance.GetUnitsInRange(owner.transform.position, skillCfg.Range, owner.side, false)
+        var allies = WorldManager.Instance.GetMySideInRange(owner.transform.position, skillCfg.Range, owner.side)
             .FindAll(x => x != owner && x.isHero && x.IsInFight());
 
         if (allies.Count == 0)

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using CommonConfig;
 using UnityEngine;
@@ -25,15 +25,21 @@ public class SkillAidNobleBless : Skill
             return false;
         }
 
-        var allies = WorldManager.Instance.GetUnitsInRange(owner.transform.position, skillCfg.Range, owner.side, false)
+        // 祝福优先同侧(battleSide)友军，无同侧目标再退到跨侧友军(alley)
+        var pool = WorldManager.Instance.GetMySideInRange(owner.transform.position, skillCfg.Range, owner.side)
             .FindAll(x => x != owner && x.isHero && x.IsInFight() && !x.HasBuff(buffCfg.Id));
-
-        if (allies.Count == 0)
+        if (pool.Count == 0)
+        {
+            pool = WorldManager.Instance.GetUnitsInRangeAll(owner.transform.position, skillCfg.Range)
+                .FindAll(x => x != owner && !WorldManager.Instance.IsEnemy(x.side, owner.side)
+                    && x.isHero && x.IsInFight() && !x.HasBuff(buffCfg.Id));
+        }
+        if (pool.Count == 0)
             return false;
 
         // 生命比例最高的友军英雄
         Chess highest = null;
-        foreach (var a in allies)
+        foreach (var a in pool)
         {
             if (highest == null || a.HpRate > highest.HpRate)
                 highest = a;

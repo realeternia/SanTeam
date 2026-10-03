@@ -23,7 +23,7 @@ public class SkillAidScorchingRain : Skill
         PlayAreaEffect(owner.transform.position);
 
         var skillDamage = GetSkillDamage();
-        var units = WorldManager.Instance.GetUnitsInRange(owner.transform.position, skillCfg.Area, owner.side, true);
+        var units = WorldManager.Instance.GetEnemyInRange(owner.transform.position, skillCfg.Area, owner.side);
         var secDamage = (int)skillCfg.Strength2[0];
         foreach (var u in units)
         {

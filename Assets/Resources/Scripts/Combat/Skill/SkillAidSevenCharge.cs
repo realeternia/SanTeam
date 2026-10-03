@@ -23,7 +23,7 @@ public class SkillAidSevenCharge : Skill
 
         owner.PlayerAnim(skillCfg.Action);
 
-        var list = WorldManager.Instance.GetUnitsInRange(target.transform.position, skillCfg.Area, owner.side, true);
+        var list = WorldManager.Instance.GetEnemyInRange(target.transform.position, skillCfg.Area, owner.side);
         WorldManager.Instance.RandomSelect(list, skillCfg.TargetCount);
         foreach (var u in list)
         {

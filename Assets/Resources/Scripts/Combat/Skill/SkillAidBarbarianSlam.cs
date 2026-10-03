@@ -20,7 +20,7 @@ public class SkillAidBarbarianSlam : Skill
 
         owner.PlayerAnim(skillCfg.Action);
 
-        var list = WorldManager.Instance.GetUnitsInRange(owner.transform.position, skillCfg.Area, owner.side, true);
+        var list = WorldManager.Instance.GetEnemyInRange(owner.transform.position, skillCfg.Area, owner.side);
         foreach (var enemy in list)
         {
             if (enemy == null || enemy.hp <= 0)

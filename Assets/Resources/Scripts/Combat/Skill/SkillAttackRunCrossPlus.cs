@@ -58,7 +58,7 @@ public class SkillAttackRunCrossPlus : Skill
             Vector3 currentPos = Vector3.Lerp(startPos, targetPos, t);
           //  currentPos.y += yOffset;
 
-            var enmeyList = WorldManager.Instance.GetUnitsInRange(currentPos, skillCfg.Area, owner.side, true);
+            var enmeyList = WorldManager.Instance.GetEnemyInRange(currentPos, skillCfg.Area, owner.side);
             foreach(var chess in enmeyList)
             {
                 if(pushedList.Contains(chess.id) || pushedList.Count >= skillCfg.TargetCount)

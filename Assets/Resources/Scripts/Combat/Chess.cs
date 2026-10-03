@@ -414,7 +414,7 @@ public class Chess : MonoBehaviour
             return;
 
         // 获取所有敌方单位：range传0表示全地图索敌（单位必须知道远处敌人的位置才能向其推进，近战单位射程近不能因此失去索敌能力）
-        var allChess = WorldManager.Instance.GetUnitsInRange(transform.position, 0, side, true);
+        var allChess = WorldManager.Instance.GetEnemyInRange(transform.position, 0, side);
         List<(Chess chess, float distance)> validTargets = new List<(Chess, float)>();
 
         // 收集所有有效目标及其距离
@@ -597,8 +597,7 @@ public class Chess : MonoBehaviour
     {
         Vector3 push = Vector3.zero;
         // 获取单位尺寸尺度内的敌我双方单位，再按米级距离过滤(范围需覆盖最大单位直径，否则重叠不触发)
-        var nearUnits = WorldManager.Instance.GetUnitsInRange(transform.position, CombatConst.UnitSpacingQueryMeters, side, true);
-        nearUnits.AddRange(WorldManager.Instance.GetUnitsInRange(transform.position, CombatConst.UnitSpacingQueryMeters, side, false));
+        var nearUnits = WorldManager.Instance.GetUnitsInRangeAll(transform.position, CombatConst.UnitSpacingQueryMeters);
         foreach (var other in nearUnits)
         {
             if (other == this || other == targetChess || other.hp <= 0 || other.isShadow)

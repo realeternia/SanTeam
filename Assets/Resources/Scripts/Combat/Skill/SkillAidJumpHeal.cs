@@ -23,7 +23,7 @@ public class SkillAidJumpHeal : Skill
     public override bool CheckAidSkill()
     {
         // 首跳目标：Range 内生命比例最低的友方英雄
-        var units = WorldManager.Instance.GetUnitsInRange(owner.transform.position, skillCfg.Range, owner.side, false)
+        var units = WorldManager.Instance.GetMySideInRange(owner.transform.position, skillCfg.Range, owner.side)
             .FindAll(x => x.isHero && x.IsInFight() && x.hp < x.maxHp);
 
         Chess first = null;
@@ -77,7 +77,7 @@ public class SkillAidJumpHeal : Skill
     // 在 from 周围 Area 内找最近的、未治疗过的友方英雄（不给士兵）
     private Chess FindNextHealTarget(Chess from, List<Chess> healedList)
     {
-        var units = WorldManager.Instance.GetUnitsInRange(from.transform.position, skillCfg.Area, owner.side, false)
+        var units = WorldManager.Instance.GetMySideInRange(from.transform.position, skillCfg.Area, owner.side)
             .FindAll(x => x.isHero && x.hp < x.maxHp && !healedList.Contains(x));
 
         Chess nearest = null;
