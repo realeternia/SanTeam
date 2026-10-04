@@ -1,13 +1,13 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using CommonConfig;
 using UnityEngine;
 
 /// <summary>
-/// 风华：攻击命中目标时造成额外魔法伤害（Strength2[0]=0.2~0.5，即攻击力的20%~50%）。
+/// 风华：攻击命中目标时造成额外魔法伤害（Strength2[0]=0.2~0.5，即本次普攻实际伤害的20%~50%）。
 /// 附加伤害作为独立魔法伤害经 OnSkillDamaged 结算（DamageType=法术，受目标魔抗减免），
-/// 不并入普攻的物理伤害，也不随暴击/闪避，仅普攻实际命中时触发。
+/// 不并入普攻的物理伤害，仅普攻实际命中时触发。
 /// </summary>
 public class SkillAttackMagicDamage : Skill
 {
@@ -20,9 +20,8 @@ public class SkillAttackMagicDamage : Skill
         if (skillCfg.Strength2[0] <= 0)
             return;
 
-        // 以攻击基准值(atk)的百分比作为额外魔法伤害，独立结算（魔法伤害受目标魔抗减免）
-        var attackBase = owner.GetAttr("atk");
-        var magicDmg = Math.Max(1, (int)(attackBase * skillCfg.Strength2[0]));
+        // 以本次普攻实际伤害(damage)的百分比作为额外魔法伤害，独立结算（魔法伤害受目标魔抗减免）
+        var magicDmg = Math.Max(1, (int)(damage * skillCfg.Strength2[0]));
         defender.OnSkillDamaged(owner, skillId, magicDmg, false, skillCfg.HurtTag);
 
         if (!string.IsNullOrEmpty(skillCfg.HitEffect))
