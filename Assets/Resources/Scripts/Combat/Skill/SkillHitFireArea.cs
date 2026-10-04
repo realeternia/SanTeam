@@ -8,12 +8,10 @@ using UnityEngine;
 /// <summary>
 /// 火攻场：类似HitWall，攻击时在目标位置召唤一个火焰场，持续造成百分比魔法伤害；
 /// 蔓延：若目标位置周围 Area 内已存在火（SummonTag=火，不区分来源，场景中任意火场都算），则按发动概率(Rate)在 Range 范围内随机敌人位置放火，等级越高概率越高
+/// 非持续施法：放火后施法者可正常移动/普攻，火焰场按 SummonTime 独立持续跳伤（施法者死亡则停止跳伤）
 /// </summary>
 public class SkillHitFireArea : Skill
 {
-    // 本次需要持续结算伤害的火焰位置（主火 + 蔓延放的火）
-    private List<Vector3> targetPosList;
-
     public SkillHitFireArea(int id, Chess unit) : base(id, unit)
     {
     }
@@ -25,29 +23,30 @@ public class SkillHitFireArea : Skill
             owner.PlayerAnim(skillCfg.Action);
             var targetPos = defender.transform.position;
 
-            targetPosList = new List<Vector3>();
+            // 本次需要持续结算伤害的火焰位置（主火 + 蔓延放的火），随协程传递，避免重复触发时互相覆盖
+            var posList = new List<Vector3>();
 
             // 蔓延：目标位置周围 Area 内已有火，则按发动概率(Rate)在 Range 范围内随机敌人位置放火
             if (HasFireNear(targetPos))
             {
                 var spreadRate = Mathf.Clamp01(skillCfg.Rate);
                 if (spreadRate > 0 && SysRandom.Value < spreadRate)
-                    SpreadFire(targetPos);
+                    SpreadFire(targetPos, posList);
             }
             else
             {
                 // 若目标位置周围 Area 内无火，则在目标位置召唤一个火焰场
-                AddFire(targetPos);
+                AddFire(targetPos, posList);
             }
 
-            owner.StartCasting(id, DelayDamage());
+            owner.StartCoroutine(DelayDamage(posList));
         }
     }
 
     // 放火：登记结算位置并创建火焰场
-    private void AddFire(Vector3 pos)
+    private void AddFire(Vector3 pos, List<Vector3> posList)
     {
-        targetPosList.Add(pos);
+        posList.Add(pos);
         var magicStub = SummonMagicField(pos, out var summonTime);
         EffectManager.PlayPosSkillEffect(magicStub, pos, skillCfg.Area, skillCfg.AreaEffect, summonTime);
     }
@@ -59,30 +58,27 @@ public class SkillHitFireArea : Skill
     }
 
     // 在 Range 范围内随机敌人位置放火
-    private void SpreadFire(Vector3 center)
+    private void SpreadFire(Vector3 center, List<Vector3> posList)
     {
         var enemies = WorldManager.Instance.GetEnemyInRange(center, skillCfg.Area, owner.side);
         if (enemies.Count <= 0)
             return;
         WorldManager.Instance.RandomSelect(enemies, Math.Max(1, skillCfg.TargetCount));
         foreach (var unit in enemies)
-            AddFire(unit.transform.position);
+            AddFire(unit.transform.position, posList);
     }
 
-    IEnumerator DelayDamage()
+    IEnumerator DelayDamage(List<Vector3> posList)
     {
         var term = (int)Math.Floor(skillCfg.SummonTime / skillCfg.SummonHitInterval);
         for (int i = 0; i < term; i++)
         {
-            // 被打断/死亡：castingSkillId 被 BreakCasting 置0，结束法阵
-            if (owner == null || owner.hp <= 0 || owner.castingSkillId != id)
+            // 非持续施法：火焰场独立持续结算，仅要求施法者存活（施法者死亡后随 GameObject 销毁停止跳伤）
+            if (owner == null || owner.hp <= 0)
                 yield break;
 
-            // 引导期间每跳持续播放施法动作
-            owner.PlayerAnim(skillCfg.Action);
-
             var unitList = new List<Chess>();
-            foreach (var pos in targetPosList)
+            foreach (var pos in posList)
             {
                 var unitsInRange = WorldManager.Instance.GetEnemyInRange(pos, skillCfg.Area * 1.5f, owner.side);
                 WorldManager.Instance.RandomSelect(unitsInRange, skillCfg.TargetCount);

@@ -9,11 +9,11 @@ using UnityEngine;
 /// 普攻触发后在目标周围 skillCfg.Range 半径内随机生成 SummonCount 个落点，
 /// 每个落点召唤法术场并播放火特效，周期性(skillCfg.SummonHitInterval)对落点周围敌人持续造成伤害。
 /// </summary>
-public class SkillAidScorchedEarth : Skill
+public class SkillCastingAidScorchedEarth : Skill
 {
     private List<Vector3> targetPosList;
 
-    public SkillAidScorchedEarth(int id, Chess unit) : base(id, unit)
+    public SkillCastingAidScorchedEarth(int id, Chess unit) : base(id, unit)
     {
     }
 

@@ -52,7 +52,7 @@ public class GlowBeamController : MonoBehaviour
     public void SetGlowColor(Color color) { }
 }
 
-// 技能激光特效：SkillAidLastStrategy 使用。无头环境不渲染，只保留命中判定（朝向直接对准目标，不做缓转向）
+// 技能激光特效：SkillCastingAidLastStrategy 使用。无头环境不渲染，只保留命中判定（朝向直接对准目标，不做缓转向）
 public class LaserBeamController : MonoBehaviour
 {
     public Chess source;

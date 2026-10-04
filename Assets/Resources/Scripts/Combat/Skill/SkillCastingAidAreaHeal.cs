@@ -3,14 +3,14 @@ using CommonConfig;
 using UnityEngine;
 
 /// <summary>
-/// 天书（ScriptName = "AidAreaHeal"）：辅助技能，在自身位置展开治疗领域（参考魔兽争霸3 丛林守护者的"宁静"）。
+/// 天书（ScriptName = "CastingAidAreaHeal"）：辅助技能，持续施法，在自身位置展开治疗领域（参考魔兽争霸3 丛林守护者的"宁静"）。
 /// 领域存在 SummonTime 秒，每 SummonHitInterval 秒为领域内全部友方英雄回复一次生命，
 /// 治疗量走独立治疗公式 GetSkillHeal()。由 SkillManager.CheckAidSkill 自动循环施放；领域召唤物用 SummonTag 区分。
 /// 用于左慈：遁甲天书撒豆成兵、起死回生，术法所至，众军自愈。
 /// </summary>
-public class SkillAidAreaHeal : Skill
+public class SkillCastingAidAreaHeal : Skill
 {
-    public SkillAidAreaHeal(int id, Chess unit) : base(id, unit)
+    public SkillCastingAidAreaHeal(int id, Chess unit) : base(id, unit)
     {
     }
 

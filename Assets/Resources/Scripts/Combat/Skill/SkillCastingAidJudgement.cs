@@ -6,9 +6,9 @@ using UnityEngine;
 /// 法正·明断（术）：对目标位置"area 范围降下雷阵，持续 bufftime 秒，每秒对其中敌人造成 /damagestrength 法术伤害。
 /// 仿张角落雷/陆逊火海：召唤法术场(可视化) + 协程每秒对范围内敌人结算一次。
 /// </summary>
-public class SkillAidJudgement : Skill
+public class SkillCastingAidJudgement : Skill
 {
-    public SkillAidJudgement(int id, Chess unit) : base(id, unit)
+    public SkillCastingAidJudgement(int id, Chess unit) : base(id, unit)
     {
     }
 

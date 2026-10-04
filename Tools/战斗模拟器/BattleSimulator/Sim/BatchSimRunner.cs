@@ -39,6 +39,7 @@ public static class BatchSimRunner
         public int Id;
         public string Name;
         public string Job;              // 职业（仅武将行，物品行为"-"）
+        public string Type;             // 组类型（仅成组行：国家/好友/职业）
         public int Quality;             // 卡片品质（仅武将行，物品行为0）
         public int Appear, Win, Loss, Draw;
         public float HeroDamageTotal;   // 对敌方英雄造成的累计伤害（用于场均）
@@ -122,6 +123,7 @@ public static class BatchSimRunner
 
         var heroStats = new Dictionary<int, StatRow>();
         var itemStats = new Dictionary<int, StatRow>();
+        var groupStats = new Dictionary<string, StatRow>();   // key = 类型|组名
         int winA = 0, winB = 0, draw = 0;
 
         int heroCount = Math.Max(1, opt.HeroCount);
@@ -140,11 +142,16 @@ public static class BatchSimRunner
             int seed = 1 + round;
             SysRandom.Seed(seed);
 
-            // 随机抽双方阵容：近战/远程各半（奇数补 1 个随机），同一英雄不会同场出现在双方
+            // 开启的羁绊类型 → 按该类型成组抽阵容；未开启任何类型时退化为普通远近随机
+            var enabledTypes = EnabledGroupTypes(opt);
+
+            // 随机抽双方阵容：每侧先从已开启类型里随机挑 1 种、再随机挑 1 个组，取一半人成组，
+            // 其余按近战/远程各半补齐；同一英雄不会同场出现在双方
             var used = new HashSet<int>();
-            var teamA = HeroLineup.PickByRole(heroCount, used)
+            HeroLineup.GroupDef groupA, groupB;
+            var teamA = HeroLineup.PickGroupLineup(heroCount, enabledTypes, used, out groupA)
                 .Select(id => (id, LevelForQuality(id, opt.Quality1Level))).ToList();
-            var teamB = HeroLineup.PickByRole(heroCount, used)
+            var teamB = HeroLineup.PickGroupLineup(heroCount, enabledTypes, used, out groupB)
                 .Select(id => (id, LevelForQuality(id, opt.Quality1Level))).ToList();
 
             var battle = new BattleSim
@@ -195,6 +202,8 @@ public static class BatchSimRunner
 
             RecordTeam(teamA, 1, winner, heroStats);
             RecordTeam(teamB, 2, winner, heroStats);
+            RecordGroup(groupStats, groupA, 1, winner);
+            RecordGroup(groupStats, groupB, 2, winner);
             AddRoundDamage(heroStats, teamA, roundHeroDamage, roundMagicDamage);
             AddRoundDamage(heroStats, teamB, roundHeroDamage, roundMagicDamage);
             foreach (var e in equips)
@@ -207,7 +216,7 @@ public static class BatchSimRunner
         var heroRows = Sort(heroStats.Values);
         var itemRows = Sort(itemStats.Values);
         var jobRows = AggregateByJob(heroRows);
-        string report = BuildReport(opt, rounds, winA, winB, draw, heroRows, itemRows, jobRows);
+        string report = BuildReport(opt, rounds, winA, winB, draw, heroRows, itemRows, jobRows, groupStats);
 
         string dir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "sim_reports");
         Directory.CreateDirectory(dir);
@@ -232,6 +241,34 @@ public static class BatchSimRunner
         {
             row = new StatRow { Id = id, Name = name, Job = job, Quality = quality };
             stats[id] = row;
+        }
+        row.Appear++;
+        if (winner == 0) row.Draw++;
+        else if (winner == side) row.Win++;
+        else row.Loss++;
+    }
+
+    // 已开启的羁绊类型（用于成组抽阵容）：未开启任何类型时返回空表 → 退化为普通远近随机
+    private static List<string> EnabledGroupTypes(Options opt)
+    {
+        var types = new List<string>();
+        if (opt.EnableFaction) types.Add(HeroLineup.GroupTypeFaction);
+        if (opt.EnableFriend) types.Add(HeroLineup.GroupTypeFriend);
+        if (opt.EnableJob) types.Add(HeroLineup.GroupTypeJob);
+        return types;
+    }
+
+    // 记录一队"本场选中的组"的胜负（成组口径：出场=该组被选中的场次）
+    private static void RecordGroup(Dictionary<string, StatRow> stats, HeroLineup.GroupDef group, int side, int winner)
+    {
+        if (group == null)
+            return;
+        string key = group.Type + "|" + group.Name;
+        StatRow row;
+        if (!stats.TryGetValue(key, out row))
+        {
+            row = new StatRow { Id = 0, Name = group.Name, Job = group.Type, Type = group.Type, Quality = 0 };
+            stats[key] = row;
         }
         row.Appear++;
         if (winner == 0) row.Draw++;
@@ -270,7 +307,8 @@ public static class BatchSimRunner
     }
 
     private static string BuildReport(Options opt, int rounds, int winA, int winB, int draw,
-        List<StatRow> heroRows, List<StatRow> itemRows, List<StatRow> jobRows)
+        List<StatRow> heroRows, List<StatRow> itemRows, List<StatRow> jobRows,
+        Dictionary<string, StatRow> groupStats)
     {
         var sb = new StringBuilder();
         sb.AppendLine("==================================================");
@@ -297,6 +335,10 @@ public static class BatchSimRunner
         sb.AppendLine("【职业胜率】按胜率降序（该职业全部英雄的出场/胜负合并统计）");
         sb.AppendLine(JobHeader());
         AppendJobRows(sb, jobRows);
+        sb.AppendLine();
+
+        sb.AppendLine("【成组胜率】按胜率降序（成组 = 每侧本场选中的那个组；出场 = 该组被选中的场次数，胜率 = 选中该组的队伍胜场/出场）");
+        AppendGroupSections(sb, groupStats);
         sb.AppendLine();
 
         sb.AppendLine("【物品胜率】按胜率降序（仅随机装备开启时有数据）");
@@ -371,6 +413,30 @@ public static class BatchSimRunner
             sb.AppendLine(string.Format("{0,-10}  {1,8}  {2,8}  {3,8}  {4,8}  {5,8:P1}",
                 r.Name, r.Appear, r.Win, r.Loss, r.Draw, r.Rate));
         }
+    }
+
+    // 成组胜率：按类型（国家/好友/职业）分三张表，仅输出有数据的类型
+    private static void AppendGroupSections(StringBuilder sb, Dictionary<string, StatRow> groupStats)
+    {
+        bool any = false;
+        foreach (var type in HeroLineup.GroupTypes)
+        {
+            var rows = Sort(groupStats.Values.Where(r => r.Type == type));
+            if (rows.Count == 0)
+                continue;
+            any = true;
+            sb.AppendLine("-- " + type + " --");
+            sb.AppendLine(GroupHeader());
+            AppendJobRows(sb, rows);
+        }
+        if (!any)
+            sb.AppendLine("(无数据：未开启任何羁绊加成)");
+    }
+
+    private static string GroupHeader()
+    {
+        return string.Format("{0,-12}  {1,8}  {2,8}  {3,8}  {4,8}  {5,8}",
+            "组名", "出场", "胜", "负", "平", "胜率");
     }
 
     private static string HeroName(int heroId)

@@ -67,7 +67,7 @@ public class BatchSimForm : Form
         Controls.Add(lbl);
         top += h + 22;
 
-        lbl = new Label { Text = "羁绊加成（默认全部关闭）:", Left = left, Top = top + 5, Width = 220 };
+        lbl = new Label { Text = "羁绊加成（开启后按该类型成组抽阵容，默认全关）:", Left = left, Top = top + 5, Width = 390 };
         Controls.Add(lbl);
         top += h;
         _factionChk = new CheckBox { Text = "国家", Left = left + 10, Top = top, Width = 90 };

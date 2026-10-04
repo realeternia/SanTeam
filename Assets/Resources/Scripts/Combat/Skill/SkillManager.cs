@@ -58,8 +58,8 @@ public static class SkillManager
                 return new SkillHitBuff(skillId, owner);
             case "HitBuffArea":
                 return new SkillHitBuffArea(skillId, owner);
-            case "HitRegion":
-                return new SkillHitRegion(skillId, owner);
+            case "CastingAidHitRegion":
+                return new SkillCastingAidHitRegion(skillId, owner);
             case "HitWall":
                 return new SkillHitWall(skillId, owner);
             case "HitFireArea":
@@ -95,8 +95,8 @@ public static class SkillManager
                 return new SkillAidCurseHeal(skillId, owner);
             case "AidJumpHeal":
                 return new SkillAidJumpHeal(skillId, owner);
-            case "AidAreaHeal":
-                return new SkillAidAreaHeal(skillId, owner);
+            case "CastingAidAreaHeal":
+                return new SkillCastingAidAreaHeal(skillId, owner);
 
             case "InitAttrChange":
                 return new SkillInitAttrChange(skillId, owner);
@@ -143,8 +143,8 @@ public static class SkillManager
                 return new SkillAidHexField(skillId, owner);
             case "SkillAidQuake":
                 return new SkillAidQuake(skillId, owner);
-            case "SkillAidScorchedEarth":
-                return new SkillAidScorchedEarth(skillId, owner);
+            case "SkillCastingAidScorchedEarth":
+                return new SkillCastingAidScorchedEarth(skillId, owner);
             case "SkillAidEmpower":
                 return new SkillAidEmpower(skillId, owner);
             case "SkillAidArmorIgnore":
@@ -221,10 +221,10 @@ public static class SkillManager
                 return new SkillAidSelfSacrifice(skillId, owner);
             case "SkillAidLifeLink":
                 return new SkillAidLifeLink(skillId, owner);
-            case "SkillAidJudgement":
-                return new SkillAidJudgement(skillId, owner);
-            case "SkillAidLastStrategy":
-                return new SkillAidLastStrategy(skillId, owner);
+            case "SkillCastingAidJudgement":
+                return new SkillCastingAidJudgement(skillId, owner);
+            case "SkillCastingAidLastStrategy":
+                return new SkillCastingAidLastStrategy(skillId, owner);
             case "SkillAidSweeping":
                 return new SkillAidSweeping(skillId, owner);
             case "SkillAidQuietPlot":

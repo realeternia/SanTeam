@@ -68,7 +68,7 @@
     <Compile Include="Assets\Resources\Scripts\UIs\TooltipHero.cs" />
     <Compile Include="Assets\Resources\Scripts\Configs\SystemAttrConfig_s.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAttackMpGain.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidAreaHeal.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillCastingAidAreaHeal.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidSlowStrike.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffTaunt.cs" />
     <Compile Include="Assets\Resources\Scripts\SystemTip.cs" />
@@ -113,7 +113,7 @@
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillSoldierFortify.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidUnbreakable.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\TooltipItem.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidScorchedEarth.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillCastingAidScorchedEarth.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillHitWall.cs" />
     <Compile Include="Assets\Resources\Scripts\PlayerInfo.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\CastleHUD.cs" />
@@ -171,7 +171,7 @@
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidQuake.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAttackedTeleport.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffDisarm.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidJudgement.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillCastingAidJudgement.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\BattleResultHeroCellControl.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillInitSoldierBuff.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidDefStack.cs" />
@@ -242,7 +242,7 @@
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAttackArmorPierce.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidBerserk.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidMarkTarget.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillHitRegion.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillCastingAidHitRegion.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillModifyBuffTime.cs" />
     <Compile Include="Assets\SineVFX\TopDownEffects\Scripts\SineCameraControllerTopDownEffects.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffManager.cs" />
@@ -285,7 +285,7 @@
     <Compile Include="Assets\Resources\Scripts\Tools\SysRandom.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidScorchingRain.cs" />
     <Compile Include="Assets\Resources\Scripts\Effect\EffectTintColor.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidLastStrategy.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillCastingAidLastStrategy.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\CombatConst.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\SideComposeItem.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillInitAddItemChance.cs" />

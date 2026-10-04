@@ -29,12 +29,12 @@ public class SkillAttackRunCrossPlus : Skill
             PlayAreaEffect(owner.transform.position);
             EffectManager.PlaySkillEffect(owner, skillCfg.HitEffect);
 
-            owner.StartCoroutine(JumpToPosition(mirrorPos));
+            owner.StartCoroutine(JumpToPosition(mirrorPos, damage));
         }
     }
 
-    // 跳跃移动协程
-    private IEnumerator JumpToPosition(Vector3 targetPos)
+    // 跳跃移动协程（damage=触发技能的那次攻击伤害，用于给被穿越敌人结算额外伤害）
+    private IEnumerator JumpToPosition(Vector3 targetPos, int damage)
     {
         Vector3 startPos = owner.transform.position;
         float moveDuration = .8f; // 移动持续时间
@@ -47,6 +47,10 @@ public class SkillAttackRunCrossPlus : Skill
         Vector3 rightDirection = Quaternion.Euler(0, 90, 0) * moveDirection;
         Vector3 leftDirection = Quaternion.Euler(0, -90, 0) * moveDirection;
         
+        // 穿越伤害倍率（Strength2 为压缩数组，空数组=不结算穿越伤害；与突破 AttackRunCross 同口径：攻击伤害×倍率）
+        float damageRate = (skillCfg.Strength2 != null && skillCfg.Strength2.Length > 0) ? skillCfg.Strength2[0] : 0f;
+        int crossDamage = (int)(damage * damageRate);
+
         List<int> pushedList = new List<int>();
         while (elapsedTime < moveDuration)
         {
@@ -76,6 +80,11 @@ public class SkillAttackRunCrossPlus : Skill
                 
                 // 计算推送后的位置
                 chess.MoveTo(chess.transform.position + pushDirection * 15f, true);
+
+                // 被穿越的敌人结算额外伤害（与突破一致，倍率取 Strength2[0]；四舍五入为0时跳过，避免 OnSkillDamaged 报非正伤害）
+                if (crossDamage > 0)
+                    chess.OnSkillDamaged(owner, skillId, crossDamage);
+
                 pushedList.Add(chess.id);
 
                 BuffManager.AddBuff(chess, owner, id, BuffConfig.GetConfigByNameS(skillCfg.BuffId).Id, skillCfg.BuffTime); //加负面buff
