@@ -27,6 +27,7 @@ public class SkillAidDrain : Skill
 
         owner.PlayerAnim(skillCfg.Action);
         var damage = GetSkillDamage();
+        owner.targetChess.OnSkillDamaged(owner, skillId, damage);
 
         // 一次性吸血：按本次技能伤害的比例立即回复自身生命（吸血不算治疗，不吃治疗加成）
         var drain = (int)(damage * 1);
