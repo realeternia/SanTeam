@@ -41,7 +41,7 @@ public class BatchSimForm : Form
 
         lbl = new Label { Text = "每侧武将数量:", Left = left, Top = top + 5, Width = 110 };
         Controls.Add(lbl);
-        _heroCountBox = new NumericUpDown { Left = left + 115, Top = top, Width = 70, Minimum = 1, Maximum = 5, Value = 5 };
+        _heroCountBox = new NumericUpDown { Left = left + 115, Top = top, Width = 70, Minimum = 1, Maximum = 6, Value = 6 };
         Controls.Add(_heroCountBox);
         top += h + 4;
 

@@ -22,7 +22,7 @@ public static class BatchSimRunner
 
     public class Options
     {
-        public int HeroCount = 5;       // 每侧武将数量
+        public int HeroCount = 6;       // 每侧武将数量（近战/远程各半，奇数补 1 个随机）
         public int SoldierCount = 4;    // 每侧小兵数量（全部近战士兵，占最前排）
         public int SoldierLevel = 6;    // 小兵等级（1~30，决定小兵攻防加成）
         public int Quality1Level = 5;   // 设定等级：品质1~2 用该等级，品质3~4 用该等级-1
@@ -140,18 +140,12 @@ public static class BatchSimRunner
             int seed = 1 + round;
             SysRandom.Seed(seed);
 
-            // 抽 2N 个不重复英雄，前半给甲、后半给乙（同一英雄不会同场出现在双方）
-            var pool = new List<int>(heroIds);
-            Shuffle(pool);
-            int need = Math.Min(pool.Count, heroCount * 2);
-            var teamA = new List<(int id, int lv)>();
-            var teamB = new List<(int id, int lv)>();
-            for (int i = 0; i < need; i++)
-            {
-                var item = (pool[i], LevelForQuality(pool[i], opt.Quality1Level));
-                if (teamA.Count < heroCount) teamA.Add(item);
-                else teamB.Add(item);
-            }
+            // 随机抽双方阵容：近战/远程各半（奇数补 1 个随机），同一英雄不会同场出现在双方
+            var used = new HashSet<int>();
+            var teamA = HeroLineup.PickByRole(heroCount, used)
+                .Select(id => (id, LevelForQuality(id, opt.Quality1Level))).ToList();
+            var teamB = HeroLineup.PickByRole(heroCount, used)
+                .Select(id => (id, LevelForQuality(id, opt.Quality1Level))).ToList();
 
             var battle = new BattleSim
             {
@@ -416,16 +410,4 @@ public static class BatchSimRunner
     }
 
     private static string OnOff(bool on) { return on ? "开" : "关"; }
-
-    // Fisher-Yates 洗牌（用 SysRandom 保证可复现）
-    private static void Shuffle(List<int> list)
-    {
-        for (int i = list.Count - 1; i > 0; i--)
-        {
-            int j = SysRandom.Range(0, i + 1);
-            int t = list[i];
-            list[i] = list[j];
-            list[j] = t;
-        }
-    }
 }

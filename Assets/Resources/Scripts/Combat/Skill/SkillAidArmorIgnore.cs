@@ -15,8 +15,8 @@ public class SkillAidArmorIgnore : Skill
 
     public override float GetArmorDelta(bool isAttackerSide)
     {
-        // 破甲：攻击方物理攻击完全无视目标护甲
-        return -1f;
+        // 破甲：自身作为攻击方时物理攻击完全无视目标护甲（受击时不生效，避免把自己的护甲也清零）
+        return isAttackerSide ? -1f : 0f;
     }
 
     public override bool CheckAidSkill()

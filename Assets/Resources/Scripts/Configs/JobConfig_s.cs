@@ -190,13 +190,13 @@ namespace CommonConfig
             config[401] = new JobConfig(401, "智士", "扇", new string[]{"ap","mpRegen","hp"}, 40, 0, 1.5f, 450, 35, 20, 2, 10, 15, 35, 8, 15, 0f, "StormExplosion");
             config[402] = new JobConfig(402, "丞相", "相", new string[]{"ap","magicres","mpRegen"}, 45, 0, 1.5f, 500, 35, 20, 2, 10, 15, 35, 8, 18, 0f, "SharpExplosionGreen");
             config[403] = new JobConfig(403, "棋手", "棋", new string[]{"ap","crit","mpRegen"}, 50, 0, 1.5f, 450, 35, 20, 2, 10, 15, 35, 8, 15, 0f, "LightningExplosionBlue");
-            config[501] = new JobConfig(501, "鼓手", "鼓", new string[]{"ap","hp","mpRegen"}, 45, 0, 1.5f, 470, 35, 20, 2, 10, 15, 40, 8, 15, 0f, "SharpExplosionGreen");
+            config[501] = new JobConfig(501, "鼓手", "鼓", new string[]{"ap","hp","mpRegen"}, 45, 0, 1.5f, 495, 35, 20, 2, 10, 25, 40, 8, 15, 0f, "SharpExplosionGreen");
             config[502] = new JobConfig(502, "琴手", "琴", new string[]{"ap","mpRegen","atkspeed"}, 45, 0, 1.5f, 480, 35, 20, 2, 10, 20, 40, 8, 15, 0f, "StormExplosion");
             config[503] = new JobConfig(503, "医士", "医", new string[]{"ap","hpRegen","mpRegen"}, 45, 0, 1.5f, 480, 35, 20, 2, 10, 20, 30, 8, 14, 0f, "ShadowExplosionGreen");
             config[601] = new JobConfig(601, "锤兵", "锤", new string[]{"atk","hp","armor"}, 55, 0, 1f, 550, 17, 20, 2, 10, 25, 15, 10, 0, 0f, "SwordHitYellowCritical");
             config[602] = new JobConfig(602, "枪兵", "枪", new string[]{"atk","atkspeed","hp"}, 55, 0, 1f, 550, 17, 20, 2, 10, 25, 25, 10, 0, 0f, "SwordHitYellowCritical");
             config[603] = new JobConfig(603, "戟兵", "戟", new string[]{"atk","armor","hp"}, 50, 0, 1f, 600, 17, 20, 2, 10, 20, 20, 10, 0, 0f, "SwordHitYellowCritical");
-            config[701] = new JobConfig(701, "工匠", "工", new string[]{"ap","atkspeed","hp"}, 45, 0, 1f, 500, 35, 20, 2, 10, 15, 40, 8, 18, 1f, "ToolExplosion");
+            config[701] = new JobConfig(701, "工匠", "工", new string[]{"ap","atkspeed","hp"}, 42, 0, 1f, 480, 35, 20, 2, 10, 15, 40, 8, 18, 1f, "ToolExplosion");
 
             RebuildIndex();
 
