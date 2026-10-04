@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿using System;
+﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -299,16 +299,11 @@ namespace CommonConfig
         public static void Load()
         {
             config.Clear();
-            config[2000001] = new SkillConfig(2000001, "国家护盾", "国", "同阵营英雄获得最大生命+/strength2-1%的护盾", "职业", 1, 0f, 0f, 0, 0f, "", 1, "", 0f, 0f, "", 0, 0f, 0f, new float[]{0.15f}, new float[0], "盾", false, 999f, "", 0, 0f, 0f, 0f, 0, "FactionShield", "", "", "", "shuai", "", "", "");
-            config[2000002] = new SkillConfig(2000002, "国家护盾", "国", "", "职业", 2, 0f, 0f, 0, 0f, "", 1, "", 0f, 0f, "", 0, 0f, 0f, new float[]{0.3f}, new float[0], "盾", false, 999f, "", 0, 0f, 0f, 0f, 0, "FactionShield", "", "", "", "shuai", "", "", "");
-            config[2000003] = new SkillConfig(2000003, "国家护盾", "国", "", "职业", 3, 0f, 0f, 0, 0f, "", 1, "", 0f, 0f, "", 0, 0f, 0f, new float[]{0.45f}, new float[0], "盾", false, 999f, "", 0, 0f, 0f, 0f, 0, "FactionShield", "", "", "", "shuai", "", "", "");
-            config[2000004] = new SkillConfig(2000004, "国家护盾", "国", " ", "职业", 4, 0f, 0f, 0, 0f, "", 1, "", 0f, 0f, "", 0, 0f, 0f, new float[]{0.6f}, new float[0], "盾", false, 999f, "", 0, 0f, 0f, 0f, 0, "FactionShield", "", "", "", "shuai", "", "", "");
-            config[2000005] = new SkillConfig(2000005, "国家护盾", "国", "", "职业", 5, 0f, 0f, 0, 0f, "", 1, "", 0f, 0f, "", 0, 0f, 0f, new float[]{0.75f}, new float[0], "盾", false, 999f, "", 0, 0f, 0f, 0f, 0, "FactionShield", "", "", "", "shuai", "", "", "");
-            config[2000006] = new SkillConfig(2000006, "连线", "友", "连线好友提升自身攻击/linkself-atk", "连接", 1, 0f, 0f, 0, 0f, "", 1, "", 0f, 0f, "", 0, 0f, 0f, new float[0], new float[0], "", false, 0f, "", 0, 0f, 0f, 0f, 0, "InitAttrChange", "", "", "", "you", "atk+15", "", "");
-            config[2000007] = new SkillConfig(2000007, "连线", "友", "", "连接", 2, 0f, 0f, 0, 0f, "", 1, "", 0f, 0f, "", 0, 0f, 0f, new float[0], new float[0], "", false, 0f, "", 0, 0f, 0f, 0f, 0, "InitAttrChange", "", "", "", "you", "atk+30", "", "");
-            config[2000008] = new SkillConfig(2000008, "连线", "友", "", "连接", 3, 0f, 0f, 0, 0f, "", 1, "", 0f, 0f, "", 0, 0f, 0f, new float[0], new float[0], "", false, 0f, "", 0, 0f, 0f, 0f, 0, "InitAttrChange", "", "", "", "you", "atk+45", "", "");
-            config[2000009] = new SkillConfig(2000009, "连线", "友", "", "连接", 4, 0f, 0f, 0, 0f, "", 1, "", 0f, 0f, "", 0, 0f, 0f, new float[0], new float[0], "", false, 0f, "", 0, 0f, 0f, 0f, 0, "InitAttrChange", "", "", "", "you", "atk+60", "", "");
-            config[2000010] = new SkillConfig(2000010, "连线", "友", "", "连接", 5, 0f, 0f, 0, 0f, "", 1, "", 0f, 0f, "", 0, 0f, 0f, new float[0], new float[0], "", false, 0f, "", 0, 0f, 0f, 0f, 0, "InitAttrChange", "", "", "", "you", "atk+90", "", "");
+            config[2000001] = new SkillConfig(2000001, "国家护盾", "国", "同阵营英雄获得最大生命+/strength2-1%的护盾", "职业", 1, 0f, 0f, 0, 0f, "", 1, "", 0f, 0f, "", 0, 0f, 0f, new float[]{0.13f}, new float[0], "盾", false, 999f, "", 0, 0f, 0f, 0f, 0, "FactionShield", "", "", "", "shuai", "", "", "");
+            config[2000002] = new SkillConfig(2000002, "国家护盾", "国", "", "职业", 2, 0f, 0f, 0, 0f, "", 1, "", 0f, 0f, "", 0, 0f, 0f, new float[]{0.18f}, new float[0], "盾", false, 999f, "", 0, 0f, 0f, 0f, 0, "FactionShield", "", "", "", "shuai", "", "", "");
+            config[2000003] = new SkillConfig(2000003, "国家护盾", "国", "", "职业", 3, 0f, 0f, 0, 0f, "", 1, "", 0f, 0f, "", 0, 0f, 0f, new float[]{0.24f}, new float[0], "盾", false, 999f, "", 0, 0f, 0f, 0f, 0, "FactionShield", "", "", "", "shuai", "", "", "");
+            config[2000004] = new SkillConfig(2000004, "国家护盾", "国", " ", "职业", 4, 0f, 0f, 0, 0f, "", 1, "", 0f, 0f, "", 0, 0f, 0f, new float[]{0.32f}, new float[0], "盾", false, 999f, "", 0, 0f, 0f, 0f, 0, "FactionShield", "", "", "", "shuai", "", "", "");
+            config[2000005] = new SkillConfig(2000005, "国家护盾", "国", "", "职业", 5, 0f, 0f, 0, 0f, "", 1, "", 0f, 0f, "", 0, 0f, 0f, new float[]{0.42f}, new float[0], "盾", false, 999f, "", 0, 0f, 0f, 0f, 0, "FactionShield", "", "", "", "shuai", "", "", "");
             config[2000011] = new SkillConfig(2000011, "诸侯", "王", "自身攻击/linkself-atk，护甲/linkself-armor，生命/linkself-hp；阵营护盾额外/strength2-1%", "职业", 1, 0f, 0f, 0, 0f, "", 1, "", 0f, 0f, "", 0, 0f, 0f, new float[]{0.1f}, new float[0], "", false, 0f, "", 0, 0f, 0f, 0f, 0, "Dumb", "", "", "", "shuai", "atk+5,armor+5,hp+50", "", "");
             config[2000012] = new SkillConfig(2000012, "诸侯", "王", "", "职业", 2, 0f, 0f, 0, 0f, "", 1, "", 0f, 0f, "", 0, 0f, 0f, new float[]{0.2f}, new float[0], "", false, 0f, "", 0, 0f, 0f, 0f, 0, "Dumb", "", "", "", "shuai", "atk+10,armor+10,hp+100", "", "");
             config[2000013] = new SkillConfig(2000013, "诸侯", "王", "", "职业", 3, 0f, 0f, 0, 0f, "", 1, "", 0f, 0f, "", 0, 0f, 0f, new float[]{0.3f}, new float[0], "", false, 0f, "", 0, 0f, 0f, 0f, 0, "Dumb", "", "", "", "shuai", "atk+20,armor+20,hp+200", "", "");

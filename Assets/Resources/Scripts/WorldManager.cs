@@ -127,11 +127,7 @@ public class WorldManager : MonoBehaviour
         JobLinkManager.ApplyJobLinks();
         GameLog.Debug("[BattleInit] jobLink done");
 
-        // 连线(武将关系)：计算好友属性加成并创建连线特效
-        FriendLineManager.ApplyFriendLines();
-        GameLog.Debug("[BattleInit] friendLine done");
-
-        // 好友连锁·特殊：在场好友数量提升关联(助益)技能等级（默认无技能，每多一个+1级）
+        // 好友连锁·特殊：在场好友数量提升关联(助益)技能等级并创建连线特效（每多一个+1级）
         FriendLineManager.ApplyFriendSpecialSkills();
         GameLog.Debug("[BattleInit] friendSpecial done");
 

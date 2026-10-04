@@ -348,10 +348,7 @@ public class WorldManager : MonoBehaviour
         if (EnableJobLinks)
             JobLinkManager.ApplyJobLinks();
         if (EnableFriendLines)
-        {
-            FriendLineManager.ApplyFriendLines();
             FriendLineManager.ApplyFriendSpecialSkills();
-        }
         if (EnableFactionShields)
             FactionShieldManager.ApplyFactionShields();
 

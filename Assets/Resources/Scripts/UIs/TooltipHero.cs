@@ -401,7 +401,7 @@ public class TooltipHero : BaseTooltip
                     break;
                 row.gameObject.SetActive(true);
 
-                // 技能描述（最多2行，超出截断）+ 图标：组内配了特殊技能用特殊技能，未配则用默认连线技能"友"
+                // 技能描述（最多2行，超出截断）+ 图标：使用组内配置的关联技能
                 int present = CountFriendPresent(friendCfg, heroId, player);
                 var friendSkillCfg = GetFriendShowSkill(friendCfg, present, out int friendLv);
                 if (isShopCard || player == null)
@@ -471,22 +471,12 @@ public class TooltipHero : BaseTooltip
         return present;
     }
 
-    // 好友组提示里展示的技能：组内配置了特殊技能就用特殊技能（等级=在场成员数，0级=未激活，文本按1级档显示）；
-    // 未配置特殊技能则回退默认连线技能"友"（等级按 CombatConst.FriendLineCounts 档位，好友不足2人=0级）。
+    // 好友组提示里展示的技能：使用组内配置的关联技能（等级=在场成员数，0级=未激活，文本按1级档显示）。
     // level 返回实际展示等级（调用方据此置灰），返回 null 表示无可用技能配置
     internal static SkillConfig GetFriendShowSkill(HeroFriendConfig friendCfg, int presentCount, out int level)
     {
-        string sname = friendCfg.SkillId;
-        if (string.IsNullOrEmpty(sname))
-        {
-            sname = CombatConst.FriendLineSkillSname;
-            level = FriendLineManager.GetFriendLineLevel(presentCount);
-        }
-        else
-        {
-            level = CombatConst.FriendSpecialBaseLevel + presentCount;
-        }
-        return ConfigManager.GetSkillConfig(sname, Mathf.Max(1, level));
+        level = CombatConst.FriendSpecialBaseLevel + presentCount;
+        return ConfigManager.GetSkillConfig(friendCfg.SkillId, Mathf.Max(1, level));
     }
 
     // 拼英雄名字列表（职业/好友列表共用）：按品质倒排（同品质保持原顺序），名字只保留最后一个字；

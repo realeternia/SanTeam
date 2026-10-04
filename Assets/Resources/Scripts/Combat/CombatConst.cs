@@ -92,7 +92,7 @@ public static class CombatConst
 
     // ---- 英雄专属技能数值修正 ----
     /// <summary>技能品质系数：英雄专属技能的 DamageStrength/HealStrength 每提升1档品质 ×本值（^(Q-1)：Q1=×1.0、Q2=×1.3、Q3=×1.69、Q4=×2.197）</summary>
-    public const float QualitySkillFactor = 1.30f;
+    public const float QualitySkillFactor = 1.40f;
     /// <summary>技能MP消耗修正基准：MpCost=本值时系数=1.0，伤害/治疗按 MpCost/本值 等比例放大或缩小（MP消耗越高、释放越慢，单次数值越高）</summary>
     public const float SkillMpStandard = 100f;
     /// <summary>技能MP消耗修正系数下限（MpCost很低时的最小倍率）</summary>
@@ -109,10 +109,8 @@ public static class CombatConst
     public const int LikeCardRefreshRate = 5;
 
     // ---- 连线(武将关系) ----
-    /// <summary>连线好友数量档位(2/3/4/5/6，对应连线技能 Lv1~5)</summary>
+    /// <summary>连线好友数量档位(2/3/4/5/6，供好友收益评估取档)</summary>
     public static readonly int[] FriendLineCounts = { 2, 3, 4, 5, 6 };
-    /// <summary>连线(默认连接)技能缩写（技能Id按 Lv 取 SkillConfig 2000006~2000010，攻击强化比例配在 LinkSelf）</summary>
-    public const string FriendLineSkillSname = "友";
     /// <summary>好友·每回合金币技能缩写（技能Id按 Lv 取 SkillConfig 2010091~2010095；Dumb技能，金币在回合发钱时结算，不在战斗内生效）</summary>
     public const string FriendGoldSkillSname = "济";
     /// <summary>好友·每回合金币技能的每人金币数（每名上阵同组英雄+1金）</summary>
