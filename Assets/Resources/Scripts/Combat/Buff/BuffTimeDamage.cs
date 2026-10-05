@@ -12,6 +12,15 @@ public class BuffTimeDamage : Buff
 
     private Coroutine damageCoroutine;
 
+    /// <summary>
+    /// 覆写每跳伤害（供技能按实时数值计算后写入，如旋风斩按命中伤害比例挂流血）：
+    /// 覆盖 OnAdd 时按 skillCfg 计算的默认伤害，须在首次 tick(1 秒)前调用。
+    /// </summary>
+    public void SetDamage(int value)
+    {
+        damage = value;
+    }
+
     public override void OnAdd(Chess chess, Chess caster)
     {
         base.OnAdd(chess, caster);

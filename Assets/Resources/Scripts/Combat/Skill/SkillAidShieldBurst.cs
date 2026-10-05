@@ -1,12 +1,16 @@
 using CommonConfig;
 
 /// <summary>
-/// 李典·武卫：自套护盾+盾破爆裂（ScriptName = "SkillAidShieldBurst"）：
-/// 循环检查：当自身不存在护盾("盾"=300001)且技能就绪时给自己套盾，护盾量 = Strength2[0] × (100+法强)/100（随法强成长）；
+/// 赵云·龙胆（ScriptName = "SkillAidShieldBurst"）：自套护盾+盾破爆裂，盾期普攻强化（攻守兼备）：
+/// 循环检查：当自身不存在护盾("盾"=300001)且技能就绪时给自己套盾，护盾量 = Strength2[0] × (100+法强)/100（随法强成长），
+/// 并同步附加龙胆状态("胆" BuffShieldGuard，与护盾同时长)：护盾期间攻击力提升 StrengthBuff1[0] 点、普攻附带额外法术伤害 Strength2[1]；
 /// 护盾被移除时经 Chess.OnBuffRemoved 派发到本技能，对周围(Area)范围内敌人造成 GetSkillDamage() 爆裂伤害。
 /// </summary>
 public class SkillAidShieldBurst : Skill
 {
+    /// <summary>龙胆 Buff 短名（BuffShieldGuard "胆"）</summary>
+    public const string GuardBuffNameS = "胆";
+
     public SkillAidShieldBurst(int id, Chess unit) : base(id, unit)
     {
     }
@@ -34,6 +38,13 @@ public class SkillAidShieldBurst : Skill
         var shield = owner.GetBuff(buffCfg.Id) as BuffShield;
         if (shield != null)
             shield.SetHp(shieldHp);
+
+        // 龙胆"胆"：护盾期间攻击力提升 + 普攻附带额外法术伤害（与护盾同时长），让套盾转为攻守兼备
+        var guardCfg = BuffConfig.GetConfigByNameS(GuardBuffNameS);
+        if (guardCfg != null)
+            BuffManager.AddBuff(owner, owner, id, guardCfg.Id, skillCfg.BuffTime);
+        else
+            GameLog.Error("SkillAidShieldBurst: 未找到龙胆Buff短名：" + GuardBuffNameS);
 
         EffectManager.PlaySkillEffect(owner, skillCfg.HitEffect);
         return true;

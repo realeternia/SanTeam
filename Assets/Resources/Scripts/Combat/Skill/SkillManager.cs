@@ -83,8 +83,8 @@ public static class SkillManager
                 return new SkillModifyBuffTime(skillId, owner);
             case "ModifyShootSpeed":
                 return new SkillModifyShootSpeed(skillId, owner);
-            case "AidDrain":
-                return new SkillAidDrain(skillId, owner);
+            case "CastingAidDrain":
+                return new SkillCastingAidDrain(skillId, owner);
             case "AidAura":
                 return new SkillAidAura(skillId, owner);
             case "AidHealShield":
@@ -157,8 +157,8 @@ public static class SkillManager
                 return new SkillAidBacklineHunt(skillId, owner);
             case "SkillAidLifestealStrike":
                 return new SkillAidLifestealStrike(skillId, owner);
-            case "SkillAidVolley":
-                return new SkillAidVolley(skillId, owner);
+            case "SkillAidRaidCamp":
+                return new SkillAidRaidCamp(skillId, owner);
             case "SkillAidDance":
                 return new SkillAidDance(skillId, owner);
             case "SkillAidAssault":
@@ -187,8 +187,8 @@ public static class SkillManager
                 return new SkillAidBashShield(skillId, owner);
             case "SkillAidExecute":
                 return new SkillAidExecute(skillId, owner);
-            case "SkillAidRandomCombo":
-                return new SkillAidRandomCombo(skillId, owner);
+            case "SkillAidCavalryStrike":
+                return new SkillAidCavalryStrike(skillId, owner);
             case "SkillAidHasteStrike":
                 return new SkillAidHasteStrike(skillId, owner);
             case "SkillAidMarkTarget":
@@ -379,9 +379,10 @@ public static class SkillManager
     /// 普攻(Attack)时 castSkillCfg 传 null；护盾按 hurtTag 决定是否吸收（如"AntiShield"绕过护盾打血）；
     /// 真实伤害(DamageType=2)同样无视护盾吸收（护盾不吸收真实伤害）
     /// </summary>
-    public static void DuringCalDamage(Chess attacker, Chess defender, SkillConfig castSkillCfg, ref int damage, string hurtTag, bool isFeedback)
+    public static void DuringCalDamage(Chess attacker, Chess defender, SkillConfig castSkillCfg, ref int damage, string hurtTag, bool isFeedback, bool isRealDamageAttack = false)
     {
-        var isRealDamage = castSkillCfg != null && castSkillCfg.DamageType == CombatConst.DamageTypeReal;
+        var isRealDamage = isRealDamageAttack
+            || (castSkillCfg != null && castSkillCfg.DamageType == CombatConst.DamageTypeReal);
         foreach (var buff in defender.buffs)
         {
             // 真实伤害：跳过吸收型护盾(BuffShield)，其余 buff 照常结算

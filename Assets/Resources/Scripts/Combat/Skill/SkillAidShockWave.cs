@@ -1,19 +1,15 @@
-using System;
-using System.Buffers;
-using System.Collections;
-using System.Collections.Generic;
 using CommonConfig;
 using UnityEngine;
 
 /// <summary>
-/// 许褚·飞斧：向目标位置扔出飞斧，造成范围法术伤害；对拥有吸收盾(BuffShield)的目标造成 2 倍伤害。
-/// 飞斧伤害由飞行中的导弹逐个命中目标结算，故"对盾翻倍"通过 Missile 的每目标伤害倍率回调实现
-/// （施法者自身技能无法在 BeforeCalDamage 中修改自己的伤害：伤害计算阶段会跳过当前施放技能自身）。
+/// 诸葛亮·惊雷（术，ScriptName = "AidShockWave"）：向目标位置降下惊雷，造成范围法术伤害
+/// （伤害由飞行中的导弹逐个命中目标结算），并对命中的敌人附加减速
+/// （BuffSlowDown "缓"，减速比例取 StrengthBuff1[0]）BuffTime 秒。
 /// </summary>
 public class SkillAidShockWave : Skill
 {
-    /// <summary>对拥有吸收盾(BuffShield)且未破盾的目标造成的伤害倍率</summary>
-    private const float ShieldDamageMulti = 2f;
+    /// <summary>减速 Buff 短名（BuffSlowDown "缓"）</summary>
+    public const string SlowBuffNameS = "缓";
 
     public SkillAidShockWave(int id, Chess unit) : base(id, unit)
     {
@@ -34,21 +30,24 @@ public class SkillAidShockWave : Skill
 
         owner.PlayerAnim(skillCfg.Action);
         var damage = GetSkillDamage(); // 固定系数 + 比例系数×关联属性
-        WorldManager.Instance.CreateSpellMissile(owner, targetPos, GetSummonTime(), skillCfg.SummonSpeed, skillCfg.Area, skillCfg.Id, damage, skillCfg.HitEffect, ShieldTargetDamageMulti);
+        WorldManager.Instance.CreateSpellMissile(owner, targetPos, GetSummonTime(), skillCfg.SummonSpeed, skillCfg.Area, skillCfg.Id, damage, skillCfg.HitEffect, null, OnMissileHit);
 
         GameLog.Debug("SkillAidShockWave id=" + id.ToString() + " damage=" + damage.ToString());
 
         return true;
     }
 
-    /// <summary>
-    /// 每目标伤害倍率：目标携带吸收盾(BuffShield)且护盾未破时，飞斧伤害 ×2（对盾克制），否则原伤害。
-    /// </summary>
-    private float ShieldTargetDamageMulti(Chess target)
+    // 导弹命中单个目标后的附加效果：挂减速
+    private void OnMissileHit(Chess target)
     {
-        if (target == null)
-            return 1f;
-        var shield = target.GetBuff(CombatConst.ShieldBuffId) as BuffShield;
-        return shield != null && shield.GetHp() > 0 ? ShieldDamageMulti : 1f;
+        if (target == null || target.hp <= 0)
+            return;
+        var slowCfg = BuffConfig.GetConfigByNameS(SlowBuffNameS);
+        if (slowCfg == null)
+        {
+            GameLog.Error("SkillAidShockWave: 未找到减速Buff短名：" + SlowBuffNameS);
+            return;
+        }
+        BuffManager.AddBuff(target, owner, id, slowCfg.Id, skillCfg.BuffTime);
     }
 }

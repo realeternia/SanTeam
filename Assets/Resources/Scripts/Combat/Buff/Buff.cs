@@ -108,5 +108,15 @@ public class Buff
     {
     }
 
+    /// <summary>
+    /// 普攻伤害类型覆写机制：返回 -1 表示不干预（普攻沿用默认物理结算）；
+    /// 返回 CombatConst.DamageTypeMagic/Attack/Real 则由该 buff 覆写携带者普攻的伤害类型
+    /// （如威震"震"把普攻转为真实伤害：无视护甲与护盾）。多个 buff 时按列表顺序取第一个非负值。
+    /// </summary>
+    public virtual int OverrideAttackDamageType()
+    {
+        return -1;
+    }
+
 
 }

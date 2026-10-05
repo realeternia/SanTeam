@@ -666,9 +666,14 @@ public class Chess : MonoBehaviour
         if (victim == null)
             return;
 
-        // 普攻基准统一为 atk（英雄取攻击；士兵加成系数已折算进atk），受目标护甲减免：
-        // 实际护甲 = 目标护甲 × 攻击方破甲/受击方加甲修正系数（实际伤害 = 攻击 × 100/(100+等效护甲)）
-        var damage = Math.Max(1, (int)(atk * CombatConst.ResistMultiplier(victim.GetEffectiveArmor(this))));
+        // 普攻伤害类型：默认物理(atk)，可被 buff（如威震"震"）覆写为真实伤害
+        var atkDamageType = GetBasicAttackDamageType();
+
+        // 普攻基准统一为 atk（英雄取攻击；士兵加成系数已折算进atk）：
+        // 物理普攻受目标护甲减免（实际伤害 = 攻击 × 100/(100+等效护甲)）；真实伤害无视护甲
+        var damage = atkDamageType == CombatConst.DamageTypeReal
+            ? atk
+            : Math.Max(1, (int)(atk * CombatConst.ResistMultiplier(victim.GetEffectiveArmor(this))));
         var effect = hitEffectName;
         var damageBase = damage;
         var damageMulti = 1f;
@@ -692,7 +697,8 @@ public class Chess : MonoBehaviour
             damage = (int)(damageBase * damageMulti);
             // 结算阶段·受击方：只做伤害吸收（护盾），不做伤害放大
             victim.lastShieldAbsorb = 0; // 记录本次结算的盾吸收量，供战斗模拟器日志区分
-                SkillManager.DuringCalDamage(this, victim, null, ref damage, "", false);
+                // 真实伤害普攻：护盾不吸收（与技能真实伤害一致）
+                SkillManager.DuringCalDamage(this, victim, null, ref damage, "", false, atkDamageType == CombatConst.DamageTypeReal);
         }
 
         if (damage > 0 || victim.lastShieldAbsorb > 0)
@@ -875,6 +881,21 @@ public class Chess : MonoBehaviour
         GameLog.Info("筑垒复活：士兵 soldierId=" + soldierIdOf + " 原地复活满血(双防加持已移除)");
     }
 
+
+    /// <summary>
+    /// 当前普攻的伤害类型：默认物理(CombatConst.DamageTypeAttack)；
+    /// 若身上有 buff 覆写(OverrideAttackDamageType，如威震"震"转真实伤害)则按其返回类型。
+    /// </summary>
+    public int GetBasicAttackDamageType()
+    {
+        foreach (var buff in buffs)
+        {
+            var type = buff.OverrideAttackDamageType();
+            if (type >= 0)
+                return type;
+        }
+        return CombatConst.DamageTypeAttack;
+    }
 
     /// <summary>
     /// 物理伤害结算时受击方的等效护甲：原始护甲 × (1 + Σ攻击方破甲增量 + Σ受击方加甲增量)，多技能按加法叠加

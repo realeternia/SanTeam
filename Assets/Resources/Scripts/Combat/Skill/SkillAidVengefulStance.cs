@@ -2,15 +2,11 @@ using CommonConfig;
 using UnityEngine;
 
 /// <summary>
-/// 张辽·威震：为自身附加威震状态（Buff "威" BuffHitStun，普攻按 Strength2[0]% 概率眩晕）bufftime 秒，
-/// 并同时为自身附加反伤（Buff "反" BuffReflect，受到伤害时把 Strength2 比例反还给攻击者）。
-/// 反伤短名"反"为技能专属常量。
+/// 张辽·威震：为自身附加威震状态（Buff "震" BuffVengefulStance）bufftime 秒。
+/// 该状态下普攻按 Strength2[0] 概率眩晕目标，且普攻伤害类型转为真实伤害（无视护甲与护盾）。
 /// </summary>
 public class SkillAidVengefulStance : Skill
 {
-    /// <summary>反伤 Buff 短名（BuffReflect）</summary>
-    public const string ReflectBuffNameS = "反";
-
     public SkillAidVengefulStance(int id, Chess unit) : base(id, unit)
     {
     }
@@ -26,19 +22,12 @@ public class SkillAidVengefulStance : Skill
         owner.PlayerAnim(skillCfg.Action);
         EffectManager.PlaySkillEffect(owner, skillCfg.HitEffect);
 
-        // 威震"威"（眩晕）
-        var weiBuffCfg = BuffConfig.GetConfigByNameS(skillCfg.BuffId);
-        if (weiBuffCfg != null)
-            BuffManager.AddBuff(owner, owner, id, weiBuffCfg.Id, skillCfg.BuffTime);
+        // 威震"震"（普攻眩晕 + 普攻转真实伤害）
+        var buffCfg = BuffConfig.GetConfigByNameS(skillCfg.BuffId);
+        if (buffCfg != null)
+            BuffManager.AddBuff(owner, owner, id, buffCfg.Id, skillCfg.BuffTime);
         else
             GameLog.Error("SkillAidVengefulStance: 未找到威震Buff短名：" + skillCfg.BuffId);
-
-        // 反伤"反"
-        var reflectBuffCfg = BuffConfig.GetConfigByNameS(ReflectBuffNameS);
-        if (reflectBuffCfg != null)
-            BuffManager.AddBuff(owner, owner, id, reflectBuffCfg.Id, skillCfg.BuffTime);
-        else
-            GameLog.Error("SkillAidVengefulStance: 未找到反伤Buff短名：" + ReflectBuffNameS);
 
         return true;
     }

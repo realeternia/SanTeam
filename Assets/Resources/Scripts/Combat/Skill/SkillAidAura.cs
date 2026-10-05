@@ -7,10 +7,16 @@ using UnityEngine;
 /// 光环主动助战（ScriptName = "AidAura"）：保留 AuroAttrs 开局被动光环，
 /// 施放时对本侧全体英雄（含自身）再永久累加 光环属性值 × Strength2[0]（Strength2[0] 即百分比 x%）。
 /// 复用 JobLinkManager.ParseBonuses/ApplyAttr 与光环被动同一套解析/施加逻辑。
+/// 另每次施放为自身永久成长（StrengthBuff1[0]=攻击、StrengthBuff1[1]=生命），
+/// 使纯光环辅助在单兵情况下也能逐步成长为可独立作战的单位。
 /// 由 SkillManager.CheckAidSkill 经 Skill.CheckAidSkill 自动按 CD 周期性施放。
 /// </summary>
 public class SkillAidAura : Skill
 {
+    /// <summary>自身成长槽位（StrengthBuff1 数组下标）</summary>
+    private const int SelfAtkGrowIdx = 0;
+    private const int SelfHpGrowIdx = 1;
+
     public SkillAidAura(int id, Chess unit) : base(id, unit)
     {
     }
@@ -27,6 +33,13 @@ public class SkillAidAura : Skill
         {
             foreach (var bonus in JobLinkManager.ParseBonuses(skillCfg.AuroAttrs))
                 JobLinkManager.ApplyAttr(unit, bonus.Attr, bonus.Value * skillCfg.Strength2[0]);
+        }
+
+        // 自身永久成长：每次释放额外叠加自身攻击与生命（数值取自 StrengthBuff1）
+        if (skillCfg.StrengthBuff1 != null && skillCfg.StrengthBuff1.Length >= 2)
+        {
+            JobLinkManager.ApplyAttr(owner, "atk", skillCfg.StrengthBuff1[SelfAtkGrowIdx]);
+            JobLinkManager.ApplyAttr(owner, "hp", skillCfg.StrengthBuff1[SelfHpGrowIdx]);
         }
 
         owner.PlayerAnim(skillCfg.Action);

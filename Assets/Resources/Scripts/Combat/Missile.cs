@@ -19,6 +19,9 @@ public class Missile : MonoBehaviour
     /// <summary>每目标伤害倍率回调（可空）：命中单个目标时按该目标计算伤害系数，用于"对特定目标伤害翻倍"类技能（如飞斧对带盾目标）</summary>
     public Func<Chess, float> perTargetDamageMulti;
 
+    /// <summary>每目标命中回调（可空）：命中单个目标结算伤害后调用，用于给命中目标施加额外效果（如惊雷挂减速）</summary>
+    public Action<Chess> perTargetOnHit;
+
     public void Init(Chess sourceChess, float size, string effectName)
     {
         this.effectName = effectName;
@@ -243,6 +246,9 @@ public class Missile : MonoBehaviour
                 : skillDamage;
             target.OnSkillDamaged(owner, skillId, damage);
             EffectManager.PlaySkillEffect(target, hitEffectName);
+            // 命中附加效果（如惊雷减速）：目标仍存活时回调
+            if (perTargetOnHit != null && target != null && target.hp > 0)
+                perTargetOnHit(target);
         }
     }
 }

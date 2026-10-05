@@ -1,12 +1,15 @@
-﻿using CommonConfig;
+using CommonConfig;
 using UnityEngine;
 
 /// <summary>
-/// 司马懿·隐忍（术）：对目标造成高额 /damagestrength 法术伤害，将其拉拽到自己身侧（强制位移 xz 平面），
-/// 并眩晕（Buff "乱"，时长 bufftime）2 秒，把核心敌人拖入己阵围杀。
+/// 司马懿·隐忍（术）：对目标造成高额 /damagestrength 法术伤害，将其推离自身（强制位移 xz 平面），
+/// 并眩晕（Buff "乱"，时长 bufftime）2 秒，把核心敌人推出己阵、打断其输出。
 /// </summary>
 public class SkillAidEnduranceStrike : Skill
 {
+    /// <summary>推远的水平距离</summary>
+    private const float PushDistance = 6f;
+
     public SkillAidEnduranceStrike(int id, Chess unit) : base(id, unit)
     {
     }
@@ -26,9 +29,15 @@ public class SkillAidEnduranceStrike : Skill
         if (GetSkillDamage() > 0)
             target.OnSkillDamaged(owner, skillId, GetSkillDamage());
 
-        // 拉拽到自身近旁（保持地面 y，xz 平面贴靠）
-        var pullPos = new Vector3(owner.transform.position.x + 1f, owner.transform.position.y, owner.transform.position.z + 1f);
-        target.transform.position = pullPos;
+        // 推远：沿"自身→目标"方向把目标推离自身（落点被挡则原地不动，保持地面 y）
+        var dir = target.transform.position - owner.transform.position;
+        dir.y = 0f;
+        if (dir.sqrMagnitude < 0.0001f)
+            dir = Vector3.forward;
+        var pushPos = target.transform.position + dir.normalized * PushDistance;
+        pushPos.y = target.transform.position.y;
+        if (!WorldManager.Instance.CheckPositionBlocked(target, pushPos))
+            target.transform.position = pushPos;
 
         // 眩晕 2 秒
         BuffManager.AddBuff(target, owner, id, BuffConfig.GetConfigByNameS("乱").Id, skillCfg.BuffTime);

@@ -166,6 +166,9 @@ namespace CommonConfig
             config[300030] = new BuffConfig(300030, "望族", "望", "提升/strength点护甲、/strength2点魔抗，每3秒衰减1/5，15秒后归零", true, "BuffDecayDef", "", "", "", "");
             config[300031] = new BuffConfig(300031, "兼资", "兼", "攻击叠层：每层提升/strength攻击、/strength2法术强度，持续攻击刷新，停手后层数清零", true, "BuffStackBuf", "", "", "", "");
             config[300032] = new BuffConfig(300032, "护甲", "甲", "提升护甲", true, "BuffArmorAdd", "", "", "", "");
+            config[300033] = new BuffConfig(300033, "威震", "震", "携带者普攻按概率眩晕目标，且普攻转为真实伤害，持续/bufftime秒", true, "BuffVengefulStance", "", "", "", "");
+            config[300034] = new BuffConfig(300034, "龙胆", "胆", "护盾期间攻击力提升/strengthbuff1-1点，普攻附带额外法术伤害", true, "BuffShieldGuard", "", "", "", "");
+            config[300035] = new BuffConfig(300035, "破甲", "削", "每层降低护甲，可叠加，越打护甲越低", false, "BuffArmorShred", "", "", "", "");
             RebuildIndex();
 
         }

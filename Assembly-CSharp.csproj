@@ -165,6 +165,9 @@
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidBarbarianSlam.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\SideBarAlphaGradient.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffHitStun.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffVengefulStance.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffShieldGuard.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffArmorShred.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAttackRunCross.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAttackShieldPierce.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidAtkDrain.cs" />
@@ -197,7 +200,7 @@
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillInitShieldValue.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidSelfAndLowHp.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffLock.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidVolley.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidRaidCamp.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\PickPanelControl.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\RankPanelManager.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffDecayDef.cs" />
@@ -213,7 +216,7 @@
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidDiveCleave.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillSoldierBuff.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidBuffArea.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidDrain.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillCastingAidDrain.cs" />
     <Compile Include="Assets\SineVFX\TopDownEffects\Scripts\PrefabSpawner.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\TooltipHeroEquip.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAttackedShield.cs" />
@@ -311,7 +314,7 @@
     <Compile Include="Assets\Resources\Scripts\MapConfig.cs" />
     <Compile Include="Assets\DOTween\Modules\DOTweenModuleUIToolkit.cs" />
     <Compile Include="Assets\DOTween\Modules\DOTweenModuleUtils.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidRandomCombo.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidCavalryStrike.cs" />
     <Compile Include="Assets\Resources\Scripts\Configs\SoldierConfig_s.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffAtkAdd.cs" />
     <Compile Include="Assets\Resources\Scripts\Tools\PlayerBook.cs" />

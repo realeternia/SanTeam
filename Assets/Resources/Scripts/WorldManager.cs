@@ -824,7 +824,7 @@ public class WorldManager : MonoBehaviour
         missile.MoveToTarget(targetChess, Mathf.Max(sourceChess.missileSpeed, 14), sourceChess.missileHight);
     }    
 
-    public void CreateSpellMissile(Chess sourceChess, Vector3 targetPos, float time, float speed, float size, int skillId, int damage, string effectName, System.Func<Chess, float> perTargetDamageMulti = null)
+    public void CreateSpellMissile(Chess sourceChess, Vector3 targetPos, float time, float speed, float size, int skillId, int damage, string effectName, System.Func<Chess, float> perTargetDamageMulti = null, System.Action<Chess> perTargetOnHit = null)
     {
         // 首先加载导弹预制体
         Missile missilePrefab = Resources.Load<Missile>("Prefabs/MissileCom");
@@ -834,6 +834,7 @@ public class WorldManager : MonoBehaviour
         missile.Init(sourceChess, size, effectName);
         missile.SetSkillInfo(skillId, damage);
         missile.perTargetDamageMulti = perTargetDamageMulti;
+        missile.perTargetOnHit = perTargetOnHit;
         missile.MoveToDirection(targetPos, time, speed);
     }
 
