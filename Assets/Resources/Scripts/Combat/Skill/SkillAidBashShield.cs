@@ -3,7 +3,7 @@ using CommonConfig;
 using UnityEngine;
 
 /// <summary>
-/// 程普·横扫：对自身范围（Area）内若干敌人（TargetCount）各造成魔法伤害，并给自身挂护盾"盾"（护盾值 = Strength2[0] × (100+法强)/100，随法强成长）
+/// 程普·横扫：对目标造成魔法伤害，并给自身挂护盾"盾"（护盾值 = Strength2[0] × (100+法强)/100，随法强成长）
 /// </summary>
 public class SkillAidBashShield : Skill
 {
@@ -16,14 +16,14 @@ public class SkillAidBashShield : Skill
         var target = owner.targetChess;
         if (target == null || target.hp <= 0)
             return false;
+        if (!WorldManager.Instance.CheckInRange(owner.transform.position, target.transform.position, skillCfg.Range))
+            return false;
         if (!CheckBurst(target))
             return false;
 
-        PlayAreaEffect(owner.transform.position);
-        var list = WorldManager.Instance.GetEnemyInRange(owner.transform.position, skillCfg.Area, owner.side);
-        WorldManager.Instance.RandomSelect(list, skillCfg.TargetCount);
-        foreach (var u in list)
-            u.OnSkillDamaged(owner, id, GetSkillDamage());
+        owner.PlayerAnim(skillCfg.Action);
+        target.OnSkillDamaged(owner, id, GetSkillDamage());
+        EffectManager.PlaySkillEffect(target, skillCfg.HitEffect);
 
         var shieldId = BuffConfig.GetConfigByNameS("盾").Id;
         BuffManager.AddBuff(owner, owner, id, shieldId, skillCfg.BuffTime);
@@ -31,7 +31,6 @@ public class SkillAidBashShield : Skill
         if (sh != null)
             sh.SetHp(GetSkillShield(0));
 
-        owner.PlayerAnim(skillCfg.Action);
         return true;
     }
 }

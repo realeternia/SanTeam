@@ -262,18 +262,12 @@ public static class SkillManager
                 return new SkillAidThrust(skillId, owner);
             case "SkillAidChargeImpale":
                 return new SkillAidChargeImpale(skillId, owner);
-            case "SkillAidScorchingRain":
-                return new SkillAidScorchingRain(skillId, owner);
             case "SkillAidColossalSlam":
                 return new SkillAidColossalSlam(skillId, owner);
-            case "SkillAidDisarmState":
-                return new SkillAidDisarmState(skillId, owner);
             case "SkillAidCraftBuff":
                 return new SkillAidCraftBuff(skillId, owner);
             case "SkillAidFireShot":
                 return new SkillAidFireShot(skillId, owner);
-            case "SkillAidDecreeAoe":
-                return new SkillAidDecreeAoe(skillId, owner);
             case "SkillAidBenevolence":
                 return new SkillAidBenevolence(skillId, owner);
             case "SkillAidImperialGuard":

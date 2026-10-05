@@ -104,7 +104,8 @@
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillInitNoEquipAttr.cs" />
     <Compile Include="Assets\Resources\Scripts\Tools\GameLog.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffArmorDown.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidDecreeAoe.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffArmorAdd.cs" />
+    
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffTimeDamage.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffLifeLink.cs" />
     <Compile Include="Assets\Resources\Scripts\Tools\SysColor.cs" />
@@ -118,7 +119,6 @@
     <Compile Include="Assets\Resources\Scripts\PlayerInfo.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\CastleHUD.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\JobLinkManager.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidDisarmState.cs" />
     <Compile Include="Assets\Resources\Scripts\Configs\ConfigManager.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffDamageAddRate.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidExecute.cs" />
@@ -170,7 +170,6 @@
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidAtkDrain.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidQuake.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAttackedTeleport.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffDisarm.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillCastingAidJudgement.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\BattleResultHeroCellControl.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillInitSoldierBuff.cs" />
@@ -283,7 +282,6 @@
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\Skill.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidTauntSlam.cs" />
     <Compile Include="Assets\Resources\Scripts\Tools\SysRandom.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidScorchingRain.cs" />
     <Compile Include="Assets\Resources\Scripts\Effect\EffectTintColor.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillCastingAidLastStrategy.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\CombatConst.cs" />

@@ -4,7 +4,7 @@ using CommonConfig;
 /// 受击加护盾（ScriptName = "AttackedShield"）：受到攻击时为自己施加数值型吸收盾，
 /// 护盾容量 = Strength2[0] × (100+法强)/100（随法强成长，与「护卫」同口径），护盾 Buff 取技能行 BuffId（"盾"= BuffConfig 300001），持续 BuffTime 秒，
 /// 是否可触发由 Skill.CheckBurst 统一判定（CD、发动概率、MpCost、TriggerCondition 条件如 "hprate&lt;30"）。
-/// 每次触发还会在 StrengthBuff1[1] 秒内每秒回复 StrengthBuff1[0] 点生命（固定值，不随法强成长），不再永久叠加生命回复。
+/// 可选：配置 StrengthBuff1（[0]=每秒回血、[1]=持续秒数）时，触发后在限时内持续回血；未配置则只套盾。
 /// 使用示例：老当益壮 · 宝刀未老（缩写「老」，2010106~2010110，生命低于30%受击时给自己套 140~300 基值护盾（随法强），并在 10 秒内每秒回复 2~6 点生命，CD 15s）。
 /// </summary>
 public class SkillAttackedShield : Skill
@@ -49,10 +49,7 @@ public class SkillAttackedShield : Skill
     {
         var healTime = GetHealTime();
         if (healTime <= 0f)
-        {
-            GameLog.Error($"受击加护盾技能缺少回血持续配置: StrengthBuff1 技能id={id}");
-            return;
-        }
+            return; // 未配置回血（StrengthBuff1 缺省）时仅套盾
 
         var healCfg = BuffConfig.GetConfigByNameS(HealBuffNameS);
         if (healCfg == null)

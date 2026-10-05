@@ -101,9 +101,6 @@ public static class BuffManager
             case "BuffLifeLink":
                 buff = new BuffLifeLink(buffId, skillId, caster, target, time);
                 break;
-            case "BuffDisarm":
-                buff = new BuffDisarm(buffId, skillId, caster, target, time);
-                break;
             case "BuffHpMpRegen":
                 buff = new BuffHpMpRegen(buffId, skillId, caster, target, time);
                 break;
@@ -121,6 +118,9 @@ public static class BuffManager
                 break;
             case "BuffDefStack":
                 buff = new BuffDefStack(buffId, skillId, caster, target, time);
+                break;
+            case "BuffArmorAdd":
+                buff = new BuffArmorAdd(buffId, skillId, caster, target, time);
                 break;
 
         }

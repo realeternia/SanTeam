@@ -3,7 +3,7 @@ using CommonConfig;
 using UnityEngine;
 
 /// <summary>
-/// 孟获·蛮锤：纵锤砸地，对自身 Area 范围内的敌人造成法术伤害并移除其吸收型护盾（对带 BuffShield 的敌人触发移除）。
+/// 曹洪·裂盾：对目标造成法术伤害并移除其吸收型护盾（对带 BuffShield 的目标触发移除）。
 /// </summary>
 public class SkillAidBarbarianSlam : Skill
 {
@@ -13,30 +13,26 @@ public class SkillAidBarbarianSlam : Skill
 
     public override bool CheckAidSkill()
     {
-        if (owner.hp <= 0)
+        var target = owner.targetChess;
+        if (target == null || target.hp <= 0)
             return false;
-        if (!CheckBurst(null))
+        if (!WorldManager.Instance.CheckInRange(owner.transform.position, target.transform.position, skillCfg.Range))
+            return false;
+        if (!CheckBurst(target))
             return false;
 
         owner.PlayerAnim(skillCfg.Action);
 
-        var list = WorldManager.Instance.GetEnemyInRange(owner.transform.position, skillCfg.Area, owner.side);
-        foreach (var enemy in list)
+        target.OnSkillDamaged(owner, id, GetSkillDamage());
+        // 移除吸收型护盾
+        var shield = target.GetBuff(CombatConst.ShieldBuffId) as BuffShield;
+        if (shield != null)
         {
-            if (enemy == null || enemy.hp <= 0)
-                continue;
-            enemy.OnSkillDamaged(owner, id, GetSkillDamage());
-            // 移除吸收型护盾
-            var shield = enemy.GetBuff(CombatConst.ShieldBuffId) as BuffShield;
-            if (shield != null)
-            {
-                shield.SetHp(0);
-                BuffManager.RemoveBuff(enemy, CombatConst.ShieldBuffId);
-            }
+            shield.SetHp(0);
+            BuffManager.RemoveBuff(target, CombatConst.ShieldBuffId);
         }
 
-        PlayAreaEffect(owner.transform.position);
-        EffectManager.PlaySkillEffect(owner, skillCfg.HitEffect);
+        EffectManager.PlaySkillEffect(target, skillCfg.HitEffect);
         return true;
     }
 }

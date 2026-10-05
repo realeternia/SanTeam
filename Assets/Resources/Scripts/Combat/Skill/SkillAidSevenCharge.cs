@@ -3,7 +3,7 @@ using CommonConfig;
 using UnityEngine;
 
 /// <summary>
-/// 赵云·七进七出：对目标及范围内最多 TargetCount 名敌人各造成一次法术伤害，并为自己附加 Strength2[0]×(100+法强)/100 的护盾（随法强成长）。
+/// 李典·御阵：为自身及范围内最多 TargetCount 名友军附加护甲提升 buff（"甲"，护甲值由 BuffArmorAdd 读 skillCfg.StrengthBuff1[0]），持续 BuffTime 秒。
 /// </summary>
 public class SkillAidSevenCharge : Skill
 {
@@ -13,33 +13,21 @@ public class SkillAidSevenCharge : Skill
 
     public override bool CheckAidSkill()
     {
-        var target = owner.targetChess;
-        if (target == null || target.hp <= 0)
+        if (!CheckBurst(null))
             return false;
-        if (!WorldManager.Instance.CheckInRange(owner.transform.position, target.transform.position, skillCfg.Range))
-            return false;
-        if (!CheckBurst(target))
-            return false;
+
+        var buffId = BuffConfig.GetConfigByNameS(skillCfg.BuffId).Id;
+        var units = WorldManager.Instance.GetMySideInRange(owner.transform.position, skillCfg.Range, owner.side)
+            .FindAll(x => x.IsInFight() && x != owner && !x.HasBuff(buffId));
+        WorldManager.Instance.RandomSelect(units, skillCfg.TargetCount);
+        units.Add(owner); // 自己必定获得
 
         owner.PlayerAnim(skillCfg.Action);
-
-        var list = WorldManager.Instance.GetEnemyInRange(target.transform.position, skillCfg.Area, owner.side);
-        WorldManager.Instance.RandomSelect(list, skillCfg.TargetCount);
-        foreach (var u in list)
+        foreach (var unit in units)
         {
-            if (u != null && u.hp > 0)
-                u.OnSkillDamaged(owner, id, GetSkillDamage());
+            BuffManager.AddBuff(unit, owner, id, buffId, skillCfg.BuffTime);
+            EffectManager.PlaySkillEffect(unit, skillCfg.HitEffect);
         }
-
-        // 冲杀后给自己套盾
-        int shieldId = BuffConfig.GetConfigByNameS("盾").Id;
-        BuffManager.AddBuff(owner, owner, id, shieldId, skillCfg.BuffTime);
-        var sh = owner.GetBuff(shieldId) as BuffShield;
-        if (sh != null)
-            sh.SetHp(GetSkillShield(0));
-
-        PlayAreaEffect(target.transform.position);
-        EffectManager.PlaySkillEffect(owner, skillCfg.HitEffect);
         return true;
     }
 }
