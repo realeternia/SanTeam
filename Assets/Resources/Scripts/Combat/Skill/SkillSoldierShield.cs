@@ -4,20 +4,13 @@ using CommonConfig;
 using UnityEngine;
 
 /// <summary>
-/// 蒋琬·抚军：战斗开始(BattleBegin)给本侧近战士兵全员套护盾；每次主动释放额外给1名近战士兵套盾。
+/// 蒋琬·抚军：每次主动释放给1名近战士兵套护盾（单目标）。
 /// 护盾 = Strength2[0] × (100+法强)/100（随法强成长），复用 BuffShield。
 /// </summary>
 public class SkillSoldierShield : Skill
 {
     public SkillSoldierShield(int id, Chess unit) : base(id, unit)
     {
-    }
-
-    public override void BattleBegin()
-    {
-        foreach (var s in GetMeleeSoldiers())
-            ShieldSoldier(s);
-        GameLog.Debug($"抚军 技能id={id} 等级={Level} 开局给本侧近战士兵套盾 {GetMeleeSoldiers().Count} 名");
     }
 
     public override bool CheckAidSkill()

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// 徐晃·疾袭：远程射击优先打后排（射程内找出距离自身最远的敌方目标）
+/// 文鸯·单骑：远程射击优先打后排（射程内找出距离自身最远的敌方目标）
 /// </summary>
 public class SkillAidBacklineHunt : Skill
 {
@@ -12,7 +12,7 @@ public class SkillAidBacklineHunt : Skill
     }
 
     /// <summary>
-    /// 疾袭：优先射击后排敌人
+    /// 单骑：优先射击后排敌人
     /// </summary>
     public override bool CheckAidSkill()
     {
