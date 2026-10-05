@@ -22,6 +22,10 @@ public class SkillAttackShieldPierce : Skill
         if (CombatConst.IsDerivedHurtTag(hurtTag))
             return;
 
+        // 仅普攻触发：技能伤害来源(castSkillCfg != null)不参与判定，避免误占CD/MP
+        if (castSkillCfg != null)
+            return;
+
         // 只对有护盾(吸收型，BuffShield)的目标生效
         var shield = target.GetBuff(CombatConst.ShieldBuffId) as BuffShield;
         if (shield == null)

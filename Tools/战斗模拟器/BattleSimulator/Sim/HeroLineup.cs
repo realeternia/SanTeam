@@ -70,12 +70,13 @@ public static class HeroLineup
 
     // ---- 成组抽阵容（国家/好友/职业）----
 
-    // 组定义：类型（国家/好友/职业）+ 组名 + 成员英雄 id
+    // 组定义：类型（国家/好友/职业）+ 组名 + 成员英雄 id + 技能名（好友组用于展示联动技能）
     public class GroupDef
     {
         public string Type;
         public string Name;
         public List<int> Heroes;
+        public string SkillName;
     }
 
     public const string GroupTypeFaction = "国家";
@@ -205,7 +206,15 @@ public static class HeroLineup
             var heroes = (cfg.Heros ?? new int[0]).Where(valid.Contains).Distinct().ToList();
             if (heroes.Count == 0)
                 continue;
-            result.Add(new GroupDef { Type = GroupTypeFriend, Name = cfg.Name, Heroes = heroes });
+            // 好友联动技能名：HeroFriendConfig.SkillId 为技能缩写(Sname)，取对应技能配置的显示名
+            string skillName = null;
+            if (!string.IsNullOrEmpty(cfg.SkillId))
+            {
+                var friendSkillCfg = ConfigManager.GetSkillConfig(cfg.SkillId);
+                if (friendSkillCfg != null)
+                    skillName = friendSkillCfg.Name;
+            }
+            result.Add(new GroupDef { Type = GroupTypeFriend, Name = cfg.Name, Heroes = heroes, SkillName = skillName });
         }
         return result;
     }

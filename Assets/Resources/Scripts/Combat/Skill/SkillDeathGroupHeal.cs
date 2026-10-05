@@ -30,8 +30,8 @@ public class SkillDeathGroupHeal : Skill
                 owner.HealTarget(chess, skillId, heal, true);
 
             // 提升目标 20%~40% atk 与 ap
-            chess.atk += (int)(chess.atk * skillCfg.Strength2[0]);
-            chess.ap += (int)skillCfg.Strength2[1];
+            chess.atk += (int)(chess.atk * skillCfg.Strength2[1]);
+
             if (chess.heroInfo != null)
                 chess.heroInfo.SetAttr(chess.ap, chess.atk);
         }

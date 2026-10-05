@@ -26,7 +26,6 @@ public class SkillInitNoEquipAttr : Skill
             return;
 
         owner.atk += (int)skillCfg.Strength2[0];
-        owner.ap += (int)skillCfg.Strength2[0];
         owner.armor += (int)skillCfg.Strength2[1];
         owner.magicRes += (int)skillCfg.Strength2[1];
         GameLog.Debug($"异禀 武将{owner.heroId} 无装备 永久提升攻击法强+{(int)skillCfg.Strength2[0]} 双防+{(int)skillCfg.Strength2[1]}");

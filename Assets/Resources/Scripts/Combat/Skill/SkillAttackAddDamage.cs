@@ -12,6 +12,10 @@ public class SkillAttackAddDamage : Skill
 
     public override void BeforeCalDamage(Chess target, SkillConfig castSkillCfg, ref int damageBase, ref float damageMulti, ref string effect, string hurtTag, bool isFeedback)
     {
+        // 仅普攻触发：技能伤害来源(castSkillCfg != null)不参与判定，避免误占CD/MP
+        if (castSkillCfg != null)
+            return;
+
         if(!string.IsNullOrEmpty(skillCfg.BuffId) && !target.HasBuff(BuffConfig.GetConfigByNameS(skillCfg.BuffId).Id))
             return;
 

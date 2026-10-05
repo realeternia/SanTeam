@@ -5,7 +5,8 @@
 /// 战斗开始时，在敌方存活英雄中随机选 1 名，对其施加 SkillConfig.BuffId 指定的 Buff，
 /// 持续 BuffTime 秒；Buff 强度由技能行 Strength2[1] 提供（由具体 Buff 实现解释，如 301003「伤」= 受到伤害增加比例）。
 /// 使用示例：权奸当道·弄权跋扈（缩写「奸」，2010096~2010100，BuffId="伤"，Strength2[1]=30%~70%，BuffTime=10~20s）。
-/// 好友组内每个成员各持一份该技能，各自独立触发一次；重复命中同一目标时同 id Buff 只刷新时间、数值不叠加。
+/// 随机范围为未持有该 Buff 的敌方英雄，优先近战，近战全部挂满后才轮到远程；若全部已持有则本次不施加。
+/// 好友组内每个成员各持一份该技能，各自独立触发一次。
 /// </summary>
 public class SkillInitEnemyRandomBuff : Skill
 {
@@ -22,8 +23,14 @@ public class SkillInitEnemyRandomBuff : Skill
             return;
         }
 
-        // 敌方存活英雄中随机选一名（优先配对敌人，无配对敌人时取全部敌方英雄）
-        var candidates = WorldManager.Instance.GetAllEnemys(owner.side);
+        // 敌方存活英雄中随机选一名未持有该 Buff 者（优先配对敌人，无配对敌人时取全部敌方英雄）：
+        // 近战优先（射程<=20 判为近战，与 JobLinkManager/弩羁绊规则一致），近战全部挂满后才轮到远程
+        var unbuffed = WorldManager.Instance.GetAllEnemys(owner.side)
+            .FindAll(x => !x.HasBuff(buffCfg.Id));
+        var melee = unbuffed.FindAll(x => HeroSelectionTool.IsMeleeHero(HeroConfig.GetConfig(x.heroId)));
+        var candidates = melee.Count > 0
+            ? melee
+            : unbuffed.FindAll(x => HeroSelectionTool.IsRangedHero(HeroConfig.GetConfig(x.heroId)));
         if (candidates.Count == 0)
             return;
 

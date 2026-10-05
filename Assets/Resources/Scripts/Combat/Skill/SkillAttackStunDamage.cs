@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using CommonConfig;
 using UnityEngine;
@@ -26,6 +26,10 @@ public class SkillAttackStunDamage : Skill
     // 攻击已眩晕的目标时额外造成50%(Strength2[0])伤害
     public override void BeforeCalDamage(Chess target, SkillConfig castSkillCfg, ref int damageBase, ref float damageMulti, ref string effect, string hurtTag, bool isFeedback)
     {
+        // 仅普攻触发：技能伤害来源(castSkillCfg != null)不参与判定
+        if (castSkillCfg != null)
+            return;
+
         if (string.IsNullOrEmpty(skillCfg.BuffId) || !target.HasBuff(BuffConfig.GetConfigByNameS(skillCfg.BuffId).Id))
             return;
         if (skillCfg.Strength2[0] > 0)

@@ -40,6 +40,7 @@ public static class BatchSimRunner
         public string Name;
         public string Job;              // 职业（仅武将行，物品行为"-"）
         public string Type;             // 组类型（仅成组行：国家/好友/职业）
+        public string SkillName;        // 组联动技能名（仅好友成组行）
         public int Quality;             // 卡片品质（仅武将行，物品行为0）
         public int Appear, Win, Loss, Draw;
         public float HeroDamageTotal;   // 对敌方英雄造成的累计伤害（用于场均）
@@ -267,7 +268,7 @@ public static class BatchSimRunner
         StatRow row;
         if (!stats.TryGetValue(key, out row))
         {
-            row = new StatRow { Id = 0, Name = group.Name, Job = group.Type, Type = group.Type, Quality = 0 };
+            row = new StatRow { Id = 0, Name = group.Name, Job = group.Type, Type = group.Type, SkillName = group.SkillName, Quality = 0 };
             stats[key] = row;
         }
         row.Appear++;
@@ -415,7 +416,7 @@ public static class BatchSimRunner
         }
     }
 
-    // 成组胜率：按类型（国家/好友/职业）分三张表，仅输出有数据的类型
+    // 成组胜率：按类型（国家/好友/职业）分三张表，仅输出有数据的类型；好友行附带联动技能名
     private static void AppendGroupSections(StringBuilder sb, Dictionary<string, StatRow> groupStats)
     {
         bool any = false;
@@ -427,7 +428,12 @@ public static class BatchSimRunner
             any = true;
             sb.AppendLine("-- " + type + " --");
             sb.AppendLine(GroupHeader());
-            AppendJobRows(sb, rows);
+            foreach (var r in rows)
+            {
+                sb.AppendLine(string.Format("{0,-10}  {1,-10}  {2,8}  {3,8}  {4,8}  {5,8}  {6,8:P1}",
+                    r.Name, string.IsNullOrEmpty(r.SkillName) ? "-" : r.SkillName,
+                    r.Appear, r.Win, r.Loss, r.Draw, r.Rate));
+            }
         }
         if (!any)
             sb.AppendLine("(无数据：未开启任何羁绊加成)");
@@ -435,8 +441,8 @@ public static class BatchSimRunner
 
     private static string GroupHeader()
     {
-        return string.Format("{0,-12}  {1,8}  {2,8}  {3,8}  {4,8}  {5,8}",
-            "组名", "出场", "胜", "负", "平", "胜率");
+        return string.Format("{0,-10}  {1,-10}  {2,8}  {3,8}  {4,8}  {5,8}  {6,8}",
+            "组名", "技能", "出场", "胜", "负", "平", "胜率");
     }
 
     private static string HeroName(int heroId)
