@@ -40,7 +40,7 @@ public class GameManager : MonoBehaviour
         public string value;
     }
 
-    // 存档摘要：存档列表展示用（年份/积分/金钱/上阵英雄）
+    // 存档摘要：存档列表展示用（年份/积分/金钱/上阵英雄/存档时间）
     [System.Serializable]
     public struct SaveSummary
     {
@@ -48,6 +48,7 @@ public class GameManager : MonoBehaviour
         public int gold;
         public int mark;
         public List<int> lineHeroes;
+        public System.DateTime saveTime;
     }
 
     /// <summary>最大存档槽位数</summary>
@@ -156,10 +157,10 @@ public class GameManager : MonoBehaviour
         {
             lastPath = path;
             lastClip = Resources.Load<AudioClip>(path);
-            if (lastClip != null)
-            {
-                audioSource.clip = lastClip;
-            }
+            if (lastClip == null)
+                GameLog.Warn($"音效加载失败：{path}");
+            // 加载失败时置空，避免复用上一个音效（lastPath 已更新，后续调用不会重试加载）
+            audioSource.clip = lastClip;
         }
 
         if (audioSource.clip != null)
@@ -239,6 +240,7 @@ public class GameManager : MonoBehaviour
         }
         try
         {
+            summary.saveTime = File.GetLastWriteTime(savePath);
             string json = File.ReadAllText(savePath);
             SaveData saveData = JsonUtility.FromJson<SaveData>(json);
             summary.year = saveData.year;

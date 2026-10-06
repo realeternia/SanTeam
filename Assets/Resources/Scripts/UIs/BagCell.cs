@@ -33,7 +33,11 @@ public class BagCell : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragH
     // Start is called before the first frame update
     void Start()
     {
-        cellButton.onClick.AddListener(() => bagControl.OnCellClick(this));
+        cellButton.onClick.AddListener(() =>
+        {
+            GameManager.Instance.PlaySound("Sounds/click");
+            bagControl.OnCellClick(this);
+        });
 
         // PointerDown 会被 cellButton（子物体）拦截，需挂转发组件把按下/抬起事件转发过来
         var forwarder = cellButton.gameObject.GetComponent<BagCellPointerForwarder>();
@@ -123,6 +127,8 @@ public class BagCell : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragH
 
         if(bagControl.bindPlayer.isAI)
             return;
+
+        GameManager.Instance.PlaySound("Sounds/drag");
 
         // 保存原始位置和父对象
         originalParent = transform.parent;

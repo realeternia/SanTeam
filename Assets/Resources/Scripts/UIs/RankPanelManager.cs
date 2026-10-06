@@ -35,26 +35,31 @@ public class RankPanelManager : MonoBehaviour
 
         btnLeadShip.onClick.AddListener(() =>
         {
+            GameManager.Instance.PlaySound("Sounds/click");
             GameLog.Debug("点击了btnLeadShip，开始按领导力排序");
             SortItems("LeadShip");
         });
         btnStr.onClick.AddListener(() =>
         {
+            GameManager.Instance.PlaySound("Sounds/click");
             GameLog.Debug("点击了btnStr，开始按力量排序");
             SortItems("Str");
         });
         btnInte.onClick.AddListener(() =>
         {
+            GameManager.Instance.PlaySound("Sounds/click");
             GameLog.Debug("点击了btnInte，开始按智力排序");
             SortItems("Inte");
         });
         btnHp.onClick.AddListener(() =>
         {
+            GameManager.Instance.PlaySound("Sounds/click");
             GameLog.Debug("点击了btnHp，开始按生命值排序");
             SortItems("Hp");
         });
         btnPrice.onClick.AddListener(() =>
         {
+            GameManager.Instance.PlaySound("Sounds/click");
             GameLog.Debug("点击了btnPrice，开始按价格排序");
             SortItems("Price");
         });

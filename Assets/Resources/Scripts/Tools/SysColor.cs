@@ -146,6 +146,11 @@ public static class SysColor
 
         public static readonly Color NextLv = new Color(0.4f, 1f, 0.4f); // 技能说明下一档差值-淡绿
         public static readonly Color SkillDesc = new Color(0.55f, 1f, 0.35f); // 技能描述-lime
+
+        public static readonly Color SaveMark = new Color(0.55f, 0.8f, 1f);  // 存档-积分浅蓝
+        public static readonly Color SaveGold = new Color(1f, 0.55f, 0.1f);  // 存档-金钱蓝
+        public static readonly Color SaveTime = new Color(0.7f, 0.7f, 0.7f);  // 存档-时间灰
+        public static readonly Color BtnClickedGray = new Color(0.4f, 0.4f, 0.4f, 1f); // 已点击按钮置灰
     }
 
     public static class Battle

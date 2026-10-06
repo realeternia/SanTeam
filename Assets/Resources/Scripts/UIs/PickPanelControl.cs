@@ -20,6 +20,8 @@ public class PickPanelControl : MonoBehaviour
     private List<PickPanelCellControl> cellControls = new List<PickPanelCellControl>();
 
     private Tween startTextTween;
+    private const float StartPanelFadeDuration = 1.5f; // 开始面板点击后渐隐时长
+    private bool startPanelClicked;
 
     public GameObject loadGamePanel;
     public Button loadGameBtn;
@@ -29,6 +31,13 @@ public class PickPanelControl : MonoBehaviour
     private RectTransform loadItemRoot;
     private readonly List<LoadGameItem> loadItems = new List<LoadGameItem>();
     private int selectedSlot = -1;
+
+    // 删除确认模式：>=0 表示待删除的槽位，此时两个按钮变为「取消删除/确认删除」
+    private int pendingDeleteSlot = -1;
+    private TMP_Text loadGameBtnText;
+    private TMP_Text newGameBtnText;
+    private string loadGameBtnOriginText;
+    private string newGameBtnOriginText;
 
     public GameObject startPanel;
     public TMP_Text startText;
@@ -53,10 +62,12 @@ public class PickPanelControl : MonoBehaviour
         });
         finBtn.onClick.AddListener(() =>
         {
+            GameManager.Instance.PlaySound("Sounds/click");
             FinishLikePhase();
         });
         okBtn.onClick.AddListener(() =>
         {
+            GameManager.Instance.PlaySound("Sounds/click");
             refreshBtn.gameObject.SetActive(false); // ok后，不能再refresh
             foreach (var cell in cellControls)
                 cell.canLike = true;
@@ -70,9 +81,23 @@ public class PickPanelControl : MonoBehaviour
         refreshBtn.gameObject.SetActive(false);
 
         // 存档面板：读档按钮默认隐藏，选中某个存档项后再显示
-        loadGameBtn.onClick.AddListener(OnLoadGameClick);
-        newGameBtn.onClick.AddListener(OnNewGameClick);
+        loadGameBtn.onClick.AddListener(() =>
+        {
+            GameManager.Instance.PlaySound("Sounds/click");
+            OnLoadGameClick();
+        });
+        newGameBtn.onClick.AddListener(() =>
+        {
+            GameManager.Instance.PlaySound("Sounds/click");
+            OnNewGameClick();
+        });
         loadGameBtn.gameObject.SetActive(false);
+
+        // 缓存两个按钮的文本与原始文字（删除确认模式下需临时改成取消/确认删除）
+        loadGameBtnText = GetButtonText(loadGameBtn);
+        newGameBtnText = GetButtonText(newGameBtn);
+        loadGameBtnOriginText = loadGameBtnText != null ? loadGameBtnText.text : "";
+        newGameBtnOriginText = newGameBtnText != null ? newGameBtnText.text : "";
 
         PanelManager.Instance.ShowPick();
 
@@ -139,6 +164,10 @@ public class PickPanelControl : MonoBehaviour
             Destroy(loadItemRoot.GetChild(i).gameObject);
         loadItems.Clear();
 
+        // 重建列表时退出删除确认模式
+        if (pendingDeleteSlot >= 0)
+            ExitDeleteMode();
+
         selectedSlot = -1;
         loadGameBtn.gameObject.SetActive(false);
 
@@ -165,7 +194,7 @@ public class PickPanelControl : MonoBehaviour
             rt.sizeDelta = new Vector2(600, 120);
 
             var item = go.GetComponent<LoadGameItem>();
-            item.Setup(slot, summary, OnLoadItemSelected, OnLoadItemDeleted);
+            item.Setup(slot, summary, OnLoadItemSelected, OnLoadItemDeleteRequested);
             loadItems.Add(item);
         }
 
@@ -177,18 +206,91 @@ public class PickPanelControl : MonoBehaviour
             OnLoadItemSelected(loadItems[0].Slot);
     }
 
-    // 选中某存档项：背景变色并显示读档按钮
+    // 选中某存档项：背景变色并显示读档按钮；切换到其它项时退出删除确认模式
     private void OnLoadItemSelected(int slot)
     {
+        if (pendingDeleteSlot >= 0 && pendingDeleteSlot != slot)
+            ExitDeleteMode();
+
         selectedSlot = slot;
         foreach (var item in loadItems)
             item.SetSelected(item.Slot == slot);
         loadGameBtn.gameObject.SetActive(true);
     }
 
-    // 删除某存档项：删档后重建列表；全部删完则直接进入新游戏
-    private void OnLoadItemDeleted(int slot)
+    // 点击存档项的删除：进入删除确认模式（继续游戏→取消删除，重新开始→确认删除）
+    private void OnLoadItemDeleteRequested(int slot)
     {
+        EnterDeleteMode(slot);
+    }
+
+    // 进入删除确认模式：按钮文字变化 + DoTween 效果，被点项的删除按钮置灰
+    private void EnterDeleteMode(int slot)
+    {
+        pendingDeleteSlot = slot;
+        selectedSlot = slot;
+        loadGameBtn.gameObject.SetActive(true);
+
+        foreach (var item in loadItems)
+        {
+            item.SetSelected(item.Slot == slot);
+            item.SetDeletePending(item.Slot == slot);
+        }
+
+        SetConfirmButtons("取消删除", "确认删除");
+    }
+
+    // 退出删除确认模式：还原按钮文字与存档项删除按钮外观
+    private void ExitDeleteMode()
+    {
+        pendingDeleteSlot = -1;
+
+        foreach (var item in loadItems)
+            item.SetDeletePending(false);
+
+        SetConfirmButtons(loadGameBtnOriginText, newGameBtnOriginText);
+    }
+
+    private void SetConfirmButtons(string loadText, string newText)
+    {
+        if (loadGameBtnText != null)
+            loadGameBtnText.text = loadText;
+        if (newGameBtnText != null)
+            newGameBtnText.text = newText;
+
+        PlayButtonChangeEffect(loadGameBtn);
+        PlayButtonChangeEffect(newGameBtn);
+    }
+
+    // 按钮文字变化时的 DoTween 弹跳效果
+    private void PlayButtonChangeEffect(Button btn)
+    {
+        if (btn == null)
+            return;
+
+        var t = btn.transform;
+        t.DOKill();
+        t.localScale = Vector3.one;
+        t.DOPunchScale(Vector3.one * 0.15f, 0.3f, 8, 1);
+    }
+
+    private TMP_Text GetButtonText(Button btn)
+    {
+        if (btn == null)
+            return null;
+
+        var text = btn.GetComponentInChildren<TMP_Text>(true);
+        if (text == null)
+            GameLog.Warn("PickPanelControl 按钮未找到文本子节点: " + btn.name);
+        return text;
+    }
+
+    // 确认删除：删除待删槽位并重建列表；全部删完则进入新游戏
+    private void ConfirmDelete()
+    {
+        int slot = pendingDeleteSlot;
+        ExitDeleteMode();
+
         GameManager.Instance.DeleteSave(slot);
 
         if (GameManager.Instance.GetUsedSaveSlots().Count == 0)
@@ -202,9 +304,15 @@ public class PickPanelControl : MonoBehaviour
         }
     }
 
-    // 点击读档：加载选中槽位并进入游戏
+    // 点击读档：删除确认模式下作为「取消删除」；否则加载选中槽位并进入游戏
     private void OnLoadGameClick()
     {
+        if (pendingDeleteSlot >= 0)
+        {
+            ExitDeleteMode();
+            return;
+        }
+
         if (selectedSlot < 0)
         {
             GameLog.Warn("PickPanelControl 未选中任何存档，忽略读档");
@@ -215,6 +323,7 @@ public class PickPanelControl : MonoBehaviour
         {
             GameManager.Instance.InitFriend(true);
             GameManager.Instance.InitHeros(true);
+            SetPlayerInfoVisible(true);
             PanelManager.Instance.ShowShop();
             PanelManager.Instance.HidePick();
         }
@@ -224,9 +333,15 @@ public class PickPanelControl : MonoBehaviour
         }
     }
 
-    // 点击新游戏：优先分配新槽位；槽位已满则覆盖当前选中的存档
+    // 点击新游戏：删除确认模式下作为「确认删除」；否则优先分配新槽位（槽位已满则覆盖选中的存档）
     private void OnNewGameClick()
     {
+        if (pendingDeleteSlot >= 0)
+        {
+            ConfirmDelete();
+            return;
+        }
+
         int slot = GameManager.Instance.CreateNewSaveSlot();
         if (slot < 0)
         {
@@ -253,6 +368,13 @@ public class PickPanelControl : MonoBehaviour
     private void ShowStartPanel()
     {
         startPanel.SetActive(true);
+        startPanelClicked = false;
+
+        // 渐隐用 CanvasGroup（预制体未挂时运行时添加）
+        var canvasGroup = startPanel.GetComponent<CanvasGroup>();
+        if (canvasGroup == null)
+            canvasGroup = startPanel.AddComponent<CanvasGroup>();
+        canvasGroup.alpha = 1f;
 
         var startBtn = startPanel.GetComponent<Button>();
         if (startBtn == null)
@@ -283,17 +405,33 @@ public class PickPanelControl : MonoBehaviour
             .SetUpdate(true);
     }
 
+    // 点击开始面板：播放音效 → 渐隐 → 消失后显示 LoadSave 页面（含上方玩家信息）
     private void OnStartPanelClick()
     {
+        if (startPanelClicked)
+            return;
+        startPanelClicked = true;
+
         if (startTextTween != null)
         {
             startTextTween.Kill();
             startTextTween = null;
         }
 
-        startPanel.SetActive(false);
-        SetPlayerInfoVisible(true);
-        BeginSelection();
+        GameManager.Instance.PlaySound("Sounds/biang");
+
+        var canvasGroup = startPanel.GetComponent<CanvasGroup>();
+        if (canvasGroup == null)
+            canvasGroup = startPanel.AddComponent<CanvasGroup>();
+
+        canvasGroup.DOFade(0f, StartPanelFadeDuration).OnComplete(() =>
+        {
+            startPanel.SetActive(false);
+            canvasGroup.alpha = 1f; // 还原透明度，便于后续复用
+
+            // 玩家信息保持隐藏，进入商店时才显示
+            BeginSelection();
+        });
     }
 
     // Update is called once per frame
@@ -332,6 +470,7 @@ public class PickPanelControl : MonoBehaviour
         // 新游戏like阶段结束进入，存档一次
         GameManager.Instance.SaveToFile();
 
+        SetPlayerInfoVisible(true);
         PanelManager.Instance.ShowShop();
         PanelManager.Instance.HidePick();
     }

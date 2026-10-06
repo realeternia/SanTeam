@@ -56,6 +56,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 
     public bool isOnTurn;
     public TMP_Text playerNameText;
+    public TMP_Text playerLevelText;
     public Image playerImage;
     public TMP_Text goldText;
     public TMP_Text resultText;
@@ -165,6 +166,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     public void UpdateView()
     {
         playerNameText.text = playerName;        
+        playerLevelText.text = level.ToString();
         playerImage.sprite = Resources.Load<Sprite>(imgPath);
         goldText.text = gold.ToString();
         resultText.text = mark.ToString();
@@ -1161,6 +1163,8 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         if (lv != level)
         {
             level = lv;
+            if (playerLevelText != null)
+                playerLevelText.text = level.ToString();
             EnsureSoldierCells(); // 玩家等级提升可能解锁更多士兵，补齐布阵格
             GameLog.Debug($"玩家{pid} 升级到 {level} 级，上阵格子 {GetSlotCount()}，士兵 {GetSoldierMeleeCount()}步+{GetSoldierRangedCount()}弓，剩余经验 {exp}");
         }

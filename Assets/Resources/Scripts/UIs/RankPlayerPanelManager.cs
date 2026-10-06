@@ -27,26 +27,31 @@ public class RankPlayerPanelManager : MonoBehaviour
 
         btnSdAtk.onClick.AddListener(() =>
         {
+            GameManager.Instance.PlaySound("Sounds/click");
             GameLog.Debug("点击了btnSdAtk，开始按攻击力排序");
             SortItems("sdatk");
         });
         btnSdHp.onClick.AddListener(() =>
         {
+            GameManager.Instance.PlaySound("Sounds/click");
             GameLog.Debug("点击了btnSdHp，开始按生命值排序");
             SortItems("sdhp");
         });
         btnGold.onClick.AddListener(() =>
         {
+            GameManager.Instance.PlaySound("Sounds/click");
             GameLog.Debug("点击了btnGold，开始按金币排序");
             SortItems("gold");
         });
         btnPower.onClick.AddListener(() =>
         {
+            GameManager.Instance.PlaySound("Sounds/click");
             GameLog.Debug("点击了btnPower，开始按战力排序");
             SortItems("power");
         });
         btnMark.onClick.AddListener(() =>
         {
+            GameManager.Instance.PlaySound("Sounds/click");
             GameLog.Debug("点击了btnMark，开始按标记排序");
             SortItems("mark");
         });

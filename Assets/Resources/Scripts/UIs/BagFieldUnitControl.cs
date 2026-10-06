@@ -170,6 +170,8 @@ public class BagFieldUnitControl : MonoBehaviour, IDropHandler, IBeginDragHandle
         if (myHeroId == 0)
             return;
 
+        GameManager.Instance.PlaySound("Sounds/drag");
+
         // 创建拖动时的预览对象
         dragInstance = new GameObject("FieldUnitDragIcon");
         dragInstance.transform.SetParent(GameObject.Find("Canvas").transform, false);

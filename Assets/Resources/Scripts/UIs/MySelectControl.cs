@@ -29,7 +29,11 @@ public class MySelectControl : MonoBehaviour
         // 容错：背包等场景的 MySelectControl 未配置 changeButton 时不做切换绑定
         if (changeButton != null)
         {
-            changeButton.onClick.AddListener(OnChangeMode);
+            changeButton.onClick.AddListener(() =>
+            {
+                GameManager.Instance.PlaySound("Sounds/click");
+                OnChangeMode();
+            });
             changeButtonText = changeButton.GetComponentInChildren<TMP_Text>();
             UpdateChangeButtonText();
         }

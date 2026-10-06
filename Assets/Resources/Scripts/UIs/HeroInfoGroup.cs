@@ -57,6 +57,7 @@ public class HeroInfoGroup : MonoBehaviour
         heroInfo.heroImage.sprite = Resources.Load<Sprite>("Textures/Skins/" + heroCfg.Icon);
 
         heroInfo.heroName.text = heroCfg.Name;
+        heroInfo.heroName.color = SysColor.GetQualityColor(heroCfg.Quality);
         heroInfo.heroLevelTxt.text = level.ToString();
         heroInfo.SetJobIcon(heroCfg);
 

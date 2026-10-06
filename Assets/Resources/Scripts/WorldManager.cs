@@ -49,8 +49,16 @@ public class WorldManager : MonoBehaviour
     {
         Instance = this;
 
-        buttonRestart.onClick.AddListener(BattleEnd);
-        buttonInfo.onClick.AddListener(ShowBattleResult);
+        buttonRestart.onClick.AddListener(() =>
+        {
+            GameManager.Instance.PlaySound("Sounds/click");
+            BattleEnd();
+        });
+        buttonInfo.onClick.AddListener(() =>
+        {
+            GameManager.Instance.PlaySound("Sounds/click");
+            ShowBattleResult();
+        });
 
         StartCoroutine(DebugBattleBeginCheck());
     }
@@ -681,6 +689,9 @@ public class WorldManager : MonoBehaviour
                 textRestart.text = "你获胜了!!!";
             else
                 textRestart.text = "你输了!!!";
+
+            // 战斗结束按胜负播放音效
+            GameManager.Instance.PlaySound(hasWin ? "Sounds/win" : "Sounds/loss");
 
             // 销毁之前的结果单元格
             foreach (GameObject cell in battleResultCells)

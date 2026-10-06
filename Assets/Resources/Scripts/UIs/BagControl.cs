@@ -58,10 +58,11 @@ public class BagControl : MonoBehaviour, IPanelEvent
             UpdateFieldView();
             UpdateExpView();
 
-            GameManager.Instance.PlaySound("Sounds/equip");
+            GameManager.Instance.PlaySound("Sounds/foot");
         });
         aiSwitchBtn.onClick.AddListener(() =>
         {
+            GameManager.Instance.PlaySound("Sounds/click");
             bindPlayer.isAI = !bindPlayer.isAI;
             aiSwitchBtn.GetComponentInChildren<TMP_Text>().text = bindPlayer.isAI ? "AI模式" : "玩家模式";
             if (bagRecycler != null)
@@ -443,8 +444,6 @@ public class BagControl : MonoBehaviour, IPanelEvent
         {
             p1.UseItemToHero(heroCardId, itemCardId);
 
-            GameManager.Instance.PlaySound("Sounds/eat");
-
             RemoveCell(itemCardId);
         }
         else
@@ -515,7 +514,7 @@ public class BagControl : MonoBehaviour, IPanelEvent
                 return;
             }
 
-            GameManager.Instance.PlaySound("Sounds/equip");
+            GameManager.Instance.PlaySound("Sounds/compose");
             UpdateView(); // 材料消耗、产物进背包，整体刷新
         }));
     }
@@ -740,7 +739,7 @@ public class BagControl : MonoBehaviour, IPanelEvent
             return;
         }
 
-        GameManager.Instance.PlaySound("Sounds/equip");
+        GameManager.Instance.PlaySound("Sounds/foot");
         UpdateFieldView();
         UpdateExpView();
     }
@@ -754,7 +753,7 @@ public class BagControl : MonoBehaviour, IPanelEvent
 
         p1.SwapBattleUnits(fromPos, toPos);
 
-        GameManager.Instance.PlaySound("Sounds/equip");
+        GameManager.Instance.PlaySound("Sounds/foot");
         UpdateFieldView();
         UpdateExpView();
     }

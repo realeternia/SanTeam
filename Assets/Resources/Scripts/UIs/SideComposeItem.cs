@@ -25,7 +25,11 @@ public class SideComposeItem : MonoBehaviour
     {
         if (button != null)
         {
-            button.onClick.AddListener(OnItemClick);
+            button.onClick.AddListener(() =>
+            {
+                GameManager.Instance.PlaySound("Sounds/click");
+                OnItemClick();
+            });
         }
     }
 

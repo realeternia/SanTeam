@@ -81,12 +81,14 @@ public class CardViewControl : MonoBehaviour, IPointerDownHandler, IPointerUpHan
         reduceButton.gameObject.SetActive(false);
         addButton.onClick.AddListener(() =>
         {
+            GameManager.Instance.PlaySound("Sounds/click");
             var nowCount = int.Parse(price.text) / priceI;
             if(count > nowCount)
                 price.text = (priceI * (nowCount + 1)).ToString();
         });
         reduceButton.onClick.AddListener(() =>
         {
+            GameManager.Instance.PlaySound("Sounds/click");
             var nowCount = int.Parse(price.text) / priceI;
             if(nowCount > 1)
                 price.text = (priceI * (nowCount - 1)).ToString();

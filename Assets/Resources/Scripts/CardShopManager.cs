@@ -48,6 +48,7 @@ public class CardShopManager : MonoBehaviour
 
         passBtn.onClick.AddListener(() =>
         {
+            GameManager.Instance.PlaySound("Sounds/click");
             OnP1Pass();
         });
 
@@ -706,6 +707,8 @@ public class CardShopManager : MonoBehaviour
 
         PanelManager.Instance.GetTooltip<BaseTooltip>()?.HideTooltip();
         PanelManager.Instance.HideShop();
+        // 商店结束进入战斗
+        GameManager.Instance.PlaySound("Sounds/biang");
         WorldManager.Instance.BattleBegin(); 
         hasEnterBattle = true;
 

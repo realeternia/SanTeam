@@ -34,8 +34,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 76.4, y: -95.5}
-  m_SizeDelta: {x: 120, y: 50}
+  m_AnchoredPosition: {x: 256.2, y: -95.5}
+  m_SizeDelta: {x: 500, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &6901965842594048999
 CanvasRenderer:
@@ -92,14 +92,14 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 32
-  m_fontSizeBase: 32
+  m_fontSize: 36
+  m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
   m_fontSizeMax: 72
   m_fontStyle: 0
-  m_HorizontalAlignment: 2
+  m_HorizontalAlignment: 1
   m_VerticalAlignment: 256
   m_textAlignment: 65535
   m_characterSpacing: -10
@@ -393,6 +393,7 @@ MonoBehaviour:
   bgImg: {fileID: 540500472637207055}
   infoText: {fileID: 3898453360415264514}
   deleteBtn: {fileID: 8636335588815615446}
+  heroParent: {fileID: 0}
 --- !u!1 &7419512645526802803
 GameObject:
   m_ObjectHideFlags: 0

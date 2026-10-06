@@ -24,6 +24,7 @@ public class PickPanelCellControl : MonoBehaviour
     {
         banBtn.onClick.AddListener(() =>
         {
+            GameManager.Instance.PlaySound("Sounds/click");
             LikeBtnClick();
         });
 

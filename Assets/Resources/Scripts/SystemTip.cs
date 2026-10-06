@@ -41,6 +41,10 @@ public class SystemTip : MonoBehaviour
 
     public void ShowTip(string tip)
     {
+        // 提示统一为失败/错误类反馈，播放 error 音效
+        if (GameManager.Instance != null)
+            GameManager.Instance.PlaySound("Sounds/error");
+
         if(tipText2.text != "")
         {
             GameLog.Info("ShowTip: " + tip);
