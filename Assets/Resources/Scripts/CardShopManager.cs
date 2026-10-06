@@ -653,8 +653,8 @@ public class CardShopManager : MonoBehaviour
         if(hasEnterBattle) //存档拉起进入游戏，不会重复存储
             GameManager.Instance.SaveToFile();
 
-        var roll = SysRandom.Range(0, 3);
-        BGMPlayer.Instance.PlaySound(roll == 0 ? "BGMs/chun" : (roll == 1 ? "BGMs/xia" : "BGMs/qiu"));
+        // 商店阶段 BGM：shop1~shop4 随机一首
+        BGMPlayer.Instance.PlaySound("BGMs/shop" + (SysRandom.Range(0, 4) + 1));
 
         if (GameManager.Instance.year == 0)
         {

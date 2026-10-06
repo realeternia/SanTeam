@@ -84,8 +84,8 @@ public class WorldManager : MonoBehaviour
 
     public void BattleBegin()
     {
-        var roll = SysRandom.Range(0, 2);
-        BGMPlayer.Instance.PlaySound(roll == 0 ? "BGMs/weifeng" : "BGMs/pozhu");
+        // 战斗阶段 BGM：battle1~battle4 随机一首
+        BGMPlayer.Instance.PlaySound("BGMs/battle" + (SysRandom.Range(0, 4) + 1));
 
         // 从回合配置表读取本回合可能刷的地图，随机选一张
         gameFinish = false;
