@@ -20,6 +20,8 @@ public class Chess : MonoBehaviour
     public int heroId;
     public string chessName = "0";
     public int pos;
+    /// <summary>战斗初始(出生)位置，Init 时记录；"叛逃"后退的参考点</summary>
+    public Vector3 spawnPosition;
     public bool sneakSwapped; // 偷袭交换标记：每个敌方英雄整场只可能被交换一次（战斗内Chess实例每次新建，天然按场重置）
 
 
@@ -41,6 +43,10 @@ public class Chess : MonoBehaviour
     public float auroEffectRate = 1f; //光环效果加成系数（1=无加成，鼓光环等 AuroAttrs 光环属性效果值乘算）
 
     public int lastDamagedPlayerId = -1;
+    /// <summary>最近一次实际受到伤害的时间(Time.time，无受伤为负无穷)，供"最近受伤"判定</summary>
+    public float lastDamagedTime = float.NegativeInfinity;
+    /// <summary>最近一次伤害来源的位置快照（受击瞬间记录攻击者位置，供"身前"方向判定；来源已阵亡仍可用）</summary>
+    public Vector3 lastDamagedSourcePos;
     // 本伤害事件中受护盾吸收的伤害量（>0 表示部分/全部被盾抵挡，供战斗模拟器区分"盾降低"与"实际受伤")
     public int lastShieldAbsorb;
     // ---- 相职业武将专属标记 ----
@@ -107,6 +113,10 @@ public class Chess : MonoBehaviour
     public List<BuffTime> buffTimes = new List<BuffTime>(); //记录最近20s的buff记录
     public int noMoveCount = 0;
     public int noActionCount = 0;
+    /// <summary>叛逃状态计数：&gt;0 时不受控制，持续朝初始位置后退(不索敌/不攻击)，由 BuffDefect 维护</summary>
+    public int fleeCount = 0;
+    /// <summary>混乱状态计数：&gt;0 时索敌改为攻击最近的己方单位，由 BuffChaos 维护</summary>
+    public int chaosCount = 0;
     /// <summary>引导状态：当前正在持续施法(引导)的技能Id，0=未施法。&gt;0 时该单位无法移动/普攻，且会被晕眩/死亡打断</summary>
     public int castingSkillId = 0;
     // 当前引导协程引用（供 BreakCasting 停止）
@@ -144,6 +154,7 @@ public class Chess : MonoBehaviour
         var initPos = transform.position;
         initPos.y = baseY + heightOffset;
         transform.position = initPos;
+        spawnPosition = initPos;
         // 创建材质实例
         material = new Material(rend.sharedMaterial);
         if (!string.IsNullOrEmpty(chessName))
@@ -413,6 +424,13 @@ public class Chess : MonoBehaviour
         if (attackRange == 0)
             return;
 
+        // 混乱：索敌改为最近的己方单位（攻击自己人）
+        if (chaosCount > 0)
+        {
+            FindChaosTarget();
+            return;
+        }
+
         // 获取所有敌方单位：range传0表示全地图索敌（单位必须知道远处敌人的位置才能向其推进，近战单位射程近不能因此失去索敌能力）
         var allChess = WorldManager.Instance.GetEnemyInRange(transform.position, 0, side);
         List<(Chess chess, float distance)> validTargets = new List<(Chess, float)>();
@@ -464,6 +482,26 @@ public class Chess : MonoBehaviour
         targetChess = scoredTargets[0].chess;
     }
 
+    // 混乱：在己方存活单位中选最近的作为攻击目标
+    private void FindChaosTarget()
+    {
+        var allUnits = WorldManager.Instance.GetUnitsInRangeAll(transform.position, 0);
+        Chess nearest = null;
+        float nearestDist = float.MaxValue;
+        foreach (var other in allUnits)
+        {
+            if (other == null || other == this || other.hp <= 0 || other.side != side)
+                continue;
+            float d = WorldManager.Instance.GetRange(transform.position, other.transform.position);
+            if (d < nearestDist)
+            {
+                nearestDist = d;
+                nearest = other;
+            }
+        }
+        targetChess = nearest;
+    }
+
     // 计算目标分数
     private float CalculateTargetScore(Chess target)
     {
@@ -484,6 +522,13 @@ public class Chess : MonoBehaviour
         // 眩晕(noActionCount>0)或引导中(castingSkillId>0)都无法移动/普攻
         if (noActionCount > 0 || castingSkillId > 0)
             return;
+
+        // 叛逃：不受控制，持续朝初始位置后退（不索敌/不攻击）
+        if (fleeCount > 0)
+        {
+            MoveBackToSpawn();
+            return;
+        }
 
         // 每3秒重新寻找目标
         if (Time.time - lastTargetUpdateTime >= 3f)
@@ -572,6 +617,24 @@ public class Chess : MonoBehaviour
             transform.position = nextPosition;
             movedThisTick = true;
         }
+    }
+
+    // 叛逃后退：朝初始位置直线移动（不寻路），踩墙则本次不动
+    private void MoveBackToSpawn()
+    {
+        if (moveSpeed <= 0f)
+            return;
+        Vector3 dir = spawnPosition - transform.position;
+        dir.y = 0f;
+        float dist = dir.magnitude;
+        if (dist < 0.05f)
+            return;
+        dir /= dist;
+        Vector3 next = transform.position + dir * moveSpeed * 0.05f;
+        if (WorldManager.Instance.CheckPositionBlocked(this, next))
+            return;
+        transform.position = next;
+        movedThisTick = true;
     }
 
     // 短程寻路重规划：朝目标绕墙取下一个途经点；直线通畅则直接朝目标
@@ -710,6 +773,9 @@ public class Chess : MonoBehaviour
                 {
                     victim.lastDamagedPlayerId = playerId;
                 }
+                // 记录最近受伤时间与伤害来源位置（供"最近受伤"判定与"身前"方向计算）
+                victim.lastDamagedTime = Time.time;
+                victim.lastDamagedSourcePos = transform.position;
                 // 记录战斗统计
                 if (isHero)
                     BattleStatManager.AddBattleStat(playerId, heroId, damage, true, victim.isHero);
@@ -771,6 +837,9 @@ public class Chess : MonoBehaviour
                 hp -= damage;
                 if (caster != this)
                     lastDamagedPlayerId = caster.playerId;
+                // 记录最近受伤时间与伤害来源位置（供"最近受伤"判定与"身前"方向计算）
+                lastDamagedTime = Time.time;
+                lastDamagedSourcePos = caster.transform.position;
 
                 // 记录战斗统计
                 if (caster.isHero)
@@ -958,6 +1027,12 @@ public class Chess : MonoBehaviour
     public bool IsInFight()
     {
         return Time.time < lastAttackTime + 0.3f;
+    }
+
+    /// <summary>是否在最近 within 秒内受到过伤害（默认1秒），供技能筛选"最近受伤"的友军</summary>
+    public bool IsRecentlyDamaged(float within = 1f)
+    {
+        return Time.time - lastDamagedTime <= within;
     }
 
     public void AddBuff(Buff buff, Chess caster, float time)

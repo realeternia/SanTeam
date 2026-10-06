@@ -3,7 +3,8 @@ using UnityEngine;
 
 /// <summary>
 /// 司马懿·隐忍（术）：对目标造成高额 /damagestrength 法术伤害，将其推离自身（强制位移 xz 平面），
-/// 并眩晕（Buff "乱"，时长 bufftime）2 秒，把核心敌人推出己阵、打断其输出。
+/// 并使其叛逃（Buff "叛"，时长 bufftime）：不受控制地向初始位置后退、移动速度减半、打断引导，
+/// 把核心敌人推出己阵并令其自乱阵脚。
 /// </summary>
 public class SkillAidEnduranceStrike : Skill
 {
@@ -39,8 +40,9 @@ public class SkillAidEnduranceStrike : Skill
         if (!WorldManager.Instance.CheckPositionBlocked(target, pushPos))
             target.transform.position = pushPos;
 
-        // 眩晕 2 秒
-        BuffManager.AddBuff(target, owner, id, BuffConfig.GetConfigByNameS("乱").Id, skillCfg.BuffTime);
+        // 施加叛逃（Buff短名由 SkillConfig.BuffId 配置，如"叛"）
+        foreach (var buffId in GetSkillBuffIds())
+            BuffManager.AddBuff(target, owner, id, buffId, skillCfg.BuffTime);
 
         EffectManager.PlaySkillEffect(target, skillCfg.HitEffect);
         return true;

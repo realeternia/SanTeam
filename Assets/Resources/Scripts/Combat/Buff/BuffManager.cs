@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using CommonConfig;
 
 public static class BuffManager
@@ -38,9 +39,6 @@ public static class BuffManager
             case "BuffSuck":
                 buff = new BuffSuck(buffId, skillId, caster, target, time);
                 break;
-            case "BuffDamageAddRate":
-                buff = new BuffDamageAddRate(buffId, skillId, caster, target, time);
-                break;                
             case "BuffDamagedAddRate":
                 buff = new BuffDamagedAddRate(buffId, skillId, caster, target, time);
                 break;
@@ -131,6 +129,12 @@ public static class BuffManager
             case "BuffArmorShred":
                 buff = new BuffArmorShred(buffId, skillId, caster, target, time);
                 break;
+            case "BuffDefect":
+                buff = new BuffDefect(buffId, skillId, caster, target, time);
+                break;
+            case "BuffChaos":
+                buff = new BuffChaos(buffId, skillId, caster, target, time);
+                break;
 
         }
 
@@ -157,6 +161,54 @@ public static class BuffManager
                 break;
             }
         }
+    }
+
+    /// <summary>
+    /// 驱散负面 Buff：移除目标身上所有"负面(IsPositive=false) 且 可驱散(CanDispel=true)"的 Buff，返回实际驱散数量。
+    /// 英雄招牌类不可驱散 Buff（CanDispel=false，如连锁/叛逃/混乱）会被保留。
+    /// </summary>
+    public static int DispelNegative(Chess chess)
+    {
+        if (chess == null)
+        {
+            GameLog.Warn("DispelNegative 目标为空，跳过驱散");
+            return 0;
+        }
+
+        // 先收集待移除的 buff id，再统一移除，避免遍历中改动 buffs 列表
+        var toRemove = new List<int>();
+        foreach (var buff in chess.buffs)
+        {
+            if (buff.buffCfg != null && !buff.buffCfg.IsPositive && buff.buffCfg.CanDispel)
+                toRemove.Add(buff.id);
+        }
+        foreach (var id in toRemove)
+            RemoveBuff(chess, id);
+        return toRemove.Count;
+    }
+
+    /// <summary>
+    /// 驱散正面 Buff：移除目标身上所有"正面(IsPositive=true) 且 可驱散(CanDispel=true)"的 Buff，返回实际驱散数量。
+    /// 英雄招牌类不可驱散 Buff（CanDispel=false，如据守/筑垒/龙胆/狂暴等）会被保留。
+    /// </summary>
+    public static int DispelPositive(Chess chess)
+    {
+        if (chess == null)
+        {
+            GameLog.Warn("DispelPositive 目标为空，跳过驱散");
+            return 0;
+        }
+
+        // 先收集待移除的 buff id，再统一移除，避免遍历中改动 buffs 列表
+        var toRemove = new List<int>();
+        foreach (var buff in chess.buffs)
+        {
+            if (buff.buffCfg != null && buff.buffCfg.IsPositive && buff.buffCfg.CanDispel)
+                toRemove.Add(buff.id);
+        }
+        foreach (var id in toRemove)
+            RemoveBuff(chess, id);
+        return toRemove.Count;
     }
 
 }

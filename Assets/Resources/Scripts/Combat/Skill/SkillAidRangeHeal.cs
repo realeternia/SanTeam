@@ -5,6 +5,7 @@ using UnityEngine;
 /// 青囊（ScriptName = "AidRangeHeal"）：辅助技能，先在 Range 内选出生命比例最低的友方英雄作为治疗中心，
 /// 再以该中心为圆心、Area 为半径，治疗范围内全部友方英雄（各 HealTarget 一次，吃医职业治疗加成）。
 /// 治疗量走独立治疗公式 GetSkillHeal()。附近友军全部满血时不施放。
+/// 并对被治疗的友军额外驱散负面 Buff（不可驱散的招牌 Buff 除外，见 BuffManager.DispelNegative）。
 /// 用于华佗：一剂青囊，药到病除，奶一圈。
 /// </summary>
 public class SkillAidRangeHeal : Skill
@@ -47,6 +48,8 @@ public class SkillAidRangeHeal : Skill
         {
             if (heal > 0)
                 owner.HealTarget(unit, skillId, heal, true);
+            // 青囊附带净化：驱散被治疗友军的负面 Buff
+            BuffManager.DispelNegative(unit);
             EffectManager.PlaySkillEffect(unit, skillCfg.HitEffect);
         }
 

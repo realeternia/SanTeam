@@ -1,8 +1,9 @@
-﻿using CommonConfig;
+using CommonConfig;
 using UnityEngine;
 
 /// <summary>
-/// 张松·舌辩（术）：对目标造成 /damagestrength 法术伤害，并大幅减速（Buff "缓"，减速比例由 BuffSlowDown 读 StrengthBuff1[0]，时长 bufftime）。
+/// 张松·舌辩（术）：对目标造成 /damagestrength 法术伤害，并大幅减速（Buff "缓"，减速比例由 BuffSlowDown 读 StrengthBuff1[0]，时长 bufftime），
+/// 同时驱散目标身上的正面 Buff（不可驱散的招牌 Buff 除外，见 BuffManager.DispelPositive）。
 /// </summary>
 public class SkillAidSilverTongue : Skill
 {
@@ -25,6 +26,9 @@ public class SkillAidSilverTongue : Skill
         if (GetSkillDamage() > 0)
             target.OnSkillDamaged(owner, skillId, GetSkillDamage());
         BuffManager.AddBuff(target, owner, id, BuffConfig.GetConfigByNameS("缓").Id, skillCfg.BuffTime);
+
+        // 舌辩附带驱散：移除目标身上的正面 Buff（不可驱散的招牌 Buff 除外）
+        BuffManager.DispelPositive(target);
 
         EffectManager.PlaySkillEffect(target, skillCfg.HitEffect);
         return true;

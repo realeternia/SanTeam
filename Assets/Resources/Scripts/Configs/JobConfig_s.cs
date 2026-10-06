@@ -180,7 +180,7 @@ namespace CommonConfig
         {
             config.Clear();
             config[1] = new JobConfig(1, "诸侯", "王", new string[]{"atk","ap","hp"}, 50, 0, 1f, 550, 17, 20, 2, 10, 30, 30, 10, 0, 0f, "SwordHitYellowCritical");
-            config[101] = new JobConfig(101, "骑士", "马", new string[]{"atk","hp","atkspeed"}, 60, 0, 1f, 480, 17, 20, 2, 10, 30, 30, 12, 0, 0f, "SwordHitYellowCritical");
+            config[101] = new JobConfig(101, "骑士", "马", new string[]{"atk","hp","atkspeed"}, 60, 0, 1f, 480, 17, 20, 2, 10, 28, 28, 12, 0, 0f, "SwordHitYellowCritical");
             config[102] = new JobConfig(102, "战车", "车", new string[]{"atk","armor","hp"}, 55, 0, 1f, 520, 17, 20, 2, 10, 30, 30, 12, 0, 0f, "SwordHitYellowCritical");
             config[201] = new JobConfig(201, "弓手", "弓", new string[]{"atk","atkspeed","crit"}, 40, 0, 1f, 450, 45, 20, 2, 10, 15, 30, 8, 20, 1.5f, "BulletExplosionBlue");
             config[202] = new JobConfig(202, "弩手", "弩", new string[]{"atk","crit","atkspeed"}, 45, 0, 1f, 400, 60, 20, 2, 10, 15, 30, 8, 25, 0f, "BulletExplosionBlue");

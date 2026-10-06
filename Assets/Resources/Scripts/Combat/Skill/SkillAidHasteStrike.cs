@@ -3,7 +3,8 @@ using CommonConfig;
 using UnityEngine;
 
 /// <summary>
-/// 曹彰·疾攻：对单体造成魔法伤害并给自身挂攻移速"翼"（时长 bufftime）
+/// 陈泰·扬鞭：对单体造成法术伤害，并给自身挂攻速提升 buff（BuffId 配到 SkillConfig，仅攻速不含移速），
+/// 数值取 StrengthBuff1[0]，时长 bufftime。
 /// </summary>
 public class SkillAidHasteStrike : Skill
 {
@@ -23,7 +24,7 @@ public class SkillAidHasteStrike : Skill
 
         target.OnSkillDamaged(owner, id, GetSkillDamage());
 
-        var hasteId = BuffConfig.GetConfigByNameS("翼").Id;
+        var hasteId = BuffConfig.GetConfigByNameS(skillCfg.BuffId).Id;
         BuffManager.AddBuff(owner, owner, id, hasteId, skillCfg.BuffTime);
 
         owner.PlayerAnim(skillCfg.Action);

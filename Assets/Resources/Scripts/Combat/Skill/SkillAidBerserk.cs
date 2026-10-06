@@ -3,7 +3,8 @@ using CommonConfig;
 using UnityEngine;
 
 /// <summary>
-/// 华雄·狂暴：给自身挂双刃"狂"（造成的伤害提升，但受到伤害也提升），增幅数值由 Buff 读取 strength2
+/// 华雄·狂暴：给自身挂双刃"狂"（造成的伤害提升，但受到伤害也提升），
+/// 增伤/受击加深分槽由 BuffFrenzy 读取 StrengthBuff1[0]/[1]
 /// </summary>
 public class SkillAidBerserk : Skill
 {

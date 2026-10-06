@@ -120,12 +120,11 @@
     <Compile Include="Assets\Resources\Scripts\UIs\CastleHUD.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\JobLinkManager.cs" />
     <Compile Include="Assets\Resources\Scripts\Configs\ConfigManager.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffDamageAddRate.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidExecute.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffSuckHaste.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillHitRepeat.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidThrust.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidBerserkCleave.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidSacrificeGuard.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffMultiShot.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillFactionShield.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffNextAttacksMult.cs" />
@@ -168,6 +167,8 @@
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffVengefulStance.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffShieldGuard.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffArmorShred.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffDefect.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffChaos.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAttackRunCross.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAttackShieldPierce.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidAtkDrain.cs" />
@@ -216,6 +217,7 @@
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidDiveCleave.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillSoldierBuff.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidBuffArea.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidDispelBuffArea.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillCastingAidDrain.cs" />
     <Compile Include="Assets\SineVFX\TopDownEffects\Scripts\PrefabSpawner.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\TooltipHeroEquip.cs" />

@@ -5,14 +5,13 @@ using UnityEngine;
 /// <summary>
 /// 荀彧·兵精：每次主动释放对一名未祝福士兵大祝福(优先近战)：回复全部生命 + 攻击+X%(Strength2[0])、
 /// 护甲+Strength2[2]、魔抗+Strength2[1] 大幅提升；每名士兵整场合仅祝福一次(BlessedByXunYu 标记)。
-/// 同时每次释放为自身永久成长（StrengthBuff1[0]=攻击、StrengthBuff1[1]=生命），
+/// 同时每次释放为自身永久叠加攻击速度（StrengthBuff1[0]），
 /// 使纯士兵辅助在无兵/单兵情况下也能逐步成长为可独立作战的单位。
 /// </summary>
 public class SkillSoldierBless : Skill
 {
     /// <summary>自身成长槽位（StrengthBuff1 数组下标）</summary>
-    private const int SelfAtkGrowIdx = 0;
-    private const int SelfHpGrowIdx = 1;
+    private const int SelfAtkSpeedGrowIdx = 0;
 
     public SkillSoldierBless(int id, Chess unit) : base(id, unit)
     {
@@ -51,12 +50,11 @@ public class SkillSoldierBless : Skill
         return true;
     }
 
-    // 自身永久成长：每次释放为自身叠加攻击与生命（无Buff，直接永久累加），数值取自 StrengthBuff1
+    // 自身永久成长：每次释放为自身叠加攻击速度（无Buff，直接永久累加），数值取自 StrengthBuff1[0]
     private void GrowSelf()
     {
-        if (skillCfg.StrengthBuff1 == null || skillCfg.StrengthBuff1.Length < 2)
+        if (skillCfg.StrengthBuff1 == null || skillCfg.StrengthBuff1.Length < 1)
             return;
-        JobLinkManager.ApplyAttr(owner, "atk", skillCfg.StrengthBuff1[SelfAtkGrowIdx]);
-        JobLinkManager.ApplyAttr(owner, "hp", skillCfg.StrengthBuff1[SelfHpGrowIdx]);
+        JobLinkManager.ApplyAttr(owner, "atkspeed", skillCfg.StrengthBuff1[SelfAtkSpeedGrowIdx]);
     }
 }

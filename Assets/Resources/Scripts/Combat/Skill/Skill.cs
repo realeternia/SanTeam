@@ -84,6 +84,26 @@ public class Skill
         return Mathf.Max(1, (int)(v * (100 + owner.GetAttr("ap")) / 100f));
     }
 
+    /// <summary>
+    /// 解析 SkillConfig.BuffId：支持英文/中文逗号、分号分隔的多个 Buff 短名（如 "盾,甲"），
+    /// 返回对应的 BuffId 列表（未配置时返回空列表）。单个短名沿用 BuffConfig.GetConfigByNameS。
+    /// </summary>
+    protected List<int> GetSkillBuffIds()
+    {
+        var ids = new List<int>();
+        if (skillCfg == null || string.IsNullOrEmpty(skillCfg.BuffId))
+            return ids;
+
+        foreach (var seg in skillCfg.BuffId.Split(new[] { ',', '，', ';', '；' }, StringSplitOptions.RemoveEmptyEntries))
+        {
+            var name = seg.Trim();
+            if (name.Length == 0)
+                continue;
+            ids.Add(BuffConfig.GetConfigByNameS(name).Id);
+        }
+        return ids;
+    }
+
     public Skill(int id, Chess unit)
     {
         this.id = id;

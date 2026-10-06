@@ -61,6 +61,8 @@ public static class CombatConst
     public const float MoveReplanInterval = 0.5f;
     /// <summary>单位侧向错位权重(拥挤时叠加横向分量打散同向队列；独行时不偏移)</summary>
     public const float MoveLaneBias = 0.4f;
+    /// <summary>"叛逃"移动速度保留比例：叛逃期间移动速度乘以本值(0.5=减半)</summary>
+    public const float DefectMoveSpeedRate = 0.5f;
     /// <summary>短程寻路最大搜索深度(格)，超过预算取最接近目标的一步继续推进</summary>
     public const int MovePathMaxDepth = 6;
 

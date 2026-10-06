@@ -3,7 +3,7 @@ using CommonConfig;
 using UnityEngine;
 
 /// <summary>
-/// 曹洪·裂盾：对目标造成法术伤害并移除其吸收型护盾（对带 BuffShield 的目标触发移除）。
+/// 曹洪·裂盾：对目标造成法术伤害；若目标带有吸收型护盾(BuffShield)，本次伤害整体提升至 Strength2[0] 倍。
 /// </summary>
 public class SkillAidBarbarianSlam : Skill
 {
@@ -23,14 +23,12 @@ public class SkillAidBarbarianSlam : Skill
 
         owner.PlayerAnim(skillCfg.Action);
 
-        target.OnSkillDamaged(owner, id, GetSkillDamage());
-        // 移除吸收型护盾
-        var shield = target.GetBuff(CombatConst.ShieldBuffId) as BuffShield;
-        if (shield != null)
-        {
-            shield.SetHp(0);
-            BuffManager.RemoveBuff(target, CombatConst.ShieldBuffId);
-        }
+        var damage = GetSkillDamage();
+        // 目标带吸收型护盾时，本次伤害整体乘以 Strength2[0]（配置缺失时按 1 倍，不放大）
+        if (skillCfg.Strength2.Length > 0 && target.GetBuff(CombatConst.ShieldBuffId) is BuffShield)
+            damage = Math.Max(1, (int)(damage * skillCfg.Strength2[0]));
+
+        target.OnSkillDamaged(owner, id, damage);
 
         EffectManager.PlaySkillEffect(target, skillCfg.HitEffect);
         return true;

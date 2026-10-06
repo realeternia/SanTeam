@@ -35,6 +35,8 @@ public static class SkillManager
                 return new SkillAidBuffHasteMoveSpeed(skillId, owner);
             case "AidBuffArea":
                 return new SkillAidBuffArea(skillId, owner);
+            case "AidDispelBuffArea":
+                return new SkillAidDispelBuffArea(skillId, owner);
             case "AttackShieldPierce":
                 return new SkillAttackShieldPierce(skillId, owner);
             case "AttackArmorPierce":
@@ -256,8 +258,8 @@ public static class SkillManager
                 return new SkillAidSweepingAoe(skillId, owner);
             case "SkillAidDiveCleave":
                 return new SkillAidDiveCleave(skillId, owner);
-            case "SkillAidBerserkCleave":
-                return new SkillAidBerserkCleave(skillId, owner);
+            case "SkillAidSacrificeGuard":
+                return new SkillAidSacrificeGuard(skillId, owner);
             case "SkillAidThrust":
                 return new SkillAidThrust(skillId, owner);
             case "SkillAidChargeImpale":

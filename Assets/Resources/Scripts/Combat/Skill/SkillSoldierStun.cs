@@ -1,15 +1,18 @@
-﻿using System.Linq;
+using System.Linq;
 using CommonConfig;
 using UnityEngine;
 
 /// <summary>
 /// 贾诩·乱阵：战斗开始给本侧近战士兵附加普攻眩晕 Buff(BuffHitStun，按 Strength2[0] 概率眩晕)；
-/// 每次主动释放对目标造成法术伤害并眩晕。
+/// 每次主动释放对目标造成法术伤害并使其混乱(攻击最近的己方单位)。
 /// </summary>
 public class SkillSoldierStun : Skill
 {
-    /// <summary>眩晕效果 Buff 短名(乱)：主动技命中目标、以及 BuffHitStun 普攻命中目标时施加的眩晕 Buff</summary>
+    /// <summary>眩晕效果 Buff 短名(乱)：BuffHitStun 普攻命中目标时施加的眩晕 Buff</summary>
     public const string StunBuffNameS = "乱";
+
+    /// <summary>主动释放施加的控制 Buff 短名(惑=混乱)：令目标不受控制地攻击最近的己方单位</summary>
+    private const string CastDebuffNameS = "惑";
 
     public SkillSoldierStun(int id, Chess unit) : base(id, unit)
     {
@@ -47,7 +50,7 @@ public class SkillSoldierStun : Skill
         owner.PlayerAnim(skillCfg.Action);
 
         target.OnSkillDamaged(owner, skillId, GetSkillDamage());
-        BuffManager.AddBuff(target, owner, id, BuffConfig.GetConfigByNameS(StunBuffNameS).Id, skillCfg.BuffTime);
+        BuffManager.AddBuff(target, owner, id, BuffConfig.GetConfigByNameS(CastDebuffNameS).Id, skillCfg.BuffTime);
         EffectManager.PlaySkillEffect(target, skillCfg.HitEffect);
         return true;
     }
