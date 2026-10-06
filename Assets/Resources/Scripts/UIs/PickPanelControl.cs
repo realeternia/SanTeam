@@ -4,6 +4,7 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using DG.Tweening;
 using CommonConfig;
 
 public class PickPanelControl : MonoBehaviour
@@ -18,9 +19,14 @@ public class PickPanelControl : MonoBehaviour
 
     private List<PickPanelCellControl> cellControls = new List<PickPanelCellControl>();
 
+    private Tween startTextTween;
+
     public GameObject loadGamePanel;
     public Button loadGameBtn;
     public Button newGameBtn;
+
+    public GameObject startPanel;
+    public TMP_Text startText;
 
     public Button finBtn;
 
@@ -59,6 +65,41 @@ public class PickPanelControl : MonoBehaviour
         refreshBtn.gameObject.SetActive(false);
 
         PanelManager.Instance.ShowPick();
+
+        // 启动画面（Unity 内置）结束后进入开始面板：隐藏读档/新游戏面板（含 loadGameBtn、newGameBtn）、开始面板与上方玩家信息
+        loadGamePanel.SetActive(false);
+        startPanel.SetActive(false);
+        SetPlayerInfoVisible(false);
+        PlayIntro();
+    }
+
+    // 进入开始面板：播放开始 BGM，再展示开始面板
+    private void PlayIntro()
+    {
+        BGMPlayer.Instance.PlaySound("BGMs/start");
+
+        ShowStartPanel();
+    }
+
+    // 上方玩家信息（TopBar 上每个玩家一个 PlayerInfo）
+    private void SetPlayerInfoVisible(bool visible)
+    {
+        if (GameManager.Instance == null || GameManager.Instance.players == null)
+        {
+            GameLog.Warn("PickPanelControl 获取玩家列表失败，跳过上方玩家信息显隐");
+            return;
+        }
+
+        foreach (var player in GameManager.Instance.players)
+        {
+            if (player != null)
+                player.gameObject.SetActive(visible);
+        }
+    }
+
+    // 点击开始面板后的原有选牌流程（读档 / 新游戏 → 刷新英雄池）
+    private void BeginSelection()
+    {
         if(GameManager.Instance.IsGameSaveExist())
         {
             loadGamePanel.SetActive(true);
@@ -96,6 +137,53 @@ public class PickPanelControl : MonoBehaviour
             RefreshBtnClick();
         }
 
+    }
+
+    // 显示开始面板：startText 循环缩放，任意点击后进入选牌流程
+    private void ShowStartPanel()
+    {
+        startPanel.SetActive(true);
+
+        var startBtn = startPanel.GetComponent<Button>();
+        if (startBtn == null)
+        {
+            startBtn = startPanel.AddComponent<Button>();
+            startBtn.transition = Selectable.Transition.None;
+            startBtn.targetGraphic = startPanel.GetComponent<Graphic>();
+        }
+        startBtn.onClick.AddListener(OnStartPanelClick);
+
+        PlayStartTextLoop();
+    }
+
+    // 开始文字循环缩放动画
+    private void PlayStartTextLoop()
+    {
+        if (startText == null)
+        {
+            GameLog.Warn("PickPanelControl.startText 未绑定，跳过开始文字动画");
+            return;
+        }
+
+        startText.transform.localScale = Vector3.one;
+        startTextTween = startText.transform
+            .DOScale(1.15f, 0.6f)
+            .SetLoops(-1, LoopType.Yoyo)
+            .SetEase(Ease.InOutSine)
+            .SetUpdate(true);
+    }
+
+    private void OnStartPanelClick()
+    {
+        if (startTextTween != null)
+        {
+            startTextTween.Kill();
+            startTextTween = null;
+        }
+
+        startPanel.SetActive(false);
+        SetPlayerInfoVisible(true);
+        BeginSelection();
     }
 
     // Update is called once per frame
