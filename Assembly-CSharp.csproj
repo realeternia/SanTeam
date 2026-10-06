@@ -172,6 +172,7 @@
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAttackedTeleport.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\BattleResultHeroCellControl.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillInitSoldierBuff.cs" />
+    <Compile Include="Assets\Resources\Scripts\UIs\LoadGameItem.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidDefStack.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillDeathGroupHeal.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\TooltipFriend.cs" />
@@ -290,7 +291,6 @@
     <Compile Include="Assets\Resources\Scripts\Tools\SysRandom.cs" />
     <Compile Include="Assets\Resources\Scripts\Effect\EffectTintColor.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\CombatConst.cs" />
-    
     <Compile Include="Assets\Resources\Scripts\UIs\SideComposeItem.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillInitAddItemChance.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidRangeHeal.cs" />

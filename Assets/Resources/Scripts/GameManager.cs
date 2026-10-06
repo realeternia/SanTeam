@@ -26,11 +26,40 @@ public class GameManager : MonoBehaviour
         public int year;
     }
 
+    // 存档摘要解析用：镜像 PlayerInfo 序列化结构 { playerData:[{key,value}] }
+    [System.Serializable]
+    private class RawPlayerSave
+    {
+        public List<RawSavePair> playerData = new List<RawSavePair>();
+    }
+
+    [System.Serializable]
+    private class RawSavePair
+    {
+        public string key;
+        public string value;
+    }
+
+    // 存档摘要：存档列表展示用（年份/积分/金钱/上阵英雄）
+    [System.Serializable]
+    public struct SaveSummary
+    {
+        public int year;
+        public int gold;
+        public int mark;
+        public List<int> lineHeroes;
+    }
+
+    /// <summary>最大存档槽位数</summary>
+    public const int SaveSlotCount = 5;
+
     public static GameManager Instance;
     public PlayerInfo[] players; //不能new，都是配置好的
     public List<FriendRandomData> friendRdData;
     public List<int> heroIds;
     public int year;
+    /// <summary>当前存档槽位（-1 表示尚未选择/新建）</summary>
+    public int currentSaveSlot = -1;
 
     // 调试阵容：配置任一方武将后，进入游戏直接开战（跳过选牌/商店流程），列表留空则走正常对局流程。
     // 仅用于开发调试，通过菜单 Tools/调试阵容配置窗口 配置（见 Assets/Editor/DebugLineupWindow.cs），配置后可一键进入战斗。
@@ -52,6 +81,8 @@ public class GameManager : MonoBehaviour
     void Start()
     {
         ConfigManager.Init();
+
+        MigrateLegacySave();
 
         players[0].Init(0, PlayerBook.GetWang());
         var pls = PlayerBook.GetRandomN(7);
@@ -138,20 +169,118 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public bool IsGameSaveExist()
+    // 存档文件路径（槽位 0 ~ SaveSlotCount-1）
+    private string GetSavePath(int slot)
     {
-        string savePath = Application.persistentDataPath + "/game_save.json";
-        
-        if(!File.Exists(savePath))
-            return false;
-        return true;
+        return Application.persistentDataPath + "/game_save_" + slot + ".json";
     }
 
-    public bool LoadFromSave()
+    // 旧版单存档迁移：game_save.json → 槽位0（仅当槽位0不存在时）
+    private void MigrateLegacySave()
     {
-        string savePath = Application.persistentDataPath + "/game_save.json";
+        string legacyPath = Application.persistentDataPath + "/game_save.json";
+        if (File.Exists(legacyPath) && !File.Exists(GetSavePath(0)))
+        {
+            try
+            {
+                File.Move(legacyPath, GetSavePath(0));
+                GameLog.Debug("旧版单存档已迁移到槽位0");
+            }
+            catch (System.Exception e)
+            {
+                GameLog.Error("旧版存档迁移失败: " + e.Message);
+            }
+        }
+    }
+
+    // 已使用的存档槽位（升序）
+    public List<int> GetUsedSaveSlots()
+    {
+        var slots = new List<int>();
+        for (int i = 0; i < SaveSlotCount; i++)
+        {
+            if (File.Exists(GetSavePath(i)))
+                slots.Add(i);
+        }
+        return slots;
+    }
+
+    public bool IsGameSaveExist()
+    {
+        return GetUsedSaveSlots().Count > 0;
+    }
+
+    // 分配一个新的空存档槽位（取第一个未占用槽位），成功返回槽位号，槽位已满返回-1
+    public int CreateNewSaveSlot()
+    {
+        for (int i = 0; i < SaveSlotCount; i++)
+        {
+            if (!File.Exists(GetSavePath(i)))
+            {
+                currentSaveSlot = i;
+                GameLog.Debug("分配新存档槽位: " + i);
+                return i;
+            }
+        }
+        GameLog.Warn("存档槽位已满，无法创建新存档");
+        return -1;
+    }
+
+    // 读取存档摘要（年份/积分/金钱/上阵英雄），供存档列表展示。
+    // 从 0 号位(人类玩家)的序列化数据解析，兼容无独立摘要字段的旧存档。
+    public SaveSummary GetSaveSummary(int slot)
+    {
+        var summary = new SaveSummary { lineHeroes = new List<int>() };
+        string savePath = GetSavePath(slot);
         if (!File.Exists(savePath))
+        {
+            GameLog.Warn("读取存档摘要失败，文件不存在: " + savePath);
+            return summary;
+        }
+        try
+        {
+            string json = File.ReadAllText(savePath);
+            SaveData saveData = JsonUtility.FromJson<SaveData>(json);
+            summary.year = saveData.year;
+
+            if (saveData.players != null && saveData.players.Count > 0)
+            {
+                RawPlayerSave raw = JsonUtility.FromJson<RawPlayerSave>(saveData.players[0]);
+                if (raw != null && raw.playerData != null)
+                {
+                    foreach (var pair in raw.playerData)
+                    {
+                        if (pair.key == "gold")
+                            int.TryParse(pair.value, out summary.gold);
+                        else if (pair.key == "mark")
+                            int.TryParse(pair.value, out summary.mark);
+                        else if (pair.key == "battleCards" && !string.IsNullOrEmpty(pair.value))
+                        {
+                            foreach (string s in pair.value.Split(','))
+                            {
+                                if (int.TryParse(s, out int cardId) && cardId > 0 && ConfigManager.IsHeroCard(cardId))
+                                    summary.lineHeroes.Add(cardId);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        catch (System.Exception e)
+        {
+            GameLog.Error("读取存档摘要失败: " + e.Message);
+        }
+        return summary;
+    }
+
+    public bool LoadFromSave(int slot)
+    {
+        string savePath = GetSavePath(slot);
+        if (!File.Exists(savePath))
+        {
+            GameLog.Warn("加载存档失败，文件不存在: " + savePath);
             return false;
+        }
         try
         {
             string json = File.ReadAllText(savePath);
@@ -183,7 +312,8 @@ public class GameManager : MonoBehaviour
                 heroIds.AddRange(saveData.heroIds);
             }
 
-            GameLog.Debug("游戏数据加载成功 year=" + year);
+            currentSaveSlot = slot;
+            GameLog.Debug("游戏数据加载成功 slot=" + slot + " year=" + year);
         }
         catch (System.Exception e)
         {
@@ -193,14 +323,42 @@ public class GameManager : MonoBehaviour
         return true;
     }
 
+    // 删除指定槽位存档
+    public void DeleteSave(int slot)
+    {
+        string savePath = GetSavePath(slot);
+        if (!File.Exists(savePath))
+        {
+            GameLog.Warn("删除存档失败，文件不存在: " + savePath);
+            return;
+        }
+        try
+        {
+            File.Delete(savePath);
+            if (currentSaveSlot == slot)
+                currentSaveSlot = -1;
+            GameLog.Debug("删除存档成功 slot=" + slot);
+        }
+        catch (System.Exception e)
+        {
+            GameLog.Error("删除存档失败: " + e.Message);
+        }
+    }
+
     public void SaveToFile()
     {
-        string savePath = Application.persistentDataPath + "/game_save.json";
+        // 未指定槽位（如调试阵容跳过选牌流程）时兜底写入槽位0
+        int slot = currentSaveSlot >= 0 ? currentSaveSlot : 0;
+        if (currentSaveSlot < 0)
+            GameLog.Warn("当前未选择存档槽位，默认写入槽位0");
+
+        string savePath = GetSavePath(slot);
         try
         {
             SaveData saveData = new SaveData();
 
             saveData.year = year;
+
             // 序列化每个PlayerInfo对象
             foreach (PlayerInfo player in players)
             {

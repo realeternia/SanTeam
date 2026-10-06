@@ -25,6 +25,11 @@ public class PickPanelControl : MonoBehaviour
     public Button loadGameBtn;
     public Button newGameBtn;
 
+    // 存档列表容器（运行时创建）与生成的存档项
+    private RectTransform loadItemRoot;
+    private readonly List<LoadGameItem> loadItems = new List<LoadGameItem>();
+    private int selectedSlot = -1;
+
     public GameObject startPanel;
     public TMP_Text startText;
 
@@ -64,6 +69,11 @@ public class PickPanelControl : MonoBehaviour
         okBtn.gameObject.SetActive(false);
         refreshBtn.gameObject.SetActive(false);
 
+        // 存档面板：读档按钮默认隐藏，选中某个存档项后再显示
+        loadGameBtn.onClick.AddListener(OnLoadGameClick);
+        newGameBtn.onClick.AddListener(OnNewGameClick);
+        loadGameBtn.gameObject.SetActive(false);
+
         PanelManager.Instance.ShowPick();
 
         // 启动画面（Unity 内置）结束后进入开始面板：隐藏读档/新游戏面板（含 loadGameBtn、newGameBtn）、开始面板与上方玩家信息
@@ -100,43 +110,143 @@ public class PickPanelControl : MonoBehaviour
     // 点击开始面板后的原有选牌流程（读档 / 新游戏 → 刷新英雄池）
     private void BeginSelection()
     {
-        if(GameManager.Instance.IsGameSaveExist())
+        if (GameManager.Instance.GetUsedSaveSlots().Count > 0)
         {
             loadGamePanel.SetActive(true);
-            loadGameBtn.onClick.AddListener(() =>
-            {
-                var isSuccess = GameManager.Instance.LoadFromSave();
-                if(isSuccess)
-                {
-                    GameManager.Instance.InitFriend(true);
-                    GameManager.Instance.InitHeros(true);
-                    PanelManager.Instance.ShowShop();
-                    PanelManager.Instance.HidePick();
-                }
-                else
-                {
-                    loadGamePanel.SetActive(false);
-                    GameManager.Instance.InitHeros(false);
-                    GameManager.Instance.InitFriend(false);
-                    RefreshBtnClick();
-                }
-            });
-            newGameBtn.onClick.AddListener(() =>
-            {
-                loadGamePanel.SetActive(false);
-                GameManager.Instance.InitHeros(false);
-                GameManager.Instance.InitFriend(false);
-                RefreshBtnClick();
-            });            
+            BuildLoadGameItems();
         }
         else
         {
-            loadGamePanel.SetActive(false);
-            GameManager.Instance.InitHeros(false);
-            GameManager.Instance.InitFriend(false);
-            RefreshBtnClick();
+            StartNewGame();
+        }
+    }
+
+    // 按已用存档数量生成存档项列表
+    private void BuildLoadGameItems()
+    {
+        if (loadItemRoot == null)
+        {
+            var rootGo = new GameObject("LoadGameItemRoot", typeof(RectTransform));
+            rootGo.transform.SetParent(loadGamePanel.transform, false);
+            loadItemRoot = rootGo.GetComponent<RectTransform>();
+            loadItemRoot.anchorMin = loadItemRoot.anchorMax = new Vector2(0.5f, 0.5f);
+            loadItemRoot.pivot = new Vector2(0.5f, 0.5f);
+            loadItemRoot.anchoredPosition = Vector2.zero;
+            loadItemRoot.sizeDelta = new Vector2(600, 900);
         }
 
+        for (int i = loadItemRoot.childCount - 1; i >= 0; i--)
+            Destroy(loadItemRoot.GetChild(i).gameObject);
+        loadItems.Clear();
+
+        selectedSlot = -1;
+        loadGameBtn.gameObject.SetActive(false);
+
+        var slots = GameManager.Instance.GetUsedSaveSlots();
+        var prefab = Resources.Load<GameObject>("Prefabs/UIs/Cells/LoadGameItem");
+        if (prefab == null)
+        {
+            GameLog.Error("PickPanelControl 加载存档项预制体失败: Prefabs/UIs/Cells/LoadGameItem");
+            return;
+        }
+
+        for (int i = 0; i < slots.Count; i++)
+        {
+            int slot = slots[i];
+            var summary = GameManager.Instance.GetSaveSummary(slot);
+
+            GameObject go = Instantiate(prefab, loadItemRoot);
+            go.transform.localScale = Vector3.one;
+
+            var rt = go.GetComponent<RectTransform>();
+            rt.anchorMin = rt.anchorMax = new Vector2(0.5f, 0.5f);
+            rt.pivot = new Vector2(0.5f, 0.5f);
+            rt.anchoredPosition = new Vector2(-220, 260 - i * 130);
+            rt.sizeDelta = new Vector2(600, 120);
+
+            var item = go.GetComponent<LoadGameItem>();
+            item.Setup(slot, summary, OnLoadItemSelected, OnLoadItemDeleted);
+            loadItems.Add(item);
+        }
+
+        // 新游戏始终可用（槽位已满时覆盖选中的存档）
+        newGameBtn.gameObject.SetActive(true);
+
+        // 默认选中第一个存档，使读档按钮立即可见
+        if (loadItems.Count > 0)
+            OnLoadItemSelected(loadItems[0].Slot);
+    }
+
+    // 选中某存档项：背景变色并显示读档按钮
+    private void OnLoadItemSelected(int slot)
+    {
+        selectedSlot = slot;
+        foreach (var item in loadItems)
+            item.SetSelected(item.Slot == slot);
+        loadGameBtn.gameObject.SetActive(true);
+    }
+
+    // 删除某存档项：删档后重建列表；全部删完则直接进入新游戏
+    private void OnLoadItemDeleted(int slot)
+    {
+        GameManager.Instance.DeleteSave(slot);
+
+        if (GameManager.Instance.GetUsedSaveSlots().Count == 0)
+        {
+            loadGamePanel.SetActive(false);
+            StartNewGame();
+        }
+        else
+        {
+            BuildLoadGameItems();
+        }
+    }
+
+    // 点击读档：加载选中槽位并进入游戏
+    private void OnLoadGameClick()
+    {
+        if (selectedSlot < 0)
+        {
+            GameLog.Warn("PickPanelControl 未选中任何存档，忽略读档");
+            return;
+        }
+
+        if (GameManager.Instance.LoadFromSave(selectedSlot))
+        {
+            GameManager.Instance.InitFriend(true);
+            GameManager.Instance.InitHeros(true);
+            PanelManager.Instance.ShowShop();
+            PanelManager.Instance.HidePick();
+        }
+        else
+        {
+            GameLog.Error("PickPanelControl 读档失败 slot=" + selectedSlot);
+        }
+    }
+
+    // 点击新游戏：优先分配新槽位；槽位已满则覆盖当前选中的存档
+    private void OnNewGameClick()
+    {
+        int slot = GameManager.Instance.CreateNewSaveSlot();
+        if (slot < 0)
+        {
+            int overwrite = selectedSlot >= 0 ? selectedSlot : 0;
+            GameManager.Instance.currentSaveSlot = overwrite;
+            GameLog.Warn("存档槽位已满，新游戏将覆盖槽位 " + overwrite);
+        }
+        StartNewGame();
+    }
+
+    // 开始一局新游戏（更新英雄池/好友池并刷新选牌）
+    private void StartNewGame()
+    {
+        if (GameManager.Instance.currentSaveSlot < 0)
+            GameManager.Instance.CreateNewSaveSlot();
+
+        loadGamePanel.SetActive(false);
+        GameManager.Instance.InitHeros(false);
+        GameManager.Instance.InitFriend(false);
+        RefreshBtnClick();
     }
 
     // 显示开始面板：startText 循环缩放，任意点击后进入选牌流程
