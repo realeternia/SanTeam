@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using System.Runtime.InteropServices;
+using CommonConfig;
 
 
 public class PickPanelCellControl : MonoBehaviour
@@ -48,6 +49,10 @@ public class PickPanelCellControl : MonoBehaviour
             return;
 
         if(ConfigManager.IsKingHero(heroId)) //主公不能点赞
+            return;
+
+        // 品质1的卡不进入许愿（收藏）池：较弱，避免占用许愿名额并在商店重复刷出
+        if(HeroConfig.GetConfig(heroId).Quality == 1)
             return;
 
         likeState = pid + 1;

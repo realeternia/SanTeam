@@ -101,6 +101,20 @@ public class BatchSimForm : Form
         Controls.Add(_status);
     }
 
+    private void InitializeComponent()
+    {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(BatchSimForm));
+            this.SuspendLayout();
+            // 
+            // BatchSimForm
+            // 
+            this.ClientSize = new System.Drawing.Size(284, 261);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.Name = "BatchSimForm";
+            this.ResumeLayout(false);
+
+    }
+
     // 开始批量模拟（无界面连打，后台线程执行，避免卡住窗体）
     private async void StartBatch()
     {
