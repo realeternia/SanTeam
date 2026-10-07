@@ -82,11 +82,11 @@ public class SelectCardNodeControl : MonoBehaviour, IPointerDownHandler, IPointe
         }
     }
 
-    public void UpdateExp(int pid, string name, int exp, string icon)
+    public void UpdateExp(int pid, string name, int exp, string icon, int quality)
     {
         bondTip = null;
         expBar.gameObject.SetActive(true);
-        cardName.color = Color.white;
+        cardName.color = SysColor.GetQualityColor(quality);
         expBar.rectTransform.sizeDelta = new Vector2(194 * HeroSelectionTool.GetExpRate(exp, true), 70);
         cardName.text = HeroSelectionTool.GetCardLevel(exp, true) + name;
         if (string.IsNullOrEmpty(icon))

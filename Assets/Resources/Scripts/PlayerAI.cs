@@ -95,6 +95,10 @@ public static class PlayerAI
 
         // 商店不卖道具：只考虑英雄卡
         affordableCards = affordableCards.Where(card => card.isHeroCard).ToList();
+        // 满级(Lv5)英雄卡不再提供经验，买入纯亏金币：直接从候选剔除（同卡加经验、换卡两种情形都不买）
+        affordableCards = affordableCards
+            .Where(card => !(cards.ContainsKey(card.cardId) && HeroSelectionTool.IsHeroCardMaxLevel(cards[card.cardId])))
+            .ToList();
         if (affordableCards.Count == 0)
             return false;
 
@@ -293,8 +297,10 @@ public static class PlayerAI
         hasSameCard = cards.ContainsKey(selectedCard.cardId);
         // 卖旧买新受次数限制：每个商店阶段最多自动卖 CombatConst.AiMaxSellPerShop 次，防止低价卡全额返还导致零成本换卡、金币永不消耗
         // 软上限：品质4强卡豁免（超限直接买，不强制卖弱）；非强卡超限且未被拒买时才卖旧买新
+        // 硬上限（PlayerMaxHeroCards）：背包已满时新英雄必须卖弱卡腾位才能买入，品质4也不例外，否则购买必然失败
+        bool atHardCap = heroCardCount >= CombatConst.PlayerMaxHeroCards;
         if (selectedCard.isHeroCard && heroCardCount >= playerInfo.GetSlotCount() + playerConfig.Cardherolimit && !hasSameCard && weakHeroCard != null
-            && HeroConfig.GetConfig(selectedCard.cardId).Quality != 4
+            && (HeroConfig.GetConfig(selectedCard.cardId).Quality != 4 || atHardCap)
             && playerInfo.aiShopSellCount < CombatConst.AiMaxSellPerShop)
         {
             playerInfo.SellCard(weakHeroCard.Item1); //卖掉最弱的卡
@@ -309,9 +315,9 @@ public static class PlayerAI
             finalBuyCount = Mathf.Clamp((int)Math.Round(playerInfo.gold * 2f / 3f / selectedCard.priceI * saveMood), 1, selectedCard.count);
         }
 
-        CardShopManager.Instance.OnPlayerBuyCard(selectedCard, playerInfo, selectedCard.cardId, selectedCard.isHeroCard, selectedCard.priceI * finalBuyCount, finalBuyCount);
-
-        return true;
+        // 返回真实购买结果：英雄卡已满且无弱卡可卖等情况下购买会失败，
+        // 此时必须返回 false 让调用方把该玩家标记为跳过本回合，否则 AI 会一直"选牌成功"却不跳过，导致选牌阶段死循环卡住
+        return CardShopManager.Instance.OnPlayerBuyCard(selectedCard, playerInfo, selectedCard.cardId, selectedCard.isHeroCard, selectedCard.priceI * finalBuyCount, finalBuyCount);
     }
 
     private static float GetBuyCostBias(int cardPrice, int year, PlayerConfig cfg)

@@ -35,6 +35,7 @@ public class BattleResultHeroCellControl : MonoBehaviour
         var heroLevel = HeroSelectionTool.GetCardLevel(player.cards[battleStat.heroId], true);
         var heroCfg = HeroConfig.GetConfig(battleStat.heroId);
         playerName.text = heroLevel.ToString() + heroCfg.Name;
+        playerName.color = SysColor.GetQualityColor(heroCfg.Quality);
 
         playerRank.text = rank.ToString(); // 假设按match顺序排列
         playerMark1.text = "总:" + battleStat.damage.ToString();

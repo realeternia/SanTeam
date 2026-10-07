@@ -50,6 +50,13 @@ public class CardViewControl : MonoBehaviour, IPointerDownHandler, IPointerUpHan
             var nowPlayer = CardShopManager.Instance.GetCurrentPlayer();
             if (!nowPlayer.isAI)
             {
+                // 满级(Lv5)英雄卡不再提供经验，禁止继续购买
+                if (isHeroCard && nowPlayer.cards.TryGetValue(cardId, out int curExp) && HeroSelectionTool.IsHeroCardMaxLevel(curExp))
+                {
+                    SystemTip.Show("该英雄已满级，无法继续购买");
+                    return;
+                }
+
                 if (count == 1 || nowPlayer.gold < priceI * 2)
                 {
                     if (CardShopManager.Instance.OnPlayerBuyCard(this, nowPlayer, cardId, isHeroCard, priceI, 1))

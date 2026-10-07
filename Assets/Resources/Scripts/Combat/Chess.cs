@@ -331,11 +331,15 @@ public class Chess : MonoBehaviour
         attackSpeed = heroConfig.AtkSpeed / 30f; // 攻速值→每秒攻击次数（30=1次/秒；攻速20=1.5秒/次，15=2秒/次）
         ap = attr.Ap;
         atk = attr.Atk;
-        armor = heroConfig.Armor;
-        magicRes = heroConfig.MagicRes;
-        // 生命/魔法回复同样由 PostModify 写回职业基准（OnSecond 中按秒结算）；装备加成在下方累加
-        hpRegen = heroConfig.HpRegen;
-        mpRegen = heroConfig.MpRegen;
+        // 次级面板基础值同样由 PostModify 写回职业基准，再叠加消耗品加成（PlayerInfo.attrAddons，如万民书 armor+1/magicres+1）；
+        // 装备加成在下方继续累加
+        armor = heroConfig.Armor + attr.Armor;
+        magicRes = heroConfig.MagicRes + attr.MagicRes;
+        // 生命/魔法回复同样由 PostModify 写回职业基准（OnSecond 中按秒结算）；消耗品/装备加成累加
+        hpRegen = heroConfig.HpRegen + attr.HpRegen;
+        mpRegen = heroConfig.MpRegen + attr.MpRegen;
+        attackSpeedRate = attr.AttackSpeedRate;
+        critRate = attr.CritRate;
 
         // 装备升级机制已移除：装备属性固定，不再按持有数量计算等级；最多3件装备属性累加
         var equipIds = player != null ? player.GetItemIdsOnHero(heroId) : new List<int>();

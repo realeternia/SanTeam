@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -186,10 +186,10 @@ namespace CommonConfig
             config[400040] = new ItemConfig(400040, "大宛宝马", "生命+500", 2, "attr", "hp+500", "hp", "体魄", "", false, 0, 0, "ma4");
             config[400041] = new ItemConfig(400041, "养由基弓", "攻速+15%，生命+250", 2, "attr", "atkspeed+0.15,hp+250", "atkspeed", "速射", "", false, 0, 0, "gong3");
             config[400042] = new ItemConfig(400042, "李广弓", "攻速+10%，法力回复+4", 2, "attr", "atkspeed+0.1,mpRegen+4", "atkspeed", "速射", "", false, 0, 0, "gong2");
-            config[401012] = new ItemConfig(401012, "万民书", "护甲+1，魔法抗性+1（仅限拥有「仁」的英雄）", 1, "tpattr", "armor+1,magicres+1", "armor", "", "仁", true, 401013, 5, "wanming1");
-            config[401013] = new ItemConfig(401013, "万民书·精", "护甲+5，魔法抗性+5（仅限拥有「仁」的英雄）", 2, "tpattr", "armor+5,magicres+5", "armor", "", "仁", true, 0, 0, "wanming2");
-            config[401014] = new ItemConfig(401014, "文赋", "法术强度+1，魔法抗性+1", 1, "tpattr", "ap+1,magicres+1", "ap", "", "", true, 401015, 5, "wenfu1");
-            config[401015] = new ItemConfig(401015, "文赋·精", "法术强度+5，魔法抗性+5", 2, "tpattr", "ap+5,magicres+5", "ap", "", "", true, 0, 0, "wenfu2");
+            config[401012] = new ItemConfig(401012, "万民书", "护甲+3，魔法抗性+3（仅限拥有「仁」的英雄）", 1, "tpattr", "armor+3,magicres+3", "armor", "", "仁", true, 401013, 5, "wanming1");
+            config[401013] = new ItemConfig(401013, "万民书·精", "护甲+15，魔法抗性+15（仅限拥有「仁」的英雄）", 2, "tpattr", "armor+15,magicres+15", "armor", "", "仁", true, 0, 0, "wanming2");
+            config[401014] = new ItemConfig(401014, "文赋", "法术强度+2，魔法抗性+4", 1, "tpattr", "ap+2,magicres+4", "ap", "", "", true, 401015, 5, "wenfu1");
+            config[401015] = new ItemConfig(401015, "文赋·精", "法术强度+10，魔法抗性+20", 2, "tpattr", "ap+10,magicres+20", "ap", "", "", true, 0, 0, "wenfu2");
             config[402001] = new ItemConfig(402001, "长刀", "攻击+10", 1, "attr", "atk+10", "atk", "", "", false, 0, 0, "jian1");
             config[402002] = new ItemConfig(402002, "皮革甲", "护甲+20", 1, "attr", "armor+20", "armor", "", "", false, 0, 0, "jia1");
             config[402003] = new ItemConfig(402003, "檀木弓", "攻速+10%", 1, "attr", "atkspeed+0.1", "atkspeed", "", "", false, 0, 0, "gong1");

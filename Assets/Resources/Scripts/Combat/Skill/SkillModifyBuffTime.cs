@@ -25,7 +25,7 @@ public class SkillModifyBuffTime : Skill
             return;
 
         time *= (1 + skillCfg.Strength2[0]);
-        WorldManager.Instance.AddBattleText(skillCfg.Name, owner.transform.position, new UnityEngine.Vector2(0, 60), SysColor.BattleText.SkillName, 3);
+        //WorldManager.Instance.AddBattleText(skillCfg.Name, owner.transform.position, new UnityEngine.Vector2(0, 60), SysColor.BattleText.SkillName, 3);
     }
 
 }

@@ -248,7 +248,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         return bonus;
     }
 
-    // 每回合金币 = 生财技能(济)对应等级(济组在场人数)的 Strength2[0]（配置驱动，不再硬编码 FriendGoldPerMember）
+    // 每回合金币 = 济世技能(济)对应等级(济组在场人数)的 Strength2[0]（配置驱动，不再硬编码 FriendGoldPerMember）
     private int GetFriendGoldBonus(int count)
     {
         int lv = count - 1; // 济组在场人数→技能等级（2人Lv1…6人Lv5）
@@ -257,7 +257,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         var goldCfg = ConfigManager.GetSkillConfig(CombatConst.FriendGoldSkillSname, lv);
         if (goldCfg == null)
         {
-            GameLog.Error($"生财技能配置缺失: Sname={CombatConst.FriendGoldSkillSname} Lv={lv}，回退每名+1");
+            GameLog.Error($"济世技能配置缺失: Sname={CombatConst.FriendGoldSkillSname} Lv={lv}，回退每名+1");
             return count * CombatConst.FriendGoldPerMember;
         }
         return (int)goldCfg.Strength2[0];
@@ -581,6 +581,13 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     {
         if (gold < price)
             return false;
+
+        // 满级(5级)英雄卡不再提供经验：禁止继续购买（人类与 AI 同一入口，AI 据此跳过本回合）
+        if (isHero && cards.TryGetValue(cardId, out int curExp) && HeroSelectionTool.IsHeroCardMaxLevel(curExp))
+        {
+            GameLog.Warn($"英雄 cardId={cardId} 已满级(Lv{HeroSelectionTool.MaxHeroCardLevel})，买卡不再获得经验，无法购买");
+            return false;
+        }
 
         // 背包英雄卡上限：新英雄（尚未拥有）会占用一个卡位，达到上限不能再买
         if (isHero && !cards.ContainsKey(cardId) && GetHeroCardList().Count >= CombatConst.PlayerMaxHeroCards)

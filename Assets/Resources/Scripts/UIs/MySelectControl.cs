@@ -134,7 +134,7 @@ public class MySelectControl : MonoBehaviour
                 skillIcon = skillCfgs[0].Icon;
             }
             selectNode.cardId = cardId;
-            selectNode.UpdateExp(checkPlayer.pid, cardCfg.Name, checkPlayer.cards[cardId], skillIcon);
+            selectNode.UpdateExp(checkPlayer.pid, cardCfg.Name, checkPlayer.cards[cardId], skillIcon, cardCfg.Quality);
 
             i++;
         }

@@ -1,6 +1,6 @@
 // ============================================================
 // 战斗模拟器 · 批量模拟参数窗口 —— BatchSimForm
-// 由主窗体菜单打开：输入双方武将数量/小兵数量/小兵等级/等级/羁绊开关/运行轮数/是否随机装备，
+// 由主窗体菜单打开：输入双方武将数量/小兵数量/小兵等级/总价(金币)/羁绊开关/运行轮数/是否随机装备，
 // 点"开始战斗"后无界面连打并把各武将、各物品胜率报告输出到日志文件。
 // ============================================================
 using System;
@@ -15,7 +15,7 @@ public class BatchSimForm : Form
     private NumericUpDown _heroCountBox;
     private NumericUpDown _soldierCountBox;
     private NumericUpDown _soldierLevelBox;
-    private NumericUpDown _levelBox;
+    private NumericUpDown _totalPriceBox;
     private CheckBox _factionChk, _friendChk, _jobChk, _equipChk;
     private NumericUpDown _roundsBox;
     private Button _startBtn, _openBtn;
@@ -26,7 +26,7 @@ public class BatchSimForm : Form
     {
         Text = "批量模拟战斗";
         Width = 440;
-        Height = 424;
+        Height = 406;
         FormBorderStyle = FormBorderStyle.FixedDialog;
         MaximizeBox = false;
         MinimizeBox = false;
@@ -59,13 +59,13 @@ public class BatchSimForm : Form
         Controls.Add(_soldierLevelBox);
         top += h + 4;
 
-        lbl = new Label { Text = "设定等级(1~5):", Left = left, Top = top + 5, Width = 110 };
+        lbl = new Label { Text = "总价(金币):", Left = left, Top = top + 5, Width = 110 };
         Controls.Add(lbl);
-        _levelBox = new NumericUpDown { Left = left + 115, Top = top, Width = 70, Minimum = 1, Maximum = 5, Value = 5 };
-        Controls.Add(_levelBox);
-        lbl = new Label { Text = "（品质1~2=设定等级，品质3~4=设定-1）", Left = left + 10, Top = top + 30, Width = 300, ForeColor = Color.Gray };
+        _totalPriceBox = new NumericUpDown { Left = left + 115, Top = top, Width = 70, Minimum = 1, Maximum = 100000, Value = 50 };
+        Controls.Add(_totalPriceBox);
+        lbl = new Label { Text = "（每卡按自身价格折算可购张数→等级，最高5级）", Left = left + 190, Top = top + 5, Width = 210, ForeColor = Color.Gray };
         Controls.Add(lbl);
-        top += h + 22;
+        top += h + 4;
 
         lbl = new Label { Text = "羁绊加成（开启后按该类型成组抽阵容，默认全关）:", Left = left, Top = top + 5, Width = 390 };
         Controls.Add(lbl);
@@ -109,7 +109,7 @@ public class BatchSimForm : Form
             HeroCount = (int)_heroCountBox.Value,
             SoldierCount = (int)_soldierCountBox.Value,
             SoldierLevel = (int)_soldierLevelBox.Value,
-            Quality1Level = (int)_levelBox.Value,
+            TotalPrice = (int)_totalPriceBox.Value,
             EnableFaction = _factionChk.Checked,
             EnableFriend = _friendChk.Checked,
             EnableJob = _jobChk.Checked,
@@ -168,7 +168,7 @@ public class BatchSimForm : Form
         _heroCountBox.Enabled = !running;
         _soldierCountBox.Enabled = !running;
         _soldierLevelBox.Enabled = !running;
-        _levelBox.Enabled = !running;
+        _totalPriceBox.Enabled = !running;
         _factionChk.Enabled = !running;
         _friendChk.Enabled = !running;
         _jobChk.Enabled = !running;

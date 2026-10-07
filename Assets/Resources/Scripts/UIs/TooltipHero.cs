@@ -249,13 +249,14 @@ public class TooltipHero : BaseTooltip
         string[] attrVals = new string[]
         {
             AppendEquip(attr.Atk, eAtk),
-            AppendEquipSpeed(heroCfg.AtkSpeed, eAtkSpeedRate),
+            AppendEquipSpeed(heroCfg.AtkSpeed, eAtkSpeedRate + attr.AttackSpeedRate),
             AppendEquip(attr.Ap, eAp),
-            AppendEquip(heroCfg.MpRegen, (int)eMpRegen),
+            // 消耗品加成（attrAddons，如万民书 armor+1/magicres+1）与装备加成一起以淡绿附加显示
+            AppendEquip(heroCfg.MpRegen, (int)(eMpRegen + attr.MpRegen)),
             AppendEquip(attr.Hp, eHp),
-            AppendEquip(heroCfg.HpRegen, (int)eHpRegen),
-            AppendEquip(heroCfg.Armor, eArmor),
-            AppendEquip(heroCfg.MagicRes, eMagicRes),
+            AppendEquip(heroCfg.HpRegen, (int)(eHpRegen + attr.HpRegen)),
+            AppendEquip(heroCfg.Armor, eArmor + attr.Armor),
+            AppendEquip(heroCfg.MagicRes, eMagicRes + attr.MagicRes),
             heroCfg.MoveSpeed.ToString(), heroCfg.Range.ToString()
         };
 

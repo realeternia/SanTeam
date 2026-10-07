@@ -4,7 +4,7 @@ using UnityEngine;
 
 /// <summary>
 /// 持续回血Buff（BuffConfig.NameS="愈"）：每秒回复一定生命值。
-/// 每跳回血量优先取技能行 StrengthBuff1[0]（固定值，不随法强成长，如宝刀未老）；
+/// 每跳回血量优先取技能行 StrengthBuff1[0]（固定值，不随法强成长，如益壮）；
 /// 未配置 StrengthBuff1 时回退到统一治疗公式 Skill.GetSkillHeal（HealStrength × (100+法强)/100，如邓艾·偷渡阴平），首次施放时快照。
 /// </summary>
 public class BuffTimeHeal : Buff

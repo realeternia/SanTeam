@@ -143,7 +143,7 @@ public class WorldManager : MonoBehaviour
         FactionShieldManager.ApplyFactionShields();
         GameLog.Debug("[BattleInit] factionShield done");
 
-        // 战斗开始技能：必须等在好友特殊技能授予之后，否则 BattleBegin 型技能（如偷袭/明镜）取不到技能
+        // 战斗开始技能：必须等在好友特殊技能授予之后，否则 BattleBegin 型技能（如偷袭/智勇）取不到技能
         foreach (var chess in chessList.ToArray()) //防止召唤
             SkillManager.BattleBegin(chess);
         GameLog.Debug("[BattleInit] skills done");

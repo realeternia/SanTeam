@@ -5,7 +5,7 @@ using CommonConfig;
 /// 护盾容量 = Strength2[0] × (100+法强)/100（随法强成长，与「护卫」同口径），护盾 Buff 取技能行 BuffId（"盾"= BuffConfig 300001），持续 BuffTime 秒，
 /// 是否可触发由 Skill.CheckBurst 统一判定（CD、发动概率、MpCost、TriggerCondition 条件如 "hprate&lt;30"）。
 /// 可选：配置 StrengthBuff1（[0]=每秒回血、[1]=持续秒数）时，触发后在限时内持续回血；未配置则只套盾。
-/// 使用示例：老当益壮 · 宝刀未老（缩写「老」，2010106~2010110，生命低于30%受击时给自己套 140~300 基值护盾（随法强），并在 10 秒内每秒回复 2~6 点生命，CD 15s）。
+/// 使用示例：益壮（缩写「老」，2010106~2010110，生命低于30%受击时给自己套 140~300 基值护盾（随法强），并在 10 秒内每秒回复 2~6 点生命，CD 15s）。
 /// </summary>
 public class SkillAttackedShield : Skill
 {

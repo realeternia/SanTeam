@@ -6,7 +6,7 @@ using UnityEngine;
 
 /// <summary>
 /// 战斗开始获得道具技能：BattleBegin 时按配置发动概率(Rate)判定，
-/// 命中则给所属玩家1个配置列 ItemId 指定的道具（0=不发放）。对应技能：仁者无敌(2010076~2010080)。
+/// 命中则给所属玩家1个配置列 ItemId 指定的道具（0=不发放）。对应技能：仁德(2010076~2010080)。
 /// </summary>
 public class SkillInitAddItem : Skill
 {

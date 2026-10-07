@@ -78,9 +78,14 @@ public static class FriendLineManager
             GrantFriendSpecialSkill(chess, relCfg.SkillId, skillLevel);
 
             // 特殊连锁仍然拉线，线颜色取 HeroFriendConfig.LineColor（未配置默认暗灰）
+            // 好友对 A-B 会从双方各遍历到一次，只由 heroId 较小的一方拉线，避免同一对生成两条重叠光柱
             var lineColor = ParseLineColor(relCfg.LineColor, SysColor.FriendLine.DefaultLine);
             foreach (var memberId in presentMembers)
+            {
+                if (chess.heroId > memberId)
+                    continue;
                 CreateFriendLine(chess, memberId, lineColor);
+            }
 
             GameLog.Debug($"FriendSpecial 关系{relCfg.Name} 武将{chess.heroId} 好友数{presentCount} 技能{relCfg.SkillId} 等级{skillLevel}");
         }

@@ -1,10 +1,10 @@
-﻿using CommonConfig;
+using CommonConfig;
 
 /// <summary>
 /// 通用·开局对随机敌方英雄施加 Buff（ScriptName = "InitEnemyRandomBuff"）：
 /// 战斗开始时，在敌方存活英雄中随机选 1 名，对其施加 SkillConfig.BuffId 指定的 Buff，
 /// 持续 BuffTime 秒；Buff 强度由技能行 Strength2[1] 提供（由具体 Buff 实现解释，如 301003「伤」= 受到伤害增加比例）。
-/// 使用示例：权奸当道·弄权跋扈（缩写「奸」，2010096~2010100，BuffId="伤"，Strength2[1]=30%~70%，BuffTime=10~20s）。
+/// 使用示例：权奸（缩写「奸」，2010096~2010100，BuffId="伤"，Strength2[1]=30%~70%，BuffTime=10~20s）。
 /// 随机范围为未持有该 Buff 的敌方英雄，优先近战，近战全部挂满后才轮到远程；若全部已持有则本次不施加。
 /// 好友组内每个成员各持一份该技能，各自独立触发一次。
 /// </summary>

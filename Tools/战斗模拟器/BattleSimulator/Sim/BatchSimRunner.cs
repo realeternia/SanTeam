@@ -1,7 +1,7 @@
 // ============================================================
 // 战斗模拟器 · 批量模拟 —— BatchSimRunner
-// 无界面连打 N 轮：每轮随机抽双方阵容（近战前排/远程后排站位），可选给每个武将随机装备一件 400 段道具，
-// 可开关 国家/好友/职业 加成，跑完后统计各武将、各物品的胜率并输出报告文件。
+// 无界面连打 N 轮：每轮随机抽双方阵容（近战前排/远程后排站位），按总价(金币)+各卡价格折算英雄等级，
+// 可选给每个武将随机装备一件 400 段道具，可开关 国家/好友/职业 加成，跑完后统计各武将、各物品的胜率并输出报告文件。
 // ============================================================
 using System;
 using System.Collections.Generic;
@@ -25,7 +25,7 @@ public static class BatchSimRunner
         public int HeroCount = 6;       // 每侧武将数量（近战/远程各半，奇数补 1 个随机）
         public int SoldierCount = 4;    // 每侧小兵数量（全部近战士兵，占最前排）
         public int SoldierLevel = 6;    // 小兵等级（1~30，决定小兵攻防加成）
-        public int Quality1Level = 5;   // 设定等级：品质1~2 用该等级，品质3~4 用该等级-1
+        public int TotalPrice = 50;      // 总价(金币)：每张卡按自身价格折算可购张数→卡牌等级(最高5级)
         public bool EnableFaction;      // 国家加成
         public bool EnableFriend;       // 好友加成
         public bool EnableJob;          // 职业加成
@@ -151,9 +151,9 @@ public static class BatchSimRunner
             var used = new HashSet<int>();
             HeroLineup.GroupDef groupA, groupB;
             var teamA = HeroLineup.PickGroupLineup(heroCount, enabledTypes, used, out groupA)
-                .Select(id => (id, LevelForQuality(id, opt.Quality1Level))).ToList();
+                .Select(id => (id, LevelForPrice(id, opt.TotalPrice))).ToList();
             var teamB = HeroLineup.PickGroupLineup(heroCount, enabledTypes, used, out groupB)
-                .Select(id => (id, LevelForQuality(id, opt.Quality1Level))).ToList();
+                .Select(id => (id, LevelForPrice(id, opt.TotalPrice))).ToList();
 
             var battle = new BattleSim
             {
@@ -317,8 +317,8 @@ public static class BatchSimRunner
         sb.AppendLine("生成时间: " + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
         sb.AppendLine("每侧武将数量: " + opt.HeroCount + "    每侧小兵数量: " + opt.SoldierCount
             + "（近战）    小兵等级: " + opt.SoldierLevel);
-        sb.AppendLine("设定等级: " + opt.Quality1Level
-            + "（品质1~2=" + opt.Quality1Level + "级, 品质3~4=" + Math.Max(1, opt.Quality1Level - 1) + "级）");
+        sb.AppendLine("总价: " + opt.TotalPrice
+            + " 金币（每张卡按自身价格折算可购张数，再查累计卡数曲线 1/4/8/13/20 得等级，最高5级）");
         sb.AppendLine("国家加成: " + OnOff(opt.EnableFaction)
             + "    好友加成: " + OnOff(opt.EnableFriend)
             + "    职业加成: " + OnOff(opt.EnableJob));
@@ -330,7 +330,7 @@ public static class BatchSimRunner
 
         sb.AppendLine("【武将胜率】按胜率降序（胜率 = 胜场 / 出场场次；场均伤害 = 对敌方英雄造成的伤害 / 出场场次；场均法术伤害 = 造成的法术伤害(任意目标) / 出场场次）");
         sb.AppendLine(HeroHeader());
-        AppendHeroRows(sb, heroRows, opt.Quality1Level);
+        AppendHeroRows(sb, heroRows, opt.TotalPrice);
         sb.AppendLine();
 
         sb.AppendLine("【职业胜率】按胜率降序（该职业全部英雄的出场/胜负合并统计）");
@@ -378,7 +378,7 @@ public static class BatchSimRunner
             "排名", "ID", "名字", "职业", "品质", "等级", "出场", "胜", "负", "平", "胜率", "场均伤害", "场均法术伤害");
     }
 
-    private static void AppendHeroRows(StringBuilder sb, List<StatRow> rows, int quality1Level)
+    private static void AppendHeroRows(StringBuilder sb, List<StatRow> rows, int totalPrice)
     {
         if (rows.Count == 0)
         {
@@ -391,7 +391,7 @@ public static class BatchSimRunner
             sb.AppendLine(string.Format("{0,4}  {1,8}  {2,-10}  {3,-6}  {4,4}  {5,4}  {6,6}  {7,6}  {8,6}  {9,6}  {10,8:P1}  {11,10:N0}  {12,12:N0}",
                 rank++, r.Id, r.Name, string.IsNullOrEmpty(r.Job) ? "-" : r.Job,
                 r.Quality > 0 ? r.Quality.ToString() : "-",
-                LevelForQuality(r.Id, quality1Level),
+                LevelForPrice(r.Id, totalPrice),
                 r.Appear, r.Win, r.Loss, r.Draw, r.Rate, r.AvgHeroDamage, r.AvgMagicDamage));
         }
     }
@@ -468,11 +468,21 @@ public static class BatchSimRunner
         return jobCfg != null ? jobCfg.Name : cfg.Job;
     }
 
-    // 卡片等级：品质1~2 = 设定等级；品质3~4 = 设定等级-1（最低1级）
-    private static int LevelForQuality(int heroId, int quality1Level)
+    // 卡片等级：以总价(金币)为预算，按卡自身价格折算可购张数，再走累计卡数曲线(1/4/8/13/20)得等级，最高5级
+    private static int LevelForPrice(int heroId, int totalPrice)
     {
-        int q = HeroQuality(heroId);
-        return Math.Max(1, q <= 2 ? quality1Level : quality1Level - 1);
+        int price = HeroPrice(heroId);
+        if (price <= 0)
+            return 1;
+        int copies = Math.Max(1, totalPrice / price);   // 价格高于预算时至少按 Lv1 出场
+        return HeroSelectionTool.GetCardLevel(copies, true);
+    }
+
+    // 卡片价格（HeroConfig.Price，2~10；取不到按0）
+    private static int HeroPrice(int heroId)
+    {
+        var cfg = HeroConfig.GetConfig(heroId);
+        return cfg != null ? cfg.Price : 0;
     }
 
     private static string ItemName(int itemId)
