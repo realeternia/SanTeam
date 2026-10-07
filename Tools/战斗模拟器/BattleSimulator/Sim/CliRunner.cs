@@ -235,7 +235,7 @@ public static class CliRunner
             }
         }
 
-        string result = !battle.IsFinished ? "平局(步数上限)" : (battle.HasWin ? "甲胜" : "乙胜");
+        string result = !battle.IsFinished ? "平局(步数上限)" : (battle.IsDraw ? "平局" : (battle.HasWin ? "甲胜" : "乙胜"));
         Utf8Console.WriteLine("结果: " + result + " | 墙钟 " + (sw.ElapsedMilliseconds / 1000.0).ToString("F1") + "s 步数 " + steps);
         Utf8Console.WriteLine(battle.GetResultSummary());
     }
@@ -260,7 +260,7 @@ public static class CliRunner
                 steps++;
             }
 
-            string r = !battle.IsFinished ? "平局" : (battle.HasWin ? "甲胜" : "乙胜");
+            string r = !battle.IsFinished ? "平局" : (battle.IsDraw ? "平局" : (battle.HasWin ? "甲胜" : "乙胜"));
             if (r == "甲胜") winA++;
             else if (r == "乙胜") winB++;
             else draw++;

@@ -857,6 +857,16 @@ public class Chess : MonoBehaviour
     }
 
 
+    /// <summary>疲劳伤害：真实伤害直接扣血，不走任何伤害结算（无视抗性/护盾/减伤/闪避）</summary>
+    public void TakeFatigueDamage(int damage)
+    {
+        if (hp <= 0 || damage <= 0)
+            return;
+        hp -= damage;
+        WorldManager.Instance.AddBattleText("疲劳-" + damage, transform.position, new UnityEngine.Vector2(0, 40), Color.red, 3);
+        OnHpChanged();
+    }
+
     public void OnHpChanged()
     {
         if (heroInfo != null) // 英雄

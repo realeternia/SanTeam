@@ -62,10 +62,18 @@ public class GameManager : MonoBehaviour
     /// <summary>当前存档槽位（-1 表示尚未选择/新建）</summary>
     public int currentSaveSlot = -1;
 
+    // 调试阵容条目：武将ID + 等级（星级，1~HeroSelectionTool.MaxHeroCardLevel）
+    [System.Serializable]
+    public class DebugHeroEntry
+    {
+        public int heroId;
+        public int level = 1;
+    }
+
     // 调试阵容：配置任一方武将后，进入游戏直接开战（跳过选牌/商店流程），列表留空则走正常对局流程。
     // 仅用于开发调试，通过菜单 Tools/调试阵容配置窗口 配置（见 Assets/Editor/DebugLineupWindow.cs），配置后可一键进入战斗。
-    [HideInInspector] public List<int> debugHeroesSide1 = new List<int>(); // 左侧(1号位)武将ID，按顺序摆入布阵格
-    [HideInInspector] public List<int> debugHeroesSide2 = new List<int>(); // 右侧(2号位)武将ID，按顺序摆入布阵格
+    [HideInInspector] public List<DebugHeroEntry> debugHeroesSide1 = new List<DebugHeroEntry>(); // 左侧(1号位)武将，按顺序摆入布阵格
+    [HideInInspector] public List<DebugHeroEntry> debugHeroesSide2 = new List<DebugHeroEntry>(); // 右侧(2号位)武将，按顺序摆入布阵格
 
     /// <summary>是否配置了调试阵容（任一方填入武将即视为调试开局）</summary>
     public bool HasDebugLineup()

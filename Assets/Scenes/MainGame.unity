@@ -2683,8 +2683,13 @@ MonoBehaviour:
   friendRdData: []
   heroIds: 
   year: 0
-  debugHeroesSide1: 
-  debugHeroesSide2: 
+  currentSaveSlot: -1
+  debugHeroesSide1:
+  - heroId: 101003
+    level: 3
+  debugHeroesSide2:
+  - heroId: 105006
+    level: 5
 --- !u!114 &1788356929
 MonoBehaviour:
   m_ObjectHideFlags: 0

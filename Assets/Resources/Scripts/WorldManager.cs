@@ -122,6 +122,7 @@ public class WorldManager : MonoBehaviour
         }
         bagDrops.Clear();
         BattleStatManager.Clear();
+        FatigueManager.Reset(); // 疲劳计时本场重新开始
 
         // 通知所有玩家开始战斗
         foreach (var player in GameManager.Instance.players)
@@ -323,20 +324,21 @@ public class WorldManager : MonoBehaviour
 
     }
 
-    // 调试阵容：按配置顺序把武将依次摆入布阵格(格0开始)，等级固定1级
-    private void SpawnDebugHeroes(PlayerInfo p, Transform center, List<int> heroIds, int side)
+    // 调试阵容：按配置顺序把武将依次摆入布阵格(格0开始)，等级取配置值(1~MaxHeroCardLevel)
+    private void SpawnDebugHeroes(PlayerInfo p, Transform center, List<GameManager.DebugHeroEntry> heroes, int side)
     {
-        if (center == null || heroIds == null)
+        if (center == null || heroes == null)
             return;
-        for (int i = 0; i < heroIds.Count && i < CombatConst.FormationCellCount; i++)
+        for (int i = 0; i < heroes.Count && i < CombatConst.FormationCellCount; i++)
         {
-            int heroId = heroIds[i];
+            int heroId = heroes[i].heroId;
             if (heroId <= 0 || !ConfigManager.IsHeroCard(heroId) || !HeroConfig.HasConfig(heroId))
             {
                 GameLog.Error($"调试阵容非法武将ID: {heroId}(side{side})");
                 continue;
             }
-            SpawnHerosForRegion(p, i, GetFormationCellPos(center, i), new System.Tuple<int, int>(heroId, 1), side);
+            int level = Mathf.Clamp(heroes[i].level, 1, HeroSelectionTool.MaxHeroCardLevel);
+            SpawnHerosForRegion(p, i, GetFormationCellPos(center, i), new System.Tuple<int, int>(heroId, level), side);
         }
     }
 
@@ -671,6 +673,8 @@ public class WorldManager : MonoBehaviour
                 if (chess != null && chess.hp > 0)
                     chess.LogicUpdate(0.05f);
             }
+            // 疲劳结算：超时后每间隔对全体英雄施加递增真实伤害
+            FatigueManager.Tick(0.05f);
         }
 
         {

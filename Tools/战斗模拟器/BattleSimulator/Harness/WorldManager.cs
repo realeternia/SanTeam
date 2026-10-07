@@ -22,6 +22,7 @@ public class WorldManager : MonoBehaviour
     public List<Chess> chessList = new List<Chess>();
     public bool gameFinish;
     public bool hasWin;
+    public bool isDraw;   // 同刻双方全灭导致的平局（与打到步数上限的平局区分）
 
     // 羁绊开关（默认全开，仅批量模拟器按需在开战前关闭；不影响战斗逻辑本身）
     public static bool EnableJobLinks = true;        // 职业连锁
@@ -328,9 +329,11 @@ public class WorldManager : MonoBehaviour
     {
         gameFinish = false;
         hasWin = false;
+        isDraw = false;
         idCounter = 100;
         chessList.Clear();
         battleTexts.Clear();
+        FatigueManager.Reset(); // 疲劳计时本场重新开始
 
         var players = GameManager.Instance.players;
         if (players == null)
@@ -627,12 +630,10 @@ public class WorldManager : MonoBehaviour
 
     // ================= 死亡判定 =================
 
-    // TeamMode2：移除死亡单位，统计存活阵营；只剩一个阵营时结束战斗
+    // TeamMode2：移除死亡单位，统计存活阵营；只剩一个阵营(或同刻双方全灭)时结束战斗
     public void OnUnitDying(Chess dieUnit, int killerPlayerId)
     {
         chessList.Remove(dieUnit);
-        gameFinish = false;
-        hasWin = false;
 
         bool[] sideHasUnits = new bool[8];
         int aliveSideCount = 0;
@@ -651,29 +652,39 @@ public class WorldManager : MonoBehaviour
 
         GameLog.Debug("id:" + dieUnit.id + " dieUnit.side:" + dieUnit.side + " 存活阵营数:" + aliveSideCount);
 
-        if (aliveSideCount == 1)
+        // 结束判定用 <=1（而非 ==1）：同一 tick 内双方最后单位同时死亡(例如疲劳同时击杀双方)时存活阵营数为 0，
+        // 此时也必须结束（平局）。另外不再每次死亡都把 gameFinish 重置为 false，
+        // 否则同 tick 的后一次死亡会把前一次已判定的结束标记抹掉，战斗永不结束（白跑到步数上限、界面看起来双方都傻了）。
+        if (aliveSideCount <= 1)
         {
-            int winnerSide = -1;
-            for (int i = 0; i < sideHasUnits.Length; i++)
+            if (aliveSideCount == 1)
             {
-                if (sideHasUnits[i])
+                int winnerSide = -1;
+                for (int i = 0; i < sideHasUnits.Length; i++)
                 {
-                    winnerSide = i + 1;
-                    break;
+                    if (sideHasUnits[i])
+                    {
+                        winnerSide = i + 1;
+                        break;
+                    }
                 }
+                var players = GameManager.Instance.players;
+                if (players != null)
+                {
+                    for (int i = 0; i < players.Length; i++)
+                    {
+                        int playerSide = i + 1;
+                        bool isWin = playerSide == winnerSide;
+                        players[i].onBattleResult(isWin, isWin ? 10 : 0);
+                    }
+                }
+                hasWin = sideHasUnits[0];
             }
-            var players = GameManager.Instance.players;
-            if (players != null)
+            else
             {
-                for (int i = 0; i < players.Length; i++)
-                {
-                    int playerSide = i + 1;
-                    bool isWin = playerSide == winnerSide;
-                    players[i].onBattleResult(isWin, isWin ? 10 : 0);
-                }
+                isDraw = true; // 同刻双方全灭：平局
             }
             gameFinish = true;
-            hasWin = sideHasUnits[0];
         }
     }
 
@@ -683,6 +694,7 @@ public class WorldManager : MonoBehaviour
     {
         gameFinish = false;
         hasWin = false;
+        isDraw = false;
         chessList.Clear();
         battleTexts.Clear();
         SkillFx.Clear();

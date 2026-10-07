@@ -88,13 +88,13 @@ public static class CombatConst
 
     // ---- 卡牌属性成长 ----
     /// <summary>星级成长倍率：每升1星 ×本值（乘方式，Lv1=×1.0、Lv2=×1.6、Lv3=×1.6²…），作用于 Atk/Ap/Hp</summary>
-    public const float StarGrowthPerStar = 1.6f;
+    public const float StarGrowthPerStar = 1.65f;
     /// <summary>品质系数：每提升1档品质 ×本值（1.50^(Q-1)，Q1=×1.0、Q2=×1.50、Q3=×2.25…），仅作用于 Atk/Hp</summary>
-    public const float QualityAttrFactor = 1.50f;
+    public const float QualityAttrFactor = 1.45f;
 
     // ---- 英雄专属技能数值修正 ----
     /// <summary>技能品质系数：英雄专属技能的 DamageStrength/HealStrength 每提升1档品质 ×本值（^(Q-1)：Q1=×1.0）</summary>
-    public const float QualitySkillFactor = 1.55f;
+    public const float QualitySkillFactor = 1.45f;
     /// <summary>技能MP消耗修正基准：MpCost=本值时系数=1.0，伤害/治疗按 MpCost/本值 等比例放大或缩小（MP消耗越高、释放越慢，单次数值越高）</summary>
     public const float SkillMpStandard = 100f;
     /// <summary>技能MP消耗修正系数下限（MpCost很低时的最小倍率）</summary>
@@ -172,4 +172,14 @@ public static class CombatConst
     public const int SoldierMaxLevel = 30;
     /// <summary>士兵升级所需金币</summary>
     public const int SodLvupGoldCost = 5;
+
+    // ---- 疲劳机制(战斗超时加压：拖时间会被逐渐耗死) ----
+    /// <summary>疲劳开始时间(秒)：开战后经过该时长开始结算疲劳</summary>
+    public const float FatigueStartTime = 30f;
+    /// <summary>疲劳结算间隔(秒)</summary>
+    public const float FatigueInterval = 5f;
+    /// <summary>首次疲劳伤害</summary>
+    public const int FatigueBaseDamage = 100;
+    /// <summary>每次疲劳伤害的线性增量(100/200/300…)</summary>
+    public const int FatigueDamageGrowth = 100;
 }

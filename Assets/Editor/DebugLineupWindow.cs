@@ -11,7 +11,7 @@ using UnityEngine.SceneManagement;
 /// 在窗口里配置当前场景 GameManager 的左侧(1号位)/右侧(2号位)上阵武将：
 /// 任一方填入武将即视为调试开局，启动游戏后跳过选牌/商店流程直接开战（见 WorldManager.SpawnDebugHeroes）；
 /// 两方留空则走正常对局流程。点「开始战斗」会先保存场景再进入 Play。
-/// 武将列表按 1 级生成，按顺序摆入布阵格。
+/// 武将列表按配置的等级(1~5级)生成，按顺序摆入布阵格。
 /// </summary>
 public class DebugLineupWindow : EditorWindow
 {
@@ -169,7 +169,7 @@ public class DebugLineupWindow : EditorWindow
         DrawLineupWarning();
 
         GUILayout.Space(4);
-        GUILayout.Label("任一方填入武将即视为调试开局；两方留空则走正常对局流程。武将按 1 级生成，按顺序摆入布阵格。配置写入当前场景，点「开始战斗」时自动保存场景。", hintStyle);
+        GUILayout.Label("任一方填入武将即视为调试开局；两方留空则走正常对局流程。武将按各自设置的等级(1~5级)生成，按顺序摆入布阵格。配置写入当前场景，点「开始战斗」时自动保存场景。", hintStyle);
 
         GUILayout.Space(6);
         GUILayout.BeginHorizontal();
@@ -221,9 +221,11 @@ public class DebugLineupWindow : EditorWindow
         for (int i = 0; i < listProp.arraySize; i++)
         {
             SerializedProperty elem = listProp.GetArrayElementAtIndex(i);
+            SerializedProperty heroProp = elem.FindPropertyRelative("heroId");
+            SerializedProperty lvProp = elem.FindPropertyRelative("level");
             EditorGUILayout.BeginHorizontal();
-            DrawSideSwatch(elem.intValue);
-            if (GUILayout.Button(HeroLabel(elem.intValue), EditorStyles.popup))
+            DrawSideSwatch(heroProp.intValue);
+            if (GUILayout.Button(HeroLabel(heroProp.intValue), EditorStyles.popup))
             {
                 int index = i;
                 ShowHeroMenu(id =>
@@ -232,15 +234,17 @@ public class DebugLineupWindow : EditorWindow
                         return;
                     var p = so.FindProperty(propName);
                     if (p != null && index < p.arraySize)
-                        p.GetArrayElementAtIndex(index).intValue = id;
+                        p.GetArrayElementAtIndex(index).FindPropertyRelative("heroId").intValue = id;
                     so.ApplyModifiedProperties();
                     MarkSceneDirty();
                 });
             }
+            GUILayout.Label("等级", GUILayout.Width(28));
+            lvProp.intValue = EditorGUILayout.IntSlider(lvProp.intValue, 1, HeroSelectionTool.MaxHeroCardLevel, GUILayout.Width(110));
             if (GUILayout.Button("×", GUILayout.Width(22)))
             {
                 EditorGUILayout.EndHorizontal();
-                listProp.DeleteArrayElementAtIndex(i);
+                RemoveElement(listProp, i);
                 so.ApplyModifiedProperties();
                 MarkSceneDirty();
                 break;
@@ -259,7 +263,9 @@ public class DebugLineupWindow : EditorWindow
                     return;
                 int n = p.arraySize;
                 p.InsertArrayElementAtIndex(n);
-                p.GetArrayElementAtIndex(n).intValue = id;
+                var elem = p.GetArrayElementAtIndex(n);
+                elem.FindPropertyRelative("heroId").intValue = id;
+                elem.FindPropertyRelative("level").intValue = 1;
                 so.ApplyModifiedProperties();
                 MarkSceneDirty();
             });
@@ -308,6 +314,16 @@ public class DebugLineupWindow : EditorWindow
             EditorGUILayout.HelpBox(
                 "布阵格只有 " + CombatConst.FormationCellCount + " 格，超出的 " + over + " 名武将不会生成。",
                 MessageType.Warning);
+    }
+
+    // 删除列表元素：DebugHeroEntry 是自定义可序列化类（引用类型），Unity 的
+    // DeleteArrayElementAtIndex 对引用类型元素第一次只会将其置空、不改变数组长度，需再删一次才真正移除。
+    private static void RemoveElement(SerializedProperty listProp, int index)
+    {
+        int sizeBefore = listProp.arraySize;
+        listProp.DeleteArrayElementAtIndex(index);
+        if (listProp.arraySize == sizeBefore)
+            listProp.DeleteArrayElementAtIndex(index);
     }
 
     private void MarkSceneDirty()

@@ -193,8 +193,6 @@ public class CardShopManager : MonoBehaviour
                 if (roll < shopCfg.MultiCardRate)
                 {
                     count = SysRandom.Range(1, shopCfg.MultiPriceTotal / heroPrice + 1);
-                    if(roll >= 95 && shopCfg.ItemAmazingCount > count)
-                        count = shopCfg.ItemAmazingCount;
                 }
 
                 if (count == 1)
@@ -573,8 +571,6 @@ public class CardShopManager : MonoBehaviour
             if (roll < shopCfg.MultiCardRate)
             {
                 count = SysRandom.Range(1, shopCfg.MultiPriceTotal / cardPrice + 1);
-                if (roll >= 95 && shopCfg.ItemAmazingCount > count)
-                    count = shopCfg.ItemAmazingCount;
             }
 
             if (count == 1)

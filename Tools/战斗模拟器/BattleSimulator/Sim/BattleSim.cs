@@ -24,6 +24,8 @@ public class BattleSim
 
     public bool IsFinished { get { return World != null && World.gameFinish; } }
     public bool HasWin { get { return World != null && World.hasWin; } }
+    // 同刻双方全灭导致的平局（结束时双方均无存活单位）
+    public bool IsDraw { get { return World != null && World.isDraw; } }
     public float BattleTime { get { return Time.time; } }
 
     private int _heroCountA;
@@ -276,6 +278,9 @@ public class BattleSim
                 chess.LogicUpdate(dt);
         }
 
+        // 疲劳结算：超时后每间隔对全体英雄施加递增真实伤害（与真机 WorldManager.GameUpdate 一致）
+        FatigueManager.Tick(dt);
+
         // 近战英雄贴身逼近：射程(17格)偏大导致近战隔空站桩输出，这里让近战英雄继续朝最近敌方逼近到近身距离再停
         const float MeleeCloseDist = 10f;   // 近战贴身判定距离
         foreach (var c in World.chessList)
@@ -355,7 +360,7 @@ public class BattleSim
         var sb = new System.Text.StringBuilder();
         sb.AppendLine("=== 战斗结果 ===");
         sb.AppendLine("战斗时长: " + BattleTime.ToString("F1") + "s");
-        sb.AppendLine("胜负: " + (HasWin ? "甲（side1）胜" : "乙（side2）胜"));
+        sb.AppendLine("胜负: " + (IsDraw ? "平局（双方同刻全灭）" : (HasWin ? "甲（side1）胜" : "乙（side2）胜")));
 
         int surviveA = 0, surviveB = 0;
         foreach (var c in World.chessList)

@@ -576,7 +576,7 @@ public class MainForm : Form
             if (_battle.IsFinished)
             {
                 _battleDone = true;
-                _statusLabel.Text = "战斗结束：" + (_battle.HasWin ? "甲胜" : "乙胜")
+                _statusLabel.Text = "战斗结束：" + (_battle.IsDraw ? "平局" : (_battle.HasWin ? "甲胜" : "乙胜"))
                     + "（时长 " + _battle.BattleTime.ToString("F1") + "s）";
                 _statusLabel.ForeColor = SDColor.Orange;
                 Utf8Console.WriteLine(_battle.GetResultSummary());

@@ -198,6 +198,7 @@
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillCastingAidDrain.cs" />
     <Compile Include="Assets\Resources\Scripts\Configs\ItemConfig_s.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffBuildFort.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\FatigueManager.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillInitShieldValue.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillCastingAidAreaHeal.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidSelfAndLowHp.cs" />

@@ -1,7 +1,8 @@
 // ============================================================
 // 战斗模拟器 · 批量模拟 —— BatchSimRunner
 // 无界面连打 N 轮：每轮随机抽双方阵容（近战前排/远程后排站位），按总价(金币)+各卡价格折算英雄等级，
-// 可选给每个武将随机装备一件 400 段道具，可开关 国家/好友/职业 加成，跑完后统计各武将、各物品的胜率并输出报告文件。
+// 可选给每个武将随机装备一件 400 段道具，可开关 国家/好友/职业 加成，跑完后统计各武将、各物品的胜率
+// 与每场耗时分布（正常比赛时间）并输出报告文件。
 // ============================================================
 using System;
 using System.Collections.Generic;
@@ -15,6 +16,11 @@ public static class BatchSimRunner
     // 单场参数（与 CLI 一致）
     private const int MaxSteps = 12000;      // 12000 × 0.05 = 600s 上限
     private const float StepDt = 0.05f;
+    // 正常比赛耗时 = 逻辑步数 × StepDt + 开场等待：StepDt 与游戏 WorldManager.GameUpdate 的 tick(0.05s) 一致，
+    // 模拟器只是按同一步长无等待连续计算（省去真机每步 0.05s 的真实等待），故逻辑时间即真实一局时长
+    private const float BattleStartDelaySeconds = 0.5f;   // 游戏 BattleBegin 后 WaitForSeconds(0.5) 才进入 tick 循环
+    // 耗时分布区间上界(秒)，最后一档为 ≥ 末值
+    private static readonly float[] TimeBuckets = { 5f, 10f, 15f, 20f, 30f, 45f, 60f, 90f, 120f };
 
     // 随机装备池：400 段成品装备（Id 400xxx）
     private const int ItemIdMin = 400000;
@@ -129,6 +135,8 @@ public static class BatchSimRunner
 
         int heroCount = Math.Max(1, opt.HeroCount);
         int rounds = Math.Max(1, opt.Rounds);
+        var roundTimes = new List<float>(rounds);   // 每场耗时(正常比赛秒数)
+        int timeouts = 0;                            // 打到步数上限仍无胜负的场次
 
         if (heroIds.Count == 0)
         {
@@ -191,12 +199,16 @@ public static class BatchSimRunner
                 battle.Step(StepDt);
                 steps++;
             }
+            // 本场耗时：逻辑步数 × 步长 + 开场等待（= 真机同参数下的一局时长）
+            if (!battle.IsFinished)
+                timeouts++;
+            roundTimes.Add(steps * StepDt + BattleStartDelaySeconds);
             var roundHeroDamage = _heroDamageToHero;
             var roundMagicDamage = _magicDamage;
             _heroDamageToHero = null;   // 本场结束，停止累积
             _magicDamage = null;
 
-            int winner = !battle.IsFinished ? 0 : (battle.HasWin ? 1 : 2);   // 0=平局
+            int winner = (!battle.IsFinished || battle.IsDraw) ? 0 : (battle.HasWin ? 1 : 2);   // 0=平局(步数上限或双方同刻全灭)
             if (winner == 1) winA++;
             else if (winner == 2) winB++;
             else draw++;
@@ -217,7 +229,7 @@ public static class BatchSimRunner
         var heroRows = Sort(heroStats.Values);
         var itemRows = Sort(itemStats.Values);
         var jobRows = AggregateByJob(heroRows);
-        string report = BuildReport(opt, rounds, winA, winB, draw, heroRows, itemRows, jobRows, groupStats);
+        string report = BuildReport(opt, rounds, winA, winB, draw, heroRows, itemRows, jobRows, groupStats, roundTimes, timeouts);
 
         string dir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "sim_reports");
         Directory.CreateDirectory(dir);
@@ -309,7 +321,7 @@ public static class BatchSimRunner
 
     private static string BuildReport(Options opt, int rounds, int winA, int winB, int draw,
         List<StatRow> heroRows, List<StatRow> itemRows, List<StatRow> jobRows,
-        Dictionary<string, StatRow> groupStats)
+        Dictionary<string, StatRow> groupStats, List<float> roundTimes, int timeouts)
     {
         var sb = new StringBuilder();
         sb.AppendLine("==================================================");
@@ -326,6 +338,11 @@ public static class BatchSimRunner
         sb.AppendLine("运行轮数: " + rounds + "    单场步数上限: " + MaxSteps + "(" + (MaxSteps * StepDt) + "s)");
         sb.AppendLine("--------------------------------------------------");
         sb.AppendLine("总胜负: 甲胜 " + winA + " / 乙胜 " + winB + " / 平局 " + draw);
+        sb.AppendLine();
+
+        sb.AppendLine("【战斗耗时分布】（正常比赛时间 = 逻辑步数×" + StepDt + "s + 开场等待" + BattleStartDelaySeconds + "s；"
+            + "模拟器按与游戏 BattleBegin 相同的 0.05s tick 无等待连算，故逻辑时间即真机一局时长）");
+        AppendTimeDistribution(sb, roundTimes, timeouts);
         sb.AppendLine();
 
         sb.AppendLine("【武将胜率】按胜率降序（胜率 = 胜场 / 出场场次；场均伤害 = 对敌方英雄造成的伤害 / 出场场次；场均法术伤害 = 造成的法术伤害(任意目标) / 出场场次）");
@@ -348,6 +365,60 @@ public static class BatchSimRunner
         sb.AppendLine();
         sb.AppendLine("==================================================");
         return sb.ToString();
+    }
+
+    // 战斗耗时分布：平均/最短/最长/中位/P90 + 分区间直方图 + 步数上限未分胜负场次
+    private static void AppendTimeDistribution(StringBuilder sb, List<float> times, int timeouts)
+    {
+        if (times == null || times.Count == 0)
+        {
+            sb.AppendLine("(无数据)");
+            return;
+        }
+        var sorted = new List<float>(times);
+        sorted.Sort();
+        float sum = 0f;
+        foreach (var t in times)
+            sum += t;
+        sb.AppendLine(string.Format("  平均 {0:N1}s    最短 {1:N1}s    最长 {2:N1}s    中位P50 {3:N1}s    P90 {4:N1}s",
+            sum / times.Count, sorted[0], sorted[sorted.Count - 1], Percentile(sorted, 0.5f), Percentile(sorted, 0.9f)));
+        sb.AppendLine("  打到步数上限(" + MaxSteps + "步=" + (MaxSteps * StepDt) + "s)仍未分胜负（计入平局）: " + timeouts + " 场");
+
+        var buckets = new int[TimeBuckets.Length + 1];
+        foreach (var t in times)
+        {
+            int idx = TimeBuckets.Length;   // 默认落最后一档(≥末值)
+            for (int i = 0; i < TimeBuckets.Length; i++)
+            {
+                if (t < TimeBuckets[i]) { idx = i; break; }
+            }
+            buckets[idx]++;
+        }
+        sb.AppendLine(string.Format("  {0,-12}{1,8}{2,10}", "耗时区间", "场次", "占比"));
+        float low = 0f;
+        for (int i = 0; i < TimeBuckets.Length; i++)
+        {
+            sb.AppendLine(string.Format("  {0,-12}{1,8}{2,10:P1}",
+                RangeLabel(low, TimeBuckets[i]), buckets[i], (float)buckets[i] / times.Count));
+            low = TimeBuckets[i];
+        }
+        sb.AppendLine(string.Format("  {0,-12}{1,8}{2,10:P1}",
+            "≥" + TimeBuckets[TimeBuckets.Length - 1] + "s", buckets[TimeBuckets.Length],
+            (float)buckets[TimeBuckets.Length] / times.Count));
+    }
+
+    private static string RangeLabel(float low, float high)
+    {
+        return (low <= 0f ? "0" : low.ToString("0")) + "~" + high.ToString("0") + "s";
+    }
+
+    // 已排序列表的 p 分位（0~1）
+    private static float Percentile(List<float> sorted, float p)
+    {
+        if (sorted.Count == 0)
+            return 0f;
+        int idx = (int)Math.Round((sorted.Count - 1) * p);
+        return sorted[Math.Max(0, Math.Min(sorted.Count - 1, idx))];
     }
 
     private static string Header()
