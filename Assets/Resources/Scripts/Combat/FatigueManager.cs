@@ -24,11 +24,9 @@ public static class FatigueManager
     /// <summary>每个战斗 tick 调用一次（dt=战斗步长），内部按秒累计并在到点后结算</summary>
     public static void Tick(float dt)
     {
-        if (CombatConst.FatigueInterval <= 0f)
-            return;
         elapsed += dt;
-        // 一帧可能跨过多个结算点，逐个补齐（如步长较大或首次触发时）
-        while (elapsed >= nextTime)
+        // FatigueInterval<=0 视为不启用疲劳（并入循环条件，避免常量折叠产生不可达代码，同时防止 nextTime 不推进导致死循环）
+        while (CombatConst.FatigueInterval > 0f && elapsed >= nextTime)
         {
             ApplyFatigue();
             nextTime += CombatConst.FatigueInterval;
@@ -55,6 +53,9 @@ public static class FatigueManager
         foreach (var player in game.players)
         {
             if (player == null || !handledSides.Add(player.battleSide))
+                continue;
+            // 战斗已结束的一方（自身无存活敌方）不再承受疲劳伤害，避免结算后被疲劳额外击杀
+            if (world.IsSideBattleOver(player.battleSide))
                 continue;
             foreach (var unit in world.GetUnitsMySide(player.battleSide))
             {

@@ -23,6 +23,7 @@ public class WorldManager : MonoBehaviour
     public bool gameFinish;
     public bool hasWin;
     public bool isDraw;   // 同刻双方全灭导致的平局（与打到步数上限的平局区分）
+    private bool[] sideBattleOver = new bool[8]; // 各阵营战斗是否已结束（无存活敌方）
 
     // 羁绊开关（默认全开，仅批量模拟器按需在开战前关闭；不影响战斗逻辑本身）
     public static bool EnableJobLinks = true;        // 职业连锁
@@ -330,6 +331,7 @@ public class WorldManager : MonoBehaviour
         gameFinish = false;
         hasWin = false;
         isDraw = false;
+        sideBattleOver = new bool[8]; // 各阵营战斗结束状态重置
         idCounter = 100;
         chessList.Clear();
         battleTexts.Clear();
@@ -517,6 +519,35 @@ public class WorldManager : MonoBehaviour
         return unitsInRange;
     }
 
+    /// <summary>该阵营的战斗是否已结束：整体战斗已结束，或该方已无存活敌方（冻结：不回血回蓝、不吃疲劳）</summary>
+    public bool IsSideBattleOver(int side)
+    {
+        if (gameFinish)
+            return true;
+        if (side < 1 || side > sideBattleOver.Length)
+            return false;
+        return sideBattleOver[side - 1];
+    }
+
+    // 重算各阵营战斗结束状态（单位阵亡移除后调用）：某阵营已无存活敌方即视为战斗结束
+    private void RecomputeSideBattleOver()
+    {
+        for (int side = 1; side <= sideBattleOver.Length; side++)
+        {
+            bool hasEnemy = false;
+            foreach (var chessComponent in chessList)
+            {
+                if (chessComponent != null && chessComponent.hp > 0 && !chessComponent.isShadow
+                    && IsEnemy(side, chessComponent.side))
+                {
+                    hasEnemy = true;
+                    break;
+                }
+            }
+            sideBattleOver[side - 1] = !hasEnemy;
+        }
+    }
+
     public Chess FindByHeroIdAndSide(int heroId, int side)
     {
         foreach (var chessComponent in chessList)
@@ -634,6 +665,7 @@ public class WorldManager : MonoBehaviour
     public void OnUnitDying(Chess dieUnit, int killerPlayerId)
     {
         chessList.Remove(dieUnit);
+        RecomputeSideBattleOver(); // 单位阵亡后重算各阵营"战斗是否已结束"（无存活敌方即结束）
 
         bool[] sideHasUnits = new bool[8];
         int aliveSideCount = 0;
@@ -695,6 +727,7 @@ public class WorldManager : MonoBehaviour
         gameFinish = false;
         hasWin = false;
         isDraw = false;
+        sideBattleOver = new bool[8]; // 各阵营战斗结束状态重置
         chessList.Clear();
         battleTexts.Clear();
         SkillFx.Clear();

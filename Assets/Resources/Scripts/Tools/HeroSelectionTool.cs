@@ -115,10 +115,21 @@ public static class HeroSelectionTool
         return likeHeroPool[SysRandom.Range(0, likeHeroPool.Count)];
     }
 
-    // 刷牌：先按GameRoundConfig品质概率roll出品质，再从该品质的英雄池随机选一张
+    // 刷牌（共享模式）：先按GameRoundConfig品质概率roll出品质，再从该品质的英雄池随机选一张
     public static int GetRandomHeroIdByQuality(GameRoundConfig shopCfg)
     {
-        int quality = RollQuality(shopCfg);
+        return GetRandomHeroIdByQuality(RollQuality(shopCfg));
+    }
+
+    // 刷牌（独立买卡）：按玩家等级(PlayerLevelConfig)的品质概率roll出品质，再从该品质英雄池随机选一张
+    public static int GetRandomHeroIdByLevel(int level)
+    {
+        return GetRandomHeroIdByQuality(RollQualityByLevel(level));
+    }
+
+    // 按已定品质从英雄池随机选一张（该品质池为空则回退整池随机）
+    public static int GetRandomHeroIdByQuality(int quality)
+    {
         List<int> candidates = new List<int>();
         foreach (var hero in heroPoolCache)
         {
@@ -138,9 +149,22 @@ public static class HeroSelectionTool
     // 品质1=100-品质2-品质3-品质4
     private static int RollQuality(GameRoundConfig shopCfg)
     {
-        int q2 = Math.Max(0, shopCfg.Quality2Rate);
-        int q3 = Math.Max(0, shopCfg.Quality3Rate);
-        int q4 = Math.Max(0, shopCfg.Quality4Rate);
+        return RollQualityRate(shopCfg.Quality2Rate, shopCfg.Quality3Rate, shopCfg.Quality4Rate);
+    }
+
+    // 独立买卡：按玩家等级配置的品质概率roll
+    private static int RollQualityByLevel(int level)
+    {
+        var cfg = PlayerLevelConfig.GetConfig(Mathf.Clamp(level, 1, CombatConst.PlayerMaxLevel));
+        return RollQualityRate(cfg.Quality2Rate, cfg.Quality3Rate, cfg.Quality4Rate);
+    }
+
+    // 品质1=100-品质2-品质3-品质4
+    private static int RollQualityRate(int q2, int q3, int q4)
+    {
+        q2 = Math.Max(0, q2);
+        q3 = Math.Max(0, q3);
+        q4 = Math.Max(0, q4);
         int q1 = Math.Max(0, 100 - q2 - q3 - q4);
 
         int roll = SysRandom.Range(0, 100);

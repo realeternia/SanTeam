@@ -81,6 +81,7 @@
     <Compile Include="Assets\Resources\Scripts\Test\EffectTestInit.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidDance.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillHitAround.cs" />
+    <Compile Include="Assets\Resources\Scripts\Shop\ShopMode.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillModifyShootSpeed.cs" />
     <Compile Include="Assets\Resources\Scripts\Configs\JobConfig_s.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidVengefulStance.cs" />
@@ -134,6 +135,7 @@
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffCoolDown.cs" />
     <Compile Include="Assets\Epic Toon FX\Scripts\ETFXRotation.cs" />
     <Compile Include="Assets\DOTween\Modules\DOTweenModuleUnityVersion.cs" />
+    <Compile Include="Assets\Resources\Scripts\Shop\IndependentShopMode.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillDumb.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillInitMpFill.cs" />
     <Compile Include="Assets\DOTween\Modules\DOTweenModulePhysics.cs" />
@@ -300,6 +302,7 @@
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillInitEnemyRandomBuff.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidSelfShield.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidCraftBuff.cs" />
+    <Compile Include="Assets\Resources\Scripts\Shop\SharedShopMode.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillCastingAidScorchedEarth.cs" />
     <Compile Include="Assets\DOTween\Modules\DOTweenModuleEPOOutline.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffMultiAttr.cs" />

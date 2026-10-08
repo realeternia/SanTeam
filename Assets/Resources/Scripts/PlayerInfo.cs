@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Text;
 using System.Collections;
 using System.Collections.Generic;
@@ -611,7 +611,9 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
             GameLog.Warn($"物品不参与商店购买 cardId={cardId}");
         }
         GameManager.Instance.PlaySound("Sounds/gold");
-        ctr.OnSold(this, count);
+        // 可见卡位才需要置灰/飞卡动画；AI 独立商店（隐藏商店，无卡位）跳过 UI 表现
+        if (ctr != null)
+            ctr.OnSold(this, count);
 
         // 购买英雄卡后自动上阵：场上英雄数少于当前上限时，把新英雄放到空闲英雄格
         if (isHero)
@@ -1173,6 +1175,9 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
             if (playerLevelText != null)
                 playerLevelText.text = level.ToString();
             EnsureSoldierCells(); // 玩家等级提升可能解锁更多士兵，补齐布阵格
+            // 人类玩家升级后刷新商店稀有度概率文本（独立买卡模式按等级刷牌）
+            if (pid == 0 && CardShopManager.Instance != null)
+                CardShopManager.Instance.RefreshRateText();
             GameLog.Debug($"玩家{pid} 升级到 {level} 级，上阵格子 {GetSlotCount()}，士兵 {GetSoldierMeleeCount()}步+{GetSoldierRangedCount()}弓，剩余经验 {exp}");
         }
     }

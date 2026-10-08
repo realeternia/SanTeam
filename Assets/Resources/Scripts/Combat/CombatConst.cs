@@ -155,6 +155,8 @@ public static class CombatConst
     public const int PlayerMaxHeroCards = 15;
     /// <summary>AI 每个商店阶段（一回合）最多自动卖卡次数（限制"卖旧买新"零成本换卡的次数）</summary>
     public const int AiMaxSellPerShop = 3;
+    /// <summary>独立买卡商店中，AI 每回合最多刷新自己私有商店的次数（避免 AI 刷金失控）</summary>
+    public const int AiMaxShopRefreshPerShop = 2;
     /// <summary>软上限：英雄卡数超限(>上阵格+Cardherolimit)时，非强卡新卡每多囤1张的拒买概率(%)；品质4强卡豁免直接买</summary>
     public const int AiOverLimitRejectPerCard = 35;
     /// <summary>羁绊信任固定倍率（每档）：friend(2-6)好友连线加成最大、job(0-4)职业次之、force(0-2)强卡/国家护盾加成最小</summary>

@@ -7,6 +7,10 @@ using TMPro;
 using System;
 using System.Linq;
 
+/// <summary>
+/// 卡片商店“宿主”：只保留各商店模式共用的能力（预制体/容器/布局/购买入口/开场收尾），
+/// 具体商店流程（共享轮换 / 独立买卡）由 <see cref="ShopMode"/> 派生类实现，按 GameRoundConfig.ShopType 选择。
+/// </summary>
 public class CardShopManager : MonoBehaviour
 {
     public static CardShopManager Instance;
@@ -15,13 +19,10 @@ public class CardShopManager : MonoBehaviour
     public GameObject cardViewPrefab; // 拖拽CardView预制体到此处
     public GameObject cardItemViewPrefab; // 拖拽CardView预制体到此处
 
-    private int round = 10000;
-    private int[] turnOrder = new int[8]; // 商店回合顺序：turnOrder[回合序号] = pid（按积分低到高排序）
-    private bool[] playerPassed = new bool[8]; // 记录每个玩家是否pass过
-    private int passedPlayers = 0; // 记录pass的玩家数量
-    private const int SOLD_REMAIN_ROUNDS = 5; // 卡售出后维持的round数
-    private const int RefreshGoldCost = 2; // 刷新商店的金币消耗
-    public int[] playerStartGold = new int[8]; // 记录每个玩家开局金币（用于AI跳过判定）
+    /// <summary>刷新商店的金币消耗（共享=刷新6张未售卡；独立=重掷自己5格）</summary>
+    public const int RefreshGoldCost = 2;
+    /// <summary>共享商店：卡售出后维持的round数</summary>
+    public const int SOLD_REMAIN_ROUNDS = 5;
 
     public Button passBtn;
     public Button refreshBtn;
@@ -29,14 +30,28 @@ public class CardShopManager : MonoBehaviour
     public Button rankBtn;
     public Button rankPlayerBtn;
 
-    private int era = 0;
     public TMP_Text eraText;
     public MySelectControl mySelect;
-    private bool isShopEnd = false;
+    public TMP_Text rateText;
 
-    public int jadePlayer = -1; //购买和氏璧买家
-    public int firstJumper = -1;
-    private bool hasEnterBattle = false;
+    private int era = 0;
+    public bool hasEnterBattle = false;
+
+    public int jadePlayer = -1; //购买和氏璧买家（仅共享模式使用）
+    public int firstJumper = -1; //共享模式首个跳过者
+    public int[] playerStartGold = new int[8]; // 记录每个玩家开局金币（用于AI跳过判定）
+
+    /// <summary>本轮商店配置（ShopBegin 内确定）</summary>
+    public GameRoundConfig ShopCfg { get; private set; }
+    /// <summary>共享商店回合顺序：按积分低→高排序（仅共享模式使用）；非序列化属性</summary>
+    public int[] TurnOrder { get; private set; } = new int[8];
+    /// <summary>本商店阶段是否已结束</summary>
+    public bool IsShopEnd { get; set; }
+    /// <summary>当前商店阶段计数（供 AI 评分）</summary>
+    public int Era => era;
+
+    /// <summary>当前激活的商店模式</summary>
+    public ShopMode Mode { get; private set; }
 
     private Coroutine shopCoroutine;
 
@@ -49,12 +64,12 @@ public class CardShopManager : MonoBehaviour
         passBtn.onClick.AddListener(() =>
         {
             GameManager.Instance.PlaySound("Sounds/click");
-            OnP1Pass();
+            Mode?.OnHumanPass();
         });
 
         refreshBtn.onClick.AddListener(() =>
         {
-            OnRefresh();
+            Mode?.OnHumanRefresh();
         });
 
         bagBtn.onClick.AddListener(() =>
@@ -86,203 +101,233 @@ public class CardShopManager : MonoBehaviour
             cardViews[i].UpdateEffectLayer();
     }
 
-    private IEnumerator DelayedUpdate()
-    { 
-        yield return new WaitForSeconds(.7f);
-        isShopEnd = false;
-        while (!isShopEnd) // 模拟 Update 的循环
-        {    
-            yield return new WaitForSeconds(SysRandom.Range(0.3f, 0.5f));
+    // ---- 宿主工具方法（供各商店模式复用） ----
 
-            // 有商店以外的面板打开（背包/排行/查看玩家等）时暂停AI选牌，等玩家关闭面板再继续；
-            // 商店面板本身会常驻 openPanelList，需排除
-            if (PanelManager.Instance != null
-                && PanelManager.Instance.openPanelList.Any(p => p != null && p != PanelManager.Instance.cardShopPanel))
-                continue;
-
-            int currentPlayerId = GetTurnPid();
-                
-            // 如果当前玩家已经pass，则直接进入下一回合
-            if (playerPassed[currentPlayerId])
-            {
-                NextTurn();
-                continue;
-            }
-            
-            var playerInfo = GameManager.Instance.GetPlayer(currentPlayerId);
-            if (playerInfo.isAI)
-            {
-                var result = PlayerAI.AiCheckBuyCard(playerInfo, era);
-                
-                if (!result)
-                {
-                    if(System.Linq.Enumerable.All(playerPassed, x => !x))
-                        firstJumper = currentPlayerId;
-                    // AI玩家放弃购买
-                    playerPassed[currentPlayerId] = true;
-                    passedPlayers++;
-                    playerInfo.SetRoundOver(true);
-                }
-            }
-
-            // 等待 1 秒（不阻塞主线程）
-            yield return new WaitForSeconds(SysRandom.Range(0.5f, 0.8f));
-
-            if (playerInfo.isAI)
-            {
-                AfterAct();
-            }
-        }
-    }      
-
-    // Update is called once per frame
-    void Update()
+    /// <summary>创建一张可见的商店英雄卡（位置由 LayoutCards/ReplaceCardAt 指定）</summary>
+    public CardViewControl CreateCardView(int heroId, int count)
     {
-        
+        GameObject card = Instantiate(cardViewPrefab, transform);
+        CardViewControl cardView = card.GetComponent<CardViewControl>();
+        cardView.Init(heroId, true, count, GameManager.Instance.year);
+        return cardView;
     }
 
-    private void NewEra()
+    /// <summary>按网格排布卡位：perRow 为每行张数，centerRows 用于垂直居中（沿用原共享商店布局公式）</summary>
+    public void LayoutCards(List<CardViewControl> views, int perRow, int centerRows)
+    {
+        if (perRow <= 0) perRow = 1;
+        float cardWidth = 228f;
+        float cardHeight = 318f;
+        float spacing = 5f;
+
+        float startX = -((perRow * cardWidth) + (perRow - 1) * spacing) / 2f + cardWidth / 2f - 50;
+        float startY = (centerRows - 1) / 2f * (cardHeight + spacing) - 320;
+
+        for (int i = 0; i < views.Count; i++)
+        {
+            int row = i / perRow;
+            int col = i % perRow;
+            RectTransform rectTransform = views[i].GetComponent<RectTransform>();
+            if (rectTransform != null)
+                rectTransform.anchoredPosition = new Vector2(startX + col * (cardWidth + spacing), startY - row * (cardHeight + spacing));
+        }
+    }
+
+    /// <summary>用随机新卡替换指定卡位（保持原位置），并销毁旧卡</summary>
+    public void ReplaceCardAt(int index, int heroId, int count)
+    {
+        if (index < 0 || index >= cardViews.Count)
+            return;
+
+        var old = cardViews[index];
+        Vector2 pos = old.GetComponent<RectTransform>().anchoredPosition;
+
+        var newCtr = CreateCardView(heroId, count);
+        newCtr.GetComponent<RectTransform>().anchoredPosition = pos;
+        cardViews[index] = newCtr;
+
+        Destroy(old.gameObject);
+    }
+
+    /// <summary>清空当前所有卡位（含飞卡动画对象）</summary>
+    public void ClearCards()
     {
         var movingCardImages = GameObject.FindGameObjectsWithTag("MovingCard");
         foreach (var img in movingCardImages)
             Destroy(img);
 
-        //移除并销毁旧卡片
         foreach (Transform child in transform)
             Destroy(child.gameObject);
-        // 物品仅掉落获得，不参与商店：无未售出物品需保留
         cardViews.Clear();
-
-        foreach(var player in GameManager.Instance.players)
-            player.OnEra(era);
-
-        var year = GameManager.Instance.year; //第几场比赛（每场战斗后+1，即一个回合）
-        var shopCfg = GameRoundConfig.GetConfig(Math.Min(100, year));
-        List<Tuple<int, int>> heroIds = new List<Tuple<int, int>>();
-        int TOTAL_HERO_CARDS = 15;        
-        // hero card
-        // 防死循环：卡池中某品质（第一回合恒为品质1）人数可能不足15张，
-        // 原 for+i-- 命中重复卡会原地打转永不前进，导致点"结束"进商店时卡死。
-        // 改为 while + 尝试上限：能凑满15张就凑满，凑不满则生成已有的全部不重复卡后结束。
-        int totalUnique = 0;                       // 已生成的不同英雄卡数量
-        int maxAttempts = TOTAL_HERO_CARDS * 20;   // 尝试上限，保证必然终止
-        int attempt = 0;
-        while (totalUnique < TOTAL_HERO_CARDS && attempt < maxAttempts)
-        {
-            attempt++;
-            var heroId = GetRandomShopHeroId(shopCfg);
-            if (heroId == 0)
-                break; // 卡池为空，无法再生成，跳出避免死循环
-            var existingIndex = heroIds.FindIndex(x => x.Item1 == heroId);
-            if (existingIndex >= 0)
-            { //重复卡的处理
-                if (shopCfg.Id > 3)
-                {
-                    var existingTuple = heroIds[existingIndex];
-                    heroIds[existingIndex] = new Tuple<int, int>(existingTuple.Item1, Mathf.Min(existingTuple.Item2 + 1, 2)); // 同一英雄卡最多2张
-                }
-
-                continue;
-            }
-
-            var count = 1;
-            var heroPrice = HeroSelectionTool.GetPrice(HeroConfig.GetConfig(heroId));
-            if (shopCfg.MultiPriceTotal > 2 * heroPrice)
-            {
-                var roll = SysRandom.Range(0, 100);
-                if (roll < shopCfg.MultiCardRate)
-                {
-                    count = SysRandom.Range(1, shopCfg.MultiPriceTotal / heroPrice + 1);
-                }
-
-                if (count == 1)
-                {
-                    count = Math.Max(1, shopCfg.MultiPriceTotal / 3 / heroPrice);
-                }
-            }
-
-            count = Mathf.Min(count, 2); // 商店同一英雄卡最多出售2张
-            heroIds.Add(new Tuple<int, int>(heroId, count));
-            totalUnique++;
-        }
-
-
-        int CARDS_PER_ROW = 5; // 3列x5行，共15张
-        float cardWidth = 228f;
-        float cardHeight = 318f;
-        float spacing = 5f;
-
-        // 计算起始位置，使其居中显示
-        float startX = -((CARDS_PER_ROW * cardWidth) + (CARDS_PER_ROW - 1) * spacing) / 2f + cardWidth / 2f - 50;
-        float startY = (5 - 1) / 2f * (cardHeight + spacing) - 320; // 5行垂直居中
-
-        for(int i = 0; i < heroIds.Count; i++)
-        {
-            var heroId = heroIds[i].Item1;
-            var heroCount = heroIds[i].Item2;
-
-            // 计算行和列
-            int row = i / CARDS_PER_ROW;
-            int col = i % CARDS_PER_ROW;
-
-            // 计算位置
-            float x = startX + col * (cardWidth + spacing);
-            float y = startY - row * (cardHeight + spacing);
-
-            // 创建CardView实例
-            GameObject card = Instantiate(cardViewPrefab, transform);
-            RectTransform rectTransform = card.GetComponent<RectTransform>();
-            if (rectTransform != null)
-                rectTransform.anchoredPosition = new Vector2(x, y);
-
-            CardViewControl cardView = card.GetComponent<CardViewControl>();
-
-            cardView.Init(heroId, true, heroCount, year);
-            cardViews.Add(cardView);            
-        }
-
-        // 物品仅掉落获得，不参与商店：不再刷出物品卡（原 RateAbs/ShopIdx/unsoldItems 逻辑已随列删除）
-
-        era++;
-        passBtn.gameObject.SetActive(true);
-
-        eraText.text = shopCfg.Name;
-
-        // 重置所有玩家的pass状态
-        for (int i = 0; i < playerPassed.Length; i++)
-        {
-            playerPassed[i] = false;
-            GameManager.Instance.GetPlayer(i).SetRoundOver(false);
-        }
-        passedPlayers = 0;
-        for (int i = 0; i < 8; i++)
-            playerStartGold[i] = GameManager.Instance.GetPlayer(i).gold; // 记录开局金币
-
-        int firstPid = -1;
-        if (jadePlayer >= 0)
-            firstPid = jadePlayer;
-        else if (firstJumper >= 0)
-            firstPid = firstJumper;
-
-        if (firstPid >= 0)
-            round = 8 * 100 + System.Array.IndexOf(turnOrder, firstPid); // 让该玩家排到回合最前
-        else
-            round = 1000;
-        jadePlayer = -1;
-        firstJumper = -1;
-
-        var pid = GetTurnPid();
-        GameManager.Instance.OnPlayerTurn(pid);
-        mySelect.UpdateCards(GameManager.Instance.GetPlayer(pid));
-
-        CheckEraBonusGold();
-        GameManager.Instance.PlaySound("Sounds/page");
     }
 
-    // 当前回合序号对应的玩家pid（回合顺序按积分低到高）
-    private int GetTurnPid()
+    /// <summary>设置“跳过/结束”按钮文案</summary>
+    public void SetPassButtonLabel(string label)
     {
-        return turnOrder[round % turnOrder.Length];
+        if (passBtn == null)
+            return;
+        var text = passBtn.GetComponentInChildren<TMP_Text>();
+        if (text != null)
+            text.text = label;
+    }
+
+    // 品质名称（品质1~4，与 SysColor.GetQualityColor 的档位一致）
+    private static readonly string[] QualityNames = { "普通", "稀有", "优秀", "卓越" };
+
+    /// <summary>
+    /// 刷新稀有度概率文本：共享模式读回合配置(GameRoundConfig)，独立模式读玩家等级配置(PlayerLevelConfig)，
+    /// 每段文本按对应品质颜色着色。触发时机：新回合开始 / 玩家(pid0)等级提升。
+    /// </summary>
+    public void RefreshRateText()
+    {
+        if (rateText == null)
+            return;
+
+        int q2, q3, q4;
+        if (Mode != null && Mode.Type == ShopModeType.Independent)
+        {
+            int level = GameManager.Instance.GetPlayer(0).level;
+            var cfg = PlayerLevelConfig.GetConfig(Mathf.Clamp(level, 1, CombatConst.PlayerMaxLevel));
+            q2 = cfg.Quality2Rate;
+            q3 = cfg.Quality3Rate;
+            q4 = cfg.Quality4Rate;
+        }
+        else if (ShopCfg != null)
+        {
+            q2 = ShopCfg.Quality2Rate;
+            q3 = ShopCfg.Quality3Rate;
+            q4 = ShopCfg.Quality4Rate;
+        }
+        else
+        {
+            return;
+        }
+
+        int[] rates = { Mathf.Max(0, 100 - q2 - q3 - q4), q2, q3, q4 };
+
+        System.Text.StringBuilder sb = new System.Text.StringBuilder();
+        for (int i = 0; i < rates.Length; i++)
+        {
+            if (i > 0)
+                sb.Append("\n");
+            sb.Append(SysColor.ColorText($"{QualityNames[i]} {rates[i]}%", SysColor.GetQualityColor(i + 1)));
+        }
+        rateText.text = sb.ToString();
+    }
+
+    // 刷新卡位出卡：先按 LikeCardRefreshRate 概率从收藏池随机出一张（收藏池=like阶段全部玩家点赞，8玩家×2张共16张，存于 HeroSelectionTool），
+    // 未命中（或收藏池空）则按 GameRoundConfig 品质概率随机出一张
+    public int GetRandomShopHeroId(GameRoundConfig shopCfg)
+    {
+        if (SysRandom.Range(0, 100) < CombatConst.LikeCardRefreshRate)
+        {
+            var likeId = HeroSelectionTool.GetRandomLikedHeroId();
+            if (likeId != 0)
+                return likeId;
+        }
+        return HeroSelectionTool.GetRandomHeroIdByQuality(shopCfg);
+    }
+
+    // 独立买卡模式刷牌：先按 LikeCardRefreshRate 概率从收藏池出一张，否则按玩家等级(PlayerLevelConfig)品质概率出一张
+    public int GetRandomShopHeroIdByLevel(int level)
+    {
+        if (SysRandom.Range(0, 100) < CombatConst.LikeCardRefreshRate)
+        {
+            var likeId = HeroSelectionTool.GetRandomLikedHeroId();
+            if (likeId != 0)
+                return likeId;
+        }
+        return HeroSelectionTool.GetRandomHeroIdByLevel(level);
+    }
+
+    // 与初始刷牌一致的卡牌数量计算逻辑
+    public int GetMultiCount(int cardPrice, GameRoundConfig shopCfg)
+    {
+        var count = 1;
+        if (shopCfg.MultiPriceTotal > 2 * cardPrice)
+        {
+            var roll = SysRandom.Range(0, 100);
+            if (roll < shopCfg.MultiCardRate)
+            {
+                count = SysRandom.Range(1, shopCfg.MultiPriceTotal / cardPrice + 1);
+            }
+
+            if (count == 1)
+                count = Math.Max(1, shopCfg.MultiPriceTotal / 3 / cardPrice);
+        }
+        return Mathf.Min(count, 2); // 同一英雄卡最多2张
+    }
+
+    // ---- 购买入口 ----
+
+    // 人类购买入口：买卡成功后通知模式推进（共享=进入下一回合；独立=无）
+    public bool RequestBuy(CardViewControl view, PlayerInfo player, int price, int count)
+    {
+        if (!OnPlayerBuyCard(view, player, view.cardId, view.isHeroCard, price, count))
+            return false;
+        Mode?.OnHumanBought(player, view.ToOffer(), count);
+        return true;
+    }
+
+    // AI 购买入口：可见卡位买卡走 OnSold；隐藏商店（view==null）由此处回写报价剩余数量
+    public bool BuyOffer(PlayerInfo player, ShopOffer offer, int buyCount)
+    {
+        if (offer == null)
+            return false;
+
+        int price = offer.price * buyCount;
+        if (!OnPlayerBuyCard(offer.view, player, offer.cardId, offer.isHero, price, buyCount))
+            return false;
+
+        if (offer.view == null)
+            offer.count -= buyCount;
+        return true;
+    }
+
+    public bool OnPlayerBuyCard(CardViewControl ctr, PlayerInfo player, int cardId, bool isHero, int price, int count)
+    {
+        // AI 买卡失败不弹提示，避免刷屏
+        bool showTip = player != null && !player.isAI;
+
+        if (player.gold < price)
+        {
+            if (showTip)
+                SystemTip.Show("金币不足，无法购买");
+            return false;
+        }
+
+        if (player.BuyCard(ctr, cardId, isHero, price, count))
+        {
+            mySelect.UpdateCards(player);
+            // 通知模式：共享=触发售出倒计时/相邻刷新；独立=无
+            Mode?.OnBought(new ShopOffer
+            {
+                cardId = cardId,
+                isHero = isHero,
+                price = price / Mathf.Max(1, count),
+                count = count,
+                view = ctr,
+            }, player);
+            return true;
+        }
+
+        // 金币足够时唯一的失败原因是新英雄卡超出背包上限
+        if (showTip)
+            SystemTip.Show($"英雄卡已满({CombatConst.PlayerMaxHeroCards}张)，无法购买新英雄");
+        return false;
+    }
+
+    public PlayerInfo GetCurrentPlayer()
+    {
+        return Mode?.GetActingPlayer();
+    }
+
+    public void QuickView(int pid)
+    {
+        if (pid >= 0)
+            mySelect.QuickView(GameManager.Instance.GetPlayer(pid));
+        else
+            mySelect.QuickViewFin();
     }
 
     // 商店开始时：按积分(mark)从低到高排序玩家，积分相同金币少的排前，再相同按pid排
@@ -297,16 +342,16 @@ public class CardShopManager : MonoBehaviour
             .OrderBy(pos => pos.x)
             .ToArray();
 
-        turnOrder = players
+        TurnOrder = players
             .OrderBy(p => p.mark)
             .ThenBy(p => p.gold)
             .ThenBy(p => p.pid)
             .Select(p => p.pid)
             .ToArray();
 
-        for (int i = 0; i < turnOrder.Length; i++)
+        for (int i = 0; i < TurnOrder.Length; i++)
         {
-            players[turnOrder[i]].GetComponent<RectTransform>().anchoredPosition = slotPos[i];
+            players[TurnOrder[i]].GetComponent<RectTransform>().anchoredPosition = slotPos[i];
         }
     }
 
@@ -352,270 +397,6 @@ public class CardShopManager : MonoBehaviour
         }
     }
 
-    public bool OnPlayerBuyCard(CardViewControl ctr, PlayerInfo player, int cardId, bool isHero, int price, int count)
-    {
-        // AI 买卡失败不弹提示，避免刷屏
-        bool showTip = player != null && !player.isAI;
-
-        if (player.gold < price)
-        {
-            if (showTip)
-                SystemTip.Show("金币不足，无法购买");
-            return false;
-        }
-
-        if (player.BuyCard(ctr, cardId, isHero, price, count))
-        {
-            mySelect.UpdateCards(player);
-            OnCardSelected(ctr);
-            return true;
-        }
-
-        // 金币足够时唯一的失败原因是新英雄卡超出背包上限
-        if (showTip)
-            SystemTip.Show($"英雄卡已满({CombatConst.PlayerMaxHeroCards}张)，无法购买新英雄");
-        return false;
-    }
-
-    public void QuickView(int pid)
-    {
-        if (pid >= 0)
-            mySelect.QuickView(GameManager.Instance.GetPlayer(pid));
-        else
-            mySelect.QuickViewFin();
-    }
-
-    public PlayerInfo GetCurrentPlayer()
-    {
-        return GameManager.Instance.GetPlayer(GetTurnPid());
-    }
-
-    public void OnP1Pass()
-    {
-        var nowPlayer = GameManager.Instance.GetPlayer(GetTurnPid());
-        if(nowPlayer.isAI)
-            return;
-        if(playerPassed[nowPlayer.pid])
-            return;
-
-        passBtn.gameObject.SetActive(false);
-        if(System.Linq.Enumerable.All(playerPassed, x => !x))
-            firstJumper = nowPlayer.pid;
-        playerPassed[nowPlayer.pid] = true;
-        passedPlayers++;
-        nowPlayer.SetRoundOver(true);
-
-        AfterAct();
-    }
-
-    // 玩家支付2gold立刻刷新6张牌，可多次进行，不结束自己的回合
-    private void OnRefresh()
-    {
-        var nowPlayer = GameManager.Instance.GetPlayer(GetTurnPid());
-        if (nowPlayer.isAI)
-            return;
-        if (playerPassed[nowPlayer.pid])
-        {
-            SystemTip.Show("你已跳过本回合，无法刷新");
-            return;
-        }
-        if (nowPlayer.gold < RefreshGoldCost)
-        {
-            SystemTip.Show($"金币不足，刷新需要{RefreshGoldCost}金币");
-            return;
-        }
-
-        nowPlayer.gold -= RefreshGoldCost;
-        nowPlayer.goldText.text = nowPlayer.gold.ToString();
-
-        // 从未售出的卡牌中随机选取6张进行刷新（不足6张则全部刷新）
-        var unsoldCards = cardViews.FindAll(x => !x.isSold);
-        for (int i = 0; i < unsoldCards.Count; i++)
-        {
-            int j = SysRandom.Range(i, unsoldCards.Count);
-            var tmp = unsoldCards[i];
-            unsoldCards[i] = unsoldCards[j];
-            unsoldCards[j] = tmp;
-        }
-
-        int refreshCount = Math.Min(6, unsoldCards.Count);
-        for (int i = 0; i < refreshCount; i++)
-            RefreshCard(unsoldCards[i]);
-
-        GameManager.Instance.PlaySound("Sounds/page");
-    }
-
-    private void NextTurn()
-    {
-        GameLog.Debug("NextTurn");
-        for(int i = 0; i < 8; i++)
-        {
-            round++;
-            var pid = GetTurnPid();
-            if (!playerPassed[pid])
-            {
-                var nextPlayer = GameManager.Instance.GetPlayer(pid);
-                passBtn.gameObject.SetActive(!nextPlayer.isAI);
-                GameManager.Instance.OnPlayerTurn(pid);
-                mySelect.UpdateCards(nextPlayer);
-                return;
-            }
-        }
-    }
-
-
-    public void AfterAct()
-    {
-        NextTurn();
-
-        // 只有一轮选牌：所有玩家都跳过时，选牌阶段结束进入战斗
-        if (passedPlayers >= 8)
-        {
-            StartCoroutine(ShopEnd());
-        }
-    }
-
-    // 玩家选中（购买）一张卡：该卡保持售出状态并设置售出倒计时；相邻卡 round-1，归0立即刷新；每次有其他卡售出，所有已售出卡的倒计时-1，归0刷新
-    private void OnCardSelected(CardViewControl ctr)
-    {
-        // 需要刷新（roundLeft归0）的卡先收集，遍历结束后再统一刷新，避免遍历中修改cardViews
-        var toRefresh = new List<CardViewControl>();
-
-        // 相邻未售出卡 round-1，归0立即刷新
-        foreach (var adj in GetAdjacentCards(ctr))
-        {
-            if (adj.isSold)
-                continue;
-            adj.roundLeft--;
-            if (adj.roundLeft <= 0)
-                toRefresh.Add(adj);
-            else
-                adj.UpdateRoundLeft();
-        }
-
-        // 刚售出的卡设置售出倒计时
-        ctr.roundLeft = SOLD_REMAIN_ROUNDS;
-        ctr.UpdateRoundLeft();
-
-        // 每次有其他卡售出，所有已售出卡的倒计时-1，归0刷新
-        foreach (var card in cardViews)
-        {
-            if (!card.isSold || card == ctr)
-                continue;
-            card.roundLeft--;
-            if (card.roundLeft <= 0)
-                toRefresh.Add(card);
-            else
-                card.UpdateRoundLeft();
-        }
-
-        foreach (var card in toRefresh)
-            RefreshCard(card);
-    }
-
-    // 刷新卡位：重新加载prefab生成一张随机新卡（防止复用旧对象导致样式/尺寸残留），roundLeft 重置为3
-    private void RefreshCard(CardViewControl ctr)
-    {
-        int index = cardViews.IndexOf(ctr);
-        if (index < 0)
-            return;
-
-        var year = GameManager.Instance.year;
-        var shopCfg = GameRoundConfig.GetConfig(Math.Min(100, year));
-
-        // 重新加载prefab，避免旧卡对象残留刷新前的样式/尺寸
-        GameObject card = Instantiate(cardViewPrefab, transform);
-        CardViewControl newCtr = card.GetComponent<CardViewControl>();
-
-        if (ctr.isHeroCard)
-        {
-            // 按当前品质概率随机刷新，允许重复；每张卡有 LikeCardRefreshRate 概率替换为收藏卡
-            var heroId = GetRandomShopHeroId(shopCfg);
-            var heroPrice = HeroSelectionTool.GetPrice(HeroConfig.GetConfig(heroId));
-            newCtr.Init(heroId, true, GetMultiCount(heroPrice, shopCfg), year);
-        }
-        else
-        {
-            // 物品仅掉落获得，不参与商店，刷新后不补物品卡
-            Destroy(ctr.gameObject);
-            return;
-        }
-
-        // 保持原卡位的位置并替换列表引用，销毁旧卡
-        newCtr.GetComponent<RectTransform>().anchoredPosition = ctr.GetComponent<RectTransform>().anchoredPosition;
-        cardViews[index] = newCtr;
-
-        Destroy(ctr.gameObject);
-    }
-
-    // 刷新卡位出卡：先按 LikeCardRefreshRate 概率从收藏池随机出一张（收藏池=like阶段全部玩家点赞，8玩家×2张共16张，存于 HeroSelectionTool），
-    // 未命中（或收藏池空）则按 GameRoundConfig 品质概率随机出一张
-    private int GetRandomShopHeroId(GameRoundConfig shopCfg)
-    {
-        if (SysRandom.Range(0, 100) < CombatConst.LikeCardRefreshRate)
-        {
-            var likeId = HeroSelectionTool.GetRandomLikedHeroId();
-            if (likeId != 0)
-                return likeId;
-        }
-        return HeroSelectionTool.GetRandomHeroIdByQuality(shopCfg);
-    }
-
-    // 与初始刷牌一致的卡牌数量计算逻辑
-    private int GetMultiCount(int cardPrice, GameRoundConfig shopCfg)
-    {
-        var count = 1;
-        if (shopCfg.MultiPriceTotal > 2 * cardPrice)
-        {
-            var roll = SysRandom.Range(0, 100);
-            if (roll < shopCfg.MultiCardRate)
-            {
-                count = SysRandom.Range(1, shopCfg.MultiPriceTotal / cardPrice + 1);
-            }
-
-            if (count == 1)
-                count = Math.Max(1, shopCfg.MultiPriceTotal / 3 / cardPrice);
-        }
-        return Mathf.Min(count, 2); // 同一英雄卡最多2张
-    }
-
-    // 获取一张卡的相邻卡：英雄卡在3列网格中算上下左右，道具卡在一行中算左右
-    private List<CardViewControl> GetAdjacentCards(CardViewControl ctr)
-    {
-        var result = new List<CardViewControl>();
-        int index = cardViews.IndexOf(ctr);
-        if (index < 0)
-            return result;
-
-        if (ctr.isHeroCard)
-        {
-            const int CARDS_PER_ROW = 3;
-            int row = index / CARDS_PER_ROW;
-            int col = index % CARDS_PER_ROW;
-            TryAddAdjacent(result, row - 1, col);
-            TryAddAdjacent(result, row + 1, col);
-            TryAddAdjacent(result, row, col - 1);
-            TryAddAdjacent(result, row, col + 1);
-        }
-        else
-        {
-            if (index - 1 >= 0 && !cardViews[index - 1].isHeroCard)
-                result.Add(cardViews[index - 1]);
-            if (index + 1 < cardViews.Count && !cardViews[index + 1].isHeroCard)
-                result.Add(cardViews[index + 1]);
-        }
-        return result;
-    }
-
-    private void TryAddAdjacent(List<CardViewControl> result, int row, int col)
-    {
-        if (row < 0 || col < 0 || row > 4 || col > 2)
-            return;
-        int i = row * 3 + col;
-        if (i < cardViews.Count && cardViews[i].isHeroCard)
-            result.Add(cardViews[i]);
-    }
-
     // 8 个基础道具（合成材料，id 连续 402001~402008）
     private static readonly int[] BaseItemIds = { 402001, 402002, 402003, 402004, 402005, 402006, 402007, 402008 };
 
@@ -639,6 +420,39 @@ public class CardShopManager : MonoBehaviour
             GameLog.Debug($"调试补齐基础道具：玩家0 获得 {given} 个");
     }
 
+    private void BeginEraCommon()
+    {
+        // 新商店阶段的公共开场：重置回合/era 状态、记录开局金币、落后补金
+        foreach (var player in GameManager.Instance.players)
+            player.OnEra(era);
+
+        eraText.text = ShopCfg.Name;
+
+        for (int i = 0; i < 8; i++)
+            GameManager.Instance.GetPlayer(i).SetRoundOver(false);
+
+        for (int i = 0; i < 8; i++)
+            playerStartGold[i] = GameManager.Instance.GetPlayer(i).gold; // 记录开局金币
+
+        CheckEraBonusGold();
+
+        era++;
+
+        GameManager.Instance.PlaySound("Sounds/page");
+    }
+
+    private ShopMode CreateMode(ShopModeType type)
+    {
+        switch (type)
+        {
+            case ShopModeType.Independent:
+                return new IndependentShopMode();
+            case ShopModeType.Shared:
+            default:
+                return new SharedShopMode();
+        }
+    }
+
     public void ShopBegin()
     {
         GameLog.Debug("ShopBegin");
@@ -660,8 +474,8 @@ public class CardShopManager : MonoBehaviour
         }
 
         var shopOpenIndex = GameManager.Instance.year; //第几场比赛
-        var shopCfg = GameRoundConfig.GetConfig(Math.Min(100, shopOpenIndex + 1));
-        var roundGold = shopCfg.RoundGold;
+        ShopCfg = GameRoundConfig.GetConfig(Math.Min(100, shopOpenIndex + 1));
+        var roundGold = ShopCfg.RoundGold;
         for(int i = 0; i < 8; i++)
             GameManager.Instance.GetPlayer(i).RoundGold(roundGold);
 
@@ -682,18 +496,36 @@ public class CardShopManager : MonoBehaviour
 
         GameManager.Instance.year++;
         era = 0;
-        NewEra();     
-        shopCoroutine = StartCoroutine(DelayedUpdate()); 
+
+        BeginEraCommon();
+
+        // 依据本回合配置选择商店模式（0=共享轮换，1=独立买卡）
+        Mode = CreateMode((ShopModeType)ShopCfg.ShopType);
+        Mode.Bind(this);
+        Mode.Begin();
+        RefreshRateText(); // 新回合开始刷新稀有度概率文本
+        shopCoroutine = StartCoroutine(Mode.Drive());
+    }
+
+    /// <summary>由商店模式在本阶段结束时调用：进入战斗</summary>
+    public void RequestEnd()
+    {
+        if (IsShopEnd)
+            return;
+        IsShopEnd = true;
+        StartCoroutine(ShopEnd());
     }
 
     private IEnumerator ShopEnd()
     {
-        isShopEnd = true;
+        IsShopEnd = true;
 
         yield return new WaitForSeconds(0.5f);
         if(shopCoroutine != null)
             StopCoroutine(shopCoroutine);
         shopCoroutine = null;
+
+        Mode?.End();
 
         GameManager.Instance.ClearTurn();
 

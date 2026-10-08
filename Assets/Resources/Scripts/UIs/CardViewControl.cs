@@ -59,8 +59,7 @@ public class CardViewControl : MonoBehaviour, IPointerDownHandler, IPointerUpHan
 
                 if (count == 1 || nowPlayer.gold < priceI * 2)
                 {
-                    if (CardShopManager.Instance.OnPlayerBuyCard(this, nowPlayer, cardId, isHeroCard, priceI, 1))
-                        CardShopManager.Instance.AfterAct();
+                    CardShopManager.Instance.RequestBuy(this, nowPlayer, priceI, 1);
                 }
                 else
                 {
@@ -72,8 +71,7 @@ public class CardViewControl : MonoBehaviour, IPointerDownHandler, IPointerUpHan
                     else
                     {
                         var nowCount = int.Parse(price.text) / priceI;
-                        if (CardShopManager.Instance.OnPlayerBuyCard(this, nowPlayer, cardId, isHeroCard, priceI * nowCount, nowCount))
-                            CardShopManager.Instance.AfterAct();
+                        CardShopManager.Instance.RequestBuy(this, nowPlayer, priceI * nowCount, nowCount);
                     }
                 }
             }
@@ -190,6 +188,19 @@ public class CardViewControl : MonoBehaviour, IPointerDownHandler, IPointerUpHan
 
         roundLeft = 3;
         UpdateRoundLeft();
+    }
+
+    /// <summary>把本卡位转成一份“可购卡报价”（供商店模式/AI 统一处理）</summary>
+    public ShopOffer ToOffer()
+    {
+        return new ShopOffer
+        {
+            cardId = cardId,
+            isHero = isHeroCard,
+            price = priceI,
+            count = count,
+            view = this,
+        };
     }
 
     // 刷新剩余轮数显示

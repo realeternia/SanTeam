@@ -22,6 +22,7 @@ public class WorldManager : MonoBehaviour
     private int[] killMark = new int[8];
     private int[] deathOrder = new int[8]; // 记录各阵营的死亡顺序，0表示未死亡
     private int deathCount = 0; // 记录已死亡的阵营数量
+    private bool[] sideBattleOver = new bool[8]; // 各阵营战斗是否已结束（无存活敌方：如 TeamMode0 独立配对中对手先被全灭）
 
     private bool gameFinish = false;
     private bool hasWin;
@@ -114,6 +115,7 @@ public class WorldManager : MonoBehaviour
         killMark = new int[8];
         deathOrder = new int[8];
         deathCount = 0;
+        sideBattleOver = new bool[8]; // 各阵营战斗结束状态本场重置
         // 清理上一场残留的掉落包
         foreach (var drop in bagDrops)
         {
@@ -1210,6 +1212,7 @@ public class WorldManager : MonoBehaviour
 
         gameFinish = false;
         hasWin = false;
+        RecomputeSideBattleOver(); // 单位阵亡后重算各阵营"战斗是否已结束"（无存活敌方即结束）
         if (isPveRound)
         {
             HandlePveUnitDying(dieUnit, killerPlayerId);
@@ -1543,6 +1546,39 @@ public class WorldManager : MonoBehaviour
             }
         }
         return unitsInRange;
+    }
+
+    /// <summary>
+    /// 该阵营的战斗是否已结束：整体战斗已结束，或该方已无存活敌方
+    /// （如 TeamMode0 的四个独立配对中对手先被全灭、其他配对仍在打）。
+    /// 战斗结束的一方不再回血/回蓝，也不再承受疲劳伤害（冻结该方）。
+    /// </summary>
+    public bool IsSideBattleOver(int side)
+    {
+        if (gameFinish)
+            return true;
+        if (side < 1 || side > sideBattleOver.Length)
+            return false;
+        return sideBattleOver[side - 1];
+    }
+
+    // 重算各阵营战斗结束状态（单位阵亡移除后调用）：某阵营已无存活敌方即视为战斗结束
+    private void RecomputeSideBattleOver()
+    {
+        for (int side = 1; side <= sideBattleOver.Length; side++)
+        {
+            bool hasEnemy = false;
+            foreach (var chessComponent in chessList)
+            {
+                if (chessComponent != null && chessComponent.hp > 0 && !chessComponent.isShadow
+                    && IsEnemy(side, chessComponent.side))
+                {
+                    hasEnemy = true;
+                    break;
+                }
+            }
+            sideBattleOver[side - 1] = !hasEnemy;
+        }
     }
 
     public Chess FindByHeroIdAndSide(int heroId, int side)

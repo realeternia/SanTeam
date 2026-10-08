@@ -294,6 +294,11 @@ public class Chess : MonoBehaviour
     // 每秒事件：hpRegen/mpRegen 等按秒结算的逻辑统一在此处理
     private void OnSecond()
     {
+        // 战斗已结束的一方（自身无存活敌方）冻结：不再回血/回蓝
+        var world = WorldManager.Instance;
+        if (world != null && world.IsSideBattleOver(side))
+            return;
+
         if (hpRegen != 0)
         {
             // 生命回复属性：正=回复，负=扣减（可为负=持续扣减）
@@ -1117,7 +1122,7 @@ public class Chess : MonoBehaviour
             // 使用正弦函数实现颜色平滑过渡
             float t = Mathf.Sin(time*20) * 0.5f + 0.5f;
             var color = Color.Lerp(start, end, t);
-            GameLog.Debug("ColorLerpCoroutine " + color + " start=" + start + " end=" + end);
+            //GameLog.Debug("ColorLerpCoroutine " + color + " start=" + start + " end=" + end);
 
             material.SetColor("_Color", color);
             time += Time.deltaTime;

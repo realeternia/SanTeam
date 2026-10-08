@@ -69,7 +69,7 @@ public static class PlayerAI
     }
 
 
-    public static bool AiCheckBuyCard(PlayerInfo playerInfo, int era)
+    public static bool AiCheckBuyCard(PlayerInfo playerInfo, int era, List<ShopOffer> offers)
     {
         if(playerInfo.nextSkip)
             return false;
@@ -79,22 +79,20 @@ public static class PlayerAI
         var playerConfig = playerInfo.playerConfig;
         var cards = playerInfo.cards;
 
-        // 获取所有未售出的卡片
-        List<CardViewControl> availableCards = CardShopManager.Instance.cardViews
-            .Where(card => !card.isSold)
-            .ToList();
+        // 当前可购卡报价（由商店模式提供：共享=全部未售共享卡；独立=该玩家私有商店）
+        List<ShopOffer> availableCards = offers;
 
         // 如果没有可用卡片，直接返回
-        if (availableCards.Count == 0)
+        if (availableCards == null || availableCards.Count == 0)
             return false;
 
         // 过滤掉买不起的卡片
-        var affordableCards = availableCards.Where(card => playerInfo.gold >= card.priceI).ToList(); //看一张卡的价格
+        var affordableCards = availableCards.Where(card => playerInfo.gold >= card.price).ToList(); //看一张卡的价格
         if (affordableCards.Count == 0)
             return false;
 
         // 商店不卖道具：只考虑英雄卡
-        affordableCards = affordableCards.Where(card => card.isHeroCard).ToList();
+        affordableCards = affordableCards.Where(card => card.isHero).ToList();
         // 满级(Lv5)英雄卡不再提供经验，买入纯亏金币：直接从候选剔除（同卡加经验、换卡两种情形都不买）
         affordableCards = affordableCards
             .Where(card => !(cards.ContainsKey(card.cardId) && HeroSelectionTool.IsHeroCardMaxLevel(cards[card.cardId])))
@@ -126,7 +124,7 @@ public static class PlayerAI
         float smart = Mathf.Clamp(playerConfig.Intelligence, 1, 99) / 99f;
 
         // 计算每张卡片的加权分
-        List<(CardViewControl card, float score)> scoredCards = new List<(CardViewControl card, float score)>();
+        List<(ShopOffer card, float score)> scoredCards = new List<(ShopOffer card, float score)>();
         foreach (var pickCard in affordableCards)
         {
             float score = 1f;
@@ -140,12 +138,12 @@ public static class PlayerAI
                 if (year < 8)
                 {
                     score *= (1 + Math.Max(0, 0.15f * (4 - cards[pickCard.cardId]))); // 优先拿低等级卡
-                    if (pickCard.isHeroCard && !strongList.Contains(pickCard.cardId)) //非主力卡-权重
+                    if (pickCard.isHero && !strongList.Contains(pickCard.cardId)) //非主力卡-权重
                         score *= 0.7f;
                 }
                 else
                 {
-                    if (pickCard.isHeroCard && !strongList.Contains(pickCard.cardId)) //非主力卡-权重
+                    if (pickCard.isHero && !strongList.Contains(pickCard.cardId)) //非主力卡-权重
                         score *= Math.Max(.5f - (year - 8) * 0.05f + cards[pickCard.cardId] * .1f, 0.1f); //card数多可以救一救
                 }
 
@@ -153,10 +151,10 @@ public static class PlayerAI
             }
 
             // 计算并记录买卡的价格偏好 bias
-            float buyBias = GetBuyCostBias(pickCard.priceI, year, playerConfig);
+            float buyBias = GetBuyCostBias(pickCard.price, year, playerConfig);
             score *= 1f + buyBias;
 
-            if (pickCard.isHeroCard)
+            if (pickCard.isHero)
             {
                 var heroCfg = HeroConfig.GetConfig(pickCard.cardId);
                 bool strongExempt = heroCfg.Quality == 4; // 品质4强卡豁免软上限：超限也照常买入
@@ -172,10 +170,10 @@ public static class PlayerAI
                     if (weakHeroCard == null) //没有可以换的卡
                         continue;
 
-                    if (pickCard.priceI < weakHeroCard.Item2)
+                    if (pickCard.price < weakHeroCard.Item2)
                         continue; //没必要换更弱的卡
 
-                    if (year > 8 && pickCard.priceI < weakHeroCard.Item2 + year - 8)
+                    if (year > 8 && pickCard.price < weakHeroCard.Item2 + year - 8)
                         continue; //新卡价格还不如旧卡，没必要换
                 }
                 // 近战/远程与羁绊统计均按"新增英雄"计算：重复卡（升星）只吃同卡分
@@ -235,7 +233,7 @@ public static class PlayerAI
         //scoredCards的key的priceI前三3的卡分别（1.5，1.3，1.1）
         if (scoredCards.Count >= 5 && scoredCards.Max(x => x.score) < 1.6f)
         {
-            var top3Cards = scoredCards.OrderByDescending(x => x.card.priceI * x.card.count).Take(3).ToList();
+            var top3Cards = scoredCards.OrderByDescending(x => x.card.price * x.card.count).Take(3).ToList();
             for (int i = 0; i < top3Cards.Count; i++)
             {
                 var card = top3Cards[i];
@@ -254,8 +252,8 @@ public static class PlayerAI
         for (int i = 0; i < scoredCards.Count; i++)
         {
             var card = scoredCards[i];
-            float cardBuyBias = GetBuyCostBias(card.card.priceI, year, playerConfig);
-            sb.AppendLine($"  [{i+1}] 卡片ID: {card.card.cardId}, 名称: {card.card.cardName.text}, 分数: {card.score}, 价格: {card.card.priceI}, buyBias: {cardBuyBias:F2}");
+            float cardBuyBias = GetBuyCostBias(card.card.price, year, playerConfig);
+            sb.AppendLine($"  [{i+1}] 卡片ID: {card.card.cardId}, 名称: {HeroConfig.GetConfig(card.card.cardId).Name}, 分数: {card.score}, 价格: {card.card.price}, buyBias: {cardBuyBias:F2}");
         }
 
         // 聪明度越高候选池越窄（只在最优的几张里挑）；越低越宽（更容易随机到次优卡）
@@ -269,7 +267,7 @@ public static class PlayerAI
 
         // 根据随机值和权重选择卡片
         float cumulativeWeight = 0f;
-        CardViewControl selectedCard = null;
+        ShopOffer selectedCard = null;
         foreach (var item in scoredCards)
         {
             cumulativeWeight += item.score;
@@ -286,7 +284,7 @@ public static class PlayerAI
 
         if (selectedCard != null)
         {
-            sb.AppendLine($"选中卡片: ID={selectedCard.cardId}, 名称={selectedCard.cardName.text}, roll={randomValue}, 英雄卡={selectedCard.isHeroCard}");
+            sb.AppendLine($"选中卡片: ID={selectedCard.cardId}, 名称={HeroConfig.GetConfig(selectedCard.cardId).Name}, roll={randomValue}, 英雄卡={selectedCard.isHero}");
         }
         else
         {
@@ -299,7 +297,7 @@ public static class PlayerAI
         // 软上限：品质4强卡豁免（超限直接买，不强制卖弱）；非强卡超限且未被拒买时才卖旧买新
         // 硬上限（PlayerMaxHeroCards）：背包已满时新英雄必须卖弱卡腾位才能买入，品质4也不例外，否则购买必然失败
         bool atHardCap = heroCardCount >= CombatConst.PlayerMaxHeroCards;
-        if (selectedCard.isHeroCard && heroCardCount >= playerInfo.GetSlotCount() + playerConfig.Cardherolimit && !hasSameCard && weakHeroCard != null
+        if (selectedCard.isHero && heroCardCount >= playerInfo.GetSlotCount() + playerConfig.Cardherolimit && !hasSameCard && weakHeroCard != null
             && (HeroConfig.GetConfig(selectedCard.cardId).Quality != 4 || atHardCap)
             && playerInfo.aiShopSellCount < CombatConst.AiMaxSellPerShop)
         {
@@ -312,12 +310,12 @@ public static class PlayerAI
         {
             // 看未来：下回合品质更好时按 Futurerate 少囤卡、留钱；更差时照常买满
             float saveMood = 1f - Mathf.Clamp(playerConfig.Futurerate, 0f, 1f) * Mathf.Max(0f, futureBias);
-            finalBuyCount = Mathf.Clamp((int)Math.Round(playerInfo.gold * 2f / 3f / selectedCard.priceI * saveMood), 1, selectedCard.count);
+            finalBuyCount = Mathf.Clamp((int)Math.Round(playerInfo.gold * 2f / 3f / selectedCard.price * saveMood), 1, selectedCard.count);
         }
 
         // 返回真实购买结果：英雄卡已满且无弱卡可卖等情况下购买会失败，
         // 此时必须返回 false 让调用方把该玩家标记为跳过本回合，否则 AI 会一直"选牌成功"却不跳过，导致选牌阶段死循环卡住
-        return CardShopManager.Instance.OnPlayerBuyCard(selectedCard, playerInfo, selectedCard.cardId, selectedCard.isHeroCard, selectedCard.priceI * finalBuyCount, finalBuyCount);
+        return CardShopManager.Instance.BuyOffer(playerInfo, selectedCard, finalBuyCount);
     }
 
     private static float GetBuyCostBias(int cardPrice, int year, PlayerConfig cfg)
