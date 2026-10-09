@@ -58,6 +58,8 @@ public class Chess : MonoBehaviour
     public bool blessedByXunYu;
     // 伤害结算事件：attacker, victim, damage, skillId(0=普攻)。供战斗模拟器精确捕获每次伤害（飘字/日志），避免逐帧血量差分漏记
     public static event System.Action<Chess, Chess, int, int> OnDamageDealt;
+    // 治疗结算事件：healer, target, effectiveHeal(不超过目标生命缺口的有效治疗量)。仅真实治疗(isHeal=true)触发，供战斗模拟器统计治疗榜
+    public static event System.Action<Chess, Chess, int> OnHealDealt;
 
     private Vector3? moveDest = null;
     // 本 tick 是否已通过寻路移动过(移动单位由移动互斥力控制间距，未移动的走位置级间距松弛，避免重复施加)
@@ -1020,7 +1022,16 @@ public class Chess : MonoBehaviour
             addon = Mathf.RoundToInt(addon * (1f + healRate + target.healedRate));
         }
         if (addon > 0)
+        {
+            // 有效治疗量 = 不超过目标生命缺口（供战斗模拟器统计治疗榜，避免满血过量治疗虚高）
+            int effective = Mathf.Min(addon, Mathf.Max(0, target.maxHp - target.hp));
             target.AddHp(addon);
+            if (isHeal && effective > 0)
+            {
+                var evt = OnHealDealt;
+                if (evt != null) evt(this, target, effective);
+            }
+        }
     }
 
     public void Cooldown(float time)

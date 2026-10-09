@@ -51,11 +51,20 @@ public static class BatchSimRunner
         public int Appear, Win, Loss, Draw;
         public float HeroDamageTotal;   // 对敌方英雄造成的累计伤害（用于场均）
         public float MagicDamageTotal;  // 造成的累计法术伤害（DamageType=法术，任意目标）
+        public float HealTotal;         // 技能真实治疗累计（有效治疗量，不超过目标生命缺口）
+        public float DamageTakenTotal;  // 承伤累计（自身生命实际损失 + 自身护盾抵挡的伤害）
+        public float ShieldAddTotal;    // 加盾累计（该英雄作为施法者提供的护盾值增量）
         public float Rate { get { return Appear > 0 ? (float)Win / Appear : 0f; } }
         // 场均对英雄伤害 = 累计伤害 / 出场场次
         public float AvgHeroDamage { get { return Appear > 0 ? HeroDamageTotal / Appear : 0f; } }
         // 场均法术伤害 = 累计法术伤害 / 出场场次
         public float AvgMagicDamage { get { return Appear > 0 ? MagicDamageTotal / Appear : 0f; } }
+        // 场均治疗量
+        public float AvgHeal { get { return Appear > 0 ? HealTotal / Appear : 0f; } }
+        // 场均承伤
+        public float AvgDamageTaken { get { return Appear > 0 ? DamageTakenTotal / Appear : 0f; } }
+        // 场均加盾
+        public float AvgShieldAdd { get { return Appear > 0 ? ShieldAddTotal / Appear : 0f; } }
     }
 
     // 一件随机装备的绑定记录（harness 桩仅提供二元 ValueTuple，故用结构体）
@@ -66,55 +75,97 @@ public static class BatchSimRunner
         public int side;
     }
 
-    // 本场累积（由 Chess.OnDamageDealt 驱动，攻击方必须是英雄）：
+    // 本场累积（由 Chess / BuffShield 事件驱动，统计对象必须是英雄）：
     // _heroDamageToHero：对敌方英雄造成的伤害（英雄打英雄）
     // _magicDamage：造成的法术伤害（SkillConfig.DamageType=法术，任意目标）
+    // _healDone：技能真实治疗量（healer → 有效治疗量）
+    // _damageTaken：承伤（受击英雄的生命实际损失 + 施法者护盾抵挡的伤害，均按英雄归属）
+    // _shieldAdd：加盾（施法者提供的护盾值增量）
     private static Dictionary<int, float> _heroDamageToHero;
     private static Dictionary<int, float> _magicDamage;
+    private static Dictionary<int, float> _healDone;
+    private static Dictionary<int, float> _damageTaken;
+    private static Dictionary<int, float> _shieldAdd;
 
     static BatchSimRunner()
     {
         Chess.OnDamageDealt += (a, v, d, sk) =>
         {
-            if (_heroDamageToHero == null || a == null || v == null || d <= 0)
-                return;
-            if (!a.isHero)
-                return;
-            if (v.isHero)
+            // 输出侧：对敌方英雄伤害 / 法术伤害（攻击方必须是英雄）
+            if (_heroDamageToHero != null && a != null && a.isHero && d > 0)
             {
-                float cur;
-                _heroDamageToHero.TryGetValue(a.heroId, out cur);
-                _heroDamageToHero[a.heroId] = cur + d;
-            }
-            if (sk > 0)
-            {
-                var cfg = SkillConfig.GetConfig(sk);
-                if (cfg != null && cfg.DamageType == CombatConst.DamageTypeMagic)
+                if (v != null && v.isHero)
                 {
                     float cur;
-                    _magicDamage.TryGetValue(a.heroId, out cur);
-                    _magicDamage[a.heroId] = cur + d;
+                    _heroDamageToHero.TryGetValue(a.heroId, out cur);
+                    _heroDamageToHero[a.heroId] = cur + d;
+                }
+                if (sk > 0)
+                {
+                    var cfg = SkillConfig.GetConfig(sk);
+                    if (cfg != null && cfg.DamageType == CombatConst.DamageTypeMagic)
+                    {
+                        float cur;
+                        _magicDamage.TryGetValue(a.heroId, out cur);
+                        _magicDamage[a.heroId] = cur + d;
+                    }
                 }
             }
+            // 承受侧：受击英雄的生命实际损失（护盾抵挡部分由 OnShieldAbsorb 单独归施法者）
+            if (_damageTaken != null && v != null && v.isHero && d > 0)
+            {
+                float cur;
+                _damageTaken.TryGetValue(v.heroId, out cur);
+                _damageTaken[v.heroId] = cur + d;
+            }
+        };
+        Chess.OnHealDealt += (healer, target, amount) =>
+        {
+            if (_healDone == null || healer == null || amount <= 0 || !healer.isHero)
+                return;
+            float cur;
+            _healDone.TryGetValue(healer.heroId, out cur);
+            _healDone[healer.heroId] = cur + amount;
+        };
+        BuffShield.OnShieldAdd += (caster, target, amount) =>
+        {
+            if (_shieldAdd == null || caster == null || amount <= 0 || !caster.isHero)
+                return;
+            float cur;
+            _shieldAdd.TryGetValue(caster.heroId, out cur);
+            _shieldAdd[caster.heroId] = cur + amount;
+        };
+        BuffShield.OnShieldAbsorb += (caster, defender, amount) =>
+        {
+            if (_damageTaken == null || caster == null || amount <= 0 || !caster.isHero)
+                return;
+            float cur;
+            _damageTaken.TryGetValue(caster.heroId, out cur);
+            _damageTaken[caster.heroId] = cur + amount;
         };
     }
 
-    // 把本场伤害累加到各武将行（对英雄伤害 / 法术伤害）
-    private static void AddRoundDamage(Dictionary<int, StatRow> stats, List<(int id, int lv)> team,
-        Dictionary<int, float> toHero, Dictionary<int, float> magic)
+    // 把本场统计累加到各武将行（伤害 / 法术伤害 / 治疗 / 承伤 / 加盾）
+    private static void AddRoundStats(Dictionary<int, StatRow> stats, List<(int id, int lv)> team,
+        Dictionary<int, float> toHero, Dictionary<int, float> magic,
+        Dictionary<int, float> heal, Dictionary<int, float> taken, Dictionary<int, float> shield)
     {
-        if (toHero == null)
-            return;
         foreach (var h in team)
         {
             StatRow row;
             if (!stats.TryGetValue(h.id, out row))
                 continue;
             float v;
-            if (toHero.TryGetValue(h.id, out v))
+            if (toHero != null && toHero.TryGetValue(h.id, out v))
                 row.HeroDamageTotal += v;
             if (magic != null && magic.TryGetValue(h.id, out v))
                 row.MagicDamageTotal += v;
+            if (heal != null && heal.TryGetValue(h.id, out v))
+                row.HealTotal += v;
+            if (taken != null && taken.TryGetValue(h.id, out v))
+                row.DamageTakenTotal += v;
+            if (shield != null && shield.TryGetValue(h.id, out v))
+                row.ShieldAddTotal += v;
         }
     }
 
@@ -192,6 +243,9 @@ public static class BatchSimRunner
 
             _heroDamageToHero = new Dictionary<int, float>();
             _magicDamage = new Dictionary<int, float>();
+            _healDone = new Dictionary<int, float>();
+            _damageTaken = new Dictionary<int, float>();
+            _shieldAdd = new Dictionary<int, float>();
             battle.Start(seed);
             int steps = 0;
             while (!battle.IsFinished && steps < MaxSteps)
@@ -205,8 +259,14 @@ public static class BatchSimRunner
             roundTimes.Add(steps * StepDt + BattleStartDelaySeconds);
             var roundHeroDamage = _heroDamageToHero;
             var roundMagicDamage = _magicDamage;
+            var roundHeal = _healDone;
+            var roundTaken = _damageTaken;
+            var roundShield = _shieldAdd;
             _heroDamageToHero = null;   // 本场结束，停止累积
             _magicDamage = null;
+            _healDone = null;
+            _damageTaken = null;
+            _shieldAdd = null;
 
             int winner = (!battle.IsFinished || battle.IsDraw) ? 0 : (battle.HasWin ? 1 : 2);   // 0=平局(步数上限或双方同刻全灭)
             if (winner == 1) winA++;
@@ -217,8 +277,8 @@ public static class BatchSimRunner
             RecordTeam(teamB, 2, winner, heroStats);
             RecordGroup(groupStats, groupA, 1, winner);
             RecordGroup(groupStats, groupB, 2, winner);
-            AddRoundDamage(heroStats, teamA, roundHeroDamage, roundMagicDamage);
-            AddRoundDamage(heroStats, teamB, roundHeroDamage, roundMagicDamage);
+            AddRoundStats(heroStats, teamA, roundHeroDamage, roundMagicDamage, roundHeal, roundTaken, roundShield);
+            AddRoundStats(heroStats, teamB, roundHeroDamage, roundMagicDamage, roundHeal, roundTaken, roundShield);
             foreach (var e in equips)
                 RecordOne(itemStats, e.itemId, ItemName(e.itemId), "-", 0, e.side, winner);
 
@@ -350,6 +410,18 @@ public static class BatchSimRunner
         AppendHeroRows(sb, heroRows, opt.TotalPrice);
         sb.AppendLine();
 
+        sb.AppendLine("【治疗榜 · 前30】按场均治疗量降序（仅技能真实治疗 isHeal=true；有效治疗量 = 不超过目标生命缺口的治疗量；场均 = 累计 / 出场场次）");
+        AppendContributionBoard(sb, heroRows, r => r.HealTotal, r => r.AvgHeal, "治疗量");
+        sb.AppendLine();
+
+        sb.AppendLine("【承伤榜 · 前30】按场均承伤降序（承伤 = 受击英雄的生命实际损失 + 该英雄作为施法者其护盾抵挡的伤害；场均 = 累计 / 出场场次）");
+        AppendContributionBoard(sb, heroRows, r => r.DamageTakenTotal, r => r.AvgDamageTaken, "承伤");
+        sb.AppendLine();
+
+        sb.AppendLine("【加盾榜 · 前30】按场均加盾降序（加盾 = 该英雄作为施法者提供的护盾值增量（刷新护盾只计增量），归施法者；场均 = 累计 / 出场场次）");
+        AppendContributionBoard(sb, heroRows, r => r.ShieldAddTotal, r => r.AvgShieldAdd, "加盾");
+        sb.AppendLine();
+
         sb.AppendLine("【职业胜率】按胜率降序（该职业全部英雄的出场/胜负合并统计）");
         sb.AppendLine(JobHeader());
         AppendJobRows(sb, jobRows);
@@ -464,6 +536,34 @@ public static class BatchSimRunner
                 r.Quality > 0 ? r.Quality.ToString() : "-",
                 LevelForPrice(r.Id, totalPrice),
                 r.Appear, r.Win, r.Loss, r.Draw, r.Rate, r.AvgHeroDamage, r.AvgMagicDamage));
+        }
+    }
+
+    // 英雄贡献榜（治疗/承伤/加盾）：按场均降序取前30，仅列出该指标累计>0的英雄
+    private static void AppendContributionBoard(StringBuilder sb, List<StatRow> heroRows,
+        Func<StatRow, float> total, Func<StatRow, float> avg, string valueName)
+    {
+        var rows = heroRows
+            .Where(r => avg(r) > 0f)
+            .OrderByDescending(avg)
+            .ThenByDescending(total)
+            .ThenBy(r => r.Id)
+            .Take(30)
+            .ToList();
+        if (rows.Count == 0)
+        {
+            sb.AppendLine("(无数据)");
+            return;
+        }
+        sb.AppendLine(string.Format("{0,4}  {1,8}  {2,-10}  {3,-6}  {4,4}  {5,6}  {6,12}  {7,12}",
+            "排名", "ID", "名字", "职业", "品质", "出场", "场均" + valueName, "累计" + valueName));
+        int rank = 1;
+        foreach (var r in rows)
+        {
+            sb.AppendLine(string.Format("{0,4}  {1,8}  {2,-10}  {3,-6}  {4,4}  {5,6}  {6,12:N0}  {7,12:N0}",
+                rank++, r.Id, r.Name, string.IsNullOrEmpty(r.Job) ? "-" : r.Job,
+                r.Quality > 0 ? r.Quality.ToString() : "-",
+                r.Appear, avg(r), total(r)));
         }
     }
 
