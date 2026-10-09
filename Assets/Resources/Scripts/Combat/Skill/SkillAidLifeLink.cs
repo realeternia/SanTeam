@@ -3,7 +3,8 @@ using CommonConfig;
 using UnityEngine;
 
 /// <summary>
-/// 貂蝉·连环：与生命比例最低的友军建立生命链接（双方各挂 BuffLifeLink），链接期间双方按 /strengthbuff1-1 比例共享伤害。
+/// 貂蝉·离间：与生命比例最低的友军建立生命链接（双方各挂 BuffLifeLink），链接期间双方按 /strengthbuff1-1 比例共享伤害，
+/// 并在链接建立时按统一治疗公式 GetSkillHeal() 立即治疗被链接的友军（吃医职业治疗加成）。
 /// </summary>
 public class SkillAidLifeLink : Skill
 {
@@ -37,6 +38,11 @@ public class SkillAidLifeLink : Skill
         // 双方各挂一份，张梁持链侧 BeforeCalDamaged 把伤害分享给自身
         BuffManager.AddBuff(lowest, owner, id, linkId, skillCfg.BuffTime);
         BuffManager.AddBuff(owner, owner, id, linkId, skillCfg.BuffTime);
+
+        // 链接建立时立即治疗被链接的友军（走统一治疗公式，吃医职业治疗加成）
+        var heal = GetSkillHeal();
+        if (heal > 0)
+            owner.HealTarget(lowest, skillId, heal, true);
 
         EffectManager.PlaySkillEffect(owner, skillCfg.HitEffect);
         return true;

@@ -7,6 +7,7 @@ using CommonConfig;
 using DG.Tweening;
 using UnityEngine.EventSystems;
 using System;
+using System.Linq;
 
 public class CardViewControl : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 {
@@ -18,8 +19,9 @@ public class CardViewControl : MonoBehaviour, IPointerDownHandler, IPointerUpHan
     public bool isHeroCard;
     public Image soldImage;    
     public TMP_Text cardName;    
-    public TMP_Text price;    
-    public TMP_Text roundLeftText;    
+    public TMP_Text price;
+    public TMP_Text roundLeftText;
+    public GameObject roundLeftIconNode;
     public Button buyButton;
     public Button addButton;
     public Button reduceButton;
@@ -150,15 +152,47 @@ public class CardViewControl : MonoBehaviour, IPointerDownHandler, IPointerUpHan
             if (count > 1)
                 cardName.text += "x" + count;
 
-            // 卡面只显示职业兵种技能图标，个人技能(Skill1)不在卡面显示
+            // 卡面技能图标：slot0=职业兵种技能（个人技能 Skill1 不显示）；slot1/2=该英雄所属好友组的关联技能图标，无则不显示
             var jobCfg = ConfigManager.GetJobConfig(heroCfg.Job);
             var jobSkillCfg = jobCfg != null ? ConfigManager.GetSkillConfig(jobCfg.NameS) : null;
+
+            // 好友组特殊连接技能图标（HeroFriendConfig.SkillId 非空），按组 Id 升序保证展示稳定
+            var friendSkillIcons = new List<string>();
+            var friendInfo = ConfigManager.GetHeroFriendInfo(cid);
+            if (friendInfo != null)
+            {
+                foreach (var relId in friendInfo.OrderBy(id => id))
+                {
+                    var relCfg = HeroFriendConfig.GetConfig(relId);
+                    if (relCfg == null || string.IsNullOrEmpty(relCfg.SkillId))
+                        continue;
+                    var relSkillCfg = ConfigManager.GetSkillConfig(relCfg.SkillId);
+                    if (relSkillCfg != null && !string.IsNullOrEmpty(relSkillCfg.Icon))
+                        friendSkillIcons.Add(relSkillCfg.Icon);
+                }
+            }
+
             for (int i = 0; i < heroJobImage.Length; i++)
             {
-                bool show = i == 0 && jobSkillCfg != null && !string.IsNullOrEmpty(jobSkillCfg.Icon);
-                heroJobImage[i].gameObject.SetActive(show);
+                string icon = null;
+                if (i == 0)
+                {
+                    if (jobSkillCfg != null && !string.IsNullOrEmpty(jobSkillCfg.Icon))
+                        icon = jobSkillCfg.Icon;
+                }
+                else if (i - 1 < friendSkillIcons.Count)
+                {
+                    icon = friendSkillIcons[i - 1];
+                }
+
+                bool show = icon != null;
+                // slot0 直接是图标节点；slot1/2 外面多套了一层容器（外框+图标），需隐藏/显示父节点，否则外框残留
+                GameObject node = (i == 0 || heroJobImage[i].transform.parent == null)
+                    ? heroJobImage[i].gameObject
+                    : heroJobImage[i].transform.parent.gameObject;
+                node.SetActive(show);
                 if (show)
-                    heroJobImage[i].sprite = Resources.Load<Sprite>("Textures/SkillPic/" + jobSkillCfg.Icon);
+                    heroJobImage[i].sprite = Resources.Load<Sprite>("Textures/SkillPic/" + icon);
             }
 
             gameObject.GetComponent<Image>().color = SysColor.GetSideColor(heroCfg.Side);
@@ -186,7 +220,13 @@ public class CardViewControl : MonoBehaviour, IPointerDownHandler, IPointerUpHan
 
         price.text = priceI.ToString();
 
+        // 单人选卡（独立买卡）模式卡面没有倒计时节点：缺 roundLeftText/roundLeftIconNode 时不计算也不显示剩余轮次
+        if (roundLeftText == null && roundLeftIconNode == null)
+            return;
+
         roundLeft = 3;
+        if (roundLeftIconNode != null)
+            roundLeftIconNode.SetActive(true);
         UpdateRoundLeft();
     }
 

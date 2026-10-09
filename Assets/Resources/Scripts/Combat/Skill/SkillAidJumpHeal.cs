@@ -12,7 +12,7 @@ using UnityEngine;
 public class SkillAidJumpHeal : Skill
 {
     /// <summary>每跳治疗量相对上一跳的衰减系数（本技能专用，不进 CombatConst）</summary>
-    private const float JumpHealDecay = 0.6f;
+    private const float JumpHealDecay = 0.85f;
     /// <summary>每跳之间的间隔(秒)（本技能专用，不进 CombatConst）</summary>
     private const float JumpHealInterval = 0.2f;
 

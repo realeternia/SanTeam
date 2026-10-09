@@ -90,6 +90,7 @@ public class WorldManager : MonoBehaviour
 
         // 从回合配置表读取本回合可能刷的地图，随机选一张
         gameFinish = false;
+        hasWin = false; // 本场重置胜负标记（阵亡处理里不再重置，见 OnUnitDying）
         currentMatch = null; // 重置号位分配，本场重新随机
         var roundCfg = GameRoundConfig.GetConfig(Math.Min(100, GameManager.Instance.year));
         isPveRound = roundCfg.RoundType == 1;
@@ -1210,8 +1211,10 @@ public class WorldManager : MonoBehaviour
         // 从chessList中移除死亡单位
         chessList.Remove(dieUnit);
 
-        gameFinish = false;
-        hasWin = false;
+        // 注意：这里绝不能重置 gameFinish/hasWin。同一 tick 内先后有多个单位阵亡时，
+        // 后一次死亡会把前一次已判定的结束标记抹掉；而该次死亡后的存活情况可能不再满足结束条件，
+        // 导致战斗永不结束、主循环 while(!gameFinish) 空转卡死（全灭后无任何日志，界面看起来永远不动）。
+        // gameFinish/hasWin 仅在本场 BattleBegin 时重置。
         RecomputeSideBattleOver(); // 单位阵亡后重算各阵营"战斗是否已结束"（无存活敌方即结束）
         if (isPveRound)
         {
@@ -1242,8 +1245,25 @@ public class WorldManager : MonoBehaviour
             }
 
             GameLog.Debug($"id:{dieUnit.id} dieUnit.side:{dieUnit.side} 存活阵营数:{aliveSideCount}");
-            // 如果只剩一个阵营有存活单位，显示重启按钮
-            if (aliveSideCount == 4)
+            // TeamMode0：独立配对（1-2/3-4/5-6/7-8），每个配对分出胜负即该配对结束。
+            // "所有配对都已分出胜负" ⇔ 存活阵营之间不存在任何互为敌人的组合。
+            // 不能写死 aliveSideCount==4：参战阵营数不足 8（如模拟/调试战斗只有 2 方）、或某配对双方同刻同灭时
+            // 该条件永远不满足，战斗永不结束 → 主循环空转卡死。
+            bool anyFightLeft = false;
+            for (int a = 1; a <= sideHasUnits.Length && !anyFightLeft; a++)
+            {
+                if (!sideHasUnits[a - 1])
+                    continue;
+                for (int b = a + 1; b <= sideHasUnits.Length; b++)
+                {
+                    if (sideHasUnits[b - 1] && IsEnemy(a, b))
+                    {
+                        anyFightLeft = true;
+                        break;
+                    }
+                }
+            }
+            if (!anyFightLeft)
             {
                 int[] match = GetMatch();
                 for (int i = 0; i < match.Length; i++)
@@ -1342,8 +1362,8 @@ public class WorldManager : MonoBehaviour
 
             GameLog.Debug($"id:{dieUnit.id} dieUnit.side:{dieUnit.side} 存活阵营数:{aliveSideCount}");
 
-            // 如果只剩一个阵营有存活单位，计算分数并结束游戏
-            if (aliveSideCount == 1)
+            // 只剩一个阵营有存活单位（或同刻双方全灭，aliveSideCount==0）即结束，计算分数
+            if (aliveSideCount <= 1)
             {
                 int winnerSide = -1;
                 for (int i = 0; i < sideHasUnits.Length; i++)

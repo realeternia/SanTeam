@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <!-- Generated file, do not modify, your changes will be overwritten (use AssetPostprocessor.OnGeneratedCSProject) -->
   <PropertyGroup>
@@ -186,7 +186,6 @@
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidLastingFocus.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\RankPlayerCellInfo.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidPoisonArrow.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidDispelBuffArea.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidShockWave.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidGuardArmy.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidSacrificeGuard.cs" />
