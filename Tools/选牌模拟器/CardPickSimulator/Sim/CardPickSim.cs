@@ -134,11 +134,14 @@ public class CardPickSim
         shop.mySelect = shopGo.AddComponent<MySelectControl>();
         CardShopManager.Instance = shop;
 
-        // 8 名 AI 玩家：使用 PlayerConfig 中的 8 个 AI 性格（Id 2~9）
+        // 8 名玩家：与真机 GameManager.Start 一致 —— pid0 固定为王（GetWang），其余 7 人用
+        // PlayerBook.GetRandomN(7) 随机抽取（4 个 CanPlay + 3 个非 CanPlay），保证每局 AI 性格/偏好随机
         var playersRoot = new GameObject("Players");
         var players = new PlayerInfo[8];
-        for (int pid = 0; pid < 8; pid++)
-            players[pid] = BuildPlayer(playersRoot, pid, pid + 2);
+        players[0] = BuildPlayer(playersRoot, 0, PlayerBook.GetWang());
+        var pls = PlayerBook.GetRandomN(7);
+        for (int i = 0; i < 7; i++)
+            players[i + 1] = BuildPlayer(playersRoot, i + 1, pls[i]);
         GameManager.Instance.players = players;
 
         // 差分快照初始化
@@ -239,8 +242,28 @@ public class CardPickSim
     {
         int before = WorldManager.BattleBeginCount;
 
-        // 开始本回合商店（内部完成加钱/排序/year++/生成商店/启动 Mode.Drive 协程）
+        // 记录买经验前各玩家的总经验：ShopBegin 内 AI 会做经验检查并可能买经验。
+        // 该阶段不发生战斗，总经验增量只能来自 PlayerInfo.BuyExp（4金=4经验，花费=总经验增量）
+        var preTotalExp = new int[states.Count];
+        for (int i = 0; i < states.Count; i++)
+            preTotalExp[i] = states[i].info.GetTotalExp();
+
+        // 开始本回合商店（内部完成加钱/排序/year++/AI经验检查/生成商店/启动 Mode.Drive 协程）
         shop.ShopBegin();
+
+        // 差分出 AI 买经验事件
+        for (int i = 0; i < states.Count; i++)
+        {
+            var st = states[i];
+            int after = st.info.GetTotalExp();
+            int gained = after - preTotalExp[i];
+            if (gained <= 0)
+                continue;
+            int times = Math.Max(1, gained / CombatConst.ExpBuyAmount);
+            Log($"  [第{round}回合] P{st.info.pid} 买经验x{times}（花费{gained}金，总经验{preTotalExp[i]}→{after}）");
+            st.buyExpCount += times;
+            totalBuyExps += times;
+        }
 
         // 先快照：否则随后同步执行的"人类代打"买卖会被这份快照吞掉，导致 P0 买卖统计漏计
         CaptureSnapshots();
@@ -381,9 +404,9 @@ public class CardPickSim
         }
     }
 
-    // 逐帧比对玩家金币/卡牌/经验变化，差分出买入、卖出、刷新、买经验
+    // 逐帧比对玩家金币/卡牌变化，差分出买入、卖出、刷新（买经验在 RunOneRound 开场单独记账）
     // 说明：AI 一个 Step 内会连续买卡并刷新（协程中间不 yield），无法逐次拦截，
-    // 故"刷新"用金币收支反推：净支出 - 买卡支出 + 卖卡退款 - 买经验支出 = 刷新次数 × RefreshGoldCost
+    // 故"刷新"用金币收支反推：净支出 - 买卡支出 + 卖卡退款 = 刷新次数 × RefreshGoldCost
     private void DiffAndLog(int round, int step)
     {
         foreach (var st in states)
@@ -394,8 +417,6 @@ public class CardPickSim
 
             // 滚动金币：每笔操作后更新，逐行展示该笔操作自身的金币收支；末行应收敛到 info.gold
             int cur = st.lastGold;
-            int boughtTotal = 0;
-            int soldTotal = 0;
             int buySpent = 0;    // 买卡支出（按单价×数量）
             int sellRefund = 0;  // 卖卡退款（按游戏卖卡公式）
 
@@ -414,7 +435,6 @@ public class CardPickSim
                     Log($"  [第{round}回合] P{pid} 卖出 {CardName(cardId)}x{sold}（原有{oldCount} → 现{newCount}，+{refund}金）金币 {prev}→{cur}");
                     st.sellCount += sold;
                     totalSells += sold;
-                    soldTotal += sold;
                     sellRefund += refund;
                 }
             }
@@ -434,30 +454,17 @@ public class CardPickSim
                     Log($"  [第{round}回合] P{pid} 买入 {CardName(cardId)}x{bought}（原有{oldCount} → 现{newCount}，-{cost}金）金币 {prev}→{cur}");
                     st.buyCount += bought;
                     totalBuys += bought;
-                    boughtTotal += bought;
                     buySpent += cost;
                 }
             }
 
-            // 买经验：游戏中商店阶段经验只可能来自 PlayerInfo.BuyExp（4 金 = 4 经验）
-            // 真机 AI 不调用 BuyExp，故此项恒为 0，此处如实记录以暴露该现状
-            int expGold = 0;
-            if ((info.exp != st.lastExp || info.level != st.lastLevel) && boughtTotal == 0 && soldTotal == 0)
-            {
-                int spentAll = st.lastGold - info.gold;
-                int times = Math.Max(1, (int)Math.Round(spentAll / (double)CombatConst.ExpBuyGoldCost));
-                expGold = times * CombatConst.ExpBuyGoldCost;
-                int prev = cur;
-                cur -= expGold;
-                Log($"  [第{round}回合] P{pid} 买经验x{times}（金币 {prev}→{cur}，经验 {st.lastExp}→{info.exp}）");
-                st.buyExpCount += times;
-                totalBuyExps += times;
-            }
+            // 买经验：AI 买经验发生在 ShopBegin（经验检查）内，已在 RunOneRound 开场单独差分记录，
+            // 此处的逐帧比对阶段（Mode.Drive）不会再产生经验变化
 
-            // 刷新：由金币收支反推（扣掉买卡/卖卡/买经验后的净支出即为刷新花费），
+            // 刷新：由金币收支反推（扣掉买卡/卖卡后的净支出即为刷新花费），
             // 用实际净支出滚动以保证收支连续、末行等于 info.gold
             int spent = st.lastGold - info.gold;
-            int refreshGold = spent - (buySpent - sellRefund) - expGold;
+            int refreshGold = spent - (buySpent - sellRefund);
             if (refreshGold > 0)
             {
                 int refreshes = (int)Math.Round(refreshGold / (double)CardShopManager.RefreshGoldCost);

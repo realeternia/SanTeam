@@ -22,7 +22,8 @@ public class PlayerBook
 
         foreach (PlayerConfig cfg in PlayerConfig.ConfigList)
         {
-            if (cfg.Id > 1 && cfg.Id != MonsterPlayerId) // 排除怪物虚拟玩家，不参与正常PVP匹配
+            // 参与随机匹配的玩家 id 范围 2~900（排除 1 号真人位与 999 号怪物虚拟玩家）
+            if (cfg.Id >= 2 && cfg.Id <= 900)
             {
                 if (cfg.CanPlay)
                     trueIds.Add(cfg.Id);

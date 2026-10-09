@@ -502,6 +502,15 @@ public class CardShopManager : MonoBehaviour
         // 依据本回合配置选择商店模式（0=共享轮换，1=独立买卡）
         Mode = CreateMode((ShopModeType)ShopCfg.ShopType);
         Mode.Bind(this);
+
+        // 回合结束后、买卡前：AI 经验检查（总经验低于期望时按概率花金币买经验；先于商店生成，升级可影响本回合商店品质）
+        for (int i = 1; i < 8; i++)
+        {
+            var aiP = GameManager.Instance.GetPlayer(i);
+            if (aiP.isAI)
+                PlayerAI.ShopBegin(aiP);
+        }
+
         Mode.Begin();
         RefreshRateText(); // 新回合开始刷新稀有度概率文本
         shopCoroutine = StartCoroutine(Mode.Drive());

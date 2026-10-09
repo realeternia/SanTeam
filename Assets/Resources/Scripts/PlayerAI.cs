@@ -69,6 +69,39 @@ public static class PlayerAI
     }
 
 
+    // 商店开始时的 AI 经验检查：回合结束后、买卡前调用一次。总经验低于期望（round×(2.5+ExpCheckOff)）时按缺口概率随机买经验，
+    // 缺口越大触发概率越高（线性、封顶70%）；命中后用当前金币的 20% 买经验（每次 4 金 = 4 经验，买 floor(预算/4) 次）
+    public static void ShopBegin(PlayerInfo playerInfo)
+    {
+        if (playerInfo == null || playerInfo.nextSkip)
+            return;
+
+        var round = GameManager.Instance.year;
+        float expected = round * ((CombatConst.BattleWinExp + CombatConst.BattleLoseExp) / 2f +playerInfo.playerConfig.ExpCheckOff);
+        int actual = playerInfo.GetTotalExp();
+        if (actual >= expected)
+            return;
+
+        // 触发概率：缺口/期望，线性，封顶 70%
+        float prob = expected > 0f ? Mathf.Min(0.7f, (expected - actual) / expected) : 0f;
+        if (SysRandom.Value >= prob)
+            return;
+
+        // 用当前金币的 20% 买经验（4金=4经验）；金币足够时保底至少买 1 次，避免余钱不足导致命中却空手
+        int budget = Mathf.FloorToInt(playerInfo.gold * 0.2f);
+        int times = budget / CombatConst.ExpBuyGoldCost;
+        if (playerInfo.gold >= CombatConst.ExpBuyGoldCost)
+            times = Mathf.Max(1, times);
+        int bought = 0;
+        for (int i = 0; i < times; i++)
+        {
+            if (!playerInfo.BuyExp())
+                break;
+            bought++;
+        }
+        GameLog.Debug($"AI玩家{playerInfo.pid} 经验检查 实际{actual}<期望{expected:F1}(系数{playerInfo.playerConfig.ExpCheckOff:F2}) 概率{prob:F2} 买经验{bought}次(花{bought * CombatConst.ExpBuyGoldCost}金)");
+    }
+
     public static bool AiCheckBuyCard(PlayerInfo playerInfo, int era, List<ShopOffer> offers)
     {
         if(playerInfo.nextSkip)

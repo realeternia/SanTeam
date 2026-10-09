@@ -1152,6 +1152,19 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         return 0;
     }
 
+    // 当前获得的总经验值 = 升到当前等级累计消耗的等级需求经验之和 + 当前 exp
+    public int GetTotalExp()
+    {
+        int total = exp;
+        for (int lv = 1; lv < level; lv++)
+        {
+            if (!PlayerLevelConfig.HasConfig(lv))
+                break;
+            total += PlayerLevelConfig.GetConfig(lv).ExpToNext;
+        }
+        return total;
+    }
+
     // 增加经验并处理升级（经验溢出顺延到下一级）
     public void AddExp(int add)
     {
