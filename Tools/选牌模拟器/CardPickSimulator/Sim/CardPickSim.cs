@@ -175,6 +175,13 @@ public class CardPickSim
         return go.AddComponent<Image>();
     }
 
+    // 技能图标：图标 Image 外套一层容器（CardViewControl.Init 通过 transform.parent 控制整格显隐）
+    private static Image BuildSkillIcon(GameObject parent, string name)
+    {
+        var container = BuildChild(parent, name + "Root");
+        return BuildImage(container, name);
+    }
+
     private static Button BuildButton(GameObject parent, string name)
     {
         var go = BuildChild(parent, name);
@@ -196,16 +203,18 @@ public class CardPickSim
         cv.roundLeftText = null;      // 无倒计时节点：Init 会跳过 roundLeft 计算
         cv.roundLeftIconNode = null;
         cv.buyButton = BuildButton(go, "BuyBtn");
-        cv.addButton = BuildButton(go, "AddBtn");
-        cv.reduceButton = BuildButton(go, "ReduceBtn");
         cv.isHeroCardNode = BuildChild(go, "HeroNode");
         cv.isItemCardNode = BuildChild(go, "ItemNode");
         cv.heroImage = BuildImage(go, "HeroImage");
-        cv.heroJobImage = new Image[]
+        // 技能图标槽位（4 个）：slot0=职业兵种 / slot1=技能分类(stXXXX) / slot2·3=好友组技能。
+        // CardViewControl.Init 用 heroSkillImage[i].transform.parent 控制整格显隐，故每个图标各套一层容器，
+        // 避免 SetActive 误命中预制体根节点
+        cv.heroSkillImage = new Image[]
         {
-            BuildImage(go, "JobIcon0"),
-            BuildImage(go, "JobIcon1"),
-            BuildImage(go, "JobIcon2"),
+            BuildSkillIcon(go, "SkillIcon0"),
+            BuildSkillIcon(go, "SkillIcon1"),
+            BuildSkillIcon(go, "SkillIcon2"),
+            BuildSkillIcon(go, "SkillIcon3"),
         };
         cv.itemImage = BuildImage(go, "ItemImage");
         cv.effectGreen = BuildChild(go, "EffectGreen");
@@ -523,7 +532,8 @@ public class CardPickSim
     {
         int exp = p.cards.TryGetValue(cardId, out var e) ? e : 0;
         int level = HeroSelectionTool.GetCardLevel(exp, true);
-        string name = HeroName(cardId);
+        // 命中玩家喜好（LikeForce 势力 / LikeJob 职业 / LikeFriend 好友组）的英雄名前置 ★
+        string name = (IsLikedByPlayer(p, cardId) ? "★" : "") + HeroName(cardId);
         if (level >= HeroSelectionTool.MaxHeroCardLevel)
             return $"{name}Lv{level}(MAX)";
         if (level <= 0)
@@ -531,6 +541,43 @@ public class CardPickSim
         int start = HeroSelectionTool.GetCardExpByLevel(level);      // 本档起始经验
         int next = HeroSelectionTool.GetCardExpByLevel(level + 1);   // 下一档所需累计经验
         return $"{name}Lv{level}({exp - start}/{next - start})";
+    }
+
+    // 该英雄是否命中玩家喜好：LikeForce(势力) / LikeJob(职业) / LikeFriend(好友组)，判定口径同 PlayerAI.LikeHas*
+    private static bool IsLikedByPlayer(PlayerInfo p, int cardId)
+    {
+        var cfg = HeroConfig.GetConfig(cardId);
+        if (cfg == null)
+            return false;
+
+        var likeForce = p.playerConfig.LikeForce;
+        if (likeForce != null && likeForce.Length > 0 && Array.IndexOf(likeForce, cfg.Side) >= 0)
+            return true;
+
+        // 职业：HeroConfig.Job 是 JobConfig.NameS，需映射回 JobConfig.Id 再比对 LikeJob
+        var likeJob = p.playerConfig.LikeJob;
+        if (likeJob != null && likeJob.Length > 0)
+        {
+            foreach (var jobCfg in JobConfig.ConfigList)
+            {
+                if (jobCfg.NameS == cfg.Job && Array.IndexOf(likeJob, jobCfg.Id) >= 0)
+                    return true;
+            }
+        }
+
+        // 好友组：英雄所属的任一好友组 Id 命中 LikeFriend 即算
+        var likeFriend = p.playerConfig.LikeFriend;
+        if (likeFriend != null && likeFriend.Length > 0)
+        {
+            var relIds = ConfigManager.GetHeroFriendInfo(cardId);
+            if (relIds != null)
+            {
+                foreach (var relId in relIds)
+                    if (Array.IndexOf(likeFriend, relId) >= 0)
+                        return true;
+            }
+        }
+        return false;
     }
 
     // 上阵阵容羁绊（仅列 Lv2 及以上），口径与游戏 MySelectControl 一致：

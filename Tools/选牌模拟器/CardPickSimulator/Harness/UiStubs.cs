@@ -174,6 +174,21 @@ public class BaseTooltip : MonoBehaviour
 /// <summary>英雄 Tooltip 替身</summary>
 public class TooltipHero : BaseTooltip
 {
+    // 技能分类图标（stXXXX）：与真机 TooltipHero 一致，卡面(CardViewControl)会调用
+    private static readonly Dictionary<string, string> SkillClassIcons = new Dictionary<string, string>
+    {
+        { "单伤", "st0001" }, { "群伤", "st0002" }, { "自增", "st0003" }, { "单增", "st0004" },
+        { "光环", "st0005" }, { "单控", "st0006" }, { "群增", "st0007" }, { "兵增", "st0008" },
+        { "群控", "st0009" }, { "群疗", "st0010" }, { "单疗", "st0011" }, { "召唤", "st0012" },
+    };
+
+    public static string GetClassIcon(string skillType)
+    {
+        if (!string.IsNullOrEmpty(skillType) && SkillClassIcons.TryGetValue(skillType, out var icon))
+            return icon;
+        return null;
+    }
+
     public void ShowTooltip(List<SkillConfig> skillConfigs, HashSet<int> friendInfo, int heroId,
         PlayerInfo player = null, bool isShopCard = false)
     {
