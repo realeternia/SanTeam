@@ -577,7 +577,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         }
     }
 
-    public bool BuyCard(CardViewControl ctr, int cardId, bool isHero, int price, int count)
+    public bool BuyCard(CardViewControl ctr, int cardId, bool isHero, int price)
     {
         if (gold < price)
             return false;
@@ -599,11 +599,11 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         SubGold(price, isHero);
         if (isHero && cards.TryGetValue(cardId, out int exp))
         {
-            cards[cardId] = exp + count;
+            cards[cardId] = exp + 1;
         }
         else if (isHero)
         {
-            cards[cardId] = count;
+            cards[cardId] = 1;
         }
         else
         {
@@ -613,7 +613,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         GameManager.Instance.PlaySound("Sounds/gold");
         // 可见卡位才需要置灰/飞卡动画；AI 独立商店（隐藏商店，无卡位）跳过 UI 表现
         if (ctr != null)
-            ctr.OnSold(this, count);
+            ctr.OnSold(this);
 
         // 购买英雄卡后自动上阵：场上英雄数少于当前上限时，把新英雄放到空闲英雄格
         if (isHero)

@@ -37,8 +37,6 @@ public class CardShopManager : MonoBehaviour
     private int era = 0;
     public bool hasEnterBattle = false;
 
-    public int jadePlayer = -1; //购买和氏璧买家（仅共享模式使用）
-    public int firstJumper = -1; //共享模式首个跳过者
     public int[] playerStartGold = new int[8]; // 记录每个玩家开局金币（用于AI跳过判定）
 
     /// <summary>本轮商店配置（ShopBegin 内确定）</summary>
@@ -104,11 +102,11 @@ public class CardShopManager : MonoBehaviour
     // ---- 宿主工具方法（供各商店模式复用） ----
 
     /// <summary>创建一张可见的商店英雄卡（位置由 LayoutCards/ReplaceCardAt 指定）</summary>
-    public CardViewControl CreateCardView(int heroId, int count)
+    public CardViewControl CreateCardView(int heroId)
     {
         GameObject card = Instantiate(cardViewPrefab, transform);
         CardViewControl cardView = card.GetComponent<CardViewControl>();
-        cardView.Init(heroId, true, count, GameManager.Instance.year);
+        cardView.Init(heroId, true, GameManager.Instance.year);
         return cardView;
     }
 
@@ -134,7 +132,7 @@ public class CardShopManager : MonoBehaviour
     }
 
     /// <summary>用随机新卡替换指定卡位（保持原位置），并销毁旧卡</summary>
-    public void ReplaceCardAt(int index, int heroId, int count)
+    public void ReplaceCardAt(int index, int heroId)
     {
         if (index < 0 || index >= cardViews.Count)
             return;
@@ -142,7 +140,7 @@ public class CardShopManager : MonoBehaviour
         var old = cardViews[index];
         Vector2 pos = old.GetComponent<RectTransform>().anchoredPosition;
 
-        var newCtr = CreateCardView(heroId, count);
+        var newCtr = CreateCardView(heroId);
         newCtr.GetComponent<RectTransform>().anchoredPosition = pos;
         cardViews[index] = newCtr;
 
@@ -240,51 +238,32 @@ public class CardShopManager : MonoBehaviour
         return HeroSelectionTool.GetRandomHeroIdByLevel(level);
     }
 
-    // 与初始刷牌一致的卡牌数量计算逻辑
-    public int GetMultiCount(int cardPrice, GameRoundConfig shopCfg)
-    {
-        var count = 1;
-        if (shopCfg.MultiPriceTotal > 2 * cardPrice)
-        {
-            var roll = SysRandom.Range(0, 100);
-            if (roll < shopCfg.MultiCardRate)
-            {
-                count = SysRandom.Range(1, shopCfg.MultiPriceTotal / cardPrice + 1);
-            }
-
-            if (count == 1)
-                count = Math.Max(1, shopCfg.MultiPriceTotal / 3 / cardPrice);
-        }
-        return Mathf.Min(count, 2); // 同一英雄卡最多2张
-    }
-
     // ---- 购买入口 ----
 
     // 人类购买入口：买卡成功后通知模式推进（共享=进入下一回合；独立=无）
-    public bool RequestBuy(CardViewControl view, PlayerInfo player, int price, int count)
+    public bool RequestBuy(CardViewControl view, PlayerInfo player, int price)
     {
-        if (!OnPlayerBuyCard(view, player, view.cardId, view.isHeroCard, price, count))
+        if (!OnPlayerBuyCard(view, player, view.cardId, view.isHeroCard, price))
             return false;
-        Mode?.OnHumanBought(player, view.ToOffer(), count);
+        Mode?.OnHumanBought(player, view.ToOffer());
         return true;
     }
 
-    // AI 购买入口：可见卡位买卡走 OnSold；隐藏商店（view==null）由此处回写报价剩余数量
-    public bool BuyOffer(PlayerInfo player, ShopOffer offer, int buyCount)
+    // AI 购买入口：可见卡位买卡走 OnSold；隐藏商店（view==null）由此处把报价标记为已售出
+    public bool BuyOffer(PlayerInfo player, ShopOffer offer)
     {
         if (offer == null)
             return false;
 
-        int price = offer.price * buyCount;
-        if (!OnPlayerBuyCard(offer.view, player, offer.cardId, offer.isHero, price, buyCount))
+        if (!OnPlayerBuyCard(offer.view, player, offer.cardId, offer.isHero, offer.price))
             return false;
 
         if (offer.view == null)
-            offer.count -= buyCount;
+            offer.sold = true;
         return true;
     }
 
-    public bool OnPlayerBuyCard(CardViewControl ctr, PlayerInfo player, int cardId, bool isHero, int price, int count)
+    public bool OnPlayerBuyCard(CardViewControl ctr, PlayerInfo player, int cardId, bool isHero, int price)
     {
         // AI 买卡失败不弹提示，避免刷屏
         bool showTip = player != null && !player.isAI;
@@ -296,7 +275,7 @@ public class CardShopManager : MonoBehaviour
             return false;
         }
 
-        if (player.BuyCard(ctr, cardId, isHero, price, count))
+        if (player.BuyCard(ctr, cardId, isHero, price))
         {
             mySelect.UpdateCards(player);
             // 通知模式：共享=触发售出倒计时/相邻刷新；独立=无
@@ -304,8 +283,7 @@ public class CardShopManager : MonoBehaviour
             {
                 cardId = cardId,
                 isHero = isHero,
-                price = price / Mathf.Max(1, count),
-                count = count,
+                price = price,
                 view = ctr,
             }, player);
             return true;

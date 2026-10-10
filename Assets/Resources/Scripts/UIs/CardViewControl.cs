@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -6,13 +5,11 @@ using TMPro;
 using CommonConfig;
 using DG.Tweening;
 using UnityEngine.EventSystems;
-using System;
 using System.Linq;
 
 public class CardViewControl : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 {
     public int cardId;
-    public int count;
     public bool isSold = false;
     public int priceI; //单价
     public int roundLeft;
@@ -23,17 +20,14 @@ public class CardViewControl : MonoBehaviour, IPointerDownHandler, IPointerUpHan
     public TMP_Text roundLeftText;
     public GameObject roundLeftIconNode;
     public Button buyButton;
-    public Button addButton;
-    public Button reduceButton;
-
-    private string cardNameS;
 
     public GameObject isHeroCardNode;
     public GameObject isItemCardNode;
 
     //英雄卡相关
     public Image heroImage;
-    public Image[] heroJobImage;
+    // 槽位：0=职业兵种图标，1=英雄技能分类图标(stXXXX)，2/3=好友组关联技能图标
+    public Image[] heroSkillImage;
 
 
     public Image itemImage;
@@ -59,46 +53,14 @@ public class CardViewControl : MonoBehaviour, IPointerDownHandler, IPointerUpHan
                     return;
                 }
 
-                if (count == 1 || nowPlayer.gold < priceI * 2)
-                {
-                    CardShopManager.Instance.RequestBuy(this, nowPlayer, priceI, 1);
-                }
-                else
-                {
-                    if(!addButton.gameObject.activeSelf)
-                    {
-                        addButton.gameObject.SetActive(true);
-                        reduceButton.gameObject.SetActive(true);
-                    }
-                    else
-                    {
-                        var nowCount = int.Parse(price.text) / priceI;
-                        CardShopManager.Instance.RequestBuy(this, nowPlayer, priceI * nowCount, nowCount);
-                    }
-                }
+                // 一次只能购买 1 张（数量选择功能已移除）
+                CardShopManager.Instance.RequestBuy(this, nowPlayer, priceI);
             }
             else
             {
                 // 对手(AI)回合：牌面仍可点击查看，但无法购买
                 SystemTip.Show("当前是对手回合，无法购买");
             }
-        });
-
-        addButton.gameObject.SetActive(false);
-        reduceButton.gameObject.SetActive(false);
-        addButton.onClick.AddListener(() =>
-        {
-            GameManager.Instance.PlaySound("Sounds/click");
-            var nowCount = int.Parse(price.text) / priceI;
-            if(count > nowCount)
-                price.text = (priceI * (nowCount + 1)).ToString();
-        });
-        reduceButton.onClick.AddListener(() =>
-        {
-            GameManager.Instance.PlaySound("Sounds/click");
-            var nowCount = int.Parse(price.text) / priceI;
-            if(nowCount > 1)
-                price.text = (priceI * (nowCount - 1)).ToString();
         });
     }
 
@@ -133,11 +95,10 @@ public class CardViewControl : MonoBehaviour, IPointerDownHandler, IPointerUpHan
         
     }
 
-    public void Init(int cid, bool isHero, int count1, int shopOpenIndex)
+    public void Init(int cid, bool isHero, int shopOpenIndex)
     {
         cardId = cid;
         isHeroCard = isHero;
-        this.count = count1;
 
         if (isHero)
         {
@@ -146,15 +107,16 @@ public class CardViewControl : MonoBehaviour, IPointerDownHandler, IPointerUpHan
 
             var heroCfg = HeroConfig.GetConfig(cid);
             heroImage.sprite = Resources.Load<Sprite>("Textures/SkinsBig/" + heroCfg.Icon);
-            cardNameS = heroCfg.Name;
             cardName.text = heroCfg.Name;
             cardName.color = SysColor.GetQualityColor(heroCfg.Quality);
-            if (count > 1)
-                cardName.text += "x" + count;
 
-            // 卡面技能图标：slot0=职业兵种技能（个人技能 Skill1 不显示）；slot1/2=该英雄所属好友组的关联技能图标，无则不显示
+            // 卡面技能图标：slot0=职业兵种技能，slot1=英雄个人技能分类图标，slot2/3=好友组关联技能图标，无则不显示
             var jobCfg = ConfigManager.GetJobConfig(heroCfg.Job);
             var jobSkillCfg = jobCfg != null ? ConfigManager.GetSkillConfig(jobCfg.NameS) : null;
+
+            // slot1：英雄个人技能(Skill1)按分类取图标(stXXXX)
+            var heroSkillCfg = string.IsNullOrEmpty(heroCfg.Skill1) ? null : ConfigManager.GetSkillConfig(heroCfg.Skill1);
+            string heroClassIcon = heroSkillCfg != null ? TooltipHero.GetClassIcon(heroSkillCfg.Type) : null;
 
             // 好友组特殊连接技能图标（HeroFriendConfig.SkillId 非空），按组 Id 升序保证展示稳定
             var friendSkillIcons = new List<string>();
@@ -172,7 +134,7 @@ public class CardViewControl : MonoBehaviour, IPointerDownHandler, IPointerUpHan
                 }
             }
 
-            for (int i = 0; i < heroJobImage.Length; i++)
+            for (int i = 0; i < heroSkillImage.Length; i++)
             {
                 string icon = null;
                 if (i == 0)
@@ -180,19 +142,23 @@ public class CardViewControl : MonoBehaviour, IPointerDownHandler, IPointerUpHan
                     if (jobSkillCfg != null && !string.IsNullOrEmpty(jobSkillCfg.Icon))
                         icon = jobSkillCfg.Icon;
                 }
-                else if (i - 1 < friendSkillIcons.Count)
+                else if (i == 1)
                 {
-                    icon = friendSkillIcons[i - 1];
+                    icon = heroClassIcon;
+                }
+                else if (i - 2 < friendSkillIcons.Count)
+                {
+                    icon = friendSkillIcons[i - 2];
                 }
 
                 bool show = icon != null;
-                // slot0 直接是图标节点；slot1/2 外面多套了一层容器（外框+图标），需隐藏/显示父节点，否则外框残留
-                GameObject node = (i == 0 || heroJobImage[i].transform.parent == null)
-                    ? heroJobImage[i].gameObject
-                    : heroJobImage[i].transform.parent.gameObject;
+                // slot0 直接是图标节点；slot1/2/3 外面多套了一层容器（外框+图标），需隐藏/显示父节点，否则外框残留
+                GameObject node = (i == 0 || heroSkillImage[i].transform.parent == null)
+                    ? heroSkillImage[i].gameObject
+                    : heroSkillImage[i].transform.parent.gameObject;
                 node.SetActive(show);
                 if (show)
-                    heroJobImage[i].sprite = Resources.Load<Sprite>("Textures/SkillPic/" + icon);
+                    heroSkillImage[i].sprite = Resources.Load<Sprite>("Textures/SkillPic/" + icon);
             }
 
             gameObject.GetComponent<Image>().color = SysColor.GetSideColor(heroCfg.Side);
@@ -206,10 +172,7 @@ public class CardViewControl : MonoBehaviour, IPointerDownHandler, IPointerUpHan
             isItemCardNode.SetActive(true);
 
             var itemCfg = ItemConfig.GetConfig(cid);
-            cardNameS = itemCfg.Name;
             cardName.text = itemCfg.Name;
-            if (count > 1)
-                cardName.text += "x" + count;
             itemImage.sprite = Resources.Load<Sprite>("Textures/ItemPic/" + itemCfg.Icon);
 
             // 物品仅掉落获得，不参与商店购买，价格恒为0（物品卡不再出现于商店）
@@ -238,7 +201,6 @@ public class CardViewControl : MonoBehaviour, IPointerDownHandler, IPointerUpHan
             cardId = cardId,
             isHero = isHeroCard,
             price = priceI,
-            count = count,
             view = this,
         };
     }
@@ -317,42 +279,26 @@ public class CardViewControl : MonoBehaviour, IPointerDownHandler, IPointerUpHan
         text.text = value.ToString();
     }
 
-    public void OnSold(PlayerInfo playerInfo, int sellCount)
+    public void OnSold(PlayerInfo playerInfo)
     {
-        if(sellCount > count || sellCount <= 0)
-        {
-            throw new ArgumentException("OnSold error, sellCount: " + sellCount + ", count: " + count);
-        }
+        // 一次买走整张卡：直接置为已售出
+        isSold = true;
+        buyButton.gameObject.SetActive(false);
+        soldImage.gameObject.SetActive(true);
 
-        count -= sellCount;
-        if (count == 0)
-        {
-            isSold = true;
-            buyButton.gameObject.SetActive(false);
-            soldImage.gameObject.SetActive(true);
+        if (effectGreen != null) //道具的情况
+            effectGreen.SetActive(false);
+        if (effectYellow != null) //道具的情况
+            effectYellow.SetActive(false);
+        if (effectGray != null) //道具的情况
+            effectGray.SetActive(false);
 
-            if (effectGreen != null) //道具的情况
-                effectGreen.SetActive(false);
-            if (effectYellow != null) //道具的情况
-                effectYellow.SetActive(false);
-            if (effectGray != null) //道具的情况
-                effectGray.SetActive(false);
+        //把heroImage变灰色 - 改为将整个panel变成灰度图
+        SetGrayscaleEffect();
+        soldImage.color = playerInfo.lineColor;
 
-            //把heroImage变灰色 - 改为将整个panel变成灰度图
-            SetGrayscaleEffect();
-            soldImage.color = playerInfo.lineColor;
-        }
-        else
-        {
-            cardName.text = cardNameS;
-            if (count > 1)
-                cardName.text += "x" + count;
-        }
-        addButton.gameObject.SetActive(false);
-        reduceButton.gameObject.SetActive(false);
-
-        //创建一个Image，启动携程 飞到 PlayerInfo的位置 
-        StartCoroutine(MoveToPlayerInfoCount(playerInfo, sellCount));
+        //创建一个Image 飞到 PlayerInfo的位置
+        MoveToPlayerInfo(playerInfo);
     }
 
     private void SetGrayscaleEffect()
@@ -418,24 +364,6 @@ public class CardViewControl : MonoBehaviour, IPointerDownHandler, IPointerUpHan
         RestoreColor();
         soldImage.gameObject.SetActive(false);
         buyButton.gameObject.SetActive(true);
-        addButton.gameObject.SetActive(false);
-        reduceButton.gameObject.SetActive(false);
-    }
-
-    private System.Collections.IEnumerator MoveToPlayerInfoCount(PlayerInfo playerInfo, int count)
-    {
-        if(count == 1)
-        {
-            MoveToPlayerInfo(playerInfo);
-        }
-        else
-        {
-            for(int i = 0; i < count; i++)
-            {
-                MoveToPlayerInfo(playerInfo);
-                yield return new WaitForSeconds(0.2f);
-            }
-        }
     }
 
     // 买卡后卡牌飞向玩家头像：DoTween 加速曲线（起步慢、越飞越快），同时缩到 50%

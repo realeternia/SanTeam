@@ -20,7 +20,7 @@ public class ShopOffer
     public int cardId;
     public bool isHero;
     public int price;   // 单价
-    public int count;   // 剩余可购数量
+    public bool sold;   // 是否已售出（AI 隐藏商店用；可见卡位以 view.isSold 为准）
     public CardViewControl view; // 可见卡位（人类/共享牌）；AI 隐藏商店为 null
 }
 
@@ -52,7 +52,7 @@ public abstract class ShopMode
     public virtual void OnBought(ShopOffer offer, PlayerInfo player) { }
 
     /// <summary>仅“人类”买卡成功后回调：共享=推进回合；独立=无</summary>
-    public virtual void OnHumanBought(PlayerInfo player, ShopOffer offer, int buyCount) { }
+    public virtual void OnHumanBought(PlayerInfo player, ShopOffer offer) { }
 
     /// <summary>人类点击“跳过/结束”</summary>
     public abstract void OnHumanPass();

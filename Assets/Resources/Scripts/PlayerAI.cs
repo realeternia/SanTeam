@@ -266,7 +266,7 @@ public static class PlayerAI
         //scoredCards的key的priceI前三3的卡分别（1.5，1.3，1.1）
         if (scoredCards.Count >= 5 && scoredCards.Max(x => x.score) < 1.6f)
         {
-            var top3Cards = scoredCards.OrderByDescending(x => x.card.price * x.card.count).Take(3).ToList();
+            var top3Cards = scoredCards.OrderByDescending(x => x.card.price).Take(3).ToList();
             for (int i = 0; i < top3Cards.Count; i++)
             {
                 var card = top3Cards[i];
@@ -338,17 +338,9 @@ public static class PlayerAI
             playerInfo.aiShopSellCount++;
         }
 
-        var finalBuyCount = 1;
-        if (selectedCard.count > 0)
-        {
-            // 看未来：下回合品质更好时按 Futurerate 少囤卡、留钱；更差时照常买满
-            float saveMood = 1f - Mathf.Clamp(playerConfig.Futurerate, 0f, 1f) * Mathf.Max(0f, futureBias);
-            finalBuyCount = Mathf.Clamp((int)Math.Round(playerInfo.gold * 2f / 3f / selectedCard.price * saveMood), 1, selectedCard.count);
-        }
-
         // 返回真实购买结果：英雄卡已满且无弱卡可卖等情况下购买会失败，
         // 此时必须返回 false 让调用方把该玩家标记为跳过本回合，否则 AI 会一直"选牌成功"却不跳过，导致选牌阶段死循环卡住
-        return CardShopManager.Instance.BuyOffer(playerInfo, selectedCard, finalBuyCount);
+        return CardShopManager.Instance.BuyOffer(playerInfo, selectedCard);
     }
 
     private static float GetBuyCostBias(int cardPrice, int year, PlayerConfig cfg)

@@ -24,6 +24,22 @@ public class TooltipHero : BaseTooltip
     private static GameObject skillRowPrefab;                             // 预制体缓存
     private readonly List<TooltipHeroSkill> skillRows = new List<TooltipHeroSkill>(); // 按需扩容
 
+    // 技能分类图标：个人技能图标按 SkillConfig.Type 分类显示（图标资源 Textures/SkillPic/stXXXX）
+    private static readonly Dictionary<string, string> SkillClassIcons = new Dictionary<string, string>
+    {
+        { "单伤", "st0001" }, { "群伤", "st0002" }, { "自增", "st0003" }, { "单增", "st0004" },
+        { "光环", "st0005" }, { "单控", "st0006" }, { "群增", "st0007" }, { "兵增", "st0008" },
+        { "群控", "st0009" }, { "群疗", "st0010" }, { "单疗", "st0011" }, { "召唤", "st0012" },
+    };
+
+    // 技能分类图标（stXXXX）：Tooltip 与卡面(CardViewControl)共用；未归类返回 null
+    public static string GetClassIcon(string skillType)
+    {
+        if (!string.IsNullOrEmpty(skillType) && SkillClassIcons.TryGetValue(skillType, out var icon))
+            return icon;
+        return null;
+    }
+
     // 装备行：每个装备一个 ToolTipHeroEquip.prefab（500x70），英雄身上有装备时显示装备名+图标
     private const float EquipRowHeight = 60f;
     private static GameObject equipRowPrefab;   // 预制体缓存
@@ -374,7 +390,7 @@ public class TooltipHero : BaseTooltip
                     int skillLv = player != null ? Mathf.Min(cardLv, 5) : 1;
                     var skillLvCfg = ConfigManager.GetSkillConfig(skillConfig.Sname, skillLv) ?? skillConfig;
                     skillText = skillConfig.Name + ConfigManager.GetSkillDescript(skillLvCfg, true); //富文本
-                    row.SetSkill(skillText, skillConfig.Icon, skillLv);
+                    row.SetSkill(skillText, GetClassIcon(skillConfig.Type) ?? skillConfig.Icon, skillLv);
                 }
 
                 // 每行固定高度100，自上而下排列

@@ -23,49 +23,25 @@ public class SharedShopMode : ShopMode
         host.ClearCards();
 
         var shopCfg = host.ShopCfg;
-        List<Tuple<int, int>> heroIds = new List<Tuple<int, int>>();
+        List<int> heroIds = new List<int>();
         int TOTAL_HERO_CARDS = 15;
         // 防死循环：卡池中某品质（第一回合恒为品质1）人数可能不足15张，
         // 命中重复卡会原地打转，故用 while + 尝试上限，凑不满则生成已有的全部不重复卡后结束。
-        int totalUnique = 0;
         int maxAttempts = TOTAL_HERO_CARDS * 20;
         int attempt = 0;
-        while (totalUnique < TOTAL_HERO_CARDS && attempt < maxAttempts)
+        while (heroIds.Count < TOTAL_HERO_CARDS && attempt < maxAttempts)
         {
             attempt++;
             var heroId = host.GetRandomShopHeroId(shopCfg);
             if (heroId == 0)
                 break; // 卡池为空，无法再生成，跳出避免死循环
-            var existingIndex = heroIds.FindIndex(x => x.Item1 == heroId);
-            if (existingIndex >= 0)
-            { // 重复卡的处理
-                if (shopCfg.Id > 3)
-                {
-                    var existingTuple = heroIds[existingIndex];
-                    heroIds[existingIndex] = new Tuple<int, int>(existingTuple.Item1, Mathf.Min(existingTuple.Item2 + 1, 2)); // 同一英雄卡最多2张
-                }
-                continue;
-            }
-
-            var count = 1;
-            var heroPrice = HeroSelectionTool.GetPrice(HeroConfig.GetConfig(heroId));
-            if (shopCfg.MultiPriceTotal > 2 * heroPrice)
-            {
-                var roll = SysRandom.Range(0, 100);
-                if (roll < shopCfg.MultiCardRate)
-                    count = SysRandom.Range(1, shopCfg.MultiPriceTotal / heroPrice + 1);
-
-                if (count == 1)
-                    count = Math.Max(1, shopCfg.MultiPriceTotal / 3 / heroPrice);
-            }
-
-            count = Mathf.Min(count, 2); // 商店同一英雄卡最多出售2张
-            heroIds.Add(new Tuple<int, int>(heroId, count));
-            totalUnique++;
+            if (heroIds.Contains(heroId))
+                continue; // 重复卡：重新抽取，商店同一英雄只出售 1 张
+            heroIds.Add(heroId);
         }
 
         for (int i = 0; i < heroIds.Count; i++)
-            host.cardViews.Add(host.CreateCardView(heroIds[i].Item1, heroIds[i].Item2));
+            host.cardViews.Add(host.CreateCardView(heroIds[i]));
 
         host.LayoutCards(host.cardViews, 5, 5);
         host.passBtn.gameObject.SetActive(true);
@@ -76,7 +52,8 @@ public class SharedShopMode : ShopMode
             playerPassed[i] = false;
         passedPlayers = 0;
 
-        ResetRoundOrder();
+        // 每轮固定从积分最低的玩家开始（TurnOrder 已按 mark 从低到高排序）
+        round = 0;
 
         var pid = GetTurnPid();
         GameManager.Instance.OnPlayerTurn(pid);
@@ -105,7 +82,7 @@ public class SharedShopMode : ShopMode
             OnCardSelected(offer.view);
     }
 
-    public override void OnHumanBought(PlayerInfo player, ShopOffer offer, int buyCount)
+    public override void OnHumanBought(PlayerInfo player, ShopOffer offer)
     {
         AfterAct();
     }
@@ -119,8 +96,6 @@ public class SharedShopMode : ShopMode
             return;
 
         host.passBtn.gameObject.SetActive(false);
-        if (playerPassed.All(x => !x))
-            host.firstJumper = nowPlayer.pid;
         playerPassed[nowPlayer.pid] = true;
         passedPlayers++;
         nowPlayer.SetRoundOver(true);
@@ -194,8 +169,6 @@ public class SharedShopMode : ShopMode
 
                 if (!result)
                 {
-                    if (playerPassed.All(x => !x))
-                        host.firstJumper = currentPlayerId;
                     // AI玩家放弃购买
                     playerPassed[currentPlayerId] = true;
                     passedPlayers++;
@@ -215,24 +188,6 @@ public class SharedShopMode : ShopMode
     private int GetTurnPid()
     {
         return host.TurnOrder[round % host.TurnOrder.Length];
-    }
-
-    // 依据上回合的“和氏璧买家/首个跳过者”设定本回合起始位
-    private void ResetRoundOrder()
-    {
-        int firstPid = -1;
-        if (host.jadePlayer >= 0)
-            firstPid = host.jadePlayer;
-        else if (host.firstJumper >= 0)
-            firstPid = host.firstJumper;
-
-        if (firstPid >= 0)
-            round = 8 * 100 + System.Array.IndexOf(host.TurnOrder, firstPid); // 让该玩家排到回合最前
-        else
-            round = 1000;
-
-        host.jadePlayer = -1;
-        host.firstJumper = -1;
     }
 
     private void NextTurn()
@@ -316,8 +271,7 @@ public class SharedShopMode : ShopMode
         var shopCfg = host.ShopCfg;
         // 按当前品质概率随机刷新，允许重复；每张卡有 LikeCardRefreshRate 概率替换为收藏卡
         var heroId = host.GetRandomShopHeroId(shopCfg);
-        var heroPrice = HeroSelectionTool.GetPrice(HeroConfig.GetConfig(heroId));
-        host.ReplaceCardAt(index, heroId, host.GetMultiCount(heroPrice, shopCfg));
+        host.ReplaceCardAt(index, heroId);
     }
 
     // 获取一张卡的相邻卡：英雄卡在3列网格中算上下左右

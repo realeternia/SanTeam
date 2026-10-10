@@ -29,7 +29,7 @@ public class IndependentShopMode : ShopMode
         for (int i = 0; i < SLOT_COUNT; i++)
         {
             var offer = RollOffer(humanLevel);
-            host.cardViews.Add(host.CreateCardView(offer.cardId, offer.count));
+            host.cardViews.Add(host.CreateCardView(offer.cardId));
         }
         host.LayoutCards(host.cardViews, SLOT_COUNT, 3);
 
@@ -62,9 +62,9 @@ public class IndependentShopMode : ShopMode
             return list;
         }
 
-        // AI：隐藏商店，过滤掉已售罄(count<=0)的报价
+        // AI：隐藏商店，过滤掉已售出的报价
         if (aiShops.TryGetValue(pid, out var offers))
-            return offers.Where(o => o.count > 0).ToList();
+            return offers.Where(o => !o.sold).ToList();
         return new List<ShopOffer>();
     }
 
@@ -111,7 +111,7 @@ public class IndependentShopMode : ShopMode
             int guard = 0;
             while (guard++ < 20)
             {
-                // 每次购买后重新拉取报价：AI 隐藏商店买入会就地扣减 count，需过滤售罄(count<=0)的卡，避免重复买同一张
+                // 每次购买后重新拉取报价：AI 隐藏商店买入会把报价标记为已售出，需过滤，避免重复买同一张
                 var offers = GetOffers(pid);
 
                 // 买得动就继续买（复用共享模式同一套 AI 评分/购买）
@@ -148,7 +148,7 @@ public class IndependentShopMode : ShopMode
             for (int i = 0; i < host.cardViews.Count; i++)
             {
                 var offer = RollOffer(player.level);
-                host.ReplaceCardAt(i, offer.cardId, offer.count);
+                host.ReplaceCardAt(i, offer.cardId);
             }
         }
         else
@@ -159,10 +159,9 @@ public class IndependentShopMode : ShopMode
         GameManager.Instance.PlaySound("Sounds/page");
     }
 
-    // 随机一条英雄报价（按玩家等级品质概率 + 收藏池 + 多张判定）
+    // 随机一条英雄报价（按玩家等级品质概率 + 收藏池）
     private ShopOffer RollOffer(int level)
     {
-        var shopCfg = host.ShopCfg;
         var heroId = host.GetRandomShopHeroIdByLevel(level);
         var price = HeroSelectionTool.GetPrice(HeroConfig.GetConfig(heroId));
         return new ShopOffer
@@ -170,7 +169,6 @@ public class IndependentShopMode : ShopMode
             cardId = heroId,
             isHero = true,
             price = price,
-            count = host.GetMultiCount(price, shopCfg),
         };
     }
 
