@@ -51,6 +51,7 @@ public class CardPickSim
         public int sellCount;
         public int refreshCount;
         public int buyExpCount;
+        public int sellLoss;   // 卖卡损失：Σ(卖出卡总价 - 实际退款)，即卖卡折扣损失
     }
 
     // 统计
@@ -438,11 +439,13 @@ public class CardPickSim
                 if (newCount < oldCount)
                 {
                     int sold = oldCount - newCount;
-                    int refund = CalcSellRefund(GetCardPrice(cardId), sold);
+                    int price = GetCardPrice(cardId);
+                    int refund = CalcSellRefund(price, sold);
                     int prev = cur;
                     cur += refund;
                     Log($"  [第{round}回合] P{pid} 卖出 {CardName(cardId)}x{sold}（原有{oldCount} → 现{newCount}，+{refund}金）金币 {prev}→{cur}");
                     st.sellCount += sold;
+                    st.sellLoss += price * sold - refund; // 卖出卡总价与退款的差额即卖卡折扣损失
                     totalSells += sold;
                     sellRefund += refund;
                 }
@@ -506,6 +509,21 @@ public class CardPickSim
     {
         int totalValue = price * count;
         return totalValue <= 5 ? totalValue : totalValue - (totalValue - 1) / 5;
+    }
+
+    // 阵容价值：Σ 卡牌单价 × 卡等级（与 GetStrongCardList/自动上阵口径一致）
+    private static int CalcLineupValue(List<int> cardIds, PlayerInfo p)
+    {
+        int sum = 0;
+        foreach (int cardId in cardIds)
+        {
+            var cfg = HeroConfig.GetConfig(cardId);
+            if (cfg == null)
+                continue;
+            int lv = p.cards.TryGetValue(cardId, out var exp) ? HeroSelectionTool.GetCardLevel(exp, true) : 0;
+            sum += HeroSelectionTool.GetPrice(cfg) * lv;
+        }
+        return sum;
     }
 
     private static string CardName(int cardId)
@@ -584,9 +602,13 @@ public class CardPickSim
     //   职业：等级 = 上阵同职业人数（1人=Lv1）
     //   国家：等级 = 上阵同阵营人数 - 1（1人=0级，仅参与同阵营护盾的阵营计入）
     //   好友：等级 = 好友组上阵成员数 - 1（1人=0级）
-    private static string BuildBondSummary(List<int> lineupIds)
+    // 命中该玩家喜好（LikeJob/LikeForce/LikeFriend）的羁绊前置 ★
+    private static string BuildBondSummary(PlayerInfo p, List<int> lineupIds)
     {
         var parts = new List<string>();
+        var likeJob = p.playerConfig.LikeJob;
+        var likeForce = p.playerConfig.LikeForce;
+        var likeFriend = p.playerConfig.LikeFriend;
 
         // 职业（同职业人数）
         var jobCounts = new Dictionary<string, int>();
@@ -602,7 +624,8 @@ public class CardPickSim
             if (kv.Value < 2)
                 continue; // 职业等级=人数，Lv2 起列
             var jobCfg = ConfigManager.GetJobConfig(kv.Key);
-            parts.Add($"职业·{(jobCfg != null ? jobCfg.Name : kv.Key)}Lv{kv.Value}");
+            bool liked = jobCfg != null && likeJob != null && Array.IndexOf(likeJob, jobCfg.Id) >= 0;
+            parts.Add((liked ? "★" : "") + $"职业·{(jobCfg != null ? jobCfg.Name : kv.Key)}Lv{kv.Value}");
         }
 
         // 国家（同阵营人数 - 1，仅参与同阵营护盾的阵营）
@@ -622,7 +645,8 @@ public class CardPickSim
             int lv = kv.Value - 1;
             if (lv < 2)
                 continue;
-            parts.Add($"国家·{forceCfg.Name}Lv{lv}");
+            bool liked = likeForce != null && Array.IndexOf(likeForce, kv.Key) >= 0;
+            parts.Add((liked ? "★" : "") + $"国家·{forceCfg.Name}Lv{lv}");
         }
 
         // 好友（好友组上阵成员数 - 1）
@@ -635,7 +659,8 @@ public class CardPickSim
             int lv = present - 1;
             if (lv < 2)
                 continue;
-            parts.Add($"好友·{friendCfg.Name}Lv{lv}");
+            bool liked = likeFriend != null && Array.IndexOf(likeFriend, friendCfg.Id) >= 0;
+            parts.Add((liked ? "★" : "") + $"好友·{friendCfg.Name}Lv{lv}");
         }
 
         return parts.Count > 0 ? string.Join(" / ", parts) : null;
@@ -663,23 +688,33 @@ public class CardPickSim
             }
 
             // 未上阵阵容（拥有的英雄卡 - 上阵）
+            var benchIds = new List<int>();
             var benchNames = new List<string>();
             foreach (int cardId in p.GetHeroCardList())
             {
                 if (!lineupIds.Contains(cardId))
+                {
+                    benchIds.Add(cardId);
                     benchNames.Add(HeroNameWithLevel(p, cardId));
+                }
             }
 
             int expToNext = p.GetExpToNext();
             string levelText = expToNext > 0 ? $"Lv{p.level} {p.exp}/{expToNext}" : $"Lv{p.level} MAX";
 
+            // 经济汇总：上阵/预备阵容价值（Σ单价×卡等级）、刷新+升级(买经验)消耗、卖卡折扣损失
+            int lineupValue = CalcLineupValue(lineupIds, p);
+            int benchValue = CalcLineupValue(benchIds, p);
+            int refreshExpSpend = st.refreshCount * CardShopManager.RefreshGoldCost + st.buyExpCount * CombatConst.ExpBuyGoldCost;
+
             Log($"P{p.pid}（{p.playerConfig.Name}） {levelText} 上阵格={p.GetSlotCount()} 金币={p.gold} 英雄卡={heroCards}张 " +
                 $"买入={st.buyCount} 卖出={st.sellCount} 刷新={st.refreshCount} 买经验={st.buyExpCount}");
+            Log($"    经济：上阵价值={lineupValue} ｜ 预备价值={benchValue} ｜ 刷新+升级消耗={refreshExpSpend}金 ｜ 卖卡损失={st.sellLoss}金");
             Log($"    上阵阵容({lineupNames.Count}/{p.GetSlotCount()})：{(lineupNames.Count > 0 ? string.Join("、", lineupNames) : "无")}");
             Log($"    未上阵阵容({benchNames.Count})：{(benchNames.Count > 0 ? string.Join("、", benchNames) : "无")}");
 
             // 上阵阵容羁绊（仅列 Lv2 及以上）：职业 / 国家 / 好友关系
-            string bondText = BuildBondSummary(lineupIds);
+            string bondText = BuildBondSummary(p, lineupIds);
             if (bondText != null)
                 Log($"    羁绊(Lv≥2)：{bondText}");
         }
