@@ -166,8 +166,8 @@ public class BagControl : MonoBehaviour, IPanelEvent
         UpdateFieldView();
 
         var soldierCfg = SoldierConfig.GetConfig(500001);
-        var textAtk = (soldierCfg.Atk + bindPlayer.sodatk + bindPlayer.GetItemPAttr("satk") + bindPlayer.GetSoldierAtkAdd()).ToString();
-        var textHp = (soldierCfg.Hp + bindPlayer.sodhp + bindPlayer.GetItemPAttr("shp") + bindPlayer.GetSoldierHpAdd()).ToString();
+        var textAtk = (soldierCfg.Atk + bindPlayer.sodatk + bindPlayer.GetItemPAttr("satk") + bindPlayer.GetSoldierAtkAdd(soldierCfg)).ToString();
+        var textHp = (soldierCfg.Hp + bindPlayer.sodhp + bindPlayer.GetItemPAttr("shp") + bindPlayer.GetSoldierHpAdd(soldierCfg)).ToString();
         UpdateExpView();
         UpdateSodView();
 
@@ -204,9 +204,10 @@ public class BagControl : MonoBehaviour, IPanelEvent
     // 刷新士兵等级显示：等级 + 当前/最大步兵/弓兵数量 + 攻防加成
     private void UpdateSodView()
     {
+        var soldierCfg = SoldierConfig.GetConfig(500001);
         sodInfoText.text = string.Format("士兵等级 {0} 攻+{1} 命+{2}",
             bindPlayer.soldierLevel,
-            bindPlayer.GetSoldierAtkAdd(), bindPlayer.GetSoldierHpAdd());
+            bindPlayer.GetSoldierAtkAdd(soldierCfg), bindPlayer.GetSoldierHpAdd(soldierCfg));
     }
 
     public void UpdateView()

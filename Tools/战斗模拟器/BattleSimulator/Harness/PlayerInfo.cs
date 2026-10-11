@@ -96,15 +96,15 @@ public class PlayerInfo
         return attrVal;
     }
 
-    // 士兵等级攻防加成（与游戏内 PlayerInfo 一致：读 SoldierLevelConfig，按 soldierLevel 取 AtkAdd/HpAdd）
-    public int GetSoldierAtkAdd()
+    // 士兵攻防加成（与游戏内 PlayerInfo 一致：士兵等级 × 兵种每级成长 SoldierConfig.AtkP/HpP）
+    public int GetSoldierAtkAdd(SoldierConfig cfg)
     {
-        return SoldierLevelConfig.HasConfig(soldierLevel) ? SoldierLevelConfig.GetConfig(soldierLevel).AtkAdd : 0;
+        return (int)(soldierLevel * cfg.AtkP);
     }
 
-    public int GetSoldierHpAdd()
+    public int GetSoldierHpAdd(SoldierConfig cfg)
     {
-        return SoldierLevelConfig.HasConfig(soldierLevel) ? SoldierLevelConfig.GetConfig(soldierLevel).HpAdd : 0;
+        return (int)(soldierLevel * cfg.HpP);
     }
 
     // 战斗结算：记录胜负即可

@@ -211,10 +211,10 @@ public static class CombatConst
     public const int ExpBuyAmount = 4;
 
     // ---- 士兵等级体系 ----
-    /// <summary>士兵最高等级(30级，只提升士兵攻防加成；数量由玩家等级决定)</summary>
+    /// <summary>士兵最高等级(30级，每级成长由 SoldierConfig.AtkP/HpP 决定；数量由玩家等级决定)</summary>
     public const int SoldierMaxLevel = 30;
-    /// <summary>士兵升级所需金币</summary>
-    public const int SodLvupGoldCost = 5;
+    /// <summary>士兵额外升级(每级)所需金币</summary>
+    public const int SodLvupGoldCost = 6;
 
     // ---- 疲劳机制(战斗超时加压：拖时间会被逐渐磨到残血，但不致死，最低扣到 1 血) ----
     /// <summary>疲劳开始时间(秒)：开战后经过该时长开始结算疲劳</summary>

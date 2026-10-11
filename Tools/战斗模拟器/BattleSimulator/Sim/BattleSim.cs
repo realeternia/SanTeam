@@ -14,12 +14,10 @@ public class BattleSim
     public WorldManager World { get; private set; }
     public GameManager Game { get; private set; }
 
-    // 布阵常量：前排近战士兵 pos0-4、弩手 pos5-7、弓手 pos8-9、英雄 pos10+
+    // 布阵常量：前排近战士兵 pos0-4、后排远程士兵 pos5-9、英雄 pos10+
     private const int MeleeSoldierId = 500001;
-    private const int CrossbowSoldierId = 500004;   // 弩手（短射程高攻击）
-    private const int ArcherSoldierId = 500003;      // 弓手（长射程）
+    private const int RangedSoldierId = 500002;   // 远程小兵
     private const int FrontMeleeCount = 5;
-    private const int FrontCrossCount = 3;
     private const int HeroStartPos = 10;
 
     public bool IsFinished { get { return World != null && World.gameFinish; } }
@@ -157,14 +155,10 @@ public class BattleSim
         Array.Clear(cards, 0, cards.Length);
 
         int melee = Math.Min(soldierCount, FrontMeleeCount);
-        int cross = Math.Min(Math.Max(0, soldierCount - FrontMeleeCount), FrontCrossCount);
-        int archer = Math.Max(0, soldierCount - FrontMeleeCount - FrontCrossCount);
         for (int i = 0; i < melee && i < cards.Length; i++)
             cards[i] = MeleeSoldierId;
-        for (int i = 0; i < cross && FrontMeleeCount + i < cards.Length; i++)
-            cards[FrontMeleeCount + i] = CrossbowSoldierId;
-        for (int i = 0; i < archer && FrontMeleeCount + FrontCrossCount + i < cards.Length; i++)
-            cards[FrontMeleeCount + FrontCrossCount + i] = ArcherSoldierId;
+        for (int i = melee; i < soldierCount && i < cards.Length; i++)
+            cards[i] = RangedSoldierId;
 
         if (heroes != null)
         {
@@ -250,7 +244,7 @@ public class BattleSim
         CoroutineRunner.Clear();
         BattleStatManager.Clear();
         World.Reset();
-        // 小兵等级需在 BattleBegin 生成单位前写入（士兵攻防加成按 PlayerInfo.soldierLevel 取 SoldierLevelConfig）
+        // 小兵等级需在 BattleBegin 生成单位前写入（士兵攻防加成 = PlayerInfo.soldierLevel × SoldierConfig.AtkP/HpP）
         Game.players[0].soldierLevel = SoldierLevel;
         Game.players[1].soldierLevel = SoldierLevel;
         // 把本场羁绊开关同步到 harness（BattleBegin 内生效），结束后复位为默认全开

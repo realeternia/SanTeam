@@ -214,10 +214,10 @@ public class Chess : MonoBehaviour
             var soldierCfg = SoldierConfig.GetConfig(soldierId);
             // playerId=999为PVE怪物(虚拟玩家，无PlayerInfo实体)，不享受任何玩家加成
             var playerInfo = (playerId >= 0 && playerId < GameManager.Instance.players.Length) ? GameManager.Instance.GetPlayer(playerId) : null;
-            if (playerInfo != null && soldierCfg.SoldierAtkRate > 0)
+            if (playerInfo != null)
             {
-                maxHp += (int)((playerInfo.sodhp + playerInfo.GetItemPAttr("shp") + playerInfo.GetSoldierHpAdd()) * soldierCfg.SoldierHpRate);
-                atk += (int)((playerInfo.sodatk + playerInfo.GetItemPAttr("satk") + playerInfo.GetSoldierAtkAdd()) * soldierCfg.SoldierAtkRate);
+                maxHp += playerInfo.sodhp + playerInfo.GetItemPAttr("shp") + playerInfo.GetSoldierHpAdd(soldierCfg);
+                atk += playerInfo.sodatk + playerInfo.GetItemPAttr("satk") + playerInfo.GetSoldierAtkAdd(soldierCfg);
             }
         }
         // 记录士兵初始生命基准：职业生命系数结算始终以它为基数（士兵无其他生命来源，此值即为战斗前最终生命）
@@ -413,15 +413,15 @@ public class Chess : MonoBehaviour
             return;
 
         var soldierCfg = SoldierConfig.GetConfig(soldierId);
-        if (soldierCfg.SoldierAtkRate <= 0)
+        if (soldierCfg.AtkP <= 0 && soldierCfg.HpP <= 0)
             return;
 
         //根据level变化模型scale
         soldierLevel += lv;
         transform.localScale = new Vector3(5 + soldierLevel * 0.75f, 3, 5 + soldierLevel * 0.75f);
 
-        atk += (int)(lv * atkAdd * soldierCfg.SoldierAtkRate);
-        maxHp += (int)(lv * hpAdd * soldierCfg.SoldierHpRate);
+        atk += (int)(lv * soldierCfg.AtkP);
+        maxHp += (int)(lv * soldierCfg.HpP);
         hp = maxHp;
     }
 

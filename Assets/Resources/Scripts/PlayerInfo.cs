@@ -1187,14 +1187,17 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         }
         if (lv != level)
         {
+            int gained = lv - level;
             level = lv;
+            // 士兵随玩家升级自然升级（上限 SoldierMaxLevel）；额外花金币升级由 SodLvup 追加
+            soldierLevel = Mathf.Min(soldierLevel + gained, CombatConst.SoldierMaxLevel);
             if (playerLevelText != null)
                 playerLevelText.text = level.ToString();
             EnsureSoldierCells(); // 玩家等级提升可能解锁更多士兵，补齐布阵格
             // 人类玩家升级后刷新商店稀有度概率文本（独立买卡模式按等级刷牌）
             if (pid == 0 && CardShopManager.Instance != null)
                 CardShopManager.Instance.RefreshRateText();
-            GameLog.Debug($"玩家{pid} 升级到 {level} 级，上阵格子 {GetSlotCount()}，士兵 {GetSoldierMeleeCount()}步+{GetSoldierRangedCount()}弓，剩余经验 {exp}");
+            GameLog.Debug($"玩家{pid} 升级到 {level} 级，上阵格子 {GetSlotCount()}，士兵等级 {soldierLevel}，士兵 {GetSoldierMeleeCount()}步+{GetSoldierRangedCount()}弓，剩余经验 {exp}");
         }
     }
 
@@ -1210,15 +1213,15 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         return true;
     }
 
-    // ---- 士兵等级体系 ----
-    // 士兵等级攻防加成（近战全量，远程按 SoldierAtkRate/SoldierHpRate 折算）
-    public int GetSoldierAtkAdd()
+    // ---- 士兵加成体系 ----
+    // 士兵攻防加成 = 士兵等级 × 兵种每级成长（SoldierConfig.AtkP/HpP）；士兵等级 = 玩家等级自然升级 + 花金币额外升级
+    public int GetSoldierAtkAdd(SoldierConfig cfg)
     {
-        return SoldierLevelConfig.HasConfig(soldierLevel) ? SoldierLevelConfig.GetConfig(soldierLevel).AtkAdd : 0;
+        return (int)(soldierLevel * cfg.AtkP);
     }
-    public int GetSoldierHpAdd()
+    public int GetSoldierHpAdd(SoldierConfig cfg)
     {
-        return SoldierLevelConfig.HasConfig(soldierLevel) ? SoldierLevelConfig.GetConfig(soldierLevel).HpAdd : 0;
+        return (int)(soldierLevel * cfg.HpP);
     }
     public int GetSoldierMeleeCount()
     {
@@ -1231,7 +1234,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         return PlayerLevelConfig.HasConfig(lv) ? PlayerLevelConfig.GetConfig(lv).RangedCount : 0;
     }
 
-    // 花金币提升士兵等级（最高30级），只提升士兵攻防加成（数量由玩家等级决定）
+    // 花金币额外提升1级士兵等级（最高30级，成长由 SoldierConfig.AtkP/HpP 决定；数量由玩家等级决定）
     public bool SodLvup()
     {
         if (soldierLevel >= CombatConst.SoldierMaxLevel)
