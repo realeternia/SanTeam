@@ -153,6 +153,7 @@ score = 1
  ├ 英雄卡：
  │   ├ × GetQualityBias(品质, year, playerInfo)               ← 品质偏好（见 5.4）
  │   ├ × (价格 / CardPriceBiasBase)^CardPriceBiasExponent      ← 价格偏好（见 5.4.1）
+ │   ├ 自己许愿的牌 → × WishCardBias(2.0)                       ← 许愿偏好（见 5.4.3）
  │   ├ 已有该卡 → × (1 + StarUpBias(0.8) × GetStarUpGain)      ← 升星导向（见 5.4.2）
  │   ├ LikeForce 命中 → × (1 + ForceBias(0.4)  × GetForceGain)
  │   ├ LikeJob   命中 → × (1 + JobBias        × GetJobGain)   ← JobBias = 1.3 或 0.8（见 5.5）
@@ -222,6 +223,15 @@ score ×= 1 + StarUpBias(0.8) × gain
 ```
 
 - 常量：`StarUpBias = 0.8`、`StarUpBenchFactor = 0.4`。
+
+### 5.4.3 许愿偏好（`score ×= WishCardBias`）
+
+**口径：like 许愿阶段各玩家各自点赞的牌进入其"收藏池"，商店刷新时按 `LikeCardRefreshRate(=5)%` 概率刷出"当前玩家自己许愿的牌"。对这类牌，AI 拿取意愿 ×2。**
+
+- 判定：`HeroSelectionTool.IsLikedHero(playerInfo.pid, 候选卡Id)`（读 `likeHeroPools`，按 pid 分玩家的收藏池）。
+- 常量：`WishCardBias = 2`（设 1 即关闭）。
+- 仅作用于英雄卡；与同卡（升星）、羁绊、品质/价格等加成叠乘。
+- 模拟器同口径复现：开局跑一次 like 阶段（`CardPickSim.RunLikePhase`，复用 `PlayerAI.CheckLike`）写入收藏池；期末"上阵 / 未上阵阵容"中许愿卡名前缀 `♥`（`★` 仍表示命中喜好，二者可叠加为 `♥★`）。
 
 ### 5.5 羁绊（Like）加成
 
@@ -332,6 +342,7 @@ score ×= 1 + StarUpBias(0.8) × gain
 | `FocusMaxTargets` | 2 | 聚焦目标名额上限（好友组与职业共用） |
 | `QualityBiasMin` / `QualityBiasMax` | 0.5 / 2.0 | 品质偏好系数区间 |
 | `QualityBias4Floor` | 1.0 | 品质4 品质偏好的下限（低等级 Q4 概率最低时抬到 1.0，避免史诗卡被过度压制） |
+| `WishCardBias` | 2 | 许愿偏好：候选卡是自己许愿(点赞收藏池)的牌时，拿取意愿 ×2（设 1 关闭） |
 | `CardPriceBiasBase` / `CardPriceBiasExponent` | 6 / 2 | 价格偏好：`score ×= (价格/6)^2`（阵容价值=价格×星级，价格是更可控的杠杆） |
 | `StarUpBias` / `StarUpBenchFactor` | 0.8 / 0.4 | 升星导向信任倍率 / 预备席权重（上阵主力=1.0，预备席=本值） |
 | `FactionShieldCounts` | {2,3,4,5,6} | 同阵营护盾档位 |
@@ -395,6 +406,7 @@ buy/sell 评分与淘汰清仓用到的列（`ExpCheckOff` 为 float，其余含
 | 品质4 是否设下限 | `CombatConst.QualityBias4Floor`（当前 1.0，设 0 即关闭下限） |
 | 价格偏好强度 | `CombatConst.CardPriceBiasBase / CardPriceBiasExponent`（当前 6 / 2，指数设 0 即关闭） |
 | 升星导向强度/开关 | `CombatConst.StarUpBias`（当前 0.8，设 0 即关闭） / `StarUpBenchFactor`（预备席权重，当前 0.4） |
+| 许愿偏好强度/开关 | `CombatConst.WishCardBias`（当前 2，设 1 即关闭）；判定 `HeroSelectionTool.IsLikedHero(pid, heroId)` |
 | 品质偏好的概率源 | `PlayerAI.GetQualityBias` 内分支 |
 | Like 三路的权重 | `CombatConst.ForceBias / JobChainBias / FriendBias` 及 `*Top` |
 | "上阵最多那一路"的判定 | `PlayerAI.IsTopLikeJob / IsTopLikeFriend` |

@@ -193,6 +193,8 @@ public static class CombatConst
     /// <summary>品质偏好系数区间：按本回合商店出卡概率线性插值，最高概率品质取上限、最低取下限</summary>
     public const float QualityBiasMax = 2f;
     public const float QualityBiasMin = 0.5f;
+    /// <summary>许愿偏好倍率：候选卡是"当前玩家自己许愿(点赞收藏池)的牌"时，拿取意愿乘本倍率</summary>
+    public const float WishCardBias = 2f;
     /// <summary>品质4强卡的品质偏好下限：避免低等级阶段 Q4 概率最低被判到 QualityBiasMin，抬高史诗卡获取（阵容价值=价格×星级）</summary>
     public const float QualityBias4Floor = 1f;
     /// <summary>升星导向信任倍率：重复卡按"距下一星卡数"（越近越高）加权，把资源集中到核心卡升星（阵容价值=价格×星级，升星是乘法收益）</summary>

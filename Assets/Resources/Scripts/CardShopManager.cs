@@ -213,33 +213,27 @@ public class CardShopManager : MonoBehaviour
         rateText.text = sb.ToString();
     }
 
-    // 刷新卡位出卡：先按 LikeCardRefreshRate 概率从收藏池随机出一张（收藏池=like阶段全部玩家点赞，8玩家×2张共16张，存于 HeroSelectionTool），
-    // 未命中（或收藏池空）则按 GameRoundConfig 品质概率随机出一张
-    public int GetRandomShopHeroId(GameRoundConfig shopCfg)
+    // 刷新卡位出卡：先按 LikeCardRefreshRate 概率从"该玩家自己"的收藏池随机出一张（收藏池=like阶段各玩家各自点赞的卡），
+    // 未命中（或该玩家收藏池空）则按 GameRoundConfig 品质概率随机出一张
+    public int GetRandomShopHeroId(GameRoundConfig shopCfg, int pid)
     {
         if (SysRandom.Range(0, 100) < CombatConst.LikeCardRefreshRate)
         {
-            var likeId = HeroSelectionTool.GetRandomLikedHeroId();
+            var likeId = HeroSelectionTool.GetRandomLikedHeroId(pid);
             if (likeId != 0)
-            {
-                HeroSelectionTool.DecayShopWeight(likeId); // 收藏卡同样计入刷出权重衰减
                 return likeId;
-            }
         }
         return HeroSelectionTool.GetRandomHeroIdByQuality(shopCfg);
     }
 
-    // 独立买卡模式刷牌：先按 LikeCardRefreshRate 概率从收藏池出一张，否则按玩家等级(PlayerLevelConfig)品质概率出一张
-    public int GetRandomShopHeroIdByLevel(int level)
+    // 独立买卡模式刷牌：先按 LikeCardRefreshRate 概率从"该玩家自己"的收藏池出一张，否则按玩家等级(PlayerLevelConfig)品质概率出一张
+    public int GetRandomShopHeroIdByLevel(int level, int pid)
     {
         if (SysRandom.Range(0, 100) < CombatConst.LikeCardRefreshRate)
         {
-            var likeId = HeroSelectionTool.GetRandomLikedHeroId();
+            var likeId = HeroSelectionTool.GetRandomLikedHeroId(pid);
             if (likeId != 0)
-            {
-                HeroSelectionTool.DecayShopWeight(likeId); // 收藏卡同样计入刷出权重衰减
                 return likeId;
-            }
         }
         return HeroSelectionTool.GetRandomHeroIdByLevel(level);
     }

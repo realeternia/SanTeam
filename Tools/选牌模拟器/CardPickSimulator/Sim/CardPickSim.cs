@@ -78,6 +78,9 @@ public class CardPickSim
             // 3) 构建无头场景：8 名玩家 + 世界 + 面板 + 商店宿主
             BuildScene();
 
+            // 3.5) like 许愿阶段（开局一次）：各 AI 点赞写入收藏池，供商店刷新出"自己许愿的牌"
+            RunLikePhase();
+
             // 4) 逐回合驱动商店
             for (int round = 1; round <= Rounds; round++)
             {
@@ -152,6 +155,56 @@ public class CardPickSim
             var st = new PlayerState { info = p, lastGold = p.gold };
             st.lastCards = new Dictionary<int, int>(p.cards);
             states.Add(st);
+        }
+    }
+
+    // like 许愿阶段：开局每个 AI 玩家按 likeCount(默认2张) 各点赞若干张，写入 HeroSelectionTool 收藏池。
+    // 收藏池会在商店刷新时按 LikeCardRefreshRate 概率出"该玩家自己许愿的牌"，AI 评分对许愿牌拿取意愿 ×2。
+    // 与真机 PickPanelControl.AllPlayerLikes 同口径（复用 PlayerAI.CheckLike），区别：模拟器 8 人全 AI，故 pid0~7 都点赞。
+    private void RunLikePhase()
+    {
+        // 点赞格：覆盖本局全部可出英雄；CheckLike 内部自行按品质/价格/主公过滤，SetLike 落格时再校验
+        var cells = new List<PickPanelCellControl>();
+        foreach (int heroId in GameManager.Instance.heroIds)
+        {
+            var go = new GameObject("LikeCell" + heroId);
+            var cell = go.AddComponent<PickPanelCellControl>();
+            cell.heroId = heroId;
+            cell.canLike = true;
+            cells.Add(cell);
+        }
+
+        foreach (var p in GameManager.Instance.players)
+        {
+            if (p.likeCount > 0)
+                PlayerAI.CheckLike(p, cells);
+        }
+
+        // 收集 likeState(pid+1) → pid → 许愿英雄列表，写入收藏池
+        var pools = new Dictionary<int, List<int>>();
+        foreach (var cell in cells)
+        {
+            if (cell.likeState <= 0)
+                continue;
+            int pid = cell.likeState - 1;
+            if (!pools.TryGetValue(pid, out var list))
+            {
+                list = new List<int>();
+                pools[pid] = list;
+            }
+            list.Add(cell.heroId);
+        }
+        HeroSelectionTool.SetLikePools(pools);
+
+        // 打印许愿结果，便于核对结算里的 ♥ 标记
+        foreach (var st in states)
+        {
+            if (!pools.TryGetValue(st.info.pid, out var list) || list.Count == 0)
+                continue;
+            var names = new List<string>();
+            foreach (int id in list)
+                names.Add(HeroName(id));
+            Log($"  P{st.info.pid} 许愿(♥)：{string.Join("、", names)}");
         }
     }
 
@@ -550,8 +603,9 @@ public class CardPickSim
     {
         int exp = p.cards.TryGetValue(cardId, out var e) ? e : 0;
         int level = HeroSelectionTool.GetCardLevel(exp, true);
-        // 命中玩家喜好（LikeForce 势力 / LikeJob 职业 / LikeFriend 好友组）的英雄名前置 ★
-        string name = (IsLikedByPlayer(p, cardId) ? "★" : "") + HeroName(cardId);
+        // 英雄名前缀：♥=自己许愿(点赞收藏池)的牌，★=命中玩家喜好（LikeForce 势力 / LikeJob 职业 / LikeFriend 好友组）
+        string name = (HeroSelectionTool.IsLikedHero(p.pid, cardId) ? "♥" : "")
+            + (IsLikedByPlayer(p, cardId) ? "★" : "") + HeroName(cardId);
         if (level >= HeroSelectionTool.MaxHeroCardLevel)
             return $"{name}Lv{level}(MAX)";
         if (level <= 0)

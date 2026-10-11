@@ -93,26 +93,29 @@ public static class HeroSelectionTool
         return result;
     }
 
-    // like阶段收藏池：8名玩家（人类+AI）各点赞2张，共16张；商店刷新时按 LikeCardRefreshRate 概率从中随机出一张
-    private static List<int> likeHeroPool = new List<int>();
+    // like阶段收藏池（按玩家分别记录）：每个玩家各点赞2张；商店刷新时按 LikeCardRefreshRate 概率从“当前玩家自己”的收藏池随机出一张
+    private static Dictionary<int, List<int>> likeHeroPools = new Dictionary<int, List<int>>();
 
-    // like阶段结束写入收藏池（收集全部玩家点赞的卡牌）
-    public static void SetLikePool(List<int> likeList)
+    // like阶段结束写入收藏池（按 pid 分玩家收集）
+    public static void SetLikePools(Dictionary<int, List<int>> pools)
     {
-        likeHeroPool = likeList == null ? new List<int>() : new List<int>(likeList);
+        likeHeroPools = pools == null ? new Dictionary<int, List<int>>() : pools;
     }
 
-    public static bool HasLikedHero()
+    // 从指定玩家的收藏池随机出一张卡（池空返回0）；命中后该卡权重 ×0.5
+    public static int GetRandomLikedHeroId(int pid)
     {
-        return likeHeroPool.Count > 0;
-    }
-
-    // 从收藏池随机出一张卡（池空返回0）
-    public static int GetRandomLikedHeroId()
-    {
-        if (likeHeroPool.Count == 0)
+        if (!likeHeroPools.TryGetValue(pid, out var pool) || pool.Count == 0)
             return 0;
-        return likeHeroPool[SysRandom.Range(0, likeHeroPool.Count)];
+        int heroId = pool[SysRandom.Range(0, pool.Count)];
+        DecayShopWeight(heroId);
+        return heroId;
+    }
+
+    // 某英雄是否被指定玩家许愿（点赞进其收藏池）
+    public static bool IsLikedHero(int pid, int heroId)
+    {
+        return likeHeroPools.TryGetValue(pid, out var pool) && pool != null && pool.Contains(heroId);
     }
 
     // 刷牌（共享模式）：先按GameRoundConfig品质概率roll出品质，再从该品质的英雄池随机选一张

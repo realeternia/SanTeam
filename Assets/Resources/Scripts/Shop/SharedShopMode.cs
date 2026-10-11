@@ -24,6 +24,8 @@ public class SharedShopMode : ShopMode
         host.ClearCards();
 
         var shopCfg = host.ShopCfg;
+        // 进入商店第一个 round：生成共享板走第一个玩家（积分最低者）的 like 判断
+        int firstPid = host.TurnOrder[0];
         List<int> heroIds = new List<int>();
         int TOTAL_HERO_CARDS = 15;
         // 防死循环：卡池中某品质（第一回合恒为品质1）人数可能不足15张，
@@ -33,7 +35,7 @@ public class SharedShopMode : ShopMode
         while (heroIds.Count < TOTAL_HERO_CARDS && attempt < maxAttempts)
         {
             attempt++;
-            var heroId = host.GetRandomShopHeroId(shopCfg);
+            var heroId = host.GetRandomShopHeroId(shopCfg, firstPid);
             if (heroId == 0)
                 break; // 卡池为空，无法再生成，跳出避免死循环
             if (heroIds.Contains(heroId))
@@ -81,7 +83,7 @@ public class SharedShopMode : ShopMode
     public override void OnBought(ShopOffer offer, PlayerInfo player)
     {
         if (offer != null && offer.view != null)
-            OnCardSelected(offer.view);
+            OnCardSelected(offer.view, player != null ? player.pid : GetTurnPid());
     }
 
     public override void OnHumanBought(PlayerInfo player, ShopOffer offer)
@@ -144,7 +146,7 @@ public class SharedShopMode : ShopMode
 
         int refreshCount = Math.Min(6, unsoldCards.Count);
         for (int i = 0; i < refreshCount; i++)
-            RefreshCard(unsoldCards[i]);
+            RefreshCard(unsoldCards[i], payer.pid);
 
         GameManager.Instance.PlaySound("Sounds/page");
     }
@@ -242,7 +244,7 @@ public class SharedShopMode : ShopMode
     }
 
     // 玩家选中（购买）一张卡：该卡保持售出状态并设置售出倒计时；相邻卡 round-1，归0立即刷新；每次有其他卡售出，所有已售出卡的倒计时-1，归0刷新
-    private void OnCardSelected(CardViewControl ctr)
+    private void OnCardSelected(CardViewControl ctr, int pid)
     {
         // 需要刷新（roundLeft归0）的卡先收集，遍历结束后再统一刷新，避免遍历中修改cardViews
         var toRefresh = new List<CardViewControl>();
@@ -276,11 +278,11 @@ public class SharedShopMode : ShopMode
         }
 
         foreach (var card in toRefresh)
-            RefreshCard(card);
+            RefreshCard(card, pid);
     }
 
-    // 刷新卡位：重新加载prefab生成一张随机新卡（防止复用旧对象导致样式/尺寸残留）
-    private void RefreshCard(CardViewControl ctr)
+    // 刷新卡位：重新加载prefab生成一张随机新卡（防止复用旧对象导致样式/尺寸残留）；按 pid 使用该玩家自己的 like 判断
+    private void RefreshCard(CardViewControl ctr, int pid)
     {
         int index = host.cardViews.IndexOf(ctr);
         if (index < 0)
@@ -294,7 +296,7 @@ public class SharedShopMode : ShopMode
 
         var shopCfg = host.ShopCfg;
         // 按当前品质概率随机刷新，允许重复；每张卡有 LikeCardRefreshRate 概率替换为收藏卡
-        var heroId = host.GetRandomShopHeroId(shopCfg);
+        var heroId = host.GetRandomShopHeroId(shopCfg, pid);
         host.ReplaceCardAt(index, heroId);
     }
 

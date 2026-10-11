@@ -63,17 +63,20 @@ public class PickPanelControl : MonoBehaviour
         finBtn.onClick.AddListener(() =>
         {
             GameManager.Instance.PlaySound("Sounds/click");
-            FinishLikePhase();
+            finBtn.gameObject.SetActive(false); // 防重复点击；AI 许愿与进入商店由协程接管
+            StartCoroutine(AiLikesThenFinish());
         });
         okBtn.onClick.AddListener(() =>
         {
             GameManager.Instance.PlaySound("Sounds/click");
             refreshBtn.gameObject.SetActive(false); // ok后，不能再refresh
+
+            // 许愿阶段：先由玩家 p0 许愿（点红心），玩家点"完成"后再由 AI 批量许愿
             foreach (var cell in cellControls)
                 cell.canLike = true;
 
-            StartCoroutine(AllPlayerLikes());
             okBtn.gameObject.SetActive(false);
+            finBtn.gameObject.SetActive(true);
         });
 
         finBtn.gameObject.SetActive(false);
@@ -440,32 +443,27 @@ public class PickPanelControl : MonoBehaviour
         
     }
 
-    // 玩家轮流点赞
-    private IEnumerator AllPlayerLikes()
+    // 许愿流程：玩家 p0 先许愿，点"完成"后由本协程让 AI 批量许愿，随后进入商店
+    private IEnumerator AiLikesThenFinish()
     {
-        // 等待1秒
-        yield return new WaitForSeconds(.3f);
-
+        // AI 批量许愿：各 AI 依次点赞 likeCount 张（cellControls 已排除 p0 已点赞的卡）
         for (int i = 1; i <= 7; i++)
         {
             var pid = (i % 7) + 1;
             var player = GameManager.Instance.GetPlayer(pid);
             if (player.likeCount > 0)
-            {
                 PlayerAI.CheckLike(player, cellControls);
-                yield return new WaitForSeconds(SysRandom.Range(0.1f, 0.3f));
-            }
         }
-        
-        finBtn.gameObject.SetActive(true);
 
+        FinishLikePhase();
+        yield break;
     }    
 
-    // like阶段结束：把全部玩家（人类+AI）点赞的卡牌写入收藏池（8玩家×2张共16张），
-    // 收藏池会在每次刷新卡牌时有 LikeCardRefreshRate 概率重新刷出一张
+    // like阶段结束：把每个玩家（人类+AI）点赞的卡牌按 pid 写入收藏池，
+    // 收藏池会在每次刷新卡牌时有 LikeCardRefreshRate 概率刷出“当前玩家自己”点赞的一张
     private void FinishLikePhase()
     {
-        HeroSelectionTool.SetLikePool(GetLikePool());
+        HeroSelectionTool.SetLikePools(GetLikePools());
 
         // 新游戏like阶段结束进入，存档一次
         GameManager.Instance.SaveToFile();
@@ -475,18 +473,24 @@ public class PickPanelControl : MonoBehaviour
         PanelManager.Instance.HidePick();
     }
 
-    // 收集全部玩家点赞的卡牌（likeState > 0）
-    private List<int> GetLikePool()
+    // 收集每个玩家点赞的卡牌（likeState = pid+1），返回 pid → 该玩家点赞的英雄ID列表
+    private Dictionary<int, List<int>> GetLikePools()
     {
-        List<int> likeList = new List<int>();
+        var pools = new Dictionary<int, List<int>>();
         foreach (var cell in cellControls)
         {
-            if (cell.likeState > 0)
+            if (cell.likeState <= 0)
+                continue;
+
+            int pid = cell.likeState - 1;
+            if (!pools.TryGetValue(pid, out var list))
             {
-                likeList.Add(cell.heroId);
+                list = new List<int>();
+                pools[pid] = list;
             }
+            list.Add(cell.heroId);
         }
-        return likeList;
+        return pools;
     }
 
 

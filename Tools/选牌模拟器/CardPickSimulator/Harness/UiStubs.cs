@@ -162,7 +162,19 @@ public class PickPanelCellControl : MonoBehaviour
     public bool canLike;
     public Image forbidImg;
 
-    public void SetLike(int pid) { }
+    // 点赞落格：镜像真机 PickPanelCellControl.SetLike 的过滤与状态写入（省略 UI 部分）
+    public void SetLike(int pid)
+    {
+        if (!canLike || likeState > 0)
+            return;
+        if (ConfigManager.IsKingHero(heroId))
+            return;
+        if (HeroConfig.GetConfig(heroId).Quality == 1)
+            return;
+
+        likeState = pid + 1;
+        GameManager.Instance.GetPlayer(pid).likeCount--;
+    }
 }
 
 /// <summary>Tooltip 基类替身</summary>

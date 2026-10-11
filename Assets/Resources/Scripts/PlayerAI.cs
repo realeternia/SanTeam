@@ -333,6 +333,10 @@ public static class PlayerAI
                 // 故"价格"是更可控的价值杠杆——按 (价格/基准)^指数 放大高价卡权重（Q4史诗=最高价）
                 score *= Mathf.Pow((float)pickCard.price / CombatConst.CardPriceBiasBase, CombatConst.CardPriceBiasExponent);
 
+                // 许愿：候选卡是"当前玩家自己许愿(点赞收藏池)的牌"时，拿取意愿 ×2
+                if (HeroSelectionTool.IsLikedHero(playerInfo.pid, pickCard.cardId))
+                    score *= CombatConst.WishCardBias;
+
                 // 升星导向：重复卡按"距下一星的卡数"加权（越近越高），上阵主力额外加成。
                 // 阵容价值=价格×星级，升星是乘法收益：把资源集中到核心卡升星，而非到处买新卡换血
                 if (hasSameCard)

@@ -24,18 +24,18 @@ public class IndependentShopMode : ShopMode
         humanEnded = false;
         aiShops.Clear();
 
-        // 人类(pid0)私有 5 格（按本人等级概率刷牌）
+        // 人类(pid0)私有 5 格（按本人等级概率刷牌，like 走本人收藏池）
         int humanLevel = GameManager.Instance.GetPlayer(0).level;
         for (int i = 0; i < SLOT_COUNT; i++)
         {
-            var offer = RollOffer(humanLevel);
+            var offer = RollOffer(humanLevel, 0);
             host.cardViews.Add(host.CreateCardView(offer.cardId));
         }
         host.LayoutCards(host.cardViews, SLOT_COUNT, 3);
 
-        // AI(pid1~7)各生成私有 5 格（无 UI，各自按本人等级概率刷牌）
+        // AI(pid1~7)各生成私有 5 格（无 UI，各自按本人等级概率刷牌，like 走各自收藏池）
         for (int pid = 1; pid < 8; pid++)
-            aiShops[pid] = BuildOffers(GameManager.Instance.GetPlayer(pid).level, SLOT_COUNT);
+            aiShops[pid] = BuildOffers(GameManager.Instance.GetPlayer(pid).level, SLOT_COUNT, pid);
 
         host.passBtn.gameObject.SetActive(true);
         host.SetPassButtonLabel("结束");
@@ -149,22 +149,22 @@ public class IndependentShopMode : ShopMode
         {
             for (int i = 0; i < host.cardViews.Count; i++)
             {
-                var offer = RollOffer(player.level);
+                var offer = RollOffer(player.level, 0);
                 host.ReplaceCardAt(i, offer.cardId);
             }
         }
         else
         {
-            aiShops[pid] = BuildOffers(player.level, SLOT_COUNT);
+            aiShops[pid] = BuildOffers(player.level, SLOT_COUNT, pid);
         }
 
         GameManager.Instance.PlaySound("Sounds/page");
     }
 
-    // 随机一条英雄报价（按玩家等级品质概率 + 收藏池）
-    private ShopOffer RollOffer(int level)
+    // 随机一条英雄报价（按玩家等级品质概率 + 该玩家自己的收藏池）
+    private ShopOffer RollOffer(int level, int pid)
     {
-        var heroId = host.GetRandomShopHeroIdByLevel(level);
+        var heroId = host.GetRandomShopHeroIdByLevel(level, pid);
         var price = HeroSelectionTool.GetPrice(HeroConfig.GetConfig(heroId));
         return new ShopOffer
         {
@@ -174,11 +174,11 @@ public class IndependentShopMode : ShopMode
         };
     }
 
-    private List<ShopOffer> BuildOffers(int level, int n)
+    private List<ShopOffer> BuildOffers(int level, int n, int pid)
     {
         var list = new List<ShopOffer>();
         for (int i = 0; i < n; i++)
-            list.Add(RollOffer(level));
+            list.Add(RollOffer(level, pid));
         return list;
     }
 }
