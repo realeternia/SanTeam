@@ -114,11 +114,11 @@ public class CardShopManager : MonoBehaviour
     public void LayoutCards(List<CardViewControl> views, int perRow, int centerRows)
     {
         if (perRow <= 0) perRow = 1;
-        float cardWidth = 228f;
+        float cardWidth = 250f;
         float cardHeight = 318f;
         float spacing = 5f;
 
-        float startX = -((perRow * cardWidth) + (perRow - 1) * spacing) / 2f + cardWidth / 2f - 50;
+        float startX = -((perRow * cardWidth) + (perRow - 1) * spacing) / 2f + cardWidth / 2f - 0;
         float startY = (centerRows - 1) / 2f * (cardHeight + spacing) - 320;
 
         for (int i = 0; i < views.Count; i++)

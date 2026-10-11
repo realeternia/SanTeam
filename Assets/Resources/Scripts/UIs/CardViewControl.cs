@@ -28,6 +28,7 @@ public class CardViewControl : MonoBehaviour, IPointerDownHandler, IPointerUpHan
     public Image heroImage;
     // 槽位：0=职业兵种图标，1=英雄技能分类图标(stXXXX)，2/3=好友组关联技能图标
     public Image[] heroSkillImage;
+    public Image kingdomImage;
 
 
     public Image itemImage;
@@ -161,7 +162,19 @@ public class CardViewControl : MonoBehaviour, IPointerDownHandler, IPointerUpHan
                     heroSkillImage[i].sprite = Resources.Load<Sprite>("Textures/SkillPic/" + icon);
             }
 
-            gameObject.GetComponent<Image>().color = SysColor.GetSideColor(heroCfg.Side);
+            // 卡面底图按卡片品质着色（原为按阵营着色）
+            gameObject.GetComponent<Image>().color = SysColor.GetQualityColor(heroCfg.Quality);
+
+            // 国家图标：显示英雄所属势力图标（野势力无图标，隐藏）
+            var forceCfg = ForceConfig.HasConfig(heroCfg.Side) ? ForceConfig.GetConfig(heroCfg.Side) : null;
+            bool hasKingdomIcon = forceCfg != null && !string.IsNullOrEmpty(forceCfg.Icon);
+            if (kingdomImage != null)
+            {
+                kingdomImage.gameObject.SetActive(hasKingdomIcon);
+                if (hasKingdomIcon)
+                    kingdomImage.sprite = Resources.Load<Sprite>("Textures/Icons/" + forceCfg.Icon);
+            }
+
             priceI = HeroSelectionTool.GetPrice(heroCfg);
 
             UpdateEffects();
@@ -340,7 +353,7 @@ public class CardViewControl : MonoBehaviour, IPointerDownHandler, IPointerUpHan
     {
         var panel = gameObject.GetComponent<Image>();
         if (isHeroCard)
-            panel.color = Color.white; // Init 会重新赋阵营色
+            panel.color = Color.white; // Init 会重新赋品质色
         else
             panel.color = SysColor.Card.ItemPanel; // 道具卡面板默认色
 
