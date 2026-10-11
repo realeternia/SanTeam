@@ -221,7 +221,10 @@ public class CardShopManager : MonoBehaviour
         {
             var likeId = HeroSelectionTool.GetRandomLikedHeroId();
             if (likeId != 0)
+            {
+                HeroSelectionTool.DecayShopWeight(likeId); // 收藏卡同样计入刷出权重衰减
                 return likeId;
+            }
         }
         return HeroSelectionTool.GetRandomHeroIdByQuality(shopCfg);
     }
@@ -233,7 +236,10 @@ public class CardShopManager : MonoBehaviour
         {
             var likeId = HeroSelectionTool.GetRandomLikedHeroId();
             if (likeId != 0)
+            {
+                HeroSelectionTool.DecayShopWeight(likeId); // 收藏卡同样计入刷出权重衰减
                 return likeId;
+            }
         }
         return HeroSelectionTool.GetRandomHeroIdByLevel(level);
     }
@@ -434,6 +440,9 @@ public class CardShopManager : MonoBehaviour
     public void ShopBegin()
     {
         GameLog.Debug("ShopBegin");
+
+        // 新商店阶段：把刷牌权重表重置为全 1（每张卡首次全随机），权重不参与存档，读档后同样回到全 1
+        HeroSelectionTool.ResetShopWeights();
 
         // 调试：每次商店阶段开始（含开局与战后回商店）给人类玩家补齐 8 个基础道具
         DebugGiveBaseItems();

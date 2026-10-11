@@ -1,7 +1,7 @@
 // ============================================================
 // 战斗 · 疲劳机制 —— FatigueManager
 // 战斗超时加压：开战后 FatigueStartTime 秒起，每 FatigueInterval 秒对全体英雄结算一次疲劳伤害，
-// 数值按 FatigueBaseDamage 线性递增(100/200/300…)。真实伤害：直接扣血，无视抗性/护盾/减伤/闪避等一切结算。
+// 数值按 FatigueBaseDamage 线性递增(100/200/300…)。真实伤害：直接扣血，无视抗性/护盾/减伤/闪避等一切结算；不致死，最多扣到 1 血。
 // 由战斗主循环驱动（真机 WorldManager.GameUpdate / 模拟器 BattleSim.Step 每 tick 调 Tick），开战前 Reset。
 // ============================================================
 using System.Collections.Generic;

@@ -127,7 +127,32 @@ public static class HeroSelectionTool
         return GetRandomHeroIdByQuality(RollQualityByLevel(level));
     }
 
-    // 按已定品质从英雄池随机选一张（该品质池为空则回退整池随机）
+    // 商店刷牌权重表：每张卡初始权重 1（首次全随机），每次被刷出后 ×ShopWeightDecay（降低连续重复刷新概率）；
+    // 权重只在同一品质内参与加权随机（品质仍由品质概率先 roll 出）。每次商店阶段重置为 1，不参与存档，读档后回到全 1。
+    private static Dictionary<int, float> shopHeroWeights = new Dictionary<int, float>();
+    private const float ShopWeightDecay = 0.5f;
+
+    // 新商店阶段重置权重（所有卡恢复为 1）
+    public static void ResetShopWeights()
+    {
+        shopHeroWeights.Clear();
+    }
+
+    // 某张卡当前权重（未记录则为初始值 1）
+    private static float GetShopWeight(int heroId)
+    {
+        return shopHeroWeights.TryGetValue(heroId, out var w) ? w : 1f;
+    }
+
+    // 某张卡被刷出：权重 ×ShopWeightDecay
+    public static void DecayShopWeight(int heroId)
+    {
+        if (heroId == 0)
+            return;
+        shopHeroWeights[heroId] = GetShopWeight(heroId) * ShopWeightDecay;
+    }
+
+    // 按已定品质从英雄池随机选一张（该品质池为空则回退整池随机）；刷出后该卡权重 ×0.5
     public static int GetRandomHeroIdByQuality(int quality)
     {
         List<int> candidates = new List<int>();
@@ -143,7 +168,28 @@ public static class HeroSelectionTool
         if (candidates.Count == 0)
             return 0;
 
-        return candidates[SysRandom.Range(0, candidates.Count)];
+        int heroId = WeightedPickHero(candidates);
+        DecayShopWeight(heroId);
+        return heroId;
+    }
+
+    // 按权重随机取一张（权重全部非正时回退等概率）
+    private static int WeightedPickHero(List<int> candidates)
+    {
+        float total = 0f;
+        for (int i = 0; i < candidates.Count; i++)
+            total += GetShopWeight(candidates[i]);
+        if (total <= 0f)
+            return candidates[SysRandom.Range(0, candidates.Count)];
+
+        float roll = SysRandom.Range(0f, total);
+        for (int i = 0; i < candidates.Count; i++)
+        {
+            roll -= GetShopWeight(candidates[i]);
+            if (roll < 0f)
+                return candidates[i];
+        }
+        return candidates[candidates.Count - 1];
     }
 
     // 品质1=100-品质2-品质3-品质4

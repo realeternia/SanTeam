@@ -214,7 +214,7 @@ public static class CombatConst
     /// <summary>士兵升级所需金币</summary>
     public const int SodLvupGoldCost = 5;
 
-    // ---- 疲劳机制(战斗超时加压：拖时间会被逐渐耗死) ----
+    // ---- 疲劳机制(战斗超时加压：拖时间会被逐渐磨到残血，但不致死，最低扣到 1 血) ----
     /// <summary>疲劳开始时间(秒)：开战后经过该时长开始结算疲劳</summary>
     public const float FatigueStartTime = 30f;
     /// <summary>疲劳结算间隔(秒)</summary>
