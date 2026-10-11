@@ -13,6 +13,7 @@ public class AttrInfo
     public float CritRate;   // 暴击率（比例，如 0.15=+15%）
     public float MpRegen;    // 法力回复/秒
     public float HpRegen;    // 生命回复/秒
+    public int MoveSpeed;    // 移动速度（绝对值，直接叠加到战斗单位移速）
 
     public int Total
     {
@@ -30,6 +31,7 @@ public class AttrInfo
         CritRate += attr.CritRate;
         MpRegen += attr.MpRegen;
         HpRegen += attr.HpRegen;
+        MoveSpeed += attr.MoveSpeed;
     }
 
 }

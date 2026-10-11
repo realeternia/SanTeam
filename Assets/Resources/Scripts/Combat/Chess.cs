@@ -333,7 +333,8 @@ public class Chess : MonoBehaviour
 
         maxHp = attr.Hp;
         // 次级面板（移速/射程/攻速/护甲/魔抗）已由 PostModify 写回为 职业基准×(1+修正%/100)
-        moveSpeed = heroConfig.MoveSpeed;
+        // 消耗品加成（attrAddons，如移速）叠加
+        moveSpeed = heroConfig.MoveSpeed + attr.MoveSpeed;
         attackRange = heroConfig.Range;
         attackSpeed = heroConfig.AtkSpeed / 30f; // 攻速值→每秒攻击次数（30=1次/秒；攻速20=1.5秒/次，15=2秒/次）
         ap = attr.Ap;
@@ -367,6 +368,7 @@ public class Chess : MonoBehaviour
                 attackSpeedRate += equipAttr.AttackSpeedRate;
                 critRate += equipAttr.CritRate;
                 mpRegen += equipAttr.MpRegen;
+                moveSpeed += equipAttr.MoveSpeed;
 
                 // 装备技能：ItemConfig.SkillId 按 sname 引用（空=无），此处为该英雄卡添加对应技能（固定1级）
                 var equipCfg = ItemConfig.GetConfig(equipId);

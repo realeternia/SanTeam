@@ -74,7 +74,8 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     public int battleSide;
 
     public bool nextSkip = false; //下一轮skip
-    public int aiShopSellCount = 0; //本商店阶段（一回合）AI 已自动卖卡次数，达到 CombatConst.AiMaxSellPerShop 后不再自动卖卡
+    // 本商店阶段（一回合）内已买入的英雄卡id：当回合买入的新卡当回合不卖（每回合商店阶段开始时清空）
+    public HashSet<int> boughtThisShopCards = new HashSet<int>();
     [CustomSerializeField]
     public int sodatk = 0; //士兵atk强化
     [CustomSerializeField]
@@ -610,6 +611,8 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
             // 物品不参与商店购买（仅掉落获得），此处不会执行
             GameLog.Warn($"物品不参与商店购买 cardId={cardId}");
         }
+        if (isHero)
+            boughtThisShopCards.Add(cardId); // 当回合买入的新卡当回合不卖
         GameManager.Instance.PlaySound("Sounds/gold");
         // 可见卡位才需要置灰/飞卡动画；AI 独立商店（隐藏商店，无卡位）跳过 UI 表现
         if (ctr != null)

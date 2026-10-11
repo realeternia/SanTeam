@@ -153,16 +153,29 @@ public static class CombatConst
     public const int BattleLoseExp = 2;
     /// <summary>背包英雄卡上限（最多持有15种不同英雄，重复卡计入经验不占位）</summary>
     public const int PlayerMaxHeroCards = 15;
-    /// <summary>AI 每个商店阶段（一回合）最多自动卖卡次数（限制"卖旧买新"零成本换卡的次数）</summary>
-    public const int AiMaxSellPerShop = 3;
+    /// <summary>卖卡意向倍率区间：按"同卡堆总价(单价×张数)÷本家最高总价"归一后线性映射，总价越高越不舍得卖</summary>
+    public const float SellValueMultiplierMin = 1f;
+    public const float SellValueMultiplierMax = 3f;
+    /// <summary>淘汰回合的最大偏移量：实际淘汰回合 = 配置基准 ± round((1-smart)×本值)，smart 越高偏移越小</summary>
+    public const int EliminateRoundMaxOffset = 5;
     /// <summary>独立买卡商店中，AI 每回合最多刷新自己私有商店的次数（避免 AI 刷金失控）</summary>
     public const int AiMaxShopRefreshPerShop = 2;
+    /// <summary>共享轮换商店中，AI 每个商店阶段最多刷新次数（每次选择最多刷一次）</summary>
+    public const int AiSharedMaxRefreshPerShop = 1;
+    /// <summary>AI 刷新商店后须保留的最低金币：支付刷新费(CardShopManager.RefreshGoldCost)后剩余 >= 本值才允许刷新，避免刷完买不起</summary>
+    public const int AiRefreshMinRemainGold = 6;
     /// <summary>软上限：英雄卡数超限(>上阵格+Cardherolimit)时，非强卡新卡每多囤1张的拒买概率(%)；品质4强卡豁免直接买</summary>
     public const int AiOverLimitRejectPerCard = 35;
     /// <summary>羁绊信任固定倍率（每档）：friend(2-6)好友连线加成最大、job(0-4)职业次之、force(0-2)强卡/国家护盾加成最小</summary>
     public const float FriendBias = 0.8f;
     public const float JobChainBias = 0.6f;
     public const float ForceBias = 0.4f;
+    /// <summary>羁绊信任提升倍率：候选卡命中 Like 且该路是当前上阵人数最多的一路时替换上述基础倍率（friend 0.8→1.5、job 0.6→1）</summary>
+    public const float FriendBiasTop = 1.5f;
+    public const float JobChainBiasTop = 1f;
+    /// <summary>品质偏好系数区间：按本回合商店出卡概率线性插值，最高概率品质取上限、最低取下限</summary>
+    public const float QualityBiasMax = 2f;
+    public const float QualityBiasMin = 0.5f;
     // ---- 买经验（预留：金铲铲4金币买4经验，1金币=1经验；UI后续接入） ----
     /// <summary>购买经验所需金币</summary>
     public const int ExpBuyGoldCost = 4;

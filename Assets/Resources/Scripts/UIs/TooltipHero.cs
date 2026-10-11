@@ -242,7 +242,7 @@ public class TooltipHero : BaseTooltip
         // 装备加成汇总：已装备物品（最多3槽）的属性总和（攻/法/命/护甲/魔抗/攻速比例）；
         // 无装备或无玩家上下文（商店/排行榜）时全为0。装备行内容与基础属性数值调整都依赖该汇总
         var equipIds = new List<int>();
-        int eAtk = 0, eAp = 0, eHp = 0, eArmor = 0, eMagicRes = 0;
+        int eAtk = 0, eAp = 0, eHp = 0, eArmor = 0, eMagicRes = 0, eMoveSpeed = 0;
         float eAtkSpeedRate = 0f, eMpRegen = 0f, eHpRegen = 0f;
         var heroEquipIds = player != null && isHero ? player.GetItemIdsOnHero(heroId) : new List<int>();
         if (player != null && isHero)
@@ -257,6 +257,7 @@ public class TooltipHero : BaseTooltip
                 eArmor += ea.Armor; eMagicRes += ea.MagicRes;
                 eAtkSpeedRate += ea.AttackSpeedRate;
                 eMpRegen += ea.MpRegen; eHpRegen += ea.HpRegen;
+                eMoveSpeed += ea.MoveSpeed;
             }
         }
         bool hasEquip = equipIds.Count > 0;
@@ -273,7 +274,7 @@ public class TooltipHero : BaseTooltip
             AppendEquip(heroCfg.HpRegen, (int)(eHpRegen + attr.HpRegen)),
             AppendEquip(heroCfg.Armor, eArmor + attr.Armor),
             AppendEquip(heroCfg.MagicRes, eMagicRes + attr.MagicRes),
-            heroCfg.MoveSpeed.ToString(), heroCfg.Range.ToString()
+            AppendEquip(heroCfg.MoveSpeed, eMoveSpeed + attr.MoveSpeed), heroCfg.Range.ToString()
         };
 
         int attrRows = 0;

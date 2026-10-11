@@ -341,6 +341,9 @@ public static class HeroSelectionTool
             case "crit":
                 attrInfo.CritRate = value;
                 break;
+            case "movespeed":
+                attrInfo.MoveSpeed = (int)value;
+                break;
         }
     }
 

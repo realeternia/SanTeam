@@ -17,6 +17,7 @@ public class SharedShopMode : ShopMode
     private bool[] playerPassed = new bool[8]; // 记录每个玩家是否pass过
     private int passedPlayers = 0;             // 记录pass的玩家数量
     private int round = 10000;                 // 回合序号（配合 host.TurnOrder 取当前玩家）
+    private readonly Dictionary<int, int> aiRefreshCount = new Dictionary<int, int>(); // 本商店阶段各AI已刷新次数（每次选择最多 AiSharedMaxRefreshPerShop 次）
 
     public override void Begin()
     {
@@ -47,10 +48,11 @@ public class SharedShopMode : ShopMode
         host.passBtn.gameObject.SetActive(true);
         host.SetPassButtonLabel("跳过");
 
-        // 重置所有玩家的pass状态
+        // 重置所有玩家的pass状态与AI刷新计数
         for (int i = 0; i < playerPassed.Length; i++)
             playerPassed[i] = false;
         passedPlayers = 0;
+        aiRefreshCount.Clear();
 
         // 每轮固定从积分最低的玩家开始（TurnOrder 已按 mark 从低到高排序）
         round = 0;
@@ -120,8 +122,15 @@ public class SharedShopMode : ShopMode
             return;
         }
 
-        nowPlayer.gold -= CardShopManager.RefreshGoldCost;
-        nowPlayer.goldText.text = nowPlayer.gold.ToString();
+        RefreshSharedBoard(nowPlayer);
+    }
+
+    // 花 2 金刷新共享店：从未售出卡中随机取 6 张重出（不足 6 张则全刷）。人类按钮与 AI 刷新共用。
+    private void RefreshSharedBoard(PlayerInfo payer)
+    {
+        payer.gold -= CardShopManager.RefreshGoldCost;
+        if (payer.goldText != null)
+            payer.goldText.text = payer.gold.ToString();
 
         // 从未售出的卡牌中随机选取6张进行刷新（不足6张则全部刷新）
         var unsoldCards = host.cardViews.FindAll(x => !x.isSold);
@@ -166,6 +175,16 @@ public class SharedShopMode : ShopMode
             {
                 var offers = GetOffers(currentPlayerId);
                 var result = PlayerAI.AiCheckBuyCard(playerInfo, host.Era, offers);
+
+                // 买不动且本商店阶段刷新次数未达上限：满足"收益评估 + 买得起"门槛时刷新共享店，再重估一次
+                int refreshed = aiRefreshCount.TryGetValue(currentPlayerId, out var rc) ? rc : 0;
+                if (!result && refreshed < CombatConst.AiSharedMaxRefreshPerShop
+                    && PlayerAI.ShouldAiRefresh(playerInfo, offers))
+                {
+                    aiRefreshCount[currentPlayerId] = refreshed + 1;
+                    RefreshSharedBoard(playerInfo);
+                    result = PlayerAI.AiCheckBuyCard(playerInfo, host.Era, GetOffers(currentPlayerId));
+                }
 
                 if (!result)
                 {

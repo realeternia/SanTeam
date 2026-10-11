@@ -118,9 +118,9 @@ public class IndependentShopMode : ShopMode
                 if (PlayerAI.AiCheckBuyCard(player, host.Era, offers))
                     continue;
 
-                // 买不动且还有余钱：刷新自己的商店后重试
+                // 买不动：满足"收益评估（当前无可用卡）+ 买得起（刷新后余额≥AiRefreshMinRemainGold）"才刷新，否则结束
                 if (refreshes < CombatConst.AiMaxShopRefreshPerShop
-                    && player.gold >= CardShopManager.RefreshGoldCost * 2)
+                    && PlayerAI.ShouldAiRefresh(player, offers))
                 {
                     RefreshShopFor(pid);
                     refreshes++;

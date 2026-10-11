@@ -457,9 +457,9 @@ public class CardShopManager : MonoBehaviour
         for(int i = 0; i < 8; i++)
             GameManager.Instance.GetPlayer(i).RoundGold(roundGold);
 
-        // 每回合商店阶段重置 AI 卖卡次数（限制 AI 卖旧买新零成本换卡的次数，防止金币不消耗）
+        // 每回合商店阶段重置"当回合已买入卡"记录：当回合买入的新卡当回合不卖
         for (int i = 0; i < 8; i++)
-            GameManager.Instance.GetPlayer(i).aiShopSellCount = 0;
+            GameManager.Instance.GetPlayer(i).boughtThisShopCards.Clear();
 
         SortPlayersByScore();
 

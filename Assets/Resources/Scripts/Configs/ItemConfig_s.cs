@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -156,7 +156,7 @@ namespace CommonConfig
             config[400008] = new ItemConfig(400008, "诗经", "法强+15，生命+250", 2, "attr", "ap+15,hp+250", "ap", "文润", "", false, 0, 0, "shijing");
             config[400011] = new ItemConfig(400011, "易经", "法强+10，法力回复+4", 2, "attr", "ap+10,mpRegen+4", "ap", "浩然", "", false, 0, 0, "yijing");
             config[400012] = new ItemConfig(400012, "道德经", "法强+15，魔法抗性+30", 2, "attr", "ap+15,magicres+30", "ap", "玄妙", "", false, 0, 0, "daode");
-            config[400013] = new ItemConfig(400013, "赤兔马", "攻速+20%，魔法抗性+30", 2, "attr", "atkspeed+0.2,magicres+30", "atkspeed", "绝尘", "", false, 0, 0, "chitu");
+            config[400013] = new ItemConfig(400013, "赤兔马", "攻速+20%，魔法抗性+30，移速+2", 2, "attr", "atkspeed+0.2,magicres+30,movespeed+2", "atkspeed", "", "", false, 0, 0, "chitu");
             config[400014] = new ItemConfig(400014, "的卢马", "生命+250，生命回复+2", 2, "attr", "hp+250,hpRegen+2", "hp", "磐石", "", false, 0, 0, "ma5");
             config[400015] = new ItemConfig(400015, "长生镜", "生命+150", 1, "attr", "hp+150", "hp", "", "", false, 0, 0, "jingzi");
             config[400016] = new ItemConfig(400016, "飞羽甲", "护甲+30，攻速+15%", 2, "attr", "armor+30,atkspeed+0.15", "armor", "疾风", "", false, 0, 0, "jia3");
@@ -173,7 +173,7 @@ namespace CommonConfig
             config[400027] = new ItemConfig(400027, "破军铁锤", "攻击+30，魔抗+30", 2, "attr", "atk+30,magicres+30", "atk", "破军", "", false, 0, 0, "chui");
             config[400028] = new ItemConfig(400028, "大克鼎", "护甲+40，法力回复+4", 2, "attr", "armor+40,mpRegen+4", "armor", "", "", false, 0, 0, "ding1");
             config[400029] = new ItemConfig(400029, "金马枪", "暴击+22%，法强+15", 2, "attr", "crit+0.22,ap+15", "crit", "灵犀", "", false, 0, 0, "mao1");
-            config[400030] = new ItemConfig(400030, "博山炉", "暴击+25%，生命+300", 2, "attr", "crit+0.25,hp+300", "crit", "", "", false, 0, 0, "lu1");
+            config[400030] = new ItemConfig(400030, "博山炉", "暴击+25%，生命+300", 2, "attr", "crit+0.25,hp+300", "crit", "火箭", "", false, 0, 0, "lu1");
             config[400031] = new ItemConfig(400031, "象鞭", "暴击+25%，法力回复+4", 2, "attr", "crit+0.25,mpRegen+4", "crit", "", "", false, 0, 0, "bian1");
             config[400032] = new ItemConfig(400032, "牛灯", "法强+15，攻速+15%", 2, "attr", "ap+15,atkspeed+0.15", "ap", "迅羽", "", false, 0, 0, "deng1");
             config[400033] = new ItemConfig(400033, "双股剑", "攻击+40", 2, "attr", "atk+40", "atk", "破甲", "", false, 0, 0, "jian3");

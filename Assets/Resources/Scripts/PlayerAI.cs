@@ -69,11 +69,18 @@ public static class PlayerAI
     }
 
 
-    // 商店开始时的 AI 经验检查：回合结束后、买卡前调用一次。总经验低于期望（round×(2.5+ExpCheckOff)）时按缺口概率随机买经验，
-    // 缺口越大触发概率越高（线性、封顶70%）；命中后用当前金币的 20% 买经验（每次 4 金 = 4 经验，买 floor(预算/4) 次）
+    // 商店开始时的 AI 检查（回合结束后、买卡前调用一次，只对 AI 调用）：
+    //   1) 淘汰清仓：到达配置的淘汰回合后，把"非主力上阵"且等级在淘汰线及以下的卡立刻卖出
+    //   2) 买经验：总经验低于期望（round×(2.5+ExpCheckOff)）时按缺口概率随机买经验，缺口越大触发概率越高（线性、封顶70%）
     public static void ShopBegin(PlayerInfo playerInfo)
     {
-        if (playerInfo == null || playerInfo.nextSkip)
+        if (playerInfo == null)
+            return;
+
+        // 淘汰清仓与 nextSkip 无关：到回合就必须清掉过期的低星卡
+        EliminateOutdatedCards(playerInfo);
+
+        if (playerInfo.nextSkip)
             return;
 
         var round = GameManager.Instance.year;
@@ -102,6 +109,126 @@ public static class PlayerAI
         GameLog.Debug($"AI玩家{playerInfo.pid} 经验检查 实际{actual}<期望{expected:F1}(系数{playerInfo.playerConfig.ExpCheckOff:F2}) 概率{prob:F2} 买经验{bought}次(花{bought * CombatConst.ExpBuyGoldCost}金)");
     }
 
+    // 淘汰清仓：到达该玩家的淘汰回合后，把"非主力上阵"且品质在淘汰线及以下的英雄卡立刻卖出。
+    // 与喜好无关——即使它属于 LikeJob/LikeForce/LikeFriend 也一视同仁（到回合就该换更强的卡）。
+    // 不卖：主力上阵卡、主公、初始卡、当回合买入的新卡。
+    public static void EliminateOutdatedCards(PlayerInfo playerInfo)
+    {
+        int maxQuality = GetEliminateMaxQuality(playerInfo);
+        if (maxQuality <= 0)
+            return;
+
+        var strongSet = new HashSet<int>(playerInfo.GetStrongCardList(playerInfo.GetSlotCount()).Select(x => x.Item1));
+        var cfg = playerInfo.playerConfig;
+
+        List<int> toSell = new List<int>();
+        foreach (var cardId in playerInfo.cards.Keys)
+        {
+            if (!ConfigManager.IsHeroCard(cardId))
+                continue;
+            if (strongSet.Contains(cardId))
+                continue; // 主力上阵不卖
+            if (ConfigManager.IsKingHero(cardId))
+                continue; // 主公核心不卖
+            if (cfg.InitCards != null && cfg.InitCards.Contains(cardId))
+                continue; // 初始卡不卖
+            if (playerInfo.boughtThisShopCards.Contains(cardId))
+                continue; // 当回合买入的新卡当回合不卖
+            if (GetCardQuality(cardId) > maxQuality)
+                continue; // 品质高于淘汰线（品质3/4）保留
+            toSell.Add(cardId);
+        }
+
+        foreach (var cardId in toSell)
+        {
+            int quality = GetCardQuality(cardId);
+            playerInfo.SellCard(cardId);
+            GameLog.Debug($"AI玩家{playerInfo.pid} 淘汰清仓 卖出{HeroConfig.GetConfig(cardId).Name} 品质{quality} 淘汰线{maxQuality} 回合{GameManager.Instance.year}");
+        }
+    }
+
+    // 当前淘汰线：0=未到回合不淘汰；1=淘汰品质1卡；2=淘汰品质2及以下卡（取两者中较大的已生效档位）
+    public static int GetEliminateMaxQuality(PlayerInfo playerInfo)
+    {
+        var cfg = playerInfo == null ? null : playerInfo.playerConfig;
+        if (cfg == null)
+            return 0;
+
+        int year = GameManager.Instance.year;
+        int maxQuality = 0;
+        if (cfg.EliminateQuality1 > 0 && year >= GetEliminateRound(playerInfo, cfg.EliminateQuality1))
+            maxQuality = Mathf.Max(maxQuality, 1);
+        if (cfg.EliminateQuality2 > 0 && year >= GetEliminateRound(playerInfo, cfg.EliminateQuality2))
+            maxQuality = Mathf.Max(maxQuality, 2);
+        return maxQuality;
+    }
+
+    // 实际淘汰回合 = 配置基准 ± round((1-smart)×EliminateRoundMaxOffset)：
+    // smart(=聪明度/99) 越高偏移越小（±1 以内），越低越大（最多 ±5）；偏移方向按 pid 固定，一局内稳定不抖动
+    private static int GetEliminateRound(PlayerInfo playerInfo, int baseRound)
+    {
+        float smart = Mathf.Clamp(playerInfo.playerConfig.Intelligence, 1, 99) / 99f;
+        int offset = Mathf.RoundToInt((1f - smart) * CombatConst.EliminateRoundMaxOffset);
+        if (playerInfo.pid % 2 != 0)
+            offset = -offset;
+        return Mathf.Max(1, baseRound + offset);
+    }
+
+    // 该卡的品质（1~4）：品质是卡自身固定属性，与是否拥有/张数无关。
+    // 因此未拥有的品质1/2卡在淘汰期同样不再买入；而品质3/4卡天然高于淘汰线，后期仍可买入补阵。
+    private static int GetCardQuality(int cardId)
+    {
+        var cfg = HeroConfig.GetConfig(cardId);
+        return cfg == null ? 0 : cfg.Quality;
+    }
+
+    // 过滤出"当前真正可考虑购买"的卡：买得起 + 英雄卡 + 非满级同卡 + 通过淘汰过滤。
+    // 供买卡评分与 AI 刷新收益判定共用，保证两处口径完全一致（避免分叉）。
+    public static List<ShopOffer> FilterOffers(PlayerInfo playerInfo, List<ShopOffer> offers)
+    {
+        var result = new List<ShopOffer>();
+        if (playerInfo == null || offers == null)
+            return result;
+
+        var cards = playerInfo.cards;
+        // 买不起的直接剔除
+        result = offers.Where(card => playerInfo.gold >= card.price).ToList();
+        // 商店不卖道具：只考虑英雄卡
+        result = result.Where(card => card.isHero).ToList();
+        // 满级(Lv5)英雄卡不再提供经验，买入纯亏金币：直接从候选剔除（同卡加经验、换卡两种情形都不买）
+        result = result
+            .Where(card => !(cards.ContainsKey(card.cardId) && HeroSelectionTool.IsHeroCardMaxLevel(cards[card.cardId])))
+            .ToList();
+        if (result.Count == 0)
+            return result;
+
+        // 淘汰期：品质已在淘汰线及以下的卡不再购买（仅非主力上阵的卡；即使它属于喜好职业/势力/好友组也一视同仁）
+        // 品质是卡自身固定属性：未拥有的品质1/2卡同样被剔除；品质3/4卡天然高于淘汰线，不受影响
+        int eliminateMaxQuality = GetEliminateMaxQuality(playerInfo);
+        if (eliminateMaxQuality > 0)
+        {
+            var strongSet = new HashSet<int>(playerInfo.GetStrongCardList(playerInfo.GetSlotCount()).Select(x => x.Item1));
+            result = result
+                .Where(card => strongSet.Contains(card.cardId) || GetCardQuality(card.cardId) > eliminateMaxQuality)
+                .ToList();
+        }
+        return result;
+    }
+
+    // AI 是否值得花 2 金刷新当前商店（共享/独立模式共用）：
+    //   1) 收益评估：当前"可用卡"为 0——一张能买/该买的卡都没有（全被满级/淘汰/买不起滤掉）。
+    //      刷新出的新卡与旧卡同源、品质期望不变，"收益"只来自把"结构性无效"的这批卡换掉；
+    //      若已有可用卡，买不动是评分/换卡/存钱问题，刷新收益低，不刷。
+    //   2) 买得起：支付刷新费后剩余金币 >= AiRefreshMinRemainGold，避免刷完买不起。
+    public static bool ShouldAiRefresh(PlayerInfo playerInfo, List<ShopOffer> offers)
+    {
+        if (playerInfo == null)
+            return false;
+        if (FilterOffers(playerInfo, offers).Count > 0)
+            return false;
+        return playerInfo.gold - CardShopManager.RefreshGoldCost >= CombatConst.AiRefreshMinRemainGold;
+    }
+
     public static bool AiCheckBuyCard(PlayerInfo playerInfo, int era, List<ShopOffer> offers)
     {
         if(playerInfo.nextSkip)
@@ -112,24 +239,8 @@ public static class PlayerAI
         var playerConfig = playerInfo.playerConfig;
         var cards = playerInfo.cards;
 
-        // 当前可购卡报价（由商店模式提供：共享=全部未售共享卡；独立=该玩家私有商店）
-        List<ShopOffer> availableCards = offers;
-
-        // 如果没有可用卡片，直接返回
-        if (availableCards == null || availableCards.Count == 0)
-            return false;
-
-        // 过滤掉买不起的卡片
-        var affordableCards = availableCards.Where(card => playerInfo.gold >= card.price).ToList(); //看一张卡的价格
-        if (affordableCards.Count == 0)
-            return false;
-
-        // 商店不卖道具：只考虑英雄卡
-        affordableCards = affordableCards.Where(card => card.isHero).ToList();
-        // 满级(Lv5)英雄卡不再提供经验，买入纯亏金币：直接从候选剔除（同卡加经验、换卡两种情形都不买）
-        affordableCards = affordableCards
-            .Where(card => !(cards.ContainsKey(card.cardId) && HeroSelectionTool.IsHeroCardMaxLevel(cards[card.cardId])))
-            .ToList();
+        // 过滤出真正可考虑的候选：买得起 + 英雄卡 + 非满级同卡 + 通过淘汰过滤（与 AI 刷新判定共用同一口径）
+        var affordableCards = FilterOffers(playerInfo, offers);
         if (affordableCards.Count == 0)
             return false;
 
@@ -137,15 +248,7 @@ public static class PlayerAI
         Tuple<int, int> weakHeroCard = null;
         var heroCardCount = playerInfo.GetHeroCardList().Count;
         if (heroCardCount >= playerInfo.GetSlotCount() + playerConfig.Cardherolimit)
-        {
             weakHeroCard = FindWeakCard(playerInfo);
-            if (weakHeroCard != null)
-            {
-                var cardCount = playerInfo.cards[weakHeroCard.Item1];
-                if (cardCount >= 2 && SysRandom.Range(0, 100) < 40 + cardCount * 20 - year * 10)
-                    weakHeroCard = null;
-            }
-        }
 
         // 直接复用 PlayerInfo 自动上阵的最强卡选择：按总战力取当前上限张
         var strongList = playerInfo.GetStrongCardList(playerInfo.GetSlotCount()).Select(x => x.Item1).ToList();
@@ -163,29 +266,12 @@ public static class PlayerAI
             float score = 1f;
             hasSameCard = false;
 
-            // 如果已经拥有该卡片，增加分数
+            // 如果已经拥有该卡片，增加分数（只保留同卡倍率；低等级优先/非主力惩罚/价格偏好已移除）
             if (cards.ContainsKey(pickCard.cardId))
             {
                 score *= playerConfig.SameCardRate;
-
-                if (year < 8)
-                {
-                    score *= (1 + Math.Max(0, 0.15f * (4 - cards[pickCard.cardId]))); // 优先拿低等级卡
-                    if (pickCard.isHero && !strongList.Contains(pickCard.cardId)) //非主力卡-权重
-                        score *= 0.7f;
-                }
-                else
-                {
-                    if (pickCard.isHero && !strongList.Contains(pickCard.cardId)) //非主力卡-权重
-                        score *= Math.Max(.5f - (year - 8) * 0.05f + cards[pickCard.cardId] * .1f, 0.1f); //card数多可以救一救
-                }
-
                 hasSameCard = true;
             }
-
-            // 计算并记录买卡的价格偏好 bias
-            float buyBias = GetBuyCostBias(pickCard.price, year, playerConfig);
-            score *= 1f + buyBias;
 
             if (pickCard.isHero)
             {
@@ -209,19 +295,29 @@ public static class PlayerAI
                     if (year > 8 && pickCard.price < weakHeroCard.Item2 + year - 8)
                         continue; //新卡价格还不如旧卡，没必要换
                 }
+                // 品质偏好：按本回合商店实际出卡概率提升——概率最高的品质系数 2.0、最低 0.5，中间线性插值
+                score *= GetQualityBias(heroCfg.Quality, year, playerInfo);
+
                 // 近战/远程与羁绊统计均按"新增英雄"计算：重复卡（升星）只吃同卡分
                 bool isNewHero = !strongList.Contains(pickCard.cardId);
 
-                // 羁绊信任固定倍率：命中即加成。friend Bias 最大、job 次之、force(强卡/国家护盾)最小
+                // 羁绊信任固定倍率：命中即加成。friend Bias 最大、job 次之、force(强卡/国家护盾)最小；
+                // 命中 Like 且该路为"当前上阵人数最多"的那一路时，job 0.6→1、friend 0.8→1.5
                 // force：候选卡所属势力命中 LikeForce 时，按推进同阵营护盾档位(2/3/4/5/6人→Lv1~5)计
                 if (LikeHasForce(playerConfig.LikeForce, heroCfg.Side))
                     score *= 1f + CombatConst.ForceBias * GetForceGain(ctx, heroCfg, isNewHero);
                 // job：候选卡所属职业命中 LikeJob 时，按推进或达成职业连锁档位(1/2/3/4/5人→Lv1~5)计
                 if (LikeHasJob(playerConfig.LikeJob, heroCfg))
-                    score *= 1f + CombatConst.JobChainBias * GetJobGain(ctx, heroCfg, isNewHero);
+                {
+                    float jobBias = IsTopLikeJob(ctx, heroCfg) ? CombatConst.JobChainBiasTop : CombatConst.JobChainBias;
+                    score *= 1f + jobBias * GetJobGain(ctx, heroCfg, isNewHero);
+                }
                 // friend：候选卡所属好友组命中 LikeFriend 时，按连线档位(2~6人)/特殊连锁组进度/每回合金币组计
                 if (LikeHasFriend(playerConfig.LikeFriend, pickCard.cardId))
-                    score *= 1f + CombatConst.FriendBias * GetFriendGain(ctx, pickCard.cardId);
+                {
+                    float friendBias = IsTopLikeFriend(ctx, pickCard.cardId) ? CombatConst.FriendBiasTop : CombatConst.FriendBias;
+                    score *= 1f + friendBias * GetFriendGain(ctx, pickCard.cardId);
+                }
                 // 远近搭配：缺哪类补哪类，同类堆多则扣分（保留聪明度折扣）
                 score *= 1f + playerConfig.BalanceFactor * GetBalanceGain(ctx, heroCfg, isNewHero) * smart;
             }
@@ -279,14 +375,12 @@ public static class PlayerAI
         //日志打印scoredCards和selectedCard
 
         var sb = new StringBuilder();
-        float accumulated = Mathf.Max(0f, playerConfig.AccumulatedCostBias) * Mathf.Sqrt(year);
-        int targetCost = Math.Max(1, Mathf.RoundToInt(accumulated));
-        sb.AppendLine($"{playerInfo.playerNameText.text} 选卡 scoredCards数量: {scoredCards.Count}, targetCost:{targetCost}, accumulated:{accumulated:F2}");
+        sb.AppendLine($"{playerInfo.playerNameText.text} 选卡 scoredCards数量: {scoredCards.Count}");
         for (int i = 0; i < scoredCards.Count; i++)
         {
             var card = scoredCards[i];
-            float cardBuyBias = GetBuyCostBias(card.card.price, year, playerConfig);
-            sb.AppendLine($"  [{i+1}] 卡片ID: {card.card.cardId}, 名称: {HeroConfig.GetConfig(card.card.cardId).Name}, 分数: {card.score}, 价格: {card.card.price}, buyBias: {cardBuyBias:F2}");
+            var logCfg = HeroConfig.GetConfig(card.card.cardId);
+            sb.AppendLine($"  [{i+1}] 卡片ID: {card.card.cardId}, 名称: {logCfg.Name}, 分数: {card.score}, 价格: {card.card.price}, 品质: {logCfg.Quality}, 品质系数: {GetQualityBias(logCfg.Quality, year, playerInfo):F2}");
         }
 
         // 聪明度越高候选池越窄（只在最优的几张里挑）；越低越宽（更容易随机到次优卡）
@@ -326,16 +420,13 @@ public static class PlayerAI
         GameLog.Debug(sb.ToString());                
 
         hasSameCard = cards.ContainsKey(selectedCard.cardId);
-        // 卖旧买新受次数限制：每个商店阶段最多自动卖 CombatConst.AiMaxSellPerShop 次，防止低价卡全额返还导致零成本换卡、金币永不消耗
-        // 软上限：品质4强卡豁免（超限直接买，不强制卖弱）；非强卡超限且未被拒买时才卖旧买新
-        // 硬上限（PlayerMaxHeroCards）：背包已满时新英雄必须卖弱卡腾位才能买入，品质4也不例外，否则购买必然失败
+        // 卖旧买新：软上限超限时卖弱卡腾位。品质4强卡豁免（超限直接买，不强制卖弱）；
+        // 硬上限（PlayerMaxHeroCards）时新英雄必须卖弱卡腾位，品质4也不例外，否则购买必然失败
         bool atHardCap = heroCardCount >= CombatConst.PlayerMaxHeroCards;
         if (selectedCard.isHero && heroCardCount >= playerInfo.GetSlotCount() + playerConfig.Cardherolimit && !hasSameCard && weakHeroCard != null
-            && (HeroConfig.GetConfig(selectedCard.cardId).Quality != 4 || atHardCap)
-            && playerInfo.aiShopSellCount < CombatConst.AiMaxSellPerShop)
+            && (HeroConfig.GetConfig(selectedCard.cardId).Quality != 4 || atHardCap))
         {
             playerInfo.SellCard(weakHeroCard.Item1); //卖掉最弱的卡
-            playerInfo.aiShopSellCount++;
         }
 
         // 返回真实购买结果：英雄卡已满且无弱卡可卖等情况下购买会失败，
@@ -343,30 +434,116 @@ public static class PlayerAI
         return CardShopManager.Instance.BuyOffer(playerInfo, selectedCard);
     }
 
-    private static float GetBuyCostBias(int cardPrice, int year, PlayerConfig cfg)
+    // 品质偏好系数：按当前商店实际出卡概率线性插值——概率最高的品质取 QualityBiasMax(2.0)、最低取 QualityBiasMin(0.5)
+    // 概率来源与真实刷牌一致：独立买卡(ShopType=1)按该玩家等级读 PlayerLevelConfig；共享轮换按回合读 GameRoundConfig
+    // 品质1概率 = 100 - 品质2 - 品质3 - 品质4
+    private static float GetQualityBias(int quality, int year, PlayerInfo playerInfo)
     {
-        if (cardPrice <= 0 || cfg == null || year <= 0)
-            return 0f;
+        int q2, q3, q4;
+        var shopMgr = CardShopManager.Instance;
+        if (shopMgr != null && shopMgr.Mode != null && shopMgr.Mode.Type == ShopModeType.Independent)
+        {
+            var lvCfg = PlayerLevelConfig.GetConfig(Mathf.Clamp(playerInfo.level, 1, CombatConst.PlayerMaxLevel));
+            if (lvCfg == null)
+                return 1f; // UI 数据未就绪：不加不减
+            q2 = lvCfg.Quality2Rate;
+            q3 = lvCfg.Quality3Rate;
+            q4 = lvCfg.Quality4Rate;
+        }
+        else
+        {
+            var roundCfg = GameRoundConfig.GetConfig(Mathf.Clamp(year, 1, 100));
+            if (roundCfg == null)
+                return 1f;
+            q2 = roundCfg.Quality2Rate;
+            q3 = roundCfg.Quality3Rate;
+            q4 = roundCfg.Quality4Rate;
+        }
 
-        // Use sqrt(year) mapping so: sqrt(10)~3.16, sqrt(30)~5.48, sqrt(60)~7.75
-        float accumulated = Mathf.Max(0f, cfg.AccumulatedCostBias) * Mathf.Sqrt(year);
-        int targetCost = Mathf.Max(1, Mathf.RoundToInt(accumulated));
+        float[] rates =
+        {
+            Mathf.Max(0f, 100f - q2 - q3 - q4),
+            Mathf.Max(0f, q2),
+            Mathf.Max(0f, q3),
+            Mathf.Max(0f, q4),
+        };
+        float min = rates[0];
+        float max = rates[0];
+        foreach (var r in rates)
+        {
+            if (r < min) min = r;
+            if (r > max) max = r;
+        }
+        if (max <= min)
+            return 1f; // 各品质概率相同，无偏好
 
-        if (cardPrice == targetCost)
-            return 1.0f; // highest boost for exact target
+        int idx = Mathf.Clamp(quality - 1, 0, rates.Length - 1);
+        return CombatConst.QualityBiasMin
+            + (CombatConst.QualityBiasMax - CombatConst.QualityBiasMin) * (rates[idx] - min) / (max - min);
+    }
 
-        // mid tier (near target) still favored
-        int lower = Math.Max(1, targetCost - 1);
-        int upper = targetCost + 1;
-        if (cardPrice >= lower && cardPrice <= upper)
-            return 0.6f;
+    // 候选卡职业是否为玩家 LikeJob 中"上阵人数最多"的那一路（决定 job 信任倍率是否用提升值）
+    private static bool IsTopLikeJob(AiContext ctx, HeroConfig heroCfg)
+    {
+        if (ctx.cfg.LikeJob == null || ctx.cfg.LikeJob.Length == 0)
+            return false;
 
-        // slightly lower costs acceptable
-        if (cardPrice < lower)
-            return 0.25f;
+        int best = 0;
+        foreach (var jobId in ctx.cfg.LikeJob)
+        {
+            var jobCfg = JobConfig.GetConfig(jobId);
+            if (jobCfg == null)
+                continue;
+            int count = ctx.GetJobCount(jobCfg.NameS);
+            if (count > best)
+                best = count;
+        }
+        return best > 0 && ctx.GetJobCount(heroCfg.Job) == best;
+    }
 
-        // higher costs penalized progressively
-        return -0.4f * (cardPrice - upper);
+    // 候选卡的（命中 LikeFriend 的）好友组中，是否存在"上阵成员最多"的那一组（决定 friend 信任倍率是否用提升值）
+    private static bool IsTopLikeFriend(AiContext ctx, int cardId)
+    {
+        if (ctx.cfg.LikeFriend == null || ctx.cfg.LikeFriend.Length == 0)
+            return false;
+
+        int best = 0;
+        foreach (var relId in ctx.cfg.LikeFriend)
+        {
+            int present = CountFriendMembersInLineup(ctx, relId);
+            if (present > best)
+                best = present;
+        }
+        if (best <= 0)
+            return false;
+
+        var cardRels = ConfigManager.GetHeroFriendInfo(cardId);
+        if (cardRels == null)
+            return false;
+        foreach (var relId in cardRels)
+        {
+            if (System.Array.IndexOf(ctx.cfg.LikeFriend, relId) < 0)
+                continue;
+            if (CountFriendMembersInLineup(ctx, relId) == best)
+                return true;
+        }
+        return false;
+    }
+
+    // 某好友组当前上阵成员数
+    private static int CountFriendMembersInLineup(AiContext ctx, int friendRelId)
+    {
+        var relCfg = HeroFriendConfig.GetConfig(friendRelId);
+        if (relCfg == null)
+            return 0;
+
+        int present = 0;
+        foreach (var memberId in relCfg.Heros)
+        {
+            if (ctx.InLineup(memberId))
+                present++;
+        }
+        return present;
     }
 
     private static float GetSellCostBias(int cardPrice, int year, PlayerConfig cfg)
@@ -393,9 +570,26 @@ public static class PlayerAI
         var ctx = BuildContext(playerInfo, strongList);
 
         List<Tuple<int, float, int>> sortDataList = new List<Tuple<int, float, int>>(); // heroId, 阵容价值, 价格
+
+        // 卖卡意向基准：以本家"同卡堆总价(单价×张数)"最高的卡堆为基数，其他卡堆按占比得倍率（总价越高越不舍得卖）
+        float maxStackValue = 0f;
+        foreach (var kv in cards)
+        {
+            if (!ConfigManager.IsHeroCard(kv.Key))
+                continue;
+            var stackCfg = HeroConfig.GetConfig(kv.Key);
+            if (stackCfg == null)
+                continue;
+            maxStackValue = Mathf.Max(maxStackValue, HeroSelectionTool.GetPrice(stackCfg) * kv.Value);
+        }
+
         foreach (int cardId in cards.Keys)
         {
             if (!ConfigManager.IsHeroCard(cardId))
+                continue;
+
+            // 当回合买入的新卡，当回合不卖
+            if (playerInfo.boughtThisShopCards.Contains(cardId))
                 continue;
 
             // 尽量不卖高星卡（保护3星及以上）
@@ -416,6 +610,11 @@ public static class PlayerAI
             var heroCfg = HeroConfig.GetConfig(cardId);
             var price = HeroSelectionTool.GetPrice(heroCfg);
             float value = GetLineupValue(ctx, heroCfg);
+            // 总价倍率：卡堆总价占本家最高卡堆的比例，线性映射到 [1, 3] 倍——低总价的卡堆卖得更靠前
+            float stackRatio = maxStackValue > 0f ? price * cards[cardId] / maxStackValue : 1f;
+            float stackMultiplier = CombatConst.SellValueMultiplierMin
+                + (CombatConst.SellValueMultiplierMax - CombatConst.SellValueMultiplierMin) * Mathf.Clamp01(stackRatio);
+            value *= stackMultiplier;
             float sellBias = GetSellCostBias(price, GameManager.Instance.year, playerInfo.playerConfig);
             value *= 1f + sellBias;
             sortDataList.Add(new Tuple<int, float, int>(cardId, value, price));

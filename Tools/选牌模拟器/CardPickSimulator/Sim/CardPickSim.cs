@@ -390,9 +390,9 @@ public class CardPickSim
             if (offers != null && offers.Count > 0 && PlayerAI.AiCheckBuyCard(human, shop.Era, offers))
                 continue;
 
-            // 买不动且还有余钱：刷新自己的 5 格后重试（与 IndependentShopMode 中 AI 的处理一致）
+            // 买不动：收益评估（当前无可用卡）+ 买得起 才刷新自己的 5 格后重试（与 IndependentShopMode 中 AI 的处理一致）
             if (refreshes < CombatConst.AiMaxShopRefreshPerShop
-                && human.gold >= CardShopManager.RefreshGoldCost * 2)
+                && PlayerAI.ShouldAiRefresh(human, offers))
             {
                 shop.Mode.OnHumanRefresh();
                 refreshes++;
