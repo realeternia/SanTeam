@@ -166,8 +166,8 @@ public class BagControl : MonoBehaviour, IPanelEvent
         UpdateFieldView();
 
         var soldierCfg = SoldierConfig.GetConfig(500001);
-        var textAtk = (soldierCfg.Atk + bindPlayer.sodatk + bindPlayer.GetItemPAttr("satk") + bindPlayer.GetSoldierAtkAdd(soldierCfg)).ToString();
-        var textHp = (soldierCfg.Hp + bindPlayer.sodhp + bindPlayer.GetItemPAttr("shp") + bindPlayer.GetSoldierHpAdd(soldierCfg)).ToString();
+        var textAtk = (soldierCfg.Atk + bindPlayer.GetSoldierAtkAdd(soldierCfg)).ToString();
+        var textHp = (soldierCfg.Hp + bindPlayer.GetItemPAttr("shp") + bindPlayer.GetSoldierHpAdd(soldierCfg)).ToString();
         UpdateExpView();
         UpdateSodView();
 

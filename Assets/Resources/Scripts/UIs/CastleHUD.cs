@@ -9,7 +9,6 @@ public class CastleHUD : MonoBehaviour
     public TMP_Text textAtk;
     public TMP_Text textHp;
     public Image healthImg;
-    private int soldierLevel;
     private PlayerInfo owner;
 
     private int baseAtk;
@@ -27,8 +26,8 @@ public class CastleHUD : MonoBehaviour
         castleName.text = p.playerNameText.text;
 
         var soldierCfg = SoldierConfig.GetConfig(500001);
-        baseAtk = soldierCfg.Atk + p.sodatk + p.GetItemPAttr("satk") + p.GetSoldierAtkAdd(soldierCfg);
-        baseHp = soldierCfg.Hp + p.sodhp + p.GetItemPAttr("shp") + p.GetSoldierHpAdd(soldierCfg);
+        baseAtk = soldierCfg.Atk + p.GetSoldierAtkAdd(soldierCfg);
+        baseHp = soldierCfg.Hp + p.GetItemPAttr("shp") + p.GetSoldierHpAdd(soldierCfg);
         textAtk.text = baseAtk.ToString();
         textHp.text = baseHp.ToString();
 
@@ -45,13 +44,4 @@ public class CastleHUD : MonoBehaviour
         rectTransform.anchoredPosition = screenPosition + new Vector2(-75, 0);
     }
 
-    public void AddSoldierLevel(int level, int atkAdd, int hpAdd)
-    {
-        soldierLevel += level;
-        var soldierCfg = SoldierConfig.GetConfig(500001);
-        textAtk.text = (baseAtk + atkAdd).ToString();
-        textHp.text = (baseHp + hpAdd).ToString();
-        textAtk.color = Color.green;
-        textHp.color = Color.green;
-    }
 }

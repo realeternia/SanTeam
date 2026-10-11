@@ -23,8 +23,6 @@ public class PlayerInfo
     public Color lineColor = Color.blue;
     public int banCount = 1;
 
-    public int sodatk = 0;      // 士兵攻击强化
-    public int sodhp = 0;       // 士兵生命强化
     public int soldierLevel = 1;
     public int level = 1;
     public int exp = 0;

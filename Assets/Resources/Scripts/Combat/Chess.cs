@@ -97,7 +97,6 @@ public class Chess : MonoBehaviour
     public int soldierId;
     /// <summary>召唤物标签（技能召唤时由 SkillConfig.SummonTag 标记，如"火"，用于技能识别场景中的召唤物类型）</summary>
     public string SummonTag;
-    private int soldierLevel = 0;
 
 
     // 攻击冷却时间
@@ -216,8 +215,8 @@ public class Chess : MonoBehaviour
             var playerInfo = (playerId >= 0 && playerId < GameManager.Instance.players.Length) ? GameManager.Instance.GetPlayer(playerId) : null;
             if (playerInfo != null)
             {
-                maxHp += playerInfo.sodhp + playerInfo.GetItemPAttr("shp") + playerInfo.GetSoldierHpAdd(soldierCfg);
-                atk += playerInfo.sodatk + playerInfo.GetItemPAttr("satk") + playerInfo.GetSoldierAtkAdd(soldierCfg);
+                maxHp += playerInfo.GetItemPAttr("shp") + playerInfo.GetSoldierHpAdd(soldierCfg);
+                atk += playerInfo.GetSoldierAtkAdd(soldierCfg);
             }
         }
         // 记录士兵初始生命基准：职业生命系数结算始终以它为基数（士兵无其他生命来源，此值即为战斗前最终生命）
@@ -404,25 +403,6 @@ public class Chess : MonoBehaviour
             this.atk = atk;
         if (heroInfo != null)
             heroInfo.SetAttr(this.ap, this.atk);
-    }
-
-    // 只能开场用
-    public void AddSoldierLevel(int lv, int atkAdd, int hpAdd)
-    {
-        if (isHero)
-            return;
-
-        var soldierCfg = SoldierConfig.GetConfig(soldierId);
-        if (soldierCfg.AtkP <= 0 && soldierCfg.HpP <= 0)
-            return;
-
-        //根据level变化模型scale
-        soldierLevel += lv;
-        transform.localScale = new Vector3(5 + soldierLevel * 0.75f, 3, 5 + soldierLevel * 0.75f);
-
-        atk += (int)(lv * soldierCfg.AtkP);
-        maxHp += (int)(lv * soldierCfg.HpP);
-        hp = maxHp;
     }
 
     public void LockTarget(Chess target1)

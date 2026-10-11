@@ -43,8 +43,8 @@ public class RankPlayerCellInfo : MonoBehaviour
         playerId = playerInfo.playerId;
 
         var soldierCfg = SoldierConfig.GetConfig(500001);
-        soldierAtk = playerInfo.sodatk + soldierCfg.Atk + playerInfo.GetItemPAttr("satk") + playerInfo.GetSoldierAtkAdd(soldierCfg);
-        soldierHp = playerInfo.sodhp + soldierCfg.Hp + playerInfo.GetItemPAttr("shp") + playerInfo.GetSoldierHpAdd(soldierCfg);
+        soldierAtk = soldierCfg.Atk + playerInfo.GetSoldierAtkAdd(soldierCfg);
+        soldierHp = soldierCfg.Hp + playerInfo.GetItemPAttr("shp") + playerInfo.GetSoldierHpAdd(soldierCfg);
         gold = playerInfo.gold;
         power = playerInfo.lastFightMark;
         mark = playerInfo.mark;

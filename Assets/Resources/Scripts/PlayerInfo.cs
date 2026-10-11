@@ -77,10 +77,6 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     // 本商店阶段（一回合）内已买入的英雄卡id：当回合买入的新卡当回合不卖（每回合商店阶段开始时清空）
     public HashSet<int> boughtThisShopCards = new HashSet<int>();
     [CustomSerializeField]
-    public int sodatk = 0; //士兵atk强化
-    [CustomSerializeField]
-    public int sodhp = 0; //士兵def强化
-    [CustomSerializeField]
     public int soldierLevel = 1; //士兵等级(1~30)，决定士兵攻防加成（数量由玩家等级决定）
     [CustomSerializeField]
     public int goldCostHero = 0;
