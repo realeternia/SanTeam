@@ -158,24 +158,50 @@ public static class CombatConst
     public const float SellValueMultiplierMax = 3f;
     /// <summary>淘汰回合的最大偏移量：实际淘汰回合 = 配置基准 ± round((1-smart)×本值)，smart 越高偏移越小</summary>
     public const int EliminateRoundMaxOffset = 5;
+    /// <summary>淘汰清仓每回合最多卖出的张数：逐回合渐进剔卡，避免单回合清空导致阵容断档</summary>
+    public const int EliminateMaxSellPerRound = 1;
     /// <summary>独立买卡商店中，AI 每回合最多刷新自己私有商店的次数（避免 AI 刷金失控）</summary>
     public const int AiMaxShopRefreshPerShop = 2;
     /// <summary>共享轮换商店中，AI 每个商店阶段最多刷新次数（每次选择最多刷一次）</summary>
     public const int AiSharedMaxRefreshPerShop = 1;
     /// <summary>AI 刷新商店后须保留的最低金币：支付刷新费(CardShopManager.RefreshGoldCost)后剩余 >= 本值才允许刷新，避免刷完买不起</summary>
     public const int AiRefreshMinRemainGold = 6;
+    /// <summary>"金币充裕"判定阈值：金币 >= 本值视为"钱多"，允许额外刷新与加大买经验预算（通用规则，不改配置类）</summary>
+    public const int RichGoldThreshold = 15;
+    /// <summary>"钱多"时每个商店阶段额外允许的刷新次数（叠加在 AiSharedMaxRefreshPerShop / AiMaxShopRefreshPerShop 之上）</summary>
+    public const int RichExtraRefreshPerShop = 2;
+    /// <summary>买经验的金币预算比例：默认取 Normal，金币充裕("钱多")时取 Rich</summary>
+    public const float NormalExpBuyGoldRate = 0.2f;
+    public const float RichExpBuyGoldRate = 0.35f;
     /// <summary>软上限：英雄卡数超限(>上阵格+Cardherolimit)时，非强卡新卡每多囤1张的拒买概率(%)；品质4强卡豁免直接买</summary>
     public const int AiOverLimitRejectPerCard = 35;
     /// <summary>羁绊信任固定倍率（每档）：friend(2-6)好友连线加成最大、job(0-4)职业次之、force(0-2)强卡/国家护盾加成最小</summary>
-    public const float FriendBias = 0.8f;
-    public const float JobChainBias = 0.6f;
+    public const float FriendBias = 1.1f;
+    public const float JobChainBias = 0.8f;
     public const float ForceBias = 0.4f;
-    /// <summary>羁绊信任提升倍率：候选卡命中 Like 且该路是当前上阵人数最多的一路时替换上述基础倍率（friend 0.8→1.5、job 0.6→1）</summary>
-    public const float FriendBiasTop = 1.5f;
-    public const float JobChainBiasTop = 1f;
+    /// <summary>羁绊信任提升倍率：候选卡命中 Like 且该路是当前上阵人数最多的一路时替换上述基础倍率（friend 1.1→1.8、job 0.8→1.3）</summary>
+    public const float FriendBiasTop = 1.8f;
+    public const float JobChainBiasTop = 1.3f;
+    /// <summary>好友"差一人"档收益：仅 1 名同组上阵时给的收益，拉平到接近成团档(0.8)以鼓励补齐第 2 人</summary>
+    public const float FriendGainOneShort = 0.7f;
+    /// <summary>聚焦目标核心卡品质门槛：拥有该品质的核心卡即触发对所属好友组/职业的聚焦</summary>
+    public const int FocusCoreQuality = 4;
+    /// <summary>聚焦目标名额上限（好友组与职业共用，通常 2 好友或 1 好友+1 职业）</summary>
+    public const int FocusMaxTargets = 2;
+    /// <summary>聚焦信任倍率：候选卡命中任一派生聚焦目标(好友组/职业)时追加的固定倍率（不要求命中 Like）</summary>
+    public const float FocusBias = 1.2f;
     /// <summary>品质偏好系数区间：按本回合商店出卡概率线性插值，最高概率品质取上限、最低取下限</summary>
     public const float QualityBiasMax = 2f;
     public const float QualityBiasMin = 0.5f;
+    /// <summary>品质4强卡的品质偏好下限：避免低等级阶段 Q4 概率最低被判到 QualityBiasMin，抬高史诗卡获取（阵容价值=价格×星级）</summary>
+    public const float QualityBias4Floor = 1f;
+    /// <summary>升星导向信任倍率：重复卡按"距下一星卡数"（越近越高）加权，把资源集中到核心卡升星（阵容价值=价格×星级，升星是乘法收益）</summary>
+    public const float StarUpBias = 0.8f;
+    /// <summary>升星导向中"预备席卡"的权重系数（上阵主力=1.0，预备席=本值；上阵卡的星级才直接计入阵容价值）</summary>
+    public const float StarUpBenchFactor = 0.4f;
+    /// <summary>价格偏好基准价与指数：score ×= (卡价/本基准)^本指数。阵容价值=价格×星级，星级受出卡随机性限制（多数卡只能到2星），价格是更可控的价值杠杆</summary>
+    public const float CardPriceBiasBase = 6f;
+    public const float CardPriceBiasExponent = 2f;
     // ---- 买经验（预留：金铲铲4金币买4经验，1金币=1经验；UI后续接入） ----
     /// <summary>购买经验所需金币</summary>
     public const int ExpBuyGoldCost = 4;

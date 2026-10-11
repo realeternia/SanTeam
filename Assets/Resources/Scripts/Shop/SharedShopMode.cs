@@ -176,14 +176,19 @@ public class SharedShopMode : ShopMode
                 var offers = GetOffers(currentPlayerId);
                 var result = PlayerAI.AiCheckBuyCard(playerInfo, host.Era, offers);
 
-                // 买不动且本商店阶段刷新次数未达上限：满足"收益评估 + 买得起"门槛时刷新共享店，再重估一次
-                int refreshed = aiRefreshCount.TryGetValue(currentPlayerId, out var rc) ? rc : 0;
-                if (!result && refreshed < CombatConst.AiSharedMaxRefreshPerShop
-                    && PlayerAI.ShouldAiRefresh(playerInfo, offers))
+                // 买不动时：在"刷新收益 + 买得起"门槛内刷新共享店再重估；
+                // 金币充裕("钱多")时上限额外放开（PlayerAI.GetShopRefreshLimit），故用循环允许多刷几次
+                int refreshLimit = PlayerAI.GetShopRefreshLimit(playerInfo, CombatConst.AiSharedMaxRefreshPerShop);
+                while (!result)
                 {
+                    int refreshed = aiRefreshCount.TryGetValue(currentPlayerId, out var rc) ? rc : 0;
+                    if (refreshed >= refreshLimit || !PlayerAI.ShouldAiRefresh(playerInfo, offers))
+                        break;
+
                     aiRefreshCount[currentPlayerId] = refreshed + 1;
                     RefreshSharedBoard(playerInfo);
-                    result = PlayerAI.AiCheckBuyCard(playerInfo, host.Era, GetOffers(currentPlayerId));
+                    offers = GetOffers(currentPlayerId);
+                    result = PlayerAI.AiCheckBuyCard(playerInfo, host.Era, offers);
                 }
 
                 if (!result)

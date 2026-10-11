@@ -119,7 +119,9 @@ public class IndependentShopMode : ShopMode
                     continue;
 
                 // 买不动：满足"收益评估（当前无可用卡）+ 买得起（刷新后余额≥AiRefreshMinRemainGold）"才刷新，否则结束
-                if (refreshes < CombatConst.AiMaxShopRefreshPerShop
+                // 刷新上限：基础上限，金币充裕("钱多")时额外放开（PlayerAI.GetShopRefreshLimit）
+                int refreshLimit = PlayerAI.GetShopRefreshLimit(player, CombatConst.AiMaxShopRefreshPerShop);
+                if (refreshes < refreshLimit
                     && PlayerAI.ShouldAiRefresh(player, offers))
                 {
                     RefreshShopFor(pid);

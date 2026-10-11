@@ -94,8 +94,10 @@ public static class PlayerAI
         if (SysRandom.Value >= prob)
             return;
 
-        // 用当前金币的 20% 买经验（4金=4经验）；金币足够时保底至少买 1 次，避免余钱不足导致命中却空手
-        int budget = Mathf.FloorToInt(playerInfo.gold * 0.2f);
+        // 用当前金币的一定比例买经验（4金=4经验）：默认 20%，金币充裕("钱多"、"多给一点钱买经验")时提高到 35%；
+        // 金币足够时保底至少买 1 次，避免余钱不足导致命中却空手
+        float expRate = IsRichGold(playerInfo) ? CombatConst.RichExpBuyGoldRate : CombatConst.NormalExpBuyGoldRate;
+        int budget = Mathf.FloorToInt(playerInfo.gold * expRate);
         int times = budget / CombatConst.ExpBuyGoldCost;
         if (playerInfo.gold >= CombatConst.ExpBuyGoldCost)
             times = Mathf.Max(1, times);
@@ -109,19 +111,23 @@ public static class PlayerAI
         GameLog.Debug($"AI玩家{playerInfo.pid} 经验检查 实际{actual}<期望{expected:F1}(系数{playerInfo.playerConfig.ExpCheckOff:F2}) 概率{prob:F2} 买经验{bought}次(花{bought * CombatConst.ExpBuyGoldCost}金)");
     }
 
-    // 淘汰清仓：到达该玩家的淘汰回合后，把"非主力上阵"且品质在淘汰线及以下的英雄卡立刻卖出。
-    // 与喜好无关——即使它属于 LikeJob/LikeForce/LikeFriend 也一视同仁（到回合就该换更强的卡）。
-    // 不卖：主力上阵卡、主公、初始卡、当回合买入的新卡。
+    // 淘汰清仓：到达该玩家的淘汰回合后，把"非主力上阵"且品质在淘汰线及以下的英雄卡逐回合卖出。
+    // 逐回合渐进：按品质升序优先淘汰最低品质，每回合最多卖 EliminateMaxSellPerRound 张，避免单回合清空导致阵容断档。
+    // 与喜好无关——即使它属于 LikeJob/LikeForce 也一视同仁（到回合就该换更强的卡）。
+    // 不卖：主力上阵卡、主公、初始卡、当回合买入的新卡、聚焦目标成员、正在成组的好友组成员。
     public static void EliminateOutdatedCards(PlayerInfo playerInfo)
     {
         int maxQuality = GetEliminateMaxQuality(playerInfo);
         if (maxQuality <= 0)
             return;
 
-        var strongSet = new HashSet<int>(playerInfo.GetStrongCardList(playerInfo.GetSlotCount()).Select(x => x.Item1));
+        var strongList = playerInfo.GetStrongCardList(playerInfo.GetSlotCount()).Select(x => x.Item1).ToList();
+        var strongSet = new HashSet<int>(strongList);
         var cfg = playerInfo.playerConfig;
+        // 聚焦/成组保护快照（与买卡评分同一派生口径）
+        var ctx = BuildContext(playerInfo, strongList);
 
-        List<int> toSell = new List<int>();
+        List<int> candidates = new List<int>();
         foreach (var cardId in playerInfo.cards.Keys)
         {
             if (!ConfigManager.IsHeroCard(cardId))
@@ -136,11 +142,20 @@ public static class PlayerAI
                 continue; // 当回合买入的新卡当回合不卖
             if (GetCardQuality(cardId) > maxQuality)
                 continue; // 品质高于淘汰线（品质3/4）保留
-            toSell.Add(cardId);
+            if (IsFocusMember(ctx, cardId))
+                continue; // 聚焦目标成员不卖
+            if (IsFormingFriendMember(playerInfo, cardId))
+                continue; // 正在成组的好友组成员不卖
+            candidates.Add(cardId);
         }
 
-        foreach (var cardId in toSell)
+        // 品质升序：优先淘汰最低品质，让淘汰在多回合内摊开
+        candidates.Sort((a, b) => GetCardQuality(a).CompareTo(GetCardQuality(b)));
+
+        int sellCount = Mathf.Min(candidates.Count, Mathf.Max(1, CombatConst.EliminateMaxSellPerRound));
+        for (int i = 0; i < sellCount; i++)
         {
+            int cardId = candidates[i];
             int quality = GetCardQuality(cardId);
             playerInfo.SellCard(cardId);
             GameLog.Debug($"AI玩家{playerInfo.pid} 淘汰清仓 卖出{HeroConfig.GetConfig(cardId).Name} 品质{quality} 淘汰线{maxQuality} 回合{GameManager.Instance.year}");
@@ -202,29 +217,46 @@ public static class PlayerAI
         if (result.Count == 0)
             return result;
 
-        // 淘汰期：品质已在淘汰线及以下的卡不再购买（仅非主力上阵的卡；即使它属于喜好职业/势力/好友组也一视同仁）
+        // 淘汰期：品质已在淘汰线及以下的卡不再购买（仅非主力上阵的卡）
         // 品质是卡自身固定属性：未拥有的品质1/2卡同样被剔除；品质3/4卡天然高于淘汰线，不受影响
+        // 例外：聚焦目标（好友组/职业）成员豁免本过滤——聚焦套卡的低品质卡仍可继续买入，避免"攒一半被淘汰线掐断"
         int eliminateMaxQuality = GetEliminateMaxQuality(playerInfo);
         if (eliminateMaxQuality > 0)
         {
-            var strongSet = new HashSet<int>(playerInfo.GetStrongCardList(playerInfo.GetSlotCount()).Select(x => x.Item1));
+            var strongList = playerInfo.GetStrongCardList(playerInfo.GetSlotCount()).Select(x => x.Item1).ToList();
+            var strongSet = new HashSet<int>(strongList);
+            var ctx = BuildContext(playerInfo, strongList);
             result = result
-                .Where(card => strongSet.Contains(card.cardId) || GetCardQuality(card.cardId) > eliminateMaxQuality)
+                .Where(card => strongSet.Contains(card.cardId)
+                    || GetCardQuality(card.cardId) > eliminateMaxQuality
+                    || IsFocusMember(ctx, card.cardId))
                 .ToList();
         }
         return result;
     }
 
+    // 金币是否充裕（"钱多"）：金币 >= RichGoldThreshold 即视为可多花——多刷新、多买经验
+    public static bool IsRichGold(PlayerInfo playerInfo)
+    {
+        return playerInfo != null && playerInfo.gold >= CombatConst.RichGoldThreshold;
+    }
+
+    // 本商店阶段允许的刷新次数上限：金币充裕时在基础上限上额外放开 RichExtraRefreshPerShop 次（共享/独立模式共用）
+    public static int GetShopRefreshLimit(PlayerInfo playerInfo, int baseLimit)
+    {
+        return baseLimit + (IsRichGold(playerInfo) ? CombatConst.RichExtraRefreshPerShop : 0);
+    }
+
     // AI 是否值得花 2 金刷新当前商店（共享/独立模式共用）：
     //   1) 收益评估：当前"可用卡"为 0——一张能买/该买的卡都没有（全被满级/淘汰/买不起滤掉）。
     //      刷新出的新卡与旧卡同源、品质期望不变，"收益"只来自把"结构性无效"的这批卡换掉；
-    //      若已有可用卡，买不动是评分/换卡/存钱问题，刷新收益低，不刷。
+    //      若已有可用卡，"钱多"时仍允许刷新（有钱追求更好的卡），金币不充裕则不刷。
     //   2) 买得起：支付刷新费后剩余金币 >= AiRefreshMinRemainGold，避免刷完买不起。
     public static bool ShouldAiRefresh(PlayerInfo playerInfo, List<ShopOffer> offers)
     {
         if (playerInfo == null)
             return false;
-        if (FilterOffers(playerInfo, offers).Count > 0)
+        if (FilterOffers(playerInfo, offers).Count > 0 && !IsRichGold(playerInfo))
             return false;
         return playerInfo.gold - CardShopManager.RefreshGoldCost >= CombatConst.AiRefreshMinRemainGold;
     }
@@ -297,6 +329,18 @@ public static class PlayerAI
                 }
                 // 品质偏好：按本回合商店实际出卡概率提升——概率最高的品质系数 2.0、最低 0.5，中间线性插值
                 score *= GetQualityBias(heroCfg.Quality, year, playerInfo);
+                // 价格偏好：阵容价值=价格×星级，星级受出卡随机性限制（多数卡只能到 2 星），
+                // 故"价格"是更可控的价值杠杆——按 (价格/基准)^指数 放大高价卡权重（Q4史诗=最高价）
+                score *= Mathf.Pow((float)pickCard.price / CombatConst.CardPriceBiasBase, CombatConst.CardPriceBiasExponent);
+
+                // 升星导向：重复卡按"距下一星的卡数"加权（越近越高），上阵主力额外加成。
+                // 阵容价值=价格×星级，升星是乘法收益：把资源集中到核心卡升星，而非到处买新卡换血
+                if (hasSameCard)
+                {
+                    float starGain = GetStarUpGain(playerInfo, strongList, pickCard.cardId);
+                    if (starGain > 0f)
+                        score *= 1f + CombatConst.StarUpBias * starGain;
+                }
 
                 // 近战/远程与羁绊统计均按"新增英雄"计算：重复卡（升星）只吃同卡分
                 bool isNewHero = !strongList.Contains(pickCard.cardId);
@@ -318,6 +362,11 @@ public static class PlayerAI
                     float friendBias = IsTopLikeFriend(ctx, pickCard.cardId) ? CombatConst.FriendBiasTop : CombatConst.FriendBias;
                     score *= 1f + friendBias * GetFriendGain(ctx, pickCard.cardId);
                 }
+                // 聚焦：候选卡命中"派生的聚焦目标"(好友组/职业)时追加固定倍率。
+                // 不要求命中 Like——聚焦是 AI 从已拥有的 Q4 核心卡"发现"出来的长期规划，只对有核心卡的玩家生效
+                float focusGain = GetFocusGain(ctx, heroCfg, pickCard.cardId, isNewHero);
+                if (focusGain > 0f)
+                    score *= 1f + CombatConst.FocusBias * focusGain;
                 // 远近搭配：缺哪类补哪类，同类堆多则扣分（保留聪明度折扣）
                 score *= 1f + playerConfig.BalanceFactor * GetBalanceGain(ctx, heroCfg, isNewHero) * smart;
             }
@@ -388,50 +437,60 @@ public static class PlayerAI
         if (scoredCards.Count > pickPool)
             scoredCards = scoredCards.Take(pickPool).ToList();
 
-        // 根据分数计算总权重
-        float totalWeight = scoredCards.Sum(item => item.score);
-        float randomValue = SysRandom.Range(0f, totalWeight);
-
-        // 根据随机值和权重选择卡片
-        float cumulativeWeight = 0f;
-        ShopOffer selectedCard = null;
-        foreach (var item in scoredCards)
+        // 尝试购买：按分数加权随机挑一张；若买不进（如满包且无可卖弱卡），跳过该卡继续挑下一张。
+        // 好处：满包时仍能买到"同卡（升星）"等无需腾位的候选；避免一次失败就整回合收工导致金币花不出去。
+        // 全部失败才返回 false，由调用方把该玩家标记跳过（防死循环）。
+        var tryPool = new List<(ShopOffer card, float score)>(scoredCards);
+        while (tryPool.Count > 0)
         {
-            cumulativeWeight += item.score;
-            if (randomValue <= cumulativeWeight)
+            // 根据分数计算总权重
+            float totalWeight = tryPool.Sum(item => item.score);
+            float randomValue = totalWeight > 0f ? SysRandom.Range(0f, totalWeight) : 0f;
+
+            // 根据随机值和权重选择卡片
+            float cumulativeWeight = 0f;
+            int pickIndex = tryPool.Count - 1;
+            for (int i = 0; i < tryPool.Count; i++)
             {
-                selectedCard = item.card;
-                break;
+                cumulativeWeight += tryPool[i].score;
+                if (randomValue <= cumulativeWeight)
+                {
+                    pickIndex = i;
+                    break;
+                }
             }
-        }
 
-        // 如果没有选到卡片，返回 false
-        if (selectedCard == null)
-            return false;
+            ShopOffer selectedCard = tryPool[pickIndex].card;
+            tryPool.RemoveAt(pickIndex);
 
-        if (selectedCard != null)
-        {
             sb.AppendLine($"选中卡片: ID={selectedCard.cardId}, 名称={HeroConfig.GetConfig(selectedCard.cardId).Name}, roll={randomValue}, 英雄卡={selectedCard.isHero}");
-        }
-        else
-        {
-            sb.AppendLine("未选中任何卡片");
-        }      
-        GameLog.Debug(sb.ToString());                
 
-        hasSameCard = cards.ContainsKey(selectedCard.cardId);
-        // 卖旧买新：软上限超限时卖弱卡腾位。品质4强卡豁免（超限直接买，不强制卖弱）；
-        // 硬上限（PlayerMaxHeroCards）时新英雄必须卖弱卡腾位，品质4也不例外，否则购买必然失败
-        bool atHardCap = heroCardCount >= CombatConst.PlayerMaxHeroCards;
-        if (selectedCard.isHero && heroCardCount >= playerInfo.GetSlotCount() + playerConfig.Cardherolimit && !hasSameCard && weakHeroCard != null
-            && (HeroConfig.GetConfig(selectedCard.cardId).Quality != 4 || atHardCap))
-        {
-            playerInfo.SellCard(weakHeroCard.Item1); //卖掉最弱的卡
+            bool sameCard = cards.ContainsKey(selectedCard.cardId);
+            int heroCardCountNow = playerInfo.GetHeroCardList().Count;
+            // 卖旧买新：软上限超限时卖弱卡腾位。品质4强卡豁免（超限直接买，不强制卖弱）；
+            // 硬上限（PlayerMaxHeroCards）时新英雄必须卖弱卡腾位，品质4也不例外，否则购买必然失败
+            Tuple<int, int> weak = null;
+            if (heroCardCountNow >= playerInfo.GetSlotCount() + playerConfig.Cardherolimit)
+                weak = FindWeakCard(playerInfo);
+            bool atHardCap = heroCardCountNow >= CombatConst.PlayerMaxHeroCards;
+            if (selectedCard.isHero && heroCardCountNow >= playerInfo.GetSlotCount() + playerConfig.Cardherolimit && !sameCard && weak != null
+                && (HeroConfig.GetConfig(selectedCard.cardId).Quality != 4 || atHardCap))
+            {
+                playerInfo.SellCard(weak.Item1); //卖掉最弱的卡
+            }
+
+            // 真实购买结果：英雄卡已满且无弱卡可卖等情况下购买会失败，此时换一张候选继续尝试
+            if (CardShopManager.Instance.BuyOffer(playerInfo, selectedCard))
+            {
+                GameLog.Debug(sb.ToString());
+                return true;
+            }
+
+            GameLog.Debug($"AI玩家{playerInfo.pid} 买卡失败跳过 {HeroConfig.GetConfig(selectedCard.cardId).Name}，继续尝试下一张");
         }
 
-        // 返回真实购买结果：英雄卡已满且无弱卡可卖等情况下购买会失败，
-        // 此时必须返回 false 让调用方把该玩家标记为跳过本回合，否则 AI 会一直"选牌成功"却不跳过，导致选牌阶段死循环卡住
-        return CardShopManager.Instance.BuyOffer(playerInfo, selectedCard);
+        GameLog.Debug(sb.ToString());
+        return false;
     }
 
     // 品质偏好系数：按当前商店实际出卡概率线性插值——概率最高的品质取 QualityBiasMax(2.0)、最低取 QualityBiasMin(0.5)
@@ -478,8 +537,29 @@ public static class PlayerAI
             return 1f; // 各品质概率相同，无偏好
 
         int idx = Mathf.Clamp(quality - 1, 0, rates.Length - 1);
-        return CombatConst.QualityBiasMin
+        float bias = CombatConst.QualityBiasMin
             + (CombatConst.QualityBiasMax - CombatConst.QualityBiasMin) * (rates[idx] - min) / (max - min);
+        // 品质4强卡设下限：低等级阶段 Q4 概率最低会被压到 QualityBiasMin，抬高史诗卡获取（也是聚焦核心卡来源）
+        if (quality == 4)
+            bias = Mathf.Max(bias, CombatConst.QualityBias4Floor);
+        return bias;
+    }
+
+    // 升星导向收益：重复卡的"距下一星卡数"越近收益越高（1张=1.0、2张=0.6、3张=0.35、更远=0.15）；
+    // 上阵主力额外×1，预备席×StarUpBenchFactor（上阵卡的星级才直接计入阵容价值）。已满级返回 0。
+    private static float GetStarUpGain(PlayerInfo playerInfo, List<int> strongList, int cardId)
+    {
+        if (playerInfo == null || !playerInfo.cards.TryGetValue(cardId, out int exp) || exp <= 0)
+            return 0f;
+        if (HeroSelectionTool.IsHeroCardMaxLevel(exp))
+            return 0f;
+
+        int level = HeroSelectionTool.GetCardLevel(exp, true);
+        int nextNeed = HeroSelectionTool.GetCardExpByLevel(level + 1);
+        int remaining = nextNeed - exp;
+        float prox = remaining <= 1 ? 1f : (remaining == 2 ? 0.6f : (remaining == 3 ? 0.35f : 0.15f));
+        bool inLineup = strongList != null && strongList.Contains(cardId);
+        return prox * (inLineup ? 1f : CombatConst.StarUpBenchFactor);
     }
 
     // 候选卡职业是否为玩家 LikeJob 中"上阵人数最多"的那一路（决定 job 信任倍率是否用提升值）
@@ -592,6 +672,9 @@ public static class PlayerAI
             if (playerInfo.boughtThisShopCards.Contains(cardId))
                 continue;
 
+            var heroCfg = HeroConfig.GetConfig(cardId);
+            var price = HeroSelectionTool.GetPrice(heroCfg);
+
             // 尽量不卖高星卡（保护3星及以上）
             int cardLevel = HeroSelectionTool.GetCardLevel(cards[cardId], true);
             if (cardLevel >= 3) // 3级及以上视为未来潜力，跳过
@@ -607,8 +690,9 @@ public static class PlayerAI
             if (ConfigManager.IsKingHero(cardId))
                 continue; //主公核心不删
 
-            var heroCfg = HeroConfig.GetConfig(cardId);
-            var price = HeroSelectionTool.GetPrice(heroCfg);
+            if (IsFocusMember(ctx, cardId))
+                continue; //聚焦目标成员不卖（与淘汰保护同一口径）
+
             float value = GetLineupValue(ctx, heroCfg);
             // 总价倍率：卡堆总价占本家最高卡堆的比例，线性映射到 [1, 3] 倍——低总价的卡堆卖得更靠前
             float stackRatio = maxStackValue > 0f ? price * cards[cardId] / maxStackValue : 1f;
@@ -654,6 +738,7 @@ public static class PlayerAI
         public Dictionary<string, int> jobCount = new Dictionary<string, int>(); // 职业→同职业英雄数
         public int meleeCount;
         public int rangedCount;
+        public List<FocusTarget> focusTargets = new List<FocusTarget>();         // 本回合派生的聚焦目标（好友组/职业，最多 FocusMaxTargets 个）
 
         public bool InLineup(int heroId)
         {
@@ -687,7 +772,216 @@ public static class PlayerAI
             else
                 ctx.rangedCount++;
         }
+        // 聚焦目标：从"当前拥有的 Q4 核心卡"派生（依赖上阵快照算档位进度），供买卡评分与卖卡/淘汰保护复用
+        ctx.focusTargets = DeriveFocusTargets(playerInfo, ctx);
         return ctx;
+    }
+
+    // 聚焦目标：好友组或职业。派生式无状态——不写存档、不做显式重置，卖掉核心卡即自动释放，跨回合天然稳定
+    private class FocusTarget
+    {
+        public bool isJob;         // true=职业聚焦；false=好友组聚焦
+        public int friendGroupId;  // 好友组Id（isJob=false 时有效）
+        public string jobNameS;    // 职业短名（isJob=true 时有效）
+    }
+
+    // 聚焦候选的排序载体（core=已拥有Q4数、owned=已拥有成员数、progress=档位进度）
+    private class FocusCandidate
+    {
+        public FocusTarget target;
+        public int core;
+        public int owned;
+        public int progress;
+    }
+
+    // 从"当前拥有的核心卡(品质=FocusCoreQuality)"派生最多 FocusMaxTargets 个聚焦目标（好友组与职业共用名额）。
+    // 候选=核心卡所属的好友组/职业（Q4数≥1）；排序 Q4数 desc → 已拥有成员数 desc → 档位进度 desc，取前 N。
+    private static List<FocusTarget> DeriveFocusTargets(PlayerInfo playerInfo, AiContext ctx)
+    {
+        var result = new List<FocusTarget>();
+        if (playerInfo == null || playerInfo.cards == null)
+            return result;
+
+        // 单次遍历已拥有卡：统计各好友组/职业的已拥有成员数，并挑出核心卡(Q4)
+        var friendOwned = new Dictionary<int, int>();
+        var jobOwned = new Dictionary<string, int>();
+        var coreIds = new List<int>();
+        foreach (var kv in playerInfo.cards)
+        {
+            if (kv.Value <= 0 || !ConfigManager.IsHeroCard(kv.Key))
+                continue;
+            var heroCfg = HeroConfig.GetConfig(kv.Key);
+            if (heroCfg == null)
+                continue;
+
+            if (!string.IsNullOrEmpty(heroCfg.Job))
+            {
+                jobOwned.TryGetValue(heroCfg.Job, out var jc);
+                jobOwned[heroCfg.Job] = jc + 1;
+            }
+            var relIds = ConfigManager.GetHeroFriendInfo(kv.Key);
+            if (relIds != null)
+            {
+                foreach (var relId in relIds)
+                {
+                    friendOwned.TryGetValue(relId, out var fc);
+                    friendOwned[relId] = fc + 1;
+                }
+            }
+            if (heroCfg.Quality == CombatConst.FocusCoreQuality)
+                coreIds.Add(kv.Key);
+        }
+        if (coreIds.Count == 0)
+            return result;
+
+        // 核心卡归属的好友组 / 职业（Q4数 >= 1 才成为候选）
+        var friendCore = new Dictionary<int, int>();
+        var jobCore = new Dictionary<string, int>();
+        foreach (var coreId in coreIds)
+        {
+            var relIds = ConfigManager.GetHeroFriendInfo(coreId);
+            if (relIds != null)
+            {
+                foreach (var relId in relIds)
+                {
+                    friendCore.TryGetValue(relId, out var c);
+                    friendCore[relId] = c + 1;
+                }
+            }
+            var heroCfg = HeroConfig.GetConfig(coreId);
+            if (heroCfg != null && !string.IsNullOrEmpty(heroCfg.Job))
+            {
+                jobCore.TryGetValue(heroCfg.Job, out var jc);
+                jobCore[heroCfg.Job] = jc + 1;
+            }
+        }
+
+        // 候选排序：Q4数 desc → 已拥有成员数 desc → 档位进度 desc（同分好友优先于职业）
+        var ranked = new List<FocusCandidate>();
+        foreach (var kv in friendCore)
+        {
+            friendOwned.TryGetValue(kv.Key, out var owned);
+            ranked.Add(new FocusCandidate
+            {
+                target = new FocusTarget { isJob = false, friendGroupId = kv.Key },
+                core = kv.Value,
+                owned = owned,
+                progress = GetTierLevel(CountFriendMembersInLineup(ctx, kv.Key), CombatConst.FriendLineCounts),
+            });
+        }
+        foreach (var kv in jobCore)
+        {
+            jobOwned.TryGetValue(kv.Key, out var owned);
+            ranked.Add(new FocusCandidate
+            {
+                target = new FocusTarget { isJob = true, jobNameS = kv.Key },
+                core = kv.Value,
+                owned = owned,
+                progress = Mathf.Min(ctx.GetJobCount(kv.Key), 5),
+            });
+        }
+        ranked.Sort((a, b) =>
+        {
+            int cmp = b.core.CompareTo(a.core);
+            if (cmp != 0) return cmp;
+            cmp = b.owned.CompareTo(a.owned);
+            if (cmp != 0) return cmp;
+            cmp = b.progress.CompareTo(a.progress);
+            if (cmp != 0) return cmp;
+            return a.target.isJob.CompareTo(b.target.isJob); // 同分好友优先（false < true）
+        });
+
+        int take = Mathf.Min(CombatConst.FocusMaxTargets, ranked.Count);
+        for (int i = 0; i < take; i++)
+            result.Add(ranked[i].target);
+        return result;
+    }
+
+    // 某好友组当前已拥有的成员数（供聚焦候选评分 / 成组保护复用）
+    private static int CountOwnedInFriendGroup(PlayerInfo playerInfo, int friendRelId)
+    {
+        var relCfg = HeroFriendConfig.GetConfig(friendRelId);
+        if (relCfg == null || relCfg.Heros == null)
+            return 0;
+
+        int owned = 0;
+        foreach (var memberId in relCfg.Heros)
+        {
+            if (playerInfo.cards.TryGetValue(memberId, out var cnt) && cnt > 0)
+                owned++;
+        }
+        return owned;
+    }
+
+    // 聚焦收益：候选卡命中任一聚焦目标（属于聚焦好友组 或 职业==聚焦职业）时的羁绊收益，复用 GetFriendGain/GetJobGain。
+    // 好友侧只算一次（同卡可能在多个聚焦组里），避免重复累加。
+    private static float GetFocusGain(AiContext ctx, HeroConfig heroCfg, int cardId, bool isNewHero)
+    {
+        if (ctx.focusTargets == null || ctx.focusTargets.Count == 0)
+            return 0f;
+
+        bool friendHit = false;
+        bool jobHit = false;
+        var relIds = ConfigManager.GetHeroFriendInfo(cardId);
+        foreach (var target in ctx.focusTargets)
+        {
+            if (target.isJob)
+            {
+                if (!string.IsNullOrEmpty(heroCfg.Job) && heroCfg.Job == target.jobNameS)
+                    jobHit = true;
+            }
+            else if (relIds != null && relIds.Contains(target.friendGroupId))
+            {
+                friendHit = true;
+            }
+        }
+
+        float gain = 0f;
+        if (friendHit)
+            gain += GetFriendGain(ctx, cardId);
+        if (jobHit)
+            gain += GetJobGain(ctx, heroCfg, isNewHero);
+        return gain;
+    }
+
+    // 该卡是否为聚焦目标成员（属于聚焦好友组 或 职业为聚焦职业）：卖卡/淘汰保护用
+    private static bool IsFocusMember(AiContext ctx, int cardId)
+    {
+        if (ctx == null || ctx.focusTargets == null || ctx.focusTargets.Count == 0)
+            return false;
+
+        var heroCfg = HeroConfig.GetConfig(cardId);
+        if (heroCfg == null)
+            return false;
+
+        var relIds = ConfigManager.GetHeroFriendInfo(cardId);
+        foreach (var target in ctx.focusTargets)
+        {
+            if (target.isJob)
+            {
+                if (!string.IsNullOrEmpty(heroCfg.Job) && heroCfg.Job == target.jobNameS)
+                    return true;
+            }
+            else if (relIds != null && relIds.Contains(target.friendGroupId))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // 该卡所属好友组是否"正在成组"（该组已拥有 >= 2 张）：淘汰时保护，避免拆散正在形成的好友羁绊
+    private static bool IsFormingFriendMember(PlayerInfo playerInfo, int cardId)
+    {
+        var relIds = ConfigManager.GetHeroFriendInfo(cardId);
+        if (relIds == null)
+            return false;
+        foreach (var relId in relIds)
+        {
+            if (CountOwnedInFriendGroup(playerInfo, relId) >= 2)
+                return true;
+        }
+        return false;
     }
 
     // 通用档位：count 达到 thresholds 第 i 档 → 返回 i+1，未达标返回 0（thresholds 需递增）
@@ -796,7 +1090,7 @@ public static class PlayerAI
         }
         else if (friendCount == 1)
         {
-            gain += 0.3f; // 差一人成团
+            gain += CombatConst.FriendGainOneShort; // 差一人成团：拉平到接近成团档(0.8)，鼓励补齐第 2 人
         }
 
         var relIds = ConfigManager.GetHeroFriendInfo(cardId);
