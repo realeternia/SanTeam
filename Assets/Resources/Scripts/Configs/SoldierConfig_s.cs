@@ -191,8 +191,8 @@ namespace CommonConfig
         public static void Load()
         {
             config.Clear();
-            config[500001] = new SoldierConfig(500001, "小兵", 1, 22, 200, 4.8f, 50f, 15, 0, 0, 10, 12, 0, 0f, false, new int[0], "UnitBing", "SwordHitBlue", "", "");
-            config[500002] = new SoldierConfig(500002, "远程小兵", 1, 17, 90, 1.5f, 6.5f, 15, 0, 0, 7, 35, 15, 1.5f, false, new int[0], "UnitBing2", "BulletExplosionFire", "", "");
+            config[500001] = new SoldierConfig(500001, "小兵", 1, 18, 240, 5.5f, 70f, 15, 0, 0, 10, 12, 0, 0f, false, new int[0], "UnitBing", "SwordHitBlue", "", "");
+            config[500002] = new SoldierConfig(500002, "远程小兵", 1, 24, 140, 7f, 50f, 15, 0, 0, 7, 35, 15, 1.5f, false, new int[0], "UnitBing2", "BulletExplosionFire", "", "");
             config[501001] = new SoldierConfig(501001, "法术场", 1, 0, 9999, 0f, 0f, 15, 0, 0, 0, 0, 0, 0f, true, new int[0], "UnitSpell", "", "", "");
             config[501002] = new SoldierConfig(501002, "关羽影子", 1, 2, 2, 0f, 0f, 15, 0, 0, 10, 17, 0, 0f, false, new int[0], "UnitHero", "SwordHitYellowCritical", "", "");
             config[502001] = new SoldierConfig(502001, "木牛流马lv1", 1, 12, 420, 0f, 0f, 12, 10, 8, 6, 9, 0, 0f, false, new int[0], "UnitBing", "SwordHitBlue", "", "");
