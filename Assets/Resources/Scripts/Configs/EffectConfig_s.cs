@@ -193,6 +193,13 @@ namespace CommonConfig
             config[10340] = new EffectConfig(10340, "MysticExplosionDark", "神秘爆裂特效AOE", "伤害", "范围", "Effect/MysticExplosionDark", "", 3.5f, 1f, 5f, 1f, "");
             config[10350] = new EffectConfig(10350, "NukeVerticalExplosionFire", "核弹垂直爆裂特效AOE", "伤害", "范围", "Effect/NukeVerticalExplosionFire", "", 2.8f, 1f, 5f, 1f, "");
             config[10360] = new EffectConfig(10360, "StarExplosionBlue", "蓝色星爆裂特效", "增益", "目标", "Effect/StarExplosionBlue", "", 8f, 1f, 5f, 1f, "");
+            config[10370] = new EffectConfig(10370, "ScanExplosion", "地震爆裂特效", "伤害", "范围", "Effect/ScanExplosion", "", 3f, 1f, 5f, 1f, "");
+            config[10380] = new EffectConfig(10380, "StunExplosion", "击晕爆裂特效", "伤害", "目标", "Effect/StunExplosion", "", 7f, 1f, 5f, 1f, "");
+            config[10390] = new EffectConfig(10390, "PoisonExplosionSoft", "中毒爆裂特效", "伤害", "范围", "Effect/PoisonExplosionSoft", "", 7f, 1f, 5f, 1f, "");
+            config[10391] = new EffectConfig(10391, "PoisonExplosionSoftYellow", "沙尘爆裂特效", "伤害", "范围", "Effect/PoisonExplosionSoft", "", 7f, 1f, 5f, 1f, "#CC6600");
+            config[10392] = new EffectConfig(10392, "PoisonExplosionSoftPurple", "紫色迷雾爆裂特效", "伤害", "范围", "Effect/PoisonExplosionSoft", "", 7f, 1f, 5f, 1f, "#550066");
+            config[10400] = new EffectConfig(10400, "MagicAuraBlue", "蓝色魔法区域特效", "增益", "范围", "Effect/MagicAuraBlue", "", 4f, 1f, 5f, 1f, "");
+            config[10401] = new EffectConfig(10401, "MagicAuraYellow", "黄色魔法区域特效", "增益", "范围", "Effect/MagicAuraBlue", "", 4f, 1f, 5f, 1f, "#fbff00ff");
 
             RebuildIndex();
 
