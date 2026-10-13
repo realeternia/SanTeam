@@ -29,33 +29,27 @@ public class EffectTestInit : MonoBehaviour
     {
         ConfigManager.Init();
 
-        // 按 EffectConfig 遍历，先排全部导弹，再排全部特效（同一配置的导弹与特效分开摆放）
-        var paths = new List<string>();
-        var isMissileList = new List<bool>();
-        var scaleList = new List<float>();
-        var tintList = new List<string>();
+        // 按 EffectConfig 收集：先全部导弹、再全部特效（同一配置的导弹与特效分开摆放），各组内按 name 字母排序
+        var missiles = new List<EffectItem>();
+        var effects = new List<EffectItem>();
         foreach (var cfg in EffectConfig.ConfigList)
         {
             if (!string.IsNullOrEmpty(cfg.MissilePath))
-            {
-                paths.Add("Prefabs/" + cfg.MissilePath);
-                isMissileList.Add(true);
-                scaleList.Add(cfg.MissileScale);
-                tintList.Add(cfg.TintColor);
-            }
+                missiles.Add(new EffectItem("Prefabs/" + cfg.MissilePath, true, cfg.MissileScale, cfg.TintColor, cfg.Name));
         }
         foreach (var cfg in EffectConfig.ConfigList)
         {
             if (!string.IsNullOrEmpty(cfg.EffPath))
-            {
-                paths.Add("Prefabs/" + cfg.EffPath);
-                isMissileList.Add(false);
-                scaleList.Add(cfg.Scale);
-                tintList.Add(cfg.TintColor);
-            }
+                effects.Add(new EffectItem("Prefabs/" + cfg.EffPath, false, cfg.Scale, cfg.TintColor, cfg.Name));
         }
+        missiles.Sort(CompareByName);
+        effects.Sort(CompareByName);
 
-        int total = paths.Count;
+        var items = new List<EffectItem>(missiles.Count + effects.Count);
+        items.AddRange(missiles);
+        items.AddRange(effects);
+
+        int total = items.Count;
         int rows = Mathf.CeilToInt((float)total / columnCount);
         int cols = Mathf.Min(columnCount, total);
 
@@ -68,10 +62,35 @@ public class EffectTestInit : MonoBehaviour
                 (col - (cols - 1) * 0.5f) * spacingX,
                 0f,
                 (row - (rows - 1) * 0.5f) * spacingZ);
-            CreateItem(paths[i], pos, isMissileList[i], scaleList[i], tintList[i]);
+            CreateItem(items[i].path, pos, items[i].isMissile, items[i].scale, items[i].tint);
         }
 
         GameLog.Info("EffectTestInit 创建特效/导弹共 " + total + " 个");
+    }
+
+    // 待创建的特效/导弹条目
+    private class EffectItem
+    {
+        public string path;
+        public bool isMissile;
+        public float scale;
+        public string tint;
+        public string name;
+
+        public EffectItem(string path, bool isMissile, float scale, string tint, string name)
+        {
+            this.path = path;
+            this.isMissile = isMissile;
+            this.scale = scale;
+            this.tint = tint;
+            this.name = name;
+        }
+    }
+
+    // 按 name 字母排序
+    private static int CompareByName(EffectItem a, EffectItem b)
+    {
+        return string.Compare(a.name, b.name, System.StringComparison.OrdinalIgnoreCase);
     }
 
     private void CreateItem(string resPath, Vector3 pos, bool isMissile, float scale, string tintHex)

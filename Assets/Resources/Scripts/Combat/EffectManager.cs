@@ -160,6 +160,14 @@ public static class EffectManager
         GameObject hitEffect = UnityEngine.Object.Instantiate(hitPrefab, sourceChess.transform.position, hitPrefab.transform.rotation);
         MountEffect(hitEffect, sourceChess.transform, new Vector3(scale, scale, scale), offsetY);
         ApplyTint(hitEffect, cfg);
+        // buff 特效随 buff 存在而持续，粒子需循环播放，避免 buff 未结束特效先熄灭
+        foreach (var ps in hitEffect.GetComponentsInChildren<ParticleSystem>(true))
+        {
+            // MainModule 的 setter 直接写回原生粒子系统，无需写回 main 属性
+            var main = ps.main;
+            main.loop = true;
+            ps.Play();
+        }
 
         return hitEffect;
 

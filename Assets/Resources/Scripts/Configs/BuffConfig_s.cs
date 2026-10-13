@@ -49,7 +49,7 @@ namespace CommonConfig
             {"ScriptName", new FieldMetaInfo("脚本名", "string", 171)},
             {"ColorStart", new FieldMetaInfo("启动色", "string", 0)},
             {"ColorEnd", new FieldMetaInfo("结束色", "string", 0)},
-            {"BuffEffect", new FieldMetaInfo("hit", "string", 0)},
+            {"BuffEffect", new FieldMetaInfo("hit", "string", 149)},
             {"Icon", new FieldMetaInfo("图标", "string", 0)},
         };
 
@@ -154,10 +154,10 @@ namespace CommonConfig
             config[300017] = new BuffConfig(300017, "倍击", "倍", "接下来数次攻击造成加倍伤害", true, false, "BuffNextAttacksMult", "", "", "", "");
             config[300019] = new BuffConfig(300019, "袭杀", "袭", "攻击增伤并吸血", true, false, "BuffLifeStealAndDamage", "", "", "", "");
             config[300022] = new BuffConfig(300022, "狂暴", "狂", "造成的伤害提升，但自身受到的伤害也提升", true, false, "BuffFrenzy", "", "", "", "");
-            config[300023] = new BuffConfig(300023, "嘲讽", "嘲", "成为敌对单位强制优先攻击的目标", true, true, "BuffTaunt", "#00CC00", "#66FF66", "", "");
+            config[300023] = new BuffConfig(300023, "嘲讽", "嘲", "成为敌对单位强制优先攻击的目标", true, true, "BuffTaunt", "#cc4300", "#664499", "", "");
             config[300024] = new BuffConfig(300024, "生命链接", "链", "与链接方共享伤害与回复", true, false, "BuffLifeLink", "", "", "", "");
             config[300025] = new BuffConfig(300025, "反伤", "反", "受到伤害时将其中一部分返还给攻击者", true, true, "BuffReflect", "", "", "", "");
-            config[300027] = new BuffConfig(300027, "仁政", "仁", "提升生命回复/strength点/秒、法力回复/strength2点/秒", true, false, "BuffHpMpRegen", "#00CC00", "#66FF66", "", "");
+            config[300027] = new BuffConfig(300027, "仁政", "仁", "提升生命回复/strength点/秒、法力回复/strength2点/秒", true, false, "BuffHpMpRegen", "#005500", "#66FF66", "", "");
             config[300028] = new BuffConfig(300028, "护驾", "护", "受到的回复效果提升/strength%", true, false, "BuffHealBoost", "", "", "", "");
             config[300029] = new BuffConfig(300029, "名门", "名", "提升攻击/strength点、护甲与魔抗/strength2点", true, true, "BuffMultiAttr", "", "", "", "");
             config[300030] = new BuffConfig(300030, "望族", "望", "提升/strength点护甲、/strength2点魔抗，每3秒衰减1/5，15秒后归零", true, true, "BuffDecayDef", "", "", "", "");
