@@ -46,6 +46,7 @@ public class SkillAidNobleBless : Skill
         }
 
         owner.PlayerAnim(skillCfg.Action);
+        PlayAreaEffect(highest.transform.position);
 
         BuffManager.AddBuff(highest, owner, id, buffCfg.Id, skillCfg.BuffTime);
         EffectManager.PlaySkillEffect(highest, skillCfg.HitEffect);

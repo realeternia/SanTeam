@@ -3,7 +3,7 @@ using CommonConfig;
 using UnityEngine;
 
 /// <summary>
-/// 忠勇·自+友军护盾（ScriptName = "AidSelfAndLowHp"）：
+/// 忠勇·自+友军护盾（ScriptName = "AidSelfAndLowHp")：
 /// 辅助技能，给自己施加一个吸收盾（容量=Strength2[0]×(100+法强)/100，随法强成长），
 /// 同时给附近(Range内)生命比例最低的一名友方英雄也施加一个吸收盾。
 /// 若附近无友方英雄则只给自己加盾。通过 Skill.CheckAidSkill 由 SkillManager 循环施放。
@@ -24,6 +24,7 @@ public class SkillAidSelfAndLowHp : Skill
         var shieldHp = GetSkillShield(0);
 
         owner.PlayerAnim(skillCfg.Action);
+        PlayAreaEffect(owner.transform.position);
 
         // 给自己加盾
         BuffManager.AddBuff(owner, owner, id, shieldId, skillCfg.BuffTime);
@@ -51,6 +52,7 @@ public class SkillAidSelfAndLowHp : Skill
 
         if (target != null)
         {
+            PlayAreaEffect(target.transform.position);
             BuffManager.AddBuff(target, owner, id, shieldId, skillCfg.BuffTime);
             var allyShield = target.GetBuff(shieldId) as BuffShield;
             if (allyShield != null)

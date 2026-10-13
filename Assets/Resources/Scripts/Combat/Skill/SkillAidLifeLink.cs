@@ -33,6 +33,7 @@ public class SkillAidLifeLink : Skill
             return false;
 
         owner.PlayerAnim(skillCfg.Action);
+        PlayAreaEffect(owner.transform.position);
 
         int linkId = BuffConfig.GetConfigByNameS("链").Id;
         // 双方各挂一份，张梁持链侧 BeforeCalDamaged 把伤害分享给自身

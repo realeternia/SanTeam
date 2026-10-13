@@ -50,8 +50,11 @@ public class SkillAidImperialGuard : Skill
 
         owner.PlayerAnim(skillCfg.Action);
 
+        var landPos = owner.transform.position + new Vector3(0, 0, 6f);
+        PlayAreaEffect(landPos);
+
         // 传送至身边（参照 SkillAttackedTeleport 瞬移路径）
-        lowest.MoveTo(owner.transform.position + new Vector3(0, 0, 6f), true);
+        lowest.MoveTo(landPos, true);
 
         // 套盾：强度 = Strength2[0] × (100+法强)/100（随法强成长）
         BuffManager.AddBuff(lowest, owner, id, shieldCfg.Id, skillCfg.BuffTime);
