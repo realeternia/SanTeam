@@ -46,7 +46,7 @@ namespace CommonConfig
             {"Type", new FieldMetaInfo("类型（增益/负面/伤害）", "string", 80)},
             {"Area", new FieldMetaInfo("作用范围（目标/范围）", "string", 80)},
             {"EffPath", new FieldMetaInfo("特效资源路径（省略 Prefabs/ 前缀，如 Effect/xxx，对应 Prefabs/Effect 下资源，无则留空）", "string", 210)},
-            {"MissilePath", new FieldMetaInfo("导弹资源路径（省略 Prefabs/ 前缀，如 Missile/xxx，对应 Prefabs/Missile 下资源，无则留空）", "string", 175)},
+            {"MissilePath", new FieldMetaInfo("导弹资源路径（省略 Prefabs/ 前缀，如 Missile/xxx，对应 Prefabs/Missile 下资源，无则留空）", "string", 245)},
             {"Scale", new FieldMetaInfo("特效世界缩放（挂载后实际大小，与挂点无关，默认取 prefab 根缩放）", "float", 60)},
             {"OffsetY", new FieldMetaInfo("特效世界Y偏移（挂载后相对单位的高度，默认1）", "float", 60)},
             {"MissileScale", new FieldMetaInfo("导弹世界缩放（挂载后实际大小，与挂点无关，未配置时取 Scale）", "float", 60)},
@@ -146,60 +146,60 @@ namespace CommonConfig
             config[10000] = new EffectConfig(10000, "BulletExplosionBlue", "蓝色子弹爆裂特效", "伤害", "目标", "Effect/BulletExplosionBlue", "Missile/BulletExplosionBlue", 8f, 1f, 12f, 1f, "");
             config[10001] = new EffectConfig(10001, "BulletExplosionFire", "火焰子弹爆裂特效", "伤害", "目标", "Effect/BulletExplosionBlue", "Missile/BulletExplosionFire", 8f, 1f, 12f, 1f, "#FF7A00");
             config[10002] = new EffectConfig(10002, "BulletExplosionGreen", "绿色子弹爆裂特效", "伤害", "目标", "Effect/BulletExplosionBlue", "Missile/BulletExplosionGreen", 8f, 1f, 12f, 1f, "#A7FF00");
-            config[10010] = new EffectConfig(10010, "AuraSoftPurple", "紫色缓冲特效", "增益", "范围", "Effect/AuraSoftPurple", "", 3f, 1f, 8f, 1f, "");
-            config[10020] = new EffectConfig(10020, "BloodExplosion", "鲜血爆裂特效", "伤害", "目标", "Effect/BloodExplosion", "", 5f, 1f, 8f, 1f, "");
-            config[10030] = new EffectConfig(10030, "ExplosionFireballFire", "火球爆炸特效", "伤害", "目标", "Effect/ExplosionFireballFire", "Missile/ExplosionFireballFire", 5f, 1f, 8f, 1f, "");
-            config[10040] = new EffectConfig(10040, "FanExplosion", "扇子爆裂特效", "伤害", "目标", "Effect/FanExplosion", "Missile/FanExplosion", 5f, 1f, 8f, 1f, "");
-            config[10050] = new EffectConfig(10050, "FrostExplosionBlue", "蓝色冰冻爆裂特效", "伤害", "目标", "Effect/FrostExplosionBlue", "Missile/FrostExplosionBlue", 5f, 1f, 8f, 1f, "");
-            config[10060] = new EffectConfig(10060, "GasExplosionFire", "火焰毒气爆裂特效", "伤害", "目标", "Effect/GasExplosionFire", "Missile/GasExplosionFire", 2.5f, 1f, 8f, 1f, "");
-            config[10070] = new EffectConfig(10070, "HeartStream", "爱心流光特效", "增益", "目标", "Effect/HeartStream", "", 8f, 1f, 8f, 1f, "");
-            config[10080] = new EffectConfig(10080, "LightningExplosionBlue", "蓝色闪电爆裂特效", "伤害", "目标", "Effect/LightningExplosionBlue", "Missile/LightningExplosionBlue", 3f, 1f, 5f, 1f, "");
-            config[10081] = new EffectConfig(10081, "LightningExplosionRed", "红色闪电爆裂特效", "伤害", "目标", "Effect/LightningExplosionBlue", "", 3f, 1f, 5f, 1f, "#FF1C00");
-            config[10082] = new EffectConfig(10082, "LightningExplosionYellow", "黄色闪电爆裂特效", "伤害", "目标", "Effect/LightningExplosionBlue", "Missile/LightningExplosionYellow", 3f, 1f, 5f, 1f, "#FFD800");
-            config[10090] = new EffectConfig(10090, "MagicBuffGreen", "绿色增益特效", "增益", "目标", "Effect/MagicBuffGreen", "", 10f, 1f, 8f, 1f, "");
-            config[10100] = new EffectConfig(10100, "MagicFieldGreen", "绿色法阵特效", "增益", "范围", "Effect/MagicFieldGreen", "", 8f, 1f, 8f, 1f, "");
-            config[10110] = new EffectConfig(10110, "SharpExplosionGreen", "绿色利刃爆裂特效", "伤害", "目标", "Effect/SharpExplosionGreen", "Missile/SharpExplosionGreen", 5f, 1f, 5f, 1f, "");
-            config[10120] = new EffectConfig(10120, "ShieldSoftBlue", "蓝色护盾特效", "增益", "目标", "Effect/ShieldSoftBlue", "", 3f, 1f, 8f, 1f, "");
-            config[10130] = new EffectConfig(10130, "SlowAuraYellow", "黄色迟缓光环特效", "负面", "范围", "Effect/SlowAuraYellow", "", 3f, 1f, 8f, 1f, "");
-            config[10140] = new EffectConfig(10140, "SoftFireBigRed", "红色大火特效", "伤害", "目标", "Effect/SoftFireBigRed", "", 10f, 1f, 8f, 1f, "");
-            config[10150] = new EffectConfig(10150, "SoulExplosionOrange", "橙色灵魂爆裂特效", "伤害", "目标", "Effect/SoulExplosionOrange", "Missile/SoulExplosionOrange", 5f, 1f, 8f, 1f, "");
-            config[10160] = new EffectConfig(10160, "MagicChargeBlue", "蓝色蓄力特效", "增益", "目标", "Effect/MagicChargeBlue", "", 3f, 1f, 8f, 1f, "");
-            config[10161] = new EffectConfig(10161, "MagicChargeGreen", "绿色蓄力特效", "增益", "目标", "Effect/MagicChargeBlue", "", 3f, 1f, 8f, 1f, "#00FF00");
-            config[10162] = new EffectConfig(10162, "MagicChargePink", "粉色蓄力特效", "增益", "目标", "Effect/MagicChargeBlue", "", 3f, 1f, 8f, 1f, "#FF00EA");
-            config[10163] = new EffectConfig(10163, "MagicChargeYellow", "黄色蓄力特效", "增益", "目标", "Effect/MagicChargeBlue", "", 3f, 1f, 8f, 1f, "#FFBB09");
-            config[10170] = new EffectConfig(10170, "SparkleAreaWhite", "白色闪耀区域特效", "增益", "范围", "Effect/SparkleAreaWhite", "", 10f, 1f, 8f, 1f, "");
-            config[10180] = new EffectConfig(10180, "StormExplosion", "风暴爆裂特效", "伤害", "范围", "Effect/StormExplosion", "Missile/StormExplosion", 8f, 1f, 8f, 1f, "");
-            config[10190] = new EffectConfig(10190, "StunnedCirclingStarsSimple", "眩晕环绕星特效", "负面", "目标", "Effect/StunnedCirclingStarsSimple", "", 3f, 1f, 8f, 1f, "");
-            config[10200] = new EffectConfig(10200, "StunnedDamageUp", "眩晕增伤特效", "负面", "目标", "Effect/StunnedDamageUp", "", 3f, 1f, 8f, 1f, "");
-            config[10210] = new EffectConfig(10210, "StunnedLock", "定身眩晕特效", "负面", "目标", "Effect/StunnedLock", "", 3f, 1f, 8f, 1f, "");
-            config[10220] = new EffectConfig(10220, "SummonStorm", "召唤风暴特效", "伤害", "范围", "Effect/SummonStorm", "", 1.2f, 1f, 8f, 1f, "");
-            config[10230] = new EffectConfig(10230, "MagicNovaBlue", "蓝色新星特效", "伤害", "范围", "Effect/MagicNovaBlue", "", 4f, 1f, 8f, 1f, "");
-            config[10231] = new EffectConfig(10231, "MagicNovaYellow", "黄色新星特效", "伤害", "范围", "Effect/MagicNovaBlue", "", 4f, 1f, 8f, 1f, "#FFBB00");
-            config[10240] = new EffectConfig(10240, "SwordSlashMiniWhite", "白色迷你斩击特效", "伤害", "目标", "Effect/SwordSlashMiniWhite", "", 5f, 1f, 8f, 1f, "");
-            config[10250] = new EffectConfig(10250, "SwordWhirlwindWhite", "白色剑旋特效", "伤害", "目标", "Effect/SwordWhirlwindWhite", "", 3f, 1f, 8f, 1f, "");
-            config[10260] = new EffectConfig(10260, "ToolExplosion", "锤类爆裂特效", "伤害", "目标", "Effect/ToolExplosion", "Missile/ToolExplosion", 5f, 1f, 8f, 1f, "");
-            config[10270] = new EffectConfig(10270, "AxeExplosion", "斧类爆裂特效（弹道）", "伤害", "目标", "", "Missile/AxeExplosion", 5f, 1f, 8f, 1f, "");
-            config[10280] = new EffectConfig(10280, "GasShootFire", "火焰喷射弹道特效", "伤害", "目标", "", "Missile/GasShootFire", 5f, 1f, 8f, 1f, "");
-            config[10290] = new EffectConfig(10290, "NukeMissileFires", "核弹导弹弹道特效", "伤害", "目标", "", "Missile/NukeMissileFires", 5f, 1f, 5f, 1f, "");
-            config[10300] = new EffectConfig(10300, "ShadowExplosion", "暗影爆裂特效", "伤害", "目标", "Effect/ShadowExplosion", "Missile/ShadowExplosion", 5f, 1f, 8f, 1f, "");
-            config[10301] = new EffectConfig(10301, "ShadowExplosionGreen", "绿色暗影爆裂特效", "伤害", "目标", "Effect/ShadowExplosion", "Missile/ShadowExplosionGreen", 5f, 1f, 8f, 1f, "#105E11");
-            config[10310] = new EffectConfig(10310, "SwordHitBlackRedCritical", "黑红暴击剑击特效", "伤害", "目标", "Effect/SwordHitYellowCritical", "", 5f, 1f, 8f, 1f, "#A60B0B");
-            config[10311] = new EffectConfig(10311, "SwordHitGreenCritical", "绿色暴击剑击特效", "伤害", "目标", "Effect/SwordHitYellowCritical", "", 5f, 1f, 8f, 1f, "#00FF1B");
-            config[10312] = new EffectConfig(10312, "SwordHitRedCritical", "红色暴击剑击特效", "伤害", "目标", "Effect/SwordHitYellowCritical", "", 5f, 1f, 8f, 1f, "#FF0000");
-            config[10313] = new EffectConfig(10313, "SwordHitWhiteCritical", "白色暴击剑击特效", "伤害", "目标", "Effect/SwordHitYellowCritical", "", 5f, 1f, 8f, 1f, "#FFFFFF");
-            config[10314] = new EffectConfig(10314, "SwordHitYellowCritical", "黄色暴击剑击特效", "伤害", "目标", "Effect/SwordHitYellowCritical", "", 5f, 1f, 8f, 1f, "#FFFF00");
-            config[10320] = new EffectConfig(10320, "SwordHitBlue", "蓝色剑击特效", "伤害", "目标", "Effect/SwordHitBlue", "", 10f, 1f, 8f, 1f, "");
-            config[10330] = new EffectConfig(10330, "LaserImpactSpark", "激光命中火花特效", "伤害", "目标", "Effect/SwordHitBlue", "", 2f, 1f, 5f, 1f, "#00D5FF");
-            config[10340] = new EffectConfig(10340, "MysticExplosionDark", "神秘爆裂特效AOE", "伤害", "范围", "Effect/MysticExplosionDark", "", 3.5f, 1f, 5f, 1f, "");
-            config[10350] = new EffectConfig(10350, "NukeVerticalExplosionFire", "核弹垂直爆裂特效AOE", "伤害", "范围", "Effect/NukeVerticalExplosionFire", "", 2.8f, 1f, 5f, 1f, "");
-            config[10360] = new EffectConfig(10360, "StarExplosionBlue", "蓝色星爆裂特效", "增益", "目标", "Effect/StarExplosionBlue", "", 8f, 1f, 5f, 1f, "");
-            config[10370] = new EffectConfig(10370, "ScanExplosion", "地震爆裂特效", "伤害", "范围", "Effect/ScanExplosion", "", 3f, 1f, 5f, 1f, "");
-            config[10380] = new EffectConfig(10380, "StunExplosion", "击晕爆裂特效", "伤害", "目标", "Effect/StunExplosion", "", 7f, 1f, 5f, 1f, "");
-            config[10390] = new EffectConfig(10390, "PoisonExplosionSoft", "中毒爆裂特效", "伤害", "范围", "Effect/PoisonExplosionSoft", "", 7f, 1f, 5f, 1f, "");
-            config[10391] = new EffectConfig(10391, "PoisonExplosionSoftYellow", "沙尘爆裂特效", "伤害", "范围", "Effect/PoisonExplosionSoft", "", 7f, 1f, 5f, 1f, "#CC6600");
-            config[10392] = new EffectConfig(10392, "PoisonExplosionSoftPurple", "紫色迷雾爆裂特效", "伤害", "范围", "Effect/PoisonExplosionSoft", "", 7f, 1f, 5f, 1f, "#550066");
-            config[10400] = new EffectConfig(10400, "MagicAuraBlue", "蓝色魔法区域特效", "增益", "范围", "Effect/MagicAuraBlue", "", 4f, 1f, 5f, 1f, "");
-            config[10401] = new EffectConfig(10401, "MagicAuraYellow", "黄色魔法区域特效", "增益", "范围", "Effect/MagicAuraBlue", "", 4f, 1f, 5f, 1f, "#fbff00ff");
+            config[10010] = new EffectConfig(10010, "ExplosionFireballFire", "火球爆炸特效", "伤害", "目标", "Effect/ExplosionFireballFire", "Missile/ExplosionFireballFire", 5f, 1f, 8f, 1f, "");
+            config[10020] = new EffectConfig(10020, "FanExplosion", "扇子爆裂特效", "伤害", "目标", "Effect/FanExplosion", "Missile/FanExplosion", 5f, 1f, 8f, 1f, "");
+            config[10030] = new EffectConfig(10030, "FrostExplosionBlue", "蓝色冰冻爆裂特效", "伤害", "目标", "Effect/FrostExplosionBlue", "Missile/FrostExplosionBlue", 5f, 1f, 8f, 1f, "");
+            config[10040] = new EffectConfig(10040, "GasExplosionFire", "火焰毒气爆裂特效", "伤害", "目标", "Effect/GasExplosionFire", "Missile/GasExplosionFire", 2.5f, 1f, 8f, 1f, "");
+            config[10050] = new EffectConfig(10050, "LightningExplosionBlue", "蓝色闪电爆裂特效", "伤害", "目标", "Effect/LightningExplosionBlue", "Missile/LightningExplosionBlue", 3f, 1f, 5f, 1f, "");
+            config[10051] = new EffectConfig(10051, "LightningExplosionYellow", "黄色闪电爆裂特效", "伤害", "目标", "Effect/LightningExplosionBlue", "Missile/LightningExplosionYellow", 3f, 1f, 5f, 1f, "#FFD800");
+            config[10060] = new EffectConfig(10060, "SharpExplosionGreen", "绿色利刃爆裂特效", "伤害", "目标", "Effect/SharpExplosionGreen", "Missile/SharpExplosionGreen", 5f, 1f, 5f, 1f, "");
+            config[10070] = new EffectConfig(10070, "SoulExplosionOrange", "橙色灵魂爆裂特效", "伤害", "目标", "Effect/SoulExplosionOrange", "Missile/SoulExplosionOrange", 5f, 1f, 8f, 1f, "");
+            config[10080] = new EffectConfig(10080, "StormExplosion", "风暴爆裂特效", "伤害", "范围", "Effect/StormExplosion", "Missile/StormExplosion", 8f, 1f, 8f, 1f, "");
+            config[10090] = new EffectConfig(10090, "ToolExplosion", "锤类爆裂特效", "伤害", "目标", "Effect/ToolExplosion", "Missile/ToolExplosion", 5f, 1f, 8f, 1f, "");
+            config[10100] = new EffectConfig(10100, "AxeExplosion", "斧类爆裂特效（弹道）", "伤害", "目标", "", "Missile/AxeExplosion", 5f, 1f, 8f, 1f, "");
+            config[10110] = new EffectConfig(10110, "GasShootFire", "火焰喷射弹道特效", "伤害", "目标", "", "Missile/GasShootFire", 5f, 1f, 8f, 1f, "");
+            config[10120] = new EffectConfig(10120, "NukeMissileFires", "核弹导弹弹道特效", "伤害", "目标", "", "Missile/NukeMissileFires", 5f, 1f, 5f, 1f, "");
+            config[10130] = new EffectConfig(10130, "ShadowExplosion", "暗影爆裂特效", "伤害", "目标", "Effect/ShadowExplosion", "Missile/ShadowExplosion", 5f, 1f, 8f, 1f, "");
+            config[10131] = new EffectConfig(10131, "ShadowExplosionGreen", "绿色暗影爆裂特效", "伤害", "目标", "Effect/ShadowExplosion", "Missile/ShadowExplosionGreen", 5f, 1f, 8f, 1f, "#105E11");
+            config[11000] = new EffectConfig(11000, "AuraSoftPurple", "紫色缓冲特效", "增益", "范围", "Effect/AuraSoftPurple", "", 3f, 1f, 8f, 1f, "");
+            config[11010] = new EffectConfig(11010, "BloodExplosion", "鲜血爆裂特效", "伤害", "目标", "Effect/BloodExplosion", "", 5f, 1f, 8f, 1f, "");
+            config[11020] = new EffectConfig(11020, "HeartStream", "爱心流光特效", "增益", "目标", "Effect/HeartStream", "", 8f, 1f, 8f, 1f, "");
+            config[11030] = new EffectConfig(11030, "LightningExplosionRed", "红色闪电爆裂特效", "伤害", "目标", "Effect/LightningExplosionBlue", "", 3f, 1f, 5f, 1f, "#FF1C00");
+            config[11040] = new EffectConfig(11040, "MagicBuffGreen", "绿色增益特效", "增益", "目标", "Effect/MagicBuffGreen", "", 10f, 1f, 8f, 1f, "");
+            config[11050] = new EffectConfig(11050, "MagicFieldGreen", "绿色法阵特效", "增益", "范围", "Effect/MagicFieldGreen", "", 8f, 1f, 8f, 1f, "");
+            config[11060] = new EffectConfig(11060, "ShieldSoftBlue", "蓝色护盾特效", "增益", "目标", "Effect/ShieldSoftBlue", "", 3f, 1f, 8f, 1f, "");
+            config[11070] = new EffectConfig(11070, "SlowAuraYellow", "黄色迟缓光环特效", "负面", "范围", "Effect/SlowAuraYellow", "", 3f, 1f, 8f, 1f, "");
+            config[11080] = new EffectConfig(11080, "SoftFireBigRed", "红色大火特效", "伤害", "目标", "Effect/SoftFireBigRed", "", 10f, 1f, 8f, 1f, "");
+            config[11090] = new EffectConfig(11090, "MagicChargeBlue", "蓝色蓄力特效", "增益", "目标", "Effect/MagicChargeBlue", "", 3f, 1f, 8f, 1f, "");
+            config[11091] = new EffectConfig(11091, "MagicChargeGreen", "绿色蓄力特效", "增益", "目标", "Effect/MagicChargeBlue", "", 3f, 1f, 8f, 1f, "#00FF00");
+            config[11092] = new EffectConfig(11092, "MagicChargePink", "粉色蓄力特效", "增益", "目标", "Effect/MagicChargeBlue", "", 3f, 1f, 8f, 1f, "#FF00EA");
+            config[11093] = new EffectConfig(11093, "MagicChargeYellow", "黄色蓄力特效", "增益", "目标", "Effect/MagicChargeBlue", "", 3f, 1f, 8f, 1f, "#FFBB09");
+            config[11100] = new EffectConfig(11100, "SparkleAreaWhite", "白色闪耀区域特效", "增益", "范围", "Effect/SparkleAreaWhite", "", 10f, 1f, 8f, 1f, "");
+            config[11110] = new EffectConfig(11110, "StunnedCirclingStarsSimple", "眩晕环绕星特效", "负面", "目标", "Effect/StunnedCirclingStarsSimple", "", 3f, 1f, 8f, 1f, "");
+            config[11120] = new EffectConfig(11120, "StunnedDamageUp", "眩晕增伤特效", "负面", "目标", "Effect/StunnedDamageUp", "", 3f, 1f, 8f, 1f, "");
+            config[11130] = new EffectConfig(11130, "StunnedLock", "定身眩晕特效", "负面", "目标", "Effect/StunnedLock", "", 3f, 1f, 8f, 1f, "");
+            config[11140] = new EffectConfig(11140, "SummonStorm", "召唤风暴特效", "伤害", "范围", "Effect/SummonStorm", "", 1.2f, 1f, 8f, 1f, "");
+            config[11150] = new EffectConfig(11150, "MagicNovaBlue", "蓝色新星特效", "伤害", "范围", "Effect/MagicNovaBlue", "", 4f, 1f, 8f, 1f, "");
+            config[11151] = new EffectConfig(11151, "MagicNovaYellow", "黄色新星特效", "伤害", "范围", "Effect/MagicNovaBlue", "", 4f, 1f, 8f, 1f, "#FFBB00");
+            config[11160] = new EffectConfig(11160, "SwordSlashMiniWhite", "白色迷你斩击特效", "伤害", "目标", "Effect/SwordSlashMiniWhite", "", 5f, 1f, 8f, 1f, "");
+            config[11170] = new EffectConfig(11170, "SwordWhirlwindWhite", "白色剑旋特效", "伤害", "目标", "Effect/SwordWhirlwindWhite", "", 3f, 1f, 8f, 1f, "");
+            config[11180] = new EffectConfig(11180, "SwordHitBlackRedCritical", "黑红暴击剑击特效", "伤害", "目标", "Effect/SwordHitYellowCritical", "", 5f, 1f, 8f, 1f, "#A60B0B");
+            config[11181] = new EffectConfig(11181, "SwordHitGreenCritical", "绿色暴击剑击特效", "伤害", "目标", "Effect/SwordHitYellowCritical", "", 5f, 1f, 8f, 1f, "#00FF1B");
+            config[11182] = new EffectConfig(11182, "SwordHitRedCritical", "红色暴击剑击特效", "伤害", "目标", "Effect/SwordHitYellowCritical", "", 5f, 1f, 8f, 1f, "#FF0000");
+            config[11183] = new EffectConfig(11183, "SwordHitWhiteCritical", "白色暴击剑击特效", "伤害", "目标", "Effect/SwordHitYellowCritical", "", 5f, 1f, 8f, 1f, "#FFFFFF");
+            config[11184] = new EffectConfig(11184, "SwordHitYellowCritical", "黄色暴击剑击特效", "伤害", "目标", "Effect/SwordHitYellowCritical", "", 5f, 1f, 8f, 1f, "#FFFF00");
+            config[11190] = new EffectConfig(11190, "SwordHitBlue", "蓝色剑击特效", "伤害", "目标", "Effect/SwordHitBlue", "", 10f, 1f, 8f, 1f, "");
+            config[11200] = new EffectConfig(11200, "LaserImpactSpark", "激光命中火花特效", "伤害", "目标", "Effect/SwordHitBlue", "", 2f, 1f, 5f, 1f, "#00D5FF");
+            config[11210] = new EffectConfig(11210, "MysticExplosionDark", "紫色神秘爆裂特效AOE", "伤害", "范围", "Effect/MysticExplosionDark", "", 3.5f, 1f, 5f, 1f, "");
+            config[11220] = new EffectConfig(11220, "NukeVerticalExplosionFire", "核弹垂直爆裂特效AOE", "伤害", "范围", "Effect/NukeVerticalExplosionFire", "", 2.8f, 1f, 5f, 1f, "");
+            config[11230] = new EffectConfig(11230, "StarExplosionBlue", "蓝色星爆裂特效", "增益", "目标", "Effect/StarExplosionBlue", "", 8f, 1f, 5f, 1f, "");
+            config[11240] = new EffectConfig(11240, "ScanExplosion", "地震爆裂特效", "伤害", "范围", "Effect/ScanExplosion", "", 3f, 1f, 5f, 1f, "");
+            config[11250] = new EffectConfig(11250, "StunExplosion", "击晕爆裂特效", "伤害", "目标", "Effect/StunExplosion", "", 7f, 1f, 5f, 1f, "");
+            config[11260] = new EffectConfig(11260, "PoisonExplosionSoft", "中毒爆裂特效", "伤害", "范围", "Effect/PoisonExplosionSoft", "", 7f, 1f, 5f, 1f, "");
+            config[11261] = new EffectConfig(11261, "PoisonExplosionSoftYellow", "沙尘爆裂特效", "伤害", "范围", "Effect/PoisonExplosionSoft", "", 7f, 1f, 5f, 1f, "#CC6600");
+            config[11262] = new EffectConfig(11262, "PoisonExplosionSoftPurple", "紫色迷雾爆裂特效", "伤害", "范围", "Effect/PoisonExplosionSoft", "", 7f, 1f, 5f, 1f, "#550066");
+            config[11270] = new EffectConfig(11270, "MagicAuraBlue", "蓝色魔法区域特效", "增益", "范围", "Effect/MagicAuraBlue", "", 4f, 1f, 5f, 1f, "");
+            config[11271] = new EffectConfig(11271, "MagicAuraYellow", "黄色魔法区域特效", "增益", "范围", "Effect/MagicAuraBlue", "", 4f, 1f, 5f, 1f, "#fbff00ff");
 
             RebuildIndex();
 

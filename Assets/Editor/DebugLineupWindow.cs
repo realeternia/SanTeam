@@ -11,7 +11,8 @@ using UnityEngine.SceneManagement;
 /// 在窗口里配置当前场景 GameManager 的左侧(1号位)/右侧(2号位)上阵武将：
 /// 任一方填入武将即视为调试开局，启动游戏后跳过选牌/商店流程直接开战（见 WorldManager.SpawnDebugHeroes）；
 /// 两方留空则走正常对局流程。点「开始战斗」会先保存场景再进入 Play。
-/// 武将列表按配置的等级(1~5级)生成，按顺序摆入布阵格。
+/// 武将按近战/远程分前后排摆入中间英雄格（近战顶排=前排、远程底排=后排），等级取各自配置值(1~5级)。
+/// 「随机阵容」可一键为两侧各生成 3 近战 + 3 远程，共 12 名互不重复的 1 级武将。
 /// </summary>
 public class DebugLineupWindow : EditorWindow
 {
@@ -109,13 +110,12 @@ public class DebugLineupWindow : EditorWindow
         hintStyle.normal.textColor = HintColor;
     }
 
-    // 编辑器下按需加载配置表（HeroConfig/ForceConfig 的静态表只有 Load 后才可用）
+    // 编辑器下按需加载配置表：统一走 ConfigManager.Init()（内部含 PostModify），
+    // 使 HeroConfig.Range 等次级面板写回为职业基准绝对值，与运行时判定一致；
+    // 若只 Load 原始表，Range 还是百分比修正值（多为0），会把所有英雄误判为近战。Init 有 hasInit 保护，重复调用无副作用。
     private static List<HeroItem> GetHeroes()
     {
-        if (HeroConfig.ConfigList.Count == 0)
-            HeroConfig.Load();
-        if (ForceConfig.ConfigList.Count == 0)
-            ForceConfig.Load();
+        ConfigManager.Init();
 
         if (heroes != null)
             return heroes;
@@ -178,6 +178,8 @@ public class DebugLineupWindow : EditorWindow
             if (GUILayout.Button("开始战斗", GUILayout.Height(28)))
                 StartBattle();
         }
+        if (GUILayout.Button("随机阵容", GUILayout.Height(28), GUILayout.Width(90)))
+            RandomLineup();
         if (GUILayout.Button("清空两侧", GUILayout.Height(28), GUILayout.Width(90)))
             ClearBoth();
         GUILayout.EndHorizontal();
@@ -345,6 +347,69 @@ public class DebugLineupWindow : EditorWindow
         if (p2 != null) p2.ClearArray();
         so.ApplyModifiedProperties();
         MarkSceneDirty();
+    }
+
+    // 随机阵容：双方各随机 6 名武将（3 近战=前排 + 3 远程=后排），共 12 名互不重复，等级统一为 1 级
+    private void RandomLineup()
+    {
+        if (so == null)
+            return;
+
+        var melee = new List<HeroItem>();
+        var ranged = new List<HeroItem>();
+        foreach (var h in GetHeroes())
+        {
+            if (!ConfigManager.IsHeroCard(h.Id) || !HeroConfig.HasConfig(h.Id))
+                continue;
+            if (HeroSelectionTool.IsRangedHero(HeroConfig.GetConfig(h.Id)))
+                ranged.Add(h);
+            else
+                melee.Add(h);
+        }
+        if (melee.Count < 6 || ranged.Count < 6)
+        {
+            GameLog.Warn($"调试阵容：随机阵容至少需要 6 名近战与 6 名远程英雄（当前近战 {melee.Count} / 远程 {ranged.Count}）");
+            return;
+        }
+
+        Shuffle(melee);
+        Shuffle(ranged);
+
+        // 每侧 3 近战(前排) + 3 远程(后排)，两侧共 12 名不重复
+        FillSide(so.FindProperty(PropSide1),
+            new List<HeroItem> { melee[0], melee[1], melee[2], ranged[0], ranged[1], ranged[2] });
+        FillSide(so.FindProperty(PropSide2),
+            new List<HeroItem> { melee[3], melee[4], melee[5], ranged[3], ranged[4], ranged[5] });
+        so.ApplyModifiedProperties();
+        MarkSceneDirty();
+        GameLog.Info("调试阵容：已生成随机阵容（甲 6 名 / 乙 6 名，各 3 前排 3 后排）");
+    }
+
+    // 用指定英雄覆盖某一侧的调试列表，等级统一 1 级
+    private static void FillSide(SerializedProperty listProp, List<HeroItem> picks)
+    {
+        if (listProp == null)
+            return;
+        listProp.ClearArray();
+        for (int i = 0; i < picks.Count; i++)
+        {
+            listProp.InsertArrayElementAtIndex(i);
+            var elem = listProp.GetArrayElementAtIndex(i);
+            elem.FindPropertyRelative("heroId").intValue = picks[i].Id;
+            elem.FindPropertyRelative("level").intValue = 1;
+        }
+    }
+
+    // Fisher-Yates 洗牌（使用工程统一的 SysRandom）
+    private static void Shuffle(List<HeroItem> list)
+    {
+        for (int i = list.Count - 1; i > 0; i--)
+        {
+            int j = SysRandom.Range(0, i + 1);
+            var tmp = list[i];
+            list[i] = list[j];
+            list[j] = tmp;
+        }
     }
 
     // 保存场景后进入 Play：GameManager.HasDebugLineup 为真时 WorldManager 会跳过选牌/商店直接开战

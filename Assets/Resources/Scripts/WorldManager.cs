@@ -327,22 +327,65 @@ public class WorldManager : MonoBehaviour
 
     }
 
-    // 调试阵容：按配置顺序把武将依次摆入布阵格(格0开始)，等级取配置值(1~MaxHeroCardLevel)
+    // 调试阵容：按近战/远程分前后排摆入中间英雄格(HeroCells)——近战从顶排往下填(前排)，远程从底排往上填(后排)；
+    // 超出9格的武将再按布阵格顺序补空位。等级取配置值(1~MaxHeroCardLevel)
     private void SpawnDebugHeroes(PlayerInfo p, Transform center, List<GameManager.DebugHeroEntry> heroes, int side)
     {
         if (center == null || heroes == null)
             return;
-        for (int i = 0; i < heroes.Count && i < CombatConst.FormationCellCount; i++)
+
+        var melee = new List<GameManager.DebugHeroEntry>();
+        var ranged = new List<GameManager.DebugHeroEntry>();
+        foreach (var hero in heroes)
         {
-            int heroId = heroes[i].heroId;
+            if (hero == null)
+                continue;
+            int heroId = hero.heroId;
             if (heroId <= 0 || !ConfigManager.IsHeroCard(heroId) || !HeroConfig.HasConfig(heroId))
             {
                 GameLog.Error($"调试阵容非法武将ID: {heroId}(side{side})");
                 continue;
             }
-            int level = Mathf.Clamp(heroes[i].level, 1, HeroSelectionTool.MaxHeroCardLevel);
-            SpawnHerosForRegion(p, i, GetFormationCellPos(center, i), new System.Tuple<int, int>(heroId, level), side);
+            if (HeroSelectionTool.IsRangedHero(HeroConfig.GetConfig(heroId)))
+                ranged.Add(hero);
+            else
+                melee.Add(hero);
         }
+
+        var heroCells = CombatConst.HeroCells;
+        var occupied = new HashSet<int>();
+        // 近战：HeroCells 顶排往下填(前排)
+        int mi = 0;
+        for (int ci = 0; ci < heroCells.Length && mi < melee.Count; ci++, mi++)
+        {
+            SpawnDebugHeroUnit(p, center, heroCells[ci], melee[mi], side);
+            occupied.Add(heroCells[ci]);
+        }
+        // 远程：HeroCells 底排往上填(后排)
+        int ri = 0;
+        for (int ci = heroCells.Length - 1; ci >= 0 && ri < ranged.Count; ci--)
+        {
+            if (occupied.Contains(heroCells[ci]))
+                continue;
+            SpawnDebugHeroUnit(p, center, heroCells[ci], ranged[ri], side);
+            occupied.Add(heroCells[ci]);
+            ri++;
+        }
+        // 溢出：剩余武将按布阵格顺序补空位
+        for (int pos = 0; pos < CombatConst.FormationCellCount && (mi < melee.Count || ri < ranged.Count); pos++)
+        {
+            if (occupied.Contains(pos))
+                continue;
+            SpawnDebugHeroUnit(p, center, pos, mi < melee.Count ? melee[mi++] : ranged[ri++], side);
+            occupied.Add(pos);
+        }
+    }
+
+    // 生成一个调试武将到指定布阵格(等级取配置值并夹在 1~MaxHeroCardLevel)
+    private void SpawnDebugHeroUnit(PlayerInfo p, Transform center, int pos, GameManager.DebugHeroEntry hero, int side)
+    {
+        int level = Mathf.Clamp(hero.level, 1, HeroSelectionTool.MaxHeroCardLevel);
+        SpawnHerosForRegion(p, pos, GetFormationCellPos(center, pos), new System.Tuple<int, int>(hero.heroId, level), side);
     }
 
     // 计算布阵图中第pos格(0~24)的世界坐标：row=pos/5 从上到下，col=pos%5 从左到右
