@@ -34,6 +34,7 @@ public class SkillHelpAidBuff : Skill
         });
 
         var targetUnit = unitsInRange[0];
+        PlayAreaEffect(targetUnit.transform.position);
         BuffManager.AddBuff(targetUnit, owner, id, BuffConfig.GetConfigByNameS(skillCfg.BuffId).Id, skillCfg.BuffTime);
         EffectManager.PlaySkillEffect(targetUnit, skillCfg.HitEffect);
 
