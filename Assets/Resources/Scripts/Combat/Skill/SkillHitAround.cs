@@ -33,7 +33,7 @@ public class SkillHitAround : Skill
             var hitEffect = EffectManager.PlaySkillEffect(defender, skillCfg.HitEffect);
             hitEffect.transform.forward = (targetPos - startPos).normalized;
 
-            var unitsInRange = WorldManager.Instance.GetEnemyInRange(startPos, skillCfg.Range, owner.side);
+            var unitsInRange = WorldManager.Instance.GetEnemyInRange(startPos, skillCfg.Area, owner.side);
             unitsInRange.Remove(defender);
             
             // 筛选startPos到targetPos方向，左右各60°开角内的单位

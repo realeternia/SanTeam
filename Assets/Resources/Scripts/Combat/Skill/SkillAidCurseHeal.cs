@@ -2,8 +2,8 @@ using CommonConfig;
 using UnityEngine;
 
 /// <summary>
-/// 妖咒（ScriptName = "AidCurseHeal")：辅助技能，直接治疗 Range 内生命比例最低的友方英雄（走独立治疗公式 GetSkillHeal），
-/// 并给 Range 内最多 TargetCount 名敌人挂"败"（溃败·每秒法术伤害，由 BuffTimeDamage 按 DamageStrength 结算），持续 BuffTime 秒。
+/// 妖咒（ScriptName = "AidCurseHeal")：辅助技能，直接治疗 Area 内生命比例最低的友方英雄（走独立治疗公式 GetSkillHeal），
+/// 并给 Area 内最多 TargetCount 名敌人挂"败"（溃败·每秒法术伤害，由 BuffTimeDamage 按 DamageStrength 结算），持续 BuffTime 秒。
 /// 友军均满血且范围内无敌人时不施放。
 /// 用于于吉：妖道符水，以敌之血养己之众。
 /// </summary>
@@ -15,10 +15,10 @@ public class SkillAidCurseHeal : Skill
 
     public override bool CheckAidSkill()
     {
-        // 找 Range 内生命比例最低的友方英雄（可含自身）
+        // 找 Area 内生命比例最低的友方英雄（可含自身）
         Chess lowest = null;
         var lowestRate = float.MaxValue;
-        foreach (var a in WorldManager.Instance.GetMySideInRange(owner.transform.position, skillCfg.Range, owner.side))
+        foreach (var a in WorldManager.Instance.GetMySideInRange(owner.transform.position, skillCfg.Area, owner.side))
         {
             if (a == null || a.hp <= 0 || !a.isHero || a.hp >= a.maxHp)
                 continue;
@@ -29,8 +29,8 @@ public class SkillAidCurseHeal : Skill
             }
         }
 
-        // Range 内敌人（含士兵），用于挂"败"
-        var enemies = WorldManager.Instance.GetEnemyInRange(owner.transform.position, skillCfg.Range, owner.side);
+        // Area 内敌人（含士兵），用于挂"败"
+        var enemies = WorldManager.Instance.GetEnemyInRange(owner.transform.position, skillCfg.Area, owner.side);
 
         // 既无可治疗的友军、又无敌人可挂"败"时不施放，避免空耗 MP
         if (lowest == null && enemies.Count == 0)
@@ -40,8 +40,6 @@ public class SkillAidCurseHeal : Skill
             return false;
 
         owner.PlayerAnim(skillCfg.Action);
-        var areaCenter = lowest != null ? lowest.transform.position : owner.transform.position;
-        PlayAreaEffect(areaCenter);
 
         // 直接治疗生命比例最低的友军英雄
         var heal = GetSkillHeal();

@@ -19,7 +19,7 @@ public class SkillAidBuffHasteMoveSpeed : Skill
             return false;
 
         var buffId = BuffConfig.GetConfigByNameS(skillCfg.BuffId).Id;
-        var units = WorldManager.Instance.GetMySideInRange(owner.transform.position, skillCfg.Range, owner.side)
+        var units = WorldManager.Instance.GetMySideInRange(owner.transform.position, skillCfg.Area, owner.side)
             .FindAll(x => x.IsInFight() && !x.HasBuff(buffId));
 
         if (units.Count == 0)

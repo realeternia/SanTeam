@@ -2,7 +2,7 @@ using CommonConfig;
 using UnityEngine;
 
 /// <summary>
-/// 青囊 / 天书（ScriptName = "AidRangeHeal"）：辅助技能，先在 Range 内选出生命比例最低的友方英雄作为治疗中心，
+/// 青囊 / 天书（ScriptName = "AidRangeHeal"）：辅助技能，先在 Area 内选出生命比例最低的友方英雄作为治疗中心，
 /// 再以该中心为圆心、Area 为半径，按生命比例从低到高最多治疗 TargetCount 名友方英雄（各 HealTarget 一次，吃医职业治疗加成）。
 /// 治疗量走独立治疗公式 GetSkillHeal()。附近友军全部满血时不施放。
 /// 并对被治疗的友军额外驱散负面 Buff（不可驱散的招牌 Buff 除外，见 BuffManager.DispelNegative）；
@@ -18,7 +18,7 @@ public class SkillAidRangeHeal : Skill
     public override bool CheckAidSkill()
     {
         // 第一步：在助战射程内选治疗中心（生命比例最低的友方英雄）
-        var units = WorldManager.Instance.GetMySideInRange(owner.transform.position, skillCfg.Range, owner.side)
+        var units = WorldManager.Instance.GetMySideInRange(owner.transform.position, skillCfg.Area, owner.side)
             .FindAll(x => x.isHero && x.IsInFight() && x.hp < x.maxHp);
 
         Chess center = null;

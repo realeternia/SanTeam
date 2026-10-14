@@ -62,6 +62,8 @@ description: 编写《三国卡牌》(金铲铲式)战斗技能与数值配置�
 - 技能文件已加 `<Compile Include>`（`Assembly-CSharp.csproj`）。
 - 全工程 `Grep` 旧字段/旧 Id 确认无残留引用。
 - 描述各等级数值与实机一一对应，`Descript` 内联的 `/字段名` 与对应字段值一致。
+- 范围技能：核对代码半径用的是 `Area` 而非 `Range`，且该行 `Area` 非 0（0=全图）且与脚本实际读取字段一致。
+- 特效：核对 `HitEffect`/`AreaEffect` 与脚本调用匹配，调 `PlaySkillEffect`/`PlayAreaEffect` 前有空判守护，单体技能必须有 `PlaySkillEffect` 或导弹表现。
 
 ## 九、相职业技能实现经验（本工程落地要点）
 
@@ -74,3 +76,11 @@ description: 编写《三国卡牌》(金铲铲式)战斗技能与数值配置�
 - **主动技 Rate 勿放带概率的被动**：`Rate=0` 表示必然发动（`CheckBurst` 随机判定）。主动技固定触发就不要填 Rate；被动需要的概率改用独立字段（如 `StrengthInt` 整型百分数，描述用 `/strengthint%`）。
 - **BuffId 一槽只能装一种 buff**：同一技能若既要"主动命中给目标上效果"，又要"BattleBegin 给友军挂承伤/被动 buff"会冲突。做法：把承伤/被动 buff 配到 `skill.BuffId`；主动技自身要施加的 effect 用常量/短名另行引用（如 `StunBuffNameS="乱"`）。
 - **死亡原地复活**：用 `IEnumerator` 协程（骑在 `WorldManager` 上），`Chess.Ondying` 校验 Buff 标记后启动，延迟后经 `SpawnUnitsForRegion` 原地重建（满血，每名至多一次）。
+
+## 十、射程与范围（Range / Area）选人规范
+
+- **字段语义**：`Range` = 射程/施法距离（单目标 `CheckInRange` 判定用）；`Area` = AoE 影响半径、以及**所有列表范围选人的搜索半径**。
+- **硬约束**：凡是调用 `GetMySideInRange` / `GetEnemyInRange` / `GetUnitsInRangeAll` / `GetUnitsInRangeByTag` 等列表查询的技能，半径参数**一律传 `skillCfg.Area`**，不得传 `skillCfg.Range`。
+- **`Area = 0` 语义**：列表查询中 `range == 0` 表示**全图**（见 `WorldManager`）。因此范围技能该行 `Area` 不得为 0，除非确为"全图"设计，需在注释中说明。
+- **方向型/直线型技能例外**：`Range` 表示直线长度、`Area` 表示走廊宽度时（如 `SkillAidChargeImpale` 冲阵、`SkillAidSuddenArrow` 骑射的索敌射程），保留 `Range` 用法并加中文注释说明原因，不强行改 `Area`。
+- **一致性**：同 `ScriptName` 的各等级行 `Range`/`Area` 含义须一致；迁移半径字段时（`Range`→`Area`）须同步改写配置表全部数据行，并 `Grep` 确认无残留 `skillCfg.Range` 误用。

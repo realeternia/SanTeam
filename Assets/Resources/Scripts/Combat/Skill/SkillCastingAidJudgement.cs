@@ -25,9 +25,8 @@ public class SkillCastingAidJudgement : Skill
         owner.PlayerAnim(skillCfg.Action);
 
         var pos = target.transform.position;
-        var magicStub = SummonMagicField(pos, out var summonTime);
-        if (magicStub != null)
-            EffectManager.PlayPosSkillEffect(magicStub, pos, skillCfg.Area, skillCfg.AreaEffect, summonTime);
+        SummonMagicField(pos, out var summonTime);
+        PlayAreaEffect(pos, summonTime);
 
         owner.StartCasting(id, ThunderField(pos));
         return true;

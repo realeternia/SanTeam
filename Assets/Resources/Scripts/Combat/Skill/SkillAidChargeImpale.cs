@@ -32,6 +32,7 @@ public class SkillAidChargeImpale : Skill
         var halfWidth = skillCfg.Area * 0.5f;
         var skillDamage = GetSkillDamage();
 
+        // 保持 Range：本技能 Range=直线长度、Area=走廊宽度，此处按直线长度取候选（后续用 Area 作垂直半宽判定），改 Area 会导致技能几乎打不到人
         var units = WorldManager.Instance.GetEnemyInRange(owner.transform.position, skillCfg.Range, owner.side);
         foreach (var u in units)
         {

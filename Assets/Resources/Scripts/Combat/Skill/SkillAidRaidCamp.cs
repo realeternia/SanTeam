@@ -45,7 +45,7 @@ public class SkillAidRaidCamp : Skill
     // 射程内最远的存活敌方单位（近似后排）
     private Chess BacklineEnemy()
     {
-        var enemies = WorldManager.Instance.GetEnemyInRange(owner.transform.position, skillCfg.Range, owner.side);
+        var enemies = WorldManager.Instance.GetEnemyInRange(owner.transform.position, skillCfg.Area, owner.side);
         Chess best = null;
         float bestDist = -1f;
         foreach (var e in enemies)

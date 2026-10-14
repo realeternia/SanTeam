@@ -17,7 +17,7 @@ public class SkillAidSevenCharge : Skill
             return false;
 
         var buffId = BuffConfig.GetConfigByNameS(skillCfg.BuffId).Id;
-        var units = WorldManager.Instance.GetMySideInRange(owner.transform.position, skillCfg.Range, owner.side)
+        var units = WorldManager.Instance.GetMySideInRange(owner.transform.position, skillCfg.Area, owner.side)
             .FindAll(x => x.IsInFight() && x != owner && !x.HasBuff(buffId));
         WorldManager.Instance.RandomSelect(units, skillCfg.TargetCount);
         units.Add(owner); // 自己必定获得

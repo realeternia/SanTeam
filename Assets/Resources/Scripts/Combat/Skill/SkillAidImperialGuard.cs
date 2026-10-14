@@ -34,7 +34,7 @@ public class SkillAidImperialGuard : Skill
             return false;
         }
 
-        var allies = WorldManager.Instance.GetMySideInRange(owner.transform.position, skillCfg.Range, owner.side)
+        var allies = WorldManager.Instance.GetMySideInRange(owner.transform.position, skillCfg.Area, owner.side)
             .FindAll(x => x != owner && x.isHero && x.IsInFight());
 
         if (allies.Count == 0)
@@ -51,7 +51,6 @@ public class SkillAidImperialGuard : Skill
         owner.PlayerAnim(skillCfg.Action);
 
         var landPos = owner.transform.position + new Vector3(0, 0, 6f);
-        PlayAreaEffect(landPos);
 
         // 传送至身边（参照 SkillAttackedTeleport 瞬移路径）
         lowest.MoveTo(landPos, true);

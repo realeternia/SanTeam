@@ -18,7 +18,7 @@ public class SkillAidBuffHasteSteal : Skill
         if (!CheckBurst(null))
             return false;
 
-        var units = WorldManager.Instance.GetMySideInRange(owner.transform.position, skillCfg.Range, owner.side)
+        var units = WorldManager.Instance.GetMySideInRange(owner.transform.position, skillCfg.Area, owner.side)
             .FindAll(x => x != owner && x.isHero && x.IsInFight());
 
         if (units.Count == 0)

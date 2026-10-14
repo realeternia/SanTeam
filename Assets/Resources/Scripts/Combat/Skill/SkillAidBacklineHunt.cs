@@ -16,7 +16,7 @@ public class SkillAidBacklineHunt : Skill
     /// </summary>
     public override bool CheckAidSkill()
     {
-        var enemies = WorldManager.Instance.GetEnemyInRange(owner.transform.position, skillCfg.Range, owner.side);
+        var enemies = WorldManager.Instance.GetEnemyInRange(owner.transform.position, skillCfg.Area, owner.side);
         Chess back = null;
         float md = -1f;
         if (enemies != null)
@@ -38,7 +38,6 @@ public class SkillAidBacklineHunt : Skill
             return false;
 
         owner.PlayerAnim(skillCfg.Action);
-        PlayAreaEffect(back.transform.position);
         int dmg = GetSkillDamage() + (int)(GetSkillDamage() * skillCfg.Strength2[0]);
         WorldManager.Instance.CreateSpellMissile(owner, back, owner.transform.position, id, dmg, owner.hitEffect);
         return true;

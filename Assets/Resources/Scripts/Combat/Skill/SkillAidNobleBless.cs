@@ -26,11 +26,11 @@ public class SkillAidNobleBless : Skill
         }
 
         // 祝福优先同侧(battleSide)友军，无同侧目标再退到跨侧友军(alley)
-        var pool = WorldManager.Instance.GetMySideInRange(owner.transform.position, skillCfg.Range, owner.side)
+        var pool = WorldManager.Instance.GetMySideInRange(owner.transform.position, skillCfg.Area, owner.side)
             .FindAll(x => x != owner && x.isHero && x.IsInFight() && !x.HasBuff(buffCfg.Id));
         if (pool.Count == 0)
         {
-            pool = WorldManager.Instance.GetUnitsInRangeAll(owner.transform.position, skillCfg.Range)
+            pool = WorldManager.Instance.GetUnitsInRangeAll(owner.transform.position, skillCfg.Area)
                 .FindAll(x => x != owner && !WorldManager.Instance.IsEnemy(x.side, owner.side)
                     && x.isHero && x.IsInFight() && !x.HasBuff(buffCfg.Id));
         }
@@ -46,7 +46,6 @@ public class SkillAidNobleBless : Skill
         }
 
         owner.PlayerAnim(skillCfg.Action);
-        PlayAreaEffect(highest.transform.position);
 
         BuffManager.AddBuff(highest, owner, id, buffCfg.Id, skillCfg.BuffTime);
         EffectManager.PlaySkillEffect(highest, skillCfg.HitEffect);

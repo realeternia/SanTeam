@@ -24,7 +24,7 @@ public class SkillAidBenevolence : Skill
             return false;
         }
 
-        var allies = WorldManager.Instance.GetMySideInRange(owner.transform.position, skillCfg.Range, owner.side)
+        var allies = WorldManager.Instance.GetMySideInRange(owner.transform.position, skillCfg.Area, owner.side)
             .FindAll(x => x.isHero && x.IsInFight() && !x.HasBuff(buffCfg.Id));
 
         if (allies.Count == 0)

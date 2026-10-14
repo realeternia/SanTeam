@@ -29,10 +29,10 @@ public class SkillCastingAidHitRegion : Skill
 
         var targetPos = target.transform.position;
 
-        var magicStub = SummonMagicField(targetPos, out var summonTime);
+        SummonMagicField(targetPos, out var summonTime);
 
-        //创建一个hitEffect
-        EffectManager.PlayPosSkillEffect(magicStub, targetPos, skillCfg.Area, skillCfg.AreaEffect, summonTime);
+        // 范围特效统一走 PlayAreaEffect
+        PlayAreaEffect(targetPos, summonTime);
 
         owner.StartCasting(id, DelayDamage(targetPos, summonTime));
         return true;

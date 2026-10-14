@@ -18,7 +18,7 @@ public class SkillAidBalance : Skill
         if (!CheckBurst(null))
             return false;
 
-        var allies = WorldManager.Instance.GetMySideInRange(owner.transform.position, skillCfg.Range, owner.side)
+        var allies = WorldManager.Instance.GetMySideInRange(owner.transform.position, skillCfg.Area, owner.side)
             .FindAll(x => x != owner && x.isHero && x.IsInFight());
 
         if (allies.Count == 0)

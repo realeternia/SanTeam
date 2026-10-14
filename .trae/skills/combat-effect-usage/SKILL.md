@@ -32,6 +32,13 @@ description: 配置与校验战斗技能/Buff 特效(HitEffect/AreaEffect/BuffEf
 - 职业/连接/道具类技能不套用上表，按效果性质单独判定。
 - 同一 `Sname` 的 5 个等级行必须共用同一 `HitEffect`/`AreaEffect`（只按 `Sname` 分配一次，再写回 5 行）。
 
+## 二·补、调用点校验（硬约束）
+
+- **空判守护**：脚本调用 `EffectManager.PlaySkillEffect(...)` / `PlayAreaEffect(...)` 前必须先判 `if (!string.IsNullOrEmpty(skillCfg.HitEffect))` / `AreaEffect`，避免配置为空时每次触发都打 `GameLog.Warn("特效名为空，跳过播放")` 噪音（`EffectManager` 内部虽有保护，但会产生告警日志）。
+- **范围特效非空**：脚本调 `PlayAreaEffect` 的技能，其配置行 `AreaEffect` 不得为空，否则范围特效缺失。
+- **单体技能表现完整**：所有单体类型（`单伤/单增/单控/单疗`）技能必须有命中表现——`PlaySkillEffect` 或导弹（`CreateSpellMissile`），二者至少其一。
+- **半径来源一致**：范围技能即使无 `AreaEffect`，其选人半径也必须是 `skillCfg.Area`（见 `combat-skill-design` 第十节）；`Area=0` 表示全图，非全图设计不得为 0。
+
 ## 三、定位与改写（SkillConfig 行格式）
 
 行形如 `config[id] = new SkillConfig(...)`，构造器共 17 个字符串参数，按出现顺序：

@@ -54,10 +54,10 @@ public class SkillAidSacrificeGuard : Skill
         return true;
     }
 
-    /// <summary>取 Range 内最近受伤的友军英雄（排除自身），多个时取最近一次受伤者；无则返回 null</summary>
+    /// <summary>取 Area 内最近受伤的友军英雄（排除自身），多个时取最近一次受伤者；无则返回 null</summary>
     private Chess FindRecentlyDamagedAlly()
     {
-        var allies = WorldManager.Instance.GetMySideInRange(owner.transform.position, skillCfg.Range, owner.side);
+        var allies = WorldManager.Instance.GetMySideInRange(owner.transform.position, skillCfg.Area, owner.side);
         Chess protect = null;
         foreach (var a in allies)
         {

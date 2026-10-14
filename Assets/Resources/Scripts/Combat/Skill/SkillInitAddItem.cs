@@ -30,7 +30,8 @@ public class SkillInitAddItem : Skill
         player.AddItemCard(skillCfg.ItemId);
 
         // 表现：在技能持有者处播放获得道具特效 + 飘字
-        EffectManager.PlaySkillEffect(owner, skillCfg.HitEffect);
+        if (!string.IsNullOrEmpty(skillCfg.HitEffect))
+            EffectManager.PlaySkillEffect(owner, skillCfg.HitEffect);
         var itemName = ItemConfig.HasConfig(skillCfg.ItemId) ? ItemConfig.GetConfig(skillCfg.ItemId).Name : skillCfg.ItemId.ToString();
         WorldManager.Instance.AddBattleText(itemName, owner.transform.position, new Vector2(0, 60), SysColor.BattleText.ItemGain, 3);
 

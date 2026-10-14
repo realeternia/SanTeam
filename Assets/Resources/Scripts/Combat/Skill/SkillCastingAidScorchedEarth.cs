@@ -41,8 +41,8 @@ public class SkillCastingAidScorchedEarth : Skill
 
         foreach (var pos in targetPosList)
         {
-            var magicStub = SummonMagicField(pos, out var summonTime);
-            EffectManager.PlayPosSkillEffect(magicStub, pos, skillCfg.Area, skillCfg.AreaEffect, summonTime);
+            SummonMagicField(pos, out var summonTime);
+            PlayAreaEffect(pos, summonTime);
         }
 
         owner.StartCasting(id, DelayDamage(GetSummonTime()));

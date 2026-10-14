@@ -34,7 +34,7 @@ public class SkillAidSwapStrike : Skill
     // 射程内取距离自身最远的存活敌人（即敌方后排），优先换后排
     Chess BacklineEnemy()
     {
-        var enemies = WorldManager.Instance.GetEnemyInRange(owner.transform.position, skillCfg.Range, owner.side);
+        var enemies = WorldManager.Instance.GetEnemyInRange(owner.transform.position, skillCfg.Area, owner.side);
         Chess back = null;
         float maxDist = -1f;
         if (enemies != null)
