@@ -33,7 +33,7 @@ public class SkillLowHpFullHealShield : Skill
         if (shield != null)
             shield.SetHp(GetSkillShield(0));
 
-        EffectManager.PlaySkillEffect(owner, skillCfg.HitEffect);
+        PlaySelfEffect();
         GameLog.Debug($"偷渡阴平触发 技能id={id} 等级={Level} 每秒回血={GetSkillHeal()} 护盾={GetSkillShield(0)} 持续={skillCfg.BuffTime}s 冷却={skillCfg.CD}s");
     }
 }

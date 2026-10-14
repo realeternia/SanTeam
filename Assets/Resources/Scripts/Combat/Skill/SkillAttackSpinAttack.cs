@@ -31,7 +31,7 @@ public class SkillAttackSpinAttack : Skill
                 ApplyBleed(unit, spinDamage);
             }
 
-            EffectManager.PlaySkillEffect(owner, skillCfg.HitEffect);
+            PlaySelfEffect();
         }
     }
 

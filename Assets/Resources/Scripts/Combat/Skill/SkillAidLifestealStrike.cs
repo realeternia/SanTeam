@@ -19,7 +19,7 @@ public class SkillAidLifestealStrike : Skill
             return false;
 
         owner.PlayerAnim(skillCfg.Action);
-        EffectManager.PlaySkillEffect(owner, skillCfg.HitEffect);
+        PlaySelfEffect();
         BuffManager.AddBuff(owner, owner, id, BuffConfig.GetConfigByNameS("袭").Id, skillCfg.BuffTime);
         return true;
     }

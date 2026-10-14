@@ -18,7 +18,7 @@ public class SkillAidEmpower : Skill
             return false;
 
         owner.PlayerAnim(skillCfg.Action);
-        EffectManager.PlaySkillEffect(owner, skillCfg.HitEffect);
+        PlaySelfEffect();
 
         BuffManager.AddBuff(owner, owner, id, BuffConfig.GetConfigByNameS("倍").Id, skillCfg.BuffTime);
         return true;

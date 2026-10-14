@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using CommonConfig;
@@ -24,7 +24,7 @@ public class SkillAttackedShadow : Skill
             shadowUnit.hp = (int)(shadowUnit.maxHp * owner.HpRate);
             shadowUnit.material.SetFloat("_SecondTexSize", 2f);
             shadowUnit.material.SetTexture("_SecondTex", Resources.Load<Texture>("Textures/SkillPic/" + skillCfg.Icon));
-            EffectManager.PlaySkillEffect(owner, skillCfg.HitEffect);
+            PlaySelfEffect();
             EffectManager.PlaySkillEffect(shadowUnit, skillCfg.HitEffect);
 
             owner.PlayerAnim(skillCfg.Action);

@@ -408,6 +408,17 @@ public class Skill
         return EffectManager.PlayPosSkillEffect(owner, pos, skillCfg.Area, skillCfg.AreaEffect, time);
     }
 
+    /// <summary>
+    /// 播放施法自身特效（施法/触发瞬间在施法者自身身上播 skillCfg.SelfEffect，取"增益/目标"类特效）。
+    /// SelfEffect 未配置时静默跳过。
+    /// </summary>
+    protected GameObject PlaySelfEffect(float time = 1.3f)
+    {
+        if (string.IsNullOrEmpty(skillCfg.SelfEffect))
+            return null;
+        return EffectManager.PlaySkillEffect(owner, skillCfg.SelfEffect, time);
+    }
+
     public float GetSummonTime()
     {
         return skillCfg.SummonTime;

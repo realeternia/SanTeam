@@ -1,4 +1,4 @@
-﻿using System.Linq;
+using System.Linq;
 using CommonConfig;
 
 /// <summary>
@@ -25,7 +25,7 @@ public class SkillSoldierArcherBuff : Skill
         }
         owner.atk += (int)(owner.atk * atkPct);
         owner.attackSpeedRate += spdPct;
-        EffectManager.PlaySkillEffect(owner, skillCfg.HitEffect);
+        PlaySelfEffect();
         return true;
     }
 }

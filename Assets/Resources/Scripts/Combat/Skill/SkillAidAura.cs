@@ -48,7 +48,7 @@ public class SkillAidAura : Skill
             BuffManager.DispelNegative(unit);
 
         owner.PlayerAnim(skillCfg.Action);
-        EffectManager.PlaySkillEffect(owner, skillCfg.HitEffect);
+        PlaySelfEffect();
         return true;
     }
 }

@@ -28,7 +28,7 @@ public class SkillAidSelfSacrifice : Skill
         int shieldHardId = BuffConfig.GetConfigByNameS("硬").Id;
         BuffManager.AddBuff(owner, owner, id, shieldHardId, skillCfg.BuffTime);
 
-        EffectManager.PlaySkillEffect(owner, skillCfg.HitEffect);
+        PlaySelfEffect();
         return true;
     }
 }

@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using CommonConfig;
 using UnityEngine;
@@ -26,7 +26,7 @@ public class SkillAttackedTeleport : Skill
 
             owner.MoveTo(randomPosition, true);
             owner.LockTarget(attacker);
-            EffectManager.PlaySkillEffect(owner, skillCfg.HitEffect);
+            PlaySelfEffect();
 
             // 施加眩晕buff，同时给予一次技能伤害
             BuffManager.AddBuff(attacker, owner, id, BuffConfig.GetConfigByNameS(skillCfg.BuffId).Id, skillCfg.BuffTime);

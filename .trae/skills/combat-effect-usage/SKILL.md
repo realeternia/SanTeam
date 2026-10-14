@@ -10,13 +10,14 @@ description: 配置与校验战斗技能/Buff 特效(HitEffect/AreaEffect/BuffEf
 ## 一、数据源
 
 - 特效表 `Assets/Resources/Scripts/Configs/EffectConfig_s.cs`：`Name`(引用key) / `Cname` / **`Type`(增益·负面·伤害)** / **`Area`(目标·范围)** / `EffPath` / `MissilePath` / `Scale` / `OffsetY` / `MissileScale` / `MissileOffsetY` / `TintColor`(hex 变色，可复用同形态特效)。
-- 技能表 `Configs/SkillConfig_s.cs`：`HitEffect`（命中特效，挂目标/自身）、`AreaEffect`（范围特效，挂地面并按技能 `Area` 缩放到基准半径）。
+- 技能表 `Configs/SkillConfig_s.cs`：`SelfEffect`（施法自身特效，施法/触发瞬间在施法者身上播）、`HitEffect`（命中特效，挂目标/自身）、`AreaEffect`（范围特效，挂地面并按技能 `Area` 缩放到基准半径）。
 - Buff 表 `Configs/BuffConfig_s.cs`：`BuffEffect`（挂单位身上，随 buff 存续）。
-- 播放入口 `Combat/EffectManager.cs`：`PlaySkillEffect`(命中)、`Skill.PlayAreaEffect`→`PlayPosSkillEffect`(范围)、`PlayBuffEffect`(buff)。
+- 播放入口 `Combat/EffectManager.cs`：`PlaySkillEffect`(命中)、`Skill.PlaySelfEffect`→`PlaySkillEffect`(施法自身)、`Skill.PlayAreaEffect`→`PlayPosSkillEffect`(范围)、`PlayBuffEffect`(buff)。
 
 ## 二、选择规则（硬约束）
 
 `HitEffect` 只能取 **Area=目标** 的特效；`AreaEffect` 只能取 **Area=范围** 的特效；且 `Type` 必须与技能语义一致（伤害技能配伤害特效、增益配增益、控制配负面）。
+`SelfEffect` 在施法者自身播放，取 **增益/目标** 类特效（如 `MagicCharge*` 蓄力、`MagicBuffGreen`、`ShieldSoftBlue`、`HeartStream`、`StarExplosionBlue`）；仅在确有特殊表现需求时才用非增益类（需注释说明）。
 
 | 技能 Type | HitEffect 池 | AreaEffect 池 |
 |---|---|---|
@@ -35,21 +36,22 @@ description: 配置与校验战斗技能/Buff 特效(HitEffect/AreaEffect/BuffEf
 ## 二·补、调用点校验（硬约束）
 
 - **空判守护**：脚本调用 `EffectManager.PlaySkillEffect(...)` / `PlayAreaEffect(...)` 前必须先判 `if (!string.IsNullOrEmpty(skillCfg.HitEffect))` / `AreaEffect`，避免配置为空时每次触发都打 `GameLog.Warn("特效名为空，跳过播放")` 噪音（`EffectManager` 内部虽有保护，但会产生告警日志）。
+- **自身施法特效走统一入口**：在施法者自身播放的特效一律调 `PlaySelfEffect()`（读 `SelfEffect`，内部已空判），不要再写 `EffectManager.PlaySkillEffect(owner, skillCfg.HitEffect)`。
 - **范围特效非空**：脚本调 `PlayAreaEffect` 的技能，其配置行 `AreaEffect` 不得为空，否则范围特效缺失。
 - **单体技能表现完整**：所有单体类型（`单伤/单增/单控/单疗`）技能必须有命中表现——`PlaySkillEffect` 或导弹（`CreateSpellMissile`），二者至少其一。
 - **半径来源一致**：范围技能即使无 `AreaEffect`，其选人半径也必须是 `skillCfg.Area`（见 `combat-skill-design` 第十节）；`Area=0` 表示全图，非全图设计不得为 0。
 
 ## 三、定位与改写（SkillConfig 行格式）
 
-行形如 `config[id] = new SkillConfig(...)`，构造器共 17 个字符串参数，按出现顺序：
+行形如 `config[id] = new SkillConfig(...)`，构造器共 18 个字符串参数，按出现顺序：
 
 ```
 Name, Sname, Descript, Type, TriggerCondition, HurtTag, TargetType, BuffId,
-SummonTag, ScriptName, Action, HitEffect(第12), AreaEffect(第13),
+SummonTag, ScriptName, Action, SelfEffect(第12), HitEffect(第13), AreaEffect(第14),
 Icon, LinkSelf, LinkTeam, AuroAttrs
 ```
 
-用正则抓取该行全部 `"..."`，第 12、13 个即命中/范围特效。改名时按匹配的字符跨度**原位替换**（先改索引大的第 13 个，再改第 12 个），避免同名串误伤。
+用正则抓取该行全部 `"..."`，第 12、13、14 个即施法自身/命中/范围特效。改名时按匹配的字符跨度**原位替换**（从索引大的往小改），避免同名串误伤。
 
 ## 四、池内轮换打散（压制高频复用）
 

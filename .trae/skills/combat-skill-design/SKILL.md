@@ -63,7 +63,7 @@ description: 编写《三国卡牌》(金铲铲式)战斗技能与数值配置�
 - 全工程 `Grep` 旧字段/旧 Id 确认无残留引用。
 - 描述各等级数值与实机一一对应，`Descript` 内联的 `/字段名` 与对应字段值一致。
 - 范围技能：核对代码半径用的是 `Area` 而非 `Range`，且该行 `Area` 非 0（0=全图）且与脚本实际读取字段一致。
-- 特效：核对 `HitEffect`/`AreaEffect` 与脚本调用匹配，调 `PlaySkillEffect`/`PlayAreaEffect` 前有空判守护，单体技能必须有 `PlaySkillEffect` 或导弹表现。
+- 特效：核对 `SelfEffect`/`HitEffect`/`AreaEffect` 与脚本调用匹配——施法者自身特效走 `PlaySelfEffect()`（读 `SelfEffect`，取增益/目标类），命中走 `HitEffect`，范围走 `AreaEffect`；调 `PlaySkillEffect`/`PlayAreaEffect` 前有空判守护，单体技能必须有 `PlaySkillEffect` 或导弹表现。
 
 ## 九、相职业技能实现经验（本工程落地要点）
 

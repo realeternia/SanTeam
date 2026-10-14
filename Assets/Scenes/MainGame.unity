@@ -2685,31 +2685,12 @@ MonoBehaviour:
   year: 0
   currentSaveSlot: -1
   debugHeroesSide1:
-  - heroId: 100006
-    level: 1
-  - heroId: 104009
-    level: 1
-  - heroId: 103009
-    level: 1
-  - heroId: 103003
-    level: 1
-  - heroId: 105007
-    level: 1
-  - heroId: 101011
+  - heroId: 102001
     level: 1
   debugHeroesSide2:
-  - heroId: 105009
+  - heroId: 101004
     level: 1
-  - heroId: 106001
-    level: 1
-  - heroId: 102012
-    level: 1
-  - heroId: 110005
-    level: 1
-  - heroId: 101019
-    level: 1
-  - heroId: 105002
-    level: 1
+  debugFullMp: 1
 --- !u!114 &1788356929
 MonoBehaviour:
   m_ObjectHideFlags: 0

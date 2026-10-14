@@ -31,7 +31,7 @@ public class SkillAidSacrificeGuard : Skill
 
         owner.PlayerAnim(skillCfg.Action);
         owner.MoveTo(landPos, true);
-        EffectManager.PlaySkillEffect(owner, skillCfg.HitEffect);
+        PlaySelfEffect();
 
         // 自身增防：按 BuffId 配置施加护甲 Buff
         foreach (var buffId in GetSkillBuffIds())

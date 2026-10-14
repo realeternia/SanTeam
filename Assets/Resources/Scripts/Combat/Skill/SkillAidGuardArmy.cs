@@ -44,7 +44,7 @@ public class SkillAidGuardArmy : Skill
         // 嘲讽：把被套盾友军 Area 范围内敌人的当前目标改到自己身上
         TauntEnemies(owner, lowest.transform.position, skillCfg.Area);
 
-        EffectManager.PlaySkillEffect(owner, skillCfg.HitEffect);
+        PlaySelfEffect();
         return true;
     }
 }

@@ -46,7 +46,7 @@ public class SkillAidShieldBurst : Skill
         else
             GameLog.Error("SkillAidShieldBurst: 未找到龙胆Buff短名：" + GuardBuffNameS);
 
-        EffectManager.PlaySkillEffect(owner, skillCfg.HitEffect);
+        PlaySelfEffect();
         return true;
     }
 
@@ -84,6 +84,6 @@ public class SkillAidShieldBurst : Skill
             enemy.OnSkillDamaged(owner, skillCfg.Id, boomDamage, false, "");
         }
 
-        EffectManager.PlaySkillEffect(owner, skillCfg.HitEffect);
+        PlaySelfEffect();
     }
 }

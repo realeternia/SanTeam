@@ -1,11 +1,11 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using CommonConfig;
 using UnityEngine;
 
 /// <summary>
-/// 郭嘉·遗计（术）：释放持续穿透激光，持续 summontime 秒，每秒对路径上所有敌人造成 /damagestrength 法术伤害。
+/// 郭嘉·遗计（术）：释放持续穿透激光，持续 bufftime 秒，每秒对路径上所有敌人造成 /damagestrength 法术伤害。
 /// 施法期间自身处于引导状态(castingSkillId>0)，无法移动/普攻，被晕眩/死亡打断停止；当前目标死亡自动切换新的最前方敌人继续照射。
 /// </summary>
 public class SkillCastingAidLastStrategy : Skill
@@ -34,7 +34,7 @@ public class SkillCastingAidLastStrategy : Skill
 
     IEnumerator LaserChannel()
     {
-        var endTime = Time.time + Math.Max(0.1f, skillCfg.SummonTime);
+        var endTime = Time.time + Math.Max(0.1f, skillCfg.BuffTime);
         var skillDamage = GetSkillDamage();
 
         // 起始目标锁敌方最前方的存活敌人，死亡后切最前方的存活敌人
@@ -69,7 +69,12 @@ public class SkillCastingAidLastStrategy : Skill
 
             if (beam != null)
             {
-                foreach (var e in beam.GetHitUnits())
+                var hitUnits = beam.GetHitUnits();
+                // 每跳命中数上限：TargetCount>0 时随机保留 N 名（同落雷/火海）；<=0 表示不限，避免 RandomSelect(0) 清空列表
+                if (skillCfg.TargetCount > 0)
+                    WorldManager.Instance.RandomSelect(hitUnits, skillCfg.TargetCount);
+
+                foreach (var e in hitUnits)
                 {
                     if (skillDamage > 0)
                         e.OnSkillDamaged(owner, skillId, skillDamage);

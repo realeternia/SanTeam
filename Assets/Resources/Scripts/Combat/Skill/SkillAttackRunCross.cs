@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using CommonConfig;
@@ -27,7 +27,7 @@ public class SkillAttackRunCross : Skill
         {
             // 启动协程移动
             owner.noMoveCount++;
-            EffectManager.PlaySkillEffect(owner, skillCfg.HitEffect);
+            PlaySelfEffect();
 
             owner.StartCoroutine(JumpToPosition(mirrorPos));
             defender.OnSkillDamaged(owner, skillId, (int)(damage * skillCfg.Strength2[0]));

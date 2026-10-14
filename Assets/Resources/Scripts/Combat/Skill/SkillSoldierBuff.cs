@@ -1,4 +1,4 @@
-﻿using System.Linq;
+using System.Linq;
 using CommonConfig;
 
 /// <summary>
@@ -21,7 +21,7 @@ public class SkillSoldierBuff : Skill
             s.atk += (int)(s.atk * skillCfg.Strength2[0]);
             s.armor += (int)skillCfg.Strength2[1];
         }
-        EffectManager.PlaySkillEffect(owner, skillCfg.HitEffect);
+        PlaySelfEffect();
         return true;
     }
 }

@@ -32,7 +32,7 @@ public class SkillAidTauntSlam : Skill
         TauntEnemies(skillCfg.Area);
 
         PlayAreaEffect(owner.transform.position);
-        EffectManager.PlaySkillEffect(owner, skillCfg.HitEffect);
+        PlaySelfEffect();
         return true;
     }
 }

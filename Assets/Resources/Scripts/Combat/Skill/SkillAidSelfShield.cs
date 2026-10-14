@@ -32,7 +32,7 @@ public class SkillAidSelfShield : Skill
             shield.SetHp(shieldHp);
         GameLog.Debug($"温良 武将{owner.heroId} 套盾{shieldHp}");
 
-        EffectManager.PlaySkillEffect(owner, skillCfg.HitEffect);
+        PlaySelfEffect();
         return true;
     }
 }

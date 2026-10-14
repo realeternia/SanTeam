@@ -20,7 +20,7 @@ public class SkillAidVengefulStance : Skill
             return false;
 
         owner.PlayerAnim(skillCfg.Action);
-        EffectManager.PlaySkillEffect(owner, skillCfg.HitEffect);
+        PlaySelfEffect();
 
         // 威震"震"（普攻眩晕 + 普攻转真实伤害）
         var buffCfg = BuffConfig.GetConfigByNameS(skillCfg.BuffId);

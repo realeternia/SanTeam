@@ -27,7 +27,7 @@ public class SkillAttackRunCrossPlus : Skill
             // 启动协程移动
             owner.noMoveCount++;
             PlayAreaEffect(owner.transform.position);
-            EffectManager.PlaySkillEffect(owner, skillCfg.HitEffect);
+            PlaySelfEffect();
 
             owner.StartCoroutine(JumpToPosition(mirrorPos, damage));
         }

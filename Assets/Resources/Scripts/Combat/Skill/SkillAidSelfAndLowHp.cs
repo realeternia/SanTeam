@@ -59,7 +59,7 @@ public class SkillAidSelfAndLowHp : Skill
             EffectManager.PlaySkillEffect(target, skillCfg.HitEffect);
         }
 
-        EffectManager.PlaySkillEffect(owner, skillCfg.HitEffect);
+        PlaySelfEffect();
         GameLog.Debug($"忠勇护盾 技能id={id} 等级={Level} 自护盾={shieldHp} 友军={target?.heroId}");
         return true;
     }

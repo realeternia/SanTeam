@@ -40,7 +40,7 @@ public class SkillAttackedShield : Skill
         // 触发后在限时内持续回血（固定值，不随法强成长），取代此前的永久生命回复叠加
         ApplyHealOverTime();
 
-        EffectManager.PlaySkillEffect(owner, skillCfg.HitEffect);
+        PlaySelfEffect();
         GameLog.Debug($"受击加护盾 技能id={id} 等级={Level} 生命={owner.hp}/{owner.maxHp} 护盾={shieldHp} 持续回血={GetHealPerTick()}/秒×{GetHealTime()}秒");
     }
 

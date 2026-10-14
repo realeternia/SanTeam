@@ -18,7 +18,7 @@ public class SkillAidFrenzy : Skill
             return false;
 
         owner.PlayerAnim(skillCfg.Action);
-        EffectManager.PlaySkillEffect(owner, skillCfg.HitEffect);
+        PlaySelfEffect();
 
         BuffManager.AddBuff(owner, owner, id, BuffConfig.GetConfigByNameS("快").Id, skillCfg.BuffTime);
         return true;

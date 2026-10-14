@@ -267,6 +267,8 @@ public class WorldManager : MonoBehaviour
 
         if (!GameManager.Instance.HasDebugLineup())
         {
+            // 非调试阵容：关闭调试用的满MP开关，避免上一次调试开局的静态值残留影响正常对局
+            CombatConst.FullMpAtBattleBegin = false;
             int[] match = GetMatch();
             if (isPveRound)
             {
@@ -316,6 +318,8 @@ public class WorldManager : MonoBehaviour
         else
         {
             // 调试阵容：玩家0占1号位、玩家1占2号位，武将取自 GameManager 配置的调试列表
+            // 开局满MP开关由调试阵容窗口的「开局技能MP拉满」控制（默认勾选）
+            CombatConst.FullMpAtBattleBegin = GameManager.Instance.debugFullMp;
             GameManager.Instance.GetPlayer(0).likeCount = 2;
             GameManager.Instance.GetPlayer(1).likeCount = 2;
             var center1 = mapConfig.SideCenters != null && mapConfig.SideCenters.Length > 0 ? mapConfig.SideCenters[0] : null;

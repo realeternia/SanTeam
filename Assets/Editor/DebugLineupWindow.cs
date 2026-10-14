@@ -20,6 +20,7 @@ public class DebugLineupWindow : EditorWindow
     private const string GameScenePath = "Assets/Scenes/MainGame.unity";
     private const string PropSide1 = "debugHeroesSide1";
     private const string PropSide2 = "debugHeroesSide2";
+    private const string PropFullMp = "debugFullMp";
 
     // 面板配色
     private static readonly Color SectionBg = new Color(0.24f, 0.26f, 0.34f, 0.6f);
@@ -164,6 +165,8 @@ public class DebugLineupWindow : EditorWindow
         DrawHeroList("左侧（1号位）", PropSide1, Side1Accent);
         GUILayout.Space(4);
         DrawHeroList("右侧（2号位）", PropSide2, Side2Accent);
+        GUILayout.Space(4);
+        DrawOptions();
         so.ApplyModifiedProperties();
 
         DrawLineupWarning();
@@ -202,6 +205,25 @@ public class DebugLineupWindow : EditorWindow
                 : "未配置（启动走正常对局流程）");
         GUILayout.Label("场景：" + SceneManager.GetActiveScene().name + "    " + state, hintStyle);
         GUILayout.Space(2);
+    }
+
+    // 调试选项：开局是否直接拉满技能MP
+    private void DrawOptions()
+    {
+        SerializedProperty fullMpProp = so.FindProperty(PropFullMp);
+        if (fullMpProp == null)
+        {
+            GameLog.Error($"DebugLineupWindow 未找到字段 {PropFullMp}");
+            return;
+        }
+
+        EditorGUILayout.BeginVertical(EditorStyles.helpBox);
+        EditorGUI.BeginChangeCheck();
+        fullMpProp.boolValue = EditorGUILayout.ToggleLeft("开局技能MP拉满", fullMpProp.boolValue);
+        if (EditorGUI.EndChangeCheck())
+            MarkSceneDirty();
+        GUILayout.Label("勾选后调试战斗开局所有技能即为满MP（默认勾选）。", hintStyle);
+        EditorGUILayout.EndVertical();
     }
 
     private void DrawHeroList(string title, string propName, Color accent)

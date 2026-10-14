@@ -32,7 +32,7 @@ public class SkillAidGuardian : Skill
         if (sh != null)
             sh.SetHp(GetSkillShield(0));
 
-        EffectManager.PlaySkillEffect(owner, skillCfg.HitEffect);
+        PlaySelfEffect();
         return true;
     }
 }

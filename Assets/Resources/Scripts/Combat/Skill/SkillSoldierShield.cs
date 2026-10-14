@@ -22,7 +22,7 @@ public class SkillSoldierShield : Skill
         var melee = GetMeleeSoldiers();
         if (melee.Count > 0)
             ShieldSoldier(melee[SysRandom.Range(0, melee.Count)]);
-        EffectManager.PlaySkillEffect(owner, skillCfg.HitEffect);
+        PlaySelfEffect();
         return true;
     }
 

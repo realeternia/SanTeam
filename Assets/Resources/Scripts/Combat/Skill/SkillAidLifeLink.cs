@@ -44,7 +44,7 @@ public class SkillAidLifeLink : Skill
         if (heal > 0)
             owner.HealTarget(lowest, skillId, heal, true);
 
-        EffectManager.PlaySkillEffect(owner, skillCfg.HitEffect);
+        PlaySelfEffect();
         return true;
     }
 }

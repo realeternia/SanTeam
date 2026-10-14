@@ -29,6 +29,7 @@ public class SkillAidShockWave : Skill
         var targetPos = owner.targetChess.transform.position; // 使用目标位置而不是自身位置
 
         owner.PlayerAnim(skillCfg.Action);
+        PlaySelfEffect();
         var damage = GetSkillDamage(); // 固定系数 + 比例系数×关联属性
         WorldManager.Instance.CreateSpellMissile(owner, targetPos, GetSummonTime(), skillCfg.SummonSpeed, skillCfg.Area, skillCfg.Id, damage, skillCfg.HitEffect, null, OnMissileHit);
 

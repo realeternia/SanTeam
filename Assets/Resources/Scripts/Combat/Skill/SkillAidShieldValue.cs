@@ -26,8 +26,8 @@ public class SkillAidShieldValue : Skill
         owner.PlayerAnim(skillCfg.Action);
 
         BuffManager.AddBuff(owner, owner, id, buffCfg.Id, skillCfg.BuffTime);
-        if (!string.IsNullOrEmpty(skillCfg.HitEffect))
-            EffectManager.PlaySkillEffect(owner, skillCfg.HitEffect);
+        if (!string.IsNullOrEmpty(skillCfg.SelfEffect))
+            PlaySelfEffect();
         GameLog.Debug($"疑城减伤盾 技能id={id} 等级={Level} 减伤={skillCfg.StrengthBuff1[0] * 100:0}% 持续={skillCfg.BuffTime}s");
         return true;
     }

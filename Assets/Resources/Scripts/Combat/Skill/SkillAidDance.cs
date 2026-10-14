@@ -31,7 +31,7 @@ public class SkillAidDance : Skill
         owner.transform.position += dir * RetreatDistance;
 
         owner.PlayerAnim(skillCfg.Action);
-        EffectManager.PlaySkillEffect(owner, skillCfg.HitEffect);
+        PlaySelfEffect();
 
         // 边撤边射：向后撤前的目标回射一箭
         if (skillCfg.DamageStrength > 0f)
