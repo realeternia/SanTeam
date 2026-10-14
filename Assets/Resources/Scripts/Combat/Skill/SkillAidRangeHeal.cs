@@ -38,6 +38,7 @@ public class SkillAidRangeHeal : Skill
             return false;
 
         owner.PlayerAnim(skillCfg.Action);
+        PlaySelfEffect();
 
         // 第二步：以治疗中心为圆心，治疗范围内友方英雄
         var healTargets = WorldManager.Instance.GetMySideInRange(center.transform.position, skillCfg.Area, owner.side)

@@ -27,6 +27,7 @@ public class SkillCastingAidDrain : Skill
             return false;
 
         owner.PlayerAnim(skillCfg.Action);
+        PlaySelfEffect();
 
         // 晕眩目标：持续 BuffTime 秒
         var stunCfg = BuffConfig.GetConfigByNameS(StunBuffNameS);

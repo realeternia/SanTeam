@@ -34,6 +34,7 @@ public class SkillAidMarkTarget : Skill
         BuffManager.AddBuff(target, owner, id, debuffCfg.Id, skillCfg.BuffTime);
 
         owner.PlayerAnim(skillCfg.Action);
+        PlaySelfEffect();
         EffectManager.PlaySkillEffect(target, skillCfg.HitEffect);
         return true;
     }

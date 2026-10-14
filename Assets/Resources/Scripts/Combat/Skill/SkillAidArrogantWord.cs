@@ -22,6 +22,7 @@ public class SkillAidArrogantWord : Skill
             return false;
 
         owner.PlayerAnim(skillCfg.Action);
+        PlaySelfEffect();
 
         // 直接伤害走统一公式（Strength2 为主数值/伤害槽，受施法者属性成长）
         var burst = GetSkillDamage();

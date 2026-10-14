@@ -20,6 +20,7 @@ public class SkillCastingAidAreaHeal : Skill
             return false;
 
         owner.PlayerAnim(skillCfg.Action);
+        PlaySelfEffect();
 
         var center = owner.transform.position;
         SummonMagicField(center, out var summonTime);

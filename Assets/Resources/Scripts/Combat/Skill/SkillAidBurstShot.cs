@@ -23,6 +23,7 @@ public class SkillAidBurstShot : Skill
             return false;
 
         owner.PlayerAnim(skillCfg.Action);
+        PlaySelfEffect();
 
         var targets = WorldManager.Instance.GetEnemyInRange(owner.transform.position, skillCfg.Area, owner.side);
         WorldManager.Instance.RandomSelect(targets, skillCfg.TargetCount);

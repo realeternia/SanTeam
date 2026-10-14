@@ -20,6 +20,7 @@ public class SkillAidIronGuard : Skill
             return false;
 
         owner.PlayerAnim(skillCfg.Action);
+        PlaySelfEffect();
         PlayAreaEffect(owner.transform.position);
 
         // 自身减伤盾（"硬"）

@@ -42,6 +42,7 @@ public class SkillAidBuffAtk : Skill
             return false;
 
         owner.PlayerAnim(skillCfg.Action);
+        PlaySelfEffect();
 
         BuffManager.AddBuff(target, owner, id, BuffConfig.GetConfigByNameS(skillCfg.BuffId).Id, skillCfg.BuffTime);
         EffectManager.PlaySkillEffect(target, skillCfg.HitEffect);

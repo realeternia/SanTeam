@@ -26,6 +26,7 @@ public class SkillAidBuffArea : Skill
             return false;
 
         owner.PlayerAnim(skillCfg.Action);
+        PlaySelfEffect();
         PlayAreaEffect(owner.transform.position);
 
         WorldManager.Instance.RandomSelect(units, skillCfg.TargetCount);

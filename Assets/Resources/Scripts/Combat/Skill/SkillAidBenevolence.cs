@@ -31,6 +31,7 @@ public class SkillAidBenevolence : Skill
             return false;
 
         owner.PlayerAnim(skillCfg.Action);
+        PlaySelfEffect();
 
         foreach (var u in allies)
         {

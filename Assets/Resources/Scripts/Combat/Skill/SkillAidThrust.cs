@@ -21,6 +21,7 @@ public class SkillAidThrust : Skill
             return false;
 
         owner.PlayerAnim(skillCfg.Action);
+        PlaySelfEffect();
 
         if (GetSkillDamage() > 0)
             target.OnSkillDamaged(owner, id, GetSkillDamage());

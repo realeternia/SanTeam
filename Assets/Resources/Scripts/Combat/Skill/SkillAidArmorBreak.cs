@@ -19,6 +19,7 @@ public class SkillAidArmorBreak : Skill
             return false;
 
         owner.PlayerAnim(skillCfg.Action);
+        PlaySelfEffect();
         PlayAreaEffect(owner.transform.position);
 
         var armorDownBuffCfg = BuffConfig.GetConfigByNameS(skillCfg.BuffId);

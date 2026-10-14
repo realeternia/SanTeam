@@ -27,6 +27,7 @@ public class SkillAidSmashStun : Skill
         BuffManager.AddBuff(target, owner, id, stunId, skillCfg.BuffTime);
 
         owner.PlayerAnim(skillCfg.Action);
+        PlaySelfEffect();
         EffectManager.PlaySkillEffect(target, skillCfg.HitEffect);
         return true;
     }

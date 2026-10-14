@@ -27,6 +27,7 @@ public class SkillAidSuddenArrow : Skill
             return false;
 
         owner.PlayerAnim(skillCfg.Action);
+        PlaySelfEffect();
         
         var damage = GetSkillDamage();
         WorldManager.Instance.CreateSpellMissile(owner, targetUnit, owner.transform.position, id, damage, skillCfg.HitEffect);

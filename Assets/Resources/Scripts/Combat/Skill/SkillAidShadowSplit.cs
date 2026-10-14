@@ -33,6 +33,7 @@ public class SkillAidShadowSplit : Skill
         shadow.hp = shadow.maxHp;
 
         owner.PlayerAnim(skillCfg.Action);
+        PlaySelfEffect();
         PlayAreaEffect(owner.transform.position);
         EffectManager.PlaySkillEffect(target, skillCfg.HitEffect);
         return true;

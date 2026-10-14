@@ -28,6 +28,7 @@ public class SkillAidMeteorHammer : Skill
             return false;
 
         owner.PlayerAnim(skillCfg.Action);
+        PlaySelfEffect();
 
         var list = WorldManager.Instance.GetEnemyInRange(target.transform.position, skillCfg.Area, owner.side);
         WorldManager.Instance.RandomSelect(list, skillCfg.TargetCount);

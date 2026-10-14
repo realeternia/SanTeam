@@ -30,6 +30,7 @@ public class SkillAidCraftBuff : Skill
         allies.Sort((a, b) => (a.hp / (float)a.maxHp).CompareTo(b.hp / (float)b.maxHp));
 
         owner.PlayerAnim(skillCfg.Action);
+        PlaySelfEffect();
 
         // 目标1：生命最低的我方英雄，永久提升攻击
         var atkTarget = allies[0];

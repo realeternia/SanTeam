@@ -43,6 +43,7 @@ public class SkillAidJumpHeal : Skill
             return false;
 
         owner.PlayerAnim(skillCfg.Action);
+        PlaySelfEffect();
         owner.StartCoroutine(JumpHeal(first));
         return true;
     }

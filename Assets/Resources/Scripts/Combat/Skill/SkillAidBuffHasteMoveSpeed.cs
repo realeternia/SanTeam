@@ -26,6 +26,7 @@ public class SkillAidBuffHasteMoveSpeed : Skill
             return false;
 
         owner.PlayerAnim(skillCfg.Action);
+        PlaySelfEffect();
 
         WorldManager.Instance.RandomSelect(units, skillCfg.TargetCount);
 

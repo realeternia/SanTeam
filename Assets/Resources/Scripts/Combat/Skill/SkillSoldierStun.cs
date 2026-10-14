@@ -48,6 +48,7 @@ public class SkillSoldierStun : Skill
         if (!CheckBurst(target))
             return false;
         owner.PlayerAnim(skillCfg.Action);
+        PlaySelfEffect();
 
         target.OnSkillDamaged(owner, skillId, GetSkillDamage());
         BuffManager.AddBuff(target, owner, id, BuffConfig.GetConfigByNameS(CastDebuffNameS).Id, skillCfg.BuffTime);

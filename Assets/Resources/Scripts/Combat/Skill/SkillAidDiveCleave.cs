@@ -19,6 +19,7 @@ public class SkillAidDiveCleave : Skill
             return false;
 
         owner.PlayerAnim(skillCfg.Action);
+        PlaySelfEffect();
         PlayAreaEffect(owner.transform.position);
 
         var healDownBuffCfg = BuffConfig.GetConfigByNameS(skillCfg.BuffId);

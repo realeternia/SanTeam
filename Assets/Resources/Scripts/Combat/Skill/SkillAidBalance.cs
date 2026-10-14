@@ -25,6 +25,7 @@ public class SkillAidBalance : Skill
             return false;
 
         owner.PlayerAnim(skillCfg.Action);
+        PlaySelfEffect();
 
         WorldManager.Instance.RandomSelect(allies, skillCfg.TargetCount);
 

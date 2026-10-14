@@ -22,6 +22,7 @@ public class SkillAidArmorShred : Skill
             return false;
 
         owner.PlayerAnim(skillCfg.Action);
+        PlaySelfEffect();
         EffectManager.PlaySkillEffect(target, skillCfg.HitEffect);
 
         target.OnSkillDamaged(owner, skillId, GetSkillDamage());

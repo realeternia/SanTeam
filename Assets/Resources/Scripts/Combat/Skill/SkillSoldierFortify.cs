@@ -19,6 +19,7 @@ public class SkillSoldierFortify : Skill
         if (!CheckBurst(null))
             return false;
         owner.PlayerAnim(skillCfg.Action);
+        PlaySelfEffect();
 
         var soldiers = WorldManager.Instance.GetUnitsMySide(owner.side).Where(x => !x.isHero).ToList();
         // 优先对生命比例最低的士兵筑垒；无士兵时强化自身

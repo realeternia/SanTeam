@@ -22,6 +22,7 @@ public class SkillAidBarbarianSlam : Skill
             return false;
 
         owner.PlayerAnim(skillCfg.Action);
+        PlaySelfEffect();
 
         var damage = GetSkillDamage();
         // 目标带吸收型护盾时，本次伤害整体乘以 Strength2[0]（配置缺失时按 1 倍，不放大）

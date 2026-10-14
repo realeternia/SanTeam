@@ -28,6 +28,7 @@ public class SkillAidDualLaser : Skill
             u.OnSkillDamaged(owner, id, GetSkillDamage());
 
         owner.PlayerAnim(skillCfg.Action);
+        PlaySelfEffect();
         return true;
     }
 }

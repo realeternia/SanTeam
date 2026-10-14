@@ -27,6 +27,7 @@ public class SkillAidSlashDefend : Skill
         BuffManager.AddBuff(owner, owner, id, armorId, skillCfg.BuffTime);
 
         owner.PlayerAnim(skillCfg.Action);
+        PlaySelfEffect();
         EffectManager.PlaySkillEffect(target, skillCfg.HitEffect);
         return true;
     }

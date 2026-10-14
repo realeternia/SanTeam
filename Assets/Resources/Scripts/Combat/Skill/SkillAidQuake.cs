@@ -24,6 +24,7 @@ public class SkillAidQuake : Skill
             return false;
 
         owner.PlayerAnim(skillCfg.Action);
+        PlaySelfEffect();
         PlayAreaEffect(target.transform.position);
 
         var units = WorldManager.Instance.GetEnemyInRange(target.transform.position, skillCfg.Area, owner.side);

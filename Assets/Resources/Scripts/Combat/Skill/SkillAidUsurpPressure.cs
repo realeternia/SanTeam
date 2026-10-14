@@ -21,6 +21,7 @@ public class SkillAidUsurpPressure : Skill
             return false;
 
         owner.PlayerAnim(skillCfg.Action);
+        PlaySelfEffect();
 
         var units = WorldManager.Instance.GetEnemyInRange(owner.transform.position, skillCfg.Area, owner.side);
         var skillDamage = GetSkillDamage();

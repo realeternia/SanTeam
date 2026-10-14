@@ -26,6 +26,7 @@ public class SkillCastingAidHitRegion : Skill
             return false;
 
         owner.PlayerAnim(skillCfg.Action);
+        PlaySelfEffect();
 
         var targetPos = target.transform.position;
 

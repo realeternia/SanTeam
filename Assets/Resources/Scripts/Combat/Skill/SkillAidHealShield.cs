@@ -39,6 +39,7 @@ public class SkillAidHealShield : Skill
             return false;
 
         owner.PlayerAnim(skillCfg.Action);
+        PlaySelfEffect();
 
         // 治疗：独立治疗公式（Strength2 × ap 加成），不套用伤害公式
         var heal = GetSkillHeal();

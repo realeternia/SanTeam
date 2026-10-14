@@ -22,6 +22,7 @@ public class SkillSoldierBless : Skill
         if (!CheckBurst(null))
             return false;
         owner.PlayerAnim(skillCfg.Action);
+        PlaySelfEffect();
 
         // 自身永久成长：每次释放无条件叠加（即使无士兵可祝福也能成长）
         GrowSelf();

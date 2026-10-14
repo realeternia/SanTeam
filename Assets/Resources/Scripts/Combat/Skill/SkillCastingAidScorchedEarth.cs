@@ -28,6 +28,7 @@ public class SkillCastingAidScorchedEarth : Skill
             return false;
 
         owner.PlayerAnim(skillCfg.Action);
+        PlaySelfEffect();
 
         // 在目标周围 Range 半径内随机生成 SummonCount 个落点（x 与 z 独立随机偏移）
         var basePos = target.transform.position;

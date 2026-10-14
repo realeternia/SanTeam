@@ -23,6 +23,7 @@ public class SkillAidSevenCharge : Skill
         units.Add(owner); // 自己必定获得
 
         owner.PlayerAnim(skillCfg.Action);
+        PlaySelfEffect();
         foreach (var unit in units)
         {
             BuffManager.AddBuff(unit, owner, id, buffId, skillCfg.BuffTime);

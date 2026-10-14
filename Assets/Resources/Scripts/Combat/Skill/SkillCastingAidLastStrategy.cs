@@ -25,6 +25,7 @@ public class SkillCastingAidLastStrategy : Skill
             return false;
 
         owner.PlayerAnim(skillCfg.Action);
+        PlaySelfEffect();
         EffectManager.PlaySkillEffect(target, skillCfg.HitEffect);
 
         // 引导状态：引导期内 castingSkillId>0，MoveAndFight 提前返回（无法移动/普攻），被晕眩/死亡打断

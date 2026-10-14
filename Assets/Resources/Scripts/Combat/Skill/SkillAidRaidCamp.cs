@@ -25,6 +25,7 @@ public class SkillAidRaidCamp : Skill
             return false;
 
         owner.PlayerAnim(skillCfg.Action);
+        PlaySelfEffect();
 
         DashTo(target);
 

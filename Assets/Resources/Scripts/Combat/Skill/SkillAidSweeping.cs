@@ -1,4 +1,4 @@
-﻿using CommonConfig;
+using CommonConfig;
 using UnityEngine;
 
 /// <summary>
@@ -22,6 +22,7 @@ public class SkillAidSweeping : Skill
             return false;
 
         owner.PlayerAnim(skillCfg.Action);
+        PlaySelfEffect();
 
         var dmg = GetSkillDamage();
         for (int i = 0; i < skillCfg.TargetCount; i++)

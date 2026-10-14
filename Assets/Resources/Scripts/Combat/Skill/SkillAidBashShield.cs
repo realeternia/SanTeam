@@ -22,6 +22,7 @@ public class SkillAidBashShield : Skill
             return false;
 
         owner.PlayerAnim(skillCfg.Action);
+        PlaySelfEffect();
         target.OnSkillDamaged(owner, id, GetSkillDamage());
         EffectManager.PlaySkillEffect(target, skillCfg.HitEffect);
 

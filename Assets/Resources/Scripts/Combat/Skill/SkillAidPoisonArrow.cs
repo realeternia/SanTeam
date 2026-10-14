@@ -22,6 +22,7 @@ public class SkillAidPoisonArrow : Skill
             return false;
 
         owner.PlayerAnim(skillCfg.Action);
+        PlaySelfEffect();
 
         // 高额直接伤害（基础技能伤害 × Strength2[1]）
         target.OnSkillDamaged(owner, skillId, (int)(GetSkillDamage() * skillCfg.Strength2[0]));

@@ -20,6 +20,7 @@ public class SkillAidColossalSlam : Skill
             return false;
 
         owner.PlayerAnim(skillCfg.Action);
+        PlaySelfEffect();
         PlayAreaEffect(owner.transform.position);
 
         var baseDamage = GetSkillDamage();

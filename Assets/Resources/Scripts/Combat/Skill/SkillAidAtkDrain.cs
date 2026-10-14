@@ -25,6 +25,7 @@ public class SkillAidAtkDrain : Skill
             return false;
 
         owner.PlayerAnim(skillCfg.Action);
+        PlaySelfEffect();
         EffectManager.PlaySkillEffect(target, skillCfg.HitEffect);
 
         if (GetSkillDamage() > 0)

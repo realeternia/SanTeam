@@ -21,6 +21,7 @@ public class SkillAidSweepingAoe : Skill
             return false;
 
         owner.PlayerAnim(skillCfg.Action);
+        PlaySelfEffect();
         PlayAreaEffect(owner.transform.position);
 
         var skillDamage = GetSkillDamage();

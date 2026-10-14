@@ -22,6 +22,7 @@ public class SkillAidChargeImpale : Skill
             return false;
 
         owner.PlayerAnim(skillCfg.Action);
+        PlaySelfEffect();
         PlayAreaEffect(owner.transform.position);
 
         var dir = target.transform.position - owner.transform.position;

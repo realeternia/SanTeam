@@ -49,6 +49,7 @@ public class SkillAidImperialGuard : Skill
         }
 
         owner.PlayerAnim(skillCfg.Action);
+        PlaySelfEffect();
 
         var landPos = owner.transform.position + new Vector3(0, 0, 6f);
 

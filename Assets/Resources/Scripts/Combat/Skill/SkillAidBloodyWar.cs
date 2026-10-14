@@ -21,6 +21,7 @@ public class SkillAidBloodyWar : Skill
             return false;
 
         owner.PlayerAnim(skillCfg.Action);
+        PlaySelfEffect();
 
         int damage = GetSkillDamage();
         // 自身已损生命比例越高伤害越高

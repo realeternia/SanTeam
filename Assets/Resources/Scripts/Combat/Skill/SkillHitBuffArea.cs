@@ -20,6 +20,7 @@ public class SkillHitBuffArea : Skill
             if (unitsInRange.Count > 0)
             {
                 owner.PlayerAnim(skillCfg.Action);
+                PlaySelfEffect();
                 WorldManager.Instance.RandomSelect(unitsInRange, skillCfg.TargetCount);
 
                 foreach (var unit in unitsInRange)

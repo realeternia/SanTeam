@@ -23,6 +23,7 @@ public class SkillAidQuietPlot : Skill
             return false;
 
         owner.PlayerAnim(skillCfg.Action);
+        PlaySelfEffect();
 
         var center = target.transform.position;
         var units = WorldManager.Instance.GetEnemyInRange(center, skillCfg.Area, owner.side);

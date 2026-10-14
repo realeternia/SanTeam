@@ -24,6 +24,7 @@ public class SkillAidHexField : Skill
             return false;
 
         owner.PlayerAnim(skillCfg.Action);
+        PlaySelfEffect();
 
         var units = WorldManager.Instance.GetEnemyInRange(target.transform.position, skillCfg.Area, owner.side);
         WorldManager.Instance.RandomSelect(units, skillCfg.TargetCount);

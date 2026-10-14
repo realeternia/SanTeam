@@ -40,6 +40,7 @@ public class SkillAidCurseHeal : Skill
             return false;
 
         owner.PlayerAnim(skillCfg.Action);
+        PlaySelfEffect();
 
         // 直接治疗生命比例最低的友军英雄
         var heal = GetSkillHeal();

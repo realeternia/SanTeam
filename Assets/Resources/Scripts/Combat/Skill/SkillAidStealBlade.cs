@@ -28,6 +28,7 @@ public class SkillAidStealBlade : Skill
             return false;
 
         owner.PlayerAnim(skillCfg.Action);
+        PlaySelfEffect();
 
         target.OnSkillDamaged(owner, skillId, GetSkillDamage());
 

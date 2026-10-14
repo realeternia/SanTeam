@@ -26,6 +26,7 @@ public class SkillAidCavalryStrike : Skill
             return false;
 
         owner.PlayerAnim(skillCfg.Action);
+        PlaySelfEffect();
 
         var shredCfg = BuffConfig.GetConfigByNameS(ArmorShredBuffNameS);
         if (shredCfg == null)

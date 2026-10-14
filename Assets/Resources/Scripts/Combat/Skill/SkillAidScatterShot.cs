@@ -23,6 +23,7 @@ public class SkillAidScatterShot : Skill
             return false;
 
         owner.PlayerAnim(skillCfg.Action);
+        PlaySelfEffect();
         PlayAreaEffect(target.transform.position);
 
         var targets = WorldManager.Instance.GetEnemyInRange(target.transform.position, skillCfg.Area, owner.side);
