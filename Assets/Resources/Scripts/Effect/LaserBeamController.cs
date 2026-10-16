@@ -48,6 +48,9 @@ public class LaserBeamController : MonoBehaviour
 
     private Material material;
     private Vector3 curDir = Vector3.right; // 当前激光方向（世界空间，仅 xz 平面）
+    // 生成时绑定的引导技能 id（>0 表示该激光依赖此引导存活）：引导结束(自然结束/被打断/切换技能)即自动销毁，
+    // 避免被 BreakCasting 停止协程后残留激光；为 0 时不绑定，不做该检查
+    private int castingSkillId;
 
     void Awake()
     {
@@ -74,6 +77,8 @@ public class LaserBeamController : MonoBehaviour
         this.target = target;
         this.length = length;
         this.hitWidth = hitWidth;
+        // 绑定生成时的引导技能：引导被打断(晕眩等)后协程被停止，靠此绑定在 Update 中自动销毁激光
+        this.castingSkillId = source != null ? source.castingSkillId : 0;
 
         if (parentTransform == null)
             parentTransform = transform.parent != null ? transform.parent : transform;
@@ -102,6 +107,13 @@ public class LaserBeamController : MonoBehaviour
     void Update()
     {
         if (source == null || source.hp <= 0)
+        {
+            Dispose();
+            return;
+        }
+
+        // 引导结束(被打断/自然结束/切换技能)：协程已被停止，这里补上销毁，避免激光残留
+        if (castingSkillId > 0 && source.castingSkillId != castingSkillId)
         {
             Dispose();
             return;

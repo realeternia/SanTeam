@@ -168,7 +168,7 @@ namespace CommonConfig
             config[11040] = new EffectConfig(11040, "MagicBuffGreen", "绿色增益特效", "增益", "目标", "Effect/MagicBuffGreen", "", 10f, 1f, 8f, 1f, "");
             config[11050] = new EffectConfig(11050, "MagicFieldGreen", "绿色法阵特效", "增益", "范围", "Effect/MagicFieldGreen", "", 8f, 1f, 8f, 1f, "");
             config[11060] = new EffectConfig(11060, "ShieldSoftBlue", "蓝色护盾特效", "增益", "目标", "Effect/ShieldSoftBlue", "", 3f, 1f, 8f, 1f, "");
-            config[11070] = new EffectConfig(11070, "SlowAuraYellow", "黄色迟缓光环特效", "负面", "范围", "Effect/SlowAuraYellow", "", 3f, 1f, 8f, 1f, "");
+            config[11070] = new EffectConfig(11070, "SlowAuraYellow", "黄色迟缓光环特效", "负面", "范围", "Effect/SlowAuraYellow", "", 3f, 2f, 8f, 1f, "");
             config[11080] = new EffectConfig(11080, "SoftFireBigRed", "红色大火特效", "伤害", "目标", "Effect/SoftFireBigRed", "", 10f, 1f, 8f, 1f, "");
             config[11090] = new EffectConfig(11090, "MagicChargeBlue", "蓝色蓄力特效", "增益", "目标", "Effect/MagicChargeBlue", "", 3f, 1f, 8f, 1f, "");
             config[11091] = new EffectConfig(11091, "MagicChargeGreen", "绿色蓄力特效", "增益", "目标", "Effect/MagicChargeBlue", "", 3f, 1f, 8f, 1f, "#00FF00");

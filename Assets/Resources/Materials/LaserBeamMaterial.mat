@@ -31,19 +31,20 @@ Material:
     m_Ints: []
     m_Floats:
     - _BandCount: 7
-    - _BeamWidth: 0.28
+    - _BeamWidth: 0.543
     - _CoreRatio: 0.35
     - _CoreSharpness: 5
     - _Flicker: 0.22
     - _FlowDepth: 0.55
-    - _GlowIntensity: 2.42
+    - _GlowIntensity: 4.11
     - _GlowPower: 1.06
     - _HaloFalloff: 1.6
-    - _NoiseScale: 3
+    - _NoiseScale: 11.59
     - _Opacity: 0.816
     - _PulseAmp: 0.3
     - _PulseSpeed: 7
-    - _Speed: 1.5
+    - _Speed: 3.21
+    - _TexFlowSpeed: 3
     - _TipBoost: 1.5
     m_Colors:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
