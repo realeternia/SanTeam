@@ -11,6 +11,7 @@ using UnityEngine.SceneManagement;
 /// 在窗口里配置当前场景 GameManager 的左侧(1号位)/右侧(2号位)上阵武将：
 /// 任一方填入武将即视为调试开局，启动游戏后跳过选牌/商店流程直接开战（见 WorldManager.SpawnDebugHeroes）；
 /// 两方留空则走正常对局流程。点「开始战斗」会先保存场景再进入 Play。
+/// 武将按各自配置的品质标记（阵营色块 + 品质色块 + 品质文本），下拉菜单按阵营分组、组内按品质倒排。
 /// 武将按近战/远程分前后排摆入中间英雄格（近战顶排=前排、远程底排=后排），等级取各自配置值(1~5级)。
 /// 「随机阵容」可一键为两侧各生成 3 近战 + 3 远程，共 12 名互不重复的 1 级武将。
 /// </summary>
@@ -35,6 +36,7 @@ public class DebugLineupWindow : EditorWindow
         public string Name;
         public int Side;
         public string SideName;
+        public int Quality;
     }
 
     private static List<HeroItem> heroes;
@@ -131,11 +133,13 @@ public class DebugLineupWindow : EditorWindow
                 Id = cfg.Id,
                 Name = cfg.Name,
                 Side = cfg.Side,
-                SideName = force != null ? force.Name : ("阵营" + cfg.Side)
+                SideName = force != null ? force.Name : ("阵营" + cfg.Side),
+                Quality = cfg.Quality
             });
         }
-        // 按阵营/ID排序，方便下拉菜单分组显示
-        heroes.Sort((a, b) => a.Side != b.Side ? a.Side.CompareTo(b.Side) : a.Id.CompareTo(b.Id));
+        // 按阵营分组，同阵营内按品质倒排（品质相同再按 ID 升序），方便下拉菜单分组显示
+        heroes.Sort((a, b) => a.Side != b.Side ? a.Side.CompareTo(b.Side)
+            : (b.Quality != a.Quality ? b.Quality.CompareTo(a.Quality) : a.Id.CompareTo(b.Id)));
         return heroes;
     }
 
@@ -249,6 +253,7 @@ public class DebugLineupWindow : EditorWindow
             SerializedProperty lvProp = elem.FindPropertyRelative("level");
             EditorGUILayout.BeginHorizontal();
             DrawSideSwatch(heroProp.intValue);
+            DrawQualitySwatch(heroProp.intValue);
             if (GUILayout.Button(HeroLabel(heroProp.intValue), EditorStyles.popup))
             {
                 int index = i;
@@ -301,29 +306,44 @@ public class DebugLineupWindow : EditorWindow
     // 阵营色块（颜色统一取自 SysColor）
     private void DrawSideSwatch(int heroId)
     {
-        int side = 0;
-        foreach (var h in GetHeroes())
-            if (h.Id == heroId) { side = h.Side; break; }
         Rect r = GUILayoutUtility.GetRect(12, 18, GUILayout.Width(12));
-        EditorGUI.DrawRect(new Rect(r.x + 1, r.y + 3, 10, 12), SysColor.GetSideColor(side));
+        EditorGUI.DrawRect(new Rect(r.x + 1, r.y + 3, 10, 12), SysColor.GetSideColor(GetHero(heroId)?.Side ?? 0));
+    }
+
+    // 品质色块（颜色统一取自 SysColor，1白 2绿 3蓝 4金）
+    private void DrawQualitySwatch(int heroId)
+    {
+        var hero = GetHero(heroId);
+        if (hero == null)
+            return;
+        Rect r = GUILayoutUtility.GetRect(12, 18, GUILayout.Width(12));
+        EditorGUI.DrawRect(new Rect(r.x + 1, r.y + 3, 10, 12), SysColor.GetQualityColor(hero.Quality));
+    }
+
+    private static HeroItem GetHero(int heroId)
+    {
+        foreach (var h in GetHeroes())
+            if (h.Id == heroId)
+                return h;
+        return null;
     }
 
     private static string HeroLabel(int heroId)
     {
-        foreach (var h in GetHeroes())
-            if (h.Id == heroId)
-                return string.Format("{0}·{1}  ({2})", h.SideName, h.Name, heroId);
+        var h = GetHero(heroId);
+        if (h != null)
+            return string.Format("{0}·{1}  品质{2}  ({3})", h.SideName, h.Name, h.Quality, heroId);
         return heroId > 0 ? ("未知英雄 (" + heroId + ")") : "（未选择）";
     }
 
-    // 弹出按阵营分组的英雄菜单（GenericMenu 的 "/" 路径自动形成子菜单）
+    // 弹出按阵营分组的英雄菜单（GenericMenu 的 "/" 路径自动形成子菜单），同阵营内已按品质倒排
     private static void ShowHeroMenu(System.Action<int> onPick)
     {
         var menu = new GenericMenu();
         foreach (var h in GetHeroes())
         {
             int id = h.Id;
-            menu.AddItem(new GUIContent(string.Format("{0}/{1} ({2})", h.SideName, h.Name, id)), false, () => onPick(id));
+            menu.AddItem(new GUIContent(string.Format("{0}/{1}  品质{2} ({3})", h.SideName, h.Name, h.Quality, id)), false, () => onPick(id));
         }
         menu.ShowAsContext();
     }

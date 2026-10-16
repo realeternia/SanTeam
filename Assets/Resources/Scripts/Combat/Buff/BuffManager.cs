@@ -126,9 +126,6 @@ public static class BuffManager
             case "BuffShieldGuard":
                 buff = new BuffShieldGuard(buffId, skillId, caster, target, time);
                 break;
-            case "BuffArmorShred":
-                buff = new BuffArmorShred(buffId, skillId, caster, target, time);
-                break;
             case "BuffDefect":
                 buff = new BuffDefect(buffId, skillId, caster, target, time);
                 break;

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -159,7 +159,7 @@ namespace CommonConfig
             config[300016] = new BuffConfig(300016, "多重箭", "箭", "攻击时额外射出多支箭", true, true, "BuffMultiShot", "", "", "", "", "");
             config[300017] = new BuffConfig(300017, "倍击", "倍", "接下来数次攻击造成加倍伤害", true, false, "BuffNextAttacksMult", "", "", "", "", "");
             config[300019] = new BuffConfig(300019, "袭杀", "袭", "攻击增伤并吸血", true, false, "BuffLifeStealAndDamage", "", "", "", "", "");
-            config[300022] = new BuffConfig(300022, "狂暴", "狂", "造成的伤害提升，但自身受到的伤害也提升", true, false, "BuffFrenzy", "", "", "", "", "");
+            config[300022] = new BuffConfig(300022, "狂暴", "狂", "造成的伤害提升，但自身受到的伤害也提升", true, false, "BuffFrenzy", "#cc4300", "#FF8800", "", "", "");
             config[300023] = new BuffConfig(300023, "嘲讽", "嘲", "成为敌对单位强制优先攻击的目标", true, true, "BuffTaunt", "#cc4300", "#664499", "", "", "");
             config[300024] = new BuffConfig(300024, "生命链接", "链", "与链接方共享伤害与回复", true, false, "BuffLifeLink", "", "", "", "", "");
             config[300025] = new BuffConfig(300025, "反伤", "反", "受到伤害时将其中一部分返还给攻击者", true, true, "BuffReflect", "", "", "", "", "");
@@ -180,7 +180,6 @@ namespace CommonConfig
             config[301007] = new BuffConfig(301007, "减疗", "疫", "降低目标受到的治疗效果", false, true, "BuffHealDown", "", "", "", "", "");
             config[301008] = new BuffConfig(301008, "减速", "缓", "降低目标移动与攻速", false, true, "BuffSlowDown", "#000099", "#3366FF", "", "BuffFrozen", "");
             config[301009] = new BuffConfig(301009, "减防", "破", "降低目标护甲", false, true, "BuffArmorDown", "", "", "", "", "");
-            config[301010] = new BuffConfig(301010, "破甲", "削", "每层降低护甲，可叠加，越打护甲越低", false, true, "BuffArmorShred", "", "", "", "", "");
             config[301011] = new BuffConfig(301011, "叛逃", "叛", "不受控制，向初始位置后退，移动速度减半", false, true, "BuffDefect", "", "", "AuraSoftPurple", "", "");
             config[301012] = new BuffConfig(301012, "混乱", "惑", "不受控制，攻击最近的友方单位", false, true, "BuffChaos", "", "", "StunnedCirclingStarsSimple", "", "");
 

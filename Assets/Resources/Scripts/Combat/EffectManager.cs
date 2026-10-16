@@ -82,7 +82,7 @@ public static class EffectManager
         var hitPrefab = Resources.Load<GameObject>(ResolveEffectPath(effectName));
         var cfg = EffectConfig.GetConfigByName(effectName);
         float scale = GetScale(effectName, cfg, hitPrefab != null ? hitPrefab.transform.localScale.x : 1f);
-        float offsetY = GetOffsetY(effectName, cfg);
+        float offsetY = GetOffsetY(effectName, cfg) + CombatConst.UnitEffectExtraOffsetY;
         GameObject hitEffect = UnityEngine.Object.Instantiate(hitPrefab, targetChess.transform.position, Quaternion.identity);
         MountEffect(hitEffect, targetChess.transform, new Vector3(scale, scale, scale), offsetY);
         ApplyTint(hitEffect, cfg);
@@ -107,7 +107,7 @@ public static class EffectManager
 
         var cfg = EffectConfig.GetConfigByName(effect);
         float scale = GetScale(effect, cfg, hitPrefab.transform.localScale.x);
-        float offsetY = GetOffsetY(effect, cfg);
+        float offsetY = GetOffsetY(effect, cfg) + CombatConst.UnitEffectExtraOffsetY;
         GameObject hitEffect = UnityEngine.Object.Instantiate(hitPrefab, sourceChess.transform.position, hitPrefab.transform.rotation);
         MountEffect(hitEffect, sourceChess.transform, new Vector3(scale, scale, scale), offsetY);
         ApplyTint(hitEffect, cfg);
@@ -156,7 +156,7 @@ public static class EffectManager
 
         var cfg = EffectConfig.GetConfigByName(effect);
         float scale = GetScale(effect, cfg, hitPrefab != null ? hitPrefab.transform.localScale.x : 1f);
-        float offsetY = GetOffsetY(effect, cfg);
+        float offsetY = GetOffsetY(effect, cfg) + CombatConst.UnitEffectExtraOffsetY;
         GameObject hitEffect = UnityEngine.Object.Instantiate(hitPrefab, sourceChess.transform.position, hitPrefab.transform.rotation);
         MountEffect(hitEffect, sourceChess.transform, new Vector3(scale, scale, scale), offsetY);
         ApplyTint(hitEffect, cfg);

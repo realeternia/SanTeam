@@ -363,6 +363,32 @@ namespace UnityEngine
             return GetComponent<T>();
         }
 
+        // 桩：递归收集自身与子节点上的组件（headless 无真实粒子层级，只需返回可枚举结果）
+        public T[] GetComponentsInChildren<T>(bool includeInactive) where T : Component, new()
+        {
+            var result = new List<T>();
+            CollectComponentsInChildren(this, result);
+            return result.ToArray();
+        }
+
+        private static void CollectComponentsInChildren<T>(GameObject go, List<T> result) where T : Component, new()
+        {
+            if (go == null)
+                return;
+            foreach (var c in go._components)
+            {
+                if (c is T)
+                    result.Add((T)c);
+            }
+            int count = go.transform.childCount;
+            for (int i = 0; i < count; i++)
+            {
+                var child = go.transform.GetChild(i);
+                if (child != null)
+                    CollectComponentsInChildren(child.gameObject, result);
+            }
+        }
+
         internal List<Component> GetAllComponents() { return _components; }
 
         public bool TryGetComponent<T>(out T component) where T : Component, new()
@@ -526,6 +552,26 @@ namespace UnityEngine
 
         public void SetTexture(string name, Texture value) { _textures[name] = value; }
         public Texture GetTexture(string name) { return _textures.ContainsKey(name) ? _textures[name] : null; }
+
+        private readonly Dictionary<string, Vector4> _vectors = new Dictionary<string, Vector4>();
+        // 桩：headless 不做真实材质属性校验，统一视为存在
+        public bool HasProperty(string name) { return true; }
+        public void SetVector(string name, Vector4 value) { _vectors[name] = value; }
+        public Vector4 GetVector(string name) { return _vectors.ContainsKey(name) ? _vectors[name] : default(Vector4); }
+    }
+
+    // 粒子系统桩：headless 只关心 main.loop 可写与 Play()，不做真实粒子模拟
+    public class ParticleSystem : Component
+    {
+        public struct MainModule
+        {
+            public bool loop { get; set; }
+        }
+
+        public MainModule main { get; set; }
+
+        public void Play() { }
+        public void Stop() { }
     }
 
     public class Texture : Object

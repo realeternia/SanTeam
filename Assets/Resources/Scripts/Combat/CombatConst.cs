@@ -85,6 +85,9 @@ public static class CombatConst
     // ---- 范围特效 ----
     /// <summary>范围特效缩放基准半径：EffectConfig.Scale 对应的半径，实际缩放 = Scale × Area / 本值</summary>
     public const float AreaEffectBaseRadius = 15f;
+    /// <summary>挂在单位身上的特效（命中/技能/施法/buff）额外抬升高度：在 EffectConfig.OffsetY 基础上统一再上抬的世界高度；
+    /// 地面范围特效(PlayPosSkillEffect)不适用，保持贴地</summary>
+    public const float UnitEffectExtraOffsetY = 4f;
 
     // ---- 卡牌属性成长 ----
     /// <summary>星级成长倍率：每升1星 ×本值（乘方式，Lv1=×1.0、Lv2=×1.6、Lv3=×1.6²…），作用于 Atk/Ap/Hp</summary>

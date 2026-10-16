@@ -2685,10 +2685,10 @@ MonoBehaviour:
   year: 0
   currentSaveSlot: -1
   debugHeroesSide1:
-  - heroId: 103008
+  - heroId: 101001
     level: 1
   debugHeroesSide2:
-  - heroId: 102016
+  - heroId: 104001
     level: 1
   debugFullMp: 1
 --- !u!114 &1788356929

@@ -30,7 +30,7 @@ public class SkillAttackSpinAttack : Skill
                 ApplyBleed(unit, spinDamage);
             }
 
-            PlaySelfEffect();
+            PlayAreaEffect(owner.transform.position);
         }
     }
 
