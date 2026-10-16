@@ -3,12 +3,10 @@ using UnityEngine;
 
 /// <summary>
 /// 甘宁·百骑劫营（武）：锁定射程内最远的敌方后排单体，突进到其近旁，
-/// 对其造成 GetSkillDamage 物理伤害并降低其护甲（BuffArmorDown "破"）BuffTime 秒。
+/// 对其造成 GetSkillDamage 物理伤害并降低其护甲（Buff 短名由 skillCfg.BuffId 配置）BuffTime 秒。
 /// </summary>
 public class SkillAidRaidCamp : Skill
 {
-    /// <summary>破甲 Buff 短名（BuffArmorDown "破"）</summary>
-    public const string ArmorDownBuffNameS = "破";
     /// <summary>突进落点到目标的水平偏移距离</summary>
     private const float DashOffset = 2f;
 
@@ -33,11 +31,11 @@ public class SkillAidRaidCamp : Skill
         if (damage > 0)
             target.OnSkillDamaged(owner, skillId, damage);
 
-        var buffCfg = BuffConfig.GetConfigByNameS(ArmorDownBuffNameS);
+        var buffCfg = BuffConfig.GetConfigByNameS(skillCfg.BuffId);
         if (buffCfg != null)
             BuffManager.AddBuff(target, owner, id, buffCfg.Id, skillCfg.BuffTime);
         else
-            GameLog.Error("SkillAidRaidCamp: 未找到破甲Buff短名：" + ArmorDownBuffNameS);
+            GameLog.Error("SkillAidRaidCamp: 未找到破甲Buff短名：" + skillCfg.BuffId);
 
         EffectManager.PlaySkillEffect(target, skillCfg.HitEffect);
         return true;

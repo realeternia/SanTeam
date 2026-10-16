@@ -29,8 +29,8 @@ public class SkillAidArrogantWord : Skill
         if (burst > 0)
             target.OnSkillDamaged(owner, skillId, burst);
 
-        // 易伤 Buff "伤"：受击倍率增量读 skillCfg.Strength2[1]
-        BuffManager.AddBuff(target, owner, id, BuffConfig.GetConfigByNameS("伤").Id, skillCfg.BuffTime);
+        // 易伤 Buff（短名由 skillCfg.BuffId 配置）：受击倍率增量读 skillCfg.Strength2[1]
+        BuffManager.AddBuff(target, owner, id, BuffConfig.GetConfigByNameS(skillCfg.BuffId).Id, skillCfg.BuffTime);
 
         // 傲言附带驱散：移除目标身上的正面 Buff（不可驱散的招牌 Buff 除外）
         BuffManager.DispelPositive(target);

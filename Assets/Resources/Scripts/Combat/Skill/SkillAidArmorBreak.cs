@@ -29,7 +29,11 @@ public class SkillAidArmorBreak : Skill
         foreach (var u in units)
         {
             if (skillDamage > 0)
+            {
                 u.OnSkillDamaged(owner, id, skillDamage);
+                if (!string.IsNullOrEmpty(skillCfg.HitEffect))
+                    EffectManager.PlaySkillEffect(u, skillCfg.HitEffect);
+            }
             if (armorDownBuffCfg != null)
                 BuffManager.AddBuff(u, owner, id, armorDownBuffCfg.Id, skillCfg.BuffTime);
             else

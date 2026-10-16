@@ -77,7 +77,11 @@ public class SkillHitWall : Skill
             foreach (var unit in unitList)
             {
                 if (damage > 0)
+                {
                     unit.OnSkillDamaged(owner, skillId, damage);
+                    if (!string.IsNullOrEmpty(skillCfg.HitEffect))
+                        EffectManager.PlaySkillEffect(unit, skillCfg.HitEffect);
+                }
             }
 
             yield return new WaitForSeconds(skillCfg.SummonHitInterval);

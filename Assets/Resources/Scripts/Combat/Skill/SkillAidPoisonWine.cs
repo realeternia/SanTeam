@@ -32,8 +32,8 @@ public class SkillAidPoisonWine : Skill
         if (secDamage > 0)
             owner.StartCoroutine(DotTicks(target, secDamage));
 
-        // 减疗（"疫"）
-        BuffManager.AddBuff(target, owner, id, BuffConfig.GetConfigByNameS("疫").Id, skillCfg.BuffTime);
+        // 减疗（短名由 skillCfg.BuffId 配置）
+        BuffManager.AddBuff(target, owner, id, BuffConfig.GetConfigByNameS(skillCfg.BuffId).Id, skillCfg.BuffTime);
 
         EffectManager.PlaySkillEffect(target, skillCfg.HitEffect);
         return true;
@@ -49,6 +49,8 @@ public class SkillAidPoisonWine : Skill
             if (target == null || target.hp <= 0)
                 yield break;
             target.OnSkillDamaged(owner, skillId, secDamage);
+            if (!string.IsNullOrEmpty(skillCfg.HitEffect))
+                EffectManager.PlaySkillEffect(target, skillCfg.HitEffect);
         }
     }
 }

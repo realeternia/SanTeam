@@ -29,7 +29,11 @@ public class SkillAidColossalSlam : Skill
         {
             var total = baseDamage + (int)(skillCfg.Strength2[0] * u.maxHp);
             if (total > 0)
+            {
                 u.OnSkillDamaged(owner, id, total);
+                if (!string.IsNullOrEmpty(skillCfg.HitEffect))
+                    EffectManager.PlaySkillEffect(u, skillCfg.HitEffect);
+            }
         }
 
         return true;

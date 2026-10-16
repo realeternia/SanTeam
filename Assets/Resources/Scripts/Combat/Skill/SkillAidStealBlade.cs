@@ -32,8 +32,8 @@ public class SkillAidStealBlade : Skill
 
         target.OnSkillDamaged(owner, skillId, GetSkillDamage());
 
-        // 降低目标护甲（"破"）
-        BuffManager.AddBuff(target, owner, id, BuffConfig.GetConfigByNameS("破").Id, skillCfg.BuffTime);
+        // 降低目标护甲（短名由 skillCfg.BuffId 配置）
+        BuffManager.AddBuff(target, owner, id, BuffConfig.GetConfigByNameS(skillCfg.BuffId).Id, skillCfg.BuffTime);
 
         EffectManager.PlaySkillEffect(target, skillCfg.HitEffect);
         return true;

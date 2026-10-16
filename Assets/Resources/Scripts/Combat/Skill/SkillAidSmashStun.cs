@@ -23,7 +23,7 @@ public class SkillAidSmashStun : Skill
 
         target.OnSkillDamaged(owner, id, GetSkillDamage());
 
-        var stunId = BuffConfig.GetConfigByNameS("乱").Id;
+        var stunId = BuffConfig.GetConfigByNameS(skillCfg.BuffId).Id;
         BuffManager.AddBuff(target, owner, id, stunId, skillCfg.BuffTime);
 
         owner.PlayerAnim(skillCfg.Action);

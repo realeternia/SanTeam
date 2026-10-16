@@ -80,7 +80,11 @@ public class SkillCastingAidScorchedEarth : Skill
             foreach (var unit in unitList)
             {
                 if (skillDamage > 0)
+                {
                     unit.OnSkillDamaged(owner, skillId, skillDamage);
+                    if (!string.IsNullOrEmpty(skillCfg.HitEffect))
+                        EffectManager.PlaySkillEffect(unit, skillCfg.HitEffect);
+                }
             }
 
             yield return new WaitForSeconds(skillCfg.SummonHitInterval);

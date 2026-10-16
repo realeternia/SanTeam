@@ -17,7 +17,7 @@ public class SkillAidBerserk : Skill
         if (!CheckBurst(null))
             return false;
 
-        var frenzyId = BuffConfig.GetConfigByNameS("狂").Id;
+        var frenzyId = BuffConfig.GetConfigByNameS(skillCfg.BuffId).Id;
         BuffManager.AddBuff(owner, owner, id, frenzyId, skillCfg.BuffTime);
 
         owner.PlayerAnim(skillCfg.Action);

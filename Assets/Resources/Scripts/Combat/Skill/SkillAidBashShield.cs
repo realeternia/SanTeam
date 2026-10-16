@@ -26,7 +26,7 @@ public class SkillAidBashShield : Skill
         target.OnSkillDamaged(owner, id, GetSkillDamage());
         EffectManager.PlaySkillEffect(target, skillCfg.HitEffect);
 
-        var shieldId = BuffConfig.GetConfigByNameS("盾").Id;
+        var shieldId = BuffConfig.GetConfigByNameS(skillCfg.BuffId).Id;
         BuffManager.AddBuff(owner, owner, id, shieldId, skillCfg.BuffTime);
         var sh = owner.GetBuff(shieldId) as BuffShield;
         if (sh != null)

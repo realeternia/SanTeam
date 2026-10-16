@@ -41,7 +41,11 @@ public class SkillAidSweepingAoe : Skill
         foreach (var u in units)
         {
             if (skillDamage > 0)
+            {
                 u.OnSkillDamaged(owner, id, skillDamage);
+                if (!string.IsNullOrEmpty(skillCfg.HitEffect))
+                    EffectManager.PlaySkillEffect(u, skillCfg.HitEffect);
+            }
             if (debuffId > 0)
                 BuffManager.AddBuff(u, owner, id, debuffId, skillCfg.BuffTime);
         }

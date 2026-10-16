@@ -26,6 +26,8 @@ public class SkillAidTauntSlam : Skill
             if (e == null || e.hp <= 0)
                 continue;
             e.OnSkillDamaged(owner, id, GetSkillDamage());
+            if (!string.IsNullOrEmpty(skillCfg.HitEffect))
+                EffectManager.PlaySkillEffect(e, skillCfg.HitEffect);
         }
 
         // 嘲讽：把范围内敌人的当前目标改到自己身上

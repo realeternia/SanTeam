@@ -33,7 +33,7 @@ public class SkillAidSweeping : Skill
                 target.OnSkillDamaged(owner, skillId, dmg);
         }
 
-        BuffManager.AddBuff(target, owner, id, BuffConfig.GetConfigByNameS("缓").Id, skillCfg.BuffTime);
+        BuffManager.AddBuff(target, owner, id, BuffConfig.GetConfigByNameS(skillCfg.BuffId).Id, skillCfg.BuffTime);
         EffectManager.PlaySkillEffect(target, skillCfg.HitEffect);
         return true;
     }

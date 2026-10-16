@@ -79,6 +79,9 @@ public class SkillCastingAidLastStrategy : Skill
                 {
                     if (skillDamage > 0)
                         e.OnSkillDamaged(owner, skillId, skillDamage);
+                    // 命中特效：每次结算在受击目标处播一次技能命中特效
+                    if (!string.IsNullOrEmpty(skillCfg.HitEffect))
+                        EffectManager.PlaySkillEffect(e, skillCfg.HitEffect);
                     // 命中粒子：每次结算在受击目标处播一次火花
                     beam.PlayImpact(e);
                 }

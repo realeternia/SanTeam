@@ -24,9 +24,11 @@ public class SkillAidGuardian : Skill
         owner.PlayerAnim(skillCfg.Action);
 
         target.OnSkillDamaged(owner, skillId, GetSkillDamage());
+        if (!string.IsNullOrEmpty(skillCfg.HitEffect))
+            EffectManager.PlaySkillEffect(target, skillCfg.HitEffect);
 
-        // 给自己套盾（"盾"，护盾量 = Strength2[0] × (100+法强)/100）
-        int shieldId = BuffConfig.GetConfigByNameS("盾").Id;
+        // 给自己套盾（短名由 skillCfg.BuffId 配置，护盾量 = Strength2[0] × (100+法强)/100）
+        int shieldId = BuffConfig.GetConfigByNameS(skillCfg.BuffId).Id;
         BuffManager.AddBuff(owner, owner, id, shieldId, skillCfg.BuffTime);
         var sh = owner.GetBuff(shieldId) as BuffShield;
         if (sh != null)

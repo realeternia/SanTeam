@@ -27,9 +27,9 @@ public class SkillAidArmorShred : Skill
 
         target.OnSkillDamaged(owner, skillId, GetSkillDamage());
 
-        // 给目标挂减防Buff（"破"，减防比例由 BuffArmorDown 读 skillCfg.StrengthBuff1[0]）
+        // 给目标挂减防Buff（短名由 skillCfg.BuffId 配置，减防比例由 BuffArmorDown 读 skillCfg.StrengthBuff1[0]）
         if (skillCfg.StrengthBuff1[0] > 0)
-            BuffManager.AddBuff(target, owner, id, BuffConfig.GetConfigByNameS("破").Id, skillCfg.BuffTime);
+            BuffManager.AddBuff(target, owner, id, BuffConfig.GetConfigByNameS(skillCfg.BuffId).Id, skillCfg.BuffTime);
         return true;
     }
 }

@@ -48,7 +48,11 @@ public class SkillAidChargeImpale : Skill
             if (perp > halfWidth)
                 continue;
             if (skillDamage > 0)
+            {
                 u.OnSkillDamaged(owner, id, skillDamage);
+                if (!string.IsNullOrEmpty(skillCfg.HitEffect))
+                    EffectManager.PlaySkillEffect(u, skillCfg.HitEffect);
+            }
         }
 
         return true;

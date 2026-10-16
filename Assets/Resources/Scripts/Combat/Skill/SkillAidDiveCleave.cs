@@ -29,7 +29,11 @@ public class SkillAidDiveCleave : Skill
         foreach (var u in units)
         {
             if (skillDamage > 0)
+            {
                 u.OnSkillDamaged(owner, id, skillDamage);
+                if (!string.IsNullOrEmpty(skillCfg.HitEffect))
+                    EffectManager.PlaySkillEffect(u, skillCfg.HitEffect);
+            }
             if (healDownBuffCfg != null)
                 BuffManager.AddBuff(u, owner, id, healDownBuffCfg.Id, skillCfg.BuffTime);
             else

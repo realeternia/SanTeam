@@ -20,7 +20,7 @@ public class SkillAidAssault : Skill
 
         owner.PlayerAnim(skillCfg.Action);
         PlaySelfEffect();
-        BuffManager.AddBuff(owner, owner, id, BuffConfig.GetConfigByNameS("快").Id, skillCfg.BuffTime);
+        BuffManager.AddBuff(owner, owner, id, BuffConfig.GetConfigByNameS(skillCfg.BuffId).Id, skillCfg.BuffTime);
         return true;
     }
 }

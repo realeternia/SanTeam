@@ -17,6 +17,7 @@ Shader "Custom/LaserBeam"
         _CoreSharpness ("Core Sharpness", Range(0.5, 12)) = 5
         _HaloFalloff ("Halo Falloff", Range(0.5, 8)) = 1.6
         _Speed ("Energy Flow Speed", Range(-8, 8)) = 3
+        _TexFlowSpeed ("Tex Flow Speed", Range(-20, 20)) = 3
         _BandCount ("Energy Band Count", Range(0.1, 30)) = 7
         _FlowDepth ("Energy Flow Depth", Range(0, 1)) = 0.55
         _PulseSpeed ("Pulse Speed", Range(0, 20)) = 7
@@ -70,6 +71,7 @@ Shader "Custom/LaserBeam"
             float _CoreSharpness;
             float _HaloFalloff;
             float _Speed;
+            float _TexFlowSpeed;
             float _BandCount;
             float _FlowDepth;
             float _PulseSpeed;
@@ -133,9 +135,10 @@ Shader "Custom/LaserBeam"
                 float tailFade = smoothstep(0.0, 0.03, i.uv.x);
                 float tipHot = 1.0 + _TipBoost * smoothstep(0.55, 1.0, i.uv.x);
 
-                // 能量纹理（未指定时为白色，不改变观感）
-                float2 flowUV = float2(i.uv.x - _Time.y * _Speed * 0.15, i.uv.y);
-                float3 texMul = tex2D(_MainTex, flowUV).rgb;
+                // 能量纹理（未指定时为白色，不改变观感）；x-y 交换，让贴图纹理方向与光束对齐
+                // 用独立的 _TexFlowSpeed 驱动滚动，保证纹理流动足够明显
+                float2 flowUV = float2(i.uv.x - _Time.y * _TexFlowSpeed, i.uv.y);
+                float3 texMul = tex2D(_MainTex, flowUV.yx).rgb;
 
                 fixed3 rgb = _Color * core * 2.0 + _GlowColor * halo;
                 rgb *= _GlowIntensity * energy * flick * tailFade * tipHot * texMul * i.color.rgb;

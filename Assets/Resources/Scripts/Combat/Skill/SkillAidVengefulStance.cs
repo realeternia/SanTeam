@@ -4,6 +4,7 @@ using UnityEngine;
 /// <summary>
 /// 张辽·威震：为自身附加威震状态（Buff "震" BuffVengefulStance）bufftime 秒。
 /// 该状态下普攻按 Strength2[0] 概率眩晕目标，且普攻伤害类型转为真实伤害（无视护甲与护盾）。
+/// Buff 短名由 SkillConfig.BuffId 以逗号分隔配置：第 1 个=威震状态Buff(震)，第 2 个=眩晕效果Buff(乱)。
 /// </summary>
 public class SkillAidVengefulStance : Skill
 {
@@ -19,15 +20,18 @@ public class SkillAidVengefulStance : Skill
         if (!CheckBurst(target))
             return false;
 
+        // BuffId 逗号分隔：buffIds[0]=威震状态Buff(震)
+        var buffIds = GetSkillBuffIds();
+        if (buffIds.Count < 1)
+        {
+            GameLog.Error($"SkillAidVengefulStance: 未配置威震Buff BuffId={skillCfg.BuffId} 技能id={id}");
+            return false;
+        }
+
         owner.PlayerAnim(skillCfg.Action);
         PlaySelfEffect();
 
-        // 威震"震"（普攻眩晕 + 普攻转真实伤害）
-        var buffCfg = BuffConfig.GetConfigByNameS(skillCfg.BuffId);
-        if (buffCfg != null)
-            BuffManager.AddBuff(owner, owner, id, buffCfg.Id, skillCfg.BuffTime);
-        else
-            GameLog.Error("SkillAidVengefulStance: 未找到威震Buff短名：" + skillCfg.BuffId);
+        BuffManager.AddBuff(owner, owner, id, buffIds[0], skillCfg.BuffTime);
 
         return true;
     }

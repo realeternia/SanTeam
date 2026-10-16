@@ -27,8 +27,8 @@ public class SkillAidPoisonArrow : Skill
         // 高额直接伤害（基础技能伤害 × Strength2[1]）
         target.OnSkillDamaged(owner, skillId, (int)(GetSkillDamage() * skillCfg.Strength2[0]));
 
-        // 附加持续中毒Buff（"败"，每秒dot读自身 skillCfg.DamageStrength）
-        BuffManager.AddBuff(target, owner, id, BuffConfig.GetConfigByNameS("败").Id, skillCfg.BuffTime);
+        // 附加持续中毒Buff（短名由 skillCfg.BuffId 配置，每秒dot读自身 skillCfg.DamageStrength）
+        BuffManager.AddBuff(target, owner, id, BuffConfig.GetConfigByNameS(skillCfg.BuffId).Id, skillCfg.BuffTime);
 
         if (!string.IsNullOrEmpty(skillCfg.HitEffect))
             EffectManager.PlaySkillEffect(target, skillCfg.HitEffect);

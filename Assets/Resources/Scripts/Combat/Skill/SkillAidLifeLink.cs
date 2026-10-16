@@ -34,7 +34,7 @@ public class SkillAidLifeLink : Skill
 
         owner.PlayerAnim(skillCfg.Action);
 
-        int linkId = BuffConfig.GetConfigByNameS("链").Id;
+        int linkId = BuffConfig.GetConfigByNameS(skillCfg.BuffId).Id;
         // 双方各挂一份，张梁持链侧 BeforeCalDamaged 把伤害分享给自身
         BuffManager.AddBuff(lowest, owner, id, linkId, skillCfg.BuffTime);
         BuffManager.AddBuff(owner, owner, id, linkId, skillCfg.BuffTime);

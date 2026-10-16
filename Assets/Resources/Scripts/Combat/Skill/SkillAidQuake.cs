@@ -30,12 +30,16 @@ public class SkillAidQuake : Skill
         var units = WorldManager.Instance.GetEnemyInRange(target.transform.position, skillCfg.Area, owner.side);
         WorldManager.Instance.RandomSelect(units, skillCfg.TargetCount);
 
-        var huanBuffId = BuffConfig.GetConfigByNameS("缓").Id; // 减速Buff
+        var huanBuffId = BuffConfig.GetConfigByNameS(skillCfg.BuffId).Id; // 减速Buff
         var skillDamage = GetSkillDamage();
         foreach (var u in units)
         {
             if (skillDamage > 0)
+            {
                 u.OnSkillDamaged(owner, skillId, skillDamage);
+                if (!string.IsNullOrEmpty(skillCfg.HitEffect))
+                    EffectManager.PlaySkillEffect(u, skillCfg.HitEffect);
+            }
             BuffManager.AddBuff(u, owner, id, huanBuffId, skillCfg.BuffTime);
         }
         return true;

@@ -45,6 +45,8 @@ public class SkillAidCutSupply : Skill
             if (target == null || target.hp <= 0)
                 yield break;
             target.OnSkillDamaged(owner, skillId, secDamage);
+            if (!string.IsNullOrEmpty(skillCfg.HitEffect))
+                EffectManager.PlaySkillEffect(target, skillCfg.HitEffect);
         }
     }
 }

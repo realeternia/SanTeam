@@ -48,6 +48,8 @@ public class SkillAidSacrificeGuard : Skill
                 if (u == null || u.hp <= 0)
                     continue;
                 u.OnSkillDamaged(owner, id, skillDamage);
+                if (!string.IsNullOrEmpty(skillCfg.HitEffect))
+                    EffectManager.PlaySkillEffect(u, skillCfg.HitEffect);
             }
         }
 

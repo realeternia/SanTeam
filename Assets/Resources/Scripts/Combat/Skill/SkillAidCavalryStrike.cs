@@ -2,12 +2,10 @@ using CommonConfig;
 
 /// <summary>
 /// 马超·西凉铁骑（武）：对目标连续突击 3 次，每次造成 GetSkillDamage 物理伤害，
-/// 并施加一层叠加破甲（BuffArmorShred "削"）BuffTime 秒，护甲越打越低。
+/// 并施加一层叠加破甲（Buff 短名由 skillCfg.BuffId 配置）BuffTime 秒，护甲越打越低。
 /// </summary>
 public class SkillAidCavalryStrike : Skill
 {
-    /// <summary>叠加破甲 Buff 短名（BuffArmorShred "削"）</summary>
-    public const string ArmorShredBuffNameS = "削";
     /// <summary>突击次数</summary>
     private const int Hits = 3;
 
@@ -28,9 +26,9 @@ public class SkillAidCavalryStrike : Skill
         owner.PlayerAnim(skillCfg.Action);
         PlaySelfEffect();
 
-        var shredCfg = BuffConfig.GetConfigByNameS(ArmorShredBuffNameS);
+        var shredCfg = BuffConfig.GetConfigByNameS(skillCfg.BuffId);
         if (shredCfg == null)
-            GameLog.Error("SkillAidCavalryStrike: 未找到破甲Buff短名：" + ArmorShredBuffNameS);
+            GameLog.Error("SkillAidCavalryStrike: 未找到破甲Buff短名：" + skillCfg.BuffId);
 
         for (int i = 0; i < Hits; i++)
         {

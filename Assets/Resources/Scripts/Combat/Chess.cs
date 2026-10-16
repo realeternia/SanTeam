@@ -125,6 +125,7 @@ public class Chess : MonoBehaviour
 
     public Renderer rend;
     public Material material;
+    public Material materialEffect; // 「切材质」效果实例（如冰冻 Buff），移除时销毁并还原 material
     public Renderer rendFlag;
     public Material materialFlag;    
     private Coroutine colorEffectCoroutine; // 协程引用，用于追踪颜色效果协程
@@ -1108,10 +1109,54 @@ public class Chess : MonoBehaviour
         }
         
         // 恢复默认颜色
-        material.SetColor("_Color", Color.white);
-    }
+            material.SetColor("_Color", Color.white);
+        }
 
-    IEnumerator ColorLerpCoroutine(Color start, Color end)
+        /// <summary>
+        /// 切材质效果：Buff 配置了「切材质」时，把本单位渲染器材质换成 Resources/Materials 下的指定材质
+        /// （如冰冻 Buff"缓" → BuffFrozen）。名称为空或资源缺失时记录日志并跳过。
+        /// 新材质会从原英雄材质(material)拷入 _MainTex（英雄头像），并随机设置冰晶偏移(_FrostOffset)做个体差异。
+        /// </summary>
+        public void AddMaterialEffect(string materialName)
+        {
+            if (rend == null || string.IsNullOrEmpty(materialName))
+                return;
+
+            var baseMat = Resources.Load<Material>("Materials/" + materialName);
+            if (baseMat == null)
+            {
+                GameLog.Warn("切材质失败：未找到材质 Resources/Materials/" + materialName);
+                return;
+            }
+
+            // 实例化，避免修改到共享资源；仅拷入英雄头像贴图，其余属性由材质自身控制
+            var mat = new Material(baseMat);
+            if (material != null && material.HasProperty("_MainTex") && mat.HasProperty("_MainTex"))
+                mat.mainTexture = material.mainTexture;
+
+            // 每个棋子随机冰晶偏移，避免所有冰冻单位冰纹完全一致
+            if (mat.HasProperty("_FrostOffset"))
+                mat.SetVector("_FrostOffset", new Vector4(SysRandom.Range(0f, 100f), SysRandom.Range(0f, 100f), 0f, 0f));
+
+            materialEffect = mat;
+            rend.material = materialEffect;
+        }
+
+        /// <summary>
+        /// 恢复默认材质：Buff 移除时销毁切材质实例并还原为本单位原始材质实例（material 字段）。
+        /// </summary>
+        public void RemoveMaterialEffect()
+        {
+            if (materialEffect != null)
+            {
+                Destroy(materialEffect);
+                materialEffect = null;
+            }
+            if (rend != null && material != null)
+                rend.material = material;
+        }
+
+        IEnumerator ColorLerpCoroutine(Color start, Color end)
     {
         float time = 0f;
         while (true)

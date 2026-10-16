@@ -23,7 +23,7 @@ public class SkillAidSlashDefend : Skill
 
         target.OnSkillDamaged(owner, id, GetSkillDamage());
 
-        var armorId = BuffConfig.GetConfigByNameS("硬").Id;
+        var armorId = BuffConfig.GetConfigByNameS(skillCfg.BuffId).Id;
         BuffManager.AddBuff(owner, owner, id, armorId, skillCfg.BuffTime);
 
         owner.PlayerAnim(skillCfg.Action);

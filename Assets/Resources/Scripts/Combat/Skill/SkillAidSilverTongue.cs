@@ -26,7 +26,7 @@ public class SkillAidSilverTongue : Skill
 
         if (GetSkillDamage() > 0)
             target.OnSkillDamaged(owner, skillId, GetSkillDamage());
-        BuffManager.AddBuff(target, owner, id, BuffConfig.GetConfigByNameS("缓").Id, skillCfg.BuffTime);
+        BuffManager.AddBuff(target, owner, id, BuffConfig.GetConfigByNameS(skillCfg.BuffId).Id, skillCfg.BuffTime);
 
         // 舌辩附带驱散：移除目标身上的正面 Buff（不可驱散的招牌 Buff 除外）
         BuffManager.DispelPositive(target);

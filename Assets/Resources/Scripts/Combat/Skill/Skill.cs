@@ -90,16 +90,31 @@ public class Skill
     /// </summary>
     protected List<int> GetSkillBuffIds()
     {
+        return GetSkillBuffIds(skillCfg);
+    }
+
+    /// <summary>
+    /// 静态重载：解析 SkillConfig.BuffId（英文/中文逗号、分号分隔），供 Buff 等无 Skill 实例处复用。
+    /// 未配置返回空列表；短名找不到对应 BuffConfig 时跳过并记录日志。
+    /// </summary>
+    public static List<int> GetSkillBuffIds(SkillConfig cfg)
+    {
         var ids = new List<int>();
-        if (skillCfg == null || string.IsNullOrEmpty(skillCfg.BuffId))
+        if (cfg == null || string.IsNullOrEmpty(cfg.BuffId))
             return ids;
 
-        foreach (var seg in skillCfg.BuffId.Split(new[] { ',', '，', ';', '；' }, StringSplitOptions.RemoveEmptyEntries))
+        foreach (var seg in cfg.BuffId.Split(new[] { ',', '，', ';', '；' }, StringSplitOptions.RemoveEmptyEntries))
         {
             var name = seg.Trim();
             if (name.Length == 0)
                 continue;
-            ids.Add(BuffConfig.GetConfigByNameS(name).Id);
+            var buffCfg = BuffConfig.GetConfigByNameS(name);
+            if (buffCfg == null)
+            {
+                GameLog.Error($"GetSkillBuffIds: 未找到Buff短名：{name} 技能id={cfg.Id}");
+                continue;
+            }
+            ids.Add(buffCfg.Id);
         }
         return ids;
     }

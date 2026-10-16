@@ -83,7 +83,11 @@ public class SkillAttackRunCrossPlus : Skill
 
                 // 被穿越的敌人结算额外伤害（与突破一致，倍率取 Strength2[0]；四舍五入为0时跳过，避免 OnSkillDamaged 报非正伤害）
                 if (crossDamage > 0)
+                {
                     chess.OnSkillDamaged(owner, skillId, crossDamage);
+                    if (!string.IsNullOrEmpty(skillCfg.HitEffect))
+                        EffectManager.PlaySkillEffect(chess, skillCfg.HitEffect);
+                }
 
                 pushedList.Add(chess.id);
 

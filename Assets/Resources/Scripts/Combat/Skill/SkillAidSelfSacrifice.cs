@@ -24,8 +24,8 @@ public class SkillAidSelfSacrifice : Skill
         // 嘲讽：把范围内敌人的当前目标改到自己身上
         TauntEnemies(skillCfg.Area);
 
-        // 为自身附加减伤盾（"硬"=BuffShieldValue，按最大生命比例）
-        int shieldHardId = BuffConfig.GetConfigByNameS("硬").Id;
+        // 为自身附加减伤盾（短名由 skillCfg.BuffId 配置，BuffShieldValue 按最大生命比例）
+        int shieldHardId = BuffConfig.GetConfigByNameS(skillCfg.BuffId).Id;
         BuffManager.AddBuff(owner, owner, id, shieldHardId, skillCfg.BuffTime);
 
         PlaySelfEffect();

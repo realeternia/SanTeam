@@ -50,6 +50,12 @@ public class Buff
             chess.AddColorEffect(start, end);
         }
 
+        // 切材质：配置了「切材质」时把单位材质换成对应材质（如冰冻 Buff"缓" → BuffFrozen）
+        if (!string.IsNullOrEmpty(buffCfg.Material))
+        {
+            chess.AddMaterialEffect(buffCfg.Material);
+        }
+
     }
 
     public virtual void OnRemove(Chess chess)
@@ -63,6 +69,12 @@ public class Buff
         if (!string.IsNullOrEmpty(buffCfg.ColorStart))
         { 
             chess.RemoveColorEffect();
+        }
+
+        // 恢复材质：Buff 移除时还原单位原始材质
+        if (!string.IsNullOrEmpty(buffCfg.Material))
+        {
+            chess.RemoveMaterialEffect();
         }
 
         owner = null;

@@ -38,7 +38,11 @@ public class SkillAidIronGuard : Skill
         foreach (var u in units)
         {
             if (microDamage > 0)
+            {
                 u.OnSkillDamaged(owner, id, microDamage);
+                if (!string.IsNullOrEmpty(skillCfg.HitEffect))
+                    EffectManager.PlaySkillEffect(u, skillCfg.HitEffect);
+            }
         }
 
         return true;

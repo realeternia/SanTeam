@@ -25,7 +25,11 @@ public class SkillAidDoubleShot : Skill
         var list = WorldManager.Instance.GetEnemyInRange(target.transform.position, skillCfg.Area, owner.side);
         WorldManager.Instance.RandomSelect(list, skillCfg.TargetCount);
         foreach (var u in list)
+        {
             u.OnSkillDamaged(owner, id, GetSkillDamage());
+            if (!string.IsNullOrEmpty(skillCfg.HitEffect))
+                EffectManager.PlaySkillEffect(u, skillCfg.HitEffect);
+        }
 
         owner.PlayerAnim(skillCfg.Action);
         PlaySelfEffect();

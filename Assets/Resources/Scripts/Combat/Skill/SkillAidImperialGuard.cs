@@ -6,12 +6,10 @@ using UnityEngine;
 /// <summary>
 /// 曹操·护驾：将生命比例最低的友军英雄传送到身边，为其套 Strength2[0]×(100+法强)/100 的护盾（随法强成长），
 /// 并附加"护驾"Buff（受疗 healedRate 提升 /strengthbuff1-1%）。
+/// Buff 短名由 SkillConfig.BuffId 以逗号分隔配置：第 1 个=护驾Buff，第 2 个=护盾Buff（如 "护,盾"）。
 /// </summary>
 public class SkillAidImperialGuard : Skill
 {
-    /// <summary>护盾 Buff 短名</summary>
-    public const string ShieldBuffNameS = "盾";
-
     public SkillAidImperialGuard(int id, Chess unit) : base(id, unit)
     {
     }
@@ -21,18 +19,15 @@ public class SkillAidImperialGuard : Skill
         if (!CheckBurst(null))
             return false;
 
-        var shieldCfg = BuffConfig.GetConfigByNameS(ShieldBuffNameS);
-        var guardCfg = BuffConfig.GetConfigByNameS(skillCfg.BuffId);
-        if (shieldCfg == null)
+        // BuffId 逗号分隔：buffIds[0]=护驾Buff，buffIds[1]=护盾Buff
+        var buffIds = GetSkillBuffIds();
+        if (buffIds.Count < 2)
         {
-            GameLog.Error("SkillAidImperialGuard: 未找到护盾Buff短名：" + ShieldBuffNameS);
+            GameLog.Error($"SkillAidImperialGuard: BuffId 需配置护驾与护盾两个buff（如\"护,盾\"）技能id={id}");
             return false;
         }
-        if (guardCfg == null)
-        {
-            GameLog.Error("SkillAidImperialGuard: 未找到护驾Buff短名：" + skillCfg.BuffId);
-            return false;
-        }
+        int guardBuffId = buffIds[0];
+        int shieldBuffId = buffIds[1];
 
         var allies = WorldManager.Instance.GetMySideInRange(owner.transform.position, skillCfg.Area, owner.side)
             .FindAll(x => x != owner && x.isHero && x.IsInFight());
@@ -57,15 +52,15 @@ public class SkillAidImperialGuard : Skill
         lowest.MoveTo(landPos, true);
 
         // 套盾：强度 = Strength2[0] × (100+法强)/100（随法强成长）
-        BuffManager.AddBuff(lowest, owner, id, shieldCfg.Id, skillCfg.BuffTime);
-        var sh = lowest.GetBuff(shieldCfg.Id) as BuffShield;
+        BuffManager.AddBuff(lowest, owner, id, shieldBuffId, skillCfg.BuffTime);
+        var sh = lowest.GetBuff(shieldBuffId) as BuffShield;
         if (sh != null)
             sh.SetHp(GetSkillShield(0));
         else
             GameLog.Warn("SkillAidImperialGuard: 护盾Buff类型异常，无法设置护盾值");
 
         // 回复加成
-        BuffManager.AddBuff(lowest, owner, id, guardCfg.Id, skillCfg.BuffTime);
+        BuffManager.AddBuff(lowest, owner, id, guardBuffId, skillCfg.BuffTime);
 
         EffectManager.PlaySkillEffect(lowest, skillCfg.HitEffect);
         GameLog.Info("护驾：" + GetHeroName(owner) + " 将 " + GetHeroName(lowest) + " 召至身边并套盾提升回复");

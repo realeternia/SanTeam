@@ -158,7 +158,7 @@ namespace CommonConfig
             config[10090] = new EffectConfig(10090, "ToolExplosion", "锤类爆裂特效", "伤害", "目标", "Effect/ToolExplosion", "Missile/ToolExplosion", 5f, 1f, 8f, 1f, "");
             config[10100] = new EffectConfig(10100, "AxeExplosion", "斧类爆裂特效（弹道）", "伤害", "目标", "", "Missile/AxeExplosion", 5f, 1f, 8f, 1f, "");
             config[10110] = new EffectConfig(10110, "GasShootFire", "火焰喷射弹道特效", "伤害", "目标", "", "Missile/GasShootFire", 5f, 1f, 8f, 1f, "");
-            config[10120] = new EffectConfig(10120, "NukeMissileFires", "核弹导弹弹道特效", "伤害", "目标", "", "Missile/NukeMissileFires", 5f, 1f, 5f, 1f, "");
+            config[10120] = new EffectConfig(10120, "NukeMissileFires", "核弹导弹弹道特效", "伤害", "目标", "", "Missile/NukeMissileFires", 5f, 1f, 5f, 1f, "#00D5FF");
             config[10130] = new EffectConfig(10130, "ShadowExplosion", "暗影爆裂特效", "伤害", "目标", "Effect/ShadowExplosion", "Missile/ShadowExplosion", 5f, 1f, 8f, 1f, "");
             config[10131] = new EffectConfig(10131, "ShadowExplosionGreen", "绿色暗影爆裂特效", "伤害", "目标", "Effect/ShadowExplosion", "Missile/ShadowExplosionGreen", 5f, 1f, 8f, 1f, "#105E11");
             config[11000] = new EffectConfig(11000, "AuraSoftPurple", "紫色缓冲特效", "增益", "范围", "Effect/AuraSoftPurple", "", 3f, 1f, 8f, 1f, "");

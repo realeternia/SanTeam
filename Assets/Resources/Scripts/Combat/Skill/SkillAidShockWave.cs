@@ -4,13 +4,10 @@ using UnityEngine;
 /// <summary>
 /// 诸葛亮·惊雷（术，ScriptName = "AidShockWave"）：向目标位置降下惊雷，造成范围法术伤害
 /// （伤害由飞行中的导弹逐个命中目标结算），并对命中的敌人附加减速
-/// （BuffSlowDown "缓"，减速比例取 StrengthBuff1[0]）BuffTime 秒。
+/// （Buff 短名由 SkillConfig.BuffId 配置，减速比例取 StrengthBuff1[0]）BuffTime 秒。
 /// </summary>
 public class SkillAidShockWave : Skill
 {
-    /// <summary>减速 Buff 短名（BuffSlowDown "缓"）</summary>
-    public const string SlowBuffNameS = "缓";
-
     public SkillAidShockWave(int id, Chess unit) : base(id, unit)
     {
     }
@@ -43,10 +40,10 @@ public class SkillAidShockWave : Skill
     {
         if (target == null || target.hp <= 0)
             return;
-        var slowCfg = BuffConfig.GetConfigByNameS(SlowBuffNameS);
+        var slowCfg = BuffConfig.GetConfigByNameS(skillCfg.BuffId);
         if (slowCfg == null)
         {
-            GameLog.Error("SkillAidShockWave: 未找到减速Buff短名：" + SlowBuffNameS);
+            GameLog.Error("SkillAidShockWave: 未找到减速Buff短名：" + skillCfg.BuffId);
             return;
         }
         BuffManager.AddBuff(target, owner, id, slowCfg.Id, skillCfg.BuffTime);

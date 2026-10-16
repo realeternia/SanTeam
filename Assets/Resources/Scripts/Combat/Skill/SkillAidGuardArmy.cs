@@ -35,7 +35,7 @@ public class SkillAidGuardArmy : Skill
         owner.PlayerAnim(skillCfg.Action);
 
         // 给最低生命友军套盾（护盾量 = Strength2[0] × (100+法强)/100）
-        int shieldId = BuffConfig.GetConfigByNameS("盾").Id;
+        int shieldId = BuffConfig.GetConfigByNameS(skillCfg.BuffId).Id;
         BuffManager.AddBuff(lowest, owner, id, shieldId, skillCfg.BuffTime);
         var sh = lowest.GetBuff(shieldId) as BuffShield;
         if (sh != null)

@@ -5,13 +5,10 @@ using UnityEngine;
 
 /// <summary>
 /// 张飞·旋风斩：普攻时对周围最多 TargetCount 个敌人造成 Strength2[0]% 攻击伤害，
-/// 并对被溅射的敌人附加流血（BuffTimeDamage "败"），每秒伤害 = 本次溅射伤害 × StrengthBuff1[0]，持续 BuffTime 秒。
+/// 并对被溅射的敌人附加流血（Buff 短名由 skillCfg.BuffId 配置），每秒伤害 = 本次溅射伤害 × StrengthBuff1[0]，持续 BuffTime 秒。
 /// </summary>
 public class SkillAttackSpinAttack : Skill
 {
-    /// <summary>流血 Buff 短名（BuffTimeDamage "败"）</summary>
-    public const string BleedBuffNameS = "败";
-
     public SkillAttackSpinAttack(int id, Chess unit) : base(id, unit)
     {
     }
@@ -28,6 +25,8 @@ public class SkillAttackSpinAttack : Skill
             {
                 var spinDamage = (int)(damage * skillCfg.Strength2[0]);
                 unit.OnSkillDamaged(owner, skillId, spinDamage);
+                if (!string.IsNullOrEmpty(skillCfg.HitEffect))
+                    EffectManager.PlaySkillEffect(unit, skillCfg.HitEffect);
                 ApplyBleed(unit, spinDamage);
             }
 
@@ -47,10 +46,10 @@ public class SkillAttackSpinAttack : Skill
         if (bleed <= 0)
             return;
 
-        var buffCfg = BuffConfig.GetConfigByNameS(BleedBuffNameS);
+        var buffCfg = BuffConfig.GetConfigByNameS(skillCfg.BuffId);
         if (buffCfg == null)
         {
-            GameLog.Error("SkillAttackSpinAttack: 未找到流血Buff短名：" + BleedBuffNameS);
+            GameLog.Error("SkillAttackSpinAttack: 未找到流血Buff短名：" + skillCfg.BuffId);
             return;
         }
 
