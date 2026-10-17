@@ -2,9 +2,10 @@ using CommonConfig;
 using UnityEngine;
 
 /// <summary>
-/// 诸葛亮·惊雷（术，ScriptName = "AidShockWave"）：向目标位置降下惊雷，造成范围法术伤害
-/// （伤害由飞行中的导弹逐个命中目标结算），并对命中的敌人附加减速
-/// （Buff 短名由 SkillConfig.BuffId 配置，减速比例取 StrengthBuff1[0]）BuffTime 秒。
+/// 通用方向型范围导弹技能流程（诸葛亮·惊雷 / 许褚·虎啸 共用，ScriptName = "AidShockWave"）：
+/// 朝目标位置发射导弹，伤害由飞行中的导弹逐个命中路径上的敌人结算（最多 TargetCount 名）。
+/// 配置了 BuffId 时额外给命中目标挂该 buff（如惊雷减速，比例取 StrengthBuff1[0]），
+/// 未配置 BuffId 的技能（如虎啸）不挂 buff。
 /// </summary>
 public class SkillAidShockWave : Skill
 {
@@ -35,10 +36,12 @@ public class SkillAidShockWave : Skill
         return true;
     }
 
-    // 导弹命中单个目标后的附加效果：挂减速
-    private void OnMissileHit(Chess target)
+    // 导弹命中单个目标后的附加效果：挂减速（未配置 BuffId 的技能不挂 buff）；protected 供姜维·流光等复用同一命中处理
+    protected void OnMissileHit(Chess target)
     {
         if (target == null || target.hp <= 0)
+            return;
+        if (string.IsNullOrEmpty(skillCfg.BuffId))
             return;
         var slowCfg = BuffConfig.GetConfigByNameS(skillCfg.BuffId);
         if (slowCfg == null)

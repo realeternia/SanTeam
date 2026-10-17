@@ -24,9 +24,9 @@ public class SkillAidShadowSplit : Skill
         // 本体魔法伤害
         target.OnSkillDamaged(owner, id, GetSkillDamage());
 
-        // 召唤影分身：攻击/生命继承本体 × strength2
+        // 召唤影分身：落在自身周围 Area 距离内的随机角度位置，攻击/生命继承本体 × strength2
         Vector2 randomDir = SysRandom.InsideUnitCircle.normalized;
-        Vector3 randomPosition = owner.transform.position + new Vector3(randomDir.x, 0, randomDir.y) * skillCfg.Range;
+        Vector3 randomPosition = owner.transform.position + new Vector3(randomDir.x, 0, randomDir.y) * skillCfg.Area;
         var shadow = SummonUnit(randomPosition, CombatConst.SoldierShadow, HeroConfig.GetConfig(owner.heroId).Icon);
         shadow.atk = (int)(owner.atk * skillCfg.Strength2[0]);
         shadow.maxHp = (int)(owner.maxHp * skillCfg.Strength2[0]);
@@ -34,8 +34,7 @@ public class SkillAidShadowSplit : Skill
 
         owner.PlayerAnim(skillCfg.Action);
         PlaySelfEffect();
-        PlayAreaEffect(owner.transform.position);
-        EffectManager.PlaySkillEffect(target, skillCfg.HitEffect);
+        EffectManager.PlaySkillEffect(target, skillCfg.SelfEffect);
         return true;
     }
 }

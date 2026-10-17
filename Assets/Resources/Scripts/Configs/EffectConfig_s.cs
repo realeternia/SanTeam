@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -161,6 +161,8 @@ namespace CommonConfig
             config[10120] = new EffectConfig(10120, "NukeMissileFires", "核弹导弹弹道特效", "伤害", "目标", "", "Missile/NukeMissileFires", 5f, 1f, 5f, 1f, "#00D5FF");
             config[10130] = new EffectConfig(10130, "ShadowExplosion", "暗影爆裂特效", "伤害", "目标", "Effect/ShadowExplosion", "Missile/ShadowExplosion", 5f, 1f, 8f, 1f, "");
             config[10131] = new EffectConfig(10131, "ShadowExplosionGreen", "绿色暗影爆裂特效", "伤害", "目标", "Effect/ShadowExplosion", "Missile/ShadowExplosionGreen", 5f, 1f, 8f, 1f, "#105E11");
+            config[10140] = new EffectConfig(10140, "FlashExplosionBlue", "蓝色星爆", "伤害", "目标", "Effect/FlashExplosionBlue", "Missile/FlashExplosionBlue", 5f, 1f, 5f, 1f, "");
+            config[10140] = new EffectConfig(10140, "LaserMeshMissileBlue", "蓝色星爆", "伤害", "目标", "Effect/FlashExplosionBlue", "Missile/LaserMeshMissileBlue", 5f, 1f, 5f, 1f, "");
             config[11000] = new EffectConfig(11000, "AuraSoftPurple", "紫色缓冲特效", "增益", "范围", "Effect/AuraSoftPurple", "", 3f, 1f, 8f, 1f, "");
             config[11010] = new EffectConfig(11010, "BloodExplosion", "鲜血爆裂特效", "伤害", "目标", "Effect/BloodExplosion", "", 5f, 1f, 8f, 1f, "");
             config[11020] = new EffectConfig(11020, "HeartStream", "爱心流光特效", "增益", "目标", "Effect/HeartStream", "", 8f, 1f, 8f, 1f, "");
@@ -191,6 +193,7 @@ namespace CommonConfig
             config[11190] = new EffectConfig(11190, "SwordHitBlue", "蓝色剑击特效", "伤害", "目标", "Effect/SwordHitBlue", "", 10f, 1f, 8f, 1f, "");
             config[11200] = new EffectConfig(11200, "LaserImpactSpark", "激光命中火花特效", "伤害", "目标", "Effect/SwordHitBlue", "", 2f, 1f, 5f, 1f, "#00D5FF");
             config[11210] = new EffectConfig(11210, "MysticExplosionDark", "紫色神秘爆裂特效AOE", "伤害", "范围", "Effect/MysticExplosionDark", "", 3.5f, 1f, 5f, 1f, "");
+            config[11211] = new EffectConfig(11211, "MysticExplosionRed", "红色神秘爆裂特效AOE", "伤害", "范围", "Effect/MysticExplosionDark", "", 3.5f, 1f, 5f, 1f, "#FF0000");
             config[11220] = new EffectConfig(11220, "NukeVerticalExplosionFire", "核弹垂直爆裂特效AOE", "伤害", "范围", "Effect/NukeVerticalExplosionFire", "", 2.8f, 1f, 5f, 1f, "");
             config[11230] = new EffectConfig(11230, "StarExplosionBlue", "蓝色星爆裂特效", "增益", "目标", "Effect/StarExplosionBlue", "", 8f, 1f, 5f, 1f, "");
             config[11240] = new EffectConfig(11240, "ScanExplosion", "地震爆裂特效", "伤害", "范围", "Effect/ScanExplosion", "", 3f, 1f, 5f, 1f, "");

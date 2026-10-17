@@ -33,7 +33,7 @@ public class SkillAidBurstShot : Skill
             var dist = Vector3.Distance(owner.transform.position, t.transform.position);
             var near = Mathf.Max(0f, 1f - dist / skillCfg.Range);
             var dmg = GetSkillDamage() + (int)(GetSkillDamage() * skillCfg.Strength2[0] * near);
-            WorldManager.Instance.CreateSpellMissile(owner, t, owner.transform.position, id, dmg, owner.hitEffect);
+            WorldManager.Instance.CreateSpellMissile(owner, t, owner.transform.position, id, dmg, skillCfg.HitEffect);
         }
         return true;
     }

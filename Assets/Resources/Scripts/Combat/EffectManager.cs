@@ -173,4 +173,59 @@ public static class EffectManager
 
     }
 
+    // 解析导弹资源路径（规则与 Missile.ResolveMissilePath 一致）：优先 EffectConfig.MissilePath，缺失回退特效路径，再回退 Prefabs/Missile 目录
+    private static string ResolveMissilePath(string effectName)
+    {
+        var cfg = EffectConfig.GetConfigByName(effectName);
+        if (cfg != null)
+        {
+            if (!string.IsNullOrEmpty(cfg.MissilePath))
+                return "Prefabs/" + cfg.MissilePath;
+            if (!string.IsNullOrEmpty(cfg.EffPath))
+                return "Prefabs/" + cfg.EffPath;
+        }
+        GameLog.Warn("EffectManager 未在EffectConfig中配置导弹[" + effectName + "]，回退 Prefabs/Missile 目录加载");
+        return "Prefabs/Missile/" + effectName;
+    }
+
+    /// <summary>
+    /// 跟随型导弹特效：把导弹预制体挂到单位身上（作为其子节点），随单位移动持续播放粒子，
+    /// 单位瞬移/位移时粒子在移动路径上留下拖尾残影（快闪类技能用）。time&gt;0 时到时自动销毁，否则由调用方销毁。
+    /// </summary>
+    public static GameObject PlayFollowMissileEffect(Chess unit, string effect, float time = 0f)
+    {
+        if (unit == null || string.IsNullOrEmpty(effect))
+        {
+            GameLog.Warn("PlayFollowMissileEffect 参数为空，跳过播放 effect=" + effect);
+            return null;
+        }
+
+        var missilePrefab = Resources.Load<GameObject>(ResolveMissilePath(effect));
+        if (missilePrefab == null)
+        {
+            GameLog.Warn("PlayFollowMissileEffect 导弹资源不存在: " + effect);
+            return null;
+        }
+        GameLog.Debug("PlayFollowMissileEffect: " + effect);
+
+        var cfg = EffectConfig.GetConfigByName(effect);
+        float scale = cfg != null && cfg.MissileScale > 0 ? cfg.MissileScale : missilePrefab.transform.localScale.x;
+        float offsetY = cfg != null ? cfg.MissileOffsetY : 0f;
+        GameObject missileEffect = UnityEngine.Object.Instantiate(missilePrefab, unit.transform.position, missilePrefab.transform.rotation);
+        MountEffect(missileEffect, unit.transform, new Vector3(scale, scale, scale), offsetY);
+        ApplyTint(missileEffect, cfg);
+
+        // 跟随期间粒子需持续播放（拖尾），循环避免中途熄灭
+        foreach (var ps in missileEffect.GetComponentsInChildren<ParticleSystem>(true))
+        {
+            var main = ps.main;
+            main.loop = true;
+            ps.Play();
+        }
+
+        if (time > 0f)
+            UnityEngine.Object.Destroy(missileEffect, time);
+        return missileEffect;
+    }
+
 }

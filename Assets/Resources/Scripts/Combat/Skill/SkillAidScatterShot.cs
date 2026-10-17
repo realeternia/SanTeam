@@ -32,7 +32,7 @@ public class SkillAidScatterShot : Skill
         foreach (var t in targets)
         {
             var dmg = GetSkillDamage() + (int)(GetSkillDamage() * skillCfg.Strength2[0]);
-            WorldManager.Instance.CreateSpellMissile(owner, t, owner.transform.position, id, dmg, owner.hitEffect);
+            WorldManager.Instance.CreateSpellMissile(owner, t, owner.transform.position, id, dmg, skillCfg.HitEffect);
         }
         return true;
     }

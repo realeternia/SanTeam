@@ -85,6 +85,8 @@ public static class SkillManager
                 return new SkillModifyShootSpeed(skillId, owner);
             case "CastingAidDrain":
                 return new SkillCastingAidDrain(skillId, owner);
+            case "AidFlashStrike":
+                return new SkillAidFlashStrike(skillId, owner);
             case "AidAura":
                 return new SkillAidAura(skillId, owner);
             case "AidHealShield":
@@ -215,8 +217,6 @@ public static class SkillManager
                 return new SkillAidGuardArmy(skillId, owner);
             case "SkillAidTauntSlam":
                 return new SkillAidTauntSlam(skillId, owner);
-            case "SkillAidShieldBurst":
-                return new SkillAidShieldBurst(skillId, owner);
             case "SkillAidSelfSacrifice":
                 return new SkillAidSelfSacrifice(skillId, owner);
             case "SkillAidLifeLink":

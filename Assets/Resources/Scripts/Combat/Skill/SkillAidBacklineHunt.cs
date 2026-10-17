@@ -40,7 +40,7 @@ public class SkillAidBacklineHunt : Skill
         owner.PlayerAnim(skillCfg.Action);
         PlaySelfEffect();
         int dmg = GetSkillDamage() + (int)(GetSkillDamage() * skillCfg.Strength2[0]);
-        WorldManager.Instance.CreateSpellMissile(owner, back, owner.transform.position, id, dmg, owner.hitEffect);
+        WorldManager.Instance.CreateSpellMissile(owner, back, owner.transform.position, id, dmg, skillCfg.HitEffect);
         return true;
     }
 }

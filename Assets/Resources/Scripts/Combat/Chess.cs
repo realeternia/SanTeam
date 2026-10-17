@@ -218,6 +218,13 @@ public class Chess : MonoBehaviour
             {
                 maxHp += playerInfo.GetItemPAttr("shp") + playerInfo.GetSoldierHpAdd(soldierCfg);
                 atk += playerInfo.GetSoldierAtkAdd(soldierCfg);
+                // 旗帜(Banner)：非英雄单位（如召唤的影分身）也需按所属玩家头像着色，避免沿用预制体默认贴图
+                if (rendFlag != null && rendFlag.sharedMaterial != null)
+                {
+                    materialFlag = new Material(rendFlag.sharedMaterial);
+                    materialFlag.mainTexture = Resources.Load<Texture>(playerInfo.imgPath);
+                    rendFlag.material = materialFlag;
+                }
             }
         }
         // 记录士兵初始生命基准：职业生命系数结算始终以它为基数（士兵无其他生命来源，此值即为战斗前最终生命）
