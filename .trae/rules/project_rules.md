@@ -13,6 +13,7 @@ Unity (C#) | JsonUtility | UGUI | TextMeshPro
 - 脚本：`Assets/Resources/Scripts/`，其中 `Configs/`（配置类）、`Combat/`（战斗层：Chess、Skill/、Buff/、各 Manager）、`PO/`（纯数据对象）
 - 资源：`Assets/Resources/` 下按类型分目录（Skins/ SkinsBig/ ItemPic/ SkillPic/ PlayerPic/ BGMs/ Anims/ Prefabs/ Maps/）
 - Editor 脚本：`Assets/Editor/`
+- 文档：`Design/Docs/`（所有项目 `.md` 文档统一存放，见「文档规范」）
 
 ## 编码规范
 
@@ -102,6 +103,14 @@ UI 图标统一走 `IconLoader` 组件（Inspector 配 sourceType：Path / HeroA
 - pid：玩家 ID（0 为人类玩家）
 - sname：技能缩写名（SkillConfig.Sname，同 Sname 不同 Lv 为同一技能）
 
+## 文档规范
+
+- 所有项目文档（设计方案、重构方案、统计/分析、TODO、使用说明等 `.md`）**统一放 `Design/Docs/`**，禁止散落到仓库根目录、`Assets/`、`Tools/` 或个人临时目录
+- 文件名直接用中文/英文描述内容，不要新建子目录分层；已完成的文档在文件名前加 `done ` 前缀（沿用现有约定）
+- 文档内引用源码用相对路径，`Design/Docs/` 下写作 `../../Assets/...`（可直接点击跳转）
+- 例外：仓库入口 `README.md` 保留在根目录；`.trae/skills/`、`.trae/rules/`、`.trae/specs/` 属于工具配置（技能定义/规则/spec），不是项目文档，不要移动
+- 历史遗留的 `.trae/documents/` 已废弃并清空，不要再往里写
+
 ## 禁止事项
 
 - 禁止 `UnityEngine.Random` 和散落的 `new System.Random()`，统一用 `SysRandom`
@@ -114,6 +123,7 @@ UI 图标统一走 `IconLoader` 组件（Inspector 配 sourceType：Path / HeroA
 - 新增配置类必须在 `ConfigManager.Init()` 中注册 Load
 - 禁止静默 null check return，必须记录日志
 - 禁止手工创建或修改 `.meta` 文件（含手动指定 guid / 手写 prefab 的 meta）：`.meta` 由 Unity 自动生成维护，新增资源只需落对应源文件，由 Unity 导入后自动生成 meta
+- 禁止在 `Design/Docs/` 之外新增项目 `.md` 文档（README 与 `.trae/` 工具配置除外）
 
 ## 错误处理
 

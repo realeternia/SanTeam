@@ -432,6 +432,15 @@ public class Chess : MonoBehaviour
             return;
         }
 
+        // 嘲讽：身上挂着嘲讽 Buff(BuffTaunt) 时强制把嘲讽者(BuffTaunt.caster)作为目标；
+        // 嘲讽者已阵亡/已离场则忽略该嘲讽，回落到常规索敌（Buff 由 Skill.TauntEnemies 施加）
+        var tauntBuff = GetBuff(CombatConst.TauntBuffId);
+        if (tauntBuff != null && tauntBuff.caster != null && tauntBuff.caster.hp > 0)
+        {
+            targetChess = tauntBuff.caster;
+            return;
+        }
+
         // 获取所有敌方单位：range传0表示全地图索敌（单位必须知道远处敌人的位置才能向其推进，近战单位射程近不能因此失去索敌能力）
         var allChess = WorldManager.Instance.GetEnemyInRange(transform.position, 0, side);
         List<(Chess chess, float distance)> validTargets = new List<(Chess, float)>();

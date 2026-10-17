@@ -62,21 +62,14 @@ public class GameManager : MonoBehaviour
     /// <summary>当前存档槽位（-1 表示尚未选择/新建）</summary>
     public int currentSaveSlot = -1;
 
-    // 调试阵容·开局Buff条目：Buff Id + 持续时长（秒，默认10）
-    [System.Serializable]
-    public class DebugBuffEntry
-    {
-        public int buffId;
-        public float time = 10f;
-    }
-
-    // 调试阵容条目：武将ID + 等级（星级，1~HeroSelectionTool.MaxHeroCardLevel）+ 开局自动挂载的Buff列表
+    // 调试阵容条目：武将ID + 等级（星级，1~HeroSelectionTool.MaxHeroCardLevel）+ 开局自动挂载的Buff（最多一个）
     [System.Serializable]
     public class DebugHeroEntry
     {
         public int heroId;
         public int level = 1;
-        public List<DebugBuffEntry> buffs = new List<DebugBuffEntry>();
+        public int buffId;            // 开局挂载的Buff Id（BuffConfig.Id，0=不挂）
+        public float buffTime = 10f;  // Buff持续时长（秒，默认10）
     }
 
     // 调试阵容：配置任一方武将后，进入游戏直接开战（跳过选牌/商店流程），列表留空则走正常对局流程。

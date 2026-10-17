@@ -120,7 +120,6 @@
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidRaidCamp.cs" />
     <Compile Include="Assets\Resources\Scripts\Configs\ConfigManager.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidExecute.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffSuckHaste.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillHitRepeat.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffVengefulStance.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidThrust.cs" />
@@ -175,7 +174,6 @@
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidDefStack.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillDeathGroupHeal.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\TooltipFriend.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffShieldGuard.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\MySelectControl.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffShield.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidEnduranceStrike.cs" />

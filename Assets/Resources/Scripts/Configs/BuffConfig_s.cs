@@ -151,7 +151,6 @@ namespace CommonConfig
             config[300006] = new BuffConfig(300006, "据守", "守", "获得临时双防，期间每次受击再叠一层双防，状态结束后临时双防消失", true, false, "BuffDefStack", "", "", "", "", "");
             config[300007] = new BuffConfig(300007, "急救", "愈", "每秒回复一定生命值", true, true, "BuffTimeHeal", "#00CC00", "#66FF66", "", "", "");
             config[300008] = new BuffConfig(300008, "攻击提升", "攻", "按数值提升自身攻击力", true, true, "BuffAtkAdd", "", "", "", "", "");
-            config[300009] = new BuffConfig(300009, "汲血快攻", "汲", "攻击时按造成伤害吸血，并提升攻速", true, true, "BuffSuckHaste", "#FF0000", "#993333", "HeartStream", "", "");
             config[300010] = new BuffConfig(300010, "御风疾驰", "翼", "提升攻速与移动速度", true, false, "BuffHasteMoveSpeed", "", "", "HeartStream", "", "");
             config[300011] = new BuffConfig(300011, "筑垒", "垒", "双防永久强化，死亡后3秒原地复活(仅一次)", true, false, "BuffBuildFort", "", "", "", "", "");
             config[300012] = new BuffConfig(300012, "乱阵", "威", "携带者普攻按概率眩晕目标，眩晕持续/bufftime秒", true, false, "BuffHitStun", "", "", "", "", "");
@@ -160,7 +159,7 @@ namespace CommonConfig
             config[300017] = new BuffConfig(300017, "倍击", "倍", "接下来数次攻击造成加倍伤害", true, false, "BuffNextAttacksMult", "", "", "", "", "");
             config[300019] = new BuffConfig(300019, "袭杀", "袭", "攻击增伤并吸血", true, false, "BuffLifeStealAndDamage", "", "", "", "", "");
             config[300022] = new BuffConfig(300022, "狂暴", "狂", "造成的伤害提升，但自身受到的伤害也提升", true, false, "BuffFrenzy", "#cc4300", "#FF8800", "", "", "");
-            config[300023] = new BuffConfig(300023, "嘲讽", "嘲", "成为敌对单位强制优先攻击的目标", true, true, "BuffTaunt", "#cc4300", "#664499", "", "", "");
+            config[300023] = new BuffConfig(300023, "嘲讽", "嘲", "成为敌对单位强制优先攻击的目标", false, true, "BuffTaunt", "#cc4300", "#664499", "", "", "");
             config[300024] = new BuffConfig(300024, "生命链接", "链", "与链接方共享伤害与回复", true, false, "BuffLifeLink", "", "", "", "", "");
             config[300025] = new BuffConfig(300025, "反伤", "反", "受到伤害时将其中一部分返还给攻击者", true, true, "BuffReflect", "", "", "", "", "");
             config[300027] = new BuffConfig(300027, "仁政", "仁", "提升生命回复/strength点/秒、法力回复/strength2点/秒", true, false, "BuffHpMpRegen", "#005500", "#66FF66", "", "", "");
@@ -170,7 +169,6 @@ namespace CommonConfig
             config[300031] = new BuffConfig(300031, "兼资", "兼", "攻击叠层：每层提升/strength攻击、/strength2法术强度，持续攻击刷新，停手后层数清零", true, true, "BuffStackBuf", "", "", "", "", "");
             config[300032] = new BuffConfig(300032, "护甲", "甲", "提升护甲", true, true, "BuffArmorAdd", "", "", "", "", "");
             config[300033] = new BuffConfig(300033, "威震", "震", "携带者普攻按概率眩晕目标，且普攻转为真实伤害，持续/bufftime秒", true, false, "BuffVengefulStance", "", "", "", "", "");
-            config[300034] = new BuffConfig(300034, "龙胆", "胆", "护盾期间攻击力提升/strengthbuff1-1点，普攻附带额外法术伤害", true, false, "BuffShieldGuard", "", "", "", "", "");
             config[301001] = new BuffConfig(301001, "眩晕", "乱", "眩晕，无法行动", false, true, "BuffNoAction", "", "", "StunnedCirclingStarsSimple", "", "");
             config[301002] = new BuffConfig(301002, "连锁", "锁", "被攻击时，向范围内同样带连锁的友军传递同比例伤害", false, true, "BuffLock", "", "", "StunnedLock", "", "");
             config[301003] = new BuffConfig(301003, "增伤", "伤", "受到的伤害按比例增加", false, true, "BuffDamagedAddRate", "", "", "StunnedDamageUp", "", "");

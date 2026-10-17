@@ -440,9 +440,10 @@ public class Skill
     }
 
     /// <summary>
-    /// 嘲讽（统一入口，供各嘲讽类技能复用）：把 pos 周围 area 半径内所有存活敌方单位的当前锁定目标强制改为 taunter，
-    /// 并重置其索敌计时(Chess.LockTarget)。嘲讽不再进入 FindTarget 打分，只在释放瞬间改一次目标朝向，
-    /// 之后由对方常规索敌接管(3秒)。area&lt;=0 表示全地图。返回被嘲讽的敌人数量。
+    /// 嘲讽（统一入口，供各嘲讽类技能复用）：给 pos 周围 area 半径内所有存活敌方单位挂上嘲讽 Buff(CombatConst.TauntBuffId)，
+    /// 时长取本技能配置的 BuffTime。嘲讽的索敌效果由 Chess.FindTarget 判断该 Buff 是否存在来决定——
+    /// 挂着嘲讽的单位会强制把嘲讽者(BuffTaunt.caster)作为目标，直到 Buff 到期/被驱散或嘲讽者阵亡。
+    /// 挂完 Buff 后立即重算一次索敌，保证释放瞬间目标就转向嘲讽者。area&lt;=0 表示全地图。返回被嘲讽的敌人数量。
     /// </summary>
     protected int TauntEnemies(Chess taunter, Vector3 pos, float area)
     {
@@ -455,7 +456,9 @@ public class Skill
         {
             if (e == null || e.hp <= 0)
                 continue;
-            e.LockTarget(taunter);
+            BuffManager.AddBuff(e, taunter, skillCfg.Id, CombatConst.TauntBuffId, skillCfg.BuffTime);
+            // 嘲讽改为 Buff 驱动后立即重算索敌，避免等到下一次常规索敌周期(最长3秒)才生效
+            e.FindTarget();
             count++;
         }
         return count;

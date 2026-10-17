@@ -33,8 +33,8 @@ public class WorldManager : MonoBehaviour
     private int pveFightCount = 1; // PVE仅玩家0参战（1号位打2号位怪物），AI不打怪
     private List<Tuple<GameObject, PlayerInfo, int>> bagDrops = new List<Tuple<GameObject, PlayerInfo, int>>(); // 怪物掉落包（BagDrop模型，获得玩家，首个掉落物id用于显示图标）
 
-    // 调试阵容·开局Buff：记录"调试单位 → 待挂载Buff列表"，在 BattleBegin 全部技能结算后统一施加（见 ApplyDebugBuffs）
-    private List<Tuple<Chess, List<GameManager.DebugBuffEntry>>> debugBuffTargets = new List<Tuple<Chess, List<GameManager.DebugBuffEntry>>>();
+    // 调试阵容·开局Buff：记录"调试单位 → 配置条目"，在 BattleBegin 全部技能结算后统一施加（见 ApplyDebugBuffs）
+    private List<Tuple<Chess, GameManager.DebugHeroEntry>> debugBuffTargets = new List<Tuple<Chess, GameManager.DebugHeroEntry>>();
    
     public HeroInfoGroup heroInfoGroup;
     public Button buttonRestart;
@@ -182,21 +182,17 @@ public class WorldManager : MonoBehaviour
         foreach (var target in debugBuffTargets)
         {
             var chess = target.Item1;
-            if (chess == null || chess.hp <= 0)
+            var hero = target.Item2;
+            if (chess == null || hero == null || chess.hp <= 0)
                 continue;
-            foreach (var buff in target.Item2)
+            if (!BuffConfig.HasConfig(hero.buffId))
             {
-                if (buff == null || buff.buffId <= 0)
-                    continue;
-                if (!BuffConfig.HasConfig(buff.buffId))
-                {
-                    GameLog.Error($"调试阵容：Buff配置不存在 id={buff.buffId}");
-                    continue;
-                }
-                float time = buff.time > 0f ? buff.time : CombatConst.DebugBuffDefaultTime;
-                GameLog.Info($"调试阵容：给 {chess.chessName}(id{chess.id}) 挂载Buff {buff.buffId}，时长{time}秒");
-                BuffManager.AddBuff(chess, chess, CombatConst.DebugBuffSkillId, buff.buffId, time);
+                GameLog.Error($"调试阵容：Buff配置不存在 id={hero.buffId}");
+                continue;
             }
+            float time = hero.buffTime > 0f ? hero.buffTime : CombatConst.DebugBuffDefaultTime;
+            GameLog.Info($"调试阵容：给 {chess.chessName}(id{chess.id}) 挂载Buff {hero.buffId}，时长{time}秒");
+            BuffManager.AddBuff(chess, chess, CombatConst.DebugBuffSkillId, hero.buffId, time);
         }
         debugBuffTargets.Clear();
     }
@@ -438,9 +434,9 @@ public class WorldManager : MonoBehaviour
     {
         int level = Mathf.Clamp(hero.level, 1, HeroSelectionTool.MaxHeroCardLevel);
         var chess = SpawnHerosForRegion(p, pos, GetFormationCellPos(center, pos), new System.Tuple<int, int>(hero.heroId, level), side);
-        // 调试开局Buff：先记录待挂载列表，等 BattleBegin 全部技能结算后再施加（见 ApplyDebugBuffs）
-        if (chess != null && hero.buffs != null && hero.buffs.Count > 0)
-            debugBuffTargets.Add(new Tuple<Chess, List<GameManager.DebugBuffEntry>>(chess, hero.buffs));
+        // 调试开局Buff：先记录待挂载条目，等 BattleBegin 全部技能结算后再施加（见 ApplyDebugBuffs）
+        if (chess != null && hero.buffId > 0)
+            debugBuffTargets.Add(new Tuple<Chess, GameManager.DebugHeroEntry>(chess, hero));
     }
 
     // 计算布阵图中第pos格(0~24)的世界坐标：row=pos/5 从上到下，col=pos%5 从左到右

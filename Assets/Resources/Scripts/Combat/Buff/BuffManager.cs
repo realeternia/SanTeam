@@ -97,7 +97,7 @@ public static class BuffManager
 
     /// <summary>
     /// 驱散正面 Buff：移除目标身上所有"正面(IsPositive=true) 且 可驱散(CanDispel=true)"的 Buff，返回实际驱散数量。
-    /// 英雄招牌类不可驱散 Buff（CanDispel=false，如据守/筑垒/龙胆/狂暴等）会被保留。
+    /// 英雄招牌类不可驱散 Buff（CanDispel=false，如据守/筑垒/威震/狂暴等）会被保留。
     /// </summary>
     public static int DispelPositive(Chess chess)
     {
