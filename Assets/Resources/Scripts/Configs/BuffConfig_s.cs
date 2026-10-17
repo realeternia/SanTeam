@@ -148,14 +148,14 @@ namespace CommonConfig
             config[300003] = new BuffConfig(300003, "吸血", "吸", "攻击时按造成伤害的一定比例回复生命", true, true, "BuffSuck", "#FF0000", "#993333", "", "", "");
             config[300004] = new BuffConfig(300004, "伤害提升", "重", "造成的伤害按比例提升", true, true, "BuffFrenzy", "", "", "", "", "");
             config[300005] = new BuffConfig(300005, "攻速提升", "快", "攻击速度按比例提升", true, true, "BuffCoolDown", "", "", "HeartStream", "", "");
-            config[300007] = new BuffConfig(300007, "急救", "愈", "每秒回复一定生命值", true, true, "BuffTimeHeal", "#00CC00", "#66FF66", "", "", "");
+            config[300007] = new BuffConfig(300007, "急救", "愈", "每秒回复一定生命值", true, true, "BuffTimeHeal", "", "", "MagicBuffGreen", "", "");
             config[300008] = new BuffConfig(300008, "攻击提升", "攻", "按数值提升自身攻击力", true, true, "BuffAtkAdd", "", "", "", "", "");
             config[300009] = new BuffConfig(300009, "移速提升", "速", "按百分比提升移动速度", true, true, "BuffMoveSpeedAdd", "", "", "", "", "");
             config[300012] = new BuffConfig(300012, "护甲", "甲", "提升护甲", true, true, "BuffArmorAdd", "", "", "SparkleAreaWhite", "", "");
             config[300013] = new BuffConfig(300013, "魔抗提升", "抗", "提升自身魔抗", true, true, "BuffMagicResAdd", "", "", "SparkleAreaWhite", "", "");
-            config[300014] = new BuffConfig(300014, "生命回复", "血", "提升每秒生命回复", true, true, "BuffHpRegenAdd", "", "", "", "", "");
+            config[300014] = new BuffConfig(300014, "生命回复", "血", "提升每秒生命回复", true, true, "BuffHpRegenAdd", "", "", "MagicBuffGreen", "", "");
             config[300015] = new BuffConfig(300015, "闪避", "闪", "提升闪避几率", true, true, "BuffEvasion", "", "", "StunnedCirclingShadowSimple", "", "");
-            config[300018] = new BuffConfig(300018, "法力回复", "蓝", "提升每秒法力回复", true, true, "BuffMpRegenAdd", "", "", "", "", "");
+            config[300018] = new BuffConfig(300018, "法力回复", "蓝", "提升每秒法力回复", true, true, "BuffMpRegenAdd", "", "", "MagicBuffBlue", "", "");
             config[300025] = new BuffConfig(300025, "反伤", "反", "受到伤害时将其中一部分返还给攻击者", true, true, "BuffReflect", "", "", "", "", "");
             config[300101] = new BuffConfig(300101, "据守", "守", "获得临时双防，期间每次受击再叠一层双防，状态结束后临时双防消失", true, false, "BuffDefStack", "", "", "", "", "");
             config[300102] = new BuffConfig(300102, "复活", "复", "死亡后3秒原地复活(仅一次)", true, false, "BuffRevive", "", "", "", "", "");
@@ -175,10 +175,10 @@ namespace CommonConfig
             config[301007] = new BuffConfig(301007, "减疗", "疫", "降低目标受到的治疗效果", false, true, "BuffHealDown", "", "", "", "", "");
             config[301008] = new BuffConfig(301008, "减速", "缓", "降低目标移动与攻速", false, true, "BuffSlowDown", "#000099", "#3366FF", "", "BuffFrozen", "");
             config[301009] = new BuffConfig(301009, "减防", "破", "降低目标护甲", false, true, "BuffArmorDown", "", "", "", "", "");
-            config[301101] = new BuffConfig(301101, "嘲讽", "嘲", "成为敌对单位强制优先攻击的目标", false, true, "BuffTaunt", "#cc4300", "#664499", "", "", "");
+            config[301010] = new BuffConfig(301010, "嘲讽", "嘲", "成为敌对单位强制优先攻击的目标", false, true, "BuffTaunt", "#cc4300", "#664499", "", "", "");
+            config[301011] = new BuffConfig(301011, "叛逃", "叛", "不受控制，向初始位置后退，移动速度减半", false, true, "BuffDefect", "", "", "AuraSoftPurple", "", "");
+            config[301012] = new BuffConfig(301012, "混乱", "惑", "不受控制，攻击最近的友方单位", false, true, "BuffChaos", "", "", "StunnedCirclingStarsSimple", "", "");
             config[301102] = new BuffConfig(301102, "连锁", "锁", "被攻击时，向范围内同样带连锁的友军传递同比例伤害", false, true, "BuffLock", "", "", "StunnedLock", "", "");
-            config[301103] = new BuffConfig(301103, "叛逃", "叛", "不受控制，向初始位置后退，移动速度减半", false, true, "BuffDefect", "", "", "AuraSoftPurple", "", "");
-            config[301104] = new BuffConfig(301104, "混乱", "惑", "不受控制，攻击最近的友方单位", false, true, "BuffChaos", "", "", "StunnedCirclingStarsSimple", "", "");
 
             RebuildIndex();
 

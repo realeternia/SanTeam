@@ -1,10 +1,8 @@
-using System;
 using CommonConfig;
-using UnityEngine;
 
 /// <summary>
-/// 温良（温良恭俭）：每 CD(6秒) 为自己套一个 Strength2[0] × (100+法强)/100 的护盾（随法强成长）。
-/// 护盾持续到被击破（BuffTime=999），CD 到自动补满。套盾写法同「护」。
+/// 温良（温良恭俭）：每 CD(8秒) 为自己提升 StrengthBuff1[0] 点护甲，持续到 Buff 结束（BuffTime=999），CD 到自动续上。
+/// 护甲施加/移除由 BuffArmorAdd 统一处理（短名「甲」）；重复施放只刷新持续时间，不叠加数值。
 /// </summary>
 public class SkillAidSelfShield : Skill
 {
@@ -16,7 +14,9 @@ public class SkillAidSelfShield : Skill
     {
         if (!CheckBurst(null))
             return false;
-        if (string.IsNullOrEmpty(skillCfg.BuffId))
+
+        var buffIds = GetSkillBuffIds();
+        if (buffIds.Count < 1)
         {
             GameLog.Error($"温良 武将{owner.heroId} BuffId未配置");
             return false;
@@ -24,13 +24,8 @@ public class SkillAidSelfShield : Skill
 
         owner.PlayerAnim(skillCfg.Action);
 
-        var shieldId = BuffConfig.GetConfigByNameS(skillCfg.BuffId).Id;
-        BuffManager.AddBuff(owner, owner, id, shieldId, skillCfg.BuffTime);
-        var shield = owner.GetBuff(shieldId) as BuffShield;
-        var shieldHp = GetSkillShield(0);
-        if (shield != null)
-            shield.SetHp(shieldHp);
-        GameLog.Debug($"温良 武将{owner.heroId} 套盾{shieldHp}");
+        BuffManager.AddBuff(owner, owner, id, buffIds[0], skillCfg.BuffTime);
+        GameLog.Debug($"温良 武将{owner.heroId} 提升护甲 技能id={id} 等级={Level}");
 
         PlaySelfEffect();
         return true;

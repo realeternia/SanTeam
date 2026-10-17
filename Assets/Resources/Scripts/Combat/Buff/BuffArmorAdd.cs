@@ -26,4 +26,18 @@ public class BuffArmorAdd : Buff
         chess.armor -= diff;
         base.OnRemove(chess);
     }
+
+    /// <summary>
+    /// 动态设置本 Buff 提供的护甲值（如刘禅·安乐把溢出治疗量转为护甲）：先扣回旧值再加新值，Buff 结束仍按最终值扣回。
+    /// </summary>
+    public void SetArmor(int value)
+    {
+        if (owner == null)
+        {
+            GameLog.Warn("BuffArmorAdd.SetArmor 携带者为空，跳过设置");
+            return;
+        }
+        owner.armor += value - diff;
+        diff = value;
+    }
 }

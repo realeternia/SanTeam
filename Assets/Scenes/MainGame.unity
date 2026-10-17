@@ -2687,12 +2687,12 @@ MonoBehaviour:
   debugHeroesSide1:
   - heroId: 103012
     level: 1
-    buffId: 301006
+    buffId: 300014
     buffTime: 10
   debugHeroesSide2:
   - heroId: 103016
     level: 1
-    buffId: 0
+    buffId: 300018
     buffTime: 10
   debugFullMp: 1
 --- !u!114 &1788356929

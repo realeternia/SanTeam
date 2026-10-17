@@ -1,12 +1,11 @@
 using System.Collections.Generic;
 using CommonConfig;
-using UnityEngine;
 
 /// <summary>
-/// 忠勇·自+友军护盾（ScriptName = "SkillAidSelfAndLowHp")：
-/// 辅助技能，给自己施加一个吸收盾（容量=Strength2[0]×(100+法强)/100，随法强成长），
-/// 同时给附近(Area内)生命比例最低的一名友方英雄也施加一个吸收盾。
-/// 若附近无友方英雄则只给自己加盾。通过 Skill.CheckAidSkill 由 SkillManager 循环施放。
+/// 忠勇·自+友军护甲（ScriptName = "SkillAidSelfAndLowHp"）：
+/// 辅助技能，给自己提升 StrengthBuff1[0] 点护甲，
+/// 同时给附近(Area内)生命比例最低的一名友方英雄也提升等量护甲。
+/// 若附近无友方英雄则只给自己加甲。通过 Skill.CheckBurst 由 SkillManager 循环施放。
 /// 用于周仓：挨打时本能举盾，顺带护住身旁同袍。
 /// </summary>
 public class SkillAidSelfAndLowHp : Skill
@@ -20,16 +19,18 @@ public class SkillAidSelfAndLowHp : Skill
         if (!CheckBurst(null))
             return false;
 
-        var shieldId = BuffConfig.GetConfigByNameS(skillCfg.BuffId).Id;
-        var shieldHp = GetSkillShield(0);
+        var buffIds = GetSkillBuffIds();
+        if (buffIds.Count < 1)
+        {
+            GameLog.Error($"忠勇 武将{owner.heroId} BuffId未配置");
+            return false;
+        }
+        var armorBuffId = buffIds[0];
 
         owner.PlayerAnim(skillCfg.Action);
 
-        // 给自己加盾
-        BuffManager.AddBuff(owner, owner, id, shieldId, skillCfg.BuffTime);
-        var selfShield = owner.GetBuff(shieldId) as BuffShield;
-        if (selfShield != null)
-            selfShield.SetHp(shieldHp);
+        // 给自己加甲
+        BuffManager.AddBuff(owner, owner, id, armorBuffId, skillCfg.BuffTime);
 
         // 找附近生命比例最低的友军
         var units = WorldManager.Instance.GetMySideInRange(owner.transform.position, skillCfg.Area, owner.side)
@@ -51,16 +52,12 @@ public class SkillAidSelfAndLowHp : Skill
 
         if (target != null)
         {
-            BuffManager.AddBuff(target, owner, id, shieldId, skillCfg.BuffTime);
-            var allyShield = target.GetBuff(shieldId) as BuffShield;
-            if (allyShield != null)
-                allyShield.SetHp(shieldHp);
-
+            BuffManager.AddBuff(target, owner, id, armorBuffId, skillCfg.BuffTime);
             EffectManager.PlaySkillEffect(target, skillCfg.HitEffect);
         }
 
         PlaySelfEffect();
-        GameLog.Debug($"忠勇护盾 技能id={id} 等级={Level} 自护盾={shieldHp} 友军={target?.heroId}");
+        GameLog.Debug($"忠勇护甲 技能id={id} 等级={Level} 友军={target?.heroId}");
         return true;
     }
 }

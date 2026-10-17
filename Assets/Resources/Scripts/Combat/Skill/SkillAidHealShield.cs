@@ -4,7 +4,7 @@ using UnityEngine;
 /// <summary>
 /// 安乐（ScriptName = "SkillAidHealShield"）：辅助技能，治疗范围内生命比例最低的友方英雄（含自身），
 /// 治疗量走独立治疗公式 GetSkillHeal()（不套用伤害公式）；治疗量超过目标生命缺口时，
-/// 溢出的部分转化为等量吸收盾（BuffId="盾"），护盾持续 BuffTime 秒。
+/// 溢出的部分转化为等量护甲（BuffId="甲"），护甲持续 BuffTime 秒。
 /// 附近友军全部满血时不施放（省一次 CD）。由 SkillManager.CheckAidSkill 自动循环施放。
 /// 用于刘禅：没本事，但总有人护着、替人挡灾。
 /// </summary>
@@ -43,23 +43,32 @@ public class SkillAidHealShield : Skill
 
         // 治疗：独立治疗公式（Strength2 × ap 加成），不套用伤害公式
         var heal = GetSkillHeal();
-        // 溢出：治疗量超出目标生命缺口的差额，转为护盾容量（按技能基础治疗量估算）
+        // 溢出：治疗量超出目标生命缺口的差额，转为护甲值（按技能基础治疗量估算）
         var overflow = Mathf.Max(0, heal - (target.maxHp - target.hp));
         if (heal > 0)
             owner.HealTarget(target, skillId, heal, true);
 
-        // 有溢出才附盾：容量 = 溢出治疗量
+        // 有溢出才加护甲：数值 = 溢出治疗量
         if (overflow > 0)
         {
-            var shieldBuffId = BuffConfig.GetConfigByNameS(skillCfg.BuffId).Id;
-            BuffManager.AddBuff(target, owner, id, shieldBuffId, skillCfg.BuffTime);
-            var shield = target.GetBuff(shieldBuffId) as BuffShield;
-            if (shield != null)
-                shield.SetHp(overflow);
+            var buffIds = GetSkillBuffIds();
+            if (buffIds.Count < 1)
+            {
+                GameLog.Error($"安乐 武将{owner.heroId} BuffId未配置");
+            }
+            else
+            {
+                BuffManager.AddBuff(target, owner, id, buffIds[0], skillCfg.BuffTime);
+                var armorBuff = target.GetBuff(buffIds[0]) as BuffArmorAdd;
+                if (armorBuff != null)
+                    armorBuff.SetArmor(overflow);
+                else
+                    GameLog.Error($"安乐 需要护甲Buff(甲)，当前 BuffId={skillCfg.BuffId} 技能id={id}");
+            }
         }
 
         EffectManager.PlaySkillEffect(target, skillCfg.HitEffect);
-        GameLog.Debug($"安乐 技能id={id} 等级={Level} 治疗={heal} 溢出护盾={overflow} 目标={target.heroId}");
+        GameLog.Debug($"安乐 技能id={id} 等级={Level} 治疗={heal} 溢出护甲={overflow} 目标={target.heroId}");
         return true;
     }
 }
