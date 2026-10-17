@@ -7,7 +7,7 @@ public static class CombatConst
     /// <summary>护盾(BuffShield)</summary>
     public const int ShieldBuffId = 300001;
     /// <summary>嘲讽(BuffTaunt，负面效果)：被挂者强制把嘲讽者(BuffTaunt.caster)作为索敌目标，索敌判定见 Chess.FindTarget</summary>
-    public const int TauntBuffId = 300023;
+    public const int TauntBuffId = 301101;
 
     // ---- 伤害标签(SkillConfig.HurtTag) ----
     /// <summary>AntiShield：绕过护盾直接打血（破盾类技能，BuffShield 判定该标签不吸收）</summary>

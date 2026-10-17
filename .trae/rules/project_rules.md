@@ -61,6 +61,10 @@ Unity (C#) | JsonUtility | UGUI | TextMeshPro
 ### Buff 系统
 
 - 基类 `Buff`（`Combat/Buff/Buff.cs`），派生类 `BuffXxx` 放 `Combat/Buff/`，由 `BuffManager` 统一管理
+- **BuffId 号段**：`300xxx` 正面通用、`3001xx` 正面特化、`301xxx` 负面通用、`3011xx` 负面特化
+  - 通用 = 可复用、语义单一（加攻/加防/加速/护盾/回复/减攻/减速等）；特化 = 专属机制/需要独立脚本状态（复活、据守、嘲讽、混乱等）
+  - 新增 Buff 先判断正负面与是否特化，再在对应段内顺延取号；短名（`NameS`）不变，改动 Id 时需同步 `CombatConst` 与代码注释
+- 复杂 Buff 优先拆成多个通用 Buff 组合（`SkillConfig.BuffId` 用 `,` 分隔多段），各段按组合位置读取 `StrengthBuff1`（如 `快,速`=[攻速,移速]、`攻,甲,抗`=[攻击,护甲,魔抗]）
 
 ### 连锁/羁绊机制
 

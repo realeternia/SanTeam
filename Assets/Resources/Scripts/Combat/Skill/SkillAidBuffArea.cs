@@ -5,7 +5,7 @@ using UnityEngine;
 
 /// <summary>
 /// 群体增益：给范围内最多 TargetCount 名未带此 buff 的友军附加 skillCfg.BuffId 对应的正面 buff。
-/// 用于大乔·国色（群体攻击力提升，buff=攻）。通过 Skill.CheckAidSkill 自动循环施放。
+/// 支持多段组合（如奇才 "攻,甲,抗"），去重判断只看第一段。通过 Skill.CheckAidSkill 自动循环施放。
 /// </summary>
 public class SkillAidBuffArea : Skill
 {
@@ -18,9 +18,15 @@ public class SkillAidBuffArea : Skill
         if (!CheckBurst(null))
             return false;
 
-        var buffId = BuffConfig.GetConfigByNameS(skillCfg.BuffId).Id;
+        var buffIds = GetSkillBuffIds();
+        if (buffIds.Count == 0)
+        {
+            GameLog.Error($"SkillAidBuffArea: 未配置Buff短名 技能id={id}");
+            return false;
+        }
+
         var units = WorldManager.Instance.GetMySideInRange(owner.transform.position, skillCfg.Area, owner.side)
-            .FindAll(x => x.IsInFight() && !x.HasBuff(buffId));
+            .FindAll(x => x.IsInFight() && !x.HasBuff(buffIds[0]));
 
         if (units.Count == 0)
             return false;
@@ -33,7 +39,8 @@ public class SkillAidBuffArea : Skill
 
         foreach (var unit in units)
         {
-            BuffManager.AddBuff(unit, owner, id, buffId, skillCfg.BuffTime);
+            foreach (var buffId in buffIds)
+                BuffManager.AddBuff(unit, owner, id, buffId, skillCfg.BuffTime);
             EffectManager.PlaySkillEffect(unit, skillCfg.HitEffect);
         }
         return true;

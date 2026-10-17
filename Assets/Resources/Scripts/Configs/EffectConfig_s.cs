@@ -164,12 +164,13 @@ namespace CommonConfig
             config[10140] = new EffectConfig(10140, "FlashExplosionBlue", "蓝色星爆", "伤害", "目标", "Effect/FlashExplosionBlue", "Missile/FlashExplosionBlue", 5f, 1f, 5f, 1f, "");
             config[10150] = new EffectConfig(10150, "LaserMeshMissileBlue", "蓝色星爆", "伤害", "目标", "Effect/FlashExplosionBlue", "Missile/LaserMeshMissileBlue", 5f, 1f, 5f, 1f, "");
             config[11000] = new EffectConfig(11000, "AuraSoftPurple", "紫色缓冲特效", "增益", "范围", "Effect/AuraSoftPurple", "", 3f, 1f, 8f, 1f, "");
-            config[11010] = new EffectConfig(11010, "BloodExplosion", "鲜血爆裂特效", "伤害", "目标", "Effect/BloodExplosion", "", 5f, 1f, 8f, 1f, "");
+            config[11010] = new EffectConfig(11010, "BloodExplosion", "鲜血爆裂特效", "伤害", "目标", "Effect/BloodExplosion", "", 3f, 1f, 8f, 1f, "");
             config[11020] = new EffectConfig(11020, "HeartStream", "爱心流光特效", "增益", "目标", "Effect/HeartStream", "", 8f, 1f, 8f, 1f, "");
             config[11030] = new EffectConfig(11030, "LightningExplosionRed", "红色闪电爆裂特效", "伤害", "目标", "Effect/LightningExplosionBlue", "", 3f, 1f, 5f, 1f, "#FF1C00");
             config[11040] = new EffectConfig(11040, "MagicBuffGreen", "绿色增益特效", "增益", "目标", "Effect/MagicBuffGreen", "", 10f, 1f, 8f, 1f, "");
             config[11050] = new EffectConfig(11050, "MagicFieldGreen", "绿色法阵特效", "增益", "范围", "Effect/MagicFieldGreen", "", 8f, 1f, 8f, 1f, "");
             config[11060] = new EffectConfig(11060, "ShieldSoftBlue", "蓝色护盾特效", "增益", "目标", "Effect/ShieldSoftBlue", "", 3f, 1f, 8f, 1f, "");
+            config[11061] = new EffectConfig(11061, "ShieldSoftYellow", "黄色护盾特效", "增益", "目标", "Effect/ShieldSoftBlue", "", 3f, 1f, 8f, 1f, "#FFBB09");
             config[11070] = new EffectConfig(11070, "SlowAuraYellow", "黄色迟缓光环特效", "负面", "范围", "Effect/SlowAuraYellow", "", 3f, 2f, 8f, 1f, "");
             config[11080] = new EffectConfig(11080, "SoftFireBigRed", "红色大火特效", "伤害", "目标", "Effect/SoftFireBigRed", "", 10f, 1f, 8f, 1f, "");
             config[11090] = new EffectConfig(11090, "MagicChargeBlue", "蓝色蓄力特效", "增益", "目标", "Effect/MagicChargeBlue", "", 3f, 1f, 8f, 1f, "");

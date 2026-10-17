@@ -50,10 +50,10 @@ public class Chess : MonoBehaviour
     // 本伤害事件中受护盾吸收的伤害量（>0 表示部分/全部被盾抵挡，供战斗模拟器区分"盾降低"与"实际受伤")
     public int lastShieldAbsorb;
     // ---- 相职业武将专属标记 ----
-    /// <summary>张昭·筑垒：被筑垒士兵是否已武装（死亡可原地复活；由 BuffBuildFort 维护）</summary>
-    public bool buildFortArmed;
-    /// <summary>张昭·筑垒：该士兵筑垒复活是否已使用（至多一次）</summary>
-    public bool buildFortRevived;
+    /// <summary>是否已武装"复活"（张昭·筑垒：死亡可原地复活一次；由 BuffRevive 维护）</summary>
+    public bool reviveArmed;
+    /// <summary>复活是否已使用（每名单位至多一次）</summary>
+    public bool reviveUsed;
     /// <summary>荀彧·兵精：该士兵是否已被大祝福（每人整场合仅一次）</summary>
     public bool blessedByXunYu;
     // 伤害结算事件：attacker, victim, damage, skillId(0=普攻)。供战斗模拟器精确捕获每次伤害（飘字/日志），避免逐帧血量差分漏记
@@ -892,10 +892,10 @@ public class Chess : MonoBehaviour
         // 显式打断持续施法(引导)：死亡时随 GameObject 销毁协程自停，此处清理引导状态并输出日志
         BreakCasting();
 
-        // 张昭·筑垒：被筑垒的士兵死亡后，延迟原地复活（满血，筑垒双防随 buffs.Clear 移除），每名士兵至多一次
-        if (!isHero && buildFortArmed && !buildFortRevived)
+        // 复活（张昭·筑垒施加的 BuffRevive）：被标记的士兵死亡后延迟原地复活（满血），每名士兵至多一次
+        if (!isHero && reviveArmed && !reviveUsed)
         {
-            buildFortRevived = true;
+            reviveUsed = true;
             var pid = playerId;
             var sId = soldierId;
             var pos = transform.position;
@@ -959,19 +959,19 @@ public class Chess : MonoBehaviour
         }
     }
 
-    // 筑垒复活协程：延迟 BuffBuildFort.ReviveDelay 后在原地满血重建士兵（骑在 WorldManager 上，不受筑垒者存活影响）
+    // 复活协程：延迟 BuffRevive.ReviveDelay 后在原地满血重建士兵（挂在 WorldManager 上，不受施加者存活影响）
     private System.Collections.IEnumerator ReviveSoldierCoroutine(int pid, int soldierIdOf, UnityEngine.Vector3 pos, int sd, string imgPath)
     {
-        yield return new WaitForSeconds(BuffBuildFort.ReviveDelay);
+        yield return new WaitForSeconds(BuffRevive.ReviveDelay);
 
         var player = (pid >= 0 && pid < GameManager.Instance.players.Length) ? GameManager.Instance.GetPlayer(pid) : null;
         if (player == null)
         {
-            GameLog.Warn("筑垒复活失败：找不到所属玩家 pid=" + pid + "，士兵 soldierId=" + soldierIdOf);
+            GameLog.Warn("复活失败：找不到所属玩家 pid=" + pid + "，士兵 soldierId=" + soldierIdOf);
             yield break;
         }
         WorldManager.Instance.SpawnUnitsForRegion(player, soldierIdOf, -1, pos, sd, imgPath);
-        GameLog.Info("筑垒复活：士兵 soldierId=" + soldierIdOf + " 原地复活满血(双防加持已移除)");
+        GameLog.Info("复活：士兵 soldierId=" + soldierIdOf + " 原地复活满血");
     }
 
 

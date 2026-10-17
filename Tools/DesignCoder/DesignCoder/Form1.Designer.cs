@@ -25,6 +25,7 @@ namespace DesignCoder
             this.btnSave = new System.Windows.Forms.ToolStripButton();
             this.btnNewRow = new System.Windows.Forms.ToolStripButton();
             this.btnDeleteRow = new System.Windows.Forms.ToolStripButton();
+            this.btnCopyRow = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.btnBatchFill = new System.Windows.Forms.ToolStripButton();
             this.btnMultiply = new System.Windows.Forms.ToolStripButton();
@@ -80,6 +81,7 @@ namespace DesignCoder
             this.btnSave,
             this.btnNewRow,
             this.btnDeleteRow,
+            this.btnCopyRow,
             this.toolStripSeparator2,
             this.btnBatchFill,
             this.btnMultiply,
@@ -144,6 +146,17 @@ namespace DesignCoder
             this.btnDeleteRow.Size = new System.Drawing.Size(76, 31);
             this.btnDeleteRow.Text = "删除行";
             this.btnDeleteRow.Click += new System.EventHandler(this.btnDeleteRow_Click);
+            // 
+            // btnCopyRow
+            // 
+            this.btnCopyRow.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.btnCopyRow.Font = new System.Drawing.Font("微软雅黑", 10F);
+            this.btnCopyRow.ForeColor = System.Drawing.Color.White;
+            this.btnCopyRow.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.btnCopyRow.Name = "btnCopyRow";
+            this.btnCopyRow.Size = new System.Drawing.Size(76, 31);
+            this.btnCopyRow.Text = "复制行";
+            this.btnCopyRow.Click += new System.EventHandler(this.btnCopyRow_Click);
             // 
             // toolStripSeparator2
             // 
@@ -490,6 +503,7 @@ namespace DesignCoder
         private System.Windows.Forms.ToolStripButton btnSave;
         private System.Windows.Forms.ToolStripButton btnNewRow;
         private System.Windows.Forms.ToolStripButton btnDeleteRow;
+        private System.Windows.Forms.ToolStripButton btnCopyRow;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
         private System.Windows.Forms.ToolStripButton btnBatchFill;
         private System.Windows.Forms.ToolStripButton btnMultiply;

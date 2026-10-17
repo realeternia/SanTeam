@@ -3,8 +3,8 @@ using CommonConfig;
 using UnityEngine;
 
 /// <summary>
-/// 华雄·狂暴：给自身挂双刃"狂"（造成的伤害提升，但受到伤害也提升），
-/// 增伤/受击加深分槽由 BuffFrenzy 读取 StrengthBuff1[0]/[1]
+/// 华雄·狂暴：给自身挂"重,伤"两个通用 Buff ——
+/// 重（BuffFrenzy）读 StrengthBuff1[0] 提升造成伤害，伤（BuffDamagedAddRate）读 StrengthBuff1[1] 加深受到伤害。
 /// </summary>
 public class SkillAidBerserk : Skill
 {
@@ -17,11 +17,17 @@ public class SkillAidBerserk : Skill
         if (!CheckBurst(null))
             return false;
 
-        var frenzyId = BuffConfig.GetConfigByNameS(skillCfg.BuffId).Id;
-        BuffManager.AddBuff(owner, owner, id, frenzyId, skillCfg.BuffTime);
+        var buffIds = GetSkillBuffIds();
+        if (buffIds.Count == 0)
+        {
+            GameLog.Error($"SkillAidBerserk: 未配置Buff短名 技能id={id}");
+            return false;
+        }
 
         owner.PlayerAnim(skillCfg.Action);
         PlaySelfEffect();
+        foreach (var buffId in buffIds)
+            BuffManager.AddBuff(owner, owner, id, buffId, skillCfg.BuffTime);
         return true;
     }
 }

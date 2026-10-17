@@ -5,6 +5,7 @@ using UnityEngine;
 
 /// <summary>
 /// 鼓舞（小乔）：辅助技能，给范围内最多 TargetCount 名友军附加攻速+移速组合 buff。
+/// BuffId 支持多段（"快,速"）：快（BuffCoolDown）读 StrengthBuff1[0] 提升攻速，速（BuffMoveSpeedAdd）读 [1] 提升移速。
 /// 通过 Skill.CheckAidSkill 由 SkillManager 自动循环施放。
 /// </summary>
 public class SkillAidBuffHasteMoveSpeed : Skill
@@ -18,9 +19,15 @@ public class SkillAidBuffHasteMoveSpeed : Skill
         if (!CheckBurst(null))
             return false;
 
-        var buffId = BuffConfig.GetConfigByNameS(skillCfg.BuffId).Id;
+        var buffIds = GetSkillBuffIds();
+        if (buffIds.Count == 0)
+        {
+            GameLog.Error($"SkillAidBuffHasteMoveSpeed: 未配置Buff短名 技能id={id}");
+            return false;
+        }
+
         var units = WorldManager.Instance.GetMySideInRange(owner.transform.position, skillCfg.Area, owner.side)
-            .FindAll(x => x.IsInFight() && !x.HasBuff(buffId));
+            .FindAll(x => x.IsInFight() && !x.HasBuff(buffIds[0]));
 
         if (units.Count == 0)
             return false;
@@ -32,7 +39,8 @@ public class SkillAidBuffHasteMoveSpeed : Skill
 
         foreach (var unit in units)
         {
-            BuffManager.AddBuff(unit, owner, id, buffId, skillCfg.BuffTime);
+            foreach (var buffId in buffIds)
+                BuffManager.AddBuff(unit, owner, id, buffId, skillCfg.BuffTime);
             EffectManager.PlaySkillEffect(unit, skillCfg.HitEffect);
         }
         return true;

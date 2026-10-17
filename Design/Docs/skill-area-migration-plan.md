@@ -37,7 +37,7 @@ Grep 复核结论：全工程 `GetMySideInRange / GetEnemyInRange / GetUnitsInRa
 1. **配置表安全性复核**：确认 `SkillConfig_s.cs` 无正则误改到非目标行、无语法/多重 BOM 破坏（可编译或至少人工抽查改动行 Id 集合）。
 2. **异常项说明（汇报用，不需改代码）**：
    - `AidSwapStrike / HelpAidBuff / HitAround / AttackReboundArrow` 仅类文件与 `SkillManager` 有 case，配置表无对应数据行 → 配置侧无需迁移。
-   - `BuffMultiShot`（多重箭）未找到施加该 Buff 的 SkillConfig 行（`BuffConfig` 300016 NameS="箭"，无 Skill 行 `BuffId="箭"`），其 `skillCfg.Area` 来源未解析。
+   - `BuffMultiShot`（多重箭）未找到施加该 Buff 的 SkillConfig 行（`BuffConfig` 300104 NameS="箭"，无 Skill 行 `BuffId="箭"`），其 `skillCfg.Area` 来源未解析。
    - `AidRangeHeal/AidJumpHeal/HitBuffArea` 等 `Area` 本已非 0 的行：其"第一步查询"改读 `Area` 会带来轻微半径变化（规则"Area 已非 0 不动"）。
 3. **编译验证**：在 Unity/VS 侧编译确认无报错。
 

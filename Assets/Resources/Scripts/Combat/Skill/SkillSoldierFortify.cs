@@ -3,10 +3,9 @@ using CommonConfig;
 using UnityEngine;
 
 /// <summary>
-/// 张昭·筑垒：每次主动释放对1名士兵（优先生命比例最低者）永久强化双防
-/// (护甲=StrengthBuff1[0]、魔抗=StrengthBuff1[1]，BuffBuildFort)并回复满血；
-/// 场上无士兵时改为强化自身，保证技能不空放。
-/// 该单位死亡后 BuffBuildFort.ReviveDelay(3)秒原地复活(满血，筑垒双防随死亡移除，每个单位至多一次)。
+/// 张昭·筑垒：每次主动释放对1名士兵（优先生命比例最低者）回复满血，并施加"复活"Buff（BuffRevive），
+/// 该单位死亡后 BuffRevive.ReviveDelay(3)秒原地复活(满血，每个单位至多一次)；场上无士兵时改为治疗自身，保证技能不空放。
+/// Buff 由 SkillConfig.BuffId 指定（短名"复"），不在战斗代码硬编码 BuffId。
 /// </summary>
 public class SkillSoldierFortify : Skill
 {
@@ -22,20 +21,20 @@ public class SkillSoldierFortify : Skill
         PlaySelfEffect();
 
         var soldiers = WorldManager.Instance.GetUnitsMySide(owner.side).Where(x => !x.isHero).ToList();
-        // 优先对生命比例最低的士兵筑垒；无士兵时强化自身
+        // 优先对生命比例最低的士兵施加复活；无士兵时改为治疗自身
         var target = soldiers.Count > 0 ? soldiers.OrderBy(x => x.HpRate).First() : owner;
 
         if (target.hp < target.maxHp)
             owner.HealTarget(target, skillId, target.maxHp - target.hp, false);
 
-        // 筑垒 Buff 由 SkillConfig.BuffId 指定（短名"垒"→BuffBuildFort），不在战斗代码硬编码 BuffId
-        var fortCfg = BuffConfig.GetConfigByNameS(skillCfg.BuffId);
-        if (fortCfg == null)
+        // 复活 Buff 由 SkillConfig.BuffId 指定（短名"复"→BuffRevive），不在战斗代码硬编码 BuffId
+        var reviveCfg = BuffConfig.GetConfigByNameS(skillCfg.BuffId);
+        if (reviveCfg == null)
         {
-            GameLog.Error($"SkillSoldierFortify: 未找到筑垒Buff短名：{skillCfg.BuffId} 技能id={id}");
+            GameLog.Error($"SkillSoldierFortify: 未找到复活Buff短名：{skillCfg.BuffId} 技能id={id}");
             return false;
         }
-        BuffManager.AddBuff(target, owner, id, fortCfg.Id, 999f);
+        BuffManager.AddBuff(target, owner, id, reviveCfg.Id, 999f);
         EffectManager.PlaySkillEffect(target, skillCfg.HitEffect);
         return true;
     }

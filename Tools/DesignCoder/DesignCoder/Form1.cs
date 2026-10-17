@@ -548,6 +548,95 @@ namespace DesignCoder
             MarkCurrentConfigModified();
         }
 
+        // 复制当前整行选中（或当前单元格所在行）的数据，弹框输入新 Id 后按 Id 升序插入到对应位置
+        private void btnCopyRow_Click(object sender, EventArgs e)
+        {
+            if (currentConfig == null || dataTable == null) return;
+
+            dataGridView1.EndEdit();
+
+            int srcRowIdx = selectedRowIndex;
+            if (srcRowIdx < HeaderRowCount || srcRowIdx >= dataGridView1.Rows.Count || dataGridView1.Rows[srcRowIdx].IsNewRow)
+                srcRowIdx = dataGridView1.CurrentCell != null ? dataGridView1.CurrentCell.RowIndex : -1;
+
+            if (srcRowIdx < HeaderRowCount || srcRowIdx >= dataTable.Rows.Count ||
+                (dataTable.Rows[srcRowIdx]["_RowTag_"] as string) != "Data")
+            {
+                MessageBox.Show("请先选中要复制的行（点击 Id 列可整行选中）", "提示", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            if (!dataGridView1.Columns.Contains("Id"))
+            {
+                MessageBox.Show("当前配置没有 Id 列，无法复制行", "提示", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            DataRow srcRow = dataTable.Rows[srcRowIdx];
+            string srcId = srcRow["Id"] != DBNull.Value ? srcRow["Id"].ToString().Trim() : "";
+
+            string input = ShowInputDialog("复制行", "请输入新行的 Id：", srcId);
+            if (input == null) return;
+            input = input.Trim();
+
+            int newId;
+            if (!int.TryParse(input, out newId))
+            {
+                MessageBox.Show("Id 必须是整数", "输入错误", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            // 校验 Id 是否已存在（config 以 Id 为键，重复会互相覆盖）
+            foreach (DataRow dr in dataTable.Rows)
+            {
+                if ((dr["_RowTag_"] as string) != "Data") continue;
+                int existId;
+                if (int.TryParse(dr["Id"] != DBNull.Value ? dr["Id"].ToString().Trim() : "", out existId) && existId == newId)
+                {
+                    MessageBox.Show(string.Format("Id {0} 已存在", newId), "提示", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+            }
+
+            DataRow newRow = dataTable.NewRow();
+            newRow["_RowTag_"] = "Data";
+            foreach (var field in currentConfig.Fields)
+            {
+                newRow[field.Name] = srcRow[field.Name];
+            }
+            newRow["Id"] = input;
+
+            // 找到第一个 Id 大于新 Id 的数据行，插到它前面；没有则追加到末尾
+            int insertIdx = dataTable.Rows.Count;
+            for (int i = HeaderRowCount; i < dataTable.Rows.Count; i++)
+            {
+                DataRow dr = dataTable.Rows[i];
+                if ((dr["_RowTag_"] as string) != "Data") continue;
+
+                int existId;
+                if (int.TryParse(dr["Id"] != DBNull.Value ? dr["Id"].ToString().Trim() : "", out existId) && existId > newId)
+                {
+                    insertIdx = i;
+                    break;
+                }
+            }
+
+            dataTable.Rows.InsertAt(newRow, insertIdx);
+
+            // 插入后同步平移单元格配色记录，避免后续行的颜色错位
+            int insertedDataIdx = insertIdx - HeaderRowCount;
+            foreach (var cm in currentConfig.CellMetas)
+            {
+                if (cm.Row >= insertedDataIdx) cm.Row++;
+            }
+
+            selectedRowIndex = insertIdx;
+            SyncDataTableToConfig();
+            MarkCurrentConfigModified();
+            dataGridView1.Invalidate();
+            GotoCell(insertIdx, dataGridView1.Columns["Id"].Index);
+        }
+
         private void btnBatchFill_Click(object sender, EventArgs e)
         {
             if (dataGridView1 == null || dataGridView1.SelectedCells.Count == 0)
@@ -843,7 +932,7 @@ namespace DesignCoder
             dataGridView1.Focus();
         }
 
-        private string ShowInputDialog(string title, string prompt)
+        private string ShowInputDialog(string title, string prompt, string defaultValue = null)
         {
             Form inputForm = new Form();
             inputForm.Text = title;
@@ -862,6 +951,11 @@ namespace DesignCoder
             TextBox txt = new TextBox();
             txt.Location = new Point(10, 35);
             txt.Size = new Size(260, 22);
+            if (!string.IsNullOrEmpty(defaultValue))
+            {
+                txt.Text = defaultValue;
+                txt.SelectAll();
+            }
             inputForm.Controls.Add(txt);
 
             Button btnOk = new Button();

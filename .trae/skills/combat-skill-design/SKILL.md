@@ -53,9 +53,10 @@ description: 编写《三国卡牌》(金铲铲式)战斗技能与数值配置�
 
 ## 七、Buff 引用与命名
 
-- `SkillConfig` 的 `BuffId` 为 `string` 类型，存 `BuffConfig` 的 `NameS` 短名（空字符串表示无 buff）。
+- `SkillConfig` 的 `BuffId` 为 `string` 类型，存 `BuffConfig` 的 `NameS` 短名（空字符串表示无 buff）；多段用 `,`/`，`/`;`/`；` 分隔，各段按组合位置取 `StrengthBuff1` 槽位。
+- **BuffId 号段**：`300xxx` 正面通用、`3001xx` 正面特化、`301xxx` 负面通用、`3011xx` 负面特化。通用=可复用、语义单一（攻/甲/速/盾/回复等）；特化=专属机制或需要独立脚本状态（复活/据守/嘲讽/混乱等）。新增 Buff 按正负面与特化程度在对应段顺延取号。
 - 技能/Buff 常量归 `CombatConst`；不变的通用技能 Sname（如强击等）命名尽量见名知意。
-  - 例外：某技能**专属**的机制数值/短名（如复活延迟、某项效果 Buff 的短名）就近放对应 Skill/Buff 文件（`public const`），勿堆进 CombatConst；跨文件共享用"主技能类名.常量"引用（如 `SkillSoldierStun.StunBuffNameS`、`BuffBuildFort.ReviveDelay`）。
+  - 例外：某技能**专属**的机制数值/短名（如复活延迟、某项效果 Buff 的短名）就近放对应 Skill/Buff 文件（`public const`），勿堆进 CombatConst；跨文件共享用"主技能类名.常量"引用（如 `SkillSoldierStun.StunBuffNameS`、`BuffRevive.ReviveDelay`）。
 
 ## 八、落地后核对清单
 

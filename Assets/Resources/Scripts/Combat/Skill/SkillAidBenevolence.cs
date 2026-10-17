@@ -4,7 +4,8 @@ using CommonConfig;
 using UnityEngine;
 
 /// <summary>
-/// 刘备·仁德：使我方范围内全体英雄附加"仁政"Buff（提升 hpRegen/mpRegen 回复速度），不设人数上限。
+/// 刘备·仁德：使我方范围内全体英雄附加由多个通用 Buff 组成的组合（SkillConfig.BuffId = "血,蓝"），不设人数上限——
+/// 血（BuffHpRegenAdd）读 StrengthBuff1[0] 提升生命回复，蓝（BuffMpRegenAdd）读 [1] 提升法力回复。
 /// </summary>
 public class SkillAidBenevolence : Skill
 {
@@ -17,15 +18,15 @@ public class SkillAidBenevolence : Skill
         if (!CheckBurst(null))
             return false;
 
-        var buffCfg = BuffConfig.GetConfigByNameS(skillCfg.BuffId);
-        if (buffCfg == null)
+        var buffIds = GetSkillBuffIds();
+        if (buffIds.Count == 0)
         {
-            GameLog.Error("SkillAidBenevolence: 未找到仁政Buff短名：" + skillCfg.BuffId);
+            GameLog.Error($"SkillAidBenevolence: 未配置Buff短名 技能id={id}");
             return false;
         }
 
         var allies = WorldManager.Instance.GetMySideInRange(owner.transform.position, skillCfg.Area, owner.side)
-            .FindAll(x => x.isHero && x.IsInFight() && !x.HasBuff(buffCfg.Id));
+            .FindAll(x => x.isHero && x.IsInFight() && !x.HasBuff(buffIds[0]));
 
         if (allies.Count == 0)
             return false;
@@ -35,7 +36,8 @@ public class SkillAidBenevolence : Skill
 
         foreach (var u in allies)
         {
-            BuffManager.AddBuff(u, owner, id, buffCfg.Id, skillCfg.BuffTime);
+            foreach (var buffId in buffIds)
+                BuffManager.AddBuff(u, owner, id, buffId, skillCfg.BuffTime);
             EffectManager.PlaySkillEffect(u, skillCfg.HitEffect);
         }
         GameLog.Info("仁德：" + GetHeroName(owner) + " 使我方 " + allies.Count + " 名英雄提升生命与法力回复");

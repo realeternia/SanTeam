@@ -72,7 +72,7 @@
 
 ### 3.4 Buff：仁政（刘备·仁德）
 
-技能 Id 2021021 ~ 2021025，`SkillAidBenevolence` 给我方范围内全体挂 Buff「仁」，由 `BuffHpMpRegen` 每秒加减：
+技能 Id 2021021 ~ 2021025，`SkillAidBenevolence` 给我方范围内全体挂 Buff「血,蓝」，分别由 `BuffHpRegenAdd` / `BuffMpRegenAdd` 每秒加减：
 
 | Lv | mpRegen | 生命回复 | 持续 | CD | MpCost |
 |---|---|---|---|---|---|
@@ -125,5 +125,5 @@
 | 英雄 ±% 修正 | `Configs/HeroConfig_s.cs` `MpRegen` + `ConfigManager.PostModify` |
 | 装备叠加 | `Combat/Chess.cs` `InitAttr`（装备循环 `mpRegen += equipAttr.MpRegen`） |
 | 羁绊施加 | `Combat/JobLinkManager.cs`（`case "mpRegen"`） |
-| 仁政 Buff | `Combat/Skill/SkillAidBenevolence.cs` + `Combat/Buff/BuffHpMpRegen.cs` |
+| 仁德 Buff | `Combat/Skill/SkillAidBenevolence.cs` + `Combat/Buff/BuffHpRegenAdd.cs` / `BuffMpRegenAdd.cs` |
 | 攻击回蓝 | `Combat/Skill/SkillAttackMpGain.cs` |
