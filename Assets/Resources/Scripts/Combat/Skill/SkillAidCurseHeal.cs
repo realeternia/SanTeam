@@ -2,7 +2,7 @@ using CommonConfig;
 using UnityEngine;
 
 /// <summary>
-/// 妖咒（ScriptName = "AidCurseHeal")：辅助技能，直接治疗 Area 内生命比例最低的友方英雄（走独立治疗公式 GetSkillHeal），
+/// 妖咒（ScriptName = "SkillAidCurseHeal")：辅助技能，直接治疗 Area 内生命比例最低的友方英雄（走独立治疗公式 GetSkillHeal），
 /// 并给 Area 内最多 TargetCount 名敌人挂"败"（溃败·每秒法术伤害，由 BuffTimeDamage 按 DamageStrength 结算），持续 BuffTime 秒。
 /// 友军均满血且范围内无敌人时不施放。
 /// 用于于吉：妖道符水，以敌之血养己之众。

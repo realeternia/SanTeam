@@ -2,7 +2,7 @@ using CommonConfig;
 using UnityEngine;
 
 /// <summary>
-/// 张任·毒箭（ScriptName = "BowZhangRen"）：
+/// 张任·毒箭（ScriptName = "SkillAidPoisonArrow"）：
 /// 高额毒伤（基础技能伤害 × Strength2[1]）并附加持续中毒Buff（"败"，其每秒dot读自身 skillCfg.DamageStrength）。
 /// </summary>
 public class SkillAidPoisonArrow : Skill

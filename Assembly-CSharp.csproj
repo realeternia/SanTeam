@@ -80,7 +80,6 @@
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffNoMove.cs" />
     <Compile Include="Assets\Resources\Scripts\Test\EffectTestInit.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidDance.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillHitAround.cs" />
     <Compile Include="Assets\Resources\Scripts\Shop\ShopMode.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillModifyShootSpeed.cs" />
     <Compile Include="Assets\Resources\Scripts\Configs\JobConfig_s.cs" />
@@ -113,7 +112,6 @@
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillSoldierFortify.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidUnbreakable.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\TooltipItem.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillCastingAidJudgement.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillCastingAidLastStrategy.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillHitWall.cs" />
     <Compile Include="Assets\Resources\Scripts\PlayerInfo.cs" />
@@ -130,7 +128,6 @@
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillFactionShield.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffNextAttacksMult.cs" />
     <Compile Include="Assets\SineVFX\TopDownEffects\Scripts\SineUIControllerTopDownEffects.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAttackReboundArrow.cs" />
     <Compile Include="Assets\SineVFX\TopDownEffects\Scripts\RampGeneratorTDE.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffCoolDown.cs" />
     <Compile Include="Assets\Epic Toon FX\Scripts\ETFXRotation.cs" />
@@ -151,7 +148,6 @@
     <Compile Include="Assets\Resources\Scripts\Combat\EffectManager.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidDoubleShot.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffNoAction.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAttackedBuff.cs" />
     <Compile Include="Assets\Resources\Scripts\Configs\HeroFriendConfig_s.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\TooltipHeroSkill.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidDualLaser.cs" />
@@ -183,7 +179,6 @@
     <Compile Include="Assets\Resources\Scripts\UIs\MySelectControl.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffShield.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidEnduranceStrike.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillHelpAidBuff.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidLastingFocus.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\RankPlayerCellInfo.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidPoisonArrow.cs" />
@@ -260,16 +255,13 @@
     <Compile Include="Assets\Resources\Scripts\Configs\PlayerLevelConfig_s.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillLowHpFullHealShield.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAttackSpeedAttack.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidMeteorHammer.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidChargeImpale.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillInitDecayDef.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidBashShield.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidImperialGuard.cs" />
     <Compile Include="Assets\Resources\Scripts\Configs\ItemCombineConfig_s.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidSwapStrike.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffHealDown.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidArmorIgnore.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidBuffHasteSteal.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffDefect.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidBloodyWar.cs" />
     <Compile Include="Assets\Epic Toon FX\Scripts\ETFXLightFade.cs" />
@@ -296,7 +288,6 @@
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillInitAddItemChance.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidRangeHeal.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillInitAttrChange.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidLethalGambit.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillInitEnemyRandomBuff.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidSelfShield.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidCraftBuff.cs" />
@@ -305,7 +296,6 @@
     <Compile Include="Assets\DOTween\Modules\DOTweenModuleEPOOutline.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffMultiAttr.cs" />
     <Compile Include="Assets\Resources\Scripts\Tools\BGMPlayer.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAttackedShadow.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidBuffHasteMoveSpeed.cs" />
     <Compile Include="Assets\Resources\Scripts\Effect\GlowBeamController.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffDefStack.cs" />

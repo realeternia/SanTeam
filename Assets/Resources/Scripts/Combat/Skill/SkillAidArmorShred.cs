@@ -2,7 +2,7 @@ using CommonConfig;
 using UnityEngine;
 
 /// <summary>
-/// 夏侯渊·猎鹰（ScriptName = "BowXiaHouYuan"）：
+/// 夏侯渊·猎鹰（ScriptName = "SkillAidArmorShred"）：
 /// 单体大额伤害，并给目标施加减防Buff（"破"），减防数值由 BuffArmorDown 读 skillCfg.StrengthBuff1[0]。
 /// </summary>
 public class SkillAidArmorShred : Skill

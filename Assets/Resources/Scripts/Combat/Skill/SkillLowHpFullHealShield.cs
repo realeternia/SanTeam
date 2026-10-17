@@ -1,7 +1,7 @@
 using CommonConfig;
 
 /// <summary>
-/// 偷渡阴平·残血急救+护盾（ScriptName = "LowHpFullHealShield"）：
+/// 偷渡阴平·残血急救+护盾（ScriptName = "SkillLowHpFullHealShield"）：
 /// 当生命低于30%(TriggerCondition=hprate<30)且受到攻击时触发：
 /// 1. 给自己施加快速回血buff，每秒回复 HealStrength×(100+法强)/100 点生命（统一走 Skill.GetSkillHeal），持续 BuffTime 秒
 /// 2. 给自己施加一个吸收盾，容量=Strength2[0]×(100+法强)/100（随法强成长）

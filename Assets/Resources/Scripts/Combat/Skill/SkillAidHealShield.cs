@@ -2,7 +2,7 @@ using CommonConfig;
 using UnityEngine;
 
 /// <summary>
-/// 安乐（ScriptName = "AidHealShield"）：辅助技能，治疗范围内生命比例最低的友方英雄（含自身），
+/// 安乐（ScriptName = "SkillAidHealShield"）：辅助技能，治疗范围内生命比例最低的友方英雄（含自身），
 /// 治疗量走独立治疗公式 GetSkillHeal()（不套用伤害公式）；治疗量超过目标生命缺口时，
 /// 溢出的部分转化为等量吸收盾（BuffId="盾"），护盾持续 BuffTime 秒。
 /// 附近友军全部满血时不施放（省一次 CD）。由 SkillManager.CheckAidSkill 自动循环施放。

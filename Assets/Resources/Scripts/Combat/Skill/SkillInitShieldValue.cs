@@ -1,7 +1,7 @@
 using CommonConfig;
 
 /// <summary>
-/// 疑城·开场减伤盾（ScriptName = "InitShieldValue"）：
+/// 疑城·开场减伤盾（ScriptName = "SkillInitShieldValue"）：
 /// 战斗开始时给自己施加减伤盾（BuffId="硬"=BuffShieldValue 300002），
 /// 持续 BuffTime 秒，减伤比例 = 技能 StrengthBuff1[1]（如 0.3 = 减免30%伤害）。
 /// 用于徐盛：开场15秒百分比减伤盾。

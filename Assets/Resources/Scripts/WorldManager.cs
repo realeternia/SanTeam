@@ -32,6 +32,9 @@ public class WorldManager : MonoBehaviour
     private List<System.Tuple<int, int>> pveMonsterSpawns = null; // PVE怪物布阵（怪物id, 布阵格0~24：0=左上，24=右下）
     private int pveFightCount = 1; // PVE仅玩家0参战（1号位打2号位怪物），AI不打怪
     private List<Tuple<GameObject, PlayerInfo, int>> bagDrops = new List<Tuple<GameObject, PlayerInfo, int>>(); // 怪物掉落包（BagDrop模型，获得玩家，首个掉落物id用于显示图标）
+
+    // 调试阵容·开局Buff：记录"调试单位 → 待挂载Buff列表"，在 BattleBegin 全部技能结算后统一施加（见 ApplyDebugBuffs）
+    private List<Tuple<Chess, List<GameManager.DebugBuffEntry>>> debugBuffTargets = new List<Tuple<Chess, List<GameManager.DebugBuffEntry>>>();
    
     public HeroInfoGroup heroInfoGroup;
     public Button buttonRestart;
@@ -152,7 +155,50 @@ public class WorldManager : MonoBehaviour
             SkillManager.BattleBegin(chess);
         GameLog.Debug("[BattleInit] skills done");
 
+        // 调试阵容·开局Buff：等技能结算完毕后统一挂载（时长从开战时刻起算）
+        ApplyDebugBuffs();
+
         StartCoroutine(GameUpdate());
+    }
+
+    // 调试阵容·开局Buff：给窗口里配了Buff的调试武将按条目挂载Buff（时长取条目配置，默认10秒）。
+    // Buff 的效果数值统一读 SkillConfig，这里用零值调试配置行（CombatConst.DebugBuffSkillId），
+    // 只用于验证Buff的挂载/表现/时长，不产生数值影响。
+    private void ApplyDebugBuffs()
+    {
+        if (debugBuffTargets.Count == 0)
+            return;
+
+        // 零值调试技能配置行：Strength2/StrengthBuff1 各留2个槽，避免 Buff 脚本按下标取"效果数值"时越界
+        SkillConfig.Assign(CombatConst.DebugBuffSkillId, new SkillConfig
+        {
+            Id = CombatConst.DebugBuffSkillId,
+            Name = "调试Buff",
+            Sname = "调试Buff",
+            Strength2 = new float[] { 0f, 0f },
+            StrengthBuff1 = new float[] { 0f, 0f },
+        });
+
+        foreach (var target in debugBuffTargets)
+        {
+            var chess = target.Item1;
+            if (chess == null || chess.hp <= 0)
+                continue;
+            foreach (var buff in target.Item2)
+            {
+                if (buff == null || buff.buffId <= 0)
+                    continue;
+                if (!BuffConfig.HasConfig(buff.buffId))
+                {
+                    GameLog.Error($"调试阵容：Buff配置不存在 id={buff.buffId}");
+                    continue;
+                }
+                float time = buff.time > 0f ? buff.time : CombatConst.DebugBuffDefaultTime;
+                GameLog.Info($"调试阵容：给 {chess.chessName}(id{chess.id}) 挂载Buff {buff.buffId}，时长{time}秒");
+                BuffManager.AddBuff(chess, chess, CombatConst.DebugBuffSkillId, buff.buffId, time);
+            }
+        }
+        debugBuffTargets.Clear();
     }
 
     public void BattleEnd()
@@ -265,6 +311,8 @@ public class WorldManager : MonoBehaviour
             }
         }
 
+        // 本场调试开局Buff目标清空重收（仅调试阵容分支会重新填充，见 SpawnDebugHeroUnit）
+        debugBuffTargets.Clear();
         if (!GameManager.Instance.HasDebugLineup())
         {
             // 非调试阵容：关闭调试用的满MP开关，避免上一次调试开局的静态值残留影响正常对局
@@ -389,7 +437,10 @@ public class WorldManager : MonoBehaviour
     private void SpawnDebugHeroUnit(PlayerInfo p, Transform center, int pos, GameManager.DebugHeroEntry hero, int side)
     {
         int level = Mathf.Clamp(hero.level, 1, HeroSelectionTool.MaxHeroCardLevel);
-        SpawnHerosForRegion(p, pos, GetFormationCellPos(center, pos), new System.Tuple<int, int>(hero.heroId, level), side);
+        var chess = SpawnHerosForRegion(p, pos, GetFormationCellPos(center, pos), new System.Tuple<int, int>(hero.heroId, level), side);
+        // 调试开局Buff：先记录待挂载列表，等 BattleBegin 全部技能结算后再施加（见 ApplyDebugBuffs）
+        if (chess != null && hero.buffs != null && hero.buffs.Count > 0)
+            debugBuffTargets.Add(new Tuple<Chess, List<GameManager.DebugBuffEntry>>(chess, hero.buffs));
     }
 
     // 计算布阵图中第pos格(0~24)的世界坐标：row=pos/5 从上到下，col=pos%5 从左到右

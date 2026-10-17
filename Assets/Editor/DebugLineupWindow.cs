@@ -13,6 +13,7 @@ using UnityEngine.SceneManagement;
 /// 两方留空则走正常对局流程。点「开始战斗」会先保存场景再进入 Play。
 /// 武将按各自配置的品质标记（阵营色块 + 品质色块 + 品质文本），下拉菜单按阵营分组、组内按品质倒排。
 /// 武将按近战/远程分前后排摆入中间英雄格（近战顶排=前排、远程底排=后排），等级取各自配置值(1~5级)。
+/// 每名武将可另配多个开局Buff（BuffConfig 全表下拉 + 时长，默认10秒），进战斗后自动挂载。
 /// 「随机阵容」可一键为两侧各生成 3 近战 + 3 远程，共 12 名互不重复的 1 级武将。
 /// </summary>
 public class DebugLineupWindow : EditorWindow
@@ -39,7 +40,14 @@ public class DebugLineupWindow : EditorWindow
         public int Quality;
     }
 
+    private class BuffItem
+    {
+        public int Id;
+        public string Label;
+    }
+
     private static List<HeroItem> heroes;
+    private static List<BuffItem> buffs;
 
     private GUIStyle titleStyle;
     private GUIStyle hintStyle;
@@ -47,6 +55,7 @@ public class DebugLineupWindow : EditorWindow
 
     private GameManager gm;
     private SerializedObject so;
+    private Vector2 scrollPos;
 
     [MenuItem(MenuPath)]
     private static void Open()
@@ -143,6 +152,49 @@ public class DebugLineupWindow : EditorWindow
         return heroes;
     }
 
+    // Buff 下拉数据源（BuffConfig 全表，按 Id 升序）
+    private static List<BuffItem> GetBuffs()
+    {
+        ConfigManager.Init();
+
+        if (buffs != null)
+            return buffs;
+
+        buffs = new List<BuffItem>();
+        foreach (var cfg in BuffConfig.ConfigList)
+        {
+            if (cfg == null || cfg.Id <= 0) continue;
+            buffs.Add(new BuffItem
+            {
+                Id = cfg.Id,
+                Label = string.Format("{0}（{1}）", cfg.Name, cfg.Id)
+            });
+        }
+        buffs.Sort((a, b) => a.Id.CompareTo(b.Id));
+        return buffs;
+    }
+
+    private static string BuffLabel(int buffId)
+    {
+        foreach (var b in GetBuffs())
+            if (b.Id == buffId)
+                return b.Label;
+        return buffId > 0 ? ("未知Buff（" + buffId + "）") : "（未选择Buff）";
+    }
+
+    // 弹出 Buff 选择菜单（按 Id 升序平铺）
+    private static void ShowBuffMenu(System.Action<int> onPick)
+    {
+        var menu = new GenericMenu();
+        menu.AddItem(new GUIContent("（未选择Buff）"), false, () => onPick(0));
+        foreach (var b in GetBuffs())
+        {
+            int id = b.Id;
+            menu.AddItem(new GUIContent(b.Label), false, () => onPick(id));
+        }
+        menu.ShowAsContext();
+    }
+
     private void OnGUI()
     {
         InitStyles();
@@ -166,17 +218,19 @@ public class DebugLineupWindow : EditorWindow
         }
 
         so.Update();
+        scrollPos = EditorGUILayout.BeginScrollView(scrollPos);
         DrawHeroList("左侧（1号位）", PropSide1, Side1Accent);
         GUILayout.Space(4);
         DrawHeroList("右侧（2号位）", PropSide2, Side2Accent);
         GUILayout.Space(4);
         DrawOptions();
         so.ApplyModifiedProperties();
+        EditorGUILayout.EndScrollView();
 
         DrawLineupWarning();
 
         GUILayout.Space(4);
-        GUILayout.Label("任一方填入武将即视为调试开局；两方留空则走正常对局流程。武将按各自设置的等级(1~5级)生成，按顺序摆入布阵格。配置写入当前场景，点「开始战斗」时自动保存场景。", hintStyle);
+        GUILayout.Label("任一方填入武将即视为调试开局；两方留空则走正常对局流程。武将按各自设置的等级(1~5级)生成，按顺序摆入布阵格。每名武将可配多个开局Buff，进战斗后自动挂载（时长默认10秒）。配置写入当前场景，点「开始战斗」时自动保存场景。", hintStyle);
 
         GUILayout.Space(6);
         GUILayout.BeginHorizontal();
@@ -251,6 +305,7 @@ public class DebugLineupWindow : EditorWindow
             SerializedProperty elem = listProp.GetArrayElementAtIndex(i);
             SerializedProperty heroProp = elem.FindPropertyRelative("heroId");
             SerializedProperty lvProp = elem.FindPropertyRelative("level");
+            SerializedProperty buffsProp = elem.FindPropertyRelative("buffs");
             EditorGUILayout.BeginHorizontal();
             DrawSideSwatch(heroProp.intValue);
             DrawQualitySwatch(heroProp.intValue);
@@ -279,6 +334,9 @@ public class DebugLineupWindow : EditorWindow
                 break;
             }
             EditorGUILayout.EndHorizontal();
+
+            // 该武将的开局Buff列表
+            DrawBuffRows(buffsProp, propName, i);
         }
 
         if (GUILayout.Button("＋ 添加英雄", GUILayout.Height(20)))
@@ -295,12 +353,77 @@ public class DebugLineupWindow : EditorWindow
                 var elem = p.GetArrayElementAtIndex(n);
                 elem.FindPropertyRelative("heroId").intValue = id;
                 elem.FindPropertyRelative("level").intValue = 1;
+                // 插入的元素会复制上一个元素（含其Buff列表），这里清空避免带上别人的配置
+                elem.FindPropertyRelative("buffs").ClearArray();
                 so.ApplyModifiedProperties();
                 MarkSceneDirty();
             });
         }
 
         EditorGUILayout.EndVertical();
+    }
+
+    // 单个武将的开局Buff列表：每行 = Buff 下拉 + 时长(秒，默认10)
+    private void DrawBuffRows(SerializedProperty buffsProp, string heroPropName, int heroIndex)
+    {
+        if (buffsProp == null)
+            return;
+
+        for (int b = 0; b < buffsProp.arraySize; b++)
+        {
+            SerializedProperty buffProp = buffsProp.GetArrayElementAtIndex(b);
+            SerializedProperty idProp = buffProp.FindPropertyRelative("buffId");
+            SerializedProperty timeProp = buffProp.FindPropertyRelative("time");
+
+            EditorGUILayout.BeginHorizontal();
+            GUILayout.Space(14);
+            GUILayout.Label("Buff", GUILayout.Width(30));
+            if (GUILayout.Button(BuffLabel(idProp.intValue), EditorStyles.popup))
+            {
+                int buffIndex = b;
+                ShowBuffMenu(id =>
+                {
+                    if (so == null)
+                        return;
+                    var hp = so.FindProperty(heroPropName);
+                    if (hp == null || heroIndex >= hp.arraySize)
+                        return;
+                    var bp = hp.GetArrayElementAtIndex(heroIndex).FindPropertyRelative("buffs");
+                    if (bp == null || buffIndex >= bp.arraySize)
+                        return;
+                    bp.GetArrayElementAtIndex(buffIndex).FindPropertyRelative("buffId").intValue = id;
+                    so.ApplyModifiedProperties();
+                    MarkSceneDirty();
+                });
+            }
+            GUILayout.Label("时长", GUILayout.Width(30));
+            timeProp.floatValue = EditorGUILayout.FloatField(timeProp.floatValue, GUILayout.Width(56));
+            GUILayout.Label("秒", GUILayout.Width(16));
+            if (GUILayout.Button("×", GUILayout.Width(22)))
+            {
+                EditorGUILayout.EndHorizontal();
+                RemoveElement(buffsProp, b);
+                so.ApplyModifiedProperties();
+                MarkSceneDirty();
+                break;
+            }
+            EditorGUILayout.EndHorizontal();
+        }
+
+        EditorGUILayout.BeginHorizontal();
+        GUILayout.Space(14);
+        if (GUILayout.Button("＋ 添加Buff", GUILayout.Height(18)))
+        {
+            int n = buffsProp.arraySize;
+            buffsProp.InsertArrayElementAtIndex(n);
+            var elem = buffsProp.GetArrayElementAtIndex(n);
+            elem.FindPropertyRelative("buffId").intValue = 0;
+            elem.FindPropertyRelative("time").floatValue = CombatConst.DebugBuffDefaultTime;
+            so.ApplyModifiedProperties();
+            MarkSceneDirty();
+        }
+        GUILayout.Space(14);
+        EditorGUILayout.EndHorizontal();
     }
 
     // 阵营色块（颜色统一取自 SysColor）
@@ -427,7 +550,7 @@ public class DebugLineupWindow : EditorWindow
         GameLog.Info("调试阵容：已生成随机阵容（甲 6 名 / 乙 6 名，各 3 前排 3 后排）");
     }
 
-    // 用指定英雄覆盖某一侧的调试列表，等级统一 1 级
+    // 用指定英雄覆盖某一侧的调试列表，等级统一 1 级（新插入元素会复制上一个元素，Buff列表清空）
     private static void FillSide(SerializedProperty listProp, List<HeroItem> picks)
     {
         if (listProp == null)
@@ -439,6 +562,7 @@ public class DebugLineupWindow : EditorWindow
             var elem = listProp.GetArrayElementAtIndex(i);
             elem.FindPropertyRelative("heroId").intValue = picks[i].Id;
             elem.FindPropertyRelative("level").intValue = 1;
+            elem.FindPropertyRelative("buffs").ClearArray();
         }
     }
 

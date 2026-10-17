@@ -2,7 +2,7 @@ using CommonConfig;
 using UnityEngine;
 
 /// <summary>
-/// 太史慈·连珠（ScriptName = "BowTaiShiCi"）：
+/// 太史慈·连珠（ScriptName = "SkillAidBurstShot"）：
 /// 朝前方多发箭矢，距离越近伤害越高。
 /// 每目标近度 near = max(0, 1 - dist/Range)，伤害 = 基础技能伤害 × (1 + Strength2[0] × near)。
 /// </summary>

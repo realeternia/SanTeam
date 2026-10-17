@@ -4,7 +4,7 @@ using CommonConfig;
 using UnityEngine;
 
 /// <summary>
-/// 妖疗（ScriptName = "AidJumpHeal"）：辅助技能，医疗波式跳跃治疗（参考魔兽争霸3 暗影猎手/巫医的连锁治疗）。
+/// 妖疗（ScriptName = "SkillAidJumpHeal"）：辅助技能，医疗波式跳跃治疗（参考魔兽争霸3 暗影猎手/巫医的连锁治疗）。
 /// 首跳选中 Area 内生命比例最低的友方英雄，随后每跳在 Area 内寻找最近的、尚未被治疗的友方英雄继续跳跃，
 /// 共 TargetCount 跳；每跳治疗量按 JumpHealDecay 递减。治疗量走独立治疗公式 GetSkillHeal()。
 /// 用于张宝：地公将军的太平妖术，符水在军中接力相传。

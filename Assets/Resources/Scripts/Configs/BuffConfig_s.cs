@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -49,7 +49,7 @@ namespace CommonConfig
             {"ScriptName", new FieldMetaInfo("脚本名", "string", 171)},
             {"ColorStart", new FieldMetaInfo("启动色", "string", 0)},
             {"ColorEnd", new FieldMetaInfo("结束色", "string", 0)},
-            {"BuffEffect", new FieldMetaInfo("hit", "string", 149)},
+            {"BuffEffect", new FieldMetaInfo("hit", "string", 172)},
             {"Material", new FieldMetaInfo("切材质", "string", 0)},
             {"Icon", new FieldMetaInfo("图标", "string", 0)},
         };
@@ -146,7 +146,7 @@ namespace CommonConfig
             config[300001] = new BuffConfig(300001, "护盾", "盾", "吸收受到的伤害，护盾值耗尽后消失", true, false, "BuffShield", "", "", "ShieldSoftBlue", "", "");
             config[300002] = new BuffConfig(300002, "减伤盾", "硬", "受到攻击时按固定比例减免伤害", true, true, "BuffShieldValue", "#B25900", "#FFD24D", "", "", "");
             config[300003] = new BuffConfig(300003, "吸血", "吸", "攻击时按造成伤害的一定比例回复生命", true, true, "BuffSuck", "#FF0000", "#993333", "", "", "");
-            config[300004] = new BuffConfig(300004, "伤害提升", "重", "造成的伤害按比例提升", true, true, "BuffFrenzy", "", "", "SparkleAreaWhite", "", "");
+            config[300004] = new BuffConfig(300004, "伤害提升", "重", "造成的伤害按比例提升", true, true, "BuffFrenzy", "", "", "", "", "");
             config[300005] = new BuffConfig(300005, "攻速提升", "快", "攻击速度按比例提升", true, true, "BuffCoolDown", "", "", "HeartStream", "", "");
             config[300006] = new BuffConfig(300006, "据守", "守", "获得临时双防，期间每次受击再叠一层双防，状态结束后临时双防消失", true, false, "BuffDefStack", "", "", "", "", "");
             config[300007] = new BuffConfig(300007, "急救", "愈", "每秒回复一定生命值", true, true, "BuffTimeHeal", "#00CC00", "#66FF66", "", "", "");

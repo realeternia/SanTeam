@@ -2,7 +2,7 @@ using CommonConfig;
 using UnityEngine;
 
 /// <summary>
-/// 通用方向型范围导弹技能流程（诸葛亮·惊雷 / 许褚·虎啸 共用，ScriptName = "AidShockWave"）：
+/// 通用方向型范围导弹技能流程（诸葛亮·惊雷 / 许褚·虎啸 共用，ScriptName = "SkillAidShockWave"）：
 /// 朝目标位置发射导弹，伤害由飞行中的导弹逐个命中路径上的敌人结算（最多 TargetCount 名）。
 /// 配置了 BuffId 时额外给命中目标挂该 buff（如惊雷减速，比例取 StrengthBuff1[0]），
 /// 未配置 BuffId 的技能（如虎啸）不挂 buff。

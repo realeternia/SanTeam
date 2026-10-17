@@ -2,302 +2,46 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using System.Reflection;
 using CommonConfig;
 
 public static class SkillManager
 {
-    public static Skill CreateSkill(int skillId, Chess owner)
+    /// <summary>
+    /// ScriptName → 技能脚本类构造器缓存：技能创建只在开局/加技能时发生（非热路径），缓存避免重复反射查找。
+    /// </summary>
+    private static readonly Dictionary<string, ConstructorInfo> ctorCache = new Dictionary<string, ConstructorInfo>();
 
+    public static Skill CreateSkill(int skillId, Chess owner)
     {
         var skillCfg = SkillConfig.GetConfig(skillId);
+        var ctor = GetSkillConstructor(skillCfg.ScriptName);
+        if (ctor == null)
+            throw new System.Exception("Skill not found " + skillCfg.ScriptName);
+        return (Skill)ctor.Invoke(new object[] { skillId, owner });
+    }
 
-        switch (skillCfg.ScriptName)
-        {
-            case "AttackSpinAttack":
-                return new SkillAttackSpinAttack(skillId, owner);
-            case "AttackAddDamage":
-                return new SkillAttackAddDamage(skillId, owner);
-            case "AttackedBuff":
-                return new SkillAttackedBuff(skillId, owner);
-            case "AttackRunCross":
-                return new SkillAttackRunCross(skillId, owner);
-            case "AttackRunCrossPlus":
-                return new SkillAttackRunCrossPlus(skillId, owner);                
-            case "HelpAidBuff":
-                return new SkillHelpAidBuff(skillId, owner);
-            case "AidBuffLowHp":
-                return new SkillAidBuffLowHp(skillId, owner);
-            case "AidBuffAtk":
-                return new SkillAidBuffAtk(skillId, owner);
-            case "AidBuffHasteSteal":
-                return new SkillAidBuffHasteSteal(skillId, owner);
-            case "AidBuffHasteMoveSpeed":
-                return new SkillAidBuffHasteMoveSpeed(skillId, owner);
-            case "AidBuffArea":
-                return new SkillAidBuffArea(skillId, owner);
-            case "AttackShieldPierce":
-                return new SkillAttackShieldPierce(skillId, owner);
-            case "AttackArmorPierce":
-                return new SkillAttackArmorPierce(skillId, owner);
-            case "AttackStunDamage":
-                return new SkillAttackStunDamage(skillId, owner);
-            case "AttackMagicDamage":
-                return new SkillAttackMagicDamage(skillId, owner);
-            case "DeathGroupHeal":
-                return new SkillDeathGroupHeal(skillId, owner);
+    /// <summary>
+    /// 按 ScriptName 反射取技能脚本类的 (int, Chess) 构造器（约定 ScriptName 即类名，如 "SkillAidShockWave"）。
+    /// 未带 Skill 前缀时自动补全（兼容历史配置）；找不到类或构造器时记录日志并返回 null。
+    /// </summary>
+    private static ConstructorInfo GetSkillConstructor(string scriptName)
+    {
+        if (string.IsNullOrEmpty(scriptName))
+            return null;
+        if (ctorCache.TryGetValue(scriptName, out var cached))
+            return cached;
 
-            case "DefFeedback":
-                return new SkillDefFeedback(skillId, owner);
-            case "AttackSpeedAttack":
-                return new SkillAttackSpeedAttack(skillId, owner);
-            case "AttackReboundArrow":
-                return new SkillAttackReboundArrow(skillId, owner);
-            case "DefReduceDamageRate":
-                return new SkillDefReduceDamageRate(skillId, owner);
-            case "HitBuff":
-                return new SkillHitBuff(skillId, owner);
-            case "HitBuffArea":
-                return new SkillHitBuffArea(skillId, owner);
-            case "CastingAidHitRegion":
-                return new SkillCastingAidHitRegion(skillId, owner);
-            case "HitWall":
-                return new SkillHitWall(skillId, owner);
-            case "HitFireArea":
-                return new SkillHitFireArea(skillId, owner);
-            case "AttackedShadow":
-                return new SkillAttackedShadow(skillId, owner);
+        var typeName = scriptName.StartsWith("Skill") ? scriptName : "Skill" + scriptName;
+        var type = typeof(Skill).Assembly.GetType(typeName);
+        ConstructorInfo ctor = null;
+        if (type != null && typeof(Skill).IsAssignableFrom(type))
+            ctor = type.GetConstructor(new[] { typeof(int), typeof(Chess) });
+        if (ctor == null)
+            GameLog.Error("SkillManager: 未找到技能脚本类 " + typeName + "（ScriptName=" + scriptName + "）");
 
-            case "AttackedTeleport":
-                return new SkillAttackedTeleport(skillId, owner);
-            case "HitRepeat":
-                return new SkillHitRepeat(skillId, owner);
-            case "HitArea":
-                return new SkillHitArea(skillId, owner);
-            case "HitAround":
-                return new SkillHitAround(skillId, owner);
-            case "AidShockWave":
-                return new SkillAidShockWave(skillId, owner);
-            case "AidSuddenArrow":
-                return new SkillAidSuddenArrow(skillId, owner);
-            case "ModifyBuffTime":
-                return new SkillModifyBuffTime(skillId, owner);
-            case "ModifyShootSpeed":
-                return new SkillModifyShootSpeed(skillId, owner);
-            case "CastingAidDrain":
-                return new SkillCastingAidDrain(skillId, owner);
-            case "AidFlashStrike":
-                return new SkillAidFlashStrike(skillId, owner);
-            case "AidAura":
-                return new SkillAidAura(skillId, owner);
-            case "AidHealShield":
-                return new SkillAidHealShield(skillId, owner);
-            case "AidRangeHeal":
-                return new SkillAidRangeHeal(skillId, owner);
-            case "AidCurseHeal":
-                return new SkillAidCurseHeal(skillId, owner);
-            case "AidJumpHeal":
-                return new SkillAidJumpHeal(skillId, owner);
-            case "CastingAidAreaHeal":
-                return new SkillCastingAidAreaHeal(skillId, owner);
-
-            case "InitAttrChange":
-                return new SkillInitAttrChange(skillId, owner);
-            case "InitSneakChangePos":
-                return new SkillInitSneakChangePos(skillId, owner);
-            case "InitAddItem":
-                return new SkillInitAddItem(skillId, owner);
-            case "InitAddItemChance":
-                return new SkillInitAddItemChance(skillId, owner);
-            case "InitEnemyRandomBuff":
-                return new SkillInitEnemyRandomBuff(skillId, owner);
-            case "AttackedShield":
-                return new SkillAttackedShield(skillId, owner);
-
-            case "FactionShield":
-                return new SkillFactionShield(skillId, owner);
-
-            case "InitShieldValue":
-                return new SkillInitShieldValue(skillId, owner);
-            case "AidSelfAndLowHp":
-                return new SkillAidSelfAndLowHp(skillId, owner);
-            case "SkillAidDefStack":
-                return new SkillAidDefStack(skillId, owner);
-            case "LowHpFullHealShield":
-                return new SkillLowHpFullHealShield(skillId, owner);
-
-            case "SoldierShield":
-                return new SkillSoldierShield(skillId, owner);
-            case "SoldierBuff":
-                return new SkillSoldierBuff(skillId, owner);
-            case "SoldierFortify":
-                return new SkillSoldierFortify(skillId, owner);
-            case "SoldierStun":
-                return new SkillSoldierStun(skillId, owner);
-            case "SoldierArcherBuff":
-                return new SkillSoldierArcherBuff(skillId, owner);
-            case "SoldierBless":
-                return new SkillSoldierBless(skillId, owner);
-
-            case "Dumb":
-                return new SkillDumb(skillId, owner);               
-
-            case "SkillAidHexField":
-                return new SkillAidHexField(skillId, owner);
-            case "SkillAidQuake":
-                return new SkillAidQuake(skillId, owner);
-            case "SkillCastingAidScorchedEarth":
-                return new SkillCastingAidScorchedEarth(skillId, owner);
-            case "SkillAidEmpower":
-                return new SkillAidEmpower(skillId, owner);
-            case "SkillAidArmorIgnore":
-                return new SkillAidArmorIgnore(skillId, owner);
-            case "SkillAidFrenzy":
-                return new SkillAidFrenzy(skillId, owner);
-            case "SkillAidLastingFocus":
-                return new SkillAidLastingFocus(skillId, owner);
-            case "SkillAidBacklineHunt":
-                return new SkillAidBacklineHunt(skillId, owner);
-            case "SkillAidLifestealStrike":
-                return new SkillAidLifestealStrike(skillId, owner);
-            case "SkillAidRaidCamp":
-                return new SkillAidRaidCamp(skillId, owner);
-            case "SkillAidDance":
-                return new SkillAidDance(skillId, owner);
-            case "SkillAidAssault":
-                return new SkillAidAssault(skillId, owner);
-            case "SkillAidAtkDrain":
-                return new SkillAidAtkDrain(skillId, owner);
-            case "SkillAidScatterShot":
-                return new SkillAidScatterShot(skillId, owner);
-            case "SkillAidArmorShred":
-                return new SkillAidArmorShred(skillId, owner);
-            case "SkillAidBurstShot":
-                return new SkillAidBurstShot(skillId, owner);
-            case "SkillAidGuardian":
-                return new SkillAidGuardian(skillId, owner);
-            case "SkillAidPoisonArrow":
-                return new SkillAidPoisonArrow(skillId, owner);
-            case "SkillAidShadowSplit":
-                return new SkillAidShadowSplit(skillId, owner);
-            case "SkillAidDualLaser":
-                return new SkillAidDualLaser(skillId, owner);
-            case "SkillAidSmashStun":
-                return new SkillAidSmashStun(skillId, owner);
-            case "SkillAidSlashDefend":
-                return new SkillAidSlashDefend(skillId, owner);
-            case "SkillAidBashShield":
-                return new SkillAidBashShield(skillId, owner);
-            case "SkillAidExecute":
-                return new SkillAidExecute(skillId, owner);
-            case "SkillAidCavalryStrike":
-                return new SkillAidCavalryStrike(skillId, owner);
-            case "SkillAidHasteStrike":
-                return new SkillAidHasteStrike(skillId, owner);
-            case "SkillAidMarkTarget":
-                return new SkillAidMarkTarget(skillId, owner);
-            case "SkillAidDoubleShot":
-                return new SkillAidDoubleShot(skillId, owner);
-            case "SkillAidBerserk":
-                return new SkillAidBerserk(skillId, owner);
-            case "SkillAidSwapStrike":
-                return new SkillAidSwapStrike(skillId, owner);
-            case "SkillAidBloodyWar":
-                return new SkillAidBloodyWar(skillId, owner);
-            case "SkillAidUnbreakable":
-                return new SkillAidUnbreakable(skillId, owner);
-            case "SkillAidStealBlade":
-                return new SkillAidStealBlade(skillId, owner);
-            case "SkillAidMeteorHammer":
-                return new SkillAidMeteorHammer(skillId, owner);
-            case "SkillAidBarbarianSlam":
-                return new SkillAidBarbarianSlam(skillId, owner);
-            case "SkillAidSevenCharge":
-                return new SkillAidSevenCharge(skillId, owner);
-            case "SkillAidGuardArmy":
-                return new SkillAidGuardArmy(skillId, owner);
-            case "SkillAidTauntSlam":
-                return new SkillAidTauntSlam(skillId, owner);
-            case "SkillAidSelfSacrifice":
-                return new SkillAidSelfSacrifice(skillId, owner);
-            case "SkillAidLifeLink":
-                return new SkillAidLifeLink(skillId, owner);
-            case "SkillCastingAidJudgement":
-                return new SkillCastingAidJudgement(skillId, owner);
-            case "SkillCastingAidLastStrategy":
-                return new SkillCastingAidLastStrategy(skillId, owner);
-            case "SkillAidSweeping":
-                return new SkillAidSweeping(skillId, owner);
-            case "SkillAidQuietPlot":
-                return new SkillAidQuietPlot(skillId, owner);
-            case "SkillAidLethalGambit":
-                return new SkillAidLethalGambit(skillId, owner);
-            case "SkillAidSilverTongue":
-                return new SkillAidSilverTongue(skillId, owner);
-            case "SkillAidEnduranceStrike":
-                return new SkillAidEnduranceStrike(skillId, owner);
-            case "SkillAidCutSupply":
-                return new SkillAidCutSupply(skillId, owner);
-            case "SkillAidPoisonWine":
-                return new SkillAidPoisonWine(skillId, owner);
-            case "SkillAidUsurpPressure":
-                return new SkillAidUsurpPressure(skillId, owner);
-            case "SkillAidArrogantWord":
-                return new SkillAidArrogantWord(skillId, owner);
-
-            case "SkillAidSlowStrike":
-                return new SkillAidSlowStrike(skillId, owner);
-            case "SkillAidVengefulStance":
-                return new SkillAidVengefulStance(skillId, owner);
-            case "SkillAidIronGuard":
-                return new SkillAidIronGuard(skillId, owner);
-            case "SkillAidArmorBreak":
-                return new SkillAidArmorBreak(skillId, owner);
-            case "SkillAidSweepingAoe":
-                return new SkillAidSweepingAoe(skillId, owner);
-            case "SkillAidDiveCleave":
-                return new SkillAidDiveCleave(skillId, owner);
-            case "SkillAidSacrificeGuard":
-                return new SkillAidSacrificeGuard(skillId, owner);
-            case "SkillAidThrust":
-                return new SkillAidThrust(skillId, owner);
-            case "SkillAidChargeImpale":
-                return new SkillAidChargeImpale(skillId, owner);
-            case "SkillAidColossalSlam":
-                return new SkillAidColossalSlam(skillId, owner);
-            case "SkillAidCraftBuff":
-                return new SkillAidCraftBuff(skillId, owner);
-            case "SkillAidFireShot":
-                return new SkillAidFireShot(skillId, owner);
-            case "SkillAidBenevolence":
-                return new SkillAidBenevolence(skillId, owner);
-            case "SkillAidImperialGuard":
-                return new SkillAidImperialGuard(skillId, owner);
-            case "SkillAidBalance":
-                return new SkillAidBalance(skillId, owner);
-            case "SkillAidNobleBless":
-                return new SkillAidNobleBless(skillId, owner);
-
-            case "InitNoEquipAttr":
-                return new SkillInitNoEquipAttr(skillId, owner);
-            case "InitMpFill":
-                return new SkillInitMpFill(skillId, owner);
-            case "InitDecayDef":
-                return new SkillInitDecayDef(skillId, owner);
-            case "AttackStackBuffer":
-                return new SkillAttackStackBuffer(skillId, owner);
-            case "AidSelfShield":
-                return new SkillAidSelfShield(skillId, owner);
-            case "AidShieldValue":
-                return new SkillAidShieldValue(skillId, owner);
-            case "AttackMpGain":
-                return new SkillAttackMpGain(skillId, owner);
-            case "KillGain":
-                return new SkillKillGain(skillId, owner);
-            case "InitSoldierBuff":
-                return new SkillInitSoldierBuff(skillId, owner);
-        }
-
-        throw new System.Exception("Skill not found " + skillCfg.ScriptName);
+        ctorCache[scriptName] = ctor;
+        return ctor;
     }
 
     public static void BattleBegin(Chess chess)

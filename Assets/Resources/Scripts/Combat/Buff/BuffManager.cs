@@ -1,8 +1,14 @@
 using System.Collections.Generic;
+using System.Reflection;
 using CommonConfig;
 
 public static class BuffManager
 {
+    /// <summary>
+    /// ScriptName → Buff 脚本类构造器缓存：AddBuff 按配置反射创建对应 Buff 子类，缓存避免重复反射查找。
+    /// </summary>
+    private static readonly Dictionary<string, ConstructorInfo> ctorCache = new Dictionary<string, ConstructorInfo>();
+
     public static void AddBuff(Chess target, Chess caster, int skillId, int buffId, float time)
     {
         SkillManager.OnAddBuff(target, caster, ref buffId, skillId, ref time);
@@ -15,133 +21,38 @@ public static class BuffManager
 
         GameLog.Debug("AddBuff buffId=" + buffId.ToString() + " skillId=" + skillId.ToString() + " time=" + time.ToString());
 
-        Buff buff = null;
-        switch (buffCfg.ScriptName)
+        var ctor = GetBuffConstructor(buffCfg.ScriptName);
+        if (ctor == null)
         {
-            case "BuffShield":
-                buff = new BuffShield(buffId, skillId, caster, target, time);
-                break;
-            case "BuffShieldValue":
-                buff = new BuffShieldValue(buffId, skillId, caster, target, time);
-                break;
-            case "BuffCoolDown":
-                buff = new BuffCoolDown(buffId, skillId, caster, target, time);
-                break; 
-            case "BuffNoAction":
-                buff = new BuffNoAction(buffId, skillId, caster, target, time);
-                break;
-            case "BuffNoMove":
-                buff = new BuffNoMove(buffId, skillId, caster, target, time);
-                break;
-            case "BuffLock":
-                buff = new BuffLock(buffId, skillId, caster, target, time);
-                break;
-            case "BuffSuck":
-                buff = new BuffSuck(buffId, skillId, caster, target, time);
-                break;
-            case "BuffDamagedAddRate":
-                buff = new BuffDamagedAddRate(buffId, skillId, caster, target, time);
-                break;
-            case "BuffTimeDamage":
-                buff = new BuffTimeDamage(buffId, skillId, caster, target, time);
-                break;
-            case "BuffTimeHeal":
-                buff = new BuffTimeHeal(buffId, skillId, caster, target, time);
-                break;
-            case "BuffAtkAdd":
-                buff = new BuffAtkAdd(buffId, skillId, caster, target, time);
-                break;
-            case "BuffSuckHaste":
-                buff = new BuffSuckHaste(buffId, skillId, caster, target, time);
-                break;
-            case "BuffHasteMoveSpeed":
-                buff = new BuffHasteMoveSpeed(buffId, skillId, caster, target, time);
-                break;
-            case "BuffBuildFort":
-                buff = new BuffBuildFort(buffId, skillId, caster, target, time);
-                break;
-            case "BuffHitStun":
-                buff = new BuffHitStun(buffId, skillId, caster, target, time);
-                break;
-            case "BuffReflect":
-                buff = new BuffReflect(buffId, skillId, caster, target, time);
-                break;
-            case "BuffAtkDown":
-                buff = new BuffAtkDown(buffId, skillId, caster, target, time);
-                break;
-            case "BuffHealDown":
-                buff = new BuffHealDown(buffId, skillId, caster, target, time);
-                break;
-            case "BuffArmorDown":
-                buff = new BuffArmorDown(buffId, skillId, caster, target, time);
-                break;
-            case "BuffSlowDown":
-                buff = new BuffSlowDown(buffId, skillId, caster, target, time);
-                break;
-            case "BuffEvasion":
-                buff = new BuffEvasion(buffId, skillId, caster, target, time);
-                break;
-            case "BuffMultiShot":
-                buff = new BuffMultiShot(buffId, skillId, caster, target, time);
-                break;
-            case "BuffNextAttacksMult":
-                buff = new BuffNextAttacksMult(buffId, skillId, caster, target, time);
-                break;
-            case "BuffLifeStealAndDamage":
-                buff = new BuffLifeStealAndDamage(buffId, skillId, caster, target, time);
-                break;
-            case "BuffFrenzy":
-                buff = new BuffFrenzy(buffId, skillId, caster, target, time);
-                break;
-            case "BuffTaunt":
-                buff = new BuffTaunt(buffId, skillId, caster, target, time);
-                break;
-            case "BuffLifeLink":
-                buff = new BuffLifeLink(buffId, skillId, caster, target, time);
-                break;
-            case "BuffHpMpRegen":
-                buff = new BuffHpMpRegen(buffId, skillId, caster, target, time);
-                break;
-            case "BuffHealBoost":
-                buff = new BuffHealBoost(buffId, skillId, caster, target, time);
-                break;
-            case "BuffMultiAttr":
-                buff = new BuffMultiAttr(buffId, skillId, caster, target, time);
-                break;
-            case "BuffDecayDef":
-                buff = new BuffDecayDef(buffId, skillId, caster, target, time);
-                break;
-            case "BuffStackBuf":
-                buff = new BuffStackBuf(buffId, skillId, caster, target, time);
-                break;
-            case "BuffDefStack":
-                buff = new BuffDefStack(buffId, skillId, caster, target, time);
-                break;
-            case "BuffArmorAdd":
-                buff = new BuffArmorAdd(buffId, skillId, caster, target, time);
-                break;
-            case "BuffVengefulStance":
-                buff = new BuffVengefulStance(buffId, skillId, caster, target, time);
-                break;
-            case "BuffShieldGuard":
-                buff = new BuffShieldGuard(buffId, skillId, caster, target, time);
-                break;
-            case "BuffDefect":
-                buff = new BuffDefect(buffId, skillId, caster, target, time);
-                break;
-            case "BuffChaos":
-                buff = new BuffChaos(buffId, skillId, caster, target, time);
-                break;
-
-        }
-
-        if (buff == null)
-        {
-            GameLog.Error("Buff not found");
+            GameLog.Error("Buff not found " + buffCfg.ScriptName);
             return;
         }
 
+        var buff = (Buff)ctor.Invoke(new object[] { buffId, skillId, caster, target, time });
         target.AddBuff(buff, caster, time);
+    }
+
+    /// <summary>
+    /// 按 ScriptName 反射取 Buff 脚本类的 (int, int, Chess, Chess, float) 构造器（约定 ScriptName 即类名，如 "BuffShield"）。
+    /// 未带 Buff 前缀时自动补全（兼容历史配置）；找不到类或构造器时记录日志并返回 null。
+    /// </summary>
+    private static ConstructorInfo GetBuffConstructor(string scriptName)
+    {
+        if (string.IsNullOrEmpty(scriptName))
+            return null;
+        if (ctorCache.TryGetValue(scriptName, out var cached))
+            return cached;
+
+        var typeName = scriptName.StartsWith("Buff") ? scriptName : "Buff" + scriptName;
+        var type = typeof(Buff).Assembly.GetType(typeName);
+        ConstructorInfo ctor = null;
+        if (type != null && typeof(Buff).IsAssignableFrom(type))
+            ctor = type.GetConstructor(new[] { typeof(int), typeof(int), typeof(Chess), typeof(Chess), typeof(float) });
+        if (ctor == null)
+            GameLog.Error("BuffManager: 未找到Buff脚本类 " + typeName + "（ScriptName=" + scriptName + "）");
+
+        ctorCache[scriptName] = ctor;
+        return ctor;
     }
 
     public static void RemoveBuff(Chess chess, int buffId)

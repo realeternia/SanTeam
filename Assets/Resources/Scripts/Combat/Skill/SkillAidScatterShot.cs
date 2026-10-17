@@ -2,7 +2,7 @@ using CommonConfig;
 using UnityEngine;
 
 /// <summary>
-/// 黄忠·乱射（ScriptName = "BowHuangZhong"）：
+/// 黄忠·乱射（ScriptName = "SkillAidScatterShot"）：
 /// 区域多目标箭雨，对目标周围(Area)范围内敌人附加暴击加成伤害。
 /// 每目标伤害 = 基础技能伤害 × (1 + Strength2[0])。
 /// </summary>

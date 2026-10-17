@@ -34,6 +34,15 @@ public static class CombatConst
     /// <summary>战斗开始时技能MP是否直接拉满（默认关闭；开启则所有技能从满MP开局，关闭则按常规从0开始充能）</summary>
     public static bool FullMpAtBattleBegin = false;
 
+    // ---- 调试阵容·开局Buff ----
+    /// <summary>
+    /// 调试阵容给武将挂Buff时使用的临时技能配置Id：Buff 的效果数值统一取自 SkillConfig，
+    /// 该配置行数值全为0（见 WorldManager.ApplyDebugBuffs），仅保证 Buff 能正常构造，不产生数值影响
+    /// </summary>
+    public const int DebugBuffSkillId = 999999;
+    /// <summary>调试阵容挂Buff的默认时长(秒)：条目未填时长时使用</summary>
+    public const float DebugBuffDefaultTime = 10f;
+
     // ---- 国家护盾机制(同阵营连线，数值参考金铲铲神盾使羁绊) ----
     /// <summary>同阵营英雄数量档位(2/3/4/5/6，对应国家护盾技能 Lv1~5)</summary>
     public static readonly int[] FactionShieldCounts = { 2, 3, 4, 5, 6 };

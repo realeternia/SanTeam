@@ -4,7 +4,7 @@ using CommonConfig;
 using UnityEngine;
 
 /// <summary>
-/// 光环主动助战（ScriptName = "AidAura"）：保留 AuroAttrs 开局被动光环，
+/// 光环主动助战（ScriptName = "SkillAidAura"）：保留 AuroAttrs 开局被动光环，
 /// 施放时对本侧全体英雄（含自身）再永久累加 光环属性值 × Strength2[0]（Strength2[0] 即百分比 x%）。
 /// 复用 JobLinkManager.ParseBonuses/ApplyAttr 与光环被动同一套解析/施加逻辑。
 /// 另每次施放为自身永久叠加成长属性（数值取 StrengthBuff1[0]）：光环主属性为法强(ap) 时叠加自身法强，

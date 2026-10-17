@@ -1,7 +1,7 @@
 using CommonConfig;
 
 /// <summary>
-/// 受击加护盾（ScriptName = "AttackedShield"）：受到攻击时为自己施加数值型吸收盾，
+/// 受击加护盾（ScriptName = "SkillAttackedShield"）：受到攻击时为自己施加数值型吸收盾，
 /// 护盾容量 = Strength2[0] × (100+法强)/100（随法强成长，与「护卫」同口径），持续 BuffTime 秒，
 /// 是否可触发由 Skill.CheckBurst 统一判定（CD、发动概率、MpCost、TriggerCondition 条件如 "hprate&lt;30"）。
 /// Buff 短名由 SkillConfig.BuffId 配置：第 1 个=护盾Buff；配置了 StrengthBuff1（[0]=每秒回血、[1]=持续秒数）时，
