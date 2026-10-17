@@ -358,6 +358,18 @@ namespace UnityEngine
             return null;
         }
 
+        // 桩：只收集本节点上的组件（与 Unity GameObject.GetComponents<T>() 语义一致，不含子节点）
+        public T[] GetComponents<T>() where T : Component, new()
+        {
+            var result = new List<T>();
+            foreach (var c in _components)
+            {
+                if (c is T)
+                    result.Add((T)c);
+            }
+            return result.ToArray();
+        }
+
         public T GetComponentInChildren<T>() where T : Component, new()
         {
             return GetComponent<T>();
@@ -560,6 +572,9 @@ namespace UnityEngine
         public Vector4 GetVector(string name) { return _vectors.ContainsKey(name) ? _vectors[name] : default(Vector4); }
     }
 
+    // 桩：镜像 Unity 粒子缩放模式枚举（0=Hierarchy 跟随父级层级 / 1=Local 仅自身 localScale）
+    public enum ParticleSystemScalingMode { Hierarchy = 0, Local = 1, Shape = 2 }
+
     // 粒子系统桩：headless 只关心 main.loop 可写与 Play()，不做真实粒子模拟
     public class ParticleSystem : Component
     {
@@ -569,6 +584,8 @@ namespace UnityEngine
         }
 
         public MainModule main { get; set; }
+
+        public ParticleSystemScalingMode scalingMode { get; set; }
 
         public void Play() { }
         public void Stop() { }

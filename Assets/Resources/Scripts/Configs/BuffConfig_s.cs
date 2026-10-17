@@ -169,15 +169,15 @@ namespace CommonConfig
             config[300128] = new BuffConfig(300128, "护驾", "护", "受到的回复效果提升/strength%", true, false, "BuffHealBoost", "", "", "", "", "");
             config[301001] = new BuffConfig(301001, "眩晕", "乱", "眩晕，无法行动", false, true, "BuffNoAction", "", "", "StunnedCirclingStarsSimple", "", "");
             config[301003] = new BuffConfig(301003, "增伤", "伤", "受到的伤害按比例增加", false, true, "BuffDamagedAddRate", "", "", "StunnedDamageUp", "", "");
-            config[301004] = new BuffConfig(301004, "减攻", "慑", "降低目标攻击力", false, true, "BuffAtkDown", "", "", "", "", "");
-            config[301005] = new BuffConfig(301005, "陷阵", "停", "无法移动", false, true, "BuffNoMove", "", "", "AuraSoftPurple", "", "");
+            config[301004] = new BuffConfig(301004, "减攻", "慑", "降低目标攻击力", false, true, "BuffAtkDown", "", "", "Misses", "", "");
+            config[301005] = new BuffConfig(301005, "陷阵", "停", "无法移动", false, true, "BuffNoMove", "", "", "", "BuffFrozen", "");
             config[301006] = new BuffConfig(301006, "溃败", "败", "持续受到随时间结算的伤害", false, true, "BuffTimeDamage", "", "", "BloodExplosion", "", "");
-            config[301007] = new BuffConfig(301007, "减疗", "疫", "降低目标受到的治疗效果", false, true, "BuffHealDown", "", "", "", "", "");
-            config[301008] = new BuffConfig(301008, "减速", "缓", "降低目标移动与攻速", false, true, "BuffSlowDown", "#000099", "#3366FF", "", "BuffFrozen", "");
-            config[301009] = new BuffConfig(301009, "减防", "破", "降低目标护甲", false, true, "BuffArmorDown", "", "", "", "", "");
-            config[301010] = new BuffConfig(301010, "嘲讽", "嘲", "成为敌对单位强制优先攻击的目标", false, true, "BuffTaunt", "#cc4300", "#664499", "", "", "");
-            config[301011] = new BuffConfig(301011, "叛逃", "叛", "不受控制，向初始位置后退，移动速度减半", false, true, "BuffDefect", "", "", "AuraSoftPurple", "", "");
-            config[301012] = new BuffConfig(301012, "混乱", "惑", "不受控制，攻击最近的友方单位", false, true, "BuffChaos", "", "", "StunnedCirclingStarsSimple", "", "");
+            config[301007] = new BuffConfig(301007, "减疗", "疫", "降低目标受到的治疗效果", false, true, "BuffHealDown", "", "", "MissesGreen", "", "");
+            config[301008] = new BuffConfig(301008, "减速", "缓", "降低目标移动与攻速", false, true, "BuffSlowDown", "", "", "Wet", "", "");
+            config[301009] = new BuffConfig(301009, "减防", "破", "降低目标护甲", false, true, "BuffArmorDown", "", "", "MissesBlue", "", "");
+            config[301010] = new BuffConfig(301010, "嘲讽", "嘲", "成为敌对单位强制优先攻击的目标", false, true, "BuffTaunt", "", "", "Character_status_taunt", "", "");
+            config[301011] = new BuffConfig(301011, "叛逃", "叛", "不受控制，向初始位置后退，移动速度减半", false, true, "BuffDefect", "", "", "Character_status_sleep", "", "");
+            config[301012] = new BuffConfig(301012, "混乱", "惑", "不受控制，攻击最近的友方单位", false, true, "BuffChaos", "", "", "Character_status_fight", "", "");
             config[301102] = new BuffConfig(301102, "连锁", "锁", "被攻击时，向范围内同样带连锁的友军传递同比例伤害", false, true, "BuffLock", "", "", "StunnedLock", "", "");
 
             RebuildIndex();

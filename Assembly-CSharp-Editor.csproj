@@ -60,9 +60,12 @@
     <Analyzer Include="D:\Unity\2022.3.62f3\Editor\Data\Tools\Unity.SourceGenerators\Unity.Properties.SourceGenerator.dll" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\MasterMagicFX\Scripts\Editor\GradientEditorWindow.cs" />
     <Compile Include="Assets\SineVFX\TopDownEffects\Scripts\Editor\CustomRampGeneratorEditor.cs" />
+    <Compile Include="Assets\Editor\MasterMagicFXShaderFixer.cs" />
     <Compile Include="Assets\Editor\DebugLineupWindow.cs" />
     <Compile Include="Assets\Editor\EffectPrefabScaleFixer.cs" />
+    <Compile Include="Assets\MasterMagicFX\Scripts\Editor\ParticleMappingControllerEditor.cs" />
     <Compile Include="Assets\Editor\IconLoaderEditor.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -48,7 +48,22 @@ public static class EffectManager
         effect.transform.localScale = new Vector3(factor, factor, factor);
         var pos = effect.transform.localPosition;
         effect.transform.localPosition = new Vector3(pos.x, parentScale.y != 0 ? worldOffsetY / parentScale.y : worldOffsetY, pos.z);
+        NormalizeRootScalingMode(effect);
         return effect;
+    }
+
+    // 根节点上的粒子若为 Local 缩放模式，渲染尺寸只受自身 localScale 影响（忽略父级缩放），
+    // 而本方法为抵消父级缩放改写了根节点 localScale，会使这类粒子比参考尺寸（EffectTest 场景）小一个父级缩放的倍数
+    // （单位根缩放 10 则缩小 10 倍）。根节点粒子统一改为 Hierarchy（跟随父级层级），
+    // 使其世界缩放等于配置 Scale，与子级 Hierarchy 系统及测试场景观感一致。
+    // 注：不需要遍历子级——子级 localScale 未被改动，两种模式下与测试场景表现相同。
+    private static void NormalizeRootScalingMode(GameObject effect)
+    {
+        foreach (var ps in effect.GetComponents<ParticleSystem>())
+        {
+            if (ps.scalingMode == ParticleSystemScalingMode.Local)
+                ps.scalingMode = ParticleSystemScalingMode.Hierarchy;
+        }
     }
 
     // 配置了变色（TintColor）时，自动挂染色脚本并设置目标颜色
@@ -171,6 +186,42 @@ public static class EffectManager
 
         return hitEffect;
 
+    }
+
+    /// <summary>
+    /// 持续型自身特效：把特效常驻挂在单位节点下（挂点/缩放规则同 PlayBuffEffect），粒子循环播放且不自动销毁，
+    /// 随单位节点销毁（单位死亡/战斗结束）一并清理。用于需要永久存在于自身的视觉标识（如光环技能持有者）。
+    /// </summary>
+    public static GameObject PlayPersistentEffect(Chess sourceChess, string effect)
+    {
+        if (sourceChess == null || string.IsNullOrEmpty(effect))
+        {
+            GameLog.Warn("PlayPersistentEffect 参数为空，跳过播放 effect=" + effect);
+            return null;
+        }
+        var prefab = Resources.Load<GameObject>(ResolveEffectPath(effect));
+        if (prefab == null)
+        {
+            GameLog.Warn("PlayPersistentEffect 特效资源不存在: " + effect);
+            return null;
+        }
+        GameLog.Debug("PlayPersistentEffect: " + effect);
+
+        var cfg = EffectConfig.GetConfigByName(effect);
+        float scale = GetScale(effect, cfg, prefab.transform.localScale.x);
+        float offsetY = GetOffsetY(effect, cfg);
+        GameObject hitEffect = UnityEngine.Object.Instantiate(prefab, sourceChess.transform.position, prefab.transform.rotation);
+        MountEffect(hitEffect, sourceChess.transform, new Vector3(scale, scale, scale), offsetY);
+        ApplyTint(hitEffect, cfg);
+
+        // 常驻期间粒子需持续播放，循环避免中途熄灭；不设置销毁时间，交由单位节点销毁时清理
+        foreach (var ps in hitEffect.GetComponentsInChildren<ParticleSystem>(true))
+        {
+            var main = ps.main;
+            main.loop = true;
+            ps.Play();
+        }
+        return hitEffect;
     }
 
     // 解析导弹资源路径（规则与 Missile.ResolveMissilePath 一致）：优先 EffectConfig.MissilePath，缺失回退特效路径，再回退 Prefabs/Missile 目录

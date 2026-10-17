@@ -21,6 +21,17 @@ public class SkillAidAura : Skill
     {
     }
 
+    /// <summary>
+    /// 开局光环视觉标识：在自身挂一个常驻循环的 SelfEffect，表示光环正在生效（区别于每次施法的瞬时 SelfEffect）。
+    /// 特效挂在单位节点下，单位死亡/战斗结束时随节点销毁，无需额外清理。
+    /// </summary>
+    public override void BattleBegin()
+    {
+        if (string.IsNullOrEmpty(skillCfg.SelfEffect))
+            return;
+        EffectManager.PlayPersistentEffect(owner, skillCfg.SelfEffect);
+    }
+
     public override bool CheckAidSkill()
     {
         if (!CheckBurst(null))
@@ -48,7 +59,6 @@ public class SkillAidAura : Skill
             BuffManager.DispelNegative(unit);
 
         owner.PlayerAnim(skillCfg.Action);
-        PlaySelfEffect();
         return true;
     }
 }
