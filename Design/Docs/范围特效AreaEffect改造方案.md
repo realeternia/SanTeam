@@ -74,12 +74,11 @@ protected GameObject PlayAreaEffect(Vector3 pos, float time = 1.3f)
 |---|---|---|
 | SkillAidTauntSlam / SkillAidBarbarianSlam | owner | SparkleAreaWhite / MagicFieldGreen |
 | SkillAidSevenCharge / SkillAttackRunCrossPlus | owner | MagicFieldGreen / SwordWhirlwindWhite |
-| SkillAidHexField / SkillAidQuietPlot | 目标 | MagicFieldGreen / ShadowExplosion |
-| SkillAidMeteorHammer / SkillAidQuake（原 SkillAidUsurpPressure） | 目标 | ToolExplosion / MagicNovaBlue |
+| SkillAidMeteorHammer / SkillAidRangeDamageDeBuff | 目标 | ToolExplosion / MagicNovaBlue / MagicFieldGreen / ShadowExplosion |
 | SkillAidJumpHeal / SkillAidRangeHeal | 治疗落点 | MagicBuffGreen |
 
 **C. 当前完全无特效（13 个）**——新增 `PlayAreaEffect(中心)`，`AreaEffect` 取现有 `HitEffect` 值（该行 `HitEffect` 为空时按语义补）：
-`SkillAidSweepingAoe`、`SkillAidScorchingRain`、`SkillAidColossalSlam`、`SkillAidScatterShot`、`SkillAidIronGuard`、`SkillAidDiveCleave`、`SkillAidDecreeAoe`、`SkillAidBerserkCleave`、`SkillAidArmorBreak`、`SkillAidBashShield`、`SkillAidDualLaser`、`SkillAidDoubleShot`、`SkillAidQuake`。
+`SkillAidRangeDamageDeBuff`（含原 SkillAidSweepingAoe / SkillAidArmorBreak / SkillAidDiveCleave，中心点由 SkillConfig.TargetType="self" 切换）、`SkillAidScorchingRain`、`SkillAidColossalSlam`、`SkillAidScatterShot`、`SkillAidIronGuard`、`SkillAidDecreeAoe`、`SkillAidBerserkCleave`、`SkillAidBashShield`、`SkillAidDualLaser`。
 已知示例：枪出如龙 `AuraSoftPurple`、恶来 `MagicChargeYellow`、震碎 `MagicNovaBlue`。中心逐文件确认（多为 owner 自身中心）。
 
 **另外**：[SkillAidShockWave](file:///d:/Codes/SanTeam2/Assets/Resources/Scripts/Combat/Skill/SkillAidShockWave.cs#L29) 第 29 行传了 `skillCfg.EffectSize`（删列后编译不过），改为传 `skillCfg.Area`（该值只作导弹缩放兜底，实际被 `MissileScale` 覆盖）。

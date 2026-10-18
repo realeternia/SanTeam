@@ -344,7 +344,7 @@
 | --- | --- | --- | --- | --- |
 | 冲 | 铁骑 | `SkillAttackRunCrossPlus` | 2010006~2010010（兵种技能） | `伤` |
 | 奸 | 权奸 | `SkillInitEnemyRandomBuff` | 2010096~2010100（兵种技能） | `伤` |
-| 刘晔 | 卸甲 | `SkillAidArmorBreak` | 2021711~2021715 | `伤` |
+| 刘晔 | 卸甲 | `SkillAidRangeDamageDeBuff` | 2021711~2021715 | `伤` |
 | 许攸 | 傲言 | `SkillAidArrogantWord` | 2020831~2020835 | `伤` |
 | 朱桓 | 标记 | `SkillAidMarkTarget` | 2020116~2020120 | `伤` |
 | 华雄 | 狂暴 | `SkillAidBerserk` | 2020126~2020130 | `重,伤`（多段） |
@@ -354,9 +354,9 @@
 | Sname | 技能名 | 脚本 | Id 段 | 该行 BuffId |
 | --- | --- | --- | --- | --- |
 | 陈宫 | 绝策 | `SkillAidMarkTarget` | 2021026~2021030 | `慑` |
-| 法正 | 明断 | `SkillAidQuietPlot` | 2021006~2021010 | `慑` |
+| 法正 | 明断 | `SkillAidJumpDamage` | 2021006~2021010 | `慑` |
 | 马腾 | 腾驾 | `SkillAidAtkDrain` | 2020431~2020435 | `慑,攻` |
-| 徐庶 | 困敌 | `SkillAidHexField` | 2020501~2020505 | `慑,疫` |
+| 徐庶 | 困敌 | `SkillAidRangeDamageDeBuff` | 2020501~2020505 | `慑,疫` |
 
 ### 301006 溃败（败）— 4 技能 / 20 行
 
@@ -373,16 +373,16 @@
 | --- | --- | --- | --- | --- |
 | 陈群 | 律令 | `SkillAidSlowStrike` | 2021726~2021730 | `疫` |
 | 李儒 | 鸩酒 | `SkillAidPoisonWine` | 2020821~2020825 | `疫` |
-| 魏延 | 奇袭 | `SkillAidDiveCleave` | 2021601~2021605 | `疫` |
-| 徐庶 | 困敌 | `SkillAidHexField` | 2020501~2020505 | `慑,疫` |
-| 钟会 | 蓄谋 | `SkillAidQuietPlot` | 2021021~2021025 | `疫` |
+| 魏延 | 奇袭 | `SkillAidRangeDamageDeBuff` | 2021601~2021605 | `疫` |
+| 徐庶 | 困敌 | `SkillAidRangeDamageDeBuff` | 2020501~2020505 | `慑,疫` |
+| 钟会 | 蓄谋 | `SkillAidRangeDamageDeBuff` | 2021021~2021025 | `疫` |
 
 ### 301008 减速（缓）— 4 技能 / 20 行
 
 | Sname | 技能名 | 脚本 | Id 段 |
 | --- | --- | --- | --- |
 | 荀攸 | 奇策 | `SkillAidSweeping` | 2021016~2021020 |
-| 张郃 | 震碎 | `SkillAidQuake` | 2020506~2020510 |
+| 张郃 | 震碎 | `SkillAidRangeDamageDeBuff` | 2020506~2020510 |
 | 张松 | 舌辩 | `SkillAidSilverTongue` | 2020806~2020810 |
 | 诸葛亮 | 惊雷 | `SkillAidShockWave` | 2021701~2021705 |
 
@@ -394,18 +394,18 @@
 | 甘宁 | 百骑劫营 | `SkillAidRaidCamp` | 2020416~2020420 |
 | 马超 | 铁骑冲 | `SkillAidCavalryStrike` | 2020106~2020110 |
 | 潘璋 | 偷刃 | `SkillAidStealBlade` | 2021416~2021420 |
-| 孙坚 | 破阵 | `SkillAidArmorBreak` | 2021521~2021525 |
+| 孙坚 | 破阵 | `SkillAidRangeDamageDeBuff` | 2021521~2021525 |
 | 王双 | 崩山 | `SkillAidArmorShred` | 2021401~2021405 |
 | 夏侯渊 | 猎鹰 | `SkillAidArmorShred` | 2020306~2020310 |
 | 许褚 | 虎啸 | `SkillAidShockWave` | 2021421~2021425 |
-| 张绣 | 枪出如龙 | `SkillAidSweepingAoe` | 2021526~2021530 |
+| 张绣 | 枪出如龙 | `SkillAidRangeDamageDeBuff` | 2021526~2021530 |
 
 ### 301011 叛逃（叛）— 2 技能 / 10 行
 
 | Sname | 技能名 | 脚本 | Id 段 |
 | --- | --- | --- | --- |
 | 司马懿 | 隐忍 | `SkillAidEnduranceStrike` | 2020811~2020815 |
-| 司马昭 | 篡逆 | `SkillAidQuake` | 2020826~2020830 |
+| 司马昭 | 篡逆 | `SkillAidRangeDamageDeBuff` | 2020826~2020830 |
 
 ### 301012 混乱（惑）— 1 技能 / 5 行
 
@@ -439,7 +439,7 @@
 | 埋伏 | 吕蒙 | `SkillAttackedTeleport` | `乱,盾` |
 | 不屈 | 周泰 | `SkillAidUnbreakable` | `盾,甲` |
 | 腾驾 | 马腾 | `SkillAidAtkDrain` | `慑,攻` |
-| 困敌 | 徐庶 | `SkillAidHexField` | `慑,疫` |
+| 困敌 | 徐庶 | `SkillAidRangeDamageDeBuff` | `慑,疫` |
 | 威震 | 张辽 | `SkillAidVengefulStance` | `震,乱` |
 | 乱阵 | 贾诩 | `SkillSoldierStun` | `威,乱,惑` |
 | 长驱 | 徐晃 | `SkillAidLifestealStrike` | `重,吸` |

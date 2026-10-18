@@ -151,7 +151,6 @@
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidLifeLink.cs" />
     <Compile Include="Assets\Resources\Scripts\Configs\HeroConfig_s.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\EffectManager.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidDoubleShot.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffNoAction.cs" />
     <Compile Include="Assets\Resources\Scripts\Configs\HeroFriendConfig_s.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffMoveSpeedAdd.cs" />
@@ -164,7 +163,6 @@
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffFrenzy.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\SideBar.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidFireShot.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidHexField.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidBarbarianSlam.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\SideBarAlphaGradient.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffHitStun.cs" />
@@ -173,7 +171,7 @@
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAttackShieldPierce.cs" />
     <Compile Include="Assets\MasterMagicFX\Scripts\Miscs\CameraRotater.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidAtkDrain.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidQuake.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidRangeDamageDeBuff.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAttackedTeleport.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\BattleResultHeroCellControl.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillInitSoldierBuff.cs" />
@@ -222,7 +220,6 @@
     <Compile Include="Assets\MasterMagicFX\Scripts\Miscs\MMagicExample.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidSevenCharge.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\BaseTooltip.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidDiveCleave.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillSoldierBuff.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidBuffArea.cs" />
     <Compile Include="Assets\SineVFX\TopDownEffects\Scripts\PrefabSpawner.cs" />
@@ -258,9 +255,7 @@
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffManager.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\ChessHUD.cs" />
     <Compile Include="Assets\Resources\Scripts\Configs\HeroAttrConfig_s.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidArmorBreak.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffReflect.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidSweepingAoe.cs" />
     <Compile Include="Assets\Resources\Scripts\Configs\PlayerLevelConfig_s.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillLowHpFullHealShield.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAttackSpeedAttack.cs" />
@@ -313,7 +308,6 @@
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidBacklineHunt.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidColossalSlam.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\RankPlayerPanelManager.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidQuietPlot.cs" />
     <Compile Include="Assets\Resources\Scripts\Configs\SkillConfig_s.cs" />
     <Compile Include="Assets\Resources\Scripts\Configs\PlayerConfig_s.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffHealBoost.cs" />

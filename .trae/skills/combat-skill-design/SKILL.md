@@ -85,3 +85,12 @@ description: 编写《三国卡牌》(金铲铲式)战斗技能与数值配置�
 - **`Area = 0` 语义**：列表查询中 `range == 0` 表示**全图**（见 `WorldManager`）。因此范围技能该行 `Area` 不得为 0，除非确为"全图"设计，需在注释中说明。
 - **方向型/直线型技能例外**：`Range` 表示直线长度、`Area` 表示走廊宽度时（如 `SkillAidChargeImpale` 冲阵、`SkillAidSuddenArrow` 骑射的索敌射程），保留 `Range` 用法并加中文注释说明原因，不强行改 `Area`。
 - **一致性**：同 `ScriptName` 的各等级行 `Range`/`Area` 含义须一致；迁移半径字段时（`Range`→`Area`）须同步改写配置表全部数据行，并 `Grep` 确认无残留 `skillCfg.Range` 误用。
+
+## 十一、通用脚本与范围中心（TargetType）
+
+- **优先复用**：形态相同的技能先找现成通用脚本，别新建特化类。当前通用脚本：
+  - `SkillAidRangeDamageDeBuff` = 范围伤害 + 减益（可配 0~N 个 BuffId 短名），覆盖**目标中心**与**自身中心**两种形态，中心由 `TargetType` 切换（见下）；已承载 张郃·震碎 / 司马昭·篡逆 / 韩当·双射 / 钟会·蓄谋 / 徐庶·困敌（目标中心）、张绣·枪出如龙 / 孙坚·破阵 / 刘晔·卸甲 / 魏延·奇袭（自身中心）。
+  - `SkillAidScorchingRain` = 落点/定点持续范围伤害；`SkillAidRangeHeal` = 范围治疗。
+- **`TargetType` 字符串约定**：空 = 锁定目标中心（需目标存活且在 `Range` 射程内）；`"self"` = 施法者自身中心（**不做射程校验**，`Range` 可留 0）；`"targetUnit"` = 以受击者为单位目标（见 `SkillHitBuffArea`，庞统·连锁）。同一字段已被多个脚本按字符串读取，取值需沿用既有词，勿另造。
+- **自中心 vs 目标中心**：远程(棋)技能若以自身为中心会全程打空（站位远离敌阵），必须用目标中心；近战贴脸 AoE 用自身中心。
+- **`TargetCount` 与随机截断**：`TargetCount > 0` 的脚本会对候选列表做 `RandomSelect` 截断；`<= 0` 时禁止调用 `RandomSelect`（限数 0 会清空列表）。合并/改写脚本时必须核对配置 `TargetCount`，避免静默改变命中数。
