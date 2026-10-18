@@ -70,14 +70,12 @@
     <Compile Include="Assets\Resources\Scripts\Configs\SystemAttrConfig_s.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAttackMpGain.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffRevive.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidSlowStrike.cs" />
     <Compile Include="Assets\MasterMagicFX\Scripts\Miscs\MEffectExample.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffTaunt.cs" />
     <Compile Include="Assets\Resources\Scripts\SystemTip.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidScatterShot.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidJumpHeal.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffShieldValue.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidArmorShred.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Missile.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillHitBuffArea.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffNoMove.cs" />
@@ -86,7 +84,6 @@
     <Compile Include="Assets\Resources\Scripts\Shop\ShopMode.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillModifyShootSpeed.cs" />
     <Compile Include="Assets\Resources\Scripts\Configs\JobConfig_s.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidVengefulStance.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillHitFireArea.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidHasteStrike.cs" />
     <Compile Include="Assets\Resources\Scripts\PlayerAI.cs" />
@@ -127,7 +124,6 @@
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidExecute.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillHitRepeat.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffVengefulStance.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidThrust.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffMultiShot.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillFactionShield.cs" />
     <Compile Include="Assets\Lana Studio\Casual RPG VFX\Scripts\UVscroll.cs" />
@@ -146,7 +142,6 @@
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidSilverTongue.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidBuffAtk.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\BagRecycler.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidSmashStun.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillSoldierShield.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidLifeLink.cs" />
     <Compile Include="Assets\Resources\Scripts\Configs\HeroConfig_s.cs" />
@@ -162,7 +157,6 @@
     <Compile Include="Assets\Resources\Scripts\Configs\BuffConfig_s.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffFrenzy.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\SideBar.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidFireShot.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidBarbarianSlam.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\SideBarAlphaGradient.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffHitStun.cs" />
@@ -172,6 +166,8 @@
     <Compile Include="Assets\MasterMagicFX\Scripts\Miscs\CameraRotater.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidAtkDrain.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidRangeDamageDeBuff.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidSelfBuff.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidTargetDamage.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAttackedTeleport.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\BattleResultHeroCellControl.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillInitSoldierBuff.cs" />
@@ -205,12 +201,10 @@
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillCastingAidAreaHeal.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidSelfAndLowHp.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffLock.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidShieldValue.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\PickPanelControl.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\RankPanelManager.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffHpRegenAdd.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffDecayDef.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidAssault.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidBurstShot.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillKillGain.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidBalance.cs" />
@@ -248,8 +242,6 @@
     <Compile Include="Assets\Resources\Scripts\Configs\GameRoundConfig_s.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAttackSpinAttack.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAttackArmorPierce.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidBerserk.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidMarkTarget.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillModifyBuffTime.cs" />
     <Compile Include="Assets\SineVFX\TopDownEffects\Scripts\SineCameraControllerTopDownEffects.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffManager.cs" />
@@ -275,14 +267,12 @@
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffArmorAdd.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidPoisonWine.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAttackMagicDamage.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidFrenzy.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidHealShield.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidJumpDamage.cs" />
     <Compile Include="Assets\Resources\Scripts\Configs\ForceConfig_s.cs" />
     <Compile Include="Assets\Resources\Scripts\Tools\HeroSelectionTool.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidBenevolence.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\LoopScrollRect.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidLifestealStrike.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\BattleStatManager.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\Skill.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidTauntSlam.cs" />
@@ -323,13 +313,11 @@
     <Compile Include="Assets\Resources\Scripts\UIs\PanelManager.cs" />
     <Compile Include="Assets\Resources\Scripts\PO\AttrInfo.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidArrogantWord.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidEmpower.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\RankCellInfo.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffDamagedAddRate.cs" />
     <Compile Include="Assets\MasterMagicFX\Scripts\Miscs\MLaser.cs" />
     <Compile Include="Assets\Resources\Scripts\Configs\EffectConfig_s.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\BagFieldUnitControl.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidSweeping.cs" />
     <Compile Include="Assets\Epic Toon FX\Scripts\ETFXPitchRandomizer.cs" />
     <Compile Include="Assets\MasterMagicFX\Scripts\Miscs\MSelfDestroy.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillSoldierArcherBuff.cs" />

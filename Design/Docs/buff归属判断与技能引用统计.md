@@ -158,9 +158,9 @@
 | 老 | 益壮 | `SkillAttackedShield` | 2010106~2010110 | 5（兵种技能，与「愈」组合） |
 | 乐进 | 御斩 | `SkillAidSlashDefend` | 2020216~2020220 | 5 |
 | 司马炎 | 一统 | `SkillAidBuffArea` | 2020021~2020025 | 5 |
-| 徐盛 | 疑城 | `SkillAidShieldValue` | 2020711~2020715 | 5 |
+| 徐盛 | 疑城 | `SkillAidSelfBuff` | 2020711~2020715 | 5 |
 | 于禁 | 铁壁 | `SkillAidIronGuard` | 2021516~2021520 | 5 |
-| 张梁 | 黄天 | `SkillAidShieldValue` | 2020626~2020630 | 5 |
+| 张梁 | 黄天 | `SkillAidSelfBuff` | 2020626~2020630 | 5 |
 | 文润 | 文润 | `SkillInitShieldValue` | 2090015 | 1（道具技能） |
 | 玄盾 | 玄盾 | `SkillInitShieldValue` | 2090006 | 1（道具技能） |
 | 玄武 | 玄武 | `SkillInitShieldValue` | 2090023 | 1（道具技能） |
@@ -172,24 +172,24 @@
 
 | Sname | 技能名 | 脚本 | Id 段 | 该行 BuffId |
 | --- | --- | --- | --- | --- |
-| 徐晃 | 长驱 | `SkillAidLifestealStrike` | 2020411~2020415 | `重,吸`（多段） |
+| 徐晃 | 长驱 | `SkillAidSelfBuff` | 2020411~2020415 | `重,吸`（多段） |
 
 ### 300004 伤害提升（重）— 3 技能 / 15 行
 
 | Sname | 技能名 | 脚本 | Id 段 | 该行 BuffId |
 | --- | --- | --- | --- | --- |
 | 董卓 | 暴虐 | `SkillAidBuffArea` | 2020016~2020020 | `重` |
-| 徐晃 | 长驱 | `SkillAidLifestealStrike` | 2020411~2020415 | `重,吸`（多段） |
-| 华雄 | 狂暴 | `SkillAidBerserk` | 2020126~2020130 | `重,伤`（多段） |
+| 徐晃 | 长驱 | `SkillAidSelfBuff` | 2020411~2020415 | `重,吸`（多段） |
+| 华雄 | 狂暴 | `SkillAidSelfBuff` | 2020126~2020130 | `重,伤`（多段） |
 
 ### 300005 攻速提升（快）— 5 技能 / 25 行
 
 | Sname | 技能名 | 脚本 | Id 段 | 该行 BuffId |
 | --- | --- | --- | --- | --- |
 | 陈泰 | 扬鞭 | `SkillAidHasteStrike` | 2020111~2020115 | `快` |
-| 鞠义 | 先锋 | `SkillAidAssault` | 2020426~2020430 | `快` |
-| 凌统 | 迅射 | `SkillAidFrenzy` | 2020316~2020320 | `快` |
-| 王濬 | 疾击 | `SkillAidFrenzy` | 2020526~2020530 | `快` |
+| 鞠义 | 先锋 | `SkillAidSelfBuff` | 2020426~2020430 | `快` |
+| 凌统 | 迅射 | `SkillAidSelfBuff` | 2020316~2020320 | `快` |
+| 王濬 | 疾击 | `SkillAidSelfBuff` | 2020526~2020530 | `快` |
 | 小乔 | 鼓舞 | `SkillAidBuffHasteMoveSpeed` | 2021211~2021215 | `快,速`（多段） |
 
 ### 300101 据守（守）— 1 技能 / 5 行
@@ -256,7 +256,7 @@
 
 | Sname | 技能名 | 脚本 | Id 段 |
 | --- | --- | --- | --- |
-| 丁奉 | 奋威 | `SkillAidEmpower` | 2020516~2020520 |
+| 丁奉 | 奋威 | `SkillAidSelfBuff` | 2020516~2020520 |
 
 ### 300018 法力回复（蓝）— 1 技能 / 5 行
 
@@ -317,7 +317,7 @@
 
 | Sname | 技能名 | 脚本 | Id 段 | 该行 BuffId |
 | --- | --- | --- | --- | --- |
-| 张辽 | 威震 | `SkillAidVengefulStance` | 2021511~2021515 | `震,乱` |
+| 张辽 | 威震 | `SkillAidSelfBuff` | 2021511~2021515 | `震` |
 
 ### 301001 眩晕（乱）— 8 技能 / 40 行
 
@@ -326,11 +326,11 @@
 | 贾诩 | 乱阵 | `SkillSoldierStun` | 2020916~2020920 | `威,乱,惑` |
 | 吕布 | 魔神 | `SkillCastingAidDrain` | 2020101~2020105 | `乱` |
 | 吕蒙 | 埋伏 | `SkillAttackedTeleport` | 2020701~2020705 | `乱,盾` |
-| 马谡 | 守势 | `SkillAidSmashStun` | 2021506~2021510 | `乱` |
+| 马谡 | 守势 | `SkillAidTargetDamage` | 2021506~2021510 | `乱` |
 | 谋 | 深谋 | `SkillAttackStunDamage` | 2010046~2010050（兵种） | `乱` |
 | 枪 | 枪阵 | `SkillHitBuff` | 2000141~2000145（兵种） | `乱` |
-| 夏侯惇 | 歼灭 | `SkillAidSmashStun` | 2020211~2020215 | `乱` |
-| 张辽 | 威震 | `SkillAidVengefulStance` | 2021511~2021515 | `震,乱` |
+| 夏侯惇 | 歼灭 | `SkillAidTargetDamage` | 2020211~2020215 | `乱` |
+| 张辽 | 威震 | `SkillAidSelfBuff` | 2021511~2021515 | `震` |
 
 ### 301102 连锁（锁）— 1 技能 / 5 行
 
@@ -346,14 +346,14 @@
 | 奸 | 权奸 | `SkillInitEnemyRandomBuff` | 2010096~2010100（兵种技能） | `伤` |
 | 刘晔 | 卸甲 | `SkillAidRangeDamageDeBuff` | 2021711~2021715 | `伤` |
 | 许攸 | 傲言 | `SkillAidArrogantWord` | 2020831~2020835 | `伤` |
-| 朱桓 | 标记 | `SkillAidMarkTarget` | 2020116~2020120 | `伤` |
-| 华雄 | 狂暴 | `SkillAidBerserk` | 2020126~2020130 | `重,伤`（多段） |
+| 朱桓 | 标记 | `SkillAidTargetDamage` | 2020116~2020120 | `伤` |
+| 华雄 | 狂暴 | `SkillAidSelfBuff` | 2020126~2020130 | `重,伤`（多段） |
 
 ### 301004 减攻（慑）— 4 技能 / 20 行
 
 | Sname | 技能名 | 脚本 | Id 段 | 该行 BuffId |
 | --- | --- | --- | --- | --- |
-| 陈宫 | 绝策 | `SkillAidMarkTarget` | 2021026~2021030 | `慑` |
+| 陈宫 | 绝策 | `SkillAidTargetDamage` | 2021026~2021030 | `慑` |
 | 法正 | 明断 | `SkillAidJumpDamage` | 2021006~2021010 | `慑` |
 | 马腾 | 腾驾 | `SkillAidAtkDrain` | 2020431~2020435 | `慑,攻` |
 | 徐庶 | 困敌 | `SkillAidRangeDamageDeBuff` | 2020501~2020505 | `慑,疫` |
@@ -371,7 +371,7 @@
 
 | Sname | 技能名 | 脚本 | Id 段 | 该行 BuffId |
 | --- | --- | --- | --- | --- |
-| 陈群 | 律令 | `SkillAidSlowStrike` | 2021726~2021730 | `疫` |
+| 陈群 | 律令 | `SkillAidTargetDamage` | 2021726~2021730 | `疫` |
 | 李儒 | 鸩酒 | `SkillAidPoisonWine` | 2020821~2020825 | `疫` |
 | 魏延 | 奇袭 | `SkillAidRangeDamageDeBuff` | 2021601~2021605 | `疫` |
 | 徐庶 | 困敌 | `SkillAidRangeDamageDeBuff` | 2020501~2020505 | `慑,疫` |
@@ -381,7 +381,7 @@
 
 | Sname | 技能名 | 脚本 | Id 段 |
 | --- | --- | --- | --- |
-| 荀攸 | 奇策 | `SkillAidSweeping` | 2021016~2021020 |
+| 荀攸 | 奇策 | `SkillAidTargetDamage` | 2021016~2021020 |
 | 张郃 | 震碎 | `SkillAidRangeDamageDeBuff` | 2020506~2020510 |
 | 张松 | 舌辩 | `SkillAidSilverTongue` | 2020806~2020810 |
 | 诸葛亮 | 惊雷 | `SkillAidShockWave` | 2021701~2021705 |
@@ -395,8 +395,8 @@
 | 马超 | 铁骑冲 | `SkillAidCavalryStrike` | 2020106~2020110 |
 | 潘璋 | 偷刃 | `SkillAidStealBlade` | 2021416~2021420 |
 | 孙坚 | 破阵 | `SkillAidRangeDamageDeBuff` | 2021521~2021525 |
-| 王双 | 崩山 | `SkillAidArmorShred` | 2021401~2021405 |
-| 夏侯渊 | 猎鹰 | `SkillAidArmorShred` | 2020306~2020310 |
+| 王双 | 崩山 | `SkillAidTargetDamage` | 2021401~2021405 |
+| 夏侯渊 | 猎鹰 | `SkillAidTargetDamage` | 2020306~2020310 |
 | 许褚 | 虎啸 | `SkillAidShockWave` | 2021421~2021425 |
 | 张绣 | 枪出如龙 | `SkillAidRangeDamageDeBuff` | 2021526~2021530 |
 
@@ -440,10 +440,10 @@
 | 不屈 | 周泰 | `SkillAidUnbreakable` | `盾,甲` |
 | 腾驾 | 马腾 | `SkillAidAtkDrain` | `慑,攻` |
 | 困敌 | 徐庶 | `SkillAidRangeDamageDeBuff` | `慑,疫` |
-| 威震 | 张辽 | `SkillAidVengefulStance` | `震,乱` |
+| 威震 | 张辽 | `SkillAidSelfBuff` | `震` |
 | 乱阵 | 贾诩 | `SkillSoldierStun` | `威,乱,惑` |
-| 长驱 | 徐晃 | `SkillAidLifestealStrike` | `重,吸` |
-| 狂暴 | 华雄 | `SkillAidBerserk` | `重,伤` |
+| 长驱 | 徐晃 | `SkillAidSelfBuff` | `重,吸` |
+| 狂暴 | 华雄 | `SkillAidSelfBuff` | `重,伤` |
 | 鼓舞 | 小乔 | `SkillAidBuffHasteMoveSpeed` | `快,速` |
 | 仁德 | 刘备 | `SkillAidBenevolence` | `血,蓝` |
 | 奇才 | 才 | `SkillAidBuffArea` | `攻,甲,抗` |
