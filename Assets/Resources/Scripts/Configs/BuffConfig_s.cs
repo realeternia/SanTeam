@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -161,11 +161,11 @@ namespace CommonConfig
             config[300102] = new BuffConfig(300102, "复活", "复", "死亡后3秒原地复活(仅一次)", true, false, "BuffRevive", "", "", "", "", "");
             config[300103] = new BuffConfig(300103, "乱阵", "威", "携带者普攻按概率眩晕目标，眩晕持续/bufftime秒", true, false, "BuffHitStun", "", "", "", "", "");
             config[300104] = new BuffConfig(300104, "多重箭", "箭", "攻击时额外射出多支箭", true, true, "BuffMultiShot", "", "", "", "", "");
-            config[300105] = new BuffConfig(300105, "倍击", "倍", "接下来数次攻击造成加倍伤害", true, false, "BuffNextAttacksMult", "", "", "", "", "");
             config[300106] = new BuffConfig(300106, "生命链接", "链", "与链接方共享伤害与回复", true, false, "BuffLifeLink", "", "", "", "", "");
             config[300107] = new BuffConfig(300107, "望族", "望", "提升/strength点护甲、/strength2点魔抗，每3秒衰减1/5，15秒后归零", true, true, "BuffDecayDef", "", "", "", "", "");
             config[300108] = new BuffConfig(300108, "兼资", "兼", "攻击叠层：每层提升/strength攻击、/strength2法术强度，持续攻击刷新，停手后层数清零", true, true, "BuffStackBuf", "", "", "", "", "");
             config[300109] = new BuffConfig(300109, "威震", "震", "携带者普攻按概率眩晕目标，且普攻转为真实伤害，持续/bufftime秒", true, false, "BuffVengefulStance", "", "", "", "", "");
+            config[300110] = new BuffConfig(300110, "暴击提升", "暴", "提升暴击率", true, true, "BuffCritRate", "", "", "", "", "");
             config[300128] = new BuffConfig(300128, "护驾", "护", "受到的回复效果提升/strength%", true, false, "BuffHealBoost", "", "", "", "", "");
             config[301001] = new BuffConfig(301001, "眩晕", "乱", "眩晕，无法行动", false, true, "BuffNoAction", "", "", "StunnedCirclingStarsSimple", "", "");
             config[301003] = new BuffConfig(301003, "增伤", "伤", "受到的伤害按比例增加", false, true, "BuffDamagedAddRate", "", "", "StunnedDamageUp", "", "");

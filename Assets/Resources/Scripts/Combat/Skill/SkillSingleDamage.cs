@@ -20,6 +20,7 @@ using UnityEngine;
 /// · antiShield = 目标带盾时追加 Strength2[0] 倍破盾伤害，携带 AntiShield 标签（高顺·破甲）
 /// · dispel     = 伤害后驱散目标正面 Buff（许攸·傲言 / 张松·舌辩）
 /// · dot        = 附加每秒 Strength2[0] 的持续伤害，持续 BuffTime（李儒·鸩酒）
+/// · mpBurn     = 命中后燃烧目标 Strength2[1] 点法力（程昱·断粮；[0] 已被 dot 占用）
 /// </summary>
 public class SkillSingleDamage : Skill
 {
@@ -62,6 +63,10 @@ public class SkillSingleDamage : Skill
                 target.OnSkillDamaged(owner, id, extra, false, CombatConst.AntiShieldHurtTag);
             }
         }
+
+        // 法力燃烧：燃烧量取本技能的约定槽位 Strength2[1]（[0] 被 dot 占用），每次释放只结算一次
+        if (HasSkillFlag("mpBurn"))
+            BurnMpToTarget(target, GetStrength2(1));
 
         ApplyBuffs(target);
 

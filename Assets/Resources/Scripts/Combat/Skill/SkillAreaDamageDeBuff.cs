@@ -13,6 +13,7 @@ using UnityEngine;
 /// TargetType 标记扩展（可与 self 组合，逗号分隔）：
 /// · missile    = 以飞弹逐个结算，伤害 ×(1+Strength2[0])（黄忠·乱射）
 /// · maxHpBonus = 伤害 += 目标最大生命 × Strength2[0]（文丑·陷阵怒吼）
+/// · mpBurn     = 每个命中目标燃烧 Strength2[0] 点法力（贾诩·乱阵）
 /// </summary>
 public class SkillAreaDamageDeBuff : Skill
 {
@@ -49,6 +50,8 @@ public class SkillAreaDamageDeBuff : Skill
         var maxHpBonus = HasSkillFlag("maxHpBonus");
 
         var skillDamage = GetSkillDamage();
+        // 法力燃烧：燃烧量取本技能的约定槽位 Strength2[0]，每级只解析一次
+        var mpBurn = HasSkillFlag("mpBurn") ? GetStrength2(0) : 0f;
         foreach (var u in units)
         {
             var damage = skillDamage;
@@ -68,6 +71,8 @@ public class SkillAreaDamageDeBuff : Skill
                         EffectManager.PlaySkillEffect(u, skillCfg.HitEffect);
                 }
             }
+            // 法力燃烧：每个命中目标每次释放只结算一次
+            BurnMpToTarget(u, mpBurn);
             foreach (var debuffId in debuffIds)
                 BuffManager.AddBuff(u, owner, id, debuffId, skillCfg.BuffTime);
         }

@@ -3,7 +3,7 @@ using UnityEngine;
 
 /// <summary>
 /// 甘宁·百骑劫营（武）：锁定射程内最远的敌方后排单体，突进到其近旁，
-/// 对其造成 GetSkillDamage 物理伤害并降低其护甲（Buff 短名由 skillCfg.BuffId 配置）BuffTime 秒。
+/// 对其造成 GetSkillDamage 物理伤害并燃烧其法力（TargetType 含 mpBurn，燃烧量取 Strength2[0]）。
 /// </summary>
 public class SkillAidRaidCamp : Skill
 {
@@ -31,11 +31,9 @@ public class SkillAidRaidCamp : Skill
         if (damage > 0)
             target.OnSkillDamaged(owner, skillId, damage);
 
-        var buffCfg = BuffConfig.GetConfigByNameS(skillCfg.BuffId);
-        if (buffCfg != null)
-            BuffManager.AddBuff(target, owner, id, buffCfg.Id, skillCfg.BuffTime);
-        else
-            GameLog.Error("SkillAidRaidCamp: 未找到破甲Buff短名：" + skillCfg.BuffId);
+        // 法力燃烧：燃烧量取本技能的约定槽位 Strength2[0]，每次释放只结算一次
+        if (HasSkillFlag("mpBurn"))
+            BurnMpToTarget(target, GetStrength2(0));
 
         EffectManager.PlaySkillEffect(target, skillCfg.HitEffect);
         return true;

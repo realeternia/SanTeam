@@ -120,14 +120,13 @@ public class Skill
     }
 
     /// <summary>
-    /// 读取 Strength2 数值槽（0 基下标），未配置或越界时返回 def。
-    /// 通用模板通过它读取伤害倍率/护盾量等参数，避免各技能脚本硬编码下标。
+    /// 对目标燃烧指定量法力（燃烧量由上层技能按自身配置约定选取字段后传入，0/负数不生效），返回实际燃烧量。
     /// </summary>
-    protected float GetStrength2(int idx, float def = 0f)
+    protected int BurnMpToTarget(Chess target, float amount)
     {
-        if (skillCfg == null || skillCfg.Strength2 == null || idx < 0 || idx >= skillCfg.Strength2.Length)
-            return def;
-        return skillCfg.Strength2[idx];
+        if (target == null || target.hp <= 0 || amount <= 0f)
+            return 0;
+        return target.BurnMp(amount);
     }
 
     /// <summary>
@@ -214,6 +213,16 @@ public class Skill
         if (skillCfg.MpCost <= 0)
             return;
         mp = Mathf.Clamp(mp + add, 0f, skillCfg.MpCost);
+    }
+
+    // 法力燃烧：直接扣减当前技能MP（仅对设置了MpCost的技能生效），返回实际燃烧量
+    public int BurnMp(float amount)
+    {
+        if (skillCfg.MpCost <= 0 || amount <= 0f || mp <= 0f)
+            return 0;
+        var before = mp;
+        mp = Mathf.Clamp(mp - amount, 0f, skillCfg.MpCost);
+        return (int)(before - mp);
     }
 
     // MP是否已满（未设置MpCost的技能不受MP限制）

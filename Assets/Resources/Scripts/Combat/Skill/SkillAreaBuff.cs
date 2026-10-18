@@ -10,13 +10,17 @@ using UnityEngine;
 /// 护盾类 Buff 自动按统一护盾公式写入护盾量。
 ///
 /// TargetType 标记扩展（逗号分隔，空=默认随机 N 名、含士兵、首段去重）：
-/// · heroOnly           = 只选英雄（刘备·仁德 / 甄宓·洛神 / 袁绍·名门 / 周仓·忠勇）
-/// · excludeSelf        = 候选池排除施法者（甄宓 / 袁绍 / 周仓）
+/// · heroOnly           = 只选英雄（刘备·仁德 / 甄宓·洛神 / 袁绍·名门 / 周仓·忠勇 / 张梁·黄天）
+/// · excludeSelf        = 候选池排除施法者（甄宓 / 袁绍 / 周仓 / 张梁）
 /// · selfAlways         = 施法者必定获得（李典·御阵 / 周仓）
-/// · lowestHp/highestHp = 按生命比例排序取前 N（甄宓 / 周仓 / 袁绍 / 李严）
-/// · fullHpSkip         = 跳过满血友军（甄宓 / 周仓）
-/// · noDedupe           = 不按首段 Buff 去重（甄宓 / 周仓 / 李严）
-/// · crossSideFallback  = 同侧无目标时退到非敌对阵营（袁绍·名门）
+/// · lowestHp           = 按生命比例升序取前 N（周仓·忠勇 / 李严·护军）
+/// · highestHp          = 按生命比例降序取前 N（甄宓·洛神 / 大乔·国色 / 袁绍·名门）
+/// · highestArmor       = 按护甲降序取前 N（张梁·黄天）
+/// · rangedOnly         = 只选远程单位（attackRange >= CombatConst.MeleeRange，甄宓·洛神）
+/// · meleeOnly          = 只选近战单位（attackRange < CombatConst.MeleeRange，大乔·国色）
+/// · fullHpSkip         = 跳过满血友军（周仓 / 张梁）
+/// · noDedupe           = 不按首段 Buff 去重（甄宓 / 袁绍 / 周仓 / 李严 / 张梁 / 大乔）
+/// · crossSideFallback  = 同侧无目标时退到非敌对阵营（当前无技能使用）
 /// · wholeMap           = 全图选人（李严·护军；Area 只作为嘲讽半径）
 /// · tauntAroundTarget  = 给目标挂完 Buff 后，嘲讽其周围 Area 内敌人（李严·护军）
 /// </summary>
@@ -43,6 +47,9 @@ public class SkillAreaBuff : Skill
         var noDedupe = HasSkillFlag("noDedupe");
         var lowestHp = HasSkillFlag("lowestHp");
         var highestHp = HasSkillFlag("highestHp");
+        var highestArmor = HasSkillFlag("highestArmor");
+        var rangedOnly = HasSkillFlag("rangedOnly");
+        var meleeOnly = HasSkillFlag("meleeOnly");
         var fullHpSkip = HasSkillFlag("fullHpSkip");
         var selfAlways = HasSkillFlag("selfAlways");
         var crossSideFallback = HasSkillFlag("crossSideFallback");
@@ -52,6 +59,8 @@ public class SkillAreaBuff : Skill
             .FindAll(x => x.IsInFight()
                 && (!heroOnly || x.isHero)
                 && (!excludeSelf || x != owner)
+                && (!rangedOnly || x.attackRange >= CombatConst.MeleeRange)
+                && (!meleeOnly || x.attackRange < CombatConst.MeleeRange)
                 && (noDedupe || !x.HasBuff(buffIds[0]))
                 && (!fullHpSkip || x.hp < x.maxHp));
 
@@ -78,8 +87,10 @@ public class SkillAreaBuff : Skill
                 units.Sort((a, b) => a.HpRate.CompareTo(b.HpRate));
             else if (highestHp)
                 units.Sort((a, b) => b.HpRate.CompareTo(a.HpRate));
+            else if (highestArmor)
+                units.Sort((a, b) => b.armor.CompareTo(a.armor));
 
-            if (lowestHp || highestHp)
+            if (lowestHp || highestHp || highestArmor)
             {
                 if (units.Count > skillCfg.TargetCount)
                     units.RemoveRange(skillCfg.TargetCount, units.Count - skillCfg.TargetCount);

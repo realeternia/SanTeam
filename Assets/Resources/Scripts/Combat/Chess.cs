@@ -1325,6 +1325,17 @@ public class Chess : MonoBehaviour
         jumpCoroutine = null;
     }
 
+    /// <summary>
+    /// 法力燃烧：对所有设置了 MpCost 的技能扣减当前MP，返回实际燃烧总量。
+    /// </summary>
+    public int BurnMp(float amount)
+    {
+        var total = 0;
+        foreach (var skill in skills)
+            total += skill.BurnMp(amount);
+        return total;
+    }
+
     public void AddSkill(int skillId, int parentSkillId, int level = 0)
     {
         if(skills.Find(skill => skill.id == skillId || skill.id == parentSkillId) != null)
