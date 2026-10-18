@@ -119,6 +119,34 @@ public class Skill
         return ids;
     }
 
+    /// <summary>
+    /// 读取 Strength2 数值槽（0 基下标），未配置或越界时返回 def。
+    /// 通用模板通过它读取伤害倍率/护盾量等参数，避免各技能脚本硬编码下标。
+    /// </summary>
+    protected float GetStrength2(int idx, float def = 0f)
+    {
+        if (skillCfg == null || skillCfg.Strength2 == null || idx < 0 || idx >= skillCfg.Strength2.Length)
+            return def;
+        return skillCfg.Strength2[idx];
+    }
+
+    /// <summary>
+    /// 判断 SkillConfig.TargetType 是否包含指定行为标记。
+    /// TargetType 原本是“选取点”单选字段，现向后兼容地扩展为标记列表：
+    /// 多项以英文/中文逗号、分号或竖线分隔（如 "self,missile"），逐项精确匹配。
+    /// </summary>
+    protected bool HasSkillFlag(string flag)
+    {
+        if (skillCfg == null || string.IsNullOrEmpty(skillCfg.TargetType) || string.IsNullOrEmpty(flag))
+            return false;
+        foreach (var seg in skillCfg.TargetType.Split(new[] { ',', '，', ';', '；', '|' }, StringSplitOptions.RemoveEmptyEntries))
+        {
+            if (seg.Trim() == flag)
+                return true;
+        }
+        return false;
+    }
+
     public Skill(int id, Chess unit)
     {
         this.id = id;

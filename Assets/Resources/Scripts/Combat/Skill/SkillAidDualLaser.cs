@@ -6,7 +6,7 @@ using UnityEngine;
 /// 每道复用惊雷的方向型导弹流程独立结算（各自最多命中原有 TargetCount 个目标，互不去重，
 /// 同一目标被多道命中时伤害叠加），命中附加效果走基类 OnMissileHit（未配置 BuffId 时不挂 buff）。
 /// </summary>
-public class SkillAidDualLaser : SkillAidShockWave
+public class SkillAidDualLaser : SkillShockWave
 {
     /// <summary>左右两道激光相对正前方的偏转角（度）</summary>
     private const float LaserSpreadAngle = 25f;

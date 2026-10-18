@@ -11,6 +11,8 @@ using UnityEngine;
 /// </summary>
 public class SkillCastingAidScorchedEarth : Skill
 {
+    private const float TrapDuration = 2f;
+
     private List<Vector3> targetPosList;
 
     public SkillCastingAidScorchedEarth(int id, Chess unit) : base(id, unit)
@@ -29,6 +31,9 @@ public class SkillCastingAidScorchedEarth : Skill
 
         owner.PlayerAnim(skillCfg.Action);
         PlaySelfEffect();
+
+        // 主目标额外陷入「陷阵」2 秒，无法移动
+        BuffManager.AddBuff(target, owner, id, BuffConfig.GetConfigByNameS("陷阵").Id, TrapDuration);
 
         // 在目标周围 Range 半径内随机生成 SummonCount 个落点（x 与 z 独立随机偏移）
         var basePos = target.transform.position;

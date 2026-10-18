@@ -22,7 +22,7 @@ public static class SkillManager
     }
 
     /// <summary>
-    /// 按 ScriptName 反射取技能脚本类的 (int, Chess) 构造器（约定 ScriptName 即类名，如 "SkillAidShockWave"）。
+    /// 按 ScriptName 反射取技能脚本类的 (int, Chess) 构造器（约定 ScriptName 即类名，如 "SkillShockWave"）。
     /// 未带 Skill 前缀时自动补全（兼容历史配置）；找不到类或构造器时记录日志并返回 null。
     /// </summary>
     private static ConstructorInfo GetSkillConstructor(string scriptName)

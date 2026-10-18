@@ -1,10 +1,10 @@
-﻿using System.Linq;
+using System.Linq;
 using CommonConfig;
 using UnityEngine;
 
 /// <summary>
 /// 安民（济世安民）：战斗开始全组士兵最大生命提升 maxHp × skillCfg.Strength2[0]、每秒生命回复提升 skillCfg.Strength2[1] 点。
-/// 士兵血量成长机制参照相·运筹 SkillSoldierBuff；士兵为 Chess，自带 maxHp/hpRegen。
+/// 士兵血量成长机制参照相·运筹 SkillSoldierGrow；士兵为 Chess，自带 maxHp/hpRegen。
 /// </summary>
 public class SkillInitSoldierBuff : Skill
 {
