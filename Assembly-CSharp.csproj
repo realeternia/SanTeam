@@ -147,7 +147,6 @@
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidBuffAtk.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\BagRecycler.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidSmashStun.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\MissileComp.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillSoldierShield.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidLifeLink.cs" />
     <Compile Include="Assets\Resources\Scripts\Configs\HeroConfig_s.cs" />
@@ -258,7 +257,6 @@
     <Compile Include="Assets\SineVFX\TopDownEffects\Scripts\SineCameraControllerTopDownEffects.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffManager.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\ChessHUD.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidUsurpPressure.cs" />
     <Compile Include="Assets\Resources\Scripts\Configs\HeroAttrConfig_s.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidArmorBreak.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffReflect.cs" />
@@ -284,6 +282,7 @@
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAttackMagicDamage.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidFrenzy.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidHealShield.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidJumpDamage.cs" />
     <Compile Include="Assets\Resources\Scripts\Configs\ForceConfig_s.cs" />
     <Compile Include="Assets\Resources\Scripts\Tools\HeroSelectionTool.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidBenevolence.cs" />

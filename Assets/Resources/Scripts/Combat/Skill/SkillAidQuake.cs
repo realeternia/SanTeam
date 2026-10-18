@@ -3,9 +3,10 @@ using CommonConfig;
 using UnityEngine;
 
 /// <summary>
-/// 张郃·震碎（术）：范围AoE + 减速(缓)。
-/// 普攻触发后对目标周围 skillCfg.Area 范围内至多 TargetCount 个敌人造成技能伤害，
-/// 并给每个目标附加减速Buff（时长 skillCfg.BuffTime）。
+/// 通用"目标中心"范围 AoE（张郃·震碎 / 司马昭·篡逆 共用）：锁定目标在 skillCfg.Range 射程内时，
+/// 以目标位置为中心，对 skillCfg.Area 范围内敌人（TargetCount&gt;0 时至多随机 N 名，否则范围内全部）
+/// 造成 GetSkillDamage() 技能伤害，并给每个目标附加 SkillConfig.BuffId 指定的减益 buff（时长 BuffTime）。
+/// 范围特效播在目标位置、命中特效播在每个受击目标身上。
 /// </summary>
 public class SkillAidQuake : Skill
 {
@@ -28,9 +29,21 @@ public class SkillAidQuake : Skill
         PlayAreaEffect(target.transform.position);
 
         var units = WorldManager.Instance.GetEnemyInRange(target.transform.position, skillCfg.Area, owner.side);
-        WorldManager.Instance.RandomSelect(units, skillCfg.TargetCount);
+        // 命中数上限：TargetCount>0 时随机保留 N 名（同落雷/火海）；<=0 表示不限，避免 RandomSelect(0) 清空列表
+        if (skillCfg.TargetCount > 0)
+            WorldManager.Instance.RandomSelect(units, skillCfg.TargetCount);
 
-        var huanBuffId = BuffConfig.GetConfigByNameS(skillCfg.BuffId).Id; // 减速Buff
+        // 减益 buff 由 SkillConfig.BuffId 短名指定（如"缓"=减速、"叛"=叛逃），不在战斗代码硬编码 BuffId
+        var debuffId = 0;
+        if (!string.IsNullOrEmpty(skillCfg.BuffId))
+        {
+            var debuffCfg = BuffConfig.GetConfigByNameS(skillCfg.BuffId);
+            if (debuffCfg != null)
+                debuffId = debuffCfg.Id;
+            else
+                GameLog.Error($"SkillAidQuake: 未找到减益Buff短名：{skillCfg.BuffId} 技能id={id}");
+        }
+
         var skillDamage = GetSkillDamage();
         foreach (var u in units)
         {
@@ -40,7 +53,8 @@ public class SkillAidQuake : Skill
                 if (!string.IsNullOrEmpty(skillCfg.HitEffect))
                     EffectManager.PlaySkillEffect(u, skillCfg.HitEffect);
             }
-            BuffManager.AddBuff(u, owner, id, huanBuffId, skillCfg.BuffTime);
+            if (debuffId > 0)
+                BuffManager.AddBuff(u, owner, id, debuffId, skillCfg.BuffTime);
         }
         return true;
     }

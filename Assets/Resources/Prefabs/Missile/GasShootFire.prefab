@@ -9534,7 +9534,6 @@ GameObject:
   - component: {fileID: 198285934277540912}
   - component: {fileID: 199309305915587178}
   - component: {fileID: 82270442419296012}
-  - component: {fileID: -54189461762187147}
   m_Layer: 0
   m_Name: GasShootFire
   m_TagString: Untagged
@@ -14402,19 +14401,6 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 0
---- !u!114 &-54189461762187147
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1762376750822800}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7332a53d91ebb4b40a937aaf4a4de67f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  hitEffectName: GasExplosionFire
 --- !u!1 &1915560383106050
 GameObject:
   m_ObjectHideFlags: 0

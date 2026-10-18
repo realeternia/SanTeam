@@ -12,7 +12,7 @@ description: 配置与校验战斗技能/Buff 特效(HitEffect/AreaEffect/BuffEf
 - 特效表 `Assets/Resources/Scripts/Configs/EffectConfig_s.cs`：`Name`(引用key) / `Cname` / **`Type`(增益·负面·伤害)** / **`Area`(目标·范围)** / `EffPath` / `MissilePath` / `Scale` / `OffsetY` / `MissileScale` / `MissileOffsetY` / `TintColor`(hex 变色，可复用同形态特效)。
 - 技能表 `Configs/SkillConfig_s.cs`：`SelfEffect`（施法自身特效，施法/触发瞬间在施法者身上播）、`HitEffect`（命中特效，挂目标/自身）、`AreaEffect`（范围特效，挂地面并按技能 `Area` 缩放到基准半径）。
 - Buff 表 `Configs/BuffConfig_s.cs`：`BuffEffect`（挂单位身上，随 buff 存续）。
-- 播放入口 `Combat/EffectManager.cs`：`PlaySkillEffect`(命中)、`Skill.PlaySelfEffect`→`PlaySkillEffect`(施法自身)、`Skill.PlayAreaEffect`→`PlayPosSkillEffect`(范围)、`PlayBuffEffect`(buff)、`PlayPersistentEffect`(常驻自身视觉，挂单位身上不自动销毁、随单位销毁清理，如光环技能 `SkillAidAura` 开局的自身标识)。
+- 播放入口 `Combat/EffectManager.cs`：`PlaySkillEffect`(命中)、`Skill.PlaySelfEffect`→`PlaySkillEffect`(施法自身)、`Skill.PlayAreaEffect`→`PlayPosSkillEffect`(范围，挂战场场景容器不挂施法者节点，落点固定不随施法者移动/转向)、`PlayBuffEffect`(buff)、`PlayPersistentEffect`(常驻自身视觉，挂单位身上不自动销毁、随单位销毁清理，如光环技能 `SkillAidAura` 开局的自身标识)。
 
 ## 二、选择规则（硬约束）
 
@@ -75,6 +75,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .trae/skills/combat-effect-u
 
 - buff 特效随 buff 存续：`PlayBuffEffect` 内对子 `ParticleSystem` 置 `main.loop = true` 后再 `Play()`（`GetComponentsInChildren<ParticleSystem>(true)`）。
 - 一次性特效（命中/范围）不加 loop。
+- 导弹类技能（如 `SkillAidShockWave` 系）：`SkillConfig.HitEffect` 填的是**导弹特效名**（`EffectConfig.MissilePath`），命中特效取该 `EffectConfig` 条目的 `EffPath`——即一个条目同时描述"弹道 + 其命中特效"。原从导弹预制体 `MissileComp.hitEffectName` 读取命中特效的机制已移除，要改某技能的命中特效就改对应 `EffectConfig.EffPath`（缩放/染色同样取该条目）。
 - 世界缩放/偏移由配置决定，不受父节点缩放影响（按父级 `lossyScale` 的 X 轴做标量补偿）。
 - 该补偿只对 **Hierarchy** 缩放模式的粒子成立；根节点上的 **Local** 粒子只吃自身 `localScale`（忽略父级），会被补偿除法缩小一个父级缩放的倍数（单位根缩放 10 → 小 10 倍，如 `Par_PurpleField`）。`MountEffect` 已统一把根节点 Local 粒子改回 Hierarchy，故新增特效预制体若根节点粒子是 Local 也能自动修正；若想从源头规范，可直接把预制体根节点粒子 Scaling Mode 设为 Hierarchy。
 

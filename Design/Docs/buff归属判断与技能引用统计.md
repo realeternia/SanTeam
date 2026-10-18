@@ -405,7 +405,7 @@
 | Sname | 技能名 | 脚本 | Id 段 |
 | --- | --- | --- | --- |
 | 司马懿 | 隐忍 | `SkillAidEnduranceStrike` | 2020811~2020815 |
-| 司马昭 | 篡逆 | `SkillAidUsurpPressure` | 2020826~2020830 |
+| 司马昭 | 篡逆 | `SkillAidQuake` | 2020826~2020830 |
 
 ### 301012 混乱（惑）— 1 技能 / 5 行
 

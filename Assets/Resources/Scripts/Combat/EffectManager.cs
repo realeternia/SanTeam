@@ -66,6 +66,34 @@ public static class EffectManager
         }
     }
 
+    // 战场场景容器（WorldManager.Units 节点，缩放1）：单位/导弹/对地特效统一挂其下，
+    // 战斗结束（BattleEnd / 重新布阵）会销毁其全部子节点，保证对地特效不残留。
+    private static Transform SceneContainer()
+    {
+        var wm = WorldManager.Instance;
+        if (wm != null && wm.Units != null)
+            return wm.Units.transform;
+        GameLog.Warn("EffectManager 未取到 WorldManager.Units，对地特效回退挂到场景根");
+        return null;
+    }
+
+    /// <summary>
+    /// 场景锚定挂载（对地/范围特效专用）：挂到战场场景容器而非施法者节点，
+    /// 世界位置=落点+配置高度偏移、朝向=预制体朝向、世界缩放=配置值，
+    /// 均不随施法者移动/转向变化（挂施法者节点会随其移动或动作位移一起漂移）。
+    /// </summary>
+    private static GameObject MountEffectToScene(GameObject effect, Vector3 worldPos, Vector3 worldScale, float worldOffsetY)
+    {
+        var parent = SceneContainer();
+        effect.transform.parent = parent;
+        effect.transform.position = worldPos + Vector3.up * worldOffsetY;
+        var parentScale = parent != null ? parent.lossyScale : Vector3.one;
+        float factor = parentScale.x != 0 ? worldScale.x / parentScale.x : worldScale.x;
+        effect.transform.localScale = new Vector3(factor, factor, factor);
+        NormalizeRootScalingMode(effect);
+        return effect;
+    }
+
     // 配置了变色（TintColor）时，自动挂染色脚本并设置目标颜色
     public static void ApplyTint(GameObject effect, EffectConfig cfg)
     {
@@ -86,13 +114,6 @@ public static class EffectManager
 
     public static void PlayHitEffect(Chess sourceChess, Chess targetChess, string effectName)
     {
-        // if (sourceChess.isHero)
-        // {
-        //     var heroConfig = HeroConfig.GetConfig(sourceChess.heroId);
-
-        //     if ((sourceChess.side == 1 || sourceChess.side == 2) && effectName.StartsWith("Sword"))
-        //         GameManager.Instance.PlaySound("Sounds/sword");
-        // }
         // 播放粒子特效
         var hitPrefab = Resources.Load<GameObject>(ResolveEffectPath(effectName));
         var cfg = EffectConfig.GetConfigByName(effectName);
@@ -132,10 +153,11 @@ public static class EffectManager
     }
 
     /// <summary>
-    /// 对地/范围特效：在指定位置播放范围特效，缩放 = EffectConfig.Scale × (area / AreaEffectBaseRadius)，
+    /// 对地/范围特效：在指定世界位置播放范围特效，缩放 = EffectConfig.Scale × (area / AreaEffectBaseRadius)，
     /// 即施法范围越大特效越大（area&lt;=0 时不做额外缩放）。范围技能统一经 Skill.PlayAreaEffect 调用。
+    /// 特效挂在战场场景容器上（不挂施法者节点），落点固定，不随施法者移动/转向漂移。
     /// </summary>
-    public static GameObject PlayPosSkillEffect(Chess sourceChess, Vector3 sourcePos, float area, string effect, float time = 1.3f)
+    public static GameObject PlayPosSkillEffect(Vector3 sourcePos, float area, string effect, float time = 1.3f)
     {
         if (string.IsNullOrEmpty(effect))
         {
@@ -156,7 +178,7 @@ public static class EffectManager
         float scale = baseScale * extra;
         float offsetY = GetOffsetY(effect, cfg);
         GameObject hitEffect = UnityEngine.Object.Instantiate(hitPrefab, sourcePos, hitPrefab.transform.rotation);
-        MountEffect(hitEffect, sourceChess.transform, new Vector3(scale, scale, scale), offsetY);
+        MountEffectToScene(hitEffect, sourcePos, new Vector3(scale, scale, scale), offsetY);
         ApplyTint(hitEffect, cfg);
         // 可以添加代码设置特效的生命周期，例如几秒钟后自动销毁
         UnityEngine.Object.Destroy(hitEffect, time);

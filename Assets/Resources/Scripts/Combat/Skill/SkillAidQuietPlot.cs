@@ -3,8 +3,8 @@ using UnityEngine;
 
 /// <summary>
 /// 范围伤害+减益（术）：以目标位置为中心，对 /area 范围内敌人各造成 /damagestrength 法术伤害，
-/// 并附加 skillCfg.BuffId 指定的减益 buff（钟会·蓄谋="疫"降疗；法正·明断="慑"降攻），时长 bufftime。
-/// 注意：法正/钟会均为远程(棋)单位，AoE 必须以目标位置为圆心，否则自身站位远离敌阵会导致技能全程打空。
+/// 并附加 skillCfg.BuffId 指定的减益 buff（钟会·蓄谋="疫"降疗），时长 bufftime。
+/// 注意：钟会为远程(棋)单位，AoE 必须以目标位置为圆心，否则自身站位远离敌阵会导致技能全程打空。
 /// </summary>
 public class SkillAidQuietPlot : Skill
 {

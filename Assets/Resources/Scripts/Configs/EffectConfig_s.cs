@@ -156,9 +156,9 @@ namespace CommonConfig
             config[10070] = new EffectConfig(10070, "SoulExplosionOrange", "橙色灵魂爆裂特效", "伤害", "目标", "Effect/SoulExplosionOrange", "Missile/SoulExplosionOrange", 5f, 1f, 8f, 1f, "");
             config[10080] = new EffectConfig(10080, "StormExplosion", "风暴爆裂特效", "伤害", "范围", "Effect/StormExplosion", "Missile/StormExplosion", 8f, 1f, 8f, 1f, "");
             config[10090] = new EffectConfig(10090, "ToolExplosion", "锤类爆裂特效", "伤害", "目标", "Effect/ToolExplosion", "Missile/ToolExplosion", 5f, 1f, 8f, 1f, "");
-            config[10100] = new EffectConfig(10100, "AxeExplosion", "斧类爆裂特效（弹道）", "伤害", "目标", "", "Missile/AxeExplosion", 5f, 1f, 8f, 1f, "");
-            config[10110] = new EffectConfig(10110, "GasShootFire", "火焰喷射弹道特效", "伤害", "目标", "", "Missile/GasShootFire", 5f, 1f, 8f, 1f, "");
-            config[10120] = new EffectConfig(10120, "NukeMissileFires", "核弹导弹弹道特效", "伤害", "目标", "", "Missile/NukeMissileFires", 5f, 1f, 5f, 1f, "#00D5FF");
+            config[10100] = new EffectConfig(10100, "AxeExplosion", "斧类爆裂特效（弹道）", "伤害", "目标", "Effect/SwordHitBlue", "Missile/AxeExplosion", 5f, 1f, 8f, 1f, "");
+            config[10110] = new EffectConfig(10110, "GasShootFire", "火焰喷射弹道特效", "伤害", "目标", "Effect/GasExplosionFire", "Missile/GasShootFire", 5f, 1f, 8f, 1f, "");
+            config[10120] = new EffectConfig(10120, "NukeMissileFires", "核弹导弹弹道特效", "伤害", "目标", "Effect/top_down_lightning_dot_orange", "Missile/NukeMissileFires", 5f, 1f, 5f, 1f, "#00D5FF");
             config[10130] = new EffectConfig(10130, "ShadowExplosion", "暗影爆裂特效", "伤害", "目标", "Effect/ShadowExplosion", "Missile/ShadowExplosion", 5f, 1f, 8f, 1f, "");
             config[10131] = new EffectConfig(10131, "ShadowExplosionGreen", "绿色暗影爆裂特效", "伤害", "目标", "Effect/ShadowExplosion", "Missile/ShadowExplosionGreen", 5f, 1f, 8f, 1f, "#105E11");
             config[10140] = new EffectConfig(10140, "FlashExplosionBlue", "蓝色星爆", "伤害", "目标", "Effect/FlashExplosionBlue", "Missile/FlashExplosionBlue", 5f, 1f, 5f, 1f, "");
@@ -210,12 +210,17 @@ namespace CommonConfig
             config[11282] = new EffectConfig(11282, "MissesGreen", "绿色烟雾效果", "负面", "目标", "Effect/Misses", "", 8f, 1f, 5f, 1f, "#00FF1B");
             config[11290] = new EffectConfig(11290, "Wet", "蓝色下雨效果", "负面", "目标", "Effect/Wet", "", 6f, 1f, 5f, 1f, "");
             config[11300] = new EffectConfig(11300, "Character_status_sleep", "sleep", "负面", "目标", "Effect/Character_status_sleep", "", 8f, 1f, 5f, 1f, "#3333FF");
-            config[11400] = new EffectConfig(11400, "Character_status_fight", "嘲讽", "负面", "目标", "Effect/Character_status_fight", "", 8f, 1f, 5f, 1f, "");
-            config[11410] = new EffectConfig(11410, "Par_FireField", "红色光环", "负面", "目标", "Effect/Par_FireField", "", 4.5f, .5f, 5f, 1f, "");
+            config[11400] = new EffectConfig(11400, "Character_status_fight", "好战", "负面", "目标", "Effect/Character_status_fight", "", 8f, 1f, 5f, 1f, "");
+            config[11410] = new EffectConfig(11410, "Character_status_taunt", "嘲讽", "负面", "目标", "Effect/Character_status_taunt", "", 8f, 1f, 5f, 1f, "");
             config[11420] = new EffectConfig(11420, "Par_LargeMagicCircle", "蓝色光环", "负面", "目标", "Effect/Par_LargeMagicCircle", "", 1.5f, .5f, 5f, 1f, "");
             config[11421] = new EffectConfig(11421, "Par_LargeMagicCircleGreen", "绿色光环", "负面", "目标", "Effect/Par_LargeMagicCircle", "", 1.5f, .5f, 5f, 1f, "#00FF1B");
             config[11430] = new EffectConfig(11430, "Par_HolyMagicCircle", "金色光环", "负面", "目标", "Effect/Par_HolyMagicCircle", "", 1.5f, .5f, 5f, 1f, "");
             config[11440] = new EffectConfig(11440, "Par_PurpleField", "紫色光环", "负面", "目标", "Effect/Par_PurpleField", "", 4f, .5f, 5f, 1f, "");
+            config[11450] = new EffectConfig(11450, "Par_FireField", "红色光环", "负面", "目标", "Effect/Par_FireField", "", 4.5f, .5f, 5f, 1f, "");
+            config[11460] = new EffectConfig(11460, "StunnedCirclingShadowSimple", "闪避", "负面", "目标", "Effect/StunnedCirclingShadowSimple", "", 4.5f, .5f, 5f, 1f, "");
+            config[11470] = new EffectConfig(11470, "top_down_lightning_dot_blue", "攻击命中", "负面", "目标", "Effect/top_down_lightning_dot_orange", "", 7f, .5f, 5f, 1f, "#00D5FF");
+            config[11480] = new EffectConfig(11480, "top_down_starfall_circle_rainbow", "星落效果，aoe", "负面", "范围", "Effect/top_down_starfall_circle_rainbow", "", 2f, .5f, 5f, 1f, "");
+            config[11490] = new EffectConfig(11490, "top_down_ice_dot", "攻击命中", "负面", "目标", "Effect/top_down_ice_dot", "", 5f, .5f, 5f, 1f, "");
 
             RebuildIndex();
 

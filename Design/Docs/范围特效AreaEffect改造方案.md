@@ -44,8 +44,9 @@ public const float AreaEffectBaseRadius = 10f;
 
 ### 3. EffectManager
 
-- `PlayPosSkillEffect(Chess parent, Vector3 pos, float area, string effect, float time)`：参数 `size` → `area`，缩放改为
+- `PlayPosSkillEffect(Vector3 pos, float area, string effect, float time)`：参数 `size` → `area`，缩放改为
   `baseScale = GetScale(effect, cfg, prefab?prefab.localScale.x:1f)`；`scale = baseScale × (area / CombatConst.AreaEffectBaseRadius)`。
+  已去掉原 `Chess parent` 参数：对地特效挂战场场景容器（`WorldManager.Units`）而不挂施法者节点，落点固定不随施法者移动/转向。
 - 补判空，与 `PlaySkillEffect` 对齐：`effect` 为空或资源加载失败 → `GameLog.Warn` 后返回 null（当前会 NRE）。
 - `EffectConfig.GetConfigByName` 由 `idxName[val]`（未知名抛 `KeyNotFoundException`）改为 `TryGetValue`，使 [ResolveEffectPath](file:///d:/Codes/SanTeam2/Assets/Resources/Scripts/Combat/EffectManager.cs#L11-L23) 里「回退 Prefabs/Effect + Warn」的分支真正可达。
 
@@ -74,7 +75,7 @@ protected GameObject PlayAreaEffect(Vector3 pos, float time = 1.3f)
 | SkillAidTauntSlam / SkillAidBarbarianSlam | owner | SparkleAreaWhite / MagicFieldGreen |
 | SkillAidSevenCharge / SkillAttackRunCrossPlus | owner | MagicFieldGreen / SwordWhirlwindWhite |
 | SkillAidHexField / SkillAidQuietPlot | 目标 | MagicFieldGreen / ShadowExplosion |
-| SkillAidMeteorHammer / SkillAidUsurpPressure | 目标 | ToolExplosion / MagicNovaBlue |
+| SkillAidMeteorHammer / SkillAidQuake（原 SkillAidUsurpPressure） | 目标 | ToolExplosion / MagicNovaBlue |
 | SkillAidJumpHeal / SkillAidRangeHeal | 治疗落点 | MagicBuffGreen |
 
 **C. 当前完全无特效（13 个）**——新增 `PlayAreaEffect(中心)`，`AreaEffect` 取现有 `HitEffect` 值（该行 `HitEffect` 为空时按语义补）：

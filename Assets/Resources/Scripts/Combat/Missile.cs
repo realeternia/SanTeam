@@ -10,6 +10,7 @@ public class Missile : MonoBehaviour
 {
     public Chess owner;
     public string effectName;
+    /// <summary>命中特效名：即导弹特效名（effectName），命中时经 EffectConfig 解析该条目的 EffPath 播放命中特效</summary>
     private string hitEffectName;
 
     private float size;
@@ -75,9 +76,6 @@ public class Missile : MonoBehaviour
             parentScale != 0 ? scale / parentScale : scale,
             parentScale != 0 ? scale / parentScale : scale);
 
-        if(missileEffect.TryGetComponent(out MissileComp missileComp))
-            hitEffectName = missileComp.hitEffectName;
-
         var detectArea = 10f;
         var targetCount = 1;
         if (skillId > 0)
@@ -107,9 +105,6 @@ public class Missile : MonoBehaviour
             parentScale != 0 ? scale / parentScale : scale,
             parentScale != 0 ? scale / parentScale : scale,
             parentScale != 0 ? scale / parentScale : scale);
-
-        if(missileEffect.TryGetComponent(out MissileComp missileComp))
-            hitEffectName = missileComp.hitEffectName;        
 
         StartCoroutine(MoveMissileToTarget(gameObject, target, missileSpeed, missileHight));
     }

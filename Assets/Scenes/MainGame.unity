@@ -2689,8 +2689,16 @@ MonoBehaviour:
     level: 1
     buffId: 0
     buffTime: 10
+  - heroId: 103004
+    level: 1
+    buffId: 0
+    buffTime: 10
   debugHeroesSide2:
-  - heroId: 101017
+  - heroId: 105003
+    level: 1
+    buffId: 0
+    buffTime: 10
+  - heroId: 105002
     level: 1
     buffId: 0
     buffTime: 10
