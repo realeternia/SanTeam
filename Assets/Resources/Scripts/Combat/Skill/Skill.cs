@@ -120,6 +120,17 @@ public class Skill
     }
 
     /// <summary>
+    /// 读取 Strength2 数值槽（0 基下标），未配置或越界时返回 def。
+    /// 通用模板通过它读取伤害倍率/护盾量等参数，避免各技能脚本硬编码下标。
+    /// </summary>
+    protected float GetStrength2(int idx, float def = 0f)
+    {
+        if (skillCfg == null || skillCfg.Strength2 == null || idx < 0 || idx >= skillCfg.Strength2.Length)
+            return def;
+        return skillCfg.Strength2[idx];
+    }
+
+    /// <summary>
     /// 对目标燃烧指定量法力（燃烧量由上层技能按自身配置约定选取字段后传入，0/负数不生效），返回实际燃烧量。
     /// </summary>
     protected int BurnMpToTarget(Chess target, float amount)
