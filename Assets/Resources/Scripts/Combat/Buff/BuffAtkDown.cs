@@ -1,5 +1,5 @@
-﻿/// <summary>
-/// 攻击降低 Buff：施加时按 StrengthBuff1[0] 恒定削减携带者的攻击力（atk），
+/// <summary>
+/// 攻击降低 Buff（短名"慑"）：施加时按 StrengthBuff1 语义 key "atkDown" 恒定削减携带者的攻击力（atk），
 /// Buff 移除时原样加回，保持攻击力数值前后一致。
 /// </summary>
 public class BuffAtkDown : Buff
@@ -14,7 +14,7 @@ public class BuffAtkDown : Buff
     public override void OnAdd(Chess chess, Chess caster)
     {
         base.OnAdd(chess, caster);
-        diff = (int)skillCfg.StrengthBuff1[0];
+        diff = (int)GetStrBuff("atkDown");
         chess.atk -= diff;
     }
 

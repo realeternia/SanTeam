@@ -1,7 +1,8 @@
-﻿using System;
+using System;
 
 /// <summary>
-/// 护驾（曹操·护驾）：提升受治疗系数 healedRate（0.1=受到的治疗+10%），移除时还原。
+/// 护驾（曹操·护驾，短名"护"）：提升受治疗系数 healedRate（0.1=受到的治疗+10%），
+/// 数值读 StrengthBuff1 语义 key "healBoost"，移除时还原。
 /// </summary>
 public class BuffHealBoost : Buff
 {
@@ -15,7 +16,7 @@ public class BuffHealBoost : Buff
     public override void OnAdd(Chess chess, Chess caster)
     {
         base.OnAdd(chess, caster);
-        healedRateDiff = skillCfg.StrengthBuff1[0];
+        healedRateDiff = GetStrBuff("healBoost");
         chess.healedRate += healedRateDiff;
     }
 

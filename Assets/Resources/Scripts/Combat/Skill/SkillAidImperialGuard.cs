@@ -4,8 +4,8 @@ using CommonConfig;
 using UnityEngine;
 
 /// <summary>
-/// 曹操·护驾：将生命比例最低的友军英雄传送到身边，为其套 Strength2[0]×(100+法强)/100 的护盾（随法强成长），
-/// 并附加"护驾"Buff（受疗 healedRate 提升 /strengthbuff1-1%）。
+/// 曹操·护驾：将生命比例最低的友军英雄传送到身边，为其套 key "shield"×(100+法强)/100 的护盾（随法强成长），
+/// 并附加"护驾"Buff（受疗 healedRate 提升，护 Buff key "healBoost"）。
 /// Buff 短名由 SkillConfig.BuffId 以逗号分隔配置：第 1 个=护驾Buff，第 2 个=护盾Buff（如 "护,盾"）。
 /// </summary>
 public class SkillAidImperialGuard : Skill
@@ -51,11 +51,11 @@ public class SkillAidImperialGuard : Skill
         // 传送至身边（参照 SkillAttackedTeleport 瞬移路径）
         lowest.MoveTo(landPos, true);
 
-        // 套盾：强度 = Strength2[0] × (100+法强)/100（随法强成长）
+        // 套盾：强度 = key "shield" × (100+法强)/100（随法强成长）
         BuffManager.AddBuff(lowest, owner, id, shieldBuffId, skillCfg.BuffTime);
         var sh = lowest.GetBuff(shieldBuffId) as BuffShield;
         if (sh != null)
-            sh.SetHp(GetSkillShield(0));
+            sh.SetHp(GetSkillShield());
         else
             GameLog.Warn("SkillAidImperialGuard: 护盾Buff类型异常，无法设置护盾值");
 

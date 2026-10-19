@@ -1,8 +1,7 @@
 using System;
 
 /// <summary>
-/// 生命回复提升（"血"，BuffConfig 300014）：按 StrengthBuff1[0] 提升每秒生命回复（hpRegen），移除时还原。
-/// 槽位约定：组合使用时始终读 [0]（如刘备·仁德 "血,蓝"：StrengthBuff1=[生命回复, 法力回复]）。
+/// 生命回复提升（"血"，BuffConfig 300014）：按 StrengthBuff1 语义 key "hpRegen" 提升每秒生命回复，移除时还原。
 /// </summary>
 public class BuffHpRegenAdd : Buff
 {
@@ -16,7 +15,7 @@ public class BuffHpRegenAdd : Buff
     public override void OnAdd(Chess chess, Chess caster)
     {
         base.OnAdd(chess, caster);
-        diff = skillCfg.StrengthBuff1.Length > 0 ? skillCfg.StrengthBuff1[0] : 0f;
+        diff = GetStrBuff("hpRegen");
         chess.hpRegen += diff;
     }
 

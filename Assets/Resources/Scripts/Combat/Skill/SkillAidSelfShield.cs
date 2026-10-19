@@ -1,8 +1,8 @@
 using CommonConfig;
 
 /// <summary>
-/// 温良（温良恭俭）：每 CD(8秒) 为自己提升 StrengthBuff1[0] 点护甲，持续到 Buff 结束（BuffTime=999），CD 到自动续上。
-/// 护甲施加/移除由 BuffArmorAdd 统一处理（短名「甲」）；重复施放只刷新持续时间，不叠加数值。
+/// 温良（温良恭俭）：每 CD(8秒) 为自己叠加护甲提升，持续到 Buff 结束（BuffTime=999），CD 到自动续上。
+/// 护甲值由 甲 Buff（BuffArmorAdd）读 key "armor" 施加；重复施放只刷新持续时间，不叠加数值。
 /// </summary>
 public class SkillAidSelfShield : Skill
 {

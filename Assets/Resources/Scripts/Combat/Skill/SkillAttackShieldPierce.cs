@@ -38,8 +38,8 @@ public class SkillAttackShieldPierce : Skill
         if (!string.IsNullOrEmpty(skillCfg.HitEffect))
             effect = skillCfg.HitEffect;
 
-        // 额外造成%物理伤害（基于本次伤害基数 damageBase 的比例；OnSkillDamaged 统一按物理护甲减免一次后绕过护盾打血）
-        var pierce = Math.Max(1, (int)(damageBase * skillCfg.Strength2[0]));
+        // 额外造成%物理伤害（基于本次伤害基数 damageBase 的比例(key "pierceRate")；OnSkillDamaged 统一按物理护甲减免一次后绕过护盾打血）
+        var pierce = Math.Max(1, (int)(damageBase * GetStr2("pierceRate")));
         target.OnSkillDamaged(owner, skillId, pierce, false, skillCfg.HurtTag);
     }
 }

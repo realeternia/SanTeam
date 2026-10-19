@@ -71,14 +71,12 @@ public class Skill
 
     /// <summary>
     /// 统一护盾公式（除国家护盾外，所有套盾技能统一走此公式，随法强成长）：
-    /// 护盾量 = Strength2[idx] × (100 + ap) / 100，ap=0 时护盾量 = Strength2[idx]（配置中直接写基础值）。
-    /// 下标越界/配置为空返回 0，不回退到最大生命或攻击比例。
+    /// 护盾量 = Strength2[key] × (100 + ap) / 100，ap=0 时护盾量 = Strength2[key]（配置中直接写基础值）。
+    /// 默认键为 "shield"；未配置该键返回 0，不回退到最大生命或攻击比例。
     /// </summary>
-    public int GetSkillShield(int idx = 0)
+    public int GetSkillShield(string key = "shield")
     {
-        if (skillCfg == null || skillCfg.Strength2 == null || idx < 0 || idx >= skillCfg.Strength2.Length)
-            return 0;
-        var v = skillCfg.Strength2[idx];
+        var v = GetStr2(key);
         if (v <= 0f)
             return 0;
         return Mathf.Max(1, (int)(v * (100 + owner.GetAttr("ap")) / 100f));
@@ -120,14 +118,20 @@ public class Skill
     }
 
     /// <summary>
-    /// 读取 Strength2 数值槽（0 基下标），未配置或越界时返回 def。
-    /// 通用模板通过它读取伤害倍率/护盾量等参数，避免各技能脚本硬编码下标。
+    /// 按 key 读取 Strength2 数值槽（key 为 "k:v,k:v" 串中的键名），未配置 / key 不存在时返回 def。
+    /// 通用模板通过它读取伤害倍率/护盾量等参数，避免各技能脚本按下标硬编码。
     /// </summary>
-    protected float GetStrength2(int idx, float def = 0f)
+    protected float GetStr2(string key, float def = 0f)
     {
-        if (skillCfg == null || skillCfg.Strength2 == null || idx < 0 || idx >= skillCfg.Strength2.Length)
-            return def;
-        return skillCfg.Strength2[idx];
+        return ConfigManager.GetSlotValue(skillCfg == null ? null : skillCfg.Strength2, key, def);
+    }
+
+    /// <summary>
+    /// 按 key 读取 StrengthBuff1 数值槽（key 为 "k:v,k:v" 串中的键名），未配置 / key 不存在时返回 def。
+    /// </summary>
+    protected float GetStrBuff(string key, float def = 0f)
+    {
+        return ConfigManager.GetSlotValue(skillCfg == null ? null : skillCfg.StrengthBuff1, key, def);
     }
 
     /// <summary>

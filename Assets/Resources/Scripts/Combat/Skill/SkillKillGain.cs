@@ -3,7 +3,7 @@ using CommonConfig;
 using UnityEngine;
 
 /// <summary>
-/// 枭乱（乱世枭雄）：每击杀一个敌方单位，永久提升自身 skillCfg.Strength2[0] 点攻击，并回复 skillCfg.Strength2[1] 点生命（固定值，不随最大生命）。
+/// 枭乱（乱世枭雄）：每击杀一个敌方单位，永久提升自身 键 atkGain 点攻击，并回复 键 healGain 点生命（固定值，不随最大生命）。
 /// 击杀敌方英雄时上述收益加倍（×HeroKillMultiplier）。
 /// 订阅 Chess.OnDamageDealt 静态事件；战斗结束/技能移除时退订（退订在 OnDeath 兜底）。
 /// </summary>
@@ -39,9 +39,9 @@ public class SkillKillGain : Skill
         // 击杀英雄时收益加倍，击杀士兵为 ×1
         var killMult = victim.isHero ? HeroKillMultiplier : 1f;
 
-        var atkGain = (int)(skillCfg.Strength2[0] * killMult);
+        var atkGain = (int)(GetStr2("atkGain") * killMult);
         owner.atk += atkGain;
-        var heal = (int)(skillCfg.Strength2[1] * killMult);
+        var heal = (int)(GetStr2("healGain") * killMult);
         if (heal > 0)
             owner.HealTarget(owner, id, heal, false);
         GameLog.Debug($"枭乱 武将{owner.heroId} 击杀{victim.heroId}({(victim.isHero ? "英雄×2" : "士兵")}) 攻击+{atkGain} 回复{heal}");

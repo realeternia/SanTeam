@@ -1,15 +1,9 @@
 using CommonConfig;
-using UnityEngine;
 
 /// <summary>
-/// 通用"单个士兵增益"技能（ScriptName = "SkillSoldierSingle"）：
-/// 从本侧存活士兵中选 1 名，按配置回复满血并/或附加 Buff（护盾类自动写入护盾值）。
-///
-/// TargetType 标记：
-/// · meleeOnly    = 只选近战士兵（attackRange &lt; CombatConst.MeleeRange，蒋琬·抚军）
-/// · lowestHp     = 选生命比例最低的士兵（张昭·筑垒），缺省随机
-/// · fullHeal     = 先回复满血（张昭·筑垒）
-/// · selfFallback = 场上无士兵时改为对自身施放（张昭·筑垒）
+/// 蒋琬·抚军（ScriptName = "SkillSoldierSingle"）：
+/// 为一名友方英雄套盾（key "shield"，随法强成长），其周围 skillCfg.Area 半径内每名小兵额外提升
+/// key "perSoldier" 比例的护盾量；护盾时长取 skillCfg.BuffTime（BuffId 配"盾"）。
 /// </summary>
 public class SkillSoldierSingle : Skill
 {
@@ -22,49 +16,42 @@ public class SkillSoldierSingle : Skill
         if (!CheckBurst(null))
             return false;
 
-        var meleeOnly = HasSkillFlag("meleeOnly");
-        var lowestHp = HasSkillFlag("lowestHp");
-        var soldiers = WorldManager.Instance.GetUnitsMySide(owner.side)
-            .FindAll(x => !x.isHero && (!meleeOnly || x.attackRange < CombatConst.MeleeRange));
+        var buffIds = GetSkillBuffIds();
+        if (buffIds.Count == 0)
+        {
+            GameLog.Error($"SkillSoldierSingle: 未配置护盾Buff（BuffId）技能id={id}");
+            return false;
+        }
+
+        // 目标：范围内生命比例最低的友方英雄
+        var heroes = WorldManager.Instance.GetMySideInRange(owner.transform.position, skillCfg.Area, owner.side)
+            .FindAll(x => x.isHero && x.IsInFight());
+        if (heroes.Count == 0)
+            return false;
 
         Chess target = null;
-        if (lowestHp)
-        {
-            foreach (var s in soldiers)
-                if (target == null || s.HpRate < target.HpRate)
-                    target = s;
-        }
-        else if (soldiers.Count > 0)
-        {
-            target = soldiers[SysRandom.Range(0, soldiers.Count)];
-        }
+        foreach (var h in heroes)
+            if (target == null || h.HpRate < target.HpRate)
+                target = h;
 
         owner.PlayerAnim(skillCfg.Action);
+        PlaySelfEffect();
 
-        if (target == null)
-        {
-            if (!HasSkillFlag("selfFallback"))
-            {
-                PlaySelfEffect();
-                return true;
-            }
-            target = owner;
-        }
+        // 目标周围同侧小兵越多，护盾越厚
+        var soldierCount = WorldManager.Instance.GetMySideInRange(target.transform.position, skillCfg.Area, owner.side)
+            .FindAll(x => !x.isHero).Count;
+        var shield = (int)(GetSkillShield() * (1f + GetStr2("perSoldier") * soldierCount));
 
-        if (HasSkillFlag("fullHeal") && target.hp < target.maxHp)
-            owner.HealTarget(target, skillId, target.maxHp - target.hp, false);
-
-        foreach (var buffId in GetSkillBuffIds())
-        {
-            BuffManager.AddBuff(target, owner, id, buffId, skillCfg.BuffTime);
-            var shield = target.GetBuff(buffId) as BuffShield;
-            if (shield != null)
-                shield.SetHp(GetSkillShield(0));
-        }
+        var buffId = buffIds[0];
+        BuffManager.AddBuff(target, owner, id, buffId, skillCfg.BuffTime);
+        var sh = target.GetBuff(buffId) as BuffShield;
+        if (sh != null)
+            sh.SetHp(shield);
+        else
+            GameLog.Warn($"SkillSoldierSingle: 护盾Buff类型异常，无法设置护盾值 技能id={id}");
 
         if (!string.IsNullOrEmpty(skillCfg.HitEffect))
             EffectManager.PlaySkillEffect(target, skillCfg.HitEffect);
-        PlaySelfEffect();
         return true;
     }
 }

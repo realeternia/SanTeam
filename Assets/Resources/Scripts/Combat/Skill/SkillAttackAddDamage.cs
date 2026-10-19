@@ -24,9 +24,9 @@ public class SkillAttackAddDamage : Skill
             owner.PlayerAnim(skillCfg.Action);
 
             damageBase += (int)skillCfg.DamageStrength;
-            // Strength2 为压缩数组（只存非零值）：空数组表示仅加固定伤害、无额外倍率（如道具"追风/骁勇/贯日"）
-            if (skillCfg.Strength2.Length > 0 && skillCfg.Strength2[0] > 0)
-                damageMulti += skillCfg.Strength2[0];
+            // key "extraRate" 未配置(=0) 时表示仅加固定伤害、无额外倍率（如道具"追风/骁勇/贯日"）
+            if (GetStr2("extraRate") > 0f)
+                damageMulti += GetStr2("extraRate");
             effect = skillCfg.HitEffect;
         }
     }

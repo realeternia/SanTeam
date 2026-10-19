@@ -245,7 +245,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         return bonus;
     }
 
-    // 每回合金币 = 济世技能(济)对应等级(济组在场人数)的 Strength2[0]（配置驱动，不再硬编码 FriendGoldPerMember）
+    // 每回合金币 = 济世技能(济)对应等级(济组在场人数)的 Strength2 key "gold"（配置驱动，不再硬编码 FriendGoldPerMember）
     private int GetFriendGoldBonus(int count)
     {
         int lv = count - 1; // 济组在场人数→技能等级（2人Lv1…6人Lv5）
@@ -257,7 +257,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
             GameLog.Error($"济世技能配置缺失: Sname={CombatConst.FriendGoldSkillSname} Lv={lv}，回退每名+1");
             return count * CombatConst.FriendGoldPerMember;
         }
-        return (int)goldCfg.Strength2[0];
+        return (int)ConfigManager.GetSlotValue(goldCfg.Strength2, "gold");
     }
 
     public void OnEra(int era)

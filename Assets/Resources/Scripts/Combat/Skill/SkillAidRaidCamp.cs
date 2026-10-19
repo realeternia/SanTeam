@@ -3,7 +3,7 @@ using UnityEngine;
 
 /// <summary>
 /// 甘宁·百骑劫营（武）：锁定射程内最远的敌方后排单体，突进到其近旁，
-/// 对其造成 GetSkillDamage 物理伤害并燃烧其法力（TargetType 含 mpBurn，燃烧量取 Strength2[0]）。
+/// 对其造成 GetSkillDamage 物理伤害并燃烧其法力（TargetType 含 mpBurn，燃烧量取 key "mpBurn"）。
 /// </summary>
 public class SkillAidRaidCamp : Skill
 {
@@ -31,9 +31,9 @@ public class SkillAidRaidCamp : Skill
         if (damage > 0)
             target.OnSkillDamaged(owner, skillId, damage);
 
-        // 法力燃烧：燃烧量取本技能的约定槽位 Strength2[0]，每次释放只结算一次
+        // 法力燃烧：燃烧量取本技能的 key "mpBurn"，每次释放只结算一次
         if (HasSkillFlag("mpBurn"))
-            BurnMpToTarget(target, GetStrength2(0));
+            BurnMpToTarget(target, GetStr2("mpBurn"));
 
         EffectManager.PlaySkillEffect(target, skillCfg.HitEffect);
         return true;

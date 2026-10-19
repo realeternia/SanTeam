@@ -5,10 +5,10 @@ using CommonConfig;
 /// 受击加护盾 / 回血（ScriptName = "SkillAttackedShield"）：受到攻击时为自己施加吸收盾或减伤盾，
 /// 是否可触发由 Skill.CheckBurst 统一判定（CD、发动概率、MpCost、TriggerCondition 条件如 "hprate&lt;30"）。
 /// Buff 短名由 SkillConfig.BuffId 配置：第 1 个为主 Buff——
-///   吸收盾「盾」：容量 = Strength2[0] × (100+法强)/100（随法强成长，如严颜·老当益壮 / 邓艾·偷渡阴平）；
-///   减伤盾「硬」：减伤率取 StrengthBuff1[0]（如益壮）。
+///   吸收盾「盾」：容量 = key "shield" × (100+法强)/100（随法强成长，如严颜·老当益壮 / 邓艾·偷渡阴平）；
+///   减伤盾「硬」：减伤率由 硬 Buff（BuffShieldValue）读 key "shieldReduce"（如益壮）。
 /// 回血 Buff「愈」为可选第 2 段，持续秒数：
-///   · StrengthBuff1 长度≥3 时取 [2]（固定值模式，如益壮「硬,愈」=[减伤率, 每秒回血, 持续秒数]）；
+///   · 配置了 key "healTime" 时取该值（固定值模式，如益壮「硬,愈」=[shieldReduce, heal, healTime]）；
 ///   · 否则取 BuffTime（成长模式，如邓艾，每秒回血由 BuffTimeHeal 回退到 Skill.GetSkillHeal）。
 /// TargetType 标记：
 ///   · ignoreWeakHit = 不忽略 10 点以下的弱伤害（邓艾·偷渡阴平）；缺省时 damage&lt;=10 不触发。
@@ -40,9 +40,9 @@ public class SkillAttackedShield : Skill
         owner.PlayerAnim(skillCfg.Action);
 
         BuffManager.AddBuff(owner, owner, id, shieldBuffId, skillCfg.BuffTime);
-        // 吸收盾才需要写入容量；减伤盾「硬」的数值由 BuffShieldValue 直接读 StrengthBuff1
+        // 吸收盾才需要写入容量；减伤盾「硬」的数值由 BuffShieldValue 直接读 key "shieldReduce"
         var shield = owner.GetBuff(shieldBuffId) as BuffShield;
-        var shieldHp = GetSkillShield(0);
+        var shieldHp = GetSkillShield();
         if (shield != null)
             shield.SetHp(shieldHp);
 
@@ -60,19 +60,21 @@ public class SkillAttackedShield : Skill
         GameLog.Debug($"受击加护盾 技能id={id} 等级={Level} 生命={owner.hp}/{owner.maxHp} 护盾={shieldHp} 持续回血={GetHealPerTick(buffIds.Count)}/秒×{healTime}秒");
     }
 
-    // 回血持续秒数：StrengthBuff1=[减伤率, 每秒回血, 持续秒数] 时取 [2]（益壮）；否则有第 2 个回血 Buff 时取 BuffTime（邓艾）
+    // 回血持续秒数：读 key "healTime"（固定值模式，如益壮）；未配置时有第 2 个回血 Buff 时取 BuffTime（邓艾）
     private float GetHealTime(int buffCount)
     {
-        if (skillCfg.StrengthBuff1 != null && skillCfg.StrengthBuff1.Length >= 3)
-            return skillCfg.StrengthBuff1[2];
+        var healTime = GetStrBuff("healTime");
+        if (healTime > 0f)
+            return healTime;
         return buffCount >= 2 ? skillCfg.BuffTime : 0f;
     }
 
-    // 每秒回血值（仅用于日志）：固定值模式取 StrengthBuff1[1]；成长模式取 GetSkillHeal()
+    // 每秒回血值（仅用于日志）：固定值模式取 key "heal"；成长模式取 GetSkillHeal()
     private int GetHealPerTick(int buffCount)
     {
-        if (skillCfg.StrengthBuff1 != null && skillCfg.StrengthBuff1.Length >= 2 && skillCfg.StrengthBuff1[1] > 0f)
-            return (int)skillCfg.StrengthBuff1[1];
+        var heal = GetStrBuff("heal");
+        if (heal > 0f)
+            return (int)heal;
         return buffCount >= 2 ? GetSkillHeal() : 0;
     }
 }

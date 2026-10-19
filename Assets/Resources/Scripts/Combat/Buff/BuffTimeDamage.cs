@@ -1,6 +1,11 @@
 using System.Collections;
 using UnityEngine;
 
+/// <summary>
+/// 持续伤害 Buff（如"败"溃败，短名"败"）：每 1 秒对携带者结算一次技能伤害。
+/// 默认跳伤取施加技能的 StrengthBuff1 语义 key "dot"（绝对值，不走伤害公式、不随属性成长）；
+/// 需要按实时数值结算的技能（如旋风斩流血）在首次 tick 前用 SetDamage 覆写。
+/// </summary>
 public class BuffTimeDamage : Buff
 {
     private float damage;
@@ -14,7 +19,7 @@ public class BuffTimeDamage : Buff
 
     /// <summary>
     /// 覆写每跳伤害（供技能按实时数值计算后写入，如旋风斩按命中伤害比例挂流血）：
-    /// 覆盖 OnAdd 时按 skillCfg 计算的默认伤害，须在首次 tick(1 秒)前调用。
+    /// 覆盖 OnAdd 时按 StrengthBuff1 语义 key "dot" 取的默认跳伤，须在首次 tick(1 秒)前调用。
     /// </summary>
     public void SetDamage(int value)
     {
@@ -24,8 +29,8 @@ public class BuffTimeDamage : Buff
     public override void OnAdd(Chess chess, Chess caster)
     {
         base.OnAdd(chess, caster);
-        // 统一走技能伤害公式 Skill.GetSkillDamage（与技能伤害同式）；属性主体取施加者 caster，首次关联时快照，无 Skill 侧等级联动
-        damage = Skill.GetSkillDamage(skillCfg, caster ?? chess);
+        // 默认跳伤取施加技能的 StrengthBuff1 语义 key "dot"（绝对值，不走伤害公式、不随属性成长；需要实时数值的技能用 SetDamage 覆写）
+        damage = GetStrBuff("dot");
 
         // 启动伤害协程
         damageCoroutine = chess.StartCoroutine(DamageOverTime(chess, caster));

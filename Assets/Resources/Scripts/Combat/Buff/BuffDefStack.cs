@@ -1,8 +1,8 @@
-﻿using System;
+using System;
 
 /// <summary>
-/// 据守（曹仁·天人守城）：临时双防。OnAdd 增加 skillCfg.StrengthBuff1[0] 点护甲与魔抗；
-/// 状态期间每次受到攻击再追加「初始双防 × skillCfg.StrengthBuff1[1]」点，最多 (int)skillCfg.Strength2[0] 层；
+/// 据守（曹仁·天人守城，短名"守"）：临时双防。OnAdd 增加 StrengthBuff1 语义 key "armor" 点护甲与魔抗；
+/// 状态期间每次受到攻击再追加「初始双防 × StrengthBuff1 key "perStack"」点，最多 Strength2 key "maxStack" 层；
 /// Buff 到期（BuffTime 秒）由 BuffManager 移除时按累计值还原，临时双防全部消失。
 /// </summary>
 public class BuffDefStack : Buff
@@ -21,8 +21,8 @@ public class BuffDefStack : Buff
     public override void OnAdd(Chess chess, Chess caster)
     {
         base.OnAdd(chess, caster);
-        baseBonus = (int)skillCfg.StrengthBuff1[0];
-        perStackBonus = (int)(baseBonus * skillCfg.StrengthBuff1[1]);
+        baseBonus = (int)GetStrBuff("armor");
+        perStackBonus = (int)(baseBonus * GetStrBuff("perStack"));
         stack = 0;
         AddDefence(chess, baseBonus);
     }
@@ -32,7 +32,7 @@ public class BuffDefStack : Buff
     {
         if (owner == null || owner.hp <= 0)
             return;
-        if (stack >= (int)skillCfg.Strength2[0])
+        if (stack >= (int)GetStr2("maxStack"))
             return;
 
         stack++;

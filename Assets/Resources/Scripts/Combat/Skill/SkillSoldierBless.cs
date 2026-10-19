@@ -1,18 +1,14 @@
 using System.Linq;
 using CommonConfig;
-using UnityEngine;
 
 /// <summary>
-/// 荀彧·兵精：每次主动释放对一名未祝福士兵大祝福(优先近战)：回复全部生命 + 攻击+X%(Strength2[0])、
-/// 护甲+Strength2[2]、魔抗+Strength2[1] 大幅提升；每名士兵整场合仅祝福一次(BlessedByXunYu 标记)。
-/// 同时每次释放为自身永久叠加攻击速度（StrengthBuff1[0]），
-/// 使纯士兵辅助在无兵/单兵情况下也能逐步成长为可独立作战的单位。
+/// 荀彧·兵精（ScriptName = "SkillSoldierBless"）：
+/// 每次释放祝福一名友方英雄（生命比例最低者，可重复祝福），为其附加攻击(键 atk)、护甲(键 armor)、
+/// 魔抗(键 magicRes) 大幅提升的 Buff（BuffId 配"攻,甲,抗"）；增益时长 = skillCfg.BuffTime ×
+/// (1 + 键 perSoldier × 目标周围 skillCfg.Area 半径内小兵数)，身边小兵越多持续时间越长。
 /// </summary>
 public class SkillSoldierBless : Skill
 {
-    /// <summary>自身成长槽位（StrengthBuff1 数组下标）</summary>
-    private const int SelfAtkSpeedGrowIdx = 0;
-
     public SkillSoldierBless(int id, Chess unit) : base(id, unit)
     {
     }
@@ -21,41 +17,39 @@ public class SkillSoldierBless : Skill
     {
         if (!CheckBurst(null))
             return false;
+
+        var buffIds = GetSkillBuffIds();
+        if (buffIds.Count == 0)
+        {
+            GameLog.Error($"SkillSoldierBless: 未配置祝福Buff（BuffId）技能id={id}");
+            return false;
+        }
+
+        // 目标：范围内生命比例最低的友方英雄
+        var heroes = WorldManager.Instance.GetMySideInRange(owner.transform.position, skillCfg.Area, owner.side)
+            .Where(x => x.isHero && x.IsInFight()).ToList();
+        if (heroes.Count == 0)
+            return false;
+
+        Chess target = null;
+        foreach (var h in heroes)
+            if (target == null || h.HpRate < target.HpRate)
+                target = h;
+
         owner.PlayerAnim(skillCfg.Action);
         PlaySelfEffect();
 
-        // 自身永久成长：每次释放无条件叠加（即使无士兵可祝福也能成长）
-        GrowSelf();
+        // 目标周围小兵越多，增益持续越久
+        var soldierCount = WorldManager.Instance.GetMySideInRange(target.transform.position, skillCfg.Area, owner.side)
+            .Count(x => !x.isHero);
+        var time = skillCfg.BuffTime * (1f + GetStr2("perSoldier") * soldierCount);
 
-        // 祝福优先同侧(battleSide)士兵，无同侧目标再退到跨侧友军(alley)士兵
-        var pool = WorldManager.Instance.GetMySideInRange(owner.transform.position, 0f, owner.side)
-            .Where(x => !x.isHero && x.hp > 0 && !x.blessedByXunYu).ToList();
-        if (pool.Count == 0)
-        {
-            pool = WorldManager.Instance.GetUnitsInRangeAll(owner.transform.position, 0f)
-                .Where(x => !x.isHero && x.hp > 0 && !x.blessedByXunYu
-                    && !WorldManager.Instance.IsEnemy(x.side, owner.side)).ToList();
-        }
-        var melee = pool.Where(x => x.attackRange < CombatConst.MeleeRange).ToList();
-        var target = melee.Count > 0 ? melee[0] : (pool.Count > 0 ? pool[0] : null);
-        if (target != null)
-        {
-            target.blessedByXunYu = true;
-            if (target.hp < target.maxHp)
-                owner.HealTarget(target, skillId, target.maxHp - target.hp, false);
-            target.atk += (int)(target.atk * skillCfg.Strength2[0]);
-            target.armor += (int)skillCfg.Strength2[2];
-            target.magicRes += (int)skillCfg.Strength2[1];
+        foreach (var buffId in buffIds)
+            BuffManager.AddBuff(target, owner, id, buffId, time);
+
+        if (!string.IsNullOrEmpty(skillCfg.HitEffect))
             EffectManager.PlaySkillEffect(target, skillCfg.HitEffect);
-        }
+        GameLog.Info($"兵精：{owner.name} 祝福友方英雄，持续{time.ToString("0.#")}秒 技能id={id}");
         return true;
-    }
-
-    // 自身永久成长：每次释放为自身叠加攻击速度（无Buff，直接永久累加），数值取自 StrengthBuff1[0]
-    private void GrowSelf()
-    {
-        if (skillCfg.StrengthBuff1 == null || skillCfg.StrengthBuff1.Length < 1)
-            return;
-        JobLinkManager.ApplyAttr(owner, "atkspeed", skillCfg.StrengthBuff1[SelfAtkSpeedGrowIdx]);
     }
 }

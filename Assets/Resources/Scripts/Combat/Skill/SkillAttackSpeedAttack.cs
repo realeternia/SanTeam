@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using CommonConfig;
 using UnityEngine;
@@ -15,8 +15,8 @@ public class SkillAttackSpeedAttack : Skill
         {
             owner.PlayerAnim(skillCfg.Action);
 
-            // Cooldown 参数为冷却百分比（1=完全冷却），最大不超过1
-            owner.Cooldown(skillCfg.Strength2[0]);
+            // Cooldown 参数为冷却百分比（key "cooldown"，1=完全冷却），最大不超过1
+            owner.Cooldown(GetStr2("cooldown"));
         }
     }
 }

@@ -1,5 +1,5 @@
-﻿/// <summary>
-/// 降低护甲 Buff：施加时按 StrengthBuff1[0] 恒定削减携带者的护甲（armor），
+/// <summary>
+/// 降低护甲 Buff（短名"破"）：施加时按 StrengthBuff1 语义 key "armorDown" 恒定削减携带者的护甲（armor），
 /// Buff 移除时原样加回，保持护甲数值前后一致。
 /// </summary>
 public class BuffArmorDown : Buff
@@ -14,7 +14,7 @@ public class BuffArmorDown : Buff
     public override void OnAdd(Chess chess, Chess caster)
     {
         base.OnAdd(chess, caster);
-        diff = (int)skillCfg.StrengthBuff1[0];
+        diff = (int)GetStrBuff("armorDown");
         chess.armor -= diff;
     }
 

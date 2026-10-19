@@ -88,6 +88,21 @@ namespace UnityEngine
             }
         }
 
+        public void Normalize()
+        {
+            float m = magnitude;
+            if (m < 1e-6f)
+            {
+                x = 0f;
+                y = 0f;
+                z = 0f;
+                return;
+            }
+            x /= m;
+            y /= m;
+            z /= m;
+        }
+
         public static Vector3 operator +(Vector3 a, Vector3 b) { return new Vector3(a.x + b.x, a.y + b.y, a.z + b.z); }
         public static Vector3 operator -(Vector3 a, Vector3 b) { return new Vector3(a.x - b.x, a.y - b.y, a.z - b.z); }
         public static Vector3 operator -(Vector3 a) { return new Vector3(-a.x, -a.y, -a.z); }

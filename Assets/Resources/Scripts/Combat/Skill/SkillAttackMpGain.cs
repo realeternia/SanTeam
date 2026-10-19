@@ -3,7 +3,7 @@ using CommonConfig;
 using UnityEngine;
 
 /// <summary>
-/// 儒雅（儒将风范）：攻击命中时按 skillCfg.Rate 概率为自身回复 skillCfg.Strength2[0] 点法力（配置为1，即每次回1点mp）。
+/// 儒雅（儒将风范）：攻击命中时按 skillCfg.Rate 概率为自身回复 skillCfg key "mpGain" 点法力（配置为1，即每次回1点mp）。
 /// 回复对象为首个有蓝耗的主动技能。对应技能：儒雅（2010151~2010155，「儒」连锁）。
 /// </summary>
 public class SkillAttackMpGain : Skill
@@ -19,12 +19,12 @@ public class SkillAttackMpGain : Skill
         if (skillCfg.Rate > 0 && SysRandom.Value >= skillCfg.Rate)
             return;
 
-        if (skillCfg.Strength2 == null || skillCfg.Strength2.Length == 0)
+        var gain = GetStr2("mpGain");
+        if (gain <= 0f)
         {
-            GameLog.Error($"儒雅 武将{owner.heroId} 未配置回蓝数值Strength2");
+            GameLog.Error($"儒雅 武将{owner.heroId} 未配置回蓝数值 key \"mpGain\"");
             return;
         }
-        var gain = skillCfg.Strength2[0];
 
         Skill active = null;
         foreach (var s in owner.skills)

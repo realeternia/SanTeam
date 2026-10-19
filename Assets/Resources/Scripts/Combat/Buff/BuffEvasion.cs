@@ -1,7 +1,7 @@
 using UnityEngine;
 
 /// <summary>
-/// 闪避 Buff：按 StrengthBuff1 最后一位（压缩数组末尾）作为概率完全闪避即将受到的伤害（触及时伤害倍率归零），
+/// 闪避 Buff（短名"闪"）：按 StrengthBuff1 语义 key "evade" 作为概率完全闪避即将受到的伤害（触及时伤害倍率归零），
 /// 触发时在受击位置播放"闪避"提示飘字。
 /// </summary>
 public class BuffEvasion : Buff
@@ -13,11 +13,10 @@ public class BuffEvasion : Buff
 
     public override void BeforeCalDamaged(Chess attacker, ref int damageBase, ref float damageMulti, ref string effect, string hurtTag)
     {
-        // StrengthBuff1 为压缩数组：取最后一个元素作为闪避概率（空数组=不闪避）
-        if (skillCfg.StrengthBuff1 == null || skillCfg.StrengthBuff1.Length == 0)
+        var evadeChance = GetStrBuff("evade");
+        if (evadeChance <= 0f)
             return;
 
-        var evadeChance = skillCfg.StrengthBuff1[skillCfg.StrengthBuff1.Length - 1];
         if (SysRandom.Value < evadeChance)
         {
             damageMulti = 0;

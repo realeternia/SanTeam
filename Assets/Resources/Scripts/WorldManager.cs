@@ -169,14 +169,14 @@ public class WorldManager : MonoBehaviour
         if (debugBuffTargets.Count == 0)
             return;
 
-        // 零值调试技能配置行：Strength2/StrengthBuff1 各留2个槽，避免 Buff 脚本按下标取"效果数值"时越界
+        // 零值调试技能配置行：数值槽走 key-value 串，留空即可（各 Buff 脚本按固定 key 读取，缺 key 得 0）
         SkillConfig.Assign(CombatConst.DebugBuffSkillId, new SkillConfig
         {
             Id = CombatConst.DebugBuffSkillId,
             Name = "调试Buff",
             Sname = "调试Buff",
-            Strength2 = new float[] { 0f, 0f },
-            StrengthBuff1 = new float[] { 0f, 0f },
+            Strength2 = "",
+            StrengthBuff1 = "",
         });
 
         foreach (var target in debugBuffTargets)

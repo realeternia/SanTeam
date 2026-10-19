@@ -39,7 +39,7 @@ public class SkillTaunt : Skill
                 BuffManager.AddBuff(owner, owner, id, buffId, skillCfg.BuffTime);
                 var shield = owner.GetBuff(buffId) as BuffShield;
                 if (shield != null)
-                    shield.SetHp(GetSkillShield(0));
+                    shield.SetHp(GetSkillShield());
             }
         }
 

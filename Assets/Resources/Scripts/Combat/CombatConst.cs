@@ -10,6 +10,8 @@ public static class CombatConst
     public const int TauntBuffId = 301010;
     /// <summary>眩晕(BuffNoAction，负面效果，短名"乱")：无法行动；威震(BuffVengefulStance)普攻触发眩晕时使用</summary>
     public const int StunBuffId = 301001;
+    /// <summary>陷阵(BuffNoMove，负面效果，短名"停")：无法移动；张昭·筑垒把敌方英雄拖回我方出生点后用它定身数秒</summary>
+    public const int BuffNoMoveId = 301005;
 
     // ---- 伤害标签(SkillConfig.HurtTag) ----
     /// <summary>AntiShield：绕过护盾直接打血（破盾类技能，BuffShield 判定该标签不吸收）</summary>
@@ -50,7 +52,7 @@ public static class CombatConst
     // ---- 国家护盾机制(同阵营连线，数值参考金铲铲神盾使羁绊) ----
     /// <summary>同阵营英雄数量档位(2/3/4/5/6，对应国家护盾技能 Lv1~5)</summary>
     public static readonly int[] FactionShieldCounts = { 2, 3, 4, 5, 6 };
-    /// <summary>国家护盾技能缩写（技能Id按 Lv 取 SkillConfig 2000001~2000005，护盾=最大生命×Strength2）</summary>
+    /// <summary>国家护盾技能缩写（技能Id按 Lv 取 SkillConfig 2000001~2000005，护盾=最大生命×Strength2[shield]）</summary>
     public const string FactionShieldSkillSname = "国";
 
     // ---- 抗性减伤公式（参考金铲铲：实际伤害 = 原伤害 × 100/(100+抗性)） ----
@@ -106,11 +108,11 @@ public static class CombatConst
     /// <summary>星级成长倍率：每升1星 ×本值（乘方式，Lv1=×1.0、Lv2=×1.6、Lv3=×1.6²…），作用于 Atk/Ap/Hp</summary>
     public const float StarGrowthPerStar = 1.65f;
     /// <summary>品质系数：每提升1档品质 ×本值（1.50^(Q-1)，Q1=×1.0、Q2=×1.50、Q3=×2.25…），仅作用于 Atk/Hp</summary>
-    public const float QualityAttrFactor = 1.45f;
+    public const float QualityAttrFactor = 1.65f;
 
     // ---- 英雄专属技能数值修正 ----
     /// <summary>技能品质系数：英雄专属技能的 DamageStrength/HealStrength 每提升1档品质 ×本值（^(Q-1)：Q1=×1.0）</summary>
-    public const float QualitySkillFactor = 1.45f;
+    public const float QualitySkillFactor = 1.55f;
     /// <summary>技能MP消耗修正基准：MpCost=本值时系数=1.0，伤害/治疗按 MpCost/本值 等比例放大或缩小（MP消耗越高、释放越慢，单次数值越高）</summary>
     public const float SkillMpStandard = 100f;
     /// <summary>技能MP消耗修正系数下限（MpCost很低时的最小倍率）</summary>

@@ -11,9 +11,9 @@ using UnityEngine;
 /// 时长 BuffTime。范围特效播在中心点、命中特效播在每个受击目标身上。
 ///
 /// TargetType 标记扩展（可与 self 组合，逗号分隔）：
-/// · missile    = 以飞弹逐个结算，伤害 ×(1+Strength2[0])（黄忠·乱射）
-/// · maxHpBonus = 伤害 += 目标最大生命 × Strength2[0]（文丑·陷阵怒吼）
-/// · mpBurn     = 每个命中目标燃烧 Strength2[0] 点法力（贾诩·乱阵）
+/// · missile    = 以飞弹逐个结算，伤害 ×(1+键"missileRate")（黄忠·乱射）
+/// · maxHpBonus = 伤害 += 目标最大生命 × 键"maxHpBonusRate"（文丑·陷阵怒吼）
+/// · mpBurn     = 每个命中目标燃烧 键"mpBurn" 点法力（贾诩·乱阵）
 /// </summary>
 public class SkillAreaDamageDeBuff : Skill
 {
@@ -50,15 +50,15 @@ public class SkillAreaDamageDeBuff : Skill
         var maxHpBonus = HasSkillFlag("maxHpBonus");
 
         var skillDamage = GetSkillDamage();
-        // 法力燃烧：燃烧量取本技能的约定槽位 Strength2[0]，每级只解析一次
-        var mpBurn = HasSkillFlag("mpBurn") ? GetStrength2(0) : 0f;
+        // 法力燃烧：燃烧量取本技能数值槽键"mpBurn"，每级只解析一次
+        var mpBurn = HasSkillFlag("mpBurn") ? GetStr2("mpBurn") : 0f;
         foreach (var u in units)
         {
             var damage = skillDamage;
             if (useMissile)
-                damage = (int)(damage * (1f + GetStrength2(0)));
+                damage = (int)(damage * (1f + GetStr2("missileRate")));
             if (maxHpBonus)
-                damage += (int)(GetStrength2(0) * u.maxHp);
+                damage += (int)(GetStr2("maxHpBonusRate") * u.maxHp);
 
             if (damage > 0)
             {

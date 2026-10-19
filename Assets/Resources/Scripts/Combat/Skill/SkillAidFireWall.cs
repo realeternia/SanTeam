@@ -13,8 +13,6 @@ using UnityEngine;
 /// </summary>
 public class SkillAidFireWall : Skill
 {
-    private const float TrapDuration = 2f;
-
     private List<Vector3> targetPosList;
 
     public SkillAidFireWall(int id, Chess unit) : base(id, unit)
@@ -35,8 +33,9 @@ public class SkillAidFireWall : Skill
         owner.PlayerAnim(skillCfg.Action);
         PlaySelfEffect();
 
-        // 主目标额外陷入「陷阵」2 秒，无法移动
-        BuffManager.AddBuff(target, owner, id, BuffConfig.GetConfigByNameS("陷阵").Id, TrapDuration);
+        // 主目标额外陷入「陷阵」Buff（无法移动），Buff 与时长由 SkillConfig.BuffId/BuffTime 配置
+        foreach (var buffId in GetSkillBuffIds())
+            BuffManager.AddBuff(target, owner, id, buffId, skillCfg.BuffTime);
 
         var targetPos = target.transform.position;
         SummonMagicField(targetPos, out var summonTime);

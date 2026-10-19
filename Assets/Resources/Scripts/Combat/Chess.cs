@@ -54,8 +54,6 @@ public class Chess : MonoBehaviour
     public bool reviveArmed;
     /// <summary>复活是否已使用（每名单位至多一次）</summary>
     public bool reviveUsed;
-    /// <summary>荀彧·兵精：该士兵是否已被大祝福（每人整场合仅一次）</summary>
-    public bool blessedByXunYu;
     // 伤害结算事件：attacker, victim, damage, skillId(0=普攻)。供战斗模拟器精确捕获每次伤害（飘字/日志），避免逐帧血量差分漏记
     public static event System.Action<Chess, Chess, int, int> OnDamageDealt;
     // 治疗结算事件：healer, target, effectiveHeal(不超过目标生命缺口的有效治疗量)。仅真实治疗(isHeal=true)触发，供战斗模拟器统计治疗榜

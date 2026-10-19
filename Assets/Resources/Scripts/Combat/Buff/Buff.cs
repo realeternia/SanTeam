@@ -33,6 +33,24 @@ public class Buff
         endTime = Time.time + time;
     }
 
+    /// <summary>
+    /// 按 key 读取施加本 Buff 的技能配置的 StrengthBuff1 数值槽（key 为 "k:v,k:v" 串中的键名），
+    /// 未配置 / key 不存在时返回 def。每个 Buff 读自己固定的语义 key，不再按数组下标/组合位置猜槽位。
+    /// </summary>
+    protected float GetStrBuff(string key, float def = 0f)
+    {
+        return ConfigManager.GetSlotValue(skillCfg == null ? null : skillCfg.StrengthBuff1, key, def);
+    }
+
+    /// <summary>
+    /// 按 key 读取施加本 Buff 的技能配置的 Strength2 数值槽（key 为 "k:v,k:v" 串中的键名），
+    /// 未配置 / key 不存在时返回 def。
+    /// </summary>
+    protected float GetStr2(string key, float def = 0f)
+    {
+        return ConfigManager.GetSlotValue(skillCfg == null ? null : skillCfg.Strength2, key, def);
+    }
+
     public virtual void OnAdd(Chess chess, Chess caster)
     {
         GameLog.Debug("Buff OnAdd " + id + " " + skillCfg.Id + " " + caster + " " + chess);

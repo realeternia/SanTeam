@@ -477,11 +477,11 @@ public static class ConfigManager
             case "linkself": return cfg.LinkSelf ?? "";
             case "linkteam": return cfg.LinkTeam ?? "";
             default:
-                // 数值槽下标引用：/strength2-N、/strengthbuff1-N（N 从1开始，1=第一个非零值）
+                // 数值槽 key 引用：/strength2-<key>、/strengthbuff1-<key>（key 为 "k:v,k:v" 串中的键名）
                 if (fieldName.StartsWith("strength2-", StringComparison.OrdinalIgnoreCase))
-                    return GetSlotRefValue(cfg.Strength2, fieldName.Substring("strength2-".Length), pct);
+                    return SlotText(cfg.Strength2, fieldName.Substring("strength2-".Length), pct);
                 if (fieldName.StartsWith("strengthbuff1-", StringComparison.OrdinalIgnoreCase))
-                    return GetSlotRefValue(cfg.StrengthBuff1, fieldName.Substring("strengthbuff1-".Length), pct);
+                    return SlotText(cfg.StrengthBuff1, fieldName.Substring("strengthbuff1-".Length), pct);
                 // 子字段引用：/字段-属性名（如 /auroattrs-atk、/linkself-armor、/linkteam-mpRegen）展开为其中单个具体属性数值
                 if (fieldName.StartsWith("auroattrs-", StringComparison.OrdinalIgnoreCase))
                     return GetAttrFieldValue(cfg.AuroAttrs, fieldName.Substring("auroattrs-".Length), pct);
@@ -522,13 +522,38 @@ public static class ConfigManager
         return null;
     }
 
-    // 数值槽下标引用取值：suffix 为 "-N" 中的 N（从1开始）；越界/非法返回 null（占位符原样输出）
-    private static string GetSlotRefValue(float[] arr, string suffix, bool pct)
+    // 数值槽 key 引用取值：按 key 从 "k:v,k:v" 串取值；缺失/非法返回 null（占位符原样输出）
+    private static string SlotText(string slots, string key, bool pct)
     {
-        int n;
-        if (arr == null || !int.TryParse(suffix, out n) || n < 1 || n > arr.Length)
+        var v = GetSlotValue(slots, key, float.NaN);
+        if (float.IsNaN(v))
             return null;
-        return pct ? PercentText(arr[n - 1]) : arr[n - 1].ToString("0.##");
+        return pct ? PercentText(v) : v.ToString("0.##");
+    }
+
+    /// <summary>
+    /// 从数值槽字符串（格式 "key:value,key:value"，key 大小写不敏感）中按 key 取值；
+    /// 未配置 / key 不存在 / 数值非法时返回 def。
+    /// </summary>
+    public static float GetSlotValue(string slots, string key, float def = 0f)
+    {
+        if (string.IsNullOrEmpty(slots) || string.IsNullOrEmpty(key))
+            return def;
+        foreach (var seg in slots.Split(new[] { ',', '，', ';', '；' }, StringSplitOptions.RemoveEmptyEntries))
+        {
+            var s = seg.Trim();
+            int i = s.IndexOf(':');
+            if (i <= 0)
+                continue;
+            if (!string.Equals(s.Substring(0, i).Trim(), key, StringComparison.OrdinalIgnoreCase))
+                continue;
+            float v;
+            if (float.TryParse(s.Substring(i + 1).Trim(), System.Globalization.NumberStyles.Float,
+                               System.Globalization.CultureInfo.InvariantCulture, out v))
+                return v;
+            return def;
+        }
+        return def;
     }
 
     private static string PercentText(float v)

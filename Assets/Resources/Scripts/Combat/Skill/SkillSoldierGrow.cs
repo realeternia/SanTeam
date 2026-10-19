@@ -1,13 +1,9 @@
 using CommonConfig;
 
 /// <summary>
-/// 通用"士兵属性成长"技能（ScriptName = "SkillSoldierGrow"）：
-/// 本侧士兵永久叠加 Strength2[0] 比例的攻击；第二条数值按标记写入护甲或攻速。
-///
-/// TargetType 标记：
-/// · archers = 只作用于弓兵（attackRange &gt;= CombatConst.MeleeRange，沮授·强弓）
-/// · selfToo = 施法者自身也同步获得加成（沮授·强弓）
-/// · haste   = Strength2[1] 作为攻速加成（沮授·强弓）；缺省作为固定护甲（马良·励军）
+/// 马良·励军（ScriptName = "SkillSoldierGrow"）：
+/// 为一名友方英雄及其周围 skillCfg.Area 半径内的小兵附加攻击提升（BuffId 配"攻"，数值取
+/// StrengthBuff1 的 key "atk"，时长 skillCfg.BuffTime）。
 /// </summary>
 public class SkillSoldierGrow : Skill
 {
@@ -20,35 +16,39 @@ public class SkillSoldierGrow : Skill
         if (!CheckBurst(null))
             return false;
 
+        var buffIds = GetSkillBuffIds();
+        if (buffIds.Count == 0)
+        {
+            GameLog.Error($"SkillSoldierGrow: 未配置加攻Buff（BuffId）技能id={id}");
+            return false;
+        }
+
+        // 目标：范围内生命比例最低的友方英雄
+        var heroes = WorldManager.Instance.GetMySideInRange(owner.transform.position, skillCfg.Area, owner.side)
+            .FindAll(x => x.isHero && x.IsInFight());
+        if (heroes.Count == 0)
+            return false;
+
+        Chess target = null;
+        foreach (var h in heroes)
+            if (target == null || h.HpRate < target.HpRate)
+                target = h;
+
         owner.PlayerAnim(skillCfg.Action);
+        PlaySelfEffect();
 
-        var atkPct = GetStrength2(0);
-        var second = GetStrength2(1);
-        var archers = HasSkillFlag("archers");
-        var haste = HasSkillFlag("haste");
-
-        foreach (var s in WorldManager.Instance.GetUnitsMySide(owner.side))
+        // 英雄本体 + 其周围小兵一同获得加攻增益
+        var buffId = buffIds[0];
+        BuffManager.AddBuff(target, owner, id, buffId, skillCfg.BuffTime);
+        foreach (var s in WorldManager.Instance.GetMySideInRange(target.transform.position, skillCfg.Area, owner.side))
         {
             if (s.isHero)
                 continue;
-            if (archers && s.attackRange < CombatConst.MeleeRange)
-                continue;
-            ApplyGrow(s, atkPct, second, haste);
+            BuffManager.AddBuff(s, owner, id, buffId, skillCfg.BuffTime);
         }
 
-        if (HasSkillFlag("selfToo"))
-            ApplyGrow(owner, atkPct, second, haste);
-
-        PlaySelfEffect();
+        if (!string.IsNullOrEmpty(skillCfg.HitEffect))
+            EffectManager.PlaySkillEffect(target, skillCfg.HitEffect);
         return true;
-    }
-
-    private static void ApplyGrow(Chess c, float atkPct, float second, bool haste)
-    {
-        c.atk += (int)(c.atk * atkPct);
-        if (haste)
-            c.attackSpeedRate += second;
-        else
-            c.armor += (int)second;
     }
 }

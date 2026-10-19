@@ -11,7 +11,7 @@ using UnityEngine;
 /// TargetType 标记：
 /// · smart = 三层距离带降级选人（远段 70%~100% → 中段 50%~70% → 全局），每层取对应抗性最低者，
 ///           且优先只在英雄中选、无英雄才选全部单位（郭图·强击）
-/// · extra = 伤害追加 Strength2[0] 比例，即 基础伤害 × (1 + Strength2[0])（文鸯·单骑）
+/// · extra = 伤害追加 键 extraDamageRate 比例，即 基础伤害 × (1 + extraDamageRate)（文鸯·单骑）
 /// 缺省（无 smart）= 直接取搜索范围内距离最远的敌人（文鸯·单骑）。
 /// </summary>
 public class SkillBacklineStrike : Skill
@@ -38,7 +38,7 @@ public class SkillBacklineStrike : Skill
 
         var damage = GetSkillDamage();
         if (HasSkillFlag("extra"))
-            damage += (int)(damage * GetStrength2(0));
+            damage += (int)(damage * GetStr2("extraDamageRate"));
 
         WorldManager.Instance.CreateSpellMissile(owner, target, owner.transform.position, id, damage, skillCfg.HitEffect);
         return true;
