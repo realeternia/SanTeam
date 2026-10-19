@@ -3,10 +3,11 @@ using CommonConfig;
 using UnityEngine;
 
 /// <summary>
-/// 天书（ScriptName = "SkillCastingAidAreaHeal"）：辅助技能，持续施法，在自身位置展开治疗领域（参考魔兽争霸3 丛林守护者的"宁静"）。
-/// 领域存在 SummonTime 秒，每 SummonHitInterval 秒为领域内全部友方英雄回复一次生命，
+/// 胡笳（ScriptName = "SkillCastingAidAreaHeal"）：辅助技能，持续施法，在自身位置展开治疗领域（参考魔兽争霸3 丛林守护者的"宁静"）。
+/// 领域存在 SummonTime 秒，每 SummonHitInterval 秒为领域内友方单位（英雄与小兵）回复一次生命：
+/// 按生命缺口（maxHp-hp）从大到小排序，最多治疗 TargetCount 个（0=不限）。
 /// 治疗量走独立治疗公式 GetSkillHeal()。由 SkillManager.CheckAidSkill 自动循环施放；领域召唤物用 SummonTag 区分。
-/// 用于左慈：遁甲天书撒豆成兵、起死回生，术法所至，众军自愈。
+/// 用于蔡文姬：胡笳十八拍，闻者忘忧，众军自愈。
 /// </summary>
 public class SkillCastingAidAreaHeal : Skill
 {
@@ -46,9 +47,14 @@ public class SkillCastingAidAreaHeal : Skill
             // 引导期间每跳持续播放施法动作
             owner.PlayerAnim(skillCfg.Action);
 
-            // 领域内全部友方英雄（含自身），每跳回复一次（独立治疗公式）
+            // 领域内友方单位（英雄与小兵，含自身；排除领域召唤物本身），按生命缺口从大到小排序
             var units = WorldManager.Instance.GetMySideInRange(center, skillCfg.Area, owner.side)
-                .FindAll(x => x.isHero && x.hp < x.maxHp);
+                .FindAll(x => x.hp < x.maxHp && x.SummonTag != skillCfg.SummonTag);
+            units.Sort((a, b) => (b.maxHp - b.hp).CompareTo(a.maxHp - a.hp));
+
+            // 目标数上限：只回复生命缺口最大的前 TargetCount 个（0/负数表示不限）
+            if (skillCfg.TargetCount > 0 && units.Count > skillCfg.TargetCount)
+                units.RemoveRange(skillCfg.TargetCount, units.Count - skillCfg.TargetCount);
 
             var heal = GetSkillHeal();
             foreach (var unit in units)
@@ -58,7 +64,7 @@ public class SkillCastingAidAreaHeal : Skill
                 EffectManager.PlaySkillEffect(unit, skillCfg.HitEffect);
             }
 
-            GameLog.Debug($"天书 技能id={id} 等级={Level} 第{i + 1}跳 每跳治疗={heal} 目标数={units.Count}");
+            GameLog.Debug($"胡笳 技能id={id} 等级={Level} 第{i + 1}跳 每跳治疗={heal} 目标数={units.Count}");
         }
     }
 }
