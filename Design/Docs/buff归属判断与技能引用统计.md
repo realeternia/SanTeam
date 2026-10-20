@@ -382,7 +382,7 @@
 | Sname | 技能名 | 脚本 | Id 段 |
 | --- | --- | --- | --- |
 | 荀攸 | 奇策 | `SkillAidTargetDamage` | 2021016~2021020 |
-| 张郃 | 震碎 | `SkillAidRangeDamageDeBuff` | 2020506~2020510 |
+| 张郃 | 震碎 | `SkillAidShatter` | 2020506~2020510 |
 | 张松 | 舌辩 | `SkillAidSilverTongue` | 2020806~2020810 |
 | 诸葛亮 | 惊雷 | `SkillAidShockWave` | 2021701~2021705 |
 
