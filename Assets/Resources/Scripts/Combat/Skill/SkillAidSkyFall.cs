@@ -7,9 +7,9 @@ using UnityEngine;
 /// 典韦·天降恶来：从天而降，从施法点正上方加速砸落（参考吕布·魔神的下落段）。
 /// 施法点：Range 内敌人英雄 ≥2 时，先取距自身最远者为第一目标，再取其 Area 内距第一目标最远者为第二目标，取两者中点；
 /// 仅有 1 个目标时，落点取在距该目标 SingleTargetDistance（&lt;10）的位置。
-/// 落地对 Area 范围内敌人造成 GetSkillDamage 伤害，并给自身挂「甲」Buff 提升 StrengthBuff1-armor 点护甲，持续 BuffTime 秒。
+/// 落地对 Area 范围内最多 TargetCount 个敌人（由近到远）造成 GetSkillDamage 伤害，并给自身挂「甲」Buff 提升 StrengthBuff1-armor 点护甲，持续 BuffTime 秒。
 /// </summary>
-public class SkillAidSacrificeGuard : Skill
+public class SkillAidSkyFall : Skill
 {
     /// <summary>下落起始高度（世界单位）</summary>
     private const float FallHeight = 25f;
@@ -20,7 +20,7 @@ public class SkillAidSacrificeGuard : Skill
     /// <summary>单目标时的落点距离（要求 &lt;10 米）</summary>
     private const float SingleTargetDistance = 9f;
 
-    public SkillAidSacrificeGuard(int id, Chess unit) : base(id, unit)
+    public SkillAidSkyFall(int id, Chess unit) : base(id, unit)
     {
     }
 
@@ -156,11 +156,15 @@ public class SkillAidSacrificeGuard : Skill
         var skillDamage = GetSkillDamage();
         if (skillDamage > 0)
         {
-            var units = WorldManager.Instance.GetEnemyInRange(castPos, skillCfg.Area, owner.side);
-            foreach (var u in units)
+            // 按落点由近到远排序，最多命中 TargetCount 个目标（0 表示不限）
+            var targets = WorldManager.Instance.GetEnemyInRange(castPos, skillCfg.Area, owner.side)
+                .FindAll(u => u != null && u.hp > 0);
+            targets.Sort((a, b) => FlatDistance(a.transform.position, castPos)
+                .CompareTo(FlatDistance(b.transform.position, castPos)));
+            var maxTargets = skillCfg.TargetCount > 0 ? Mathf.Min(skillCfg.TargetCount, targets.Count) : targets.Count;
+            for (var i = 0; i < maxTargets; i++)
             {
-                if (u == null || u.hp <= 0)
-                    continue;
+                var u = targets[i];
                 u.OnSkillDamaged(owner, id, skillDamage);
                 if (!string.IsNullOrEmpty(skillCfg.HitEffect))
                     EffectManager.PlaySkillEffect(u, skillCfg.HitEffect);

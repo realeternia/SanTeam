@@ -303,7 +303,7 @@
 
 | Sname | 技能名 | 脚本 | Id 段 | 该行 BuffId |
 | --- | --- | --- | --- | --- |
-| 典韦 | 舍身救主 | `SkillAidSacrificeGuard` | 2021606~2021610 | `甲` |
+| 典韦 | 天降恶来 | `SkillAidSkyFall` | 2021606~2021610 | `甲` |
 | 高览 | 御守 | `SkillAidGuardian` | 2020321~2020325 | `甲` |
 | 俭 | 温良 | `SkillAidSelfShield` | 2010146~2010150（兵种技能） | `甲` |
 | 李典 | 御阵 | `SkillAidSevenCharge` | 2020601~2020605 | `甲` |

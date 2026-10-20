@@ -320,9 +320,14 @@ public class Chess : MonoBehaviour
 
         if (mpRegen != 0)
         {
-            // 法力回复属性：为所有设置了MpCost的技能持续充能（可为负=充能倒扣）
-            foreach (var skill in skills)
-                skill.AddRegenMp(mpRegen);
+            // 处于控制状态（BuffConfig.IsControl）期间，技能不回复蓝量
+            bool controlled = buffs.Exists(b => BuffConfig.GetConfig(b.id).IsControl);
+            if (!controlled)
+            {
+                // 法力回复属性：为所有设置了MpCost的技能持续充能（可为负=充能倒扣）
+                foreach (var skill in skills)
+                    skill.AddRegenMp(mpRegen);
+            }
         }
     }
 

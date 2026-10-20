@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <!-- Generated file, do not modify, your changes will be overwritten (use AssetPostprocessor.OnGeneratedCSProject) -->
   <PropertyGroup>
@@ -166,7 +166,7 @@
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffShield.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidEnduranceStrike.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\RankPlayerCellInfo.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidSacrificeGuard.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidSkyFall.cs" />
     <Compile Include="Assets\MasterMagicFX\Scripts\Miscs\LaserShooter.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidCurseHeal.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidShadowSplit.cs" />
