@@ -49,6 +49,9 @@ public class Chess : MonoBehaviour
     public Vector3 lastDamagedSourcePos;
     // 本伤害事件中受护盾吸收的伤害量（>0 表示部分/全部被盾抵挡，供战斗模拟器区分"盾降低"与"实际受伤")
     public int lastShieldAbsorb;
+    // 最近一次实际受到伤害的伤害类型（CombatConst.DamageTypeMagic/Attack/Real），
+    // 在伤害结算处统一记录，供飘字等表现层直接读取，避免各技能重复判断（真实伤害=紫字）
+    public int lastDamageType;
     // ---- 相职业武将专属标记 ----
     /// <summary>是否已武装"复活"（张昭·筑垒：死亡可原地复活一次；由 BuffRevive 维护）</summary>
     public bool reviveArmed;
@@ -566,7 +569,8 @@ public class Chess : MonoBehaviour
             // 检查攻击冷却（攻击频率累积满1次即可出手，attackSpeed=攻速值/30，attackSpeedRate为乘法比例加成）
             if (attackPoint >= 1f)
             {
-            //    PlayerAnim("jumpspin");
+                // 普攻统一播放 sway 动画（近战出手与远程发射导弹时各播一次）
+                PlayerAnim("sway");
                 attackPoint = 0;
                 SkillManager.AimTarget(this, targetChess);
                 if (attackRange >= 20)
@@ -789,7 +793,12 @@ public class Chess : MonoBehaviour
                     BattleStatManager.AddBattleStat(playerId, heroId, damage, true, victim.isHero);
 
                 SkillManager.OnAttack(this, victim, damage);
+
+                // 真实伤害普攻飘紫字（与暴击"暴!"同一套飘字机制）
+                if (atkDamageType == CombatConst.DamageTypeReal)
+                    WorldManager.Instance.AddBattleText("-" + damage, victim.transform.position, new UnityEngine.Vector2(0, 60), SysColor.BattleText.RealDamage, 3);
             }
+            victim.lastDamageType = atkDamageType; // 记录本次伤害类型（真实伤害普攻飘紫字）
             var evt = OnDamageDealt;
             if (evt != null) evt(this, victim, damage, 0);
         }
@@ -852,7 +861,12 @@ public class Chess : MonoBehaviour
                 // 记录战斗统计
                 if (caster.isHero)
                     BattleStatManager.AddBattleStat(caster.playerId, caster.heroId, damage, false, isHero);
+
+                // 真实伤害技能飘紫字
+                if (skillCfg != null && skillCfg.DamageType == CombatConst.DamageTypeReal)
+                    WorldManager.Instance.AddBattleText("-" + damage, transform.position, new UnityEngine.Vector2(0, 60), SysColor.BattleText.RealDamage, 3);
             }
+            lastDamageType = skillCfg != null ? skillCfg.DamageType : CombatConst.DamageTypeAttack; // 记录本次伤害类型
             var evt = OnDamageDealt;
             if (evt != null) evt(caster, this, damage, skillId);
         }
@@ -871,7 +885,8 @@ public class Chess : MonoBehaviour
         if (actual <= 0)
             return;
         hp -= actual;
-        WorldManager.Instance.AddBattleText("疲劳-" + actual, transform.position, new UnityEngine.Vector2(0, 40), Color.red, 3);
+        // 疲劳也是真实伤害，统一用紫色
+        WorldManager.Instance.AddBattleText("疲劳-" + actual, transform.position, new UnityEngine.Vector2(0, 40), SysColor.BattleText.RealDamage, 3);
         OnHpChanged();
     }
 

@@ -2694,11 +2694,11 @@ MonoBehaviour:
     buffId: 0
     buffTime: 10
   debugHeroesSide2:
-  - heroId: 105003
+  - heroId: 102004
     level: 1
     buffId: 0
     buffTime: 10
-  - heroId: 105002
+  - heroId: 102007
     level: 1
     buffId: 0
     buffTime: 10

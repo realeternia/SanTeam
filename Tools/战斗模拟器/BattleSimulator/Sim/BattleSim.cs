@@ -52,6 +52,7 @@ public class BattleSim
         public int attackerSide;    // 攻击方阵营（1/2），日志按此方着色
         public string skillName;    // 来源技能名（null=普攻），供日志区分技能/普攻伤害
         public int shieldAbsorb;    // 本次被护盾吸收的伤害量（>0=有盾抵挡），日志区分"盾降低"与"实际受伤"
+        public bool isReal;         // 本次是否为真实伤害（飘字用紫色，取受击方 lastDamageType）
     }
 
     public readonly List<HitFxData> HitFx = new List<HitFxData>();
@@ -116,7 +117,8 @@ public class BattleSim
             attackerName = atkName,
             attackerSide = attacker.side,
             skillName = skillName,
-            shieldAbsorb = victim.lastShieldAbsorb
+            shieldAbsorb = victim.lastShieldAbsorb,
+            isReal = victim.lastDamageType == CombatConst.DamageTypeReal
         });
         if (HitFx.Count > 300)
             HitFx.RemoveRange(0, 150);

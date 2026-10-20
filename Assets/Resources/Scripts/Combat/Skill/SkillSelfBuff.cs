@@ -22,6 +22,10 @@ public class SkillSelfBuff : Skill
 
     public override bool CheckAidSkill()
     {
+        // 自己未进入交战（跑位/待机中）不施放，避免移动途中空开浪费 Buff 时长
+        if (!owner.IsInFight())
+            return false;
+
         // permanent：不挂 Buff，直接把 键 selfAtkSpeed 永久叠到自身攻速
         if (HasSkillFlag("permanent"))
         {

@@ -13,6 +13,9 @@ public class WorldManager : MonoBehaviour
 {
     public static WorldManager Instance;
 
+    // 模拟器由 MainForm 自己绘制伤害飘字（HitFx，真实伤害为紫色），不再生成核心层飘字，避免重复
+    public static bool ShowWorldDamageText = false;
+
     public int gridCellSize = 3;
     public GameObject Units;
     public GameObject HudNode;

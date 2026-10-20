@@ -916,7 +916,9 @@ public class MainForm : Form
                 float offsetX = f.dirZ * tt * 30f;   // 朝攻击方水平飘
                 float rise = tt * 12f;               // 轻微上浮
                 int a = (int)((1f - tt) * 255);
-                using (var b = new SolidBrush(SDColor.FromArgb(a, 255, 70, 60)))
+                // 真实伤害紫字，其余红字（伤害类型由 Chess 伤害结算统一记录）
+                var dmgColor = f.isReal ? SDColor.FromArgb(a, 205, 90, 255) : SDColor.FromArgb(a, 255, 70, 60);
+                using (var b = new SolidBrush(dmgColor))
                     g.DrawString("-" + f.damage, _dmgFont, b, sp.X - 12 + offsetX, sp.Y - 24 - rise);
             }
 
