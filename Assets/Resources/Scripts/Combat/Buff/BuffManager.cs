@@ -55,20 +55,30 @@ public static class BuffManager
         return ctor;
     }
 
+    /// <summary>
+    /// 按实例移除 Buff：共存模式(StackMode=1)下同 Id 允许多个实例，过期与刷新顶掉必须按实例删
+    /// </summary>
+    public static void RemoveBuff(Chess chess, Buff buff)
+    {
+        if (chess == null || buff == null)
+            return;
+        if (!chess.buffs.Remove(buff))
+            return;
+        buff.OnRemove(chess);
+        // buff 移除事件分发：参考技能体系，经 Chess 虚方法派发到各技能（如天人守城护盾破爆炸）
+        chess.OnBuffRemoved(buff);
+    }
+
+    /// <summary>
+    /// 按 BuffId 移除该 Id 的全部实例（驱散、技能主动移除用）
+    /// </summary>
     public static void RemoveBuff(Chess chess, int buffId)
     {
-        for(int i = 0; i < chess.buffs.Count; i++)
-        {
-            if(chess.buffs[i].id == buffId)
-            {
-                var buff = chess.buffs[i];
-                buff.OnRemove(chess);
-                // buff 移除事件分发：参考技能体系，经 Chess 虚方法派发到各技能（如天人守城护盾破爆炸）
-                chess.OnBuffRemoved(buff);
-                chess.buffs.RemoveAt(i);
-                break;
-            }
-        }
+        if (chess == null)
+            return;
+        var toRemove = chess.buffs.FindAll(b => b.id == buffId);
+        foreach (var buff in toRemove)
+            RemoveBuff(chess, buff);
     }
 
     /// <summary>
@@ -83,15 +93,15 @@ public static class BuffManager
             return 0;
         }
 
-        // 先收集待移除的 buff id，再统一移除，避免遍历中改动 buffs 列表
-        var toRemove = new List<int>();
+        // 先收集待移除的 buff 实例，再统一移除，避免遍历中改动 buffs 列表
+        var toRemove = new List<Buff>();
         foreach (var buff in chess.buffs)
         {
             if (buff.buffCfg != null && !buff.buffCfg.IsPositive && buff.buffCfg.CanDispel)
-                toRemove.Add(buff.id);
+                toRemove.Add(buff);
         }
-        foreach (var id in toRemove)
-            RemoveBuff(chess, id);
+        foreach (var buff in toRemove)
+            RemoveBuff(chess, buff);
         return toRemove.Count;
     }
 
@@ -107,15 +117,15 @@ public static class BuffManager
             return 0;
         }
 
-        // 先收集待移除的 buff id，再统一移除，避免遍历中改动 buffs 列表
-        var toRemove = new List<int>();
+        // 先收集待移除的 buff 实例，再统一移除，避免遍历中改动 buffs 列表
+        var toRemove = new List<Buff>();
         foreach (var buff in chess.buffs)
         {
             if (buff.buffCfg != null && buff.buffCfg.IsPositive && buff.buffCfg.CanDispel)
-                toRemove.Add(buff.id);
+                toRemove.Add(buff);
         }
-        foreach (var id in toRemove)
-            RemoveBuff(chess, id);
+        foreach (var buff in toRemove)
+            RemoveBuff(chess, buff);
         return toRemove.Count;
     }
 

@@ -21,21 +21,14 @@ public class BuffShield : Buff
 
     }
 
-    public override void Refresh(Chess caster, float lastTime)
+    // 叠加模式为"数值融合"(StackMode=2)：同 Id 护盾合并到同一实例，本次施加值累加到现有护盾上
+    public virtual void AddHp(int value)
     {
-        base.Refresh(caster, lastTime);
-    }
-
-    // 直接指定护盾值(默认同阵营护盾机制使用，覆盖按配置计算)
-    public virtual void SetHp(int value)
-    {
-        int added = value - hp;   // 刷新已有护盾时只计增量（新增的护盾值）
-        hp = value;
-        if (added > 0)
-        {
-            var evt = OnShieldAdd;
-            if (evt != null) evt(caster, owner, added);
-        }
+        if (value <= 0)
+            return;
+        hp += value;
+        var evt = OnShieldAdd;
+        if (evt != null) evt(caster, owner, value);
     }
 
     public void SubHp(int damage)

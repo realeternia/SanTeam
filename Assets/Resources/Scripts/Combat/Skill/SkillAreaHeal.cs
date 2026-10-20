@@ -80,7 +80,8 @@ public class SkillAreaHeal : Skill
                 if (overflow > 0 && buffId > 0)
                 {
                     BuffManager.AddBuff(unit, owner, id, buffId, skillCfg.BuffTime);
-                    var armorBuff = unit.GetBuff(buffId) as BuffArmorAdd;
+                    // 共存模式(StackMode=1)下同 Id 可能已有旧实例，取本次新加的最后一个
+                    var armorBuff = unit.GetLastBuff(buffId) as BuffArmorAdd;
                     if (armorBuff != null)
                         armorBuff.SetArmor(overflow);
                 }

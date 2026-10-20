@@ -1,4 +1,4 @@
-using CommonConfig;
+﻿using CommonConfig;
 using UnityEngine;
 
 /// <summary>
@@ -39,7 +39,7 @@ public class SkillTaunt : Skill
                 BuffManager.AddBuff(owner, owner, id, buffId, skillCfg.BuffTime);
                 var shield = owner.GetBuff(buffId) as BuffShield;
                 if (shield != null)
-                    shield.SetHp(GetSkillShield());
+                    shield.AddHp(GetSkillShield());
             }
         }
 

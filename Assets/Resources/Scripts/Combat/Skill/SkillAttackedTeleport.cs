@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using CommonConfig;
 using UnityEngine;
@@ -51,7 +51,7 @@ public class SkillAttackedTeleport : Skill
                 BuffManager.AddBuff(owner, owner, id, shieldBuffId, 999f);
                 var shield = owner.GetBuff(shieldBuffId) as BuffShield;
                 if (shield != null)
-                    shield.SetHp(shieldHp);
+                    shield.AddHp(shieldHp);
             }
         }
     }

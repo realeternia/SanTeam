@@ -52,7 +52,8 @@ public class SkillAttackSpinAttack : Skill
         }
 
         BuffManager.AddBuff(target, owner, id, buffCfg.Id, skillCfg.BuffTime);
-        var buff = target.GetBuff(buffCfg.Id) as BuffTimeDamage;
+        // 共存模式(StackMode=1)下同 Id 可能已有旧实例，取本次新加的最后一个
+        var buff = target.GetLastBuff(buffCfg.Id) as BuffTimeDamage;
         if (buff != null)
             buff.SetDamage(bleed);
     }

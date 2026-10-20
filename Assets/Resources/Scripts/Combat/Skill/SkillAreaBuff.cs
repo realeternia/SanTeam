@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using CommonConfig;
 using UnityEngine;
@@ -138,7 +138,7 @@ public class SkillAreaBuff : Skill
                 // 护盾类 buff 需按统一护盾公式写入护盾值（李严·护军的"盾"）
                 var shield = unit.GetBuff(buffId) as BuffShield;
                 if (shield != null)
-                    shield.SetHp(GetSkillShield());
+                    shield.AddHp(GetSkillShield());
             }
             if (!string.IsNullOrEmpty(skillCfg.HitEffect))
                 EffectManager.PlaySkillEffect(unit, skillCfg.HitEffect);

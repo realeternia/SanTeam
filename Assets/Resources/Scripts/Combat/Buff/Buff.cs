@@ -16,6 +16,12 @@ public class Buff
     public float endTime;
     public GameObject effect;
 
+    /// <summary>
+    /// 叠加模式为"时间延长"(StackMode=3)时，本实例存续期间被延长的次数：
+    /// 第1次延长×0.9、第2次×0.8…用于控制类 Buff 的衰减，实例被顶掉/过期后重新计数
+    /// </summary>
+    public int extendCount;
+
 
     public Buff(int id, int skillId, Chess caster, Chess unit, float lastTime)
     {
@@ -97,14 +103,6 @@ public class Buff
 
         owner = null;
     }
-
-    //刷新
-    public virtual void Refresh(Chess caster, float lastTime)
-    {
-        endTime = Math.Max(endTime, Time.time + lastTime);
-
-    }
-
 
     public void WaitForRemove()
     {

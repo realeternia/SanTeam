@@ -1,4 +1,4 @@
-using CommonConfig;
+﻿using CommonConfig;
 
 /// <summary>
 /// 蒋琬·抚军（ScriptName = "SkillSoldierSingle"）：
@@ -46,7 +46,7 @@ public class SkillSoldierSingle : Skill
         BuffManager.AddBuff(target, owner, id, buffId, skillCfg.BuffTime);
         var sh = target.GetBuff(buffId) as BuffShield;
         if (sh != null)
-            sh.SetHp(shield);
+            sh.AddHp(shield);
         else
             GameLog.Warn($"SkillSoldierSingle: 护盾Buff类型异常，无法设置护盾值 技能id={id}");
 

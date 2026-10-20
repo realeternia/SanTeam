@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using CommonConfig;
 
 /// <summary>
@@ -44,7 +44,7 @@ public class SkillAttackedShield : Skill
         var shield = owner.GetBuff(shieldBuffId) as BuffShield;
         var shieldHp = GetSkillShield();
         if (shield != null)
-            shield.SetHp(shieldHp);
+            shield.AddHp(shieldHp);
 
         // 触发后在限时内持续回血；固定值（益壮）与随法强成长（邓艾）由 BuffTimeHeal 自行区分
         var healTime = GetHealTime(buffIds.Count);

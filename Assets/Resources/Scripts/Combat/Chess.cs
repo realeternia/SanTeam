@@ -112,7 +112,6 @@ public class Chess : MonoBehaviour
     public List<Skill> skills = new List<Skill>();
 
     public List<Buff> buffs = new List<Buff>();
-    public List<BuffTime> buffTimes = new List<BuffTime>(); //记录最近20s的buff记录
     public int noMoveCount = 0;
     public int noActionCount = 0;
     /// <summary>叛逃状态计数：&gt;0 时不受控制，持续朝初始位置后退(不索敌/不攻击)，由 BuffDefect 维护</summary>
@@ -274,7 +273,8 @@ public class Chess : MonoBehaviour
         if (hp <= 0)
             return;
 
-        buffs.Where(x => Time.time > x.endTime).ToList().ForEach(x => BuffManager.RemoveBuff(this, x.id));
+        // 过期按实例移除：共存模式下同 Id 可能有多个实例
+        buffs.Where(x => Time.time > x.endTime).ToList().ForEach(x => BuffManager.RemoveBuff(this, x));
 
         // 每秒计时，满1s触发一次OnSecond事件（回复/充能等按秒结算的逻辑统一在该事件处理）
         secondTimer += deltaTime;
@@ -1088,33 +1088,52 @@ public class Chess : MonoBehaviour
 
     public void AddBuff(Buff buff, Chess caster, float time)
     {
-        float buffCount = 0;
-        var nowTime = Time.time;
-        buffTimes.RemoveAll(buff => nowTime - buff.time > 30);
-        foreach (var existingBuffTime in buffTimes)
+        // 未配置/非法叠加模式按最常见的"共存"处理
+        int mode = buff.buffCfg != null && buff.buffCfg.StackMode >= CombatConst.BuffStackCoexist && buff.buffCfg.StackMode <= CombatConst.BuffStackRefresh
+            ? buff.buffCfg.StackMode
+            : CombatConst.BuffStackCoexist;
+
+        // 1 共存：同 Id 允许多个实例并存，各自 OnAdd 结算数值（如减甲/减攻叠加）
+        if (mode == CombatConst.BuffStackCoexist)
         {
-            if (existingBuffTime.id == buff.id)
-                buffCount++;
-        }
-        if(buffCount >= 3)
-        {
-            time = Math.Max(.1f, time * (10 - buffCount) * .1f);
-            buff.SetTime(time);
+            buffs.Add(buff);
+            buff.OnAdd(this, caster);
+            return;
         }
 
-        // 保留原有的buff刷新逻辑
-        foreach(var item in buffs)
+        var existing = GetBuff(buff.id);
+        if (existing == null)
         {
-            if(item.id == buff.id)
-            {
-                item.Refresh(caster, time);
-                return;
-            }
+            buffs.Add(buff);
+            buff.OnAdd(this, caster);
+            return;
         }
 
-        buffs.Add(buff);
-        buff.OnAdd(this, caster);
-        buffTimes.Add(new BuffTime{id = buff.id, time = Time.time});
+        switch (mode)
+        {
+            case CombatConst.BuffStackMerge:
+                // 2 数值融合：保留单实例，数值由施加方追加到该实例（护盾走 BuffShield.AddHp），施法者换成最新
+                existing.caster = caster;
+                existing.skillCfg = buff.skillCfg;
+                existing.endTime = Math.Max(existing.endTime, Time.time + time);
+                break;
+
+            case CombatConst.BuffStackExtend:
+                // 3 时间延长：保留原数值，按被控期间第 N 次延长衰减（第1次0.9、第2次0.8…最低0.1）
+                existing.caster = caster;
+                existing.extendCount++;
+                float factor = Math.Max(CombatConst.BuffStackExtendMinFactor,
+                    1f - CombatConst.BuffStackExtendDecayStep * existing.extendCount);
+                existing.endTime += time * factor;
+                break;
+
+            default:
+                // 4 刷新：时间重置，用新实例顶掉旧实例（数值/施法者/技能配置全部换新）
+                BuffManager.RemoveBuff(this, existing);
+                buffs.Add(buff);
+                buff.OnAdd(this, caster);
+                break;
+        }
     }
 
     // buff 移除事件分发：参考技能体系，虚方法派发到本单位的各技能（技能覆写 OnBuffRemoved 响应，如天人守城护盾破爆炸）
@@ -1257,6 +1276,15 @@ public class Chess : MonoBehaviour
     public Buff GetBuff(int id)
     {
         return buffs.Find(buff => buff.id == id);
+    }
+
+    /// <summary>
+    /// 取该 Id 最新施加的 Buff 实例：共存模式(StackMode=1)下同 Id 可能有多个实例，
+    /// 刚 AddBuff 完需要修改本次施加实例时用这个（列表尾部即最新）
+    /// </summary>
+    public Buff GetLastBuff(int id)
+    {
+        return buffs.FindLast(buff => buff.id == id);
     }
 
     // 当前全部护盾剩余值之和（供战斗模拟器在单位上绘制盾圈；>0 表示有盾）

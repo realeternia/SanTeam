@@ -1,4 +1,4 @@
-using CommonConfig;
+﻿using CommonConfig;
 
 /// <summary>
 /// 国家护盾技能：战斗开始(BattleBegin)时按技能等级(1~5)给自身施加同阵营护盾。
@@ -29,7 +29,7 @@ public class SkillFactionShield : Skill
         BuffManager.AddBuff(owner, owner, id, buffCfg.Id, skillCfg.BuffTime);
         var shield = owner.GetBuff(buffCfg.Id) as BuffShield;
         if (shield != null)
-            shield.SetHp(shieldHp);
+            shield.AddHp(shieldHp);
         GameLog.Debug($"国家护盾 技能id={id} 等级={Level} 护盾={shieldHp}({rate * 100:0}%)");
     }
 

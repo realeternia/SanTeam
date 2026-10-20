@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using CommonConfig;
 using UnityEngine;
@@ -55,7 +55,7 @@ public class SkillAidImperialGuard : Skill
         BuffManager.AddBuff(lowest, owner, id, shieldBuffId, skillCfg.BuffTime);
         var sh = lowest.GetBuff(shieldBuffId) as BuffShield;
         if (sh != null)
-            sh.SetHp(GetSkillShield());
+            sh.AddHp(GetSkillShield());
         else
             GameLog.Warn("SkillAidImperialGuard: 护盾Buff类型异常，无法设置护盾值");
 

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using CommonConfig;
@@ -50,7 +50,7 @@ public class SkillAidBuffLowHp : Skill
         BuffManager.AddBuff(target, owner, id, shieldId, skillCfg.BuffTime);
         var shield = target.GetBuff(shieldId) as BuffShield;
         if (shield != null)
-            shield.SetHp(GetSkillShield());
+            shield.AddHp(GetSkillShield());
 
         EffectManager.PlaySkillEffect(target, skillCfg.HitEffect);
         return true;

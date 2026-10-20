@@ -13,6 +13,20 @@ public static class CombatConst
     /// <summary>陷阵(BuffNoMove，负面效果，短名"停")：无法移动；张昭·筑垒把敌方英雄拖回我方出生点后用它定身数秒</summary>
     public const int BuffNoMoveId = 301005;
 
+    // ---- Buff 叠加模式(BuffConfig.StackMode) ----
+    /// <summary>1 共存：同 Id 允许多个实例并存，数值各自生效（如减甲、减攻）</summary>
+    public const int BuffStackCoexist = 1;
+    /// <summary>2 数值融合：保留单个实例，数值合并到同一 Buff（如护盾）</summary>
+    public const int BuffStackMerge = 2;
+    /// <summary>3 时间延长：保留单个实例与原数值，延长时长并按被控期间第 N 次延长衰减（0.9/0.8/…）</summary>
+    public const int BuffStackExtend = 3;
+    /// <summary>4 刷新：单实例，时间重置并用新实例顶掉旧实例（数值/施法者/配置全部换新）</summary>
+    public const int BuffStackRefresh = 4;
+    /// <summary>时间延长模式：每次延长的衰减步长（第1次×0.9、第2次×0.8…）</summary>
+    public const float BuffStackExtendDecayStep = 0.1f;
+    /// <summary>时间延长模式：单次延长的最低系数</summary>
+    public const float BuffStackExtendMinFactor = 0.1f;
+
     // ---- 伤害标签(SkillConfig.HurtTag) ----
     /// <summary>AntiShield：绕过护盾直接打血（破盾类技能，BuffShield 判定该标签不吸收）</summary>
     public const string AntiShieldHurtTag = "AntiShield";

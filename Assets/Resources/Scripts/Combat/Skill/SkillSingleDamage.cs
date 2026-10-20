@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using CommonConfig;
 using UnityEngine;
 
@@ -123,7 +123,7 @@ public class SkillSingleDamage : Skill
         // 护盾类 buff 需按统一护盾公式写入护盾值（护甲等其它 buff 无需额外赋值）
         var shield = owner.GetBuff(buffId) as BuffShield;
         if (shield != null)
-            shield.SetHp(GetSkillShield());
+            shield.AddHp(GetSkillShield());
     }
 
 }
