@@ -447,10 +447,20 @@ public class BagControl : MonoBehaviour, IPanelEvent
         var p1 = GameManager.Instance.GetPlayer(bindPlayer.pid);
         var itemCfg = ItemConfig.GetConfig(itemCardId);
 
-        // 使用限制：目标英雄需属于该技能的好友羁绊组（如万民书限定「仁」）
+        // 分解符只能在合成区使用，拖到英雄身上无效
+        if (itemCfg.Effect == "tpsplit")
+        {
+            SystemTip.Show($"「{itemCfg.Name}」需拖到合成区使用");
+            return;
+        }
+
+        // 使用限制：目标英雄需属于该技能的好友羁绊组（如万民书限定「仁」）；经验消耗品在英雄满级时不可使用
         if (!p1.CanUseItemToHero(heroCardId, itemCardId))
         {
-            SystemTip.Show($"只能对拥有「{itemCfg.LimitSkillSname}」的英雄使用");
+            if (itemCfg.Effect == "tpexp")
+                SystemTip.Show($"英雄已满级，无法使用「{itemCfg.Name}」");
+            else
+                SystemTip.Show($"只能对拥有「{itemCfg.LimitSkillSname}」的英雄使用");
             return;
         }
 
@@ -471,9 +481,13 @@ public class BagControl : MonoBehaviour, IPanelEvent
 
         if(itemCfg.RemoveWhenUse)
         {
-            p1.UseItemToHero(heroCardId, itemCardId);
+            if (!p1.UseItemToHero(heroCardId, itemCardId))
+                return;
 
+            // 消耗品使用后消失：整体刷新背包（经验消耗品会改变英雄卡等级显示）
             RemoveCell(itemCardId);
+            UpdateView();
+            UpdateFieldView();
         }
         else
         {
@@ -524,6 +538,53 @@ public class BagControl : MonoBehaviour, IPanelEvent
 
         SideComposeSelector.SetContext(bindPlayer.pid, itemCardId, OnComposeConfirm);
         PanelManager.Instance.ShowSideBar("SideComposeSelector");
+    }
+
+    // 分解区：分解状态下拖入合成装备 → 消耗1件该装备与1个分解符，返还合成前的两件材料，成功后背景还原
+    public void DecomposeItem(int itemCardId)
+    {
+        if (bindPlayer == null)
+            return;
+
+        var p1 = GameManager.Instance.GetPlayer(bindPlayer.pid);
+
+        if (itemCardId == 0 || !ItemConfig.HasConfig(itemCardId) || ConfigManager.IsHeroCard(itemCardId) || !HasCombineRecipe(itemCardId))
+        {
+            SystemTip.Show("该道具不是可分解的合成装备");
+            return;
+        }
+        if (p1.GetItemFreeCount(itemCardId) <= 0)
+        {
+            SystemTip.Show(p1.GetEquippedCount(itemCardId) > 0 ? "该装备已全部装备，需先卸下" : "背包中没有该装备");
+            return;
+        }
+        if (p1.GetItemCount(401011) <= 0)
+        {
+            SystemTip.Show("缺少分解符，无法分解");
+            if (bagCompose != null)
+                bagCompose.ResetSplitState();
+            return;
+        }
+
+        if (!p1.DecomposeItem(itemCardId, 401011))
+            return;
+
+        GameManager.Instance.PlaySound("Sounds/compose");
+        UpdateView();
+        UpdateFieldView();
+        if (bagCompose != null)
+            bagCompose.ResetSplitState();
+    }
+
+    // 是否存在以该道具为结果的合成配方（即是否为合成装备、可分解）
+    private bool HasCombineRecipe(int itemId)
+    {
+        foreach (var rcp in ItemCombineConfig.ConfigList)
+        {
+            if (rcp.ResultId == itemId)
+                return true;
+        }
+        return false;
     }
 
     // 确认合成：先收起侧边栏，等侧边栏滑出后在背包里播合成动画，动画结束才真正合成并刷新

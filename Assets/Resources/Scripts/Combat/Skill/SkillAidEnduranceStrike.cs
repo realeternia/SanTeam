@@ -31,15 +31,18 @@ public class SkillAidEnduranceStrike : Skill
         if (GetSkillDamage() > 0)
             target.OnSkillDamaged(owner, skillId, GetSkillDamage());
 
-        // 推远：沿"自身→目标"方向把目标推离自身（落点被挡则原地不动，保持地面 y）
-        var dir = target.transform.position - owner.transform.position;
-        dir.y = 0f;
-        if (dir.sqrMagnitude < 0.0001f)
-            dir = Vector3.forward;
-        var pushPos = target.transform.position + dir.normalized * PushDistance;
-        pushPos.y = target.transform.position.y;
-        if (!WorldManager.Instance.CheckPositionBlocked(target, pushPos))
-            target.transform.position = pushPos;
+        // 推远：沿"自身→目标"方向把目标推离自身（落点被挡则原地不动，保持地面 y）；跳跃中的目标不受位移打断
+        if (!target.isJumping)
+        {
+            var dir = target.transform.position - owner.transform.position;
+            dir.y = 0f;
+            if (dir.sqrMagnitude < 0.0001f)
+                dir = Vector3.forward;
+            var pushPos = target.transform.position + dir.normalized * PushDistance;
+            pushPos.y = target.transform.position.y;
+            if (!WorldManager.Instance.CheckPositionBlocked(target, pushPos))
+                target.transform.position = pushPos;
+        }
 
         // 施加叛逃（Buff短名由 SkillConfig.BuffId 配置，如"叛"）
         foreach (var buffId in GetSkillBuffIds())

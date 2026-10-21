@@ -105,6 +105,7 @@
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillSoldierGrow.cs" />
     <Compile Include="Assets\Resources\Scripts\CardShopManager.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillSoldierFortify.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidJumpReturn.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\TooltipItem.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillCastingAidLastStrategy.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillHitWall.cs" />
@@ -228,6 +229,7 @@
     <Compile Include="Assets\Resources\Scripts\Configs\HeroAttrConfig_s.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAreaHeal.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffReflect.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidAmbush.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAreaDamageDeBuff.cs" />
     <Compile Include="Assets\Resources\Scripts\Configs\PlayerLevelConfig_s.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAttackSpeedAttack.cs" />

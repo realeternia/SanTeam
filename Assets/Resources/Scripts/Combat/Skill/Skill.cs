@@ -523,4 +523,102 @@ public class Skill
         return TauntEnemies(owner, owner.transform.position, area);
     }
 
+    // ---- 空中位移（跳跃/飞行/俯冲）通用封装 ----
+
+    /// <summary>空中位移采样步长（秒），与战斗逻辑时钟 0.05s 对齐，保证模拟器与真机时长一致</summary>
+    protected const float AirMoveStepTime = 0.05f;
+
+    /// <summary>
+    /// 进入空中位移状态：标记 owner.isJumping（跳跃期间外部位移技能 MoveTo 会被忽略）并锁住寻路，
+    /// 保证跳跃/俯冲等空中动作不会被击退、换位、拖拽类技能打断，必然完整播完；仅单位死亡（销毁）会终止。
+    /// 须与 EndAirMove 成对调用。
+    /// </summary>
+    protected void BeginAirMove()
+    {
+        if (owner == null)
+            return;
+        owner.isJumping = true;
+        owner.noMoveCount++;
+    }
+
+    /// <summary>结束空中位移状态：清除跳跃标记并解锁寻路</summary>
+    protected void EndAirMove()
+    {
+        if (owner == null)
+            return;
+        owner.isJumping = false;
+        owner.noMoveCount--;
+    }
+
+    /// <summary>
+    /// 空中位移通用实现：duration 秒内按 curve(t)（t=0~1）计算每步位置并直接写入 owner 位置，结束时落到 curve(1)。
+    /// 注意：须在技能顶层协程里手动逐段推进（var e = AirMove(...); while (e.MoveNext()) yield return e.Current;），
+    /// 不能直接 yield return 本枚举器——模拟器桩协程不展开嵌套 IEnumerator。
+    /// 位移状态由调用方用 BeginAirMove/EndAirMove 管理。
+    /// </summary>
+    protected IEnumerator AirMove(float duration, Func<float, Vector3> curve, Action onComplete = null)
+    {
+        var total = Mathf.Max(0.05f, duration);
+        var elapsed = 0f;
+        while (elapsed < total)
+        {
+            if (owner == null || owner.hp <= 0)
+                yield break;
+            owner.transform.position = curve(Mathf.Clamp01(elapsed / total));
+            elapsed += AirMoveStepTime;
+            yield return new WaitForSeconds(AirMoveStepTime);
+        }
+        if (owner == null)
+            yield break;
+        owner.transform.position = curve(1f);
+        onComplete?.Invoke();
+    }
+
+    /// <summary>
+    /// 抛物线跳跃到 dest：水平方向直线插值，垂直方向叠加 4h·t(1-t) 抛物线（t=0.5 时最高 height）。
+    /// 全程处于空中位移状态（外部位移被忽略、寻路锁定），动作必播完；仅死亡中断。
+    /// 调用方须手动逐段推进：var e = JumpTo(...); while (e.MoveNext()) yield return e.Current;
+    /// </summary>
+    protected IEnumerator JumpTo(Vector3 dest, float height, float duration, Action onComplete = null)
+    {
+        if (owner == null || owner.hp <= 0)
+            yield break;
+        if (owner.isJumping)
+        {
+            GameLog.Warn("跳跃失败：单位已在空中位移中 id=" + id);
+            yield break;
+        }
+
+        BeginAirMove();
+
+        var groundY = owner.baseY + owner.heightOffset;
+        var start = owner.transform.position;
+        start.y = groundY;
+        dest.y = groundY;
+
+        var total = Mathf.Max(0.05f, duration);
+        var elapsed = 0f;
+        var alive = true;
+        while (elapsed < total)
+        {
+            if (owner == null || owner.hp <= 0)
+            {
+                alive = false;
+                break;
+            }
+            var t = Mathf.Clamp01(elapsed / total);
+            var pos = Vector3.Lerp(start, dest, t);
+            pos.y = groundY + 4f * height * t * (1f - t); // 抛物线：中点最高
+            owner.transform.position = pos;
+            elapsed += AirMoveStepTime;
+            yield return new WaitForSeconds(AirMoveStepTime);
+        }
+
+        EndAirMove();
+        if (!alive || owner == null)
+            yield break;
+        owner.transform.position = dest;
+        onComplete?.Invoke();
+    }
+
 }

@@ -114,6 +114,8 @@ public class Chess : MonoBehaviour
     public List<Buff> buffs = new List<Buff>();
     public int noMoveCount = 0;
     public int noActionCount = 0;
+    /// <summary>跳跃中标记：技能跳跃/空中位移期间为 true，外部位移(MoveTo)会被忽略，保证跳跃过程完整播完，由 Skill 维护</summary>
+    public bool isJumping;
     /// <summary>叛逃状态计数：&gt;0 时不受控制，持续朝初始位置后退(不索敌/不攻击)，由 BuffDefect 维护</summary>
     public int fleeCount = 0;
     /// <summary>混乱状态计数：&gt;0 时索敌改为攻击最近的己方单位，由 BuffChaos 维护</summary>
@@ -537,6 +539,10 @@ public class Chess : MonoBehaviour
 
         // 眩晕(noActionCount>0)或引导中(castingSkillId>0)都无法移动/普攻
         if (noActionCount > 0 || castingSkillId > 0)
+            return;
+
+        // 空中位移（跳跃/俯冲）期间位置由技能协程接管，屏蔽寻路、普攻与叛逃回退
+        if (isJumping)
             return;
 
         // 叛逃：不受控制，持续朝初始位置后退（不索敌/不攻击）
@@ -1304,6 +1310,12 @@ public class Chess : MonoBehaviour
 
     public bool MoveTo(Vector3 targetPosition, bool isForce = false)
     {
+        // 跳跃中不受位移技能打断：击退/拖拽/换位等外部位移一律忽略，保证跳跃动作完整播完
+        if (isJumping)
+        {
+            GameLog.Debug("跳跃中忽略外部位移 id=" + id);
+            return false;
+        }
         return WorldManager.Instance.MoveTo(this, targetPosition, isForce);
     }
 
@@ -1321,6 +1333,9 @@ public class Chess : MonoBehaviour
 
     public void StartJump(float time)
     {
+        // 技能脚本已接管空中位移（isJumping）时，动画事件不再叠加跳跃，避免两套位移互相覆盖
+        if (isJumping)
+            return;
         var height = 15;
         GameLog.Debug("StartJump " + height + " " + id + " " + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff"));
 

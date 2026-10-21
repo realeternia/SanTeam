@@ -19,8 +19,6 @@ public class SkillCastingAidDrain : Skill
     private const float FlyUpHeight = 25f;
     /// <summary>落点与目标的水平距离（落在目标身前）</summary>
     private const float LandDistance = 15f;
-    /// <summary>位移采样步长（秒）</summary>
-    private const float StepTime = 0.025f;
 
     public SkillCastingAidDrain(int id, Chess unit) : base(id, unit)
     {
@@ -28,6 +26,8 @@ public class SkillCastingAidDrain : Skill
 
     public override bool CheckAidSkill()
     {
+        if (owner.isJumping)
+            return false;
         var target = owner.targetChess;
         if (target == null || target.hp <= 0)
             return false;
@@ -37,7 +37,6 @@ public class SkillCastingAidDrain : Skill
             return false;
 
         // 起手位移期间由协程接管位置，锁住寻路避免被互斥力/寻路拉走
-        owner.noMoveCount++;
         owner.StartCoroutine(Approach(target));
         return true;
     }
@@ -52,40 +51,47 @@ public class SkillCastingAidDrain : Skill
         var startPos = owner.transform.position;
         startPos.y = groundY;
 
+        // 空中位移状态：外部位移技能无法打断，动作必播完
+        BeginAirMove();
+
         // 第一阶段：原地往天上飞
-        var elapsed = 0f;
-        while (elapsed < FlyUpDuration)
+        var rise = AirMove(FlyUpDuration, t =>
         {
-            if (owner == null || owner.hp <= 0)
-                yield break;
             var pos = startPos;
-            pos.y = groundY + FlyUpHeight * Mathf.Clamp01(elapsed / FlyUpDuration);
-            owner.transform.position = pos;
-            elapsed += StepTime;
-            yield return new WaitForSeconds(StepTime);
+            pos.y = groundY + FlyUpHeight * t;
+            return pos;
+        });
+        while (rise.MoveNext())
+            yield return rise.Current;
+        if (owner == null || owner.hp <= 0)
+        {
+            EndAirMove();
+            yield break;
         }
 
         // 第二阶段：从空中快速俯冲到目标身前；目标位置一直在变，落点每步按目标当前位置修正
         var flyPos = new Vector3(startPos.x, groundY + FlyUpHeight, startPos.z);
         var landPos = CalcLandPos(target, groundY);
-        elapsed = 0f;
-        while (elapsed < DashDuration)
+        var dive = AirMove(DashDuration, t =>
         {
-            if (owner == null || owner.hp <= 0)
-                yield break;
             if (target != null && target.hp > 0)
                 landPos = CalcLandPos(target, groundY);
-            owner.transform.position = Vector3.Lerp(flyPos, landPos, Mathf.Clamp01(elapsed / DashDuration));
-            elapsed += StepTime;
-            yield return new WaitForSeconds(StepTime);
+            return Vector3.Lerp(flyPos, landPos, t);
+        });
+        while (dive.MoveNext())
+            yield return dive.Current;
+        if (owner == null || owner.hp <= 0)
+        {
+            EndAirMove();
+            yield break;
         }
 
         owner.transform.position = landPos;
+        EndAirMove();
         owner.LockTarget(target);
         // 落地爆裂特效（范围特效，半径取 skillCfg.Area）
         PlayAreaEffect(landPos);
 
-        owner.noMoveCount--;
         owner.StartCasting(id, DrainChannel(target));
     }
 

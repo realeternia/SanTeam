@@ -15,8 +15,6 @@ public class SkillAidSkyFall : Skill
     private const float FallHeight = 25f;
     /// <summary>下落耗时（秒），位移按 t² 加速（等效匀加速自由落体）</summary>
     private const float FallDuration = 0.55f;
-    /// <summary>位移采样步长（秒）</summary>
-    private const float StepTime = 0.025f;
     /// <summary>单目标时的落点距离（要求 &lt;10 米）</summary>
     private const float SingleTargetDistance = 9f;
 
@@ -41,7 +39,6 @@ public class SkillAidSkyFall : Skill
             return false;
 
         var castPos = CalcCastPos(primary);
-        owner.noMoveCount++;
         owner.StartCoroutine(DropDown(castPos, primary));
         return true;
     }
@@ -122,34 +119,28 @@ public class SkillAidSkyFall : Skill
         PlaySelfEffect();
         owner.LockTarget(primary);
 
-        // 位移期间由协程接管位置，锁住寻路避免被互斥力/寻路拉走
+        // 位移期间由协程接管位置，锁住寻路避免被互斥力/寻路拉走；空中状态同样屏蔽外部位移
         var groundY = owner.baseY + owner.heightOffset;
         castPos.y = groundY;
         owner.transform.position = new Vector3(castPos.x, groundY + FallHeight, castPos.z);
+        BeginAirMove();
 
-        var elapsed = 0f;
-        while (elapsed < FallDuration)
+        var drop = AirMove(FallDuration, t =>
         {
-            if (owner == null)
-                yield break;
-            if (owner.hp <= 0)
-            {
-                owner.noMoveCount--;
-                yield break;
-            }
-
-            var t = Mathf.Clamp01(elapsed / FallDuration);
             var pos = castPos;
             pos.y = groundY + FallHeight * (1f - t * t); // t² 缓动 = 匀加速下落
-            owner.transform.position = pos;
-            elapsed += StepTime;
-            yield return new WaitForSeconds(StepTime);
+            return pos;
+        });
+        while (drop.MoveNext())
+            yield return drop.Current;
+        if (owner == null || owner.hp <= 0)
+        {
+            EndAirMove();
+            yield break;
         }
 
-        if (owner == null)
-            yield break;
         owner.transform.position = castPos;
-        owner.noMoveCount--;
+        EndAirMove();
 
         // 落地：范围特效 + 范围伤害
         PlayAreaEffect(castPos);

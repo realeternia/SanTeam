@@ -274,14 +274,25 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         roundOverImg.gameObject.SetActive(isOver);
     }
 
-    // 道具是否可对指定英雄卡使用：ItemConfig.LimitSkillSname 非空时，目标英雄需属于该技能的好友羁绊组（如万民书限定「仁」）
+    // 道具是否可对指定英雄卡使用：
+    // 1) ItemConfig.LimitSkillSname 非空时，目标英雄需属于该技能的好友羁绊组（如万民书限定「仁」）
+    // 2) 经验消耗品（tpexp）：英雄卡满级(Lv5)或未持有时不可使用
     public bool CanUseItemToHero(int heroId, int itemId)
     {
         var itemCfg = ItemConfig.GetConfig(itemId);
         if (itemCfg == null)
             return false;
 
-        return ConfigManager.HeroHasFriendSkill(heroId, itemCfg.LimitSkillSname);
+        if (!ConfigManager.HeroHasFriendSkill(heroId, itemCfg.LimitSkillSname))
+            return false;
+
+        if (itemCfg.Effect == "tpexp")
+        {
+            int exp;
+            if (!cards.TryGetValue(heroId, out exp) || HeroSelectionTool.IsHeroCardMaxLevel(exp))
+                return false;
+        }
+        return true;
     }
 
     public bool UseItemToHero(int heroId, int itemId)
@@ -290,15 +301,21 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 
         if (!CanUseItemToHero(heroId, itemId))
         {
-            var itemCfg = ItemConfig.GetConfig(itemId);
-            if (itemCfg == null)
+            var failCfg = ItemConfig.GetConfig(itemId);
+            if (failCfg == null)
                 GameLog.Error($"道具使用失败：道具配置不存在 itemId={itemId}");
+            else if (failCfg.Effect == "tpexp")
+                GameLog.Warn($"道具{itemId}使用失败：英雄{heroId}未持有或已满级，无法增加经验，已取消");
             else
-                GameLog.Warn($"道具{itemId}限定了使用对象：仅可对拥有技能「{itemCfg.LimitSkillSname}」的英雄使用，heroId={heroId} 不满足，已取消");
+                GameLog.Warn($"道具{itemId}限定了使用对象：仅可对拥有技能「{failCfg.LimitSkillSname}」的英雄使用，heroId={heroId} 不满足，已取消");
             return false;
         }
 
-        AddAttrAddon(heroId, HeroSelectionTool.GetCardAttr(this, itemId, 1));
+        var itemCfg = ItemConfig.GetConfig(itemId);
+        if (itemCfg.Effect == "tpexp")
+            cards[heroId] += 1; // 经验消耗品：直接增加英雄卡经验（满级已在上方拦截）
+        else
+            AddAttrAddon(heroId, HeroSelectionTool.GetCardAttr(this, itemId, 1));
         RemoveCard(itemId, 1);
         return true;
     }
@@ -941,7 +958,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
             GameLog.Info($"AI自动装备：{playerConfig.Name} 装备{equippedCount}件");
     }
 
-    // AI进商店时自动使用消耗品：背包中未使用的属性消耗品（tpattr）按培养度优先挑英雄使用；只对 AI 生效
+    // AI进商店时自动使用消耗品：背包中未使用的属性/经验消耗品（tpattr/tpexp）按培养度优先挑英雄使用；只对 AI 生效
     public void AutoUseItems()
     {
         if (!isAI)
@@ -950,7 +967,9 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         var freeItemIds = items
             .Where(slot => slot.HeroId == 0)
             .Select(slot => slot.ItemId)
-            .Where(itemId => ItemConfig.HasConfig(itemId) && ItemConfig.GetConfig(itemId).Effect == "tpattr")
+            .Where(itemId => ItemConfig.HasConfig(itemId)
+                             && (ItemConfig.GetConfig(itemId).Effect == "tpattr"
+                                 || ItemConfig.GetConfig(itemId).Effect == "tpexp"))
             .ToList();
 
         if (freeItemIds.Count == 0)
@@ -967,11 +986,34 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
             var itemCfg = ItemConfig.GetConfig(itemId);
             string mainAttr = itemCfg == null ? "" : itemCfg.MainAttr;
 
-            // 优先挑职业偏好属性匹配且满足使用限制的英雄，其次培养度最高的可用英雄
-            int heroId = heroOrder.Find(h => CanUseItemToHero(h, itemId)
+            // 经验消耗品：优先给品质最高的可用英雄，同品质取培养度(exp)最高的
+            int heroId;
+            if (itemCfg != null && itemCfg.Effect == "tpexp")
+            {
+                heroId = 0;
+                int bestQuality = 0;
+                foreach (int h in heroOrder)
+                {
+                    if (!CanUseItemToHero(h, itemId))
+                        continue;
+                    var heroCfg = HeroConfig.GetConfig(h);
+                    int quality = heroCfg == null ? 0 : heroCfg.Quality;
+                    // heroOrder 已按 exp 降序，同品质只保留第一个即为该品质下经验最高的
+                    if (quality > bestQuality)
+                    {
+                        bestQuality = quality;
+                        heroId = h;
+                    }
+                }
+            }
+            else
+            {
+                // 优先挑职业偏好属性匹配且满足使用限制的英雄，其次培养度最高的可用英雄
+                heroId = heroOrder.Find(h => CanUseItemToHero(h, itemId)
                                              && (string.IsNullOrEmpty(mainAttr) || IsAttrPreferred(h, mainAttr)));
-            if (heroId == 0)
-                heroId = heroOrder.Find(h => CanUseItemToHero(h, itemId));
+                if (heroId == 0)
+                    heroId = heroOrder.Find(h => CanUseItemToHero(h, itemId));
+            }
             if (heroId == 0)
                 continue; // 无可用英雄（如万民书限定「仁」且场上没有仁英雄）
             if (!UseItemToHero(heroId, itemId))
@@ -1344,6 +1386,37 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         AddItemCountDirect(rcp.ResultId, rcp.ResultCount);
         GameLog.Debug(string.Format("背包合成：玩家{0} 消耗{1}x{2}+{3}x{4} 合成{5}x{6}",
             pid, rcp.ItemA, rcp.ItemAcount, rcp.ItemB, rcp.ItemBcount, rcp.ResultId, rcp.ResultCount));
+        return true;
+    }
+
+    // 分解合成装备：按 ItemCombineConfig 反查配方，消耗1件该装备与1个分解符，返还合成前的两件材料（不触发自动合成）
+    public bool DecomposeItem(int itemCardId, int splitItemId)
+    {
+        ItemCombineConfig rcp = null;
+        foreach (var cfg in ItemCombineConfig.ConfigList)
+        {
+            if (cfg.ResultId == itemCardId)
+            {
+                rcp = cfg;
+                break;
+            }
+        }
+        if (rcp == null)
+        {
+            GameLog.Warn(string.Format("分解失败：道具{0}不是合成装备，玩家{1}", itemCardId, pid));
+            return false;
+        }
+        if (GetItemFreeCount(itemCardId) <= 0 || GetItemCount(splitItemId) <= 0)
+        {
+            GameLog.Warn(string.Format("分解失败：背包缺少装备{0}或分解符{1}，玩家{2}", itemCardId, splitItemId, pid));
+            return false;
+        }
+        ConsumeItemCount(itemCardId, 1);
+        ConsumeItemCount(splitItemId, 1);
+        AddItemCountDirect(rcp.ItemA, rcp.ItemAcount);
+        AddItemCountDirect(rcp.ItemB, rcp.ItemBcount);
+        GameLog.Debug(string.Format("背包分解：玩家{0} 分解{1} 返还 {2}x{3} + {4}x{5}",
+            pid, itemCardId, rcp.ItemA, rcp.ItemAcount, rcp.ItemB, rcp.ItemBcount));
         return true;
     }
 
