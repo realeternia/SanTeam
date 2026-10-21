@@ -261,6 +261,7 @@ public class GameManager : MonoBehaviour
                 RawPlayerSave raw = JsonUtility.FromJson<RawPlayerSave>(saveData.players[0]);
                 if (raw != null && raw.playerData != null)
                 {
+                    string legacyCards = null;
                     foreach (var pair in raw.playerData)
                     {
                         if (pair.key == "gold")
@@ -274,6 +275,19 @@ public class GameManager : MonoBehaviour
                                 if (int.TryParse(s, out int cardId) && cardId > 0 && ConfigManager.IsHeroCard(cardId))
                                     summary.lineHeroes.Add(cardId);
                             }
+                        }
+                        else if (pair.key == "cards")
+                            legacyCards = pair.value;
+                    }
+                    // 旧存档兼容：老版本布阵字段缺失时，退回展示持有英雄（cards 为 "英雄Id:数量,..."）
+                    if (summary.lineHeroes.Count == 0 && !string.IsNullOrEmpty(legacyCards))
+                    {
+                        foreach (string entry in legacyCards.Split(','))
+                        {
+                            int colon = entry.IndexOf(':');
+                            string idStr = colon > 0 ? entry.Substring(0, colon) : entry;
+                            if (int.TryParse(idStr, out int cardId) && cardId > 0 && ConfigManager.IsHeroCard(cardId))
+                                summary.lineHeroes.Add(cardId);
                         }
                     }
                 }

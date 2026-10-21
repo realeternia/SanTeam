@@ -186,7 +186,7 @@ public class CardViewControl : MonoBehaviour, IPointerDownHandler, IPointerUpHan
 
             var itemCfg = ItemConfig.GetConfig(cid);
             cardName.text = itemCfg.Name;
-            itemImage.sprite = Resources.Load<Sprite>("Textures/ItemPic/" + itemCfg.Icon);
+            itemImage.sprite = ItemIconLoader.Load(itemCfg.Icon);
 
             // 物品仅掉落获得，不参与商店购买，价格恒为0（物品卡不再出现于商店）
             priceI = 0;

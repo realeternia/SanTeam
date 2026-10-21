@@ -303,9 +303,24 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         return true;
     }
 
+    // 代友道具装备限制：
+    // 1) 英雄本身已属于该羁绊组时不可装备（否则自己会重复计算为2人）
+    // 2) 同一英雄每种代友道具只能装备1件
+    public bool IsFriendProxyEquipBlocked(int heroId, ItemConfig itemCfg)
+    {
+        if (itemCfg == null || itemCfg.Effect != CombatConst.FriendProxyItemEffect)
+            return false;
+        if (ConfigManager.HeroHasFriendSkill(heroId, itemCfg.RefSkillSname))
+            return true;
+        return GetItemIdsOnHero(heroId).Contains(itemCfg.Id);
+    }
+
     // 装备到英雄的空槽：没有空槽或没有多余副本时返回false（不替换已有装备）
     public bool Equip(int heroId, int itemId)
     {
+        if (ItemConfig.HasConfig(itemId) && IsFriendProxyEquipBlocked(heroId, ItemConfig.GetConfig(itemId)))
+            return false;
+
         // 已装备数量不能超过持有数量（同id装备多件可分别装备）
         int owned = GetItemCount(itemId);
         if (GetEquippedCount(itemId) >= owned)
@@ -886,7 +901,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     }
 
     // AI进商店/买英雄时自动穿戴
-    // 仅 Effect=="attr" 可穿戴（pattr/sellhigh 为玩家级道具，不占用英雄装备槽）；只对 AI 生效
+    // 仅 Effect=="attr"（属性装备）与 "friendrep"（代友道具）可穿戴（pattr/sellhigh 为玩家级道具，不占用英雄装备槽）；只对 AI 生效
     // 分配规则：待装备道具按品质从高到低逐件分配，先看培养度（等级+exp）最高的3个英雄、按职业偏好属性第1位→第3位找匹配的空槽，
     // 都不匹配再把候选扩到第4个英雄往后继续比；全部英雄都没有匹配属性时，兜底发给有空槽的最强英雄
     public void AutoEquipItems()
@@ -897,7 +912,9 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         var freeItemIds = items
             .Where(slot => slot.HeroId == 0)
             .Select(slot => slot.ItemId)
-            .Where(itemId => ItemConfig.HasConfig(itemId) && ItemConfig.GetConfig(itemId).Effect == "attr")
+            .Where(itemId => ItemConfig.HasConfig(itemId)
+                             && (ItemConfig.GetConfig(itemId).Effect == "attr"
+                                 || ItemConfig.GetConfig(itemId).Effect == CombatConst.FriendProxyItemEffect))
             .OrderByDescending(itemId => ItemConfig.GetConfig(itemId).Quality)
             .ToList();
 
@@ -982,6 +999,17 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     {
         var itemCfg = ItemConfig.GetConfig(itemId);
         string mainAttr = itemCfg == null ? "" : itemCfg.MainAttr;
+
+        // 代友道具：跳过已属于该羁绊组、已装同款道具的英雄，按培养度优先找有空槽的
+        if (itemCfg != null && itemCfg.Effect == CombatConst.FriendProxyItemEffect)
+        {
+            foreach (int heroId in heroOrder)
+            {
+                if (GetHeroEquippedCount(heroId) < MaxEquipSlots && !IsFriendProxyEquipBlocked(heroId, itemCfg))
+                    return heroId;
+            }
+            return 0;
+        }
 
         for (int attrIdx = 0; attrIdx < EquipAttrSlotCount; attrIdx++)
         {

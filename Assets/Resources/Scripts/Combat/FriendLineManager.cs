@@ -47,9 +47,14 @@ public static class FriendLineManager
 
     private static void ApplyFriendSpecialSkills(Chess chess)
     {
-        var relIds = ConfigManager.GetHeroFriendInfo(chess.heroId);
-        if (relIds == null)
+        var owner = chess.GetPlayerInfo();
+        // 真实所属组 + 装备的代友道具指代组（代友道具只参与人数与拉线，不授予该组技能）
+        var relIds = CollectFriendRelationIds(owner, chess.heroId);
+        if (relIds.Count == 0)
             return;
+
+        // 本侧在场英雄：代友道具按装备者统计，每个道具实例=该羁绊组额外在场1人
+        var sideHeroes = WorldManager.Instance.GetUnitsMySide(chess.side);
 
         foreach (var relId in relIds)
         {
@@ -57,7 +62,7 @@ public static class FriendLineManager
             if (relCfg == null || string.IsNullOrEmpty(relCfg.SkillId))
                 continue;
 
-            // 统计该关系组内、本侧在场的其他成员数量（每多一个好友 +1 级）
+            // 统计该关系组内、本侧在场的其他真实成员数量（每多一个好友 +1 级）
             var presentCount = 0;
             var presentMembers = new List<int>();
             foreach (var memberId in relCfg.Heros)
@@ -70,15 +75,28 @@ public static class FriendLineManager
                     presentMembers.Add(memberId);
                 }
             }
-            if (presentCount <= 0)
+            // 代友道具：装备者视为该组在场1人（只提升人数/等级，自身不获得该组技能）
+            var proxyHeroIds = GetProxyCarrierHeroIds(sideHeroes, relCfg.SkillId);
+            var proxyCount = 0;
+            foreach (var proxyHeroId in proxyHeroIds)
+            {
+                if (proxyHeroId != chess.heroId)
+                    proxyCount++;
+            }
+            if (presentCount + proxyCount <= 0)
                 continue;
 
-            // 激活特殊关联技能，等级 = 在场好友数
-            var skillLevel = CombatConst.FriendSpecialBaseLevel + presentCount;
-            GrantFriendSpecialSkill(chess, relCfg.SkillId, skillLevel);
+            // 只有该组真实成员才获得关联技能，等级 = 在场好友数（含代友道具额外人数）
+            if (ConfigManager.HeroHasFriendSkill(chess.heroId, relCfg.SkillId))
+            {
+                var skillLevel = CombatConst.FriendSpecialBaseLevel + presentCount + proxyCount;
+                GrantFriendSpecialSkill(chess, relCfg.SkillId, skillLevel);
+
+                GameLog.Debug($"FriendSpecial 关系{relCfg.Name} 武将{chess.heroId} 好友数{presentCount} 代友{proxyCount} 技能{relCfg.SkillId} 等级{skillLevel}");
+            }
 
             // 特殊连锁仍然拉线，线颜色取 HeroFriendConfig.LineColor（未配置默认暗灰）
-            // 好友对 A-B 会从双方各遍历到一次，只由 heroId 较小的一方拉线，避免同一对生成两条重叠光柱
+            // 真实成员与代友装备者都参与连线；好友对 A-B 会从双方各遍历到一次，只由 heroId 较小的一方拉线，避免重复光柱
             var lineColor = ParseLineColor(relCfg.LineColor, SysColor.FriendLine.DefaultLine);
             foreach (var memberId in presentMembers)
             {
@@ -86,9 +104,96 @@ public static class FriendLineManager
                     continue;
                 CreateFriendLine(chess, memberId, lineColor);
             }
-
-            GameLog.Debug($"FriendSpecial 关系{relCfg.Name} 武将{chess.heroId} 好友数{presentCount} 技能{relCfg.SkillId} 等级{skillLevel}");
+            foreach (var proxyHeroId in proxyHeroIds)
+            {
+                if (proxyHeroId == chess.heroId || chess.heroId > proxyHeroId)
+                    continue;
+                CreateFriendLine(chess, proxyHeroId, lineColor);
+            }
         }
+    }
+
+    /// <summary>
+    /// 英雄参与的好友羁绊组：真实所属组 + 装备的代友道具指代组（供人数统计与连线共用）
+    /// </summary>
+    public static HashSet<int> CollectFriendRelationIds(PlayerInfo owner, int heroId)
+    {
+        var ids = new HashSet<int>();
+        var realIds = ConfigManager.GetHeroFriendInfo(heroId);
+        if (realIds != null)
+        {
+            foreach (var relId in realIds)
+                ids.Add(relId);
+        }
+        if (owner == null)
+            return ids;
+
+        foreach (var itemId in owner.GetItemIdsOnHero(heroId))
+        {
+            if (!ItemConfig.HasConfig(itemId))
+                continue;
+            var itemCfg = ItemConfig.GetConfig(itemId);
+            if (itemCfg == null || itemCfg.Effect != CombatConst.FriendProxyItemEffect || string.IsNullOrEmpty(itemCfg.RefSkillSname))
+                continue;
+            foreach (var relCfg in HeroFriendConfig.ConfigList)
+            {
+                if (relCfg.SkillId == itemCfg.RefSkillSname)
+                {
+                    ids.Add(relCfg.Id);
+                    break;
+                }
+            }
+        }
+        return ids;
+    }
+
+    // 本侧在场英雄中，装备了指代指定好友羁绊组代友道具的英雄id（同一英雄同组只算一次）
+    private static List<int> GetProxyCarrierHeroIds(List<Chess> sideUnits, string friendSkillSname)
+    {
+        var heroIds = new List<int>();
+        if (string.IsNullOrEmpty(friendSkillSname) || sideUnits == null)
+            return heroIds;
+
+        foreach (var unit in sideUnits)
+        {
+            if (unit == null || !unit.isHero)
+                continue;
+            if (CountProxyItemsOnHero(unit.GetPlayerInfo(), unit.heroId, friendSkillSname) > 0 && !heroIds.Contains(unit.heroId))
+                heroIds.Add(unit.heroId);
+        }
+        return heroIds;
+    }
+
+    /// <summary>
+    /// 统计玩家指定英雄上装备的代友道具数量（指代指定好友羁绊技能），供界面展示羁绊人数使用
+    /// </summary>
+    public static int CountProxyItems(PlayerInfo player, IList<int> heroIds, string friendSkillSname)
+    {
+        if (player == null || heroIds == null || string.IsNullOrEmpty(friendSkillSname))
+            return 0;
+
+        var count = 0;
+        foreach (var heroId in heroIds)
+            count += CountProxyItemsOnHero(player, heroId, friendSkillSname);
+        return count;
+    }
+
+    private static int CountProxyItemsOnHero(PlayerInfo owner, int heroId, string friendSkillSname)
+    {
+        if (owner == null)
+            return 0;
+
+        var count = 0;
+        foreach (var itemId in owner.GetItemIdsOnHero(heroId))
+        {
+            if (!ItemConfig.HasConfig(itemId))
+                continue;
+            var itemCfg = ItemConfig.GetConfig(itemId);
+            if (itemCfg != null && itemCfg.Effect == CombatConst.FriendProxyItemEffect
+                && itemCfg.RefSkillSname == friendSkillSname)
+                count++;
+        }
+        return count;
     }
 
     // 将特殊关联技能赋予英雄并按等级激活（技能需已配置在SkillConfig，按缩写引用）

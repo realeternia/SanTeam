@@ -112,9 +112,13 @@ public class LoadGameItem : MonoBehaviour
         deleteVisualCached = true;
     }
 
-    // 年份显示走 GameRoundConfig（如 41 → "220年"），配置缺失时回退原始年份
+    // 年份显示走 GameRoundConfig：存档里的 year 是"已完成回合数"（0 基），
+    // 当前回合对应 year+1（如 year=0 → 180年，year=2 → 182年）；配置缺失时回退原始年份
     private string GetYearText(int year)
     {
+        int round = year + 1;
+        if (GameRoundConfig.HasConfig(round))
+            return GameRoundConfig.GetConfig(round).Name;
         if (GameRoundConfig.HasConfig(year))
             return GameRoundConfig.GetConfig(year).Name;
         return year + "年";

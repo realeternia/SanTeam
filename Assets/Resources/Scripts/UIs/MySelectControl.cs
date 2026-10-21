@@ -210,7 +210,9 @@ public class MySelectControl : MonoBehaviour
                 if (battleHeroes.Contains(memberId))
                     present.Add(memberId);
             }
-            if (present.Count <= 0)
+            // 代友道具：装备者视为该组额外在场1人（自身不获得该组技能）
+            int proxyCount = FriendLineManager.CountProxyItems(checkPlayer, battleHeroes, friendCfg.SkillId);
+            if (present.Count + proxyCount <= 0)
                 continue;
 
             Color? lineColor = null;
@@ -220,7 +222,7 @@ public class MySelectControl : MonoBehaviour
                     lineColor = parsed;
             }
             string skillSname = friendCfg.SkillId;
-            int bondLevel = present.Count - 1;
+            int bondLevel = present.Count + proxyCount - 1;
             entries.Add(new BondTipData
             {
                 Kind = BondKind.Friend,

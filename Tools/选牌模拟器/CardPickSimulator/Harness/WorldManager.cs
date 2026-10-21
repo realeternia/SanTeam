@@ -739,7 +739,32 @@ public class WorldManager : MonoBehaviour
         }
     }
 
-    // ================= 清理 =================
+    // ================= 掉落 =================
+
+    // 与游戏内 WorldManager.RollDropItem 一致：DropWeight > 0 且 DropStartRound <= 回合 的道具按权重随机一个
+    public static int RollDropItem(int round)
+    {
+        var entries = new List<KeyValuePair<int, int>>();
+        int totalWeight = 0;
+        foreach (var itemCfg in ItemConfig.ConfigList)
+        {
+            if (itemCfg.DropWeight <= 0 || itemCfg.DropStartRound > round)
+                continue;
+            entries.Add(new KeyValuePair<int, int>(itemCfg.Id, itemCfg.DropWeight));
+            totalWeight += itemCfg.DropWeight;
+        }
+        if (entries.Count == 0)
+            return 0;
+        int roll = SysRandom.Range(0, totalWeight);
+        int acc = 0;
+        foreach (var entry in entries)
+        {
+            acc += entry.Value;
+            if (roll < acc)
+                return entry.Key;
+        }
+        return 0;
+    }
 
     public void Reset()
     {

@@ -455,7 +455,7 @@ public class TooltipHero : BaseTooltip
                     break;
                 row.gameObject.SetActive(true);
                 var itemCfg = ItemConfig.GetConfig(equipIds[i]);
-                row.img.sprite = Resources.Load<Sprite>("Textures/ItemPic/" + itemCfg.Icon);
+                row.img.sprite = ItemIconLoader.Load(itemCfg.Icon);
                 row.textEquip.text = itemCfg.Name + ":" + itemCfg.Des;
                 var rowRt = (RectTransform)row.transform;
                 rowRt.anchorMin = new Vector2(0, 1);
@@ -474,7 +474,7 @@ public class TooltipHero : BaseTooltip
         Show();
     }
 
-    // 好友关系组在场（上阵）成员数（不含自己）
+    // 好友关系组在场（上阵）成员数（不含自己），加上代友道具额外人数（每个道具视为该组1人）
     private static int CountFriendPresent(HeroFriendConfig friendCfg, int heroId, PlayerInfo player)
     {
         int present = 0;
@@ -485,6 +485,7 @@ public class TooltipHero : BaseTooltip
                 if (mid != heroId && player.battleCards.Contains(mid))
                     present++;
             }
+            present += FriendLineManager.CountProxyItems(player, player.battleCards, friendCfg.SkillId);
         }
         return present;
     }

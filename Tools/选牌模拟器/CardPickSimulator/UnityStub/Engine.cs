@@ -41,7 +41,7 @@ namespace UnityEngine
 
     public static class Debug
     {
-        // 无头环境默认非调试构建（CardShopManager.DebugGiveBaseItems 依赖）
+        // 无头环境默认非调试构建（CardShopManager.DebugGiveRandomItems 依赖）
         public static bool isDebugBuild = false;
 
         public static void Log(object message)

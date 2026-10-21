@@ -644,7 +644,7 @@ public class WorldManager : MonoBehaviour
             SpawnMonsterForRegion(spawn.Item1, spawn.Item2, GetFormationCellPos(center, spawn.Item2), side);
     }
 
-    // 生成一只PVE怪物：归属虚拟玩家999(PlayerConfig"怪物"，无PlayerInfo实体，不参与PVP匹配)，贴图用SoldierConfig.Img，死亡时按Drops掉落给配对玩家
+    // 生成一只PVE怪物：归属虚拟玩家999(PlayerConfig"怪物"，无PlayerInfo实体，不参与PVP匹配)，贴图用SoldierConfig.Img，死亡时按IsDrop从道具掉落池随机掉落给配对玩家
     private Chess SpawnMonsterForRegion(int soldierId, int posId, UnityEngine.Vector3 spawnPos, int side)
     {
         var soldierConfig = SoldierConfig.GetConfig(soldierId);
@@ -879,7 +879,7 @@ public class WorldManager : MonoBehaviour
             var card = Instantiate(movingCardPrefab, canvas.transform, false);
             var img = card.GetComponent<Image>();
             if (ItemConfig.HasConfig(drop.Item3))
-                img.sprite = Resources.Load<Sprite>("Textures/ItemPic/" + ItemConfig.GetConfig(drop.Item3).Icon);
+                img.sprite = ItemIconLoader.Load(ItemConfig.GetConfig(drop.Item3).Icon);
             card.GetComponent<RectTransform>().anchoredPosition = startLocalPos;
 
             cards.Add(card);
@@ -1190,7 +1190,13 @@ public class WorldManager : MonoBehaviour
             if (pairIdx >= 0 && pairIdx < pveFightCount)
             {
                 var p = GameManager.Instance.GetPlayer(match[pairIdx]);
-                var drops = RollDrops(SoldierConfig.GetConfig(dieUnit.soldierId));
+                var drops = new List<int>();
+                if (SoldierConfig.GetConfig(dieUnit.soldierId).IsDrop)
+                {
+                    int dropItemId = RollDropItem(GameManager.Instance.year);
+                    if (dropItemId > 0)
+                        drops.Add(dropItemId);
+                }
                 foreach (var itemId in drops)
                 {
                     p.AddItemCard(itemId);
@@ -1240,42 +1246,31 @@ public class WorldManager : MonoBehaviour
         hasWin = player0Idx >= pveFightCount || sideHasUnits[player0Idx * 2];
     }
 
-    // PVE：按掉落配置加权随机一个道具（权重=相对权重，最终只掉落一个；空配置返回空列表）。
+    // PVE：从 ItemConfig 掉落池加权随机一个道具，返回 0 表示无可用掉落。
+    // 掉落池 = DropWeight > 0 且 DropStartRound <= 当前回合 的道具；权重为相对权重（30 的概率是 10 的 3 倍）。
     // 掉落解析属战斗/掉落业务逻辑，不放配置类（配置类仅保留数据定义与基础方法）
-    private static List<int> RollDrops(SoldierConfig cfg)
+    public static int RollDropItem(int round)
     {
-        var result = new List<int>();
-        if (string.IsNullOrEmpty(cfg.Drops))
-            return result;
         var entries = new List<KeyValuePair<int, int>>();
         int totalWeight = 0;
-        foreach (var seg in cfg.Drops.Split('|'))
+        foreach (var itemCfg in ItemConfig.ConfigList)
         {
-            var parts = seg.Split(';');
-            if (parts.Length != 2)
+            if (itemCfg.DropWeight <= 0 || itemCfg.DropStartRound > round)
                 continue;
-            int itemId, weight;
-            if (!int.TryParse(parts[0].Trim(), out itemId) || !int.TryParse(parts[1].Trim(), out weight))
-                continue;
-            if (weight <= 0)
-                continue;
-            entries.Add(new KeyValuePair<int, int>(itemId, weight));
-            totalWeight += weight;
+            entries.Add(new KeyValuePair<int, int>(itemCfg.Id, itemCfg.DropWeight));
+            totalWeight += itemCfg.DropWeight;
         }
         if (entries.Count == 0)
-            return result;
+            return 0;
         int roll = SysRandom.Range(0, totalWeight);
         int acc = 0;
         foreach (var entry in entries)
         {
             acc += entry.Value;
             if (roll < acc)
-            {
-                result.Add(entry.Key);
-                break;
-            }
+                return entry.Key;
         }
-        return result;
+        return 0;
     }
 
     // PVE：未参战玩家没有战斗过程，战斗结束一起随机获得装备（模拟一轮怪物掉落）
@@ -1289,12 +1284,14 @@ public class WorldManager : MonoBehaviour
             var p = GameManager.Instance.GetPlayer(match[i]);
             foreach (var spawn in pveMonsterSpawns)
             {
-                foreach (var itemId in RollDrops(SoldierConfig.GetConfig(spawn.Item1)))
-                {
-                    p.AddItemCard(itemId);
-                    var itemName = ItemConfig.HasConfig(itemId) ? ItemConfig.GetConfig(itemId).Name : itemId.ToString();
-                    GameLog.Debug($"[PVE] 未参战玩家{p.pid} 随机获得 {itemName}({itemId})");
-                }
+                if (!SoldierConfig.GetConfig(spawn.Item1).IsDrop)
+                    continue;
+                int itemId = RollDropItem(GameManager.Instance.year);
+                if (itemId <= 0)
+                    continue;
+                p.AddItemCard(itemId);
+                var itemName = ItemConfig.HasConfig(itemId) ? ItemConfig.GetConfig(itemId).Name : itemId.ToString();
+                GameLog.Debug($"[PVE] 未参战玩家{p.pid} 随机获得 {itemName}({itemId})");
             }
         }
     }

@@ -330,14 +330,27 @@ public class BagControl : MonoBehaviour, IPanelEvent
                 if(heroId1 == 0 || heroId2 == 0 || !ConfigManager.IsHeroCard(heroId1) || !ConfigManager.IsHeroCard(heroId2))
                     continue;
                 
-                // 检查是否是好友关系
-                if (ConfigManager.GetFriendLevel(heroId1, heroId2) > 0)
+                // 检查好友关系：真实所属组 + 装备的代友道具指代组，两组有交集即拉线
+                var relIds1 = FriendLineManager.CollectFriendRelationIds(bindPlayer, heroId1);
+                var relIds2 = FriendLineManager.CollectFriendRelationIds(bindPlayer, heroId2);
+                HeroFriendConfig sharedRel = null;
+                foreach (var relId in relIds1)
                 {
-                    // 线颜色取该武将所在关系行配置的 LineColor（未配置默认暗灰），与战场 FriendLineManager 一致
+                    if (!relIds2.Contains(relId))
+                        continue;
+                    var relCfg = HeroFriendConfig.GetConfig(relId);
+                    if (relCfg != null)
+                    {
+                        sharedRel = relCfg;
+                        break;
+                    }
+                }
+                if (sharedRel != null)
+                {
+                    // 线颜色取该关系行配置的 LineColor（未配置默认暗灰），与战场 FriendLineManager 一致
                     var lineColor = SysColor.FriendLine.DefaultLine;
-                    var lineColorStr = ConfigManager.GetFriendLineColor(heroId1, heroId2);
-                    if (!string.IsNullOrEmpty(lineColorStr))
-                        ColorUtility.TryParseHtmlString(lineColorStr, out lineColor);
+                    if (!string.IsNullOrEmpty(sharedRel.LineColor))
+                        ColorUtility.TryParseHtmlString(sharedRel.LineColor, out lineColor);
                     // 创建连接线
                     CreateConnectionLine(heroUnits[i].transform, heroUnits[j].transform, lineColor, Vector2.zero);
                 }
@@ -441,6 +454,21 @@ public class BagControl : MonoBehaviour, IPanelEvent
             return;
         }
 
+        // 代友道具：英雄已属于该羁绊组不可装备；同一英雄每种代友道具只能装备1件
+        if (itemCfg.Effect == CombatConst.FriendProxyItemEffect)
+        {
+            if (ConfigManager.HeroHasFriendSkill(heroCardId, itemCfg.RefSkillSname))
+            {
+                SystemTip.Show($"该英雄已拥有此羁绊，无法装备「{itemCfg.Name}」");
+                return;
+            }
+            if (p1.GetItemIdsOnHero(heroCardId).Contains(itemCardId))
+            {
+                SystemTip.Show("同一英雄只能装备一件该代友道具");
+                return;
+            }
+        }
+
         if(itemCfg.RemoveWhenUse)
         {
             p1.UseItemToHero(heroCardId, itemCardId);
@@ -460,6 +488,7 @@ public class BagControl : MonoBehaviour, IPanelEvent
             GameManager.Instance.PlaySound("Sounds/equip");
 
             UpdateView(); // 装备后背包不再显示该装备，需整体刷新（内部会重建格子）
+            UpdateFieldView(); // 代友道具会影响羁绊连线与左侧羁绊人数，需同步刷新阵型区
         }
     }
 
@@ -635,7 +664,7 @@ public class BagControl : MonoBehaviour, IPanelEvent
         rt.anchoredPosition = anchoredPos;
 
         Image img = go.GetComponent<Image>();
-        img.sprite = Resources.Load<Sprite>("Textures/ItemPic/" + ItemConfig.GetConfig(itemId).Icon);
+        img.sprite = ItemIconLoader.Load(ItemConfig.GetConfig(itemId).Icon);
         img.preserveAspect = true;
         img.raycastTarget = false;
         return img;

@@ -115,7 +115,7 @@ public class SideComposeItem : MonoBehaviour
             icon.sprite = null;
             return;
         }
-        icon.sprite = Resources.Load<Sprite>("Textures/ItemPic/" + ItemConfig.GetConfig(itemId).Icon);
+        icon.sprite = ItemIconLoader.Load(ItemConfig.GetConfig(itemId).Icon);
     }
 
     public void SetOnClickCallback(System.Action<SideComposeItem> callback)

@@ -375,27 +375,26 @@ public class CardShopManager : MonoBehaviour
         }
     }
 
-    // 8 个基础道具（合成材料，id 连续 402001~402008）
-    private static readonly int[] BaseItemIds = { 402001, 402002, 402003, 402004, 402005, 402006, 402007, 402008 };
-
-    // 调试用：给人类玩家补齐 8 个基础道具（已有该道具的跳过），仅 Debug.isDebugBuild 生效
-    public static void DebugGiveBaseItems()
+    // 调试用：给人类玩家按掉落池（ItemConfig 的回合门槛 + 权重）随机发放 10 个道具，仅 Debug.isDebugBuild 生效
+    public static void DebugGiveRandomItems()
     {
         if (!Debug.isDebugBuild)
             return;
 
         var p1 = GameManager.Instance.GetPlayer(0);
+        int round = Math.Max(1, GameManager.Instance.year + 1); // 商店阶段对应的是即将开打的回合
         int given = 0;
-        foreach (int itemId in BaseItemIds)
+        for (int i = 0; i < 10; i++)
         {
-            if (p1.GetItemCount(itemId) > 0)
+            int itemId = WorldManager.RollDropItem(round);
+            if (itemId <= 0)
                 continue;
             p1.AddItemCard(itemId);
             given++;
         }
 
         if (given > 0)
-            GameLog.Debug($"调试补齐基础道具：玩家0 获得 {given} 个");
+            GameLog.Debug($"调试随机道具：玩家0 按掉落规则获得 {given} 个（回合{round}）");
     }
 
     private void BeginEraCommon()
@@ -438,8 +437,8 @@ public class CardShopManager : MonoBehaviour
         // 新商店阶段：把刷牌权重表重置为全 1（每张卡首次全随机），权重不参与存档，读档后同样回到全 1
         HeroSelectionTool.ResetShopWeights();
 
-        // 调试：每次商店阶段开始（含开局与战后回商店）给人类玩家补齐 8 个基础道具
-        DebugGiveBaseItems();
+        // 调试：每次商店阶段开始（含开局与战后回商店）给人类玩家按掉落规则随机发 10 个道具
+        DebugGiveRandomItems();
 
         if(hasEnterBattle) //存档拉起进入游戏，不会重复存储
             GameManager.Instance.SaveToFile();

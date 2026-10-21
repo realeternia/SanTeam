@@ -62,7 +62,7 @@ public class BagCell : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragH
                 equipImages[i].gameObject.SetActive(has);
                 if (has)
                 {
-                    equipImages[i].sprite = Resources.Load<Sprite>("Textures/ItemPic/" + ItemConfig.GetConfig(slots[i]).Icon);
+                    equipImages[i].sprite = ItemIconLoader.Load(ItemConfig.GetConfig(slots[i]).Icon);
                     // 装备槽边框按装备品质上色（1白 2绿 3蓝 4紫，同英雄品质）
                     if (equipBorderImages != null && i < equipBorderImages.Length)
                         equipBorderImages[i].color = SysColor.GetQualityColor(ItemConfig.GetConfig(slots[i]).Quality);
@@ -89,7 +89,7 @@ public class BagCell : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragH
     {
         // 装备升级机制已移除：物品按堆叠上限分格（默认1 每格一件），堆叠格右下角显示持有数量
         var itemCfg = ItemConfig.GetConfig(cardId);
-        itemImage.sprite = Resources.Load<Sprite>("Textures/ItemPic/" + itemCfg.Icon);
+        itemImage.sprite = ItemIconLoader.Load(itemCfg.Icon);
 
         // item 边框按品质上色（1白 2绿 3蓝 4紫，同英雄品质）
         if (borderImg != null)
@@ -149,7 +149,8 @@ public class BagCell : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragH
         else
         {
             var effect = ItemConfig.GetConfig(cardId).Effect;
-            if(effect != "attr" && effect != "tpattr") //无法装备
+            // attr/tpattr 为英雄装备/消耗品，friendrep 为代友道具，均可拖到英雄上
+            if(effect != "attr" && effect != "tpattr" && effect != CombatConst.FriendProxyItemEffect)
                 return;
             dragImage.sprite = itemImage.sprite;
         }

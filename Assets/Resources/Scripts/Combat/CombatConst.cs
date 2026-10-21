@@ -155,6 +155,8 @@ public static class CombatConst
     // ---- 好友连锁·特殊 ----
     /// <summary>好友特殊(关联助益)技能起始等级（默认没有该技能=0级，每多一个好友+1级）</summary>
     public const int FriendSpecialBaseLevel = 0;
+    /// <summary>代友道具的 ItemConfig.Effect 标记：装备后计算好友羁绊人数时视为指代组在场1人（自身不获得该组技能）</summary>
+    public const string FriendProxyItemEffect = "friendrep";
 
     // ---- 布阵图(5x5) ----
     // 布阵图坐标(索引 0~24, 行优先)：
