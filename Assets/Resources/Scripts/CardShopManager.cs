@@ -382,9 +382,13 @@ public class CardShopManager : MonoBehaviour
             return;
 
         var p1 = GameManager.Instance.GetPlayer(0);
+        // 调试：先清空背包中未装备的道具（保留已装备的），避免每轮累积把装备区塞满
+        int cleared = p1.items.RemoveAll(slot => slot.HeroId == 0);
+        if (cleared > 0)
+            GameLog.Debug($"调试清理：玩家0 清除背包中 {cleared} 件未装备道具");
         int round = Math.Max(1, GameManager.Instance.year + 1); // 商店阶段对应的是即将开打的回合
         int given = 0;
-        for (int i = 0; i < 10; i++)
+        for (int i = 0; i < 6; i++)
         {
             int itemId = WorldManager.RollDropItem(round);
             if (itemId <= 0)
@@ -395,6 +399,12 @@ public class CardShopManager : MonoBehaviour
 
         if (given > 0)
             GameLog.Debug($"调试随机道具：玩家0 按掉落规则获得 {given} 个（回合{round}）");
+
+        // 调试：额外固定发放新增消耗品（经验书 / 分解锤），不受回合门槛限制，方便测试
+        int[] extraItemIds = { 401010, 401011 };
+        foreach (int extraItemId in extraItemIds)
+            p1.AddItemCard(extraItemId);
+        GameLog.Debug("调试固定道具：玩家0 获得 无字天书(401010) + 分解锤(401011)");
     }
 
     private void BeginEraCommon()

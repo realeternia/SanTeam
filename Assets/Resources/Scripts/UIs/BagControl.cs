@@ -484,6 +484,9 @@ public class BagControl : MonoBehaviour, IPanelEvent
             if (!p1.UseItemToHero(heroCardId, itemCardId))
                 return;
 
+            // 使用消耗场景：播放道具配置的使用音效
+            PlayItemUseSound(itemCfg);
+
             // 消耗品使用后消失：整体刷新背包（经验消耗品会改变英雄卡等级显示）
             RemoveCell(itemCardId);
             UpdateView();
@@ -504,6 +507,14 @@ public class BagControl : MonoBehaviour, IPanelEvent
             UpdateView(); // 装备后背包不再显示该装备，需整体刷新（内部会重建格子）
             UpdateFieldView(); // 代友道具会影响羁绊连线与左侧羁绊人数，需同步刷新阵型区
         }
+    }
+
+    // 播放道具的使用音效：UseSound 为 Resources/Sounds 下的文件名（如 metalhit），空则不播放
+    private void PlayItemUseSound(ItemConfig itemCfg)
+    {
+        if (itemCfg == null || string.IsNullOrEmpty(itemCfg.UseSound))
+            return;
+        GameManager.Instance.PlaySound("Sounds/" + itemCfg.UseSound);
     }
 
     // 卸装区：拖英雄过来脱下其所有装备进背包
@@ -548,7 +559,8 @@ public class BagControl : MonoBehaviour, IPanelEvent
 
         var p1 = GameManager.Instance.GetPlayer(bindPlayer.pid);
 
-        if (itemCardId == 0 || !ItemConfig.HasConfig(itemCardId) || ConfigManager.IsHeroCard(itemCardId) || !HasCombineRecipe(itemCardId))
+        var recipe = GetCombineRecipe(itemCardId);
+        if (itemCardId == 0 || !ItemConfig.HasConfig(itemCardId) || ConfigManager.IsHeroCard(itemCardId) || recipe == null)
         {
             SystemTip.Show("该道具不是可分解的合成装备");
             return;
@@ -566,25 +578,82 @@ public class BagControl : MonoBehaviour, IPanelEvent
             return;
         }
 
-        if (!p1.DecomposeItem(itemCardId, 401011))
-            return;
+        // 先播分解动画：两件材料从分解区以不同速度加速飞回物品区，动画结束再结算并还原背景
+        PlayDecomposeAnim(recipe, () =>
+        {
+            if (!p1.DecomposeItem(itemCardId, 401011))
+                return;
 
-        GameManager.Instance.PlaySound("Sounds/compose");
-        UpdateView();
-        UpdateFieldView();
-        if (bagCompose != null)
-            bagCompose.ResetSplitState();
+            GameManager.Instance.PlaySound("Sounds/compose");
+            PlayItemUseSound(ItemConfig.HasConfig(401011) ? ItemConfig.GetConfig(401011) : null); // 分解锤被消耗，播放其使用音效
+            UpdateView();
+            UpdateFieldView();
+            if (bagCompose != null)
+                bagCompose.ResetSplitState();
+        });
     }
 
-    // 是否存在以该道具为结果的合成配方（即是否为合成装备、可分解）
-    private bool HasCombineRecipe(int itemId)
+    // 查找以该道具为结果的合成配方（即是否为合成装备、可分解）
+    private ItemCombineConfig GetCombineRecipe(int itemId)
     {
         foreach (var rcp in ItemCombineConfig.ConfigList)
         {
             if (rcp.ResultId == itemId)
-                return true;
+                return rcp;
         }
-        return false;
+        return null;
+    }
+
+    // 分解动画：合成装备的两件材料图标从分解区飞回物品区，一件慢、一件快，均带加速下落（Ease.In）
+    private void PlayDecomposeAnim(ItemCombineConfig recipe, System.Action onComplete)
+    {
+        if (recipe == null || bagItemRegion == null || bagCompose == null)
+        {
+            GameLog.Error($"BagControl.PlayDecomposeAnim: 配方/物品区/分解区未就绪，跳过动画 resultId={recipe?.ResultId}");
+            onComplete?.Invoke();
+            return;
+        }
+
+        const float iconSize = 80f;
+        const float slowDuration = 0.9f;  // 慢的一件
+        const float fastDuration = 0.45f; // 快的一件
+        const float startGap = 18f;       // 两件材料起飞点左右错开
+        const float landGap = 34f;        // 落点左右错开，避免完全重叠
+
+        GameObject containerObj = new GameObject("DecomposeAnim", typeof(RectTransform));
+        RectTransform container = containerObj.GetComponent<RectTransform>();
+        container.SetParent(bagItemRegion.transform.parent, false);
+        container.anchoredPosition = Vector2.zero;
+        container.SetAsLastSibling();
+
+        Vector2 start = ToContainerPos(container, bagCompose.transform as RectTransform);
+        Vector2 bagPos = ToContainerPos(container, bagItemRegion.transform as RectTransform);
+
+        Image iconA = CreateTempItemIcon(container, recipe.ItemA, start - new Vector2(startGap, 0f), iconSize);
+        Image iconB = CreateTempItemIcon(container, recipe.ItemB, start + new Vector2(startGap, 0f), iconSize);
+        if (iconA == null || iconB == null)
+        {
+            GameLog.Error("BagControl.PlayDecomposeAnim: 临时图标创建失败，跳过动画");
+            Destroy(containerObj);
+            onComplete?.Invoke();
+            return;
+        }
+
+        Sequence seq = DOTween.Sequence().SetUpdate(true);
+        // 慢件：一开始就出发，缓慢加速
+        seq.Join(iconA.rectTransform.DOAnchorPos(bagPos - new Vector2(landGap, 0f), slowDuration).SetEase(Ease.InQuad));
+        seq.Join(iconA.rectTransform.DOScale(0.6f, slowDuration));
+        // 快件：稍后出发，加速更陡
+        seq.Insert(0.15f, iconB.rectTransform.DOAnchorPos(bagPos + new Vector2(landGap, 0f), fastDuration).SetEase(Ease.InCubic));
+        seq.Insert(0.15f, iconB.rectTransform.DOScale(0.6f, fastDuration));
+        seq.Append(iconA.DOFade(0f, 0.1f));
+        seq.Join(iconB.DOFade(0f, 0.1f));
+
+        seq.OnComplete(() =>
+        {
+            Destroy(containerObj);
+            onComplete?.Invoke();
+        });
     }
 
     // 确认合成：先收起侧边栏，等侧边栏滑出后在背包里播合成动画，动画结束才真正合成并刷新

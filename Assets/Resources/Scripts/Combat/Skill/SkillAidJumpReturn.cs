@@ -3,8 +3,8 @@ using CommonConfig;
 using UnityEngine;
 
 /// <summary>
-/// 邓艾·偷渡阴平：跃向 Range 内最远的敌方英雄（抛物线飞行），落地后对其施加「陷阵」BuffTime 秒；
-/// 停留 BuffTime 秒后沿抛物线跳回起跳点。
+/// 邓艾·偷渡阴平：跃向 Range 内最远的敌方英雄（抛物线飞行），落地时对其造成一次单体技能伤害
+/// 并施加「陷阵」BuffTime 秒；停留 BuffTime 秒后沿抛物线跳回起跳点。
 /// 两段跳跃统一走 Skill.JumpTo（跳跃期间 isJumping，击退/拖拽/换位等外部位移无法打断，动作必播完）。
 /// </summary>
 public class SkillAidJumpReturn : Skill
@@ -83,12 +83,15 @@ public class SkillAidJumpReturn : Skill
         if (owner == null || owner.hp <= 0)
             yield break;
 
-        // 落地：施加陷阵
+        // 落地：先结算一次单体技能伤害，再施加陷阵
         var buffIds = GetSkillBuffIds();
         if (buffIds.Count == 0)
             GameLog.Error($"SkillAidJumpReturn: 缺少陷阵Buff配置 BuffId={skillCfg.BuffId} 技能id={id}");
+        var damage = GetSkillDamage();
         if (target != null && target.hp > 0)
         {
+            if (damage > 0)
+                target.OnSkillDamaged(owner, id, damage);
             foreach (var buffId in buffIds)
                 BuffManager.AddBuff(target, owner, id, buffId, skillCfg.BuffTime);
             if (!string.IsNullOrEmpty(skillCfg.HitEffect))

@@ -96,7 +96,7 @@ public class BagRecycler : MonoBehaviour, IDropHandler, IPointerClickHandler
         }
         isSplitArmed = true;
         bgImage.sprite = splitSprite;
-        SystemTip.Show("已进入分解状态：把要分解的合成装备拖到这里（点击取消）");
+        SystemTip.Show("已进入分解状态");
     }
 
     // 退出分解状态：还原原始背景图
