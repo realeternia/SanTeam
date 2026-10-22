@@ -23,11 +23,11 @@ public class WorldManager : MonoBehaviour
     private int[] killMark = new int[8];
     private int[] deathOrder = new int[8]; // 记录各阵营的死亡顺序，0表示未死亡
     private int deathCount = 0; // 记录已死亡的阵营数量
-    private bool[] sideBattleOver = new bool[8]; // 各阵营战斗是否已结束（无存活敌方：如 TeamMode0 独立配对中对手先被全灭）
+    private bool[] sideBattleOver = new bool[8]; // 各阵营战斗是否已结束（无存活敌方：如地图规则0 独立配对中对手先被全灭）
 
     private bool gameFinish = false;
     private bool hasWin;
-    private MapConfig mapConfig;
+    private MapInfo mapInfo;
     private int[] currentMatch = null; // 本场战斗的1-8号位随机分配结果
     private bool isPveRound = false; // 本场是否为PVE（打怪物拿掉落）
     private List<System.Tuple<int, int>> pveMonsterSpawns = null; // PVE怪物布阵（怪物id, 布阵格0~24：0=左上，24=右下）
@@ -92,7 +92,7 @@ public class WorldManager : MonoBehaviour
         // 战斗阶段 BGM：battle1~battle4 随机一首
         BGMPlayer.Instance.PlaySound("BGMs/battle" + (SysRandom.Range(0, 4) + 1));
 
-        // 从回合配置表读取本回合可能刷的地图，随机选一张
+        // 从回合配置表读取本回合可刷地图权重，按权重随机选一张
         gameFinish = false;
         hasWin = false; // 本场重置胜负标记（阵亡处理里不再重置，见 OnUnitDying）
         currentMatch = null; // 重置号位分配，本场重新随机
@@ -101,18 +101,17 @@ public class WorldManager : MonoBehaviour
         pveMonsterSpawns = ParsePveMonsterSpawns(roundCfg.SoldierList);
         if (isPveRound)
             GameLog.Debug($"[PVE] 回合{GameManager.Instance.year} {roundCfg.Name} 怪物布阵: {(string.IsNullOrEmpty(roundCfg.SoldierList) ? "(空!请在GameRoundConfig填SoldierList)" : roundCfg.SoldierList)} 解析到{pveMonsterSpawns.Count}只");
-        var mapIds = roundCfg.MapIds;
-        var newMapId = mapIds[SysRandom.Range(0, mapIds.Length)];
-        if (mapConfig == null || newMapId != mapConfig.Mapid)
+        var newMapId = RollMapId(roundCfg.MapWeights);
+        if (mapInfo == null || newMapId != mapInfo.Mapid)
         {
             // 打印加载耗时
             var startTime = Time.realtimeSinceStartup;
             var mapNode = Resources.Load<GameObject>("Maps/Map" + newMapId);
-            if (mapConfig != null)
-                Destroy(mapConfig.gameObject);
+            if (mapInfo != null)
+                Destroy(mapInfo.gameObject);
 
             GameObject cell = Instantiate(mapNode, gameObject.transform.parent);
-            mapConfig = cell.GetComponent<MapConfig>();
+            mapInfo = cell.GetComponent<MapInfo>();
             var endTime = Time.realtimeSinceStartup;
             GameLog.Debug("加载地图耗时：" + (endTime - startTime) + "秒");
         }
@@ -286,9 +285,9 @@ public class WorldManager : MonoBehaviour
         heroInfoGroup.Reset();
 
         // 生成墙
-        for (int i = 0; i < mapConfig.WallNode.transform.childCount; i++)
+        for (int i = 0; i < mapInfo.WallNode.transform.childCount; i++)
         {
-            var wallNodeCell = mapConfig.WallNode.transform.GetChild(i);
+            var wallNodeCell = mapInfo.WallNode.transform.GetChild(i);
             // 使用GetOccupiedGrids方法获取需要锁定的格子列表
             List<Vector2Int> requiredGrids = GetOccupiedGrids(wallNodeCell.transform.position, wallNodeCell.GetComponent<Collider>());
             // 锁定新格子
@@ -323,10 +322,10 @@ public class WorldManager : MonoBehaviour
                 for (int i = 0; i < 8; i++)
                     GameManager.Instance.GetPlayer(match[i]).battleSide = i == 0 ? 1 : 0;
 
-                if (mapConfig.SideCenters != null && mapConfig.SideCenters.Length >= 2 && mapConfig.SideCenters[0] != null)
+                if (mapInfo.SideCenters != null && mapInfo.SideCenters.Length >= 2 && mapInfo.SideCenters[0] != null)
                 {
-                    var playerCenter = mapConfig.SideCenters[0];
-                    var monsterCenter = mapConfig.SideCenters[1];
+                    var playerCenter = mapInfo.SideCenters[0];
+                    var monsterCenter = mapInfo.SideCenters[1];
                     var p = GameManager.Instance.GetPlayer(match[0]);
 
                     SpawnSoldiersForSide(p, playerCenter, 1);
@@ -350,9 +349,9 @@ public class WorldManager : MonoBehaviour
                 for (int side = 1; side <= 8; side++)
                 {
                     var p = GameManager.Instance.GetPlayer(match[side - 1]);
-                    if (mapConfig.SideCenters == null || side - 1 >= mapConfig.SideCenters.Length || mapConfig.SideCenters[side - 1] == null)
+                    if (mapInfo.SideCenters == null || side - 1 >= mapInfo.SideCenters.Length || mapInfo.SideCenters[side - 1] == null)
                         continue;
-                    var center = mapConfig.SideCenters[side - 1];
+                    var center = mapInfo.SideCenters[side - 1];
                     SpawnSoldiersForSide(p, center, side);
                     SpawnHerosForSide(p, center, p.GetBattleCardList(), side);
                     SpawnGongSummonForSide(p, center, side);
@@ -367,8 +366,8 @@ public class WorldManager : MonoBehaviour
             CombatConst.FullMpAtBattleBegin = GameManager.Instance.debugFullMp;
             GameManager.Instance.GetPlayer(0).likeCount = 2;
             GameManager.Instance.GetPlayer(1).likeCount = 2;
-            var center1 = mapConfig.SideCenters != null && mapConfig.SideCenters.Length > 0 ? mapConfig.SideCenters[0] : null;
-            var center2 = mapConfig.SideCenters != null && mapConfig.SideCenters.Length > 1 ? mapConfig.SideCenters[1] : null;
+            var center1 = mapInfo.SideCenters != null && mapInfo.SideCenters.Length > 0 ? mapInfo.SideCenters[0] : null;
+            var center2 = mapInfo.SideCenters != null && mapInfo.SideCenters.Length > 1 ? mapInfo.SideCenters[1] : null;
 
             SpawnDebugHeroes(GameManager.Instance.GetPlayer(0), center1, GameManager.Instance.debugHeroesSide1, 1);
             SpawnDebugHeroes(GameManager.Instance.GetPlayer(1), center2, GameManager.Instance.debugHeroesSide2, 2);
@@ -449,7 +448,7 @@ public class WorldManager : MonoBehaviour
         Vector3 forward = Vector3.ProjectOnPlane(center.forward, Vector3.up).normalized;
         Vector3 right = Vector3.ProjectOnPlane(center.right, Vector3.up).normalized;
         float half = (CombatConst.FormationGridSize - 1) * 0.5f;
-        return center.position + forward * (row - half) * mapConfig.FormationCellSize + right * (col - half) * mapConfig.FormationCellSize;
+        return center.position + forward * (row - half) * mapInfo.FormationCellSize + right * (col - half) * mapInfo.FormationCellSize;
     }
 
     // 生成一个势力的5个小兵：按布阵面板中小兵摆放位置生成(近战500001/远程500002)
@@ -633,6 +632,44 @@ public class WorldManager : MonoBehaviour
             result.Add(System.Tuple.Create(id, pos));
         }
         return result;
+    }
+
+    // 解析回合可刷地图权重"地图英文名:权重,地图英文名:权重"（与 SkillConfig 数值槽 k:v、ItemConfig 掉落权重同一套解析口径：
+    // 逗号分隔、键值冒号、相对权重、≤0 不参与），按权重随机返回一个地图Id；无有效条目时记录错误并回退地图1。
+    private int RollMapId(string cfg)
+    {
+        var entries = new List<KeyValuePair<int, int>>();
+        int totalWeight = 0;
+        if (!string.IsNullOrEmpty(cfg))
+        {
+            foreach (var seg in cfg.Split(new[] { ',', '，' }, StringSplitOptions.RemoveEmptyEntries))
+            {
+                var s = seg.Trim();
+                int i = s.IndexOf(':');
+                if (i <= 0)
+                    continue;
+                var nameE = s.Substring(0, i).Trim();
+                int weight;
+                if (!int.TryParse(s.Substring(i + 1).Trim(), out weight) || weight <= 0)
+                    continue;
+                var mapCfg = MapConfig.GetConfigByNameE(nameE);
+                entries.Add(new KeyValuePair<int, int>(mapCfg.Id, weight));
+                totalWeight += weight;
+            }
+        }
+        if (totalWeight <= 0)
+        {
+            GameLog.Error($"GameRoundConfig.MapWeights 无有效地图权重（{cfg}），回退地图1");
+            return 1;
+        }
+        int roll = SysRandom.Range(0, totalWeight);
+        foreach (var entry in entries)
+        {
+            roll -= entry.Value;
+            if (roll < 0)
+                return entry.Key;
+        }
+        return entries[entries.Count - 1].Key;
     }
 
     // PVE：按回合配置的怪物布阵在怪物号位生成（每只在配置指定的5x5布阵格上）
@@ -1157,7 +1194,7 @@ public class WorldManager : MonoBehaviour
             // PVE：只有配对的(玩家奇数号位,怪物偶数号位)互为敌人，各对之间互不干扰
             return a != b && (a + 1) / 2 == (b + 1) / 2;
         }
-        if (mapConfig.TeamMode == 1)
+        if (MapConfig.GetConfig(mapInfo.Mapid).Rule == 1)
         {
             // 阵营1、3、4为一个阵营，阵营2、5、6为另一个阵营
             bool isTeam1 = a == 1 || a == 3 || a == 5 || a == 7;
@@ -1168,7 +1205,7 @@ public class WorldManager : MonoBehaviour
             // 不同阵营之间是敌人
             return (isTeam1 && targetIsTeam2) || (isTeam2 && targetIsTeam1);
         }
-        else if (mapConfig.TeamMode == 0)
+        else if (MapConfig.GetConfig(mapInfo.Mapid).Rule == 0)
         {
             return a != b && (a + 1) / 2 == (b + 1) / 2;
         }
@@ -1313,7 +1350,7 @@ public class WorldManager : MonoBehaviour
             HandlePveUnitDying(dieUnit, killerPlayerId);
             return;
         }
-        if (mapConfig.TeamMode == 0)
+        if (MapConfig.GetConfig(mapInfo.Mapid).Rule == 0)
         {
             // 检查所有阵营是否还有存活单位
             // 创建一个数组来统计每个阵营是否有存活单位，数组索引对应阵营编号减1
@@ -1337,7 +1374,7 @@ public class WorldManager : MonoBehaviour
             }
 
             GameLog.Debug($"id:{dieUnit.id} dieUnit.side:{dieUnit.side} 存活阵营数:{aliveSideCount}");
-            // TeamMode0：独立配对（1-2/3-4/5-6/7-8），每个配对分出胜负即该配对结束。
+            // 地图规则0：独立配对（1-2/3-4/5-6/7-8），每个配对分出胜负即该配对结束。
             // "所有配对都已分出胜负" ⇔ 存活阵营之间不存在任何互为敌人的组合。
             // 不能写死 aliveSideCount==4：参战阵营数不足 8（如模拟/调试战斗只有 2 方）、或某配对双方同刻同灭时
             // 该条件永远不满足，战斗永不结束 → 主循环空转卡死。
@@ -1371,7 +1408,7 @@ public class WorldManager : MonoBehaviour
                 hasWin = sideHasUnits[0];
             }
         }
-        else if (mapConfig.TeamMode == 1)
+        else if (MapConfig.GetConfig(mapInfo.Mapid).Rule == 1)
         {
             // 团队模式逻辑：检查两个阵营是否还有存活单位
             bool team1HasUnits = false; // 阵营1、3、4
@@ -1415,7 +1452,7 @@ public class WorldManager : MonoBehaviour
                 hasWin = team1HasUnits;
             }
         }
-       else if (mapConfig.TeamMode == 2)
+       else if (MapConfig.GetConfig(mapInfo.Mapid).Rule == 2)
         {
             // 检查所有阵营是否还有存活单位
             // 创建一个数组来统计每个阵营是否有存活单位，数组索引对应阵营编号减1
@@ -1662,7 +1699,7 @@ public class WorldManager : MonoBehaviour
 
     /// <summary>
     /// 该阵营的战斗是否已结束：整体战斗已结束，或该方已无存活敌方
-    /// （如 TeamMode0 的四个独立配对中对手先被全灭、其他配对仍在打）。
+    /// （如 地图规则0 的四个独立配对中对手先被全灭、其他配对仍在打）。
     /// 战斗结束的一方不再回血/回蓝，也不再承受疲劳伤害（冻结该方）。
     /// </summary>
     public bool IsSideBattleOver(int side)

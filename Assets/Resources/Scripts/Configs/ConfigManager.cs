@@ -30,6 +30,7 @@ public static class ConfigManager
         ItemConfig.Load();
         SoldierConfig.Load();
         GameRoundConfig.Load();
+        MapConfig.Load();
         PlayerConfig.Load();
         HeroFriendConfig.Load();
         PlayerLevelConfig.Load();

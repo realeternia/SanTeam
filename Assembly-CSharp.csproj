@@ -232,6 +232,7 @@
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidAmbush.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAreaDamageDeBuff.cs" />
     <Compile Include="Assets\Resources\Scripts\Configs\PlayerLevelConfig_s.cs" />
+    <Compile Include="Assets\Resources\Scripts\Configs\MapConfig_s.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAttackSpeedAttack.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidChargeImpale.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillInitDecayDef.cs" />
@@ -274,7 +275,7 @@
     <Compile Include="Assets\Resources\Scripts\Configs\SkillConfig_s.cs" />
     <Compile Include="Assets\Resources\Scripts\Configs\PlayerConfig_s.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffHealBoost.cs" />
-    <Compile Include="Assets\Resources\Scripts\MapConfig.cs" />
+    <Compile Include="Assets\Resources\Scripts\MapInfo.cs" />
     <Compile Include="Assets\DOTween\Modules\DOTweenModuleUIToolkit.cs" />
     <Compile Include="Assets\DOTween\Modules\DOTweenModuleUtils.cs" />
     <Compile Include="Assets\MasterMagicFX\Scripts\Miscs\BulletPreviewerShooter.cs" />
