@@ -185,7 +185,7 @@ namespace CommonConfig
             config[301005] = new BuffConfig(301005, "陷阵", "停", "无法移动", false, true, false, 3, "BuffNoMove", "", "", "", "BuffFrozen", "");
             config[301006] = new BuffConfig(301006, "溃败", "败", "持续受到随时间结算的伤害", false, true, false, 1, "BuffTimeDamage", "", "", "BloodExplosion", "", "");
             config[301007] = new BuffConfig(301007, "减疗", "疫", "降低目标受到的治疗效果", false, true, false, 1, "BuffHealDown", "", "", "MissesGreen", "", "");
-            config[301008] = new BuffConfig(301008, "减速", "缓", "降低目标移动与攻速", false, true, false, 3, "BuffSlowDown", "", "", "Wet", "", "");
+            config[301008] = new BuffConfig(301008, "减速", "缓", "降低目标移动与攻速", false, true, false, 3, "BuffSlowDown", "", "", "MissesBlue", "", "");
             config[301009] = new BuffConfig(301009, "减防", "破", "降低目标护甲", false, true, false, 1, "BuffArmorDown", "", "", "MissesBlue", "", "");
             config[301010] = new BuffConfig(301010, "嘲讽", "嘲", "成为敌对单位强制优先攻击的目标", false, true, true, 3, "BuffTaunt", "", "", "Character_status_taunt", "", "");
             config[301011] = new BuffConfig(301011, "叛逃", "叛", "不受控制，向初始位置后退，移动速度减半", false, true, true, 3, "BuffDefect", "", "", "Character_status_sleep", "", "");
