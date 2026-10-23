@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -42,7 +42,7 @@ namespace CommonConfig
         {
             {"Id", new FieldMetaInfo("序列", "int", 60)},
             {"Name", new FieldMetaInfo("回合名字", "string", 0)},
-            {"MapWeights", new FieldMetaInfo("可刷地图权重（格式 地图英文名:权重，逗号分隔，如 forest1v1:30,forest4v4:20；相对权重，≤0不参与）", "string", 0)},
+            {"MapWeights", new FieldMetaInfo("可刷地图权重（格式 地图英文名:权重，逗号分隔，如 forest1v1:30,forest4v4:20；相对权重，≤0不参与）", "string", 275)},
             {"RoundGold", new FieldMetaInfo("回合加钱", "int", 60)},
             {"MultiCardRate", new FieldMetaInfo("多等级概率", "float", 60)},
             {"MultiPriceTotal", new FieldMetaInfo("多等级", "int", 73)},

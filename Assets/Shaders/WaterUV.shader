@@ -1,4 +1,4 @@
-Shader "MyShader/NoiseWater"
+Shader "Custom/NoiseWater"
 {
 	Properties
 	{

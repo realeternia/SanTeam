@@ -118,6 +118,7 @@
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillHitRepeat.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillTaunt.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffVengefulStance.cs" />
+    <Compile Include="Assets\Resources\Scripts\Configs\MapConfig_s.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffMultiShot.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillFactionShield.cs" />
     <Compile Include="Assets\Lana Studio\Casual RPG VFX\Scripts\UVscroll.cs" />
@@ -193,6 +194,7 @@
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillKillGain.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidBalance.cs" />
     <Compile Include="Assets\Resources\Scripts\Effect\LaserBeamController.cs" />
+    <Compile Include="Assets\Resources\Scripts\MapInfo.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillJumpChain.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAttackStunDamage.cs" />
     <Compile Include="Assets\DOTween\Modules\DOTweenModulePhysics2D.cs" />
@@ -232,7 +234,6 @@
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidAmbush.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAreaDamageDeBuff.cs" />
     <Compile Include="Assets\Resources\Scripts\Configs\PlayerLevelConfig_s.cs" />
-    <Compile Include="Assets\Resources\Scripts\Configs\MapConfig_s.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAttackSpeedAttack.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidChargeImpale.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillInitDecayDef.cs" />
@@ -275,7 +276,6 @@
     <Compile Include="Assets\Resources\Scripts\Configs\SkillConfig_s.cs" />
     <Compile Include="Assets\Resources\Scripts\Configs\PlayerConfig_s.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffHealBoost.cs" />
-    <Compile Include="Assets\Resources\Scripts\MapInfo.cs" />
     <Compile Include="Assets\DOTween\Modules\DOTweenModuleUIToolkit.cs" />
     <Compile Include="Assets\DOTween\Modules\DOTweenModuleUtils.cs" />
     <Compile Include="Assets\MasterMagicFX\Scripts\Miscs\BulletPreviewerShooter.cs" />
@@ -356,6 +356,7 @@
     <None Include="Assets\SineVFX\TopDownEffects\Environment\EnvShaders\PrototypeGridQuadV2TDE.shader" />
     <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF Overlay.shader" />
     <None Include="Assets\TextMesh Pro\Shaders\TMP_Bitmap-Mobile.shader" />
+    <None Include="Assets\Shaders\WaterMoveUV.shader" />
     <None Include="Assets\TextMesh Pro\Fonts\LiberationSans - OFL.txt" />
     <None Include="Assets\SineVFX\TopDownEffects\Shaders\DissolveParticleFlipBook.shader" />
     <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF-Mobile.shader" />

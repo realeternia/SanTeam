@@ -1,4 +1,4 @@
-﻿using System;
+﻿﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -40,10 +40,12 @@ namespace CommonConfig
 
         private static Dictionary<string, FieldMetaInfo> fieldMeta = new Dictionary<string, FieldMetaInfo>()
         {
-            {"Id", new FieldMetaInfo("地图Id（对应 Resources/Maps/Map{Id} 资源）", "int", 60)},
+            {"Id", new FieldMetaInfo("地图Id（与 MapInfo.Mapid 一致）", "int", 60)},
             {"NameE", new FieldMetaInfo("地图英文名（GameRoundConfig.MapWeights 的权重键，如 forest1v1:30）", "string", 0, "", true)},
             {"Des", new FieldMetaInfo("描述", "string", 377)},
             {"Rule", new FieldMetaInfo("地图规则（0=独立配对，1=两队混战，2=全场混战）", "int", 60)},
+            {"Prefab", new FieldMetaInfo("地图prefab名（Resources/Maps 下的预制体名，如 Map1）", "string", 0)},
+            {"IsTestDefault", new FieldMetaInfo("测试默认地图（调试阵容/测试战斗固定使用该地图；多个 true 时取第一个）", "bool", 0)},
         };
 
         public static Dictionary<string, FieldMetaInfo> FieldMeta { get { return fieldMeta; } }
@@ -52,7 +54,7 @@ namespace CommonConfig
         public static List<CellMeta> CellMetas { get { return cellMeta; } }
 
         /// <summary>
-        ///地图Id（对应 Resources/Maps/Map{Id} 资源）
+        ///地图Id（与 MapInfo.Mapid 一致）
         /// </summary>
         public int Id;
         /// <summary>
@@ -67,14 +69,24 @@ namespace CommonConfig
         ///地图规则（0=独立配对，1=两队混战，2=全场混战）
         /// </summary>
         public int Rule;
+        /// <summary>
+        ///地图prefab名（Resources/Maps 下的预制体名，如 Map1）
+        /// </summary>
+        public string Prefab;
+        /// <summary>
+        ///测试默认地图（调试阵容/测试战斗固定使用该地图；多个 true 时取第一个）
+        /// </summary>
+        public bool IsTestDefault;
 
 
-        public MapConfig(int Id, string NameE, string Des, int Rule)
+        public MapConfig(int Id, string NameE, string Des, int Rule, string Prefab, bool IsTestDefault)
         {
             this.Id = Id;
             this.NameE = NameE;
             this.Des = Des;
             this.Rule = Rule;
+            this.Prefab = Prefab;
+            this.IsTestDefault = IsTestDefault;
         }
 
         public MapConfig() { }
@@ -95,10 +107,11 @@ namespace CommonConfig
         public static void Load()
         {
             config.Clear();
-            config[1] = new MapConfig(1, "forest1v1", "独立配对：1-2/3-4/5-6/7-8 各自1v1，分出胜负即结束", 0);
-            config[2] = new MapConfig(2, "forest4v4", "两队混战：奇数位 vs 偶数位，一队全灭即结束", 1);
-            config[3] = new MapConfig(3, "islandteam", "两队混战：奇数位 vs 偶数位，一队全灭即结束", 1);
-            config[4] = new MapConfig(4, "map4", "全场混战：最后存活阵营获胜，按死亡顺序计分", 2);
+            config[1] = new MapConfig(1, "forest1v1", "独立配对：1-2/3-4/5-6/7-8 各自1v1，分出胜负即结束", 0, "Map1", false);
+            config[2] = new MapConfig(2, "forest4v4", "两队混战：奇数位 vs 偶数位，一队全灭即结束", 1, "Map2", false);
+            config[3] = new MapConfig(3, "islandteam", "两队混战：奇数位 vs 偶数位，一队全灭即结束", 1, "Map3", false);
+            config[4] = new MapConfig(4, "map4", "全场混战：最后存活阵营获胜，按死亡顺序计分", 2, "Map4", false);
+            config[5] = new MapConfig(5, "river", "独立配对：1-2/3-4/5-6/7-8 各自1v1，分出胜负即结束", 0, "Map11River", true);
 
             RebuildIndex();
 
@@ -128,7 +141,6 @@ namespace CommonConfig
         {
             return GetConfig(idxNameE[val]);
         }
-
 
         public static bool HasConfig(int id)
         {
