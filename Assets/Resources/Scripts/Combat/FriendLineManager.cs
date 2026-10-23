@@ -48,7 +48,7 @@ public static class FriendLineManager
     private static void ApplyFriendSpecialSkills(Chess chess)
     {
         var owner = chess.GetPlayerInfo();
-        // 真实所属组 + 装备的代友道具指代组（代友道具只参与人数与拉线，不授予该组技能）
+        // 真实所属组 + 装备的代友道具指代组（代友道具装备者视为该组在场成员，同样参与人数、拉线与技能授予）
         var relIds = CollectFriendRelationIds(owner, chess.heroId);
         if (relIds.Count == 0)
             return;
@@ -75,7 +75,7 @@ public static class FriendLineManager
                     presentMembers.Add(memberId);
                 }
             }
-            // 代友道具：装备者视为该组在场1人（只提升人数/等级，自身不获得该组技能）
+            // 代友道具：装备者视为该组在场1人（计入人数/等级，也获得该组关联技能）
             var proxyHeroIds = GetProxyCarrierHeroIds(sideHeroes, relCfg.SkillId);
             var proxyCount = 0;
             foreach (var proxyHeroId in proxyHeroIds)
@@ -86,8 +86,8 @@ public static class FriendLineManager
             if (presentCount + proxyCount <= 0)
                 continue;
 
-            // 只有该组真实成员才获得关联技能，等级 = 在场好友数（含代友道具额外人数）
-            if (ConfigManager.HeroHasFriendSkill(chess.heroId, relCfg.SkillId))
+            // 该组在场成员（真实成员或装备代友道具的英雄）都获得关联技能，等级 = 在场好友数（含代友道具额外人数）
+            if (ConfigManager.HeroHasFriendSkill(chess.heroId, relCfg.SkillId) || proxyHeroIds.Contains(chess.heroId))
             {
                 var skillLevel = CombatConst.FriendSpecialBaseLevel + presentCount + proxyCount;
                 GrantFriendSpecialSkill(chess, relCfg.SkillId, skillLevel);

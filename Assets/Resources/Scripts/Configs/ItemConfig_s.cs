@@ -97,7 +97,7 @@ namespace CommonConfig
         /// </summary>
         public string SkillId;
         /// <summary>
-        ///指代技能（代友道具专用：装备后计算好友羁绊人数时，视为 SkillId 缩写对应羁绊组的在场1人，但不获得该组技能）
+        ///指代技能（代友道具专用：装备后视为 SkillId 缩写对应羁绊组的在场1人，参与人数计算、连线与关联技能授予）
         /// </summary>
         public string RefSkillSname;
         /// <summary>

@@ -110,7 +110,7 @@ namespace CommonConfig
             config[1] = new MapConfig(1, "forest1v1", "独立配对：1-2/3-4/5-6/7-8 各自1v1，分出胜负即结束", 0, "Map1", false);
             config[2] = new MapConfig(2, "forest4v4", "两队混战：奇数位 vs 偶数位，一队全灭即结束", 1, "Map2", false);
             config[3] = new MapConfig(3, "islandteam", "两队混战：奇数位 vs 偶数位，一队全灭即结束", 1, "Map3", false);
-            config[4] = new MapConfig(4, "map4", "全场混战：最后存活阵营获胜，按死亡顺序计分", 2, "Map4", false);
+            config[4] = new MapConfig(4, "iceland", "全场混战：最后存活阵营获胜，按死亡顺序计分", 2, "Map4", false);
             config[5] = new MapConfig(5, "river", "独立配对：1-2/3-4/5-6/7-8 各自1v1，分出胜负即结束", 0, "Map11River", true);
 
             RebuildIndex();
@@ -141,6 +141,7 @@ namespace CommonConfig
         {
             return GetConfig(idxNameE[val]);
         }
+
 
         public static bool HasConfig(int id)
         {

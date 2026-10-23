@@ -210,7 +210,7 @@ public class MySelectControl : MonoBehaviour
                 if (battleHeroes.Contains(memberId))
                     present.Add(memberId);
             }
-            // 代友道具：装备者视为该组额外在场1人（自身不获得该组技能）
+            // 代友道具：装备者视为该组额外在场1人（同样计入技能等级）
             int proxyCount = FriendLineManager.CountProxyItems(checkPlayer, battleHeroes, friendCfg.SkillId);
             if (present.Count + proxyCount <= 0)
                 continue;
