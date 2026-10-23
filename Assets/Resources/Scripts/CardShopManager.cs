@@ -400,11 +400,11 @@ public class CardShopManager : MonoBehaviour
         if (given > 0)
             GameLog.Debug($"调试随机道具：玩家0 按掉落规则获得 {given} 个（回合{round}）");
 
-        // 调试：额外固定发放新增消耗品（经验书 / 分解锤），不受回合门槛限制，方便测试
-        int[] extraItemIds = { 401010, 401011 };
+        // 调试：额外固定发放新增消耗品（重铸镜 / 经验书 / 分解锤），不受回合门槛限制，方便测试
+        int[] extraItemIds = { 401009, 401010, 401011 };
         foreach (int extraItemId in extraItemIds)
             p1.AddItemCard(extraItemId);
-        GameLog.Debug("调试固定道具：玩家0 获得 无字天书(401010) + 分解锤(401011)");
+        GameLog.Debug("调试固定道具：玩家0 获得 重铸镜(401009) + 无字天书(401010) + 分解锤(401011)");
     }
 
     private void BeginEraCommon()

@@ -13,6 +13,8 @@ public class BagRecycler : MonoBehaviour, IDropHandler, IPointerClickHandler
 
     // 分解状态：合成区拖入分解符(401011)后进入，背景切到 dcompose；点击可还原，分解成功后也还原
     private bool isSplitArmed;
+    // 重铸状态：合成区拖入重铸镜(401009)后进入，背景同样切到 dcompose；点击可还原，重铸成功后也还原
+    private bool isRerollArmed;
     private Image bgImage;
     private Sprite defaultSprite;
     private Sprite splitSprite;
@@ -47,10 +49,22 @@ public class BagRecycler : MonoBehaviour, IDropHandler, IPointerClickHandler
                 ArmSplit();
                 return;
             }
+            // 拖入重铸镜：进入重铸状态（重铸镜同样等真正重铸时再扣）
+            if (itemCfg != null && itemCfg.Effect == "tpreroll")
+            {
+                ArmReroll();
+                return;
+            }
             // 分解状态下拖入装备：执行分解
             if (isSplitArmed)
             {
                 bagControl.DecomposeItem(draggedCell.cardId);
+                return;
+            }
+            // 重铸状态下拖入装备：执行重铸
+            if (isRerollArmed)
+            {
+                bagControl.RerollItem(draggedCell.cardId);
                 return;
             }
             bagControl.OpenComposePanel(draggedCell.cardId);
@@ -61,22 +75,46 @@ public class BagRecycler : MonoBehaviour, IDropHandler, IPointerClickHandler
             bagControl.SellCard(draggedCell.cardId);
     }
 
-    // 分解状态下点击合成区：退出分解状态并还原背景图
+    // 分解状态下点击合成区：退出当前状态并还原背景图
     public void OnPointerClick(PointerEventData eventData)
     {
-        if (mode == "compose" && isSplitArmed)
+        if (mode == "compose" && (isSplitArmed || isRerollArmed))
             ResetSplitState();
     }
 
     // 进入分解状态：背景图切换为 dcompose.png
     private void ArmSplit()
     {
-        if (isSplitArmed)
+        if (isSplitArmed && !isRerollArmed)
             return;
+        if (!EnsureSplitSprite())
+            return;
+        isSplitArmed = true;
+        isRerollArmed = false;
+        bgImage.sprite = splitSprite;
+        SystemTip.Show("已进入分解状态");
+    }
+
+    // 进入重铸状态：背景图同样切换为 dcompose.png
+    private void ArmReroll()
+    {
+        if (isRerollArmed && !isSplitArmed)
+            return;
+        if (!EnsureSplitSprite())
+            return;
+        isRerollArmed = true;
+        isSplitArmed = false;
+        bgImage.sprite = splitSprite;
+        SystemTip.Show("已进入重铸状态");
+    }
+
+    // 准备状态切换用的背景图（dcompose），失败记录日志
+    private bool EnsureSplitSprite()
+    {
         if (bgImage == null)
         {
-            GameLog.Error("BagRecycler.ArmSplit: 合成区缺少 Image 组件，无法切换分解背景");
-            return;
+            GameLog.Error("BagRecycler.EnsureSplitSprite: 合成区缺少 Image 组件，无法切换背景");
+            return false;
         }
         if (splitSprite == null)
         {
@@ -91,20 +129,19 @@ public class BagRecycler : MonoBehaviour, IDropHandler, IPointerClickHandler
         }
         if (splitSprite == null)
         {
-            GameLog.Error("BagRecycler.ArmSplit: 分解背景图不存在或无法加载 Textures/dcompose");
-            return;
+            GameLog.Error("BagRecycler.EnsureSplitSprite: 背景图不存在或无法加载 Textures/dcompose");
+            return false;
         }
-        isSplitArmed = true;
-        bgImage.sprite = splitSprite;
-        SystemTip.Show("已进入分解状态");
+        return true;
     }
 
-    // 退出分解状态：还原原始背景图
+    // 退出分解/重铸状态：还原原始背景图
     public void ResetSplitState()
     {
-        if (!isSplitArmed)
+        if (!isSplitArmed && !isRerollArmed)
             return;
         isSplitArmed = false;
+        isRerollArmed = false;
         if (bgImage != null)
             bgImage.sprite = defaultSprite;
     }

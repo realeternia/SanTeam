@@ -10,7 +10,11 @@ public static class ItemIconLoader
         if (string.IsNullOrEmpty(icon))
             return null;
 
-        string path = icon.StartsWith("SkillPic/") ? "Textures/" + icon : "Textures/ItemPic/" + icon;
-        return Resources.Load<Sprite>(path);
+        if (icon.StartsWith("SkillPic/"))
+            return Resources.Load<Sprite>("Textures/" + icon);
+
+        // 先找道具图标目录，找不到再回退到 Textures 根目录（如 drandom/dcompose 这类整图）
+        Sprite sprite = Resources.Load<Sprite>("Textures/ItemPic/" + icon);
+        return sprite != null ? sprite : Resources.Load<Sprite>("Textures/" + icon);
     }
 }

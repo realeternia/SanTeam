@@ -1420,6 +1420,42 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         return true;
     }
 
+    // 重铸装备的候选池：同一 Id 段(如 400/402/403)内的其它道具
+    public List<int> GetRerollCandidates(int itemCardId)
+    {
+        var list = new List<int>();
+        if (itemCardId <= 0)
+            return list;
+        int seg = itemCardId / 1000;
+        foreach (var cfg in ItemConfig.ConfigList)
+        {
+            if (cfg.Id / 1000 != seg || cfg.Id == itemCardId)
+                continue;
+            list.Add(cfg.Id);
+        }
+        return list;
+    }
+
+    // 重铸装备：消耗1件该装备与1个重铸符，产出同 Id 段的另一件随机装备（不触发自动合成）
+    public bool RerollItem(int itemCardId, int rerollItemId, int newItemId)
+    {
+        if (GetItemFreeCount(itemCardId) <= 0 || GetItemCount(rerollItemId) <= 0)
+        {
+            GameLog.Warn(string.Format("重铸失败：背包缺少装备{0}或重铸符{1}，玩家{2}", itemCardId, rerollItemId, pid));
+            return false;
+        }
+        if (newItemId <= 0 || newItemId / 1000 != itemCardId / 1000 || newItemId == itemCardId)
+        {
+            GameLog.Warn(string.Format("重铸失败：产物{0}与原料{1}不在同一 Id 段，玩家{2}", newItemId, itemCardId, pid));
+            return false;
+        }
+        ConsumeItemCount(itemCardId, 1);
+        ConsumeItemCount(rerollItemId, 1);
+        AddItemCountDirect(newItemId, 1);
+        GameLog.Debug(string.Format("背包重铸：玩家{0} 装备{1} → {2}", pid, itemCardId, newItemId));
+        return true;
+    }
+
     // 消耗指定数量的物品实例（优先背包副本，不足再移除已装备的），不触发自动合成
     private void ConsumeItemCount(int itemId, int count)
     {

@@ -604,6 +604,114 @@ public class BagControl : MonoBehaviour, IPanelEvent
         return null;
     }
 
+    // 重铸区：重铸状态下拖入装备 → 消耗1件该装备与1个重铸镜，产出同 Id 段的随机装备，成功后背景还原
+    public void RerollItem(int itemCardId)
+    {
+        if (bindPlayer == null)
+            return;
+
+        var p1 = GameManager.Instance.GetPlayer(bindPlayer.pid);
+
+        if (itemCardId == 0 || !ItemConfig.HasConfig(itemCardId) || ConfigManager.IsHeroCard(itemCardId))
+        {
+            SystemTip.Show("该道具不能重铸");
+            return;
+        }
+        int seg = itemCardId / 1000;
+        if (seg != 400 && seg != 402 && seg != 403)
+        {
+            SystemTip.Show("只能重铸 400/402/403 系列装备");
+            return;
+        }
+        if (p1.GetItemFreeCount(itemCardId) <= 0)
+        {
+            SystemTip.Show(p1.GetEquippedCount(itemCardId) > 0 ? "该装备已全部装备，需先卸下" : "背包中没有该装备");
+            return;
+        }
+        if (p1.GetItemCount(401009) <= 0)
+        {
+            SystemTip.Show("缺少重铸镜，无法重铸");
+            if (bagCompose != null)
+                bagCompose.ResetSplitState();
+            return;
+        }
+        var candidates = p1.GetRerollCandidates(itemCardId);
+        if (candidates.Count == 0)
+        {
+            SystemTip.Show("没有可重铸的同系列道具");
+            return;
+        }
+        int newItemId = candidates[SysRandom.Range(0, candidates.Count)];
+
+        // 先播重铸动画，动画结束再结算并还原背景
+        PlayRerollAnim(itemCardId, newItemId, () =>
+        {
+            if (!p1.RerollItem(itemCardId, 401009, newItemId))
+                return;
+
+            GameManager.Instance.PlaySound("Sounds/compose");
+            PlayItemUseSound(ItemConfig.HasConfig(401009) ? ItemConfig.GetConfig(401009) : null); // 重铸镜被消耗，播放其使用音效
+            UpdateView();
+            UpdateFieldView();
+            if (bagCompose != null)
+                bagCompose.ResetSplitState();
+        });
+    }
+
+    // 重铸动画：原装备在重铸区旋转缩小消失，新装备弹出后跳回物品区
+    private void PlayRerollAnim(int srcItemId, int resultItemId, System.Action onComplete)
+    {
+        if (bagItemRegion == null || bagCompose == null || !ItemConfig.HasConfig(resultItemId))
+        {
+            GameLog.Error($"BagControl.PlayRerollAnim: 物品区/重铸区未就绪或产物配置缺失，跳过动画 resultId={resultItemId}");
+            onComplete?.Invoke();
+            return;
+        }
+
+        const float iconSize = 80f;
+        const float spinDuration = 0.35f; // 原装备旋转消失 / 新装备弹出
+        const float flyDuration = 0.45f;  // 新装备跳回背包
+        const float jumpPower = 70f;
+
+        GameObject containerObj = new GameObject("RerollAnim", typeof(RectTransform));
+        RectTransform container = containerObj.GetComponent<RectTransform>();
+        container.SetParent(bagItemRegion.transform.parent, false);
+        container.anchoredPosition = Vector2.zero;
+        container.SetAsLastSibling();
+
+        Vector2 start = ToContainerPos(container, bagCompose.transform as RectTransform);
+        Vector2 bagPos = ToContainerPos(container, bagItemRegion.transform as RectTransform);
+
+        Image iconSrc = CreateTempItemIcon(container, srcItemId, start, iconSize);
+        Image iconResult = CreateTempItemIcon(container, resultItemId, start, iconSize);
+        if (iconSrc == null || iconResult == null)
+        {
+            GameLog.Error("BagControl.PlayRerollAnim: 临时图标创建失败，跳过动画");
+            Destroy(containerObj);
+            onComplete?.Invoke();
+            return;
+        }
+        iconResult.rectTransform.localScale = Vector3.zero;
+
+        Sequence seq = DOTween.Sequence().SetUpdate(true);
+        // 原装备旋转并缩小淡出
+        seq.Append(iconSrc.rectTransform.DORotate(new Vector3(0f, 0f, 360f), spinDuration, RotateMode.FastBeyond360).SetEase(Ease.InOutQuad));
+        seq.Join(iconSrc.rectTransform.DOScale(0f, spinDuration).SetEase(Ease.InBack));
+        seq.Join(iconSrc.DOFade(0f, spinDuration));
+        // 新装备在同一位置弹出
+        seq.Join(iconResult.rectTransform.DOScale(1f, spinDuration).SetEase(Ease.OutBack));
+        // 新装备跳回背包
+        seq.Append(iconResult.rectTransform.DOJumpAnchorPos(bagPos, jumpPower, 1, flyDuration));
+        seq.Join(iconResult.rectTransform.DOScale(0.7f, flyDuration));
+        seq.Append(iconResult.DOFade(0f, 0.1f));
+
+        seq.OnComplete(() =>
+        {
+            Destroy(containerObj);
+            onComplete?.Invoke();
+        });
+    }
+
     // 分解动画：合成装备的两件材料图标从分解区飞回物品区，一件慢、一件快，均带加速下落（Ease.In）
     private void PlayDecomposeAnim(ItemCombineConfig recipe, System.Action onComplete)
     {
