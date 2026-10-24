@@ -1,19 +1,18 @@
 using System;
 using System.Collections;
-using System.Collections.Generic;
-using CommonConfig;
 using UnityEngine;
 
 /// <summary>
-/// 雷电阵持续施法（张角·落雷 / 张郃·震碎 共用，ScriptName = "SkillCastingAidHitRegion"）：
-/// 引导期间在目标位置召唤雷电阵（法术场可视化），每秒对范围内敌人结算一次法术伤害，持续 SummonTime 秒；
-/// 引导可被打断，施法者死亡则结束。张角·落雷原地不动；
-/// 张郃·震碎在 Strength2 配了 moveDist 时，法阵会在引导期间沿"施法者→落点"方向缓慢前移该总距离（逐跳均分，踩墙则停）。
+/// 雷电阵（张角·落雷 / 张郃·震碎 共用，ScriptName = "SkillAidHitRegion"）：
+/// 顺发——在目标位置召唤雷电阵（法术场可视化）并播放一次范围特效（特效本身持续时间较长），
+/// 之后每 SummonHitInterval 秒对范围内敌人结算一次法术伤害，持续 SummonTime 秒；
+/// 施法期间自身可自由移动/普攻，施法者死亡则结束。
+/// 张角·落雷原地不动；张郃·震碎在 Strength2 配了 moveDist 时，法阵会在持续期间沿"施法者→落点"方向缓慢前移该总距离（逐跳均分，踩墙则停）。
 /// 仿法正·明断，由 SkillManager.CheckAidSkill 自动循环施放。
 /// </summary>
-public class SkillCastingAidHitRegion : Skill
+public class SkillAidHitRegion : Skill
 {
-    public SkillCastingAidHitRegion(int id, Chess unit) : base(id, unit)
+    public SkillAidHitRegion(int id, Chess unit) : base(id, unit)
     {
     }
 
@@ -34,10 +33,11 @@ public class SkillCastingAidHitRegion : Skill
 
         var field = SummonMagicField(targetPos, out var summonTime);
 
-        // 范围特效统一走 PlayAreaEffect
+        // 范围特效一次性播放（该特效自身持续时间长，覆盖整个法阵持续时间）
         var areaFx = PlayAreaEffect(targetPos, summonTime);
 
-        owner.StartCasting(id, DelayDamage(targetPos, summonTime, field, areaFx));
+        // 顺发（不进入引导）：放完法阵即可继续移动/普攻，由协程独立维持伤害
+        owner.StartCoroutine(DelayDamage(targetPos, summonTime, field, areaFx));
         return true;
     }
 
@@ -45,7 +45,7 @@ public class SkillCastingAidHitRegion : Skill
     {
         var term = (int)Math.Floor(summonTime / skillCfg.SummonHitInterval);
 
-        // 法阵前移：Strength2 的 moveDist 为整段引导前进的总距离，逐跳均分；未配置时原地不动（张角·落雷）
+        // 法阵前移：Strength2 的 moveDist 为整段持续时间前进的总距离，逐跳均分；未配置时原地不动（张角·落雷）
         var moveStep = GetForwardStep(targetPos, term);
         var curPos = targetPos;
 
@@ -55,12 +55,9 @@ public class SkillCastingAidHitRegion : Skill
 
         for (int i = 0; i < term; i++)
         {
-            // 被打断/死亡：castingSkillId 被 BreakCasting 置0，结束法阵
-            if (owner == null || owner.hp <= 0 || owner.castingSkillId != id)
+            // 施法者死亡则结束法阵
+            if (owner == null || owner.hp <= 0)
                 yield break;
-
-            // 引导期间每跳持续播放施法动作
-            owner.PlayerAnim(skillCfg.Action);
 
             var unitsInRange = WorldManager.Instance.GetEnemyInRange(curPos, skillCfg.Area, owner.side);
             if (unitsInRange.Count > 0)
@@ -91,7 +88,7 @@ public class SkillCastingAidHitRegion : Skill
                     float elapsed = 0f;
                     while (elapsed < skillCfg.SummonHitInterval)
                     {
-                        if (owner == null || owner.hp <= 0 || owner.castingSkillId != id)
+                        if (owner == null || owner.hp <= 0)
                             yield break;
                         elapsed += Time.deltaTime;
                         curPos = Vector3.Lerp(fromPos, toPos, Mathf.Clamp01(elapsed / skillCfg.SummonHitInterval));

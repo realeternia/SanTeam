@@ -121,9 +121,11 @@ public class EffectTestInit : MonoBehaviour
                 GameLog.Warn("EffectTestInit 变色配置无效: " + resPath + " TintColor=" + tintHex);
             }
         }
-        // 测试时循环播放，便于持续观察
+        // 测试时循环播放，便于持续观察；同时把粒子缩放模式切到 Hierarchy，
+        // 否则 prefab 多为 ScalingMode=Local（只认自身 localScale），根节点的 Scale/MissileScale 缩放对子节点粒子无效
         foreach (var ps in go.GetComponentsInChildren<ParticleSystem>(true))
         {
+            ps.scalingMode = ParticleSystemScalingMode.Hierarchy;
             // MainModule 的 setter 直接写回原生粒子系统，无需写回 main 属性
             var main = ps.main;
             main.loop = true;

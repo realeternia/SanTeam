@@ -163,6 +163,8 @@ namespace CommonConfig
             config[10131] = new EffectConfig(10131, "ShadowExplosionGreen", "绿色暗影爆裂特效", "伤害", "目标", "Effect/ShadowExplosion", "Missile/ShadowExplosionGreen", 5f, 1f, 8f, 1f, "#105E11");
             config[10140] = new EffectConfig(10140, "FlashExplosionBlue", "蓝色星爆", "伤害", "目标", "Effect/FlashExplosionBlue", "Missile/FlashExplosionBlue", 5f, 1f, 5f, 1f, "");
             config[10150] = new EffectConfig(10150, "LaserMeshMissileBlue", "蓝色星爆", "伤害", "目标", "Effect/FlashExplosionBlue", "Missile/LaserMeshMissileBlue", 5f, 1f, 5f, 1f, "");
+            config[10160] = new EffectConfig(10160, "Par_FireShoot_Bullet", "火焰射击", "伤害", "目标", "Effect/Par_FireShoot_Hit", "Missile/Par_FireShoot_Bullet", 1.5f, 1f, 3f, 1f, "");
+            config[10170] = new EffectConfig(10170, "SwordWaveBlue", "蓝色冲击波", "伤害", "目标", "Effect/StormExplosion", "Missile/SwordWaveBlue", 5f, 1f, 3.4f, 1f, "");
             config[11000] = new EffectConfig(11000, "AuraSoftPurple", "紫色缓冲特效", "增益", "范围", "Effect/AuraSoftPurple", "", 3f, 1f, 8f, 1f, "");
             config[11010] = new EffectConfig(11010, "BloodExplosion", "鲜血爆裂特效", "伤害", "目标", "Effect/BloodExplosion", "", 3f, 1f, 8f, 1f, "");
             config[11020] = new EffectConfig(11020, "HeartStream", "爱心流光特效", "增益", "目标", "Effect/HeartStream", "", 8f, 1f, 8f, 1f, "");

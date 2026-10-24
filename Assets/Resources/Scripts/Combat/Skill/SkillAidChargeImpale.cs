@@ -2,18 +2,18 @@ using System.Collections;
 using UnityEngine;
 
 /// <summary>
-/// 孙策·破阵冲阵：以施法时自身位置为圆心、Area 为半径，单位沿圆周绕行一整圈（约 1.5 秒），
-/// 绕行结束后对圆心 Area 范围内的所有敌人造成一次 /damagestrength 法术伤害（AOE，每个敌人只结算一次）。
-/// 绕行期间锁定常规移动，轨迹采样时遇墙停在上一帧位置，结束后回到圆心并重新索敌。
+/// 孙策·破阵冲阵：以目标单位为圆心、Area 为半径，施法时自身先抬高 LiftHeight，
+/// 随后一边绕目标旋转一整圈、一边从高处下降回地面，旋转期间播放范围特效，
+/// 结束时对圆心 Area 范围内的所有敌人造成一次 AOE 伤害（每个敌人只结算一次）。
+/// 与吕布·魔神一致：全程处于空中位移状态(BeginAirMove)，外部位移/击退/拖拽无法打断，
+/// 寻路与普攻也被屏蔽，避免位置被来回拉扯造成闪烁；落地后重新索敌。
 /// </summary>
 public class SkillAidChargeImpale : Skill
 {
     /// <summary>绕圈总时长（秒）</summary>
-    private const float SpinDuration = 1f;
-    /// <summary>从圆心外扩到圆周的时长（秒）</summary>
-    private const float RampDuration = 0.2f;
-    /// <summary>轨迹采样步长（秒）</summary>
-    private const float StepTime = 0.025f;
+    private const float SpinDuration = .8f;
+    /// <summary>施法时抬高的高度（米）</summary>
+    private const float LiftHeight = 10f;
 
     public SkillAidChargeImpale(int id, Chess unit) : base(id, unit)
     {
@@ -21,6 +21,9 @@ public class SkillAidChargeImpale : Skill
 
     public override bool CheckAidSkill()
     {
+        // 已在跳跃/空中位移中则不重复施放
+        if (owner.isJumping)
+            return false;
         var target = owner.targetChess;
         if (target == null || target.hp <= 0)
             return false;
@@ -29,53 +32,61 @@ public class SkillAidChargeImpale : Skill
         if (!CheckBurst(target))
             return false;
 
-        // 圆心 = 施法瞬间的自身位置；起始角度朝目标方向，绕行从面对目标开始
-        var center = owner.transform.position;
-        var startDir = target.transform.position - center;
+        // 圆心 = 目标位置；起始角度取施法瞬间自身相对圆心的方向，绕行从当前方位开始
+        var center = target.transform.position;
+        var startDir = owner.transform.position - center;
         startDir.y = 0f;
         if (startDir.sqrMagnitude < 0.0001f)
             startDir = owner.transform.forward;
         startDir.y = 0f;
         startDir.Normalize();
 
-        owner.noMoveCount++;
         owner.StartCoroutine(SpinAndStrike(center, startDir));
         return true;
     }
 
-    // 绕圆周一整圈后回到圆心，再对范围内敌人结算一次 AOE 伤害
+    // 抬高 → 绕目标旋转并下降 → 落地结算 AOE
     private IEnumerator SpinAndStrike(Vector3 center, Vector3 startDir)
     {
         owner.PlayerAnim(skillCfg.Action);
         PlaySelfEffect();
-        PlayAreaEffect(center, SpinDuration);
 
-        var lastPos = center;
+        // 空中位移状态：不可被位移技能/控制打断，并锁住寻路与普攻（避免两套位移互相拉扯）
+        BeginAirMove();
+
+        var groundY = owner.baseY + owner.heightOffset;
         var elapsed = 0f;
         while (elapsed < SpinDuration)
         {
-            // 半径：先在外扩阶段从 0 涨到 Area，随后保持圆周
-            var radius = skillCfg.Area * Mathf.Clamp01(elapsed / RampDuration);
-            // 角度：外扩阶段停留在起始角度，之后匀速走满一圈
-            var angle = Mathf.Clamp01((elapsed - RampDuration) / (SpinDuration - RampDuration)) * 360f;
+            if (owner == null || owner.hp <= 0)
+            {
+                EndAirMove();
+                yield break;
+            }
 
-            var pos = center + Quaternion.Euler(0f, angle, 0f) * startDir * radius;
-            pos.y = center.y;
+            var t = Mathf.Clamp01(elapsed / SpinDuration);
+            // 从起始方位匀速绕满一圈
+            var angle = t * 360f;
+            var pos = center + Quaternion.Euler(0f, angle, 0f) * startDir * skillCfg.Area;
+            // 一边旋转一边从 LiftHeight 平滑下降回地面
+            pos.y = groundY + LiftHeight * (1f - t);
 
-            // 轨迹点踩墙时停在上一帧位置，避免穿墙
-            if (!WorldManager.Instance.CheckPositionBlocked(owner, pos))
-                lastPos = pos;
-            owner.transform.position = lastPos;
+            owner.transform.position = pos;
 
-            elapsed += StepTime;
-            yield return new WaitForSeconds(StepTime);
+            elapsed += AirMoveStepTime;
+            yield return new WaitForSeconds(AirMoveStepTime);
         }
 
-        // 回到圆心（原位置）并结算 AOE
-        owner.MoveTo(center, true);
+        // 落地站稳（回到起点方位的圆周位置）
+        var landPos = center + startDir * skillCfg.Area;
+        landPos.y = groundY;
+        owner.transform.position = landPos;
+        EndAirMove();
 
+        // 落地 AOE：圆心范围内所有敌人各结算一次伤害
         var damage = GetSkillDamage();
         var enemies = WorldManager.Instance.GetEnemyInRange(center, skillCfg.Area, owner.side);
+        PlayAreaEffect(center, SpinDuration);
         foreach (var enemy in enemies)
         {
             if (enemy == null || enemy == owner || enemy.hp <= 0)
@@ -88,7 +99,6 @@ public class SkillAidChargeImpale : Skill
             }
         }
 
-        owner.noMoveCount--;
-        owner.FindTarget(); // 绕圈结束后重新锁定一次
+        owner.FindTarget(); // 落地后重新索敌
     }
 }

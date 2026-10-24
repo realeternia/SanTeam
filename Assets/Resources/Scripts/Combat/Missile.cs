@@ -58,6 +58,19 @@ public class Missile : MonoBehaviour
         skillDamage = damage;
     }
 
+    /// <summary>
+    /// 按世界缩放设置导弹可视大小：prefab 内粒子常为 ScalingMode=Local（只认自身 localScale，父级缩放无效），
+    /// 这里统一改为 Hierarchy 后缩放导弹根节点，保证 MissileScale 对全部子粒子生效。
+    /// </summary>
+    private static void ApplyVisualScale(GameObject visual, float worldScale)
+    {
+        foreach (var ps in visual.GetComponentsInChildren<ParticleSystem>(true))
+            ps.scalingMode = ParticleSystemScalingMode.Hierarchy;
+        var parentScale = visual.transform.parent != null ? visual.transform.parent.lossyScale.x : 1f;
+        var localScale = parentScale != 0 ? worldScale / parentScale : worldScale;
+        visual.transform.localScale = new Vector3(localScale, localScale, localScale);
+    }
+
     public void MoveToDirection(Vector3 targetPos, float time, float missileSpeed)
     {
         var missilePrefab = Resources.Load<GameObject>(ResolveMissilePath(effectName));
@@ -70,11 +83,7 @@ public class Missile : MonoBehaviour
         var cfg = EffectConfig.GetConfigByName(effectName);
         EffectManager.ApplyTint(missileEffect, cfg);
         float scale = cfg != null && cfg.MissileScale > 0 ? cfg.MissileScale : size * missilePrefab.transform.localScale.x;
-        float parentScale = transform.parent != null ? transform.parent.lossyScale.x : 1f;
-        transform.localScale = new Vector3(
-            parentScale != 0 ? scale / parentScale : scale,
-            parentScale != 0 ? scale / parentScale : scale,
-            parentScale != 0 ? scale / parentScale : scale);
+        ApplyVisualScale(missileEffect, scale);
 
         var detectArea = 10f;
         var targetCount = 1;
@@ -100,11 +109,7 @@ public class Missile : MonoBehaviour
         var cfg = EffectConfig.GetConfigByName(effectName);
         EffectManager.ApplyTint(missileEffect, cfg);
         float scale = cfg != null && cfg.MissileScale > 0 ? cfg.MissileScale : missilePrefab.transform.localScale.x;
-        float parentScale = missileEffect.transform.parent != null ? missileEffect.transform.parent.lossyScale.x : 1f;
-        missileEffect.transform.localScale = new Vector3(
-            parentScale != 0 ? scale / parentScale : scale,
-            parentScale != 0 ? scale / parentScale : scale,
-            parentScale != 0 ? scale / parentScale : scale);
+        ApplyVisualScale(missileEffect, scale);
 
         StartCoroutine(MoveMissileToTarget(gameObject, target, missileSpeed, missileHight));
     }

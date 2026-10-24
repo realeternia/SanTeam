@@ -2684,8 +2684,16 @@ MonoBehaviour:
   heroIds: 
   year: 0
   currentSaveSlot: -1
-  debugHeroesSide1: []
-  debugHeroesSide2: []
+  debugHeroesSide1:
+  - heroId: 103004
+    level: 1
+    buffId: 0
+    buffTime: 10
+  debugHeroesSide2:
+  - heroId: 102005
+    level: 1
+    buffId: 0
+    buffTime: 10
   debugFullMp: 1
 --- !u!114 &1788356929
 MonoBehaviour:
