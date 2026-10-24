@@ -36,11 +36,6 @@ public class BagControl : MonoBehaviour, IPanelEvent
 
     void Start()
     {
-        // bindPlayer = GameManager.Instance.GetPlayer(0);
-        // bindPlayer.cards[ 101003 ] = 1;         
-        // bindPlayer.cards[  101011 ] = 1;         
-        //   bindPlayer.cards[103003] = 1;      
-
         infoText.raycastTarget = false;
         OnShow();
 

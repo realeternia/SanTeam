@@ -441,9 +441,11 @@ public class Chess : MonoBehaviour
         }
 
         // 嘲讽：身上挂着嘲讽 Buff(BuffTaunt) 时强制把嘲讽者(BuffTaunt.caster)作为目标；
-        // 嘲讽者已阵亡/已离场则忽略该嘲讽，回落到常规索敌（Buff 由 Skill.TauntEnemies 施加）
+        // 嘲讽者已阵亡/已离场则忽略该嘲讽，回落到常规索敌（Buff 由 Skill.TauntEnemies 施加）；
+        // 嘲讽者带隐匿(BuffStealth)时同样忽略（隐匿是嘲讽的反效果，无法被锁定）
         var tauntBuff = GetBuff(CombatConst.TauntBuffId);
-        if (tauntBuff != null && tauntBuff.caster != null && tauntBuff.caster.hp > 0)
+        if (tauntBuff != null && tauntBuff.caster != null && tauntBuff.caster.hp > 0
+            && !tauntBuff.caster.HasBuff(CombatConst.StealthBuffId))
         {
             targetChess = tauntBuff.caster;
             return;
@@ -458,6 +460,9 @@ public class Chess : MonoBehaviour
         {
             if (chess != this)
             {
+                // 隐匿：身上挂着隐匿 Buff 的敌方单位无法被锁定（嘲讽的反效果），直接跳过
+                if (chess.HasBuff(CombatConst.StealthBuffId))
+                    continue;
                 float distance = WorldManager.Instance.GetRange(transform.position, chess.transform.position);
                 validTargets.Add((chess, distance));
             }
@@ -559,8 +564,8 @@ public class Chess : MonoBehaviour
             lastTargetUpdateTime = Time.time;
         }
 
-        // 检查目标是否存在
-        if (targetChess == null || targetChess.hp <= 0)
+        // 检查目标是否存在（目标阵亡或进入隐匿后需立即重新索敌，避免继续锁定无法被选中的单位）
+        if (targetChess == null || targetChess.hp <= 0 || targetChess.HasBuff(CombatConst.StealthBuffId))
         {
             // 如果没有目标，尝试寻找新目标
             FindTarget();
@@ -664,6 +669,14 @@ public class Chess : MonoBehaviour
     private void ReplanMoveDest()
     {
         moveDestPlanTime = Time.time;
+
+        // 隐匿期间：移动到离自己最远的敌方单位身后，再外推自身攻击射程（深入敌后偷袭，落点被挡则回退到该单位位置）
+        if (HasBuff(CombatConst.StealthBuffId) && TryGetStealthMoveDest(out var stealthDest))
+        {
+            moveDest = stealthDest;
+            return;
+        }
+
         var wp = WorldManager.Instance.FindMoveWaypoint(transform.position, targetChess.transform.position);
         if (wp.HasValue)
         {
@@ -676,6 +689,43 @@ public class Chess : MonoBehaviour
             // 直线通畅(或无法寻路时直接朝目标)，由踩墙校验兜底
             moveDest = targetChess.transform.position;
         }
+    }
+
+    /// <summary>
+    /// 隐匿移动目的点：取全地图离自身最远的存活敌方单位，目的点 = 该单位位置 + 沿"自身→该单位"方向外推自身攻击射程。
+    /// 落点踩墙时回退到该单位位置；找不到敌人返回 false。
+    /// </summary>
+    private bool TryGetStealthMoveDest(out Vector3 dest)
+    {
+        dest = Vector3.zero;
+        var enemies = WorldManager.Instance.GetEnemyInRange(transform.position, 0, side);
+        Chess farthest = null;
+        float farthestDist = -1f;
+        foreach (var e in enemies)
+        {
+            if (e == null || e.hp <= 0)
+                continue;
+            float d = WorldManager.Instance.GetRange(transform.position, e.transform.position);
+            if (d > farthestDist)
+            {
+                farthestDist = d;
+                farthest = e;
+            }
+        }
+        if (farthest == null)
+            return false;
+
+        var dir = farthest.transform.position - transform.position;
+        dir.y = 0f;
+        if (dir.sqrMagnitude < 0.0001f)
+            return false;
+
+        var farPos = farthest.transform.position;
+        var target = farPos + dir.normalized * attackRange;
+        target.y = transform.position.y;
+        dest = WorldManager.Instance.CheckPositionBlocked(this, target) ? farPos : target;
+        dest.y = transform.position.y;
+        return true;
     }
 
     // 互斥力：与周围过近的单位互相推开(目标除外)，防止贴脸黏住导致移动卡死

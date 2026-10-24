@@ -210,9 +210,9 @@ namespace CommonConfig
             config[400040] = new ItemConfig(400040, "大宛宝马", "生命+500", 2, "attr", "hp+500", "hp", "", "", "", false, "", 0, 0, 999, 0, "ma4");
             config[400041] = new ItemConfig(400041, "养由基弓", "攻速+15%，生命+250", 2, "attr", "atkspeed+0.15,hp+250", "atkspeed", "速射", "", "", false, "", 0, 0, 999, 0, "gong3");
             config[400042] = new ItemConfig(400042, "李广弓", "攻速+10%，法力回复+4", 2, "attr", "atkspeed+0.1,mpRegen+4", "atkspeed", "速射", "", "", false, "", 0, 0, 999, 0, "gong2");
-            config[401009] = new ItemConfig(401009, "重铸镜", "将一件装备随机重铸为同系列的另一件", 2, "tpreroll", "", "", "", "", "", true, "metalhit", 0, 0, 30, 10, "drandom");
-            config[401010] = new ItemConfig(401010, "无字天书", "英雄经验+1", 2, "tpexp", "", "", "", "", "", true, "yell", 0, 0, 20, 10, "tianshu");
-            config[401011] = new ItemConfig(401011, "分解锤", "可将合成装备分解为合成前的两件材料", 2, "tpsplit", "", "", "", "", "", true, "metalhit", 0, 0, 30, 10, "dcompose");
+            config[401009] = new ItemConfig(401009, "西洋镜", "将一件装备随机重铸为另一件", 2, "tpreroll", "", "", "", "", "", true, "metalhit", 0, 0, 22, 10, "jingzi2");
+            config[401010] = new ItemConfig(401010, "无字天书", "英雄经验+1", 2, "tpexp", "", "", "", "", "", true, "yell", 0, 0, 15, 10, "tianshu");
+            config[401011] = new ItemConfig(401011, "分解锤", "可将合成装备分解为合成前的两件材料", 2, "tpsplit", "", "", "", "", "", true, "metalhit", 0, 0, 22, 10, "fenjie");
             config[401012] = new ItemConfig(401012, "万民书", "护甲+3，魔法抗性+3（仅限拥有「仁」的英雄）", 1, "tpattr", "armor+3,magicres+3", "armor", "", "", "仁", true, "yell", 401013, 5, 999, 0, "wanming1");
             config[401013] = new ItemConfig(401013, "万民书·精", "护甲+15，魔法抗性+15（仅限拥有「仁」的英雄）", 2, "tpattr", "armor+15,magicres+15", "armor", "", "", "仁", true, "yell", 0, 0, 999, 0, "wanming2");
             config[401014] = new ItemConfig(401014, "文赋", "法术强度+2，魔法抗性+4", 1, "tpattr", "ap+2,magicres+4", "ap", "", "", "", true, "yell", 401015, 5, 999, 0, "wenfu1");

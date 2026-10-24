@@ -5,7 +5,8 @@ using UnityEngine;
 
 /// <summary>
 /// 光环主动助战（ScriptName = "SkillAura"）：保留 AuroAttrs 开局被动光环，
-/// 施放时对本侧全体英雄（含自身）再永久累加 光环属性值 × 键 auraRate（即百分比 x%）。
+/// 施放时对本侧全体英雄（含自身）再永久累加 光环属性值 × (100+法强)/100 × 键 auraRate（即百分比 x%）。
+/// 光环数值（含开局的被动光环）统一按法强百分比成长，且都乘 auroEffectRate（鼓加成），对自身与队友同样生效。
 /// 复用 JobLinkManager.ParseBonuses/ApplyAttr 与光环被动同一套解析/施加逻辑。
 /// 另每次施放为自身永久叠加成长属性（数值取键 selfGrow）：光环主属性为法强(ap) 时叠加自身法强，
 /// 否则叠加自身攻击(atk)，使纯光环辅助在单兵情况下也能逐步成长为可独立作战的单位。
@@ -38,18 +39,21 @@ public class SkillAura : Skill
             .FindAll(x => x.isHero);   // 我方全体英雄（含自身）
 
         var bonuses = JobLinkManager.ParseBonuses(skillCfg.AuroAttrs);
+        var auraRate = GetStr2("auraRate");
         foreach (var unit in allMyHeroes)
         {
+            // 光环数值吃法强（法强按百分比）：配置值 × (100 + 法强) / 100；
+            // 再乘 auraRate（每次施放的累积比例）与 auroEffectRate（鼓加成），自身与队友同样生效
             foreach (var bonus in bonuses)
-                JobLinkManager.ApplyAttr(unit, bonus.Attr, bonus.Value * GetStr2("auraRate"));
+                JobLinkManager.ApplyAttr(unit, bonus.Attr, bonus.Value * (100f + owner.ap) / 100f * auraRate * owner.auroEffectRate);
         }
 
-        // 自身永久成长：光环主属性为法强则叠法强，否则叠攻击（数值取自键 selfGrow）
+        // 自身永久成长：光环主属性为法强则叠法强，否则叠攻击（数值取自键 selfGrow，同样按法强百分比成长并受 auroEffectRate 加成）
         var selfGrow = GetStrBuff("selfGrow");
         if (selfGrow > 0f)
         {
             var growAttr = (bonuses.Count > 0 && bonuses[0].Attr == "ap") ? "ap" : "atk";
-            JobLinkManager.ApplyAttr(owner, growAttr, selfGrow);
+            JobLinkManager.ApplyAttr(owner, growAttr, selfGrow * (100f + owner.ap) / 100f * owner.auroEffectRate);
         }
 
         // 每次释放驱散我方全体英雄（含自身）身上的负面 Buff（不可驱散的招牌 Buff 除外）

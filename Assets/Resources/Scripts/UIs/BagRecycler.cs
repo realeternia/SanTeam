@@ -13,11 +13,12 @@ public class BagRecycler : MonoBehaviour, IDropHandler, IPointerClickHandler
 
     // 分解状态：合成区拖入分解符(401011)后进入，背景切到 dcompose；点击可还原，分解成功后也还原
     private bool isSplitArmed;
-    // 重铸状态：合成区拖入重铸镜(401009)后进入，背景同样切到 dcompose；点击可还原，重铸成功后也还原
+    // 重铸状态：合成区拖入重铸镜(401009)后进入，背景切到 drandom；点击可还原，重铸成功后也还原
     private bool isRerollArmed;
     private Image bgImage;
     private Sprite defaultSprite;
     private Sprite splitSprite;
+    private Sprite rerollSprite;
 
     private void Awake()
     {
@@ -87,7 +88,7 @@ public class BagRecycler : MonoBehaviour, IDropHandler, IPointerClickHandler
     {
         if (isSplitArmed && !isRerollArmed)
             return;
-        if (!EnsureSplitSprite())
+        if (!EnsureSprite(ref splitSprite, "dcompose"))
             return;
         isSplitArmed = true;
         isRerollArmed = false;
@@ -95,41 +96,41 @@ public class BagRecycler : MonoBehaviour, IDropHandler, IPointerClickHandler
         SystemTip.Show("已进入分解状态");
     }
 
-    // 进入重铸状态：背景图同样切换为 dcompose.png
+    // 进入重铸状态：背景图切换为 drandom.png
     private void ArmReroll()
     {
         if (isRerollArmed && !isSplitArmed)
             return;
-        if (!EnsureSplitSprite())
+        if (!EnsureSprite(ref rerollSprite, "drandom"))
             return;
         isRerollArmed = true;
         isSplitArmed = false;
-        bgImage.sprite = splitSprite;
+        bgImage.sprite = rerollSprite;
         SystemTip.Show("已进入重铸状态");
     }
 
-    // 准备状态切换用的背景图（dcompose），失败记录日志
-    private bool EnsureSplitSprite()
+    // 准备状态切换用的背景图（Textures 根目录下），失败记录日志
+    private bool EnsureSprite(ref Sprite cache, string spriteName)
     {
         if (bgImage == null)
         {
-            GameLog.Error("BagRecycler.EnsureSplitSprite: 合成区缺少 Image 组件，无法切换背景");
+            GameLog.Error("BagRecycler.EnsureSprite: 合成区缺少 Image 组件，无法切换背景");
             return false;
         }
-        if (splitSprite == null)
+        if (cache == null)
         {
-            splitSprite = Resources.Load<Sprite>("Textures/dcompose");
-            if (splitSprite == null)
+            cache = Resources.Load<Sprite>("Textures/" + spriteName);
+            if (cache == null)
             {
-                // dcompose 未按 Sprite 类型导入时，用 Texture2D 在运行时生成 Sprite
-                var tex = Resources.Load<Texture2D>("Textures/dcompose");
+                // 图片未按 Sprite 类型导入时，用 Texture2D 在运行时生成 Sprite
+                var tex = Resources.Load<Texture2D>("Textures/" + spriteName);
                 if (tex != null)
-                    splitSprite = Sprite.Create(tex, new Rect(0f, 0f, tex.width, tex.height), new Vector2(0.5f, 0.5f), 100f);
+                    cache = Sprite.Create(tex, new Rect(0f, 0f, tex.width, tex.height), new Vector2(0.5f, 0.5f), 100f);
             }
         }
-        if (splitSprite == null)
+        if (cache == null)
         {
-            GameLog.Error("BagRecycler.EnsureSplitSprite: 背景图不存在或无法加载 Textures/dcompose");
+            GameLog.Error(string.Format("BagRecycler.EnsureSprite: 背景图不存在或无法加载 Textures/{0}", spriteName));
             return false;
         }
         return true;

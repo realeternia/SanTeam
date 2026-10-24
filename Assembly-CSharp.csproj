@@ -61,6 +61,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Resources\Scripts\UIs\PickPanelCellControl.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffStealth.cs" />
     <Compile Include="Assets\Lana Studio\Casual RPG VFX\Demo\Scripts\ObjectsSwitcher.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\IconLoader.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\BagCellPointerForwarder.cs" />
@@ -84,6 +85,7 @@
     <Compile Include="Assets\Resources\Scripts\PlayerAI.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffStackBuf.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillHitBuff.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidDominion.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillSoldierBless.cs" />
     <Compile Include="Assets\Resources\Scripts\WorldManager.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidBuffLowHp.cs" />
@@ -150,9 +152,9 @@
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffSlowDown.cs" />
     <Compile Include="Assets\Resources\Scripts\Configs\BuffConfig_s.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffFrenzy.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidShatter.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillSingleDamage.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\SideBar.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidFeint.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\SideBarAlphaGradient.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffHitStun.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAttackRunCross.cs" />
@@ -190,9 +192,7 @@
     <Compile Include="Assets\Resources\Scripts\UIs\RankPanelManager.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffHpRegenAdd.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffDecayDef.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidBurstShot.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillKillGain.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidBalance.cs" />
     <Compile Include="Assets\Resources\Scripts\Effect\LaserBeamController.cs" />
     <Compile Include="Assets\Resources\Scripts\MapInfo.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillJumpChain.cs" />
@@ -200,6 +200,7 @@
     <Compile Include="Assets\DOTween\Modules\DOTweenModulePhysics2D.cs" />
     <Compile Include="Assets\MasterMagicFX\Scripts\Miscs\MMagicExample.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\BaseTooltip.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffApAdd.cs" />
     <Compile Include="Assets\SineVFX\TopDownEffects\Scripts\PrefabSpawner.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\TooltipHeroEquip.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAttackedShield.cs" />
@@ -221,6 +222,7 @@
     <Compile Include="Assets\MasterMagicFX\Scripts\Miscs\ParticleMappingController.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillHitArea.cs" />
     <Compile Include="Assets\Resources\Scripts\Configs\GameRoundConfig_s.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidManaRally.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAttackSpinAttack.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillShockWave.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAttackArmorPierce.cs" />
@@ -237,7 +239,6 @@
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAttackSpeedAttack.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidChargeImpale.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillInitDecayDef.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidImperialGuard.cs" />
     <Compile Include="Assets\Resources\Scripts\Configs\ItemCombineConfig_s.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffHealDown.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffDefect.cs" />

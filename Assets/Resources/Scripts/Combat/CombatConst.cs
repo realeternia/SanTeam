@@ -12,6 +12,9 @@ public static class CombatConst
     public const int StunBuffId = 301001;
     /// <summary>陷阵(BuffNoMove，负面效果，短名"停")：无法移动；张昭·筑垒把敌方英雄拖回我方出生点后用它定身数秒</summary>
     public const int BuffNoMoveId = 301005;
+    /// <summary>隐匿(BuffStealth，正面效果，短名"隐")：嘲讽的反效果，敌方索敌(Chess.FindTarget)与单体技能锁定不到；
+    /// 甘宁·百骑劫营每次释放给自己挂 5 秒，并切半透明材质</summary>
+    public const int StealthBuffId = 300030;
 
     // ---- Buff 叠加模式(BuffConfig.StackMode) ----
     /// <summary>1 共存：同 Id 允许多个实例并存，数值各自生效（如减甲、减攻）</summary>

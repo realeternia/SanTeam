@@ -5,12 +5,18 @@ using CommonConfig;
 using UnityEngine;
 
 /// <summary>
-/// 陆逊·火海（术）：范围召唤大量火随机位置持续灼烧。
-/// 普攻触发后在目标周围 skillCfg.Range 半径内随机生成 SummonCount 个落点，
-/// 每个落点召唤法术场并播放火特效，周期性(skillCfg.SummonHitInterval)对落点周围敌人持续造成伤害。
+/// 陆逊·火海（术）：在身前扇形区域生成多片火持续灼烧。
+/// 以施法者为顶点、朝目标方向左右各 30° 开角、Range 为半径的扇形内，
+/// 沿 Range 的 1/5、2/5、3/5、4/5 距离处各随机取一个开角生成一片火（共 4 片），
+/// 每片火召唤法术场并播放火特效，周期性(skillCfg.SummonHitInterval)对落点周围敌人持续造成伤害。
 /// </summary>
 public class SkillCastingAidScorchedEarth : Skill
 {
+    /// <summary>扇形左右开角（度）</summary>
+    private const float HalfAngle = 30f;
+    /// <summary>沿射程方向生成的火焰片数</summary>
+    private const int FireCount = 4;
+
     private List<Vector3> targetPosList;
 
     public SkillCastingAidScorchedEarth(int id, Chess unit) : base(id, unit)
@@ -34,14 +40,24 @@ public class SkillCastingAidScorchedEarth : Skill
         foreach (var buffId in GetSkillBuffIds())
             BuffManager.AddBuff(target, owner, id, buffId, skillCfg.BuffTime);
 
-        // 在目标周围 Range 半径内随机生成 SummonCount 个落点（x 与 z 独立随机偏移）
-        var basePos = target.transform.position;
+        // 前方扇形：以自身为顶点、朝目标方向，沿 Range 的 1/(FireCount+1) ~ FireCount/(FireCount+1) 处
+        // 各在左右 HalfAngle 度内随机取一个开角生成一片火
+        var origin = owner.transform.position;
+        var dir = target.transform.position - origin;
+        dir.y = 0f;
+        if (dir.sqrMagnitude < 0.0001f)
+            dir = owner.transform.forward;
+        dir.y = 0f;
+        dir.Normalize();
+
         targetPosList = new List<Vector3>();
-        for (int i = 0; i < skillCfg.SummonCount; i++)
+        for (int i = 1; i <= FireCount; i++)
         {
-            var ox = (SysRandom.Value * 2f - 1f) * skillCfg.Range;
-            var oz = (SysRandom.Value * 2f - 1f) * skillCfg.Range;
-            targetPosList.Add(basePos + new Vector3(ox, 0f, oz));
+            var dist = skillCfg.Range * i / (FireCount + 1f);
+            var angle = (SysRandom.Value * 2f - 1f) * HalfAngle;
+            var pos = origin + Quaternion.Euler(0f, angle, 0f) * dir * dist;
+            pos.y = origin.y;
+            targetPosList.Add(pos);
         }
 
         foreach (var pos in targetPosList)

@@ -144,8 +144,9 @@ public static class JobLinkManager
                 {
                     if (!unit.isHero)
                         continue;
+                    // 光环数值吃法强（法强按百分比）：配置值 × (100 + 法强) / 100，再乘 auroEffectRate（鼓加成，对自身与队友同样生效）
                     foreach (var bonus in auraBonuses)
-                        ApplyAttr(unit, bonus.Attr, bonus.Value * provider.auroEffectRate);
+                        ApplyAttr(unit, bonus.Attr, bonus.Value * (100f + provider.ap) / 100f * provider.auroEffectRate);
                 }
             }
         }

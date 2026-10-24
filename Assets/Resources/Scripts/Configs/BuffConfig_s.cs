@@ -1,4 +1,4 @@
-﻿using System;
+﻿﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -167,9 +167,11 @@ namespace CommonConfig
             config[300013] = new BuffConfig(300013, "魔抗提升", "抗", "提升自身魔抗", true, true, false, 1, "BuffMagicResAdd", "", "", "SparkleAreaWhite", "", "");
             config[300014] = new BuffConfig(300014, "生命回复", "血", "提升每秒生命回复", true, true, false, 1, "BuffHpRegenAdd", "", "", "MagicBuffGreen", "", "");
             config[300015] = new BuffConfig(300015, "闪避", "闪", "提升闪避几率", true, true, false, 1, "BuffEvasion", "", "", "StunnedCirclingShadowSimple", "", "");
+            config[300016] = new BuffConfig(300016, "法强提升", "术", "提升自身法术强度", true, true, false, 1, "BuffApAdd", "", "", "MagicBuffBlue", "", "");
             config[300018] = new BuffConfig(300018, "法力回复", "蓝", "提升每秒法力回复", true, true, false, 1, "BuffMpRegenAdd", "", "", "MagicBuffBlue", "", "");
             config[300019] = new BuffConfig(300019, "暴击提升", "暴", "提升暴击率", true, true, false, 1, "BuffCritRate", "", "", "", "", "");
             config[300025] = new BuffConfig(300025, "反伤", "反", "受到伤害时将其中一部分返还给攻击者", true, true, false, 1, "BuffReflect", "", "", "", "", "");
+            config[300030] = new BuffConfig(300030, "隐匿", "隐", "敌方索敌与单体技能无法锁定自身，单位呈半透明", true, true, false, 4, "BuffStealth", "", "", "", "BuffStealth", "");
             config[300101] = new BuffConfig(300101, "据守", "守", "获得临时双防，期间每次受击再叠一层双防，状态结束后临时双防消失", true, false, false, 4, "BuffDefStack", "", "", "", "", "");
             config[300102] = new BuffConfig(300102, "复活", "复", "死亡后3秒原地复活(仅一次)", true, false, false, 4, "BuffRevive", "", "", "", "", "");
             config[300103] = new BuffConfig(300103, "乱阵", "威", "携带者普攻按概率眩晕目标", true, false, false, 4, "BuffHitStun", "", "", "", "", "");
