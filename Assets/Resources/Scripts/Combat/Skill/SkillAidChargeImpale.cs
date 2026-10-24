@@ -9,7 +9,7 @@ using UnityEngine;
 public class SkillAidChargeImpale : Skill
 {
     /// <summary>绕圈总时长（秒）</summary>
-    private const float SpinDuration = 1.5f;
+    private const float SpinDuration = 1f;
     /// <summary>从圆心外扩到圆周的时长（秒）</summary>
     private const float RampDuration = 0.2f;
     /// <summary>轨迹采样步长（秒）</summary>

@@ -6,16 +6,17 @@ using UnityEngine;
 
 /// <summary>
 /// 陆逊·火海（术）：在身前扇形区域生成多片火持续灼烧。
-/// 以施法者为顶点、朝目标方向左右各 30° 开角、Range 为半径的扇形内，
-/// 沿 Range 的 1/5、2/5、3/5、4/5 距离处各随机取一个开角生成一片火（共 4 片），
-/// 每片火召唤法术场并播放火特效，周期性(skillCfg.SummonHitInterval)对落点周围敌人持续造成伤害。
+/// 必定有 1 片火落在目标单位身上；其余 SummonCount-1 片按 Range/SummonCount 等距分布在
+/// 施法者朝目标方向的扇形内（左右各 30° 随机开角）。
+/// 每片火召唤一个火焰场（SummonTag=火）并播放火特效，周期性(skillCfg.SummonHitInterval)对落点周围敌人持续造成伤害。
+/// 非持续施法：放火后施法者可正常移动/普攻，火焰场按 SummonTime 独立持续跳伤。
 /// </summary>
 public class SkillCastingAidScorchedEarth : Skill
 {
     /// <summary>扇形左右开角（度）</summary>
     private const float HalfAngle = 30f;
-    /// <summary>沿射程方向生成的火焰片数</summary>
-    private const int FireCount = 4;
+    /// <summary>未配置 SummonCount 时的默认火焰片数</summary>
+    private const int DefaultFireCount = 4;
 
     private List<Vector3> targetPosList;
 
@@ -40,8 +41,7 @@ public class SkillCastingAidScorchedEarth : Skill
         foreach (var buffId in GetSkillBuffIds())
             BuffManager.AddBuff(target, owner, id, buffId, skillCfg.BuffTime);
 
-        // 前方扇形：以自身为顶点、朝目标方向，沿 Range 的 1/(FireCount+1) ~ FireCount/(FireCount+1) 处
-        // 各在左右 HalfAngle 度内随机取一个开角生成一片火
+        // 前方扇形：必定有一片火落在目标单位身上；其余 SummonCount-1 片按 Range 平均分距离
         var origin = owner.transform.position;
         var dir = target.transform.position - origin;
         dir.y = 0f;
@@ -50,23 +50,34 @@ public class SkillCastingAidScorchedEarth : Skill
         dir.y = 0f;
         dir.Normalize();
 
+        int fireCount = skillCfg.SummonCount > 0 ? skillCfg.SummonCount : DefaultFireCount;
         targetPosList = new List<Vector3>();
-        for (int i = 1; i <= FireCount; i++)
+
+        // 目标身上的那一片
+        var targetPos = target.transform.position;
+        targetPos.y = origin.y;
+        targetPosList.Add(targetPos);
+
+        // 其余 SummonCount-1 片：按 Range/SummonCount 等距分布在施法者身前，随机开角
+        var step = skillCfg.Range / fireCount;
+        for (int i = 1; i < fireCount; i++)
         {
-            var dist = skillCfg.Range * i / (FireCount + 1f);
             var angle = (SysRandom.Value * 2f - 1f) * HalfAngle;
-            var pos = origin + Quaternion.Euler(0f, angle, 0f) * dir * dist;
+            var pos = origin + Quaternion.Euler(0f, angle, 0f) * dir * (step * i);
             pos.y = origin.y;
             targetPosList.Add(pos);
         }
 
+        // 每片火各召唤一个火焰场（SummonTag=火，供蔓延判定/持续跳伤），并播放范围特效
+        float summonTime = skillCfg.SummonTime > 0f ? skillCfg.SummonTime : GetSummonTime();
         foreach (var pos in targetPosList)
         {
-            SummonMagicField(pos, out var summonTime);
+            SummonMagicField(pos, out summonTime);
             PlayAreaEffect(pos, summonTime);
         }
 
-        owner.StartCasting(id, DelayDamage(GetSummonTime()));
+        // 非持续施法：放下火后施法者可正常移动/普攻，火焰场按 SummonTime 独立持续跳伤
+        owner.StartCoroutine(DelayDamage(summonTime));
         return true;
     }
 
@@ -75,12 +86,9 @@ public class SkillCastingAidScorchedEarth : Skill
         var term = (int)Math.Floor(summonTime / skillCfg.SummonHitInterval);
         for (int i = 0; i < term; i++)
         {
-            // 被打断/死亡：castingSkillId 被 BreakCasting 置0，结束法阵
-            if (owner == null || owner.hp <= 0 || owner.castingSkillId != id)
+            // 施法者死亡后停止跳伤
+            if (owner == null || owner.hp <= 0)
                 yield break;
-
-            // 引导期间每跳持续播放施法动作
-            owner.PlayerAnim(skillCfg.Action);
 
             var unitList = new List<Chess>();
             foreach (var pos in targetPosList)
