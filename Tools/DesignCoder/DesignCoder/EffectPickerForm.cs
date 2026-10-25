@@ -9,17 +9,26 @@ using System.Windows.Forms;
 namespace DesignCoder
 {
     /// <summary>
-    /// 特效截图选择面板：按行列显示 EffectScreenshots 目录下的特效截图。
-    /// 负面特效红框、正面（增益）特效绿框，伤害类灰框；缩略图左上显示资源路径，右下显示 EffectConfig 的 Area。
+    /// 特效截图选择面板：分“导弹 / 目标型 / 范围型 / Buff”四个页签，按行列显示 EffectScreenshots 目录下的特效截图。
+    /// 导弹看截图文件名 _Missile 后缀，其余按 EffectConfig.Area（目标/范围/Buff）分页签。
+    /// 负面特效红框、正面（增益）特效绿框，伤害类灰框；缩略图左上显示资源路径，右下显示 EffectConfig 的 Area，
+    /// 右上显示该特效在 SkillConfig 中被多少个技能引用（同一技能多等级只算一次，导弹不统计）。
     /// 双击缩略图或点“确定”返回选中的特效名（EffectConfig.Name，即技能配置里存的值）。
     /// </summary>
     public class EffectPickerForm : Form
     {
-        private const int ThumbSize = 128;
-        private const int ItemPad = 10;
-        private const int NameHeight = 20;
+        private const int ThumbSize = 90;      // 缩略图（比初版缩小 30%）
+        private const int ItemPad = 9;
+        private const int NameHeight = 18;
         private const int ItemWidth = ThumbSize + ItemPad * 2 + 6;
         private const int ItemHeight = ThumbSize + ItemPad * 2 + NameHeight;
+        private const int BadgeWidth = 34;
+
+        private const int TabMissile = 0;
+        private const int TabTarget = 1;
+        private const int TabArea = 2;
+        private const int TabBuff = 3;
+        private static readonly string[] TabTitles = { "导弹", "目标型", "范围型", "Buff" };
 
         private static readonly Color PanelBg = Color.FromArgb(37, 37, 38);
         private static readonly Color ItemBg = Color.FromArgb(45, 45, 48);
@@ -31,28 +40,36 @@ namespace DesignCoder
         private readonly string effectConfigPath;
         private readonly string screenshotDir;
         private readonly string currentValue;
+        private readonly Dictionary<string, int> usageCounts;
 
-        private readonly FlowLayoutPanel panel;
+        private readonly TabControl tabControl;
+        private readonly TabPage[] tabPages = new TabPage[4];
+        private readonly FlowLayoutPanel[] tabPanels = new FlowLayoutPanel[4];
         private readonly Label tipLabel;
         private readonly List<EffectItemControl> itemControls = new List<EffectItemControl>();
         private EffectItemControl selected;
-        // 打开时默认选中的缩略图（等窗体显示后再滚动到可视区域）
+        // 打开时默认选中的缩略图（等窗体显示后再切页签并滚动到可视区域）
         private EffectItemControl pendingDefault;
 
         /// <summary>选中返回的特效名（EffectConfig.Name），未选择时为 null</summary>
         public string SelectedEffect { get; private set; }
 
-        public EffectPickerForm(string effectConfigPath, string screenshotDir, string currentValue)
+        /// <param name="usageCounts">特效被 SkillConfig 引用的技能数（key 为 EffectConfig.Name），可为 null</param>
+        public EffectPickerForm(string effectConfigPath, string screenshotDir, string currentValue,
+            Dictionary<string, int> usageCounts)
         {
             this.effectConfigPath = effectConfigPath;
             this.screenshotDir = screenshotDir;
             this.currentValue = currentValue ?? "";
+            this.usageCounts = usageCounts;
 
             Text = "选择特效";
             StartPosition = FormStartPosition.CenterParent;
             ShowInTaskbar = false;
             MinimizeBox = false;
-            Size = new Size(1120, 800);
+            // 初版 1120x800，各放大 30%，超出屏幕工作区时收窄
+            var wa = Screen.PrimaryScreen.WorkingArea;
+            Size = new Size(Math.Min(1456, wa.Width - 40), Math.Min(1040, wa.Height - 40));
             BackColor = PanelBg;
             Font = new Font("微软雅黑", 9F);
 
@@ -87,14 +104,28 @@ namespace DesignCoder
             btnCancel.DialogResult = DialogResult.Cancel;
             bottom.Controls.Add(btnCancel);
 
-            panel = new FlowLayoutPanel();
-            panel.Dock = DockStyle.Fill;
-            panel.AutoScroll = true;
-            panel.WrapContents = true;
-            panel.BackColor = PanelBg;
-            panel.Padding = new Padding(8);
-            Controls.Add(panel);
-            panel.BringToFront();
+            tabControl = new TabControl();
+            tabControl.Dock = DockStyle.Fill;
+            tabControl.Font = new Font("微软雅黑", 10F);
+            for (int i = 0; i < tabPages.Length; i++)
+            {
+                var page = new TabPage(TabTitles[i]);
+                page.BackColor = PanelBg;
+
+                var flow = new FlowLayoutPanel();
+                flow.Dock = DockStyle.Fill;
+                flow.AutoScroll = true;
+                flow.WrapContents = true;
+                flow.BackColor = PanelBg;
+                flow.Padding = new Padding(8);
+                page.Controls.Add(flow);
+
+                tabPanels[i] = flow;
+                tabPages[i] = page;
+                tabControl.TabPages.Add(page);
+            }
+            Controls.Add(tabControl);
+            tabControl.BringToFront();
 
             CancelButton = btnCancel;
             KeyPreview = true;
@@ -155,14 +186,19 @@ namespace DesignCoder
                 item.PathName = resPath;
                 item.Area = area;
                 item.BorderColor = GetBorderColor(type);
+                item.TabIndex = isMissile ? TabMissile : GetAreaTab(area);
+                item.Usage = isMissile ? -1 : GetUsageCount(item.Value);
                 item.Thumb = LoadThumbnail(file);
 
                 var ctl = new EffectItemControl(item);
                 ctl.Click += ItemControl_Click;
                 ctl.DoubleClick += ItemControl_DoubleClick;
                 itemControls.Add(ctl);
-                panel.Controls.Add(ctl);
+                tabPanels[item.TabIndex].Controls.Add(ctl);
             }
+
+            for (int i = 0; i < tabPages.Length; i++)
+                tabPages[i].Text = string.Format("{0} ({1})", TabTitles[i], tabPanels[i].Controls.Count);
 
             if (itemControls.Count == 0)
             {
@@ -170,13 +206,20 @@ namespace DesignCoder
                 return;
             }
 
-            tipLabel.Text = string.Format("共 {0} 张（红框=负面，绿框=正面，灰框=伤害）；单击选中，双击或点“确定”应用　　当前值：{1}",
+            tipLabel.Text = string.Format("共 {0} 张（红框=负面，绿框=正面，灰框=伤害；“用N”=被N个技能引用，导弹不统计）　　当前值：{1}",
                 itemControls.Count, string.IsNullOrEmpty(currentValue) ? "（空）" : currentValue);
 
             SelectDefault();
         }
 
-        // 默认选中当前字符串对应的截图（同名特效优先取本体，其次导弹）
+        private int GetUsageCount(string effectName)
+        {
+            if (usageCounts == null || string.IsNullOrEmpty(effectName)) return 0;
+            int count;
+            return usageCounts.TryGetValue(effectName, out count) ? count : 0;
+        }
+
+        // 默认选中当前字符串对应的截图（同名特效优先取本体，其次导弹），并切到它所在的页签
         private void SelectDefault()
         {
             if (string.IsNullOrEmpty(currentValue)) return;
@@ -201,9 +244,12 @@ namespace DesignCoder
         protected override void OnShown(EventArgs e)
         {
             base.OnShown(e);
-            // 窗体真正显示后才能可靠滚动，把默认选中的缩略图带到可视区域
+            // 窗体真正显示后才能可靠切页签/滚动，把默认选中的缩略图带到可视区域
             if (pendingDefault != null)
-                panel.ScrollControlIntoView(pendingDefault);
+            {
+                tabControl.SelectedIndex = pendingDefault.Item.TabIndex;
+                tabPanels[pendingDefault.Item.TabIndex].ScrollControlIntoView(pendingDefault);
+            }
         }
 
         private static Dictionary<string, Dictionary<string, string>> LoadEffectConfig(string path)
@@ -219,6 +265,14 @@ namespace DesignCoder
                 result[name] = row;
             }
             return result;
+        }
+
+        // 按 EffectConfig.Area 分页签：范围 → 范围型、Buff → Buff、其余归目标型
+        private static int GetAreaTab(string area)
+        {
+            if (area == "范围") return TabArea;
+            if (area == "Buff") return TabBuff;
+            return TabTarget;
         }
 
         private static string GetConfigValue(Dictionary<string, string> row, string field)
@@ -314,6 +368,8 @@ namespace DesignCoder
             public string Area;         // 右下显示的 Area
             public Color BorderColor;
             public Bitmap Thumb;
+            public int TabIndex;        // 所属页签（导弹/目标型/范围型）
+            public int Usage = -1;      // SkillConfig 引用技能数，-1 表示不统计（导弹）
         }
 
         private class EffectItemControl : Control
@@ -321,8 +377,8 @@ namespace DesignCoder
             public readonly EffectItem Item;
             public bool IsSelected;
 
-            private readonly Font nameFont = new Font("微软雅黑", 8.5F);
-            private readonly Font overlayFont = new Font("微软雅黑", 7.5F);
+            private readonly Font nameFont = new Font("微软雅黑", 8F);
+            private readonly Font overlayFont = new Font("微软雅黑", 7F);
 
             public EffectItemControl(EffectItem item)
             {
@@ -366,11 +422,19 @@ namespace DesignCoder
                     }
                 }
 
-                // 左上：资源路径（半透明黑底 + 省略号）
-                DrawOverlayText(g, Item.PathName, new Rectangle(imgRect.X + 1, imgRect.Y + 1, imgRect.Width - 2, 18), ContentAlignment.MiddleLeft);
+                // 左上：资源路径（半透明黑底 + 省略号）；右上：SkillConfig 引用计数
+                var topRect = new Rectangle(imgRect.X + 1, imgRect.Y + 1, imgRect.Width - 2, 18);
+                if (Item.Usage >= 0 && topRect.Width > BadgeWidth + 10)
+                {
+                    var badgeRect = new Rectangle(topRect.Right - BadgeWidth, topRect.Y, BadgeWidth, topRect.Height);
+                    DrawOverlayText(g, Item.Usage.ToString(), badgeRect, ContentAlignment.MiddleRight, Item.Usage > 0);
+                    topRect.Width -= BadgeWidth + 1;
+                }
+                DrawOverlayText(g, Item.PathName, topRect, ContentAlignment.MiddleLeft, false);
+
                 // 右下：EffectConfig.Area
                 if (!string.IsNullOrEmpty(Item.Area))
-                    DrawOverlayText(g, Item.Area, new Rectangle(imgRect.X + 1, imgRect.Bottom - 19, imgRect.Width - 2, 18), ContentAlignment.MiddleRight);
+                    DrawOverlayText(g, Item.Area, new Rectangle(imgRect.X + 1, imgRect.Bottom - 19, imgRect.Width - 2, 18), ContentAlignment.MiddleRight, false);
 
                 // 底部：截图文件名
                 var nameRect = new Rectangle(2, imgRect.Bottom + 2, Width - 4, NameHeight - 2);
@@ -379,11 +443,12 @@ namespace DesignCoder
                     TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter | TextFormatFlags.EndEllipsis | TextFormatFlags.NoPrefix);
             }
 
-            private void DrawOverlayText(Graphics g, string text, Rectangle rect, ContentAlignment align)
+            private void DrawOverlayText(Graphics g, string text, Rectangle rect, ContentAlignment align, bool highlight)
             {
                 if (string.IsNullOrEmpty(text)) return;
 
-                using (var back = new SolidBrush(Color.FromArgb(175, 0, 0, 0)))
+                Color backColor = highlight ? Color.FromArgb(190, 60, 130, 70) : Color.FromArgb(175, 0, 0, 0);
+                using (var back = new SolidBrush(backColor))
                 {
                     g.FillRectangle(back, rect);
                 }

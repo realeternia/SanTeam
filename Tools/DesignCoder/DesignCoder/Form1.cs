@@ -16,6 +16,8 @@ namespace DesignCoder
             Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"..\..\..\..\..\Assets\Resources\Scripts\Configs"));
         // 特效配置表（特效字段选图面板要用它的 Type/Area/EffPath）
         private static readonly string EffectConfigPath = Path.Combine(ConfigDir, "EffectConfig_s.cs");
+        // 技能配置表（选图面板统计特效被多少技能引用）
+        private static readonly string SkillConfigPath = Path.Combine(ConfigDir, "SkillConfig_s.cs");
         // EffectTest 场景自动截图输出目录（项目根目录下）
         private static readonly string EffectScreenshotDir = Path.GetFullPath(
             Path.Combine(ConfigDir, @"..\..\..\..\EffectScreenshots"));
@@ -851,12 +853,73 @@ namespace DesignCoder
             object cellValue = dataGridView1.Rows[rowIdx].Cells[colIdx].Value;
             string currentValue = cellValue != null ? cellValue.ToString() : "";
 
-            using (var dlg = new EffectPickerForm(EffectConfigPath, EffectScreenshotDir, currentValue))
+            using (var dlg = new EffectPickerForm(EffectConfigPath, EffectScreenshotDir, currentValue, BuildEffectUsageCounts()))
             {
                 if (dlg.ShowDialog(this) != DialogResult.OK) return;
                 if (string.IsNullOrEmpty(dlg.SelectedEffect)) return;
                 ApplyEffectValueToAllLevels(rowIdx, fieldName, dlg.SelectedEffect);
             }
+        }
+
+        // 统计 SkillConfig 中每个特效被多少个技能引用：同一技能（Sname）多等级只算一次
+        // 优先用工具内已加载的 SkillConfig（含未保存修改），否则读文件
+        private Dictionary<string, int> BuildEffectUsageCounts()
+        {
+            var result = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+
+            ConfigData skill;
+            if (currentConfigName == "SkillConfig" && currentConfig != null)
+            {
+                skill = currentConfig;
+            }
+            else if (!loadedConfigs.TryGetValue("SkillConfig", out skill))
+            {
+                skill = null;
+            }
+
+            if (skill == null)
+            {
+                if (!File.Exists(SkillConfigPath)) return result;
+                try
+                {
+                    skill = ConfigData.Parse(File.ReadAllText(SkillConfigPath, Encoding.UTF8));
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine("读取 SkillConfig 统计特效引用失败：" + ex.Message);
+                    return result;
+                }
+            }
+
+            string[] effectFields = { "SelfEffect", "HitEffect", "AreaEffect" };
+            var effectToSkills = new Dictionary<string, HashSet<string>>(StringComparer.OrdinalIgnoreCase);
+            for (int i = 0; i < skill.Rows.Count; i++)
+            {
+                Dictionary<string, string> row = skill.Rows[i];
+                string sname;
+                if (!row.TryGetValue("Sname", out sname) || string.IsNullOrWhiteSpace(sname))
+                    sname = "#row" + i;   // 没有 Sname 时按行各算一次
+
+                foreach (string fieldName in effectFields)
+                {
+                    string value;
+                    if (!row.TryGetValue(fieldName, out value)) continue;
+                    value = value == null ? "" : value.Trim();
+                    if (value.Length == 0) continue;
+
+                    HashSet<string> skills;
+                    if (!effectToSkills.TryGetValue(value, out skills))
+                    {
+                        skills = new HashSet<string>();
+                        effectToSkills[value] = skills;
+                    }
+                    skills.Add(sname);
+                }
+            }
+
+            foreach (var kv in effectToSkills)
+                result[kv.Key] = kv.Value.Count;
+            return result;
         }
 
         // 技能配置按 Sname 展开为多等级行：改特效时把同 Sname 的全部行一起改掉
