@@ -24,7 +24,7 @@ public class SkillAidDominion : Skill
             return false;
 
         // 以目标为圆心的大范围 AOE（王多在后排，避免自身中心打空）
-        var center = target.transform.position;
+        var center = owner.transform.position;
         center.y = owner.transform.position.y;
 
         owner.PlayerAnim(skillCfg.Action);

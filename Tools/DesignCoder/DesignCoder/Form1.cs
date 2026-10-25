@@ -14,6 +14,13 @@ namespace DesignCoder
         // 相对可执行文件目录定位 Configs，保证工具复制到任意目录（含 SanTeam 部署）都能找到配置
         private static readonly string ConfigDir = Path.GetFullPath(
             Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"..\..\..\..\..\Assets\Resources\Scripts\Configs"));
+        // 特效配置表（特效字段选图面板要用它的 Type/Area/EffPath）
+        private static readonly string EffectConfigPath = Path.Combine(ConfigDir, "EffectConfig_s.cs");
+        // EffectTest 场景自动截图输出目录（项目根目录下）
+        private static readonly string EffectScreenshotDir = Path.GetFullPath(
+            Path.Combine(ConfigDir, @"..\..\..\..\EffectScreenshots"));
+        // 字段规则里带该标记的列按“特效字段”显示：格子右侧多一个选图按钮
+        private const string EffectFieldRule = "effect";
         private const int HeaderRowCount = 3;
 
         private ConfigData currentConfig;
@@ -31,6 +38,8 @@ namespace DesignCoder
         private Dictionary<string, string> originalSources = new Dictionary<string, string>();
         private HashSet<string> modifiedConfigs = new HashSet<string>();
         private string copiedCellValue = null;
+        // 特效字段“选”按钮的文字字体（缓存，避免每次绘制都新建字体）
+        private Font effectButtonFont;
 
         // 搜索状态：关键字变化时从表头下方重新开始，关键字不变时循环定位到下一个匹配
         private string lastSearchText = null;
@@ -745,6 +754,154 @@ namespace DesignCoder
             return -1;
         }
 
+        // 字段规则里带 effect 标记的列按特效字段处理（格子右侧显示选图按钮）
+        private bool IsEffectField(int fieldIdx)
+        {
+            if (currentConfig == null || fieldIdx < 0 || fieldIdx >= currentConfig.Fields.Count) return false;
+
+            string rule = currentConfig.Fields[fieldIdx].FieldRule;
+            if (string.IsNullOrEmpty(rule)) return false;
+
+            foreach (string part in rule.Split(','))
+            {
+                if (part.Trim().Equals(EffectFieldRule, StringComparison.OrdinalIgnoreCase))
+                    return true;
+            }
+            return false;
+        }
+
+        // 特效字段格子右侧的选图按钮区域（绘制与点击判定共用同一套计算）
+        private static Rectangle GetEffectButtonBounds(Rectangle cellBounds)
+        {
+            const int buttonWidth = 22;
+            const int margin = 3;
+            int height = Math.Max(12, cellBounds.Height - margin * 2);
+            return new Rectangle(cellBounds.Right - buttonWidth - margin, cellBounds.Y + margin, buttonWidth, height);
+        }
+
+        // 特效字段格子：左侧显示特效名字符串，右侧画“选”按钮，点击后打开截图选择面板
+        private void PaintEffectFieldCell(DataGridViewCellPaintingEventArgs e)
+        {
+            if (effectButtonFont == null)
+                effectButtonFont = new Font("微软雅黑", 8F);
+
+            bool isHighlighted = (e.RowIndex == selectedRowIndex) || (e.ColumnIndex == selectedColumnIndex);
+            Color bgColor = isHighlighted ? Color.FromArgb(245, 235, 150) : e.CellStyle.BackColor;
+            Color fgColor = isHighlighted ? Color.FromArgb(40, 40, 30) : e.CellStyle.ForeColor;
+
+            using (Brush bgBrush = new SolidBrush(bgColor))
+            {
+                e.Graphics.FillRectangle(bgBrush, e.CellBounds);
+            }
+            if (!isHighlighted && (e.State & DataGridViewElementStates.Selected) == DataGridViewElementStates.Selected)
+            {
+                using (Brush selBrush = new SolidBrush(e.CellStyle.SelectionBackColor))
+                {
+                    e.Graphics.FillRectangle(selBrush, e.CellBounds);
+                }
+            }
+
+            Rectangle btnRect = GetEffectButtonBounds(e.CellBounds);
+            string text = e.Value != null ? e.Value.ToString() : "";
+            var textRect = new Rectangle(e.CellBounds.X + 4, e.CellBounds.Y,
+                Math.Max(0, btnRect.X - e.CellBounds.X - 6), e.CellBounds.Height);
+            using (Brush textBrush = new SolidBrush(fgColor))
+            {
+                using (var sf = new StringFormat
+                {
+                    LineAlignment = StringAlignment.Center,
+                    Alignment = StringAlignment.Near,
+                    FormatFlags = StringFormatFlags.NoWrap,
+                    Trimming = StringTrimming.EllipsisCharacter
+                })
+                {
+                    e.Graphics.DrawString(text, e.CellStyle.Font, textBrush, textRect, sf);
+                }
+            }
+
+            using (Brush btnBrush = new SolidBrush(Color.FromArgb(70, 90, 115)))
+            {
+                e.Graphics.FillRectangle(btnBrush, btnRect);
+            }
+            using (Pen btnPen = new Pen(Color.FromArgb(130, 160, 200)))
+            {
+                e.Graphics.DrawRectangle(btnPen, btnRect.X, btnRect.Y, btnRect.Width - 1, btnRect.Height - 1);
+            }
+            using (var btnSf = new StringFormat { LineAlignment = StringAlignment.Center, Alignment = StringAlignment.Center })
+            {
+                e.Graphics.DrawString("选", effectButtonFont, Brushes.White, btnRect, btnSf);
+            }
+
+            using (Pen borderPen = new Pen(dataGridView1.GridColor))
+            {
+                e.Graphics.DrawRectangle(borderPen, new Rectangle(e.CellBounds.X, e.CellBounds.Y, e.CellBounds.Width - 1, e.CellBounds.Height - 1));
+            }
+        }
+
+        // 打开特效截图选择面板；选中后把同一 Sname（多等级）的全部行一起改掉
+        private void OpenEffectPicker(int rowIdx, int colIdx)
+        {
+            if (currentConfig == null || dataTable == null) return;
+            if (rowIdx < HeaderRowCount || rowIdx >= dataGridView1.Rows.Count || colIdx < 0) return;
+
+            int fieldIdx = GetFieldIndexFromColumnIndex(colIdx);
+            if (!IsEffectField(fieldIdx)) return;
+
+            string fieldName = currentConfig.Fields[fieldIdx].Name;
+            object cellValue = dataGridView1.Rows[rowIdx].Cells[colIdx].Value;
+            string currentValue = cellValue != null ? cellValue.ToString() : "";
+
+            using (var dlg = new EffectPickerForm(EffectConfigPath, EffectScreenshotDir, currentValue))
+            {
+                if (dlg.ShowDialog(this) != DialogResult.OK) return;
+                if (string.IsNullOrEmpty(dlg.SelectedEffect)) return;
+                ApplyEffectValueToAllLevels(rowIdx, fieldName, dlg.SelectedEffect);
+            }
+        }
+
+        // 技能配置按 Sname 展开为多等级行：改特效时把同 Sname 的全部行一起改掉
+        private void ApplyEffectValueToAllLevels(int rowIdx, string fieldName, string value)
+        {
+            if (dataTable == null || rowIdx < 0 || rowIdx >= dataTable.Rows.Count) return;
+
+            string sname = null;
+            if (dataTable.Columns.Contains("Sname"))
+            {
+                object v = dataTable.Rows[rowIdx]["Sname"];
+                sname = v == null || v == DBNull.Value ? "" : v.ToString().Trim();
+            }
+
+            bool changed = false;
+            for (int i = HeaderRowCount; i < dataTable.Rows.Count; i++)
+            {
+                DataRow dr = dataTable.Rows[i];
+                if ((dr["_RowTag_"] as string) != "Data") continue;
+
+                if (!string.IsNullOrEmpty(sname))
+                {
+                    object sv = dr["Sname"];
+                    string rowSname = sv == null || sv == DBNull.Value ? "" : sv.ToString().Trim();
+                    if (rowSname != sname) continue;
+                }
+                else if (i != rowIdx)
+                {
+                    continue;
+                }
+
+                string oldValue = dr[fieldName] == DBNull.Value ? "" : dr[fieldName].ToString();
+                if (oldValue == value) continue;
+
+                dr[fieldName] = value;
+                changed = true;
+            }
+
+            if (!changed) return;
+
+            SyncDataTableToConfig();
+            MarkCurrentConfigModified();
+            dataGridView1.Invalidate();
+        }
+
         private bool ValidateInput(string input, string type)
         {
             if (string.IsNullOrEmpty(input)) return true;
@@ -1403,6 +1560,24 @@ namespace DesignCoder
 
         private void dataGridView1_CellMouseDown(object sender, DataGridViewCellMouseEventArgs e)
         {
+            // 特效字段右侧的“选”按钮：点击打开特效截图选择面板
+            if (e.Button == MouseButtons.Left && e.RowIndex >= HeaderRowCount && e.ColumnIndex >= 0)
+            {
+                int fieldIdx = GetFieldIndexFromColumnIndex(e.ColumnIndex);
+                if (IsEffectField(fieldIdx))
+                {
+                    Rectangle cellRect = dataGridView1.GetCellDisplayRectangle(e.ColumnIndex, e.RowIndex, false);
+                    Rectangle btnRect = GetEffectButtonBounds(cellRect);
+                    var clickPoint = new Point(cellRect.X + e.X, cellRect.Y + e.Y);
+                    if (btnRect.Contains(clickPoint))
+                    {
+                        dataGridView1.CurrentCell = dataGridView1[e.ColumnIndex, e.RowIndex];
+                        OpenEffectPicker(e.RowIndex, e.ColumnIndex);
+                        return;
+                    }
+                }
+            }
+
             if (e.Button == MouseButtons.Right)
             {
                 if (e.RowIndex >= 0 && e.ColumnIndex >= 0)
@@ -1604,6 +1779,14 @@ namespace DesignCoder
                 string cellValue = e.Value != null ? e.Value.ToString() : "";
                 int fieldIdx = GetFieldIndexFromColumnIndex(e.ColumnIndex);
                 string fieldType = fieldIdx >= 0 && fieldIdx < currentConfig.Fields.Count ? currentConfig.Fields[fieldIdx].Type.ToLower() : "";
+
+                // 特效字段：左侧文本 + 右侧选图按钮
+                if (IsEffectField(fieldIdx))
+                {
+                    PaintEffectFieldCell(e);
+                    e.Handled = true;
+                    return;
+                }
                 Color? colorValue = TryParseColorString(cellValue);
                 bool isBoolTrue = cellValue == "true" || cellValue == "True";
                 bool isBoolFalse = cellValue == "false" || cellValue == "False";

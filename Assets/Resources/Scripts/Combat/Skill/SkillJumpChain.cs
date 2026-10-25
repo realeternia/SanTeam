@@ -123,17 +123,22 @@ public class SkillJumpChain : Skill
         if (!CheckBurst(first))
             return false;
 
-        // 减益 buff 由 SkillConfig.BuffId 指定，不在战斗代码硬编码 BuffId
-        var debuffCfg = BuffConfig.GetConfigByNameS(skillCfg.BuffId);
-        if (debuffCfg == null)
+        // 减益 buff 由 SkillConfig.BuffId 指定（留空表示不带减益），不在战斗代码硬编码 BuffId
+        var debuffId = 0;
+        if (!string.IsNullOrEmpty(skillCfg.BuffId))
         {
-            GameLog.Error($"SkillJumpChain: 未找到减益Buff短名：{skillCfg.BuffId} 技能id={id}");
-            return false;
+            var debuffCfg = BuffConfig.GetConfigByNameS(skillCfg.BuffId);
+            if (debuffCfg == null)
+            {
+                GameLog.Error($"SkillJumpChain: 未找到减益Buff短名：{skillCfg.BuffId} 技能id={id}");
+                return false;
+            }
+            debuffId = debuffCfg.Id;
         }
 
         owner.PlayerAnim(skillCfg.Action);
         PlaySelfEffect();
-        owner.StartCoroutine(DamageTicks(first, debuffCfg.Id));
+        owner.StartCoroutine(DamageTicks(first, debuffId));
         return true;
     }
 
@@ -157,7 +162,9 @@ public class SkillJumpChain : Skill
 
             if (currentDamage > 0)
                 current.OnSkillDamaged(owner, skillId, currentDamage);
-            BuffManager.AddBuff(current, owner, id, debuffId, skillCfg.BuffTime);
+            // debuffId=0 表示本技能未配置减益，跳过挂载
+            if (debuffId > 0)
+                BuffManager.AddBuff(current, owner, id, debuffId, skillCfg.BuffTime);
 
             if (!string.IsNullOrEmpty(skillCfg.HitEffect))
                 EffectManager.PlaySkillEffect(current, skillCfg.HitEffect);

@@ -39,6 +39,8 @@ public class SkillAidManaShare : Skill
 
         foreach (var ally in allies)
         {
+            if (ally == owner)
+                continue;
             var given = false;
             foreach (var s in ally.skills)
             {

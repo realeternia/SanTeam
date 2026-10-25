@@ -161,7 +161,7 @@ namespace CommonConfig
             config[300004] = new BuffConfig(300004, "伤害提升", "重", "造成的伤害按比例提升", true, true, false, 1, "BuffFrenzy", "", "", "", "", "");
             config[300005] = new BuffConfig(300005, "攻速提升", "快", "攻击速度按比例提升", true, true, false, 1, "BuffCoolDown", "", "", "HeartStream", "", "");
             config[300007] = new BuffConfig(300007, "急救", "愈", "每秒回复一定生命值", true, true, false, 1, "BuffTimeHeal", "", "", "MagicBuffGreen", "", "");
-            config[300008] = new BuffConfig(300008, "攻击提升", "攻", "按数值提升自身攻击力", true, true, false, 1, "BuffAtkAdd", "", "", "", "", "");
+            config[300008] = new BuffConfig(300008, "攻击提升", "攻", "按数值提升自身攻击力", true, true, false, 1, "BuffAtkAdd", "#FF0000", "#993333", "", "", "");
             config[300009] = new BuffConfig(300009, "移速提升", "速", "按百分比提升移动速度", true, true, false, 1, "BuffMoveSpeedAdd", "", "", "", "", "");
             config[300012] = new BuffConfig(300012, "护甲", "甲", "提升护甲", true, true, false, 1, "BuffArmorAdd", "", "", "SparkleAreaWhite", "", "");
             config[300013] = new BuffConfig(300013, "魔抗提升", "抗", "提升自身魔抗", true, true, false, 1, "BuffMagicResAdd", "", "", "SparkleAreaWhite", "", "");
