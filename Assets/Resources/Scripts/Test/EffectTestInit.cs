@@ -13,7 +13,7 @@ public class EffectTestInit : MonoBehaviour
     [Tooltip("网格中心（X/Z 为地面坐标，Y 为高度，比地面高 5）")]
     public Vector3 gridCenter = new Vector3(24.2f+387, 5f, 36.8f+199);
     [Tooltip("每行摆放数量")]
-    public int columnCount = 10;
+    public int columnCount = 13;
     [Tooltip("X 方向格子间距")]
     public float spacingX = 10f;
     [Tooltip("Z 方向格子间距（行距）")]
@@ -62,7 +62,9 @@ public class EffectTestInit : MonoBehaviour
                 (col - (cols - 1) * 0.5f) * spacingX,
                 0f,
                 (row - (rows - 1) * 0.5f) * spacingZ);
-            CreateItem(items[i].path, pos, items[i].isMissile, items[i].scale, items[i].tint);
+            var go = CreateItem(items[i].path, pos, items[i].scale, items[i].tint);
+            if (items[i].isMissile && go != null)
+                StartCoroutine(Swing(go, pos, swingAmplitude, swingSpeed));
         }
 
         GameLog.Info("EffectTestInit 创建特效/导弹共 " + total + " 个");
@@ -93,13 +95,13 @@ public class EffectTestInit : MonoBehaviour
         return string.Compare(a.name, b.name, System.StringComparison.OrdinalIgnoreCase);
     }
 
-    private void CreateItem(string resPath, Vector3 pos, bool isMissile, float scale, string tintHex)
+    private GameObject CreateItem(string resPath, Vector3 pos, float scale, string tintHex)
     {
         var prefab = Resources.Load<GameObject>(resPath);
         if (prefab == null)
         {
             GameLog.Warn("EffectTestInit 资源不存在: " + resPath);
-            return;
+            return null;
         }
         var go = Instantiate(prefab, pos, prefab.transform.rotation);
         // 缩放读 EffectConfig.Scale（当前配置统一为 5）
@@ -131,8 +133,7 @@ public class EffectTestInit : MonoBehaviour
             main.loop = true;
             ps.Play();
         }
-        if (isMissile)
-            StartCoroutine(Swing(go, pos, swingAmplitude, swingSpeed));
+        return go;
     }
 
     // 导弹左右往复摆动，露出拖尾

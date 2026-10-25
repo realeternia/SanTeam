@@ -183,13 +183,13 @@ public class Chess : MonoBehaviour
             var jobSkillSname = jobCfg != null ? jobCfg.NameS : "";
             var playerInfo = GameManager.Instance.GetPlayer(playerId);
             // 初始化技能：默认取1级行创建，随后按来源修正等级——
-            // 个人技能(Skill1)等级 = 卡片等级（超出技能配置最高等级行时按最高等级行生效）；兵种技能为占位技能(Dumb)，职业被动加成由 JobLinkManager 按同职业英雄数直接施加；
+            // 个人技能(Skill1)等级 = 卡片等级（即单位等级 level，正常对局与调试阵容同源）；兵种技能为占位技能(Dumb)，职业被动加成由 JobLinkManager 按同职业英雄数直接施加；
             // 好友特殊技能由 FriendLineManager 按在场好友数计算。
             foreach (var skillCfg in ConfigManager.GetHeroSkillConfigs(heroCfg))
             {
                 var skill = SkillManager.CreateSkill(skillCfg.Id, this);
-                if (skillCfg.Sname != jobSkillSname && playerInfo != null && playerInfo.cards.TryGetValue(heroId, out int heroExp))
-                    skill.SetLevel(HeroSelectionTool.GetCardLevel(heroExp, true));
+                if (skillCfg.Sname != jobSkillSname)
+                    skill.SetLevel(level);
                 skills.Add(skill);
             }
 
@@ -1242,6 +1242,12 @@ public class Chess : MonoBehaviour
             var mat = new Material(baseMat);
             if (material != null && material.HasProperty("_MainTex") && mat.HasProperty("_MainTex"))
                 mat.mainTexture = material.mainTexture;
+
+            // 保留原材质的第二纹理(职业技能图标)及显示开关，避免切材质后单位上的技能图标消失
+            if (material != null && mat.HasProperty("_SecondTex") && material.HasProperty("_SecondTex"))
+                mat.SetTexture("_SecondTex", material.GetTexture("_SecondTex"));
+            if (material != null && mat.HasProperty("_SecondTexSize") && material.HasProperty("_SecondTexSize"))
+                mat.SetFloat("_SecondTexSize", material.GetFloat("_SecondTexSize"));
 
             // 每个棋子随机冰晶偏移，避免所有冰冻单位冰纹完全一致
             if (mat.HasProperty("_FrostOffset"))

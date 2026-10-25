@@ -223,6 +223,8 @@ namespace CommonConfig
             config[11470] = new EffectConfig(11470, "top_down_lightning_dot_blue", "攻击命中", "负面", "目标", "Effect/top_down_lightning_dot_orange", "", 7f, .5f, 5f, 1f, "#00D5FF");
             config[11480] = new EffectConfig(11480, "top_down_starfall_circle_rainbow", "星落效果，aoe", "负面", "范围", "Effect/top_down_starfall_circle_rainbow", "", 2f, .5f, 5f, 1f, "");
             config[11490] = new EffectConfig(11490, "top_down_ice_dot", "攻击命中", "负面", "目标", "Effect/top_down_ice_dot", "", 5f, .5f, 5f, 1f, "");
+            config[11500] = new EffectConfig(11500, "top_down_stone_circle", "攻击命中", "负面", "范围", "Effect/top_down_stone_circle", "", 2f, .5f, 5f, 1f, "");
+            config[11510] = new EffectConfig(11510, "FlamethrowerSpikyRed", "攻击命中", "负面", "范围", "Effect/FlamethrowerSpikyRed", "", 8f, .5f, 5f, 1f, "");
 
             RebuildIndex();
 

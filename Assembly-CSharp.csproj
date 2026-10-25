@@ -77,7 +77,6 @@
     <Compile Include="Assets\Resources\Scripts\Combat\Missile.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffNoMove.cs" />
     <Compile Include="Assets\Resources\Scripts\Test\EffectTestInit.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidDance.cs" />
     <Compile Include="Assets\Resources\Scripts\Shop\ShopMode.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillModifyShootSpeed.cs" />
     <Compile Include="Assets\Resources\Scripts\Configs\JobConfig_s.cs" />
@@ -92,6 +91,7 @@
     <Compile Include="Assets\Resources\Scripts\GameManager.cs" />
     <Compile Include="Assets\DOTween\Modules\DOTweenModuleAudio.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\ILoopScrollItem.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillCastingAidFrontalFlaming.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\CardViewControl.cs" />
     <Compile Include="Assets\Resources\Scripts\Configs\FormulaLearnAttrConfig_s.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidCavalryStrike.cs" />
@@ -107,6 +107,7 @@
     <Compile Include="Assets\Resources\Scripts\UIs\BagControl.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillSoldierGrow.cs" />
     <Compile Include="Assets\Resources\Scripts\CardShopManager.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillMultiHit.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillSoldierFortify.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidJumpReturn.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\TooltipItem.cs" />
@@ -238,6 +239,7 @@
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAreaDamageDeBuff.cs" />
     <Compile Include="Assets\Resources\Scripts\Configs\PlayerLevelConfig_s.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAttackSpeedAttack.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidBackstepShot.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidChargeImpale.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillInitDecayDef.cs" />
     <Compile Include="Assets\Resources\Scripts\Configs\ItemCombineConfig_s.cs" />

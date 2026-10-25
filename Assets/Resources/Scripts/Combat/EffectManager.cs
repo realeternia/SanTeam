@@ -156,8 +156,9 @@ public static class EffectManager
     /// 对地/范围特效：在指定世界位置播放范围特效，缩放 = EffectConfig.Scale × (area / AreaEffectBaseRadius)，
     /// 即施法范围越大特效越大（area&lt;=0 时不做额外缩放）。范围技能统一经 Skill.PlayAreaEffect 调用。
     /// 特效挂在战场场景容器上（不挂施法者节点），落点固定，不随施法者移动/转向漂移。
+    /// rotation 非空时按该朝向摆放特效（如扇形/矩形喷火需要朝向施法方向）。
     /// </summary>
-    public static GameObject PlayPosSkillEffect(Vector3 sourcePos, float area, string effect, float time = 1.3f)
+    public static GameObject PlayPosSkillEffect(Vector3 sourcePos, float area, string effect, float time = 1.3f, Quaternion? rotation = null)
     {
         if (string.IsNullOrEmpty(effect))
         {
@@ -179,6 +180,8 @@ public static class EffectManager
         float offsetY = GetOffsetY(effect, cfg);
         GameObject hitEffect = UnityEngine.Object.Instantiate(hitPrefab, sourcePos, hitPrefab.transform.rotation);
         MountEffectToScene(hitEffect, sourcePos, new Vector3(scale, scale, scale), offsetY);
+        if (rotation.HasValue)
+            hitEffect.transform.rotation = rotation.Value;
         ApplyTint(hitEffect, cfg);
         // 可以添加代码设置特效的生命周期，例如几秒钟后自动销毁
         UnityEngine.Object.Destroy(hitEffect, time);

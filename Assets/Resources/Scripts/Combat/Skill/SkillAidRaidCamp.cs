@@ -2,15 +2,15 @@ using CommonConfig;
 using UnityEngine;
 
 /// <summary>
-/// 甘宁·百骑劫营（武）：锁定射程内最远的敌方后排单体，突进到其近旁，
-/// 对其造成 GetSkillDamage 物理伤害并燃烧其法力（TargetType 含 mpBurn，燃烧量取 key "mpBurn"）。
+/// 甘宁·百骑劫营（武）：锁定射程内最远的敌方后排单体，突进到其身后 DashOffset 距离，
+/// 对其造成 GetSkillDamage 物理伤害。
 /// 每次释放同时给自己挂 SkillConfig.BuffId 指定的隐匿 Buff（"隐"，时长 BuffTime=5 秒）：
 /// 隐匿期间敌方索敌与单体技能锁定不到，且自身移动目的点改为"最远敌人身后 + 自身攻击射程"（见 Chess.ReplanMoveDest）。
 /// </summary>
 public class SkillAidRaidCamp : Skill
 {
-    /// <summary>突进落点到目标的水平偏移距离</summary>
-    private const float DashOffset = 2f;
+    /// <summary>突进落点在目标身后的水平距离</summary>
+    private const float DashOffset = 40f;
 
     public SkillAidRaidCamp(int id, Chess unit) : base(id, unit)
     {
@@ -37,10 +37,6 @@ public class SkillAidRaidCamp : Skill
         if (damage > 0)
             target.OnSkillDamaged(owner, skillId, damage);
 
-        // 法力燃烧：燃烧量取本技能的 key "mpBurn"，每次释放只结算一次
-        if (HasSkillFlag("mpBurn"))
-            BurnMpToTarget(target, GetStr2("mpBurn"));
-
         EffectManager.PlaySkillEffect(target, skillCfg.HitEffect);
         return true;
     }
@@ -65,14 +61,16 @@ public class SkillAidRaidCamp : Skill
         return best;
     }
 
-    // 突进到目标近旁（朝自身一侧偏移，落点被挡则原地不动）
+    // 突进到目标身后（沿自身→目标方向越过目标 DashOffset 距离），落点踩墙则原地不动
     private void DashTo(Chess target)
     {
-        var dir = owner.transform.position - target.transform.position;
+        var dir = target.transform.position - owner.transform.position;
         dir.y = 0f;
         if (dir.sqrMagnitude < 0.0001f)
-            dir = Vector3.right;
-        var landPos = target.transform.position + dir.normalized * DashOffset;
+            dir = owner.transform.forward;
+        dir.Normalize();
+
+        var landPos = target.transform.position + dir * DashOffset;
         landPos.y = owner.transform.position.y;
         if (WorldManager.Instance.CheckPositionBlocked(owner, landPos))
             return;

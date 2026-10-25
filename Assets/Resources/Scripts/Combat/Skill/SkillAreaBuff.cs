@@ -1,4 +1,4 @@
-﻿﻿using System;
+﻿﻿﻿﻿using System;
 using System.Collections.Generic;
 using CommonConfig;
 using UnityEngine;
@@ -20,7 +20,6 @@ using UnityEngine;
 /// · meleeOnly          = 近战优先：近战单位排在前，无近战时回退到其余单位（attackRange < CombatConst.MeleeRange，大乔·国色）
 /// · fullHpSkip         = 跳过满血友军（周仓 / 张梁）
 /// · noDedupe           = 不按首段 Buff 去重（甄宓 / 袁绍 / 周仓 / 李严 / 张梁 / 大乔）
-/// · crossSideFallback  = 同侧无目标时退到非敌对阵营（当前无技能使用）
 /// · wholeMap           = 全图选人（李严·护军；Area 只作为嘲讽半径）
 /// · tauntAroundTarget  = 给目标挂完 Buff 后，嘲讽其周围 Area 内敌人（李严·护军）
 /// · splitByRange       = 按近战/远程分开发放：近战取 BuffId 第 1 段、远程取第 2 段（司马炎·一统 "甲,攻"）
@@ -77,15 +76,6 @@ public class SkillAreaBuff : Skill
         // 施法者必定获得：先从候选池移除，避免随机选人时占用名额
         if (selfAlways)
             units.Remove(owner);
-
-        if (crossSideFallback && units.Count == 0)
-        {
-            units = WorldManager.Instance.GetUnitsInRangeAll(owner.transform.position, searchRange)
-                .FindAll(x => x != owner && !WorldManager.Instance.IsEnemy(x.side, owner.side)
-                    && x.isHero && x.IsInFight()
-                    && (noDedupe || !x.HasBuff(buffIds[0]))
-                    && (!fullHpSkip || x.hp < x.maxHp));
-        }
 
         if (units.Count == 0 && !selfAlways)
             return false;

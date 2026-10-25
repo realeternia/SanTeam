@@ -160,8 +160,12 @@ public class Missile : MonoBehaviour
             }
             else
             {
-                // 直线路径
+                // 直线路径（missileHight=0 的单位如弩手）：同样需要转向飞行方向，否则弹体保持出生朝向
                 missile.transform.position = Vector3.Lerp(missile.transform.position, targetPos, fractionOfJourney);
+                var lookDir = targetPos - missile.transform.position;
+                lookDir.y = 0f;
+                if (lookDir.sqrMagnitude > 0.0001f)
+                    missile.transform.rotation = Quaternion.LookRotation(lookDir);
             }
             lastTime = Time.time;
             yield return new WaitForSeconds(0.025f);

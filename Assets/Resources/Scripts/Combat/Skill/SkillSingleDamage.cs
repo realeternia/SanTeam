@@ -6,7 +6,7 @@ using UnityEngine;
 /// 通用"单体伤害 + 可选增益/减益"技能（ScriptName = "SkillSingleDamage"）：
 /// 锁定 skillCfg.Range 射程内的当前目标，造成 GetSkillDamage() 技能伤害，并可选附加 SkillConfig.BuffId
 /// 指定的 Buff（英文/中文逗号或分号分隔多个，空=纯伤害），时长 BuffTime。
-/// TargetCount>0 时对同一目标连打 TargetCount 段（如荀攸·奇策的段数），否则单段。
+/// 多段连打请使用 SkillMultiHit（荀攸·奇策）。
 ///
 /// 通过 TargetType 标记列表扩展同族行为（多项逗号分隔，空=默认）：
 /// · selfBuff   = BuffId 全部挂给自身（高览·御守 / 陈泰·扬鞭 / 乐进·御斩 / 程普·横扫；护盾类自动写护盾值）
@@ -16,8 +16,8 @@ using UnityEngine;
 /// · missingHp  = 伤害 += 伤害 × 键"missingHpRate" × 已损生命比例（孟获·蛮勇）
 /// · armorIgnore= 自身普攻无视目标护甲（潘璋·偷刃 / 高顺·破甲）
 /// · antiShield = 目标带盾时追加 键"antiShieldRate" 倍破盾伤害，携带 AntiShield 标签（高顺·破甲）
-/// · dispel     = 伤害后驱散目标正面 Buff（许攸·傲言 / 张松·舌辩）
-/// · mpBurn     = 命中后燃烧目标 键"mpBurn" 点法力（程昱·断粮 / 贾诩·乱阵 / 甘宁·百骑劫营）
+/// · dispel     = 伤害后驱散目标正面 Buff（许攸·傲言）
+/// · mpBurn     = 命中后燃烧目标 键"mpBurn" 点法力（程昱·断粮 / 贾诩·乱阵）
 ///
 /// 持续伤害（dot）不再由本脚本结算：统一在 BuffId 里挂 DoT Buff（如"败"），
 /// 每秒跳伤由 BuffTimeDamage 读施加技能的 StrengthBuff1 键"dot"（绝对值）结算。
@@ -47,21 +47,15 @@ public class SkillSingleDamage : Skill
         owner.PlayerAnim(skillCfg.Action);
         PlaySelfEffect();
 
-        // 段数：TargetCount>0 时对同一目标连打 N 段（奇策），否则单段
-        var hits = skillCfg.TargetCount > 0 ? skillCfg.TargetCount : 1;
-        for (var i = 0; i < hits; i++)
+        // 单段伤害（多段连打已拆分为 SkillMultiHit，如荀攸·奇策）
+        var dmg = BuildDamage(target);
+        if (dmg > 0)
+            target.OnSkillDamaged(owner, id, dmg);
+        // 破盾追加伤害：以技能基础伤害为基数，携带 AntiShield 标签绕过护盾直接打血
+        if (HasSkillFlag("antiShield") && target.GetBuff(CombatConst.ShieldBuffId) is BuffShield)
         {
-            if (target.hp <= 0)
-                break;
-            var dmg = BuildDamage(target);
-            if (dmg > 0)
-                target.OnSkillDamaged(owner, id, dmg);
-            // 破盾追加伤害：以技能基础伤害为基数，携带 AntiShield 标签绕过护盾直接打血
-            if (HasSkillFlag("antiShield") && target.GetBuff(CombatConst.ShieldBuffId) is BuffShield)
-            {
-                var extra = Math.Max(1, (int)(GetSkillDamage() * GetStr2("antiShieldRate", 1f)));
-                target.OnSkillDamaged(owner, id, extra, false, CombatConst.AntiShieldHurtTag);
-            }
+            var extra = Math.Max(1, (int)(GetSkillDamage() * GetStr2("antiShieldRate", 1f)));
+            target.OnSkillDamaged(owner, id, extra, false, CombatConst.AntiShieldHurtTag);
         }
 
         // 法力燃烧：燃烧量取本技能数值槽键"mpBurn"，每次释放只结算一次
