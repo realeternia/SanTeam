@@ -4,16 +4,19 @@ using CommonConfig;
 using UnityEngine;
 
 /// <summary>
-/// 陈宫·绝策（棋手）：持续施法，对身前长 Range、宽 Area 的矩形区域持续喷火。
+/// 陈宫·绝策（棋手）：持续施法，对身前距自身 FlamingStartDistance 起、长 Range、宽 Area 的矩形区域持续喷火。
 /// 引导期 BuffTime 秒内施法者无法移动/普攻（castingSkillId>0），死亡/晕眩立即打断。
 /// 每 SummonHitInterval 秒跳伤一次，整轮总伤害 = DamageStrength（按跳数均分），
 /// 每跳最多对 TargetCount 名区域内敌人造成一次伤害；跳伤之间互不去重，同一目标可被多跳累计命中。
-/// 命中后挂 SkillConfig.BuffId 指定的减益；矩形中心播一次 AreaEffect 作为喷火视觉。
+/// 命中后挂 SkillConfig.BuffId 指定的减益；在起始距离处播一次 AreaEffect 作为喷火视觉。
 /// </summary>
 public class SkillCastingAidFrontalFlaming : Skill
 {
     /// <summary>默认跳伤间隔(秒)，未配置 SummonHitInterval 时使用</summary>
     private const float DefaultHitInterval = 0.5f;
+
+    /// <summary>喷火起始距离(米)，特效与伤害矩形均从该距离开始</summary>
+    private const float FlamingStartDistance = 10f;
 
     public SkillCastingAidFrontalFlaming(int id, Chess unit) : base(id, unit)
     {
@@ -41,8 +44,8 @@ public class SkillCastingAidFrontalFlaming : Skill
         forwardDir.y = 0f;
         forwardDir.Normalize();
 
-        // 矩形中心：沿朝向走 Range/2，播一次范围特效作为喷火表现（朝向与施法方向对齐）
-        var areaCenter = origin + forwardDir * (skillCfg.Range * 0.5f);
+        // 喷火表现：沿朝向偏移 FlamingStartDistance 处播一次范围特效（朝向与施法方向对齐）
+        var areaCenter = origin + forwardDir * FlamingStartDistance;
         areaCenter.y = origin.y;
         PlayAreaEffect(areaCenter, skillCfg.BuffTime, Quaternion.LookRotation(forwardDir));
 
@@ -70,7 +73,7 @@ public class SkillCastingAidFrontalFlaming : Skill
 
             owner.PlayerAnim(skillCfg.Action);
 
-            var hitUnits = GetEnemyInRect(origin, forwardDir, rightDir, skillCfg.Range, halfWidth);
+            var hitUnits = GetEnemyInRect(origin, forwardDir, rightDir, FlamingStartDistance, skillCfg.Range, halfWidth);
             // 每跳命中数上限：TargetCount>0 时随机保留 N 名，<=0 表示不限
             if (skillCfg.TargetCount > 0)
                 WorldManager.Instance.RandomSelect(hitUnits, skillCfg.TargetCount);
@@ -89,8 +92,8 @@ public class SkillCastingAidFrontalFlaming : Skill
         }
     }
 
-    /// <summary>取以 origin 为顶点、沿 forwardDir 长 length、左右各宽 halfWidth 的矩形内所有存活敌人</summary>
-    private List<Chess> GetEnemyInRect(Vector3 origin, Vector3 forwardDir, Vector3 rightDir, float length, float halfWidth)
+    /// <summary>取沿 forwardDir 距 origin [startDistance, startDistance+length]、左右各宽 halfWidth 的矩形内所有存活敌人</summary>
+    private List<Chess> GetEnemyInRect(Vector3 origin, Vector3 forwardDir, Vector3 rightDir, float startDistance, float length, float halfWidth)
     {
         var result = new List<Chess>();
         foreach (var e in WorldManager.Instance.GetAllEnemys(owner.side))
@@ -102,7 +105,7 @@ public class SkillCastingAidFrontalFlaming : Skill
             delta.y = 0f;
 
             var depth = Vector3.Dot(delta, forwardDir);
-            if (depth < 0f || depth > length)
+            if (depth < startDistance || depth > startDistance + length)
                 continue;
 
             if (Mathf.Abs(Vector3.Dot(delta, rightDir)) > halfWidth)

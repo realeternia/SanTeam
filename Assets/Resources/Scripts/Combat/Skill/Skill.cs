@@ -24,6 +24,8 @@ public class Skill
     public int skillId{ get{ return skillCfg.Id; } }
 
     public float mp; // 当前技能MP，开局按 SkillConfig.StartMpRate 填充（默认0=从0充能），满值=MpCost
+    /// <summary>本次发动前的MP累积量（CheckBurst 清零 mp 前记录，供"清空/转移全部法力"类技能读取）</summary>
+    public float mpBeforeBurst;
 
     /// <summary>
     /// 统一技能伤害公式：DamageType=0 法术 = DamageStrength × (100 + ap) / 100（ap 为百分比加成，ap=0 时伤害=DamageStrength）；
@@ -272,6 +274,7 @@ public class Skill
         if(isBurst)
         {
             UpdateCD();
+            mpBeforeBurst = mp; // 记录发动前累积量，供"转移全部法力"类技能读取
             mp = 0; // 发动技能后清空MP
         }
         return isBurst;

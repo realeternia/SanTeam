@@ -158,7 +158,6 @@
     <Compile Include="Assets\Resources\Scripts\UIs\SideBar.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidFeint.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\SideBarAlphaGradient.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffHitStun.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAttackRunCross.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidFlashStrike.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAttackShieldPierce.cs" />
@@ -274,6 +273,7 @@
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidSkyFall.cs" />
     <Compile Include="Assets\DOTween\Modules\DOTweenModuleEPOOutline.cs" />
     <Compile Include="Assets\Resources\Scripts\Tools\BGMPlayer.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidManaShare.cs" />
     <Compile Include="Assets\Resources\Scripts\Effect\GlowBeamController.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffDefStack.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\RankPlayerPanelManager.cs" />

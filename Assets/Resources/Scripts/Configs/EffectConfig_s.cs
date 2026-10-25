@@ -180,6 +180,7 @@ namespace CommonConfig
             config[11091] = new EffectConfig(11091, "MagicChargeGreen", "绿色蓄力特效", "增益", "目标", "Effect/MagicChargeBlue", "", 3f, 1f, 8f, 1f, "#00FF00");
             config[11092] = new EffectConfig(11092, "MagicChargePink", "粉色蓄力特效", "增益", "目标", "Effect/MagicChargeBlue", "", 3f, 1f, 8f, 1f, "#FF00EA");
             config[11093] = new EffectConfig(11093, "MagicChargeYellow", "黄色蓄力特效", "增益", "目标", "Effect/MagicChargeBlue", "", 3f, 1f, 8f, 1f, "#FFBB09");
+            config[11094] = new EffectConfig(11094, "MagicChargeRed", "红色蓄力特效", "增益", "目标", "Effect/MagicChargeBlue", "", 3f, 1f, 8f, 1f, "#FF2222");
             config[11100] = new EffectConfig(11100, "SparkleAreaWhite", "白色闪耀区域特效", "增益", "范围", "Effect/SparkleAreaWhite", "", 10f, 1f, 8f, 1f, "");
             config[11110] = new EffectConfig(11110, "StunnedCirclingStarsSimple", "眩晕环绕星特效", "负面", "目标", "Effect/StunnedCirclingStarsSimple", "", 3f, 1f, 8f, 1f, "");
             config[11120] = new EffectConfig(11120, "StunnedDamageUp", "眩晕增伤特效", "负面", "目标", "Effect/StunnedDamageUp", "", 3f, 1f, 8f, 1f, "");
@@ -224,7 +225,7 @@ namespace CommonConfig
             config[11480] = new EffectConfig(11480, "top_down_starfall_circle_rainbow", "星落效果，aoe", "负面", "范围", "Effect/top_down_starfall_circle_rainbow", "", 2f, .5f, 5f, 1f, "");
             config[11490] = new EffectConfig(11490, "top_down_ice_dot", "攻击命中", "负面", "目标", "Effect/top_down_ice_dot", "", 5f, .5f, 5f, 1f, "");
             config[11500] = new EffectConfig(11500, "top_down_stone_circle", "攻击命中", "负面", "范围", "Effect/top_down_stone_circle", "", 2f, .5f, 5f, 1f, "");
-            config[11510] = new EffectConfig(11510, "FlamethrowerSpikyRed", "攻击命中", "负面", "范围", "Effect/FlamethrowerSpikyRed", "", 8f, .5f, 5f, 1f, "");
+            config[11510] = new EffectConfig(11510, "FlamethrowerSpikyRed", "攻击命中", "负面", "范围", "Effect/FlamethrowerSpikyRed", "", 8.5f, .5f, 5f, 1f, "");
 
             RebuildIndex();
 

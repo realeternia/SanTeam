@@ -174,7 +174,6 @@ namespace CommonConfig
             config[300030] = new BuffConfig(300030, "隐匿", "隐", "敌方索敌与单体技能无法锁定自身，单位呈半透明", true, true, false, 4, "BuffStealth", "", "", "", "BuffStealth", "");
             config[300101] = new BuffConfig(300101, "据守", "守", "获得临时双防，期间每次受击再叠一层双防，状态结束后临时双防消失", true, false, false, 4, "BuffDefStack", "", "", "", "", "");
             config[300102] = new BuffConfig(300102, "复活", "复", "死亡后3秒原地复活(仅一次)", true, false, false, 4, "BuffRevive", "", "", "", "", "");
-            config[300103] = new BuffConfig(300103, "乱阵", "威", "携带者普攻按概率眩晕目标", true, false, false, 4, "BuffHitStun", "", "", "", "", "");
             config[300104] = new BuffConfig(300104, "多重箭", "箭", "攻击时额外射出多支箭", true, true, false, 4, "BuffMultiShot", "", "", "", "", "");
             config[300106] = new BuffConfig(300106, "生命链接", "链", "与链接方共享伤害与回复", true, false, false, 4, "BuffLifeLink", "", "", "", "", "");
             config[300107] = new BuffConfig(300107, "望族", "望", "提升/strength点护甲、/strength2点魔抗，每3秒衰减1/5，15秒后归零", true, true, false, 4, "BuffDecayDef", "", "", "", "", "");
