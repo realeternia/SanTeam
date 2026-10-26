@@ -151,7 +151,7 @@ HeroFriendConfig(Id, Name, Level, Heros, SkillId, LineColor)
   战斗开始时，对**随机 1 名敌方 hero** 添加**增伤**效果，持续 **10~20s**，增伤比例 **30%~60%**；**每个有 link 的 hero 各自触发一次**
 - 落地内容：
   - 新脚本 `Combat/Skill/SkillInitEnemyRandomBuff.cs`（`ScriptName = "InitEnemyRandomBuff"`，**通用技能**：开局对随机 1 名敌方 hero 施加 `BuffId` 指定的 Buff，强度取 `Strength`、时长取 `BuffTime`，已注册 `SkillManager.CreateSkill` + `Assembly-CSharp.csproj`）
-  - 技能行 `SkillConfig 2010096~2010100`（`Name = 弄权跋扈`、`Sname = 奸`、`Type = 连接`、`BuffId = "伤"`、`NegBuff = false`）
+  - 技能行 `SkillConfig 2010096~2010100`（`Name = 弄权跋扈`、`Sname = 奸`、`Type = 连接`、`BuffId = "伤"`）
   - `HeroFriendConfig[16]` → `SkillId = "奸"`、`LineColor = "#660033"`
   - 随机选敌照抄 `SkillInitSneakChangePos.BattleBegin`（`GetUnitsInRange(pos, 0, side, true)` 过滤 `isHero && hp > 0`，`SysRandom.Range` 取一名）
   - Buff 走 `BuffConfig 301003「伤」/BuffDamagedAddRate`，"受到的伤害按比例增加"

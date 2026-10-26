@@ -226,7 +226,7 @@
 | Lv4（4人） | 自身施加的负面 buff 持续+60% | 法力回复+1.2/秒 |
 | Lv5（5人） | 自身施加的负面 buff 持续+100% | 法力回复+1.5/秒 |
 
-> 实现：`SkillModifyBuffTime`（NegBuff=true 只管负面），BuffManager.AddBuff 时按 Strength 延长负面时长。
+> 实现：`SkillModifyBuffTime`（`Strength2` 配 `negBuff:1` 只管负面），BuffManager.AddBuff 时按 Strength 延长负面时长。
 
 **琴·声乐（正面强化）**（连接英雄：正面 buff 延长 ｜ 我方其他：生命回复）
 | 档位 | 连接英雄 | 我方其他 |
@@ -237,7 +237,7 @@
 | Lv4（4人） | 自身施加的正面 buff 持续+50% | 生命回复+8/秒 |
 | Lv5（5人） | 自身施加的正面 buff 持续+70% | 生命回复+10/秒 |
 
-> 实现：`SkillModifyBuffTime`（NegBuff=false 只管正面）。
+> 实现：`SkillModifyBuffTime`（`Strength2` 不配 `negBuff` 只管正面）。
 
 **医·治疗（生存辅助）**（连接英雄：治疗增强 ｜ 我方其他：生命回复）
 | 档位 | 连接英雄 | 我方其他 |

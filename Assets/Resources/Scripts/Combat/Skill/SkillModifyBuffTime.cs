@@ -18,7 +18,8 @@ public class SkillModifyBuffTime : Skill
             return; //自己挂的buff，不再连续触发
 
         var buffCfg = BuffConfig.GetConfig(buffId);
-        if (buffCfg.IsPositive == skillCfg.NegBuff)
+        bool negBuff = GetStr2("negBuff") > 0f;
+        if (buffCfg.IsPositive == negBuff)
             return;
 
         if (!string.IsNullOrEmpty(skillCfg.BuffId) && buffId != BuffConfig.GetConfigByNameS(skillCfg.BuffId).Id) //为强化id

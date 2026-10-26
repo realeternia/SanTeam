@@ -21,9 +21,14 @@ namespace DesignCoder
         // EffectTest 场景自动截图输出目录（项目根目录下）
         private static readonly string EffectScreenshotDir = Path.GetFullPath(
             Path.Combine(ConfigDir, @"..\..\..\..\EffectScreenshots"));
+        // 技能脚本目录：特效字段按 ScriptName 在这里找对应脚本，判断脚本是否引用了该特效字段
+        private static readonly string SkillScriptDir = Path.GetFullPath(
+            Path.Combine(ConfigDir, @"..\Combat\Skill"));
         // 字段规则里带该标记的列按“特效字段”显示：格子右侧多一个选图按钮
         private const string EffectFieldRule = "effect";
         private const int HeaderRowCount = 3;
+        // 数据区左侧冻结的列数（与顶部 3 行表头一起固定，横向滚动时保持可见）
+        private const int FrozenDataColumnCount = 4;
 
         private ConfigData currentConfig;
         private string currentConfigName;   // 当前已加载的配置名（不带 _s 后缀），用于滚动位置缓存
@@ -42,6 +47,9 @@ namespace DesignCoder
         private string copiedCellValue = null;
         // 特效字段“选”按钮的文字字体（缓存，避免每次绘制都新建字体）
         private Font effectButtonFont;
+        // 技能脚本源码缓存（key: 脚本名）与“脚本是否引用某特效字段”判定缓存（key: 脚本名|字段名）
+        private readonly Dictionary<string, string> scriptTextCache = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        private readonly Dictionary<string, bool> effectRefCache = new Dictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
 
         // 搜索状态：关键字变化时从表头下方重新开始，关键字不变时循环定位到下一个匹配
         private string lastSearchText = null;
@@ -188,6 +196,10 @@ namespace DesignCoder
 
         private void BuildDataTable()
         {
+            // 切换/重载配置后脚本引用判定需要重新读取
+            scriptTextCache.Clear();
+            effectRefCache.Clear();
+
             foreach (DataGridViewColumn col in dataGridView1.Columns)
                 col.Frozen = false;
             dataGridView1.DataSource = null;
@@ -321,7 +333,18 @@ namespace DesignCoder
                 dataGridView1.Columns[firstDataColIdx].DefaultCellStyle.BackColor = idColumnBg;
                 dataGridView1.Columns[firstDataColIdx].DefaultCellStyle.Font = headerFont;
                 dataGridView1.Columns[firstDataColIdx].DefaultCellStyle.ForeColor = idColumnFg;
-                dataGridView1.Columns[firstDataColIdx].Frozen = true;
+            }
+
+            // 冻结数据区前 4 列（按字段顺序取前 4 个可见列），与顶部表头一起固定
+            int frozenCols = 0;
+            for (int i = 0; i < currentConfig.Fields.Count && frozenCols < FrozenDataColumnCount; i++)
+            {
+                string frozenName = currentConfig.Fields[i].Name;
+                if (!dataGridView1.Columns.Contains(frozenName)) continue;
+                DataGridViewColumn frozenCol = dataGridView1.Columns[frozenName];
+                if (!frozenCol.Visible) continue;
+                frozenCol.Frozen = true;
+                frozenCols++;
             }
 
             dataGridView1.AllowUserToResizeRows = false;
@@ -781,21 +804,96 @@ namespace DesignCoder
             return new Rectangle(cellBounds.Right - buttonWidth - margin, cellBounds.Y + margin, buttonWidth, height);
         }
 
+        // 技能脚本里是否引用了该特效字段：脚本中直接出现字段名即视为引用
+        // （如 skillCfg.HitEffect、skillCfg.SelfEffect、PlaySelfEffect()、PlayAreaEffect()）
+        private bool IsEffectReferencedByScript(int rowIdx, string fieldName)
+        {
+            string scriptName = GetRowCellText(rowIdx, "ScriptName");
+            if (string.IsNullOrEmpty(scriptName)) return false;
+
+            string cacheKey = scriptName + "|" + fieldName;
+            bool cached;
+            if (effectRefCache.TryGetValue(cacheKey, out cached)) return cached;
+
+            string script = GetSkillScriptText(scriptName);
+            bool referenced = !string.IsNullOrEmpty(script) &&
+                script.IndexOf(fieldName, StringComparison.Ordinal) >= 0;
+
+            effectRefCache[cacheKey] = referenced;
+            return referenced;
+        }
+
+        // 读取技能脚本源码（按 ScriptName 匹配 Combat/Skill 下的同名脚本文件），首次读取后缓存
+        private string GetSkillScriptText(string scriptName)
+        {
+            string text;
+            if (scriptTextCache.TryGetValue(scriptName, out text)) return text;
+
+            text = null;
+            string path = Path.Combine(SkillScriptDir, scriptName + ".cs");
+            if (File.Exists(path))
+            {
+                try
+                {
+                    text = File.ReadAllText(path, Encoding.UTF8);
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine("读取技能脚本失败[" + path + "]：" + ex.Message);
+                }
+            }
+            scriptTextCache[scriptName] = text;
+            return text;
+        }
+
+        // 取数据行单元格文本（列不存在或行越界时返回空）
+        private string GetRowCellText(int rowIdx, string columnName)
+        {
+            if (dataGridView1 == null || rowIdx < 0 || rowIdx >= dataGridView1.Rows.Count) return "";
+            if (!dataGridView1.Columns.Contains(columnName)) return "";
+            object value = dataGridView1.Rows[rowIdx].Cells[columnName].Value;
+            return value == null ? "" : value.ToString().Trim();
+        }
+
         // 特效字段格子：左侧显示特效名字符串，右侧画“选”按钮，点击后打开截图选择面板
+        // 脚本引用了该特效字段时（SkillConfig.ScriptName 对应脚本里出现字段名）整格背景标绿
         private void PaintEffectFieldCell(DataGridViewCellPaintingEventArgs e)
         {
             if (effectButtonFont == null)
                 effectButtonFont = new Font("微软雅黑", 8F);
 
+            int fieldIdx = GetFieldIndexFromColumnIndex(e.ColumnIndex);
+            string fieldName = fieldIdx >= 0 && fieldIdx < currentConfig.Fields.Count ? currentConfig.Fields[fieldIdx].Name : "";
+            string text = e.Value != null ? e.Value.ToString() : "";
+            // 配置了特效、且 ScriptName 对应脚本里引用了该特效字段 → 标绿（空值不标，避免满屏绿）
+            bool referenced = text.Trim().Length > 0 && !string.IsNullOrEmpty(fieldName)
+                && IsEffectReferencedByScript(e.RowIndex, fieldName);
+
             bool isHighlighted = (e.RowIndex == selectedRowIndex) || (e.ColumnIndex == selectedColumnIndex);
-            Color bgColor = isHighlighted ? Color.FromArgb(245, 235, 150) : e.CellStyle.BackColor;
-            Color fgColor = isHighlighted ? Color.FromArgb(40, 40, 30) : e.CellStyle.ForeColor;
+            Color bgColor;
+            Color fgColor;
+            if (referenced)
+            {
+                // 脚本已引用该特效字段：绿色背景 + 浅绿文字
+                bgColor = Color.FromArgb(45, 105, 60);
+                fgColor = Color.FromArgb(225, 255, 230);
+            }
+            else if (isHighlighted)
+            {
+                bgColor = Color.FromArgb(245, 235, 150);
+                fgColor = Color.FromArgb(40, 40, 30);
+            }
+            else
+            {
+                bgColor = e.CellStyle.BackColor;
+                fgColor = e.CellStyle.ForeColor;
+            }
 
             using (Brush bgBrush = new SolidBrush(bgColor))
             {
                 e.Graphics.FillRectangle(bgBrush, e.CellBounds);
             }
-            if (!isHighlighted && (e.State & DataGridViewElementStates.Selected) == DataGridViewElementStates.Selected)
+            if (!referenced && !isHighlighted && (e.State & DataGridViewElementStates.Selected) == DataGridViewElementStates.Selected)
             {
                 using (Brush selBrush = new SolidBrush(e.CellStyle.SelectionBackColor))
                 {
@@ -804,7 +902,6 @@ namespace DesignCoder
             }
 
             Rectangle btnRect = GetEffectButtonBounds(e.CellBounds);
-            string text = e.Value != null ? e.Value.ToString() : "";
             var textRect = new Rectangle(e.CellBounds.X + 4, e.CellBounds.Y,
                 Math.Max(0, btnRect.X - e.CellBounds.X - 6), e.CellBounds.Height);
             using (Brush textBrush = new SolidBrush(fgColor))
@@ -837,6 +934,16 @@ namespace DesignCoder
             using (Pen borderPen = new Pen(dataGridView1.GridColor))
             {
                 e.Graphics.DrawRectangle(borderPen, new Rectangle(e.CellBounds.X, e.CellBounds.Y, e.CellBounds.Width - 1, e.CellBounds.Height - 1));
+            }
+
+            // 绿色背景会盖掉高亮底色，这里用黄色内框保留整行/整列高亮提示
+            if (isHighlighted)
+            {
+                using (Pen hlPen = new Pen(Color.FromArgb(255, 220, 60), 2f))
+                {
+                    e.Graphics.DrawRectangle(hlPen, new Rectangle(e.CellBounds.X + 1, e.CellBounds.Y + 1,
+                        e.CellBounds.Width - 3, e.CellBounds.Height - 3));
+                }
             }
         }
 
