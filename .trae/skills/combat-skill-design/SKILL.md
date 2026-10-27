@@ -1,98 +1,241 @@
 ---
 name: combat-skill-design
-description: 编写《三国卡牌》(金铲铲式)战斗技能与数值配置的规范指南。当需要新增技能、调整技能数值或平衡、改技能说明(Descript)、分配技能 Id 段时使用。不要用于纯 Buff、羁绊或物品的配置。
+description: 《三国卡牌》(金铲铲式) SkillConfig 表的配置方法与战斗技能设计规范。当需要新增/修改一条技能配置（SkillConfig_s.cs 的 38 列）、分配技能 Id 段、按 Lv1~5 展开、写 Descript 动态引用、配伤害/治疗/护盾/MP/Buff/特效/召唤/连线字段，或排查配置不生效时使用。纯 Buff/BuffConfig、羁绊、物品掉落配置请另用对应技能。
 ---
 
-# 战斗技能设计规范
+# SkillConfig 表配置方法
 
-指导在本工程中新增或调整一个战斗技能。先通读 SkillConfig 的既有行（如强击/火墙/火矢）作为模板，再按本规范落地。
+本工程技能配置是**手写维护的唯一数据源**：`Assets/Resources/Scripts/Configs/SkillConfig_s.cs`。改技能 = 改该文件的 `new SkillConfig(...)` 数据行，**没有 Excel/源表/导入工具**，不需要考虑同步。
 
-## 一、技能实体分层
+## 一、落地流程（新增一个技能）
 
-- **配置数据**：`SkillConfig`（`Configs/SkillConfig_s.cs`），一行一条记录，按 `Id` 存入字典。
-- **业务逻辑**：`Combat/Skill/SkillXxx.cs`，一技能一文件，继承基类 `Skill`。减法/伤害/状态相关虚方法覆写签名须与基类一致。
-- **常量引用**：战斗代码中出现的技能/Buff Id 或机制数值必须提取到 `CombatConst`，禁止硬编码。
+1. **定形态**：单伤 / 群伤 / 单控 / 群控 / 单疗 / 群疗 / 自增 / 群增 / 光环 / 召唤 / 兵增 / 连击。
+2. **选脚本**：先找现成通用脚本（见第八节），形态一致直接复用；确实没有才新建 `Combat/Skill/SkillXxx.cs`（英文类名，一技能一文件，继承 `Skill`）。
+3. **取 Id**：按第三节段位取下一个空号，同一技能的 5 个等级必须**连号**。
+4. **写 5 行数据**：`Sname` 相同、`Lv` 1~5，除数值字段外其余列**逐行保持一致**。
+5. **写 Descript**：只在 Lv1 写模板，其余 4 行留空。
+6. **注册**：新建 `.cs` 必须在 `Assembly-CSharp.csproj` 加 `<Compile Include>`（Editor 脚本加 `Assembly-CSharp-Editor.csproj`）。
+7. **自检**：跑 `scripts/dump_skill.py <Sname>`（见第十节），确认 5 行齐全、Id 连号、脚本/Buff/特效存在。
 
-## 二、等级机制
+> 构造函数**无默认参数**：新增列必须插到 `SkillConfig` 构造签名对应位置，并同步为**全部数据行**补值，否则编译即失败。
 
-- 同一技能按 `Sname` 展开为 5 行（`Lv=1~5`）。`SetLevel(lv)` 会切换到对应配置行；连锁/好友等机制通过改写 `Level` 生效。
-- 取配置统一走 `ConfigManager.GetSkillConfig(sname, lv)`（按缩写+等级）。
-- 同名技能各等级行其余字段应保持语义一致，仅数值（Strength/CD/耗蓝等）按级递增。
-- 新增配置类或字段必须同步 `ConfigManager.Init()` 注册，并核对 `fieldMeta` 与全部数据行的参数位顺序。
+## 二、38 列逐列配置方法
 
-## 三、伤害公式
+### 2.1 身份与分类
 
-统一公式：`GetSkillDamage() = Strength + 关联属性 × (1 + Strength2)`
+| 列 | 类型 | 配置方法 |
+| --- | --- | --- |
+| `Id` | int | 唯一，按第三节段位分配；同 Sname 五个等级连号 |
+| `Name` | string | 技能显示名，如 `烈火`；好友/职业连锁直接写技能名 |
+| `Sname` | string | 技能缩写，是 `GetSkillConfig(sname, lv)`、`SetLevel`、好友/职业连锁的索引键。**英雄专属技能 Sname = 英雄名**（110 个英雄全部如此，`HeroConfig.Skill1` 挂它）；**Sname 全局唯一归属，禁止两个英雄共用**（`ConfigManager.PostModify` 会按英雄重复放大数值） |
+| `Type` | string | 分类标签，只影响展示/统计，不驱动逻辑。现用值：`单伤 群伤 单控 群控 单增 群增 自增 单疗 群疗 光环 召唤 兵增 职业 连接 道具` |
+| `Lv` | int | 1~5；同 Sname 每级一行 |
+| `ScriptName` | string | 业务脚本类名（反射创建，构造签名固定 `(int skillId, Chess owner)`）；必须与 `Combat/Skill/` 下的类名完全一致 |
 
-- 魔法技能：`Strength × (100 + ap×(1+Strength2)) / 100`（受魔抗减免）；武力技能：`Strength + atk×(1+Strength2)`。属性类型由技能类型决定（技/术对应职业主属性）。
-- 倍率槽：`Strength` 为主数值/基础伤害；当 `Strength` 被占用（作基础伤害或其它用途）时，倍率系数放入 `Strength2`。
-- 普攻与技能伤害统一经 `SkillManager.DuringCalDamage` 计算，再走受击方 `DuringCalDamaged`。
+> 第 4 列 `Descript` 是技能说明文案，写法和动态引用规则见第四节。
 
-## 四、数值设计原则（平衡核心）
+### 2.2 触发与资源
 
-1. **触发率 Rate**：`Rate = 0` 表示必然发动（无随机判定）。需要概率触发时才填非 0。
-2. **单体 vs 群体**：群体技能（多目标/范围弹射）的单体伤害要**明显小于**单体爆伤技能，通过目标数控制总输出上限，避免范围技能碾压单体。
-3. **MP 消耗是主要制约与平衡手段**：高耗蓝技能应换来更高的伤害或更强效果；同强度下耗蓝越高、数值越强，反之亦然。不要把单体与群体技能拉到同一伤害水平，靠耗蓝错开。
-4. **数值成长对照基准技能**：以单体基准技能（如 `强击`，Strength Lv1=60，描述"对目标造成法强/strength的魔法伤害"）为参照，逐等级提升伤害。参考模板档位：
-   - 单体法术阵（火墙式）：Strength Lv1~5 = 25/40/60/80/110。
-   - 群体/弹射技能：用 `Strength` 作伤害倍率（如 0.4、0.8，经 `damage × Strength` 结算）+ 目标数 `TargetCount` 控制，使单段伤害低于单体基准。
-5. 数值全部放进配置行，不在逻辑里写死；调整数值只改 `SkillConfig`，无需改代码。
+| 列 | 类型 | 配置方法 |
+| --- | --- | --- |
+| `Rate` | float | 发动概率 0~1。**`<=0` = 必然发动**；`(0,1)` 时 `SysRandom.Value < Rate` |
+| `CD` | float | 发动冷却（秒），`0` = 无冷却；与 `MpCost` 二选一或叠加，不要在脚本里另写死冷却 |
+| `MpCost` | int | 技能 MP 上限。`0` = 不用蓝随时可发；`>0` 靠棋子 `mpRegen` 每秒充能，满才发动，发动后清空。见 [MP法力系统说明](../../Design/Docs/MP法力系统说明.md) |
+| `StartMpRate` | float | 0~1 开局法力比例：`0` 从零充能（默认），`1` 开局满蓝 |
+| `TriggerCondition` | string | 满足才触发，空 = 无条件。格式 `key<数值`，多条件 `;` 分隔且需**全部满足**；key 走 `Chess.GetAttr`（如 `hprate<50` = 自身生命低于 50%）。解析失败会 `GameLog.Warn` 并**判定为不触发** |
+| `HurtTag` | string | 伤害标签，`AntiShield` = 绕过护盾直接打血（破盾类）；空 = 无 |
 
-## 五、技能说明（Descript）规范
+### 2.3 选目标与范围
 
-- **模板**：仅在 `Lv1` 行的 `Descript` 填完整说明，数值处内联 `/字段名` 动态引用（斜杠无需 C# 转义）。支持字段：`/Strength`、`/StrengthInt`、`/Rate`、`/Range`、`/Area`、`/BuffTime` 等（数字字段末尾加 `%` 表示按百分比输出，如 `/Strength%` 0.4→"40%"）；光环/连线子字段用 `/linkself-atk`、`/linkteam-armor`、`/auroattrs-atk` 等形式展开。
-- **其余等级（Lv2~5）**：`Descript` 留空，显示时自动取同 Sname Lv1 模板并按本级字段值替换。无动态引用的整型文案（每级数字个数不一致、需逐级完整描述）才每级直接填完整 Descript 兜底。
-- 显示统一走 `ConfigManager.GetSkillDescript(cfg, withNext)`：默认仅当前等级；`withNext=true` 每个数值字段附下一档不同值（淡绿 `SysColor.UI.NextLv`），供职业/好友档位提示。
-- 字段引用只写在各等级行自身对应字段（Descript 里的 `/字段名` 在每次显示时按该等级行取值），故 Lv1 模板即可通用到所有等级；改数值时 Lv1 模板无需动。
+| 列 | 类型 | 配置方法 |
+| --- | --- | --- |
+| `Range` | float | 射程/施法距离：单目标 `CheckInRange`、直线技能长度、走廊宽度的判定用；目标中心类范围技能 `<=0` 视为不限射程 |
+| `Area` | float | AoE 半径 + **所有列表选人**（`GetEnemyInRange` 等）的搜索半径；`0` = 全图 |
+| `TargetType` | string | **逗号分隔的标记串**（不是单选枚举），由所选 `ScriptName` 解释，`HasSkillFlag(flag)` 逐个匹配；空 = 脚本默认行为。**配之前必须先读该脚本类头部的标记目录注释** |
+| `TargetCount` | int | 最大命中数；`>0` 时脚本会 `RandomSelect` 截断，`<=0` 时**禁止调用** `RandomSelect`（限数 0 会清空列表） |
 
-## 六、技能 Id 段分配
+> 硬约束：列表选人半径一律传 `skillCfg.Area`，不得传 `Range`。唯一例外是方向/直线型（`SkillAidChargeImpale` 冲阵：`Range`=直线长度、`Area`=走廊宽度），需注释说明。
 
-- 武将专属技能集中在 `20202xx` 连续段：单体法术向放在火矢(2020215) 之后（如 2020216+），弹射/范围技能紧随其后。已固定占用示例：共杀 2020216~2020220、旋风斩 2020221~2020225、落雷 2020226~2020230。
-- 复用其它既定技能时避免改其 Id；新技能才在空段分配，勿与已占用 Id 冲突。
-- 全局搜索确认旧 Id 无其它脚本引用后再改段。
+**TargetType 常用标记（按脚本区分，可组合）**
 
-## 七、Buff 引用与命名
+| 脚本 | 标记 | 含义 |
+| --- | --- | --- |
+| `SkillAreaBuff`（群增） | `heroOnly` / `excludeSelf` / `selfAlways` | 只选英雄 / 排除施法者 / 施法者必得 |
+| | `lowestHp` / `highestHp` / `highestArmor` | 按生命比例升 / 降序、按护甲降序取 `TargetCount` 名 |
+| | `rangedOnly` / `meleeOnly` | 远程 / 近战优先排序（无匹配时回退其余单位） |
+| | `fullHpSkip` / `noDedupe` | 跳过满血 / 不按首段 Buff 去重 |
+| | `wholeMap` / `splitByRange` / `tauntAroundTarget` | 全图选人（`Area` 仅作嘲讽半径）/ 近战取第 1 段、远程取第 2 段 Buff / 挂完 Buff 嘲讽 `Area` 内敌人 |
+| `SkillAreaDamageDeBuff`（群伤） | `self` / `missile` / `maxHpBonus` / `mpBurn` | 自身中心（不做射程校验）/ 走导弹 / 附加最大生命伤害 / 燃烧 `Strength2[mpBurn]` 蓝量 |
+| `SkillAreaHeal`（群疗） | `overflowToArmor` | 溢出治疗转护甲 |
+| `SkillSelfBuff`（自增） | `permanent` / `noStack` | 永久 / 不叠加 |
+| `SkillBacklineStrike` | `smart` / `extra` | 智能选后排 / 额外效果 |
+| `SkillJumpChain` | `heal` | 治疗弹射模式 |
+| `SkillAttackedShield` | `ignoreWeakHit` | 忽略 ≤10 的低伤害 |
 
-- `SkillConfig` 的 `BuffId` 为 `string` 类型，存 `BuffConfig` 的 `NameS` 短名（空字符串表示无 buff）；多段用 `,`/`，`/`;`/`；` 分隔，各段按组合位置取 `StrengthBuff1` 槽位。
-- **BuffId 号段**：`300xxx` 正面通用、`3001xx` 正面特化、`301xxx` 负面通用、`3011xx` 负面特化。通用=可复用、语义单一（攻/甲/速/盾/回复等）；特化=专属机制或需要独立脚本状态（复活/据守/嘲讽/混乱等）。新增 Buff 按正负面与特化程度在对应段顺延取号。
-- 技能/Buff 常量归 `CombatConst`；不变的通用技能 Sname（如强击等）命名尽量见名知意。
-  - 例外：某技能**专属**的机制数值/短名（如复活延迟、某项效果 Buff 的短名）就近放对应 Skill/Buff 文件（`public const`），勿堆进 CombatConst；跨文件共享用"主技能类名.常量"引用（如 `SkillSoldierStun.StunBuffNameS`、`BuffRevive.ReviveDelay`）。
+- 远程技能以自身为中心会全程打空（站位远离敌阵）→ 用目标中心；近战贴脸 AoE 用 `self`。
+- 已废弃词不要复用：同一标记在不同脚本里含义必须一致，新增标记前先全局 `Grep HasSkillFlag`。
 
-## 八、落地后核对清单
+### 2.4 数值列
 
-- 技能文件已加 `<Compile Include>`（`Assembly-CSharp.csproj`）。
-- 全工程 `Grep` 旧字段/旧 Id 确认无残留引用。
-- 描述各等级数值与实机一一对应，`Descript` 内联的 `/字段名` 与对应字段值一致。
-- 范围技能：核对代码半径用的是 `Area` 而非 `Range`，且该行 `Area` 非 0（0=全图）且与脚本实际读取字段一致。
-- 特效：核对 `SelfEffect`/`HitEffect`/`AreaEffect` 与脚本调用匹配——施法者自身特效走 `PlaySelfEffect()`（读 `SelfEffect`，取增益/目标类），命中走 `HitEffect`，范围走 `AreaEffect`；调 `PlaySkillEffect`/`PlayAreaEffect` 前有空判守护，单体技能必须有 `PlaySkillEffect` 或导弹表现。
+| 列 | 类型 | 配置方法 |
+| --- | --- | --- |
+| `DamageType` | int | 伤害类型：`0`=`DamageTypeMagic` 法术（受魔抗，`×(100+ap)/100`）、`1`=`DamageTypeAttack` 物理（受护甲，`+atk`）、`2`=`DamageTypeReal` 真实（无视抗性与护盾）。默认 `0` |
+| `DamageStrength` | float | 伤害基值。公式见第五节；DOT 类也走它 |
+| `HealStrength` | float | 治疗基值，与伤害完全解耦，禁止用伤害公式当治疗 |
+| `Strength2` | string | 通用数值槽 `key:value,key:value`。key 由脚本/描述约定，缺 key 读到 0。常用 key：`shield`（护盾）、`reduceRate`（减伤）、`dodge`、`mpRegen`、`shareRate`、`soldierAtk`… |
+| `StrengthBuff1` | string | Buff 数值槽，由各 `BuffXxx` 按固定 key 读取；多 Buff 组合时按 `BuffId` 段位顺序取对应 key（如 `攻,甲,抗` 对应 `atk,armor,magicRes`） |
 
-## 九、相职业技能实现经验（本工程落地要点）
+数值写法约定：
 
-- **类名用英文**：技能类与 `ScriptName` 用英文（如 `SkillSoldierShield/SkillSoldierBuff/SkillSoldierFortify/SkillSoldierStun/SkillSoldierArcherBuff/SkillSoldierBless`），不要用拼音（`SkillFujun` 等）。
-- **Sname＝英雄名**：武将专属技能 `Sname` 取英雄名（乱阵→贾诩、抚军→蒋琬……），`Name` 保留技能名；`HeroConfig.Skill1` 挂 Sname。多个技能若同属一英雄（主动+被动）共用 Sname 会与 `ConfigManager` 的 Sname 去重(`PostModify`)、`GetSkillConfig`、`Skill.SetLevel` 冲突——处理见下条。
-- **被动/常驻友军加成优先做 Buff，而非独立被动技能行**：
-  - `Buff` 基类自带 `OnAttack/OnAttacked` 等钩子，且 `SkillManager.OnAttack` 会遍历 `unit.buffs`——给单位挂 Buff 即可让普攻/受击触发效果，无需单独被动技能。
-  - 独立被动技能行若与主动技共用 Sname 会导致 Sname 去重/GetSkillConfig/SetLevel 三处错乱；故先考虑 Buff 方案。
-  - 主动技 `BattleBegin` 按 `skillCfg.BuffId`（配到 config）给友军 `AddBuff(承伤buff, time=999)`，Buff 内读 `skillCfg.Strength/Strength2/StrengthInt` 等做被动行为。
-- **主动技 Rate 勿放带概率的被动**：`Rate=0` 表示必然发动（`CheckBurst` 随机判定）。主动技固定触发就不要填 Rate；被动需要的概率改用独立字段（如 `StrengthInt` 整型百分数，描述用 `/strengthint%`）。
-- **BuffId 一槽只能装一种 buff**：同一技能若既要"主动命中给目标上效果"，又要"BattleBegin 给友军挂承伤/被动 buff"会冲突。做法：把承伤/被动 buff 配到 `skill.BuffId`；主动技自身要施加的 effect 用常量/短名另行引用（如 `StunBuffNameS="乱"`）。
-- **死亡原地复活**：用 `IEnumerator` 协程（骑在 `WorldManager` 上），`Chess.Ondying` 校验 Buff 标记后启动，延迟后经 `SpawnUnitsForRegion` 原地重建（满血，每名至多一次）。
+- 比例类写小数（`0.13` = 13%），由描述 `/字段%` 或 Buff 侧 `×100` 输出。
+- 护盾走 `Strength2[shield]`，按法强成长 `×(100+ap)/100`；**国家护盾除外**（走最大生命比例）。
+- 不要预先乘品质系数：英雄专属技能的品质/耗蓝/法系修正由 `PostModify` 统一写回（见第五节）。
 
-## 十、射程与范围（Range / Area）选人规范
+### 2.5 Buff 列
 
-- **字段语义**：`Range` = 射程/施法距离（单目标 `CheckInRange` 判定用）；`Area` = AoE 影响半径、以及**所有列表范围选人的搜索半径**。
-- **硬约束**：凡是调用 `GetMySideInRange` / `GetEnemyInRange` / `GetUnitsInRangeAll` / `GetUnitsInRangeByTag` 等列表查询的技能，半径参数**一律传 `skillCfg.Area`**，不得传 `skillCfg.Range`。
-- **`Area = 0` 语义**：列表查询中 `range == 0` 表示**全图**（见 `WorldManager`）。因此范围技能该行 `Area` 不得为 0，除非确为"全图"设计，需在注释中说明。
-- **方向型/直线型技能例外**：`Range` 表示直线长度、`Area` 表示走廊宽度时（如 `SkillAidChargeImpale` 冲阵、`SkillAidSuddenArrow` 骑射的索敌射程），保留 `Range` 用法并加中文注释说明原因，不强行改 `Area`。
-- **一致性**：同 `ScriptName` 的各等级行 `Range`/`Area` 含义须一致；迁移半径字段时（`Range`→`Area`）须同步改写配置表全部数据行，并 `Grep` 确认无残留 `skillCfg.Range` 误用。
+| 列 | 类型 | 配置方法 |
+| --- | --- | --- |
+| `BuffId` | string | 填 `BuffConfig.NameS` **短名**（不是 Id）；空 = 无 Buff；多个用 `,`/`，`/`;`/`；` 分隔 |
+| `BuffTime` | float | Buff 持续秒数；常规 1~10 秒。**永久类效果不要靠超大 BuffTime 模拟**，用脚本直接改属性（`SkillKillGain` / `SkillAidCraftBuff` / `SkillSelfBuff.permanent`） |
 
-## 十一、通用脚本与范围中心（TargetType）
+- 一槽只能装一种语义：既要主动命中给目标上效果、又要开局给友军挂被动 Buff 时，冲突需拆（被动 Buff 配 `BuffId`，命中效果在脚本里用常量短名另引）。
+- **BuffId 号段**：`300xxx` 正面通用、`3001xx` 正面特化、`301xxx` 负面通用、`3011xx` 负面特化。新增 Buff 先判正负面与是否特化，再在对应段顺延。
 
-- **优先复用**：形态相同的技能先找现成通用脚本，别新建特化类。当前通用脚本：
-  - `SkillAidRangeDamageDeBuff` = 范围伤害 + 减益（可配 0~N 个 BuffId 短名），覆盖**目标中心**与**自身中心**两种形态，中心由 `TargetType` 切换（见下）；已承载 司马昭·篡逆 / 韩当·双射 / 钟会·蓄谋 / 徐庶·困敌（目标中心）、张绣·枪出如龙 / 孙坚·破阵 / 刘晔·卸甲 / 魏延·奇袭（自身中心）。
-  - `SkillAidTargetDamage` = 单体伤害 + 可选减益（`BuffId` 空=纯伤害，可配 0~N 个短名），`TargetCount>0` 时对同一目标连打 N 段（段数）；已承载 杜预·发火 / 曹真·虎豹（纯伤害）、夏侯渊·猎鹰 / 王双·崩山（破）、朱桓·标记（伤）、陈宫·绝策（慑）、夏侯惇·歼灭 / 马谡·守势（乱）、陈群·律令（疫）、荀攸·奇策（缓，段数）。
-  - `SkillAidSelfBuff` = 自身增益（触发给自己挂 1~N 个 `BuffId` 短名，数值由各 Buff 读 `Strength2/StrengthBuff1`）；已承载 丁奉·奋威（倍）、王濬·疾击 / 凌统·迅射 / 鞠义·先锋（快）、华雄·狂暴（重,伤）、徐晃·长驱（重,吸）、徐盛·疑城 / 张梁·黄天（硬）、张辽·威震（震）。
-  - `SkillAidScorchingRain` = 落点/定点持续范围伤害；`SkillAidRangeHeal` = 范围治疗。
-- **`TargetType` 字符串约定**：空 = 锁定目标中心（需目标存活且在 `Range` 射程内）；`"self"` = 施法者自身中心（**不做射程校验**，`Range` 可留 0）；`"targetUnit"` = 以受击者为单位目标（见 `SkillHitBuffArea`，庞统·连锁）。同一字段已被多个脚本按字符串读取，取值需沿用既有词，勿另造。
-- **自中心 vs 目标中心**：远程(棋)技能若以自身为中心会全程打空（站位远离敌阵），必须用目标中心；近战贴脸 AoE 用自身中心。
-- **`TargetCount` 与随机截断**：`TargetCount > 0` 的脚本会对候选列表做 `RandomSelect` 截断；`<= 0` 时禁止调用 `RandomSelect`（限数 0 会清空列表）。合并/改写脚本时必须核对配置 `TargetCount`，避免静默改变命中数。
+### 2.6 召唤列
+
+| 列 | 类型 | 配置方法 |
+| --- | --- | --- |
+| `SummonTag` | string | 召唤物标签（对应单位/棋子标签）；空 = 非召唤技能 |
+| `SummonCount` | int | 一次召唤数量 |
+| `SummonTime` | float | 召唤物存活秒数 |
+| `SummonHitInterval` | float | 召唤场伤害间隔（持续伤害类） |
+| `SummonSpeed` | float | 召唤物移动速度 |
+
+### 2.7 道具列
+
+| 列 | 类型 | 配置方法 |
+| --- | --- | --- |
+| `ItemId` | int | 战斗开始时按 `Rate` 概率给所属玩家 1 个该道具；`0` = 无。对应 `ItemConfig.Id` |
+
+### 2.8 表现列
+
+| 列 | 类型 | 配置方法 |
+| --- | --- | --- |
+| `Action` | string | 施法动作名，脚本里 `owner.PlayerAnim(skillCfg.Action)` 播放；空 = 用默认动作 |
+| `SelfEffect` | string | 施法/触发瞬间在**施法者身上**播的特效名（`EffectConfig.Name`），走 `PlaySelfEffect()` |
+| `HitEffect` | string | 命中主目标时播的特效；单体技能必须有它或导弹表现 |
+| `AreaEffect` | string | 范围特效，按 `Area / CombatConst.AreaEffectBaseRadius(15)` 缩放；空 = 不播 |
+| `Icon` | string | 技能图标资源名（`SkillPic/`） |
+
+### 2.9 连锁与光环列
+
+| 列 | 类型 | 配置方法 |
+| --- | --- | --- |
+| `LinkSelf` | string | 只给**连接英雄本人**的加成串（`atk+0.2,armor+0.3` 或 `mpRegen+0.5`） |
+| `LinkTeam` | string | 给我方其他英雄（不含本人）的加成，**配置即总量，不乘人数** |
+| `AuroAttrs` | string | 光环技能的持续光环属性串，由光环脚本按帧/秒施加 |
+
+- 子字段可被描述引用：`/linkself-atk`、`/linkteam-mpRegen`、`/auroattrs-atk`。
+- 连锁数值改动只改配置，禁止写进 `JobLinkManager` 等代码；机制档位常量放 `CombatConst`。
+
+## 三、Id 段（当前实际占用）
+
+| 段 | 用途 | 分配规则 | 下一个空位 |
+| --- | --- | --- | --- |
+| `2000001~2000185` | 职业/国家连锁 | 每 Sname 5 连号，按 10 宽分块（国 2000001-5、王 2000011-15 … 工 2000181-185） | `2000191` |
+| `2010001~2010165` | 好友连线技能 | 每组 5 连号，顺序递增 | `2010166` |
+| `2020001~2021730` | 英雄个人技能 | 每英雄 5 连号；每百段约放 6~7 个英雄，块起点 `…01` | `2021731` |
+| `2090001~2090030` | 道具技能 | 单行 `Lv=1`，稀疏递增（有跳号） | `2090031` |
+
+- 新技能只取空段；**复用既有技能时不要改其 Id**。
+- 改 Id 前先全工程 `Grep` 旧 Id，确认无脚本/`CombatConst` 硬引用。
+
+## 四、等级展开与 Descript
+
+- 同 `Sname` 展开 Lv1~5；`SetLevel(lv)` 切行，连锁/好友机制通过改 `Level` 生效。
+- **Descript 只在 Lv1 写模板**，Lv2~5 留空：显示时自动回退 Lv1 模板并按本级字段值替换。
+- 模板内联动态引用（斜杠**无需转义**）：`/damagestrength`、`/healstrength`、`/rate%`、`/cd`、`/range`、`/area`、`/bufftime`、`/targetcount`、`/mpcost`、`/strength2-<key>`、`/strengthbuff1-<key>`、`/linkself-<attr>`、`/linkteam-<attr>`、`/auroattrs-<attr>`。
+  - 数字字段末尾加 `%` = 按百分比输出（`/rate%`：0.4 → "40%"）。
+  - 比例槽 `strength2-<key>` 用 `%` 输出时按×100 处理。
+- 无动态引用的整型文案（每级数字个数不同、必须逐级完整描述）才每级直接写满 Descript 兜底。
+- 显示统一走 `ConfigManager.GetSkillDescript(cfg, withNext)`；`withNext=true` 附下一档数值（Tooltip 职业/好友档位用）。
+
+## 五、数值公式（以 `Skill.cs` 现实现为准）
+
+| 用途 | 公式 | 减免 |
+| --- | --- | --- |
+| 伤害 `DamageType=0` 法术 | `DamageStrength × (100 + ap) / 100` | 受魔抗 |
+| 伤害 `DamageType=1` 物理 | `DamageStrength + atk` | 受护甲 |
+| 伤害 `DamageType=2` 真实 | `DamageStrength + atk` | 无视抗性、护盾不吸收 |
+| 治疗 | `HealStrength × (100 + ap) / 100` | — |
+| 护盾（非国家） | `Strength2[shield] × (100 + ap) / 100` | 走护盾 Buff（`盾`） |
+
+- 入口：`Skill.GetSkillDamage()` / `GetSkillHeal()` / `GetSkillShield()`，静态重载供 Buff 复用。
+- **英雄专属技能（`HeroConfig.Skill1` 指向的 Sname）额外修正**（`ConfigManager.PostModify`，只作用于 `DamageStrength`/`HealStrength`）：
+  `× QualitySkillFactor^(Q-1) × Clamp(MpCost / SkillMpStandard, 0.2, 2) × MagicRate`
+  （`QualitySkillFactor=1.55`、`SkillMpStandard=100`、`MagicRate` 法系 1.5 / 物理 1.0）
+  → 配置里写"Q1、耗蓝 100、非法系"的基准值，品质/耗蓝/法系收益自动生效，战场与 Tip 同口径。
+- 职业/好友/道具技能的 Sname 不是英雄名，**不参与**上述修正。
+
+## 六、数值设计原则
+
+1. **单体 > 群体单段**：群体/弹射靠 `TargetCount`、`Area` 控制总输出，单段明显低于单体爆伤。
+2. **MP 与 CD 是主要平衡轴**：高耗蓝/长 CD 换更高伤害或更强效果；不要把单体与群体拉到同一水平。
+3. **以基准技能对照**：单体法术基准（`强击` Lv1 `DamageStrength=60`），逐级递增；群体用较低基值 + 多目标。
+4. 数值只进配置，逻辑里不写死；调平衡只改 `SkillConfig`。
+5. 同一 Sname 五行的 `Range/Area/TargetType/TargetCount` 语义必须一致。
+
+## 七、Buff / 特效联动
+
+- BuffId 填短名；组合按段位顺序读 `StrengthBuff1`（小键盘如 `攻,甲,抗` ↔ `atk,armor,magicRes`）。
+- 特效名必须是 `EffectConfig.Name` 中存在的名字（见 `combat-effect-usage` 技能）。
+- 范围技能的 `AreaEffect` 随 `Area` 缩放；普攻溅射类（`SkillHitArea`）只播主目标 `HitEffect`。
+
+## 八、优先复用通用脚本
+
+| 脚本 | 形态（配置行数） | 配置要点 |
+| --- | --- | --- |
+| `SkillSingleDamage` | 单体伤害（125 行，最常用） | `DamageStrength`/`HealStrength` + `BuffId`（空=纯伤害）；`TargetCount>0` = 对同一目标连打 N 段 |
+| `SkillAreaDamageDeBuff` | 范围伤害 + 减益（60 行） | `TargetType` 空=目标中心 / `self`=自身中心；`BuffId` 可 0~N 段 |
+| `SkillSelfBuff` | 自身增益（50 行） | `BuffId` 挂 1~N 个 Buff，数值放 `Strength2`/`StrengthBuff1` 由 Buff 读 |
+| `SkillAreaBuff` | 群体增益（45 行） | `TargetType` 标记选人（见 2.3）；护盾类按统一护盾公式写 `Strength2[shield]` |
+| `SkillAura` | 光环（30 行） | `AuroAttrs` 配持续光环属性 |
+| `SkillAreaHeal` | 范围治疗（15 行） | `HealStrength` + `Area`，`overflowToArmor` 可转护甲 |
+| `SkillJumpChain` | 弹射（10 行） | `TargetType=heal` 走治疗链，否则伤害链 |
+| `SkillBacklineStrike` | 打后排（15 行） | `smart` 智能选后排 / 默认最远 |
+| `SkillAidBuffLowHp` / `SkillDefReduceDamageRate` | 低血触发（5 行各） | `TriggerCondition=hprate<50` + `Strength2[reduceRate]` |
+| `SkillAidChargeImpale` | 直线穿透 | `Range`=长度、`Area`=宽度（唯一合法用 `Range` 的列表技能） |
+| `SkillDumb` | 占位（65 行） | 无战斗行为，仅用于职业/道具等纯展示行；**不要给它配伤害字段** |
+
+- 远程技能以自身为中心会全程打空（站位远离敌阵），必须目标中心；近战贴脸 AoE 用 `self`。
+- 类名与 `ScriptName` 用英文，不用拼音；表里已有同名类时优先复用，别新建特化类。
+
+## 九、新建脚本要点
+
+- 继承 `Skill`，构造 `(int skillId, Chess owner)`；生命周期钩子覆写签名与基类一致。
+- 触发判定统一走基类 `CheckBurst`（CD / Rate / MpCost / TriggerCondition），**不要在脚本里重复判概率或蓝量**。
+- 伤害/治疗/护盾一律用第五节公式，禁止自造系数；属性读取用 `owner.GetAttr(key)`。
+- 技能专属常量就近放本文件 `public const`，跨文件共享用 `类名.常量`；通用 Id/机制数值放 `CombatConst`。
+- 随机统一 `SysRandom`，日志统一 `GameLog`（中文）。
+- 空判失败必须 `GameLog.Warn/Error`，禁止静默 return。
+
+## 十、自检清单
+
+- [ ] 5 行齐全、`Lv=1~5`、同 `Sname`、Id 连号、无 Id 冲突
+- [ ] `ScriptName` 类存在且已加入 `.csproj`
+- [ ] `BuffId` 短名在 `BuffConfig` 存在；`BuffTime` 合理（常规 1~10 秒；永久效果走脚本改属性，不用超大 BuffTime 模拟）
+- [ ] `HitEffect`/`AreaEffect`/`SelfEffect` 特效名在 `EffectConfig` 存在
+- [ ] 列表选人半径用 `Area`，范围技能 `Area ≠ 0`（除非确为全图）
+- [ ] `TargetCount>0` 的随机截断与脚本 `RandomSelect` 匹配
+- [ ] Lv2~5 的 Descript 为空，Lv1 模板引用的 key 在本行都有值
+- [ ] 英雄专属技能 `Sname` = 英雄名、未被其他英雄占用
+- [ ] 特殊计数：`hprate<50` 这类条件键能被 `Chess.GetAttr` 解析
+
+**自动自检**：
+
+```powershell
+python .trae/skills/combat-skill-design/scripts/dump_skill.py 烈火
+python .trae/skills/combat-skill-design/scripts/dump_skill.py 2020001
+```
+
+脚本按 `Sname` 或 `Id` 打印该技能全部等级行、关键字段，并检查行数/Id 连号/脚本文件/Buff 短名/特效名。

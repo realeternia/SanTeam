@@ -43,12 +43,12 @@ Unity (C#) | JsonUtility | UGUI | TextMeshPro
 ### 配置系统
 
 - 命名空间：`CommonConfig`，文件命名 `XxxConfig_s.cs`，类内只定义公共字段（禁止属性），字段加 `/// <summary>` 中文注释
-- 配置类（`XxxConfig_s.cs`）为工程内手写维护的唯一数据源，没有外部源表/Excel/导入工具：改配置直接编辑该文件即可，无需（也不要）考虑"同步源表"
+- 配置类（`XxxConfig_s.cs`）为工程内唯一数据源：数据行手写维护，没有外部源表/Excel，无需（也不要）考虑"同步源表"；但类骨架（字段、构造器、`Load`、`GetConfig`/`HasConfig`/`ConfigList` 等基础成员）由配表工具按统一模板生成
+- **禁止在配置类中新增模板之外的任何方法**：业务方法、静态便捷方法、工具方法、重载/扩展方法一律不允许（重新生成配表会整体覆盖丢失）。需要逻辑时放到调用方、`ConfigManager` 或独立静态类
 - 加载入口：`ConfigManager.Init()` 统一调用各 `XxxConfig.Load()`，新增配置类必须在 `ConfigManager.Init()` 中注册
 - 获取配置：`XxxConfig.GetConfig(id)` / `HasConfig(id)` / `ConfigList`；技能按缩写+等级取：`ConfigManager.GetSkillConfig(sname, lv)`；属性配置按名取：`GetConfigByname(name)`
 - 配置后处理（字段补默认值/联动修正）统一放 `ConfigManager.PostModify()`，如 HeroConfig 数值为 0 时取职业基准值
-- 禁止在配置类（`XxxConfig_s.cs`）中添加业务方法，配置类仅保留数据定义、Load、GetConfig、HasConfig 等基础方法
-- 禁止在配置类（如 `SoldierConfig`）中添加掉落解析/加权随机等业务实现：
+- 禁止在配置类（如 `SoldierConfig`）中添加掉落解析/加权随机等业务实现
 - 禁止在配置类构造器中使用默认参数：新增列必须插入到对应字段/构造参数的位置（保持表列顺序，如 CD 后加触发条件 TriggerCondition），并同步为全部数据行补值，不允许让旧行缺参
 - 战斗中用到的技能/Buff Id 常量放 `CombatConst`（`Combat/CombatConst.cs`），不要在战斗代码里硬编码 Id
 
@@ -120,7 +120,7 @@ UI 图标统一走 `IconLoader` 组件（Inspector 配 sourceType：Path / HeroA
 - 禁止 `UnityEngine.Random` 和散落的 `new System.Random()`，统一用 `SysRandom`
 - 禁止 `UnityEngine.Debug.Log`，统一用 `GameLog`，消息用中文
 - 禁止配置类使用属性，用公共字段
-- 禁止在配置类（`XxxConfig_s.cs`）中添加业务方法
+- 禁止在配置类（`XxxConfig_s.cs`）中添加模板之外的任何方法（业务/工具/静态便捷/重载），配表由工具模板生成，重新生成会覆盖丢失
 - 禁止硬编码颜色，用 `SysColor`（含嵌套类）
 - 禁止在战斗代码中硬编码技能/Buff Id 和机制数值，提取到 `CombatConst`
 - 新增 `.cs` 文件必须在 `Assembly-CSharp.csproj` 添加 `<Compile Include>`（Editor 脚本加到 `Assembly-CSharp-Editor.csproj`）

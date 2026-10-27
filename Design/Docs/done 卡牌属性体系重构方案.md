@@ -33,26 +33,30 @@
   | 9 | 240 | 830 | 80 |
   | 10 | 255 | 920 | 85 |
 - 每个英雄的三攻按原有专精比例缩放至档位总和（保留武将高攻/谋士高法强的定位差异）；生命在档位基准上按原生命高低微调 ±60。
-- 升星成长改为**乘方式**：1 星带品质面板 × **1.7^(星级-1)**（2 星=1.7 倍，3 星=1.7²≈2.89 倍，4 星≈4.91 倍，以此类推）。倍率常量 `StarGrowthPerStar=1.7`（`HeroSelectionTool.GrowPanel`），原 `AtkP/ApP/HpP` 每星百分比字段不再参与成长计算（字段保留但已失效）。`HeroConfig.Total` 字段已删除，三攻总和由 `Atk+Ap+Might` 推导。
-- 主属性 1 星面板 = 职业基准 × (1+修正%/100) × **品质系数 1.23^(Q-1)**（Q1×1.0 / Q2×1.23 / Q3≈1.51 / Q4≈1.86），于 `ConfigManager.PostModify` 写回；次级面板（攻速/射程/护甲/魔抗/移速/生命回复/魔法回复）不乘品质系数。
+- 升星成长改为**乘方式**：1 星带品质面板 × **1.65^(星级-1)**（2 星=1.65 倍，3 星≈2.72 倍，4 星≈4.49 倍，5 星≈7.41 倍）。倍率常量 `StarGrowthPerStar=1.65`（[HeroSelectionTool.cs](../../Assets/Resources/Scripts/Tools/HeroSelectionTool.cs) `GrowPanel`），原 `AtkP/ApP/HpP` 每星百分比字段不再参与成长计算（字段保留但已失效）。`HeroConfig.Total` 字段已删除，三攻总和由 `Atk+Ap+Might` 推导。
+- 主属性 1 星面板 = 职业基准 × (1+修正%/100) × **品质系数 1.65^(Q-1)**（Q1×1.0 / Q2×1.65 / Q3≈2.72 / Q4≈4.49），于 [ConfigManager.cs](../../Assets/Resources/Scripts/Configs/ConfigManager.cs) `PostModify` 写回。
+  - **仅攻击/生命**乘品质系数；**法术强度 Ap 不乘**（保持次级面板口径）。
+  - 攻击额外 **÷ 法术倍率 MagicRate**（法系 1.5，取 `HeroConfig.MagicRate`，为 0 时回落职业值）。
+- 次级面板（攻速/射程/护甲/魔抗/移速/生命回复/法力回复）不乘品质系数。
+- 英雄个人技能（`HeroConfig.Skill1` 指向的 Sname）数值在 `PostModify` 中统一修正：`× 1.55^(Q-1) × Clamp(MpCost/100) × MagicRate`（`QualitySkillFactor=1.55`、`SkillMpStandard=100`，钳制区间 `SkillMpFactorMin/Max`），战场结算与技能 Tip 自动同口径。
 - 新增 `AtkSpeed`（攻速）字段：攻击间隔秒数，默认 1.5s（暂所有英雄一致），接入战斗攻击冷却判定。
 - 护甲/法术抗性基础值按「品质 + 职业/站位」计算，取值约 5~55，不随星级成长。
 
 ---
 
-## 二、升星成本调整
+## 二、升级成本（当前）
 
-| 星级 | 所需卡牌数（累计） | 当前（旧） |
+| 卡片等级 | 最低累计卡数 | 说明 |
 | --- | --- | --- |
-| 1 星 | 1 | 1 |
-| 2 星 | 3 | 2 |
-| 3 星 | 5 | 4 |
-| 4 星 | 7 | 7 |
-| 5 星 | 9 | 11 |
-| N 星 | `2N - 1` | 递增 |
+| Lv1 | 1 | 初始 |
+| Lv2 | 4 | 再买 3 张 |
+| Lv3 | 8 | 再买 4 张 |
+| Lv4 | 13 | 再买 5 张 |
+| Lv5 | 20 | 再买 7 张（封顶） |
 
-- 规则：1→2 需要 3 张，2→3 需要 5 张，3→4 需要 7 张，以此类推（奇数递增），提高低星升级成本。
-- 实现：`cardHeroExp` 数组由 `[1,2,4,7,11,...]` 改为按 `2N-1` 生成的奇数数组。
+- 实现：`cardHeroExp = { 1, 4, 8, 13, 20, 28, ... }`（[HeroSelectionTool.cs](../../Assets/Resources/Scripts/Tools/HeroSelectionTool.cs)），`MaxHeroCardLevel = 5`，满级后禁止继续买卡（`IsHeroCardMaxLevel`）。
+- `PlayerInfo.cards` 存的是累计卡数（经验），不是等级本身；按等级写回用 `GetCardExpByLevel(level)`。
+- 装备不再升级：同 id 装备可存多件、各自独立生效，等级恒为 1。
 
 ---
 
@@ -91,7 +95,7 @@
 | 文件 | 改动内容 |
 | --- | --- |
 | `Scripts/PO/AttrInfo.cs` | 字段改为 `Atk/Ap/Might/Hp/Armor/MagicRes`，更新 `Total/AddAttr` |
-| `Scripts/Configs/HeroConfig_s.cs` | 字段语义重定义（或改名），新增护甲/法抗普通配置字段（含 meta、构造器参数与 103 行数据） |
+| `Scripts/Configs/HeroConfig_s.cs` | 字段语义重定义（或改名），新增护甲/法抗普通配置字段（含 meta、构造器参数与 110 行数据） |
 | `Scripts/Configs/SkillConfig_s.cs` | `Attr/CheckAttrs` 取值替换 |
 | `Scripts/Configs/ItemConfig_s.cs` | `Attr1/Attr2` 取值替换，描述文案更新 |
 | `Scripts/Configs/JobConfig_s.cs` | 无改动 |
@@ -126,7 +130,7 @@
 
 ## 七、验证点
 1. 卡片商店/背包展示的攻击、法术强度、无双强度、生命数值正确。
-2. 升星：2 星属性 = 1.7 倍 1 星，3 星 ≈ 2.89 倍 1 星（乘方式成长）。
+2. 升星：2 星属性 = 1.65 倍 1 星，3 星 ≈ 2.72 倍，5 星 ≈ 7.41 倍（乘方式成长）。
 3. 普攻伤害随攻击变化、受护甲减免；法术技能受法抗减免。
 4. 火计/落雷等吃法术强度；飞斧/火矢等吃无双强度；炮车/箭雨等吃攻击。
-5. 护甲/法抗不随星级变化。
+5. 护甲/法抗不随星级变化；Ap 不吃品质系数，攻击吃品质系数后再 ÷ MagicRate。
