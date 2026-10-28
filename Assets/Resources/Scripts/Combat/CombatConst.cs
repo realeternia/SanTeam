@@ -123,9 +123,9 @@ public static class CombatConst
 
     // ---- 卡牌属性成长 ----
     /// <summary>星级成长倍率：每升1星 ×本值（乘方式，Lv1=×1.0、Lv2=×1.6、Lv3=×1.6²…），作用于 Atk/Ap/Hp</summary>
-    public const float StarGrowthPerStar = 1.65f;
+    public const float StarGrowthPerStar = 1.55f;
     /// <summary>品质系数：每提升1档品质 ×本值（1.50^(Q-1)，Q1=×1.0、Q2=×1.50、Q3=×2.25…），仅作用于 Atk/Hp</summary>
-    public const float QualityAttrFactor = 1.65f;
+    public const float QualityAttrFactor = 1.55f;
 
     // ---- 英雄专属技能数值修正 ----
     /// <summary>技能品质系数：英雄专属技能的 DamageStrength/HealStrength 每提升1档品质 ×本值（^(Q-1)：Q1=×1.0）</summary>

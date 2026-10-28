@@ -106,8 +106,8 @@
     <Compile Include="Assets\Resources\Scripts\Tools\SysColor.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\BagControl.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillSoldierGrow.cs" />
-    <Compile Include="Assets\Resources\Scripts\CardShopManager.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillMultiHit.cs" />
+    <Compile Include="Assets\Resources\Scripts\CardShopManager.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillSoldierFortify.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidJumpReturn.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\TooltipItem.cs" />

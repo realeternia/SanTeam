@@ -1200,6 +1200,18 @@ public class WorldManager : MonoBehaviour
         return Mathf.Abs(a.x - b.x) + Mathf.Abs(a.y - b.y);
     }
 
+    /// <summary>当前战斗地图规则（MapConfig.Rule）：0=1v1配对 1=两大阵营 2=混战；无地图时为 -1</summary>
+    public int MapRule
+    {
+        get
+        {
+            if (mapInfo == null)
+                return -1;
+            var cfg = MapConfig.GetConfig(mapInfo.Mapid);
+            return cfg != null ? cfg.Rule : -1;
+        }
+    }
+
     public bool IsEnemy(int a, int b)
     {
         if (isPveRound)

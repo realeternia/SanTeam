@@ -163,6 +163,13 @@ public static class SysColor
         public static readonly Color HealthLowColor = new Color(0.4f, 0.33f, 0f);
         public static readonly Color HealthNormalColor = new Color(0f, 0.4f, 0.1f);
         public static readonly Color HealthWarningColor = Color.yellow;
+        // 血条按敌我关系上色
+        public static readonly Color HealthOwnColor = Color.green;                       // 自己军队-绿
+        public static readonly Color HealthAllyColor = new Color(0.5f, 0.85f, 1f, 1f);   // 友军-浅蓝
+        public static readonly Color HealthEnemyColor = new Color(1f, 0.55f, 0.1f, 1f);  // 敌方-橙
+        public static readonly Color HealthSideEvenColor = new Color(1f, 0.7f, 0.8f, 1f);  // 1v1地图其他玩家-浅粉（偶数号位）
+        public static readonly Color HealthSideOddColor = new Color(1f, 0.95f, 0.6f, 1f);  // 1v1地图其他玩家-浅黄（奇数号位）
+        public static readonly Color HealthTickColor = Color.black;                      // 血条刻度线-黑
         public static readonly Color AttackSuccessColor = Color.red;
         public static readonly Color AttackFailColor = Color.green;
         public static readonly Color CapturedOutlineColor = Color.red;
