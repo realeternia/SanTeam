@@ -1109,6 +1109,15 @@ MonoBehaviour:
   - {fileID: 2866308342036905196}
   - {fileID: 776647266872912469}
   - {fileID: 1586102138517360650}
+  Castles:
+  - {fileID: 1291135732543381676}
+  - {fileID: 4480154771525556360}
+  - {fileID: 6884217761739676646}
+  - {fileID: 988171994093795267}
+  - {fileID: 5550263302206904347}
+  - {fileID: 1236749391730760380}
+  - {fileID: 850035830027735975}
+  - {fileID: 8731746999911286390}
   FormationCellSize: 10
   WallNode: {fileID: 5392608752814234730}
   RegionNode: {fileID: 6434610096104522131}
@@ -1177,13 +1186,13 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1291135732542897292}
-  - {fileID: 5550263302206669883}
   - {fileID: 4480154771525387432}
   - {fileID: 6884217761739442118}
   - {fileID: 988171994093890531}
+  - {fileID: 5550263302206669883}
+  - {fileID: 1236749391730919068}
   - {fileID: 850035830028226439}
   - {fileID: 8731746999911324246}
-  - {fileID: 1236749391730919068}
   m_Father: {fileID: 1861988832353961624}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &6434610096104522131
@@ -1216,13 +1225,13 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 8564215565997517137}
-  - {fileID: 2866308342036905196}
-  - {fileID: 1499849381903444596}
-  - {fileID: 1586102138517360650}
-  - {fileID: 5869940313971536682}
   - {fileID: 6742831137334787675}
   - {fileID: 6067680238856523785}
+  - {fileID: 1499849381903444596}
+  - {fileID: 5869940313971536682}
+  - {fileID: 2866308342036905196}
   - {fileID: 776647266872912469}
+  - {fileID: 1586102138517360650}
   m_Father: {fileID: 1861988832353961624}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &6817773147184610477
@@ -1538,7 +1547,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 100000, guid: 05035b78d90b21f43854dfe010ccd289, type: 3}
       propertyPath: m_Name
-      value: House (5)
+      value: House7
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 05035b78d90b21f43854dfe010ccd289, type: 3}
       propertyPath: m_LocalScale.x
@@ -1601,6 +1610,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 05035b78d90b21f43854dfe010ccd289, type: 3}
+--- !u!1 &850035830027735975 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 100000, guid: 05035b78d90b21f43854dfe010ccd289, type: 3}
+  m_PrefabInstance: {fileID: 850035830027834631}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &850035830028226439 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 400000, guid: 05035b78d90b21f43854dfe010ccd289, type: 3}
@@ -1616,7 +1630,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 100000, guid: 05035b78d90b21f43854dfe010ccd289, type: 3}
       propertyPath: m_Name
-      value: House (6)
+      value: House4
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 05035b78d90b21f43854dfe010ccd289, type: 3}
       propertyPath: m_LocalScale.x
@@ -1679,6 +1693,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 05035b78d90b21f43854dfe010ccd289, type: 3}
+--- !u!1 &988171994093795267 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 100000, guid: 05035b78d90b21f43854dfe010ccd289, type: 3}
+  m_PrefabInstance: {fileID: 988171994093760867}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &988171994093890531 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 400000, guid: 05035b78d90b21f43854dfe010ccd289, type: 3}
@@ -1694,7 +1713,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 100000, guid: 05035b78d90b21f43854dfe010ccd289, type: 3}
       propertyPath: m_Name
-      value: House (1)
+      value: House6
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 05035b78d90b21f43854dfe010ccd289, type: 3}
       propertyPath: m_LocalScale.x
@@ -1757,6 +1776,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 05035b78d90b21f43854dfe010ccd289, type: 3}
+--- !u!1 &1236749391730760380 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 100000, guid: 05035b78d90b21f43854dfe010ccd289, type: 3}
+  m_PrefabInstance: {fileID: 1236749391730793500}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &1236749391730919068 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 400000, guid: 05035b78d90b21f43854dfe010ccd289, type: 3}
@@ -1840,6 +1864,11 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 400000, guid: 05035b78d90b21f43854dfe010ccd289, type: 3}
   m_PrefabInstance: {fileID: 1291135732543284748}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1291135732543381676 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 100000, guid: 05035b78d90b21f43854dfe010ccd289, type: 3}
+  m_PrefabInstance: {fileID: 1291135732543284748}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &4480154771525525032
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1850,7 +1879,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 100000, guid: 05035b78d90b21f43854dfe010ccd289, type: 3}
       propertyPath: m_Name
-      value: House (3)
+      value: House2
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 05035b78d90b21f43854dfe010ccd289, type: 3}
       propertyPath: m_LocalScale.x
@@ -1918,6 +1947,11 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 400000, guid: 05035b78d90b21f43854dfe010ccd289, type: 3}
   m_PrefabInstance: {fileID: 4480154771525525032}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &4480154771525556360 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 100000, guid: 05035b78d90b21f43854dfe010ccd289, type: 3}
+  m_PrefabInstance: {fileID: 4480154771525525032}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &5550263302206807739
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1928,7 +1962,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 100000, guid: 05035b78d90b21f43854dfe010ccd289, type: 3}
       propertyPath: m_Name
-      value: House (2)
+      value: House5
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 05035b78d90b21f43854dfe010ccd289, type: 3}
       propertyPath: m_LocalScale.x
@@ -1996,6 +2030,11 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 400000, guid: 05035b78d90b21f43854dfe010ccd289, type: 3}
   m_PrefabInstance: {fileID: 5550263302206807739}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &5550263302206904347 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 100000, guid: 05035b78d90b21f43854dfe010ccd289, type: 3}
+  m_PrefabInstance: {fileID: 5550263302206807739}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &6884217761739578694
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2006,7 +2045,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 100000, guid: 05035b78d90b21f43854dfe010ccd289, type: 3}
       propertyPath: m_Name
-      value: House (4)
+      value: House3
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 05035b78d90b21f43854dfe010ccd289, type: 3}
       propertyPath: m_LocalScale.x
@@ -2074,6 +2113,11 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 400000, guid: 05035b78d90b21f43854dfe010ccd289, type: 3}
   m_PrefabInstance: {fileID: 6884217761739578694}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &6884217761739676646 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 100000, guid: 05035b78d90b21f43854dfe010ccd289, type: 3}
+  m_PrefabInstance: {fileID: 6884217761739578694}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &8731746999911186646
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2084,7 +2128,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 100000, guid: 05035b78d90b21f43854dfe010ccd289, type: 3}
       propertyPath: m_Name
-      value: House (7)
+      value: House8
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 05035b78d90b21f43854dfe010ccd289, type: 3}
       propertyPath: m_LocalScale.x
@@ -2104,7 +2148,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 05035b78d90b21f43854dfe010ccd289, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 05035b78d90b21f43854dfe010ccd289, type: 3}
       propertyPath: m_LocalPosition.z
@@ -2147,6 +2191,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 05035b78d90b21f43854dfe010ccd289, type: 3}
+--- !u!1 &8731746999911286390 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 100000, guid: 05035b78d90b21f43854dfe010ccd289, type: 3}
+  m_PrefabInstance: {fileID: 8731746999911186646}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &8731746999911324246 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 400000, guid: 05035b78d90b21f43854dfe010ccd289, type: 3}

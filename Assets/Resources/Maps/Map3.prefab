@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 9077521410877998376}
   - component: {fileID: 5324722683049540360}
   m_Layer: 0
-  m_Name: HR3
+  m_Name: HR5
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -132,7 +132,7 @@ GameObject:
   - component: {fileID: 7708595249974919705}
   - component: {fileID: 2126783237018798989}
   m_Layer: 0
-  m_Name: HR5
+  m_Name: HR2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -384,13 +384,13 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 6589435683823952507}
+  - {fileID: 7045001692050031319}
   - {fileID: 7304761878946992247}
+  - {fileID: 1030479992679287700}
   - {fileID: 250991778220807237}
+  - {fileID: 8785787516738594429}
   - {fileID: 1590410828590782858}
   - {fileID: 4262729762803641380}
-  - {fileID: 7045001692050031319}
-  - {fileID: 8785787516738594429}
-  - {fileID: 1030479992679287700}
   m_Father: {fileID: 1861988832353961624}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1381556469068355350
@@ -407,7 +407,7 @@ GameObject:
   - component: {fileID: 4867771128782377562}
   - component: {fileID: 1819602869888075356}
   m_Layer: 0
-  m_Name: HR6
+  m_Name: HR4
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -525,7 +525,7 @@ GameObject:
   - component: {fileID: 7780329129331270627}
   - component: {fileID: 4565216522331005323}
   m_Layer: 0
-  m_Name: HR4
+  m_Name: HR7
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -947,7 +947,7 @@ GameObject:
   - component: {fileID: 6331534300310793378}
   - component: {fileID: 7491073763522838455}
   m_Layer: 0
-  m_Name: HR2
+  m_Name: HR3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1109,10 +1109,18 @@ MonoBehaviour:
   - {fileID: 741742674112668745}
   - {fileID: 7044813828639407842}
   - {fileID: 183827838683137762}
+  Castles:
+  - {fileID: 6589435683823926875}
+  - {fileID: 7045001692050136823}
+  - {fileID: 7304761878947089495}
+  - {fileID: 1030479992679323572}
+  - {fileID: 250991778220640357}
+  - {fileID: 8785787516738632285}
+  - {fileID: 1590410828590417322}
+  - {fileID: 4262729762803478532}
   FormationCellSize: 13
   WallNode: {fileID: 5392608752814234730}
   RegionNode: {fileID: 6434610096104522131}
-  TeamMode: 1
   Mapid: 3
 --- !u!1 &5392608752814234730
 GameObject:
@@ -1177,12 +1185,12 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 5887865156012285165}
-  - {fileID: 2859629469905389646}
-  - {fileID: 9088219232084438824}
-  - {fileID: 7044813828639407842}
   - {fileID: 6551633517750141283}
+  - {fileID: 2859629469905389646}
   - {fileID: 1002987368959257614}
+  - {fileID: 9088219232084438824}
   - {fileID: 741742674112668745}
+  - {fileID: 7044813828639407842}
   - {fileID: 183827838683137762}
   m_Father: {fileID: 1861988832353961624}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -1423,7 +1431,7 @@ GameObject:
   - component: {fileID: 3475401965950942578}
   - component: {fileID: 7365419541206301970}
   m_Layer: 0
-  m_Name: HR7
+  m_Name: HR6
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1537,7 +1545,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 100000, guid: 9bf280570cf5dce45a29b84470a52c7e, type: 3}
       propertyPath: m_Name
-      value: Temple (1)
+      value: Temple5
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 9bf280570cf5dce45a29b84470a52c7e, type: 3}
       propertyPath: m_LocalScale.x
@@ -1600,6 +1608,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 9bf280570cf5dce45a29b84470a52c7e, type: 3}
+--- !u!1 &250991778220640357 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 100000, guid: 9bf280570cf5dce45a29b84470a52c7e, type: 3}
+  m_PrefabInstance: {fileID: 250991778220674757}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &250991778220807237 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 400000, guid: 9bf280570cf5dce45a29b84470a52c7e, type: 3}
@@ -1615,7 +1628,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 100000, guid: e2f28d7d7478cb64597ebb9077abfe6e, type: 3}
       propertyPath: m_Name
-      value: Barracks (3)
+      value: Barracks4
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: e2f28d7d7478cb64597ebb9077abfe6e, type: 3}
       propertyPath: m_LocalScale.x
@@ -1679,6 +1692,11 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 400000, guid: e2f28d7d7478cb64597ebb9077abfe6e, type: 3}
   m_PrefabInstance: {fileID: 1030479992679420180}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1030479992679323572 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 100000, guid: e2f28d7d7478cb64597ebb9077abfe6e, type: 3}
+  m_PrefabInstance: {fileID: 1030479992679420180}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1590410828590383882
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1689,7 +1707,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 100000, guid: 9bf280570cf5dce45a29b84470a52c7e, type: 3}
       propertyPath: m_Name
-      value: Temple (2)
+      value: Temple7
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 9bf280570cf5dce45a29b84470a52c7e, type: 3}
       propertyPath: m_LocalScale.x
@@ -1752,6 +1770,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 9bf280570cf5dce45a29b84470a52c7e, type: 3}
+--- !u!1 &1590410828590417322 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 100000, guid: 9bf280570cf5dce45a29b84470a52c7e, type: 3}
+  m_PrefabInstance: {fileID: 1590410828590383882}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &1590410828590782858 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 400000, guid: 9bf280570cf5dce45a29b84470a52c7e, type: 3}
@@ -1767,7 +1790,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 100000, guid: e2f28d7d7478cb64597ebb9077abfe6e, type: 3}
       propertyPath: m_Name
-      value: Barracks
+      value: Barracks8
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: e2f28d7d7478cb64597ebb9077abfe6e, type: 3}
       propertyPath: m_LocalScale.x
@@ -1826,6 +1849,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e2f28d7d7478cb64597ebb9077abfe6e, type: 3}
+--- !u!1 &4262729762803478532 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 100000, guid: e2f28d7d7478cb64597ebb9077abfe6e, type: 3}
+  m_PrefabInstance: {fileID: 4262729762803512996}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &4262729762803641380 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 400000, guid: e2f28d7d7478cb64597ebb9077abfe6e, type: 3}
@@ -1841,7 +1869,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 100000, guid: 9bf280570cf5dce45a29b84470a52c7e, type: 3}
       propertyPath: m_Name
-      value: Temple
+      value: Temple1
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 9bf280570cf5dce45a29b84470a52c7e, type: 3}
       propertyPath: m_LocalScale.x
@@ -1904,6 +1932,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 9bf280570cf5dce45a29b84470a52c7e, type: 3}
+--- !u!1 &6589435683823926875 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 100000, guid: 9bf280570cf5dce45a29b84470a52c7e, type: 3}
+  m_PrefabInstance: {fileID: 6589435683823827195}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &6589435683823952507 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 400000, guid: 9bf280570cf5dce45a29b84470a52c7e, type: 3}
@@ -1919,7 +1952,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 100000, guid: e2f28d7d7478cb64597ebb9077abfe6e, type: 3}
       propertyPath: m_Name
-      value: Barracks (1)
+      value: Barracks2
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: e2f28d7d7478cb64597ebb9077abfe6e, type: 3}
       propertyPath: m_LocalScale.x
@@ -1983,6 +2016,11 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 400000, guid: e2f28d7d7478cb64597ebb9077abfe6e, type: 3}
   m_PrefabInstance: {fileID: 7045001692050167895}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &7045001692050136823 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 100000, guid: e2f28d7d7478cb64597ebb9077abfe6e, type: 3}
+  m_PrefabInstance: {fileID: 7045001692050167895}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &7304761878947121911
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1993,7 +2031,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 100000, guid: 9bf280570cf5dce45a29b84470a52c7e, type: 3}
       propertyPath: m_Name
-      value: Temple (3)
+      value: Temple3
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 9bf280570cf5dce45a29b84470a52c7e, type: 3}
       propertyPath: m_LocalScale.x
@@ -2061,6 +2099,11 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 400000, guid: 9bf280570cf5dce45a29b84470a52c7e, type: 3}
   m_PrefabInstance: {fileID: 7304761878947121911}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &7304761878947089495 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 100000, guid: 9bf280570cf5dce45a29b84470a52c7e, type: 3}
+  m_PrefabInstance: {fileID: 7304761878947121911}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &8785787516738731261
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2071,7 +2114,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 100000, guid: e2f28d7d7478cb64597ebb9077abfe6e, type: 3}
       propertyPath: m_Name
-      value: Barracks (2)
+      value: Barracks6
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: e2f28d7d7478cb64597ebb9077abfe6e, type: 3}
       propertyPath: m_LocalScale.x
@@ -2133,5 +2176,10 @@ PrefabInstance:
 --- !u!4 &8785787516738594429 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 400000, guid: e2f28d7d7478cb64597ebb9077abfe6e, type: 3}
+  m_PrefabInstance: {fileID: 8785787516738731261}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &8785787516738632285 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 100000, guid: e2f28d7d7478cb64597ebb9077abfe6e, type: 3}
   m_PrefabInstance: {fileID: 8785787516738731261}
   m_PrefabAsset: {fileID: 0}

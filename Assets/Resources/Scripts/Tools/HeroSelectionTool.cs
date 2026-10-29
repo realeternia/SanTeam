@@ -260,8 +260,8 @@ public static class HeroSelectionTool
     }
 
     // 主属性面板（Atk/Ap/Hp 统一计算入口，无双强度已并入 Atk）：
-    // HeroConfig 数值列经 ConfigManager.PostModify 写回为“1星带品质面板” = 职业基准×(1+修正%/100) × 品质系数(CombatConst.QualityAttrFactor)^(Q-1)，
-    // 此处只按星级成长放大：每星 ×CombatConst.StarGrowthPerStar（2星=1.7倍，3星=1.7²，以此类推），对主属性统一
+    // HeroConfig 数值列经 ConfigManager.PostModify 写回为“1星带品质面板” = 职业基准×(1+修正%/100) × 品质系数CombatConst.QualityAttrFactors[Q-1]（Q1=×1、Q2=×1.4、Q3=×1.8、Q4=×2.2），
+    // 此处只按星级成长放大：每星 ×CombatConst.StarGrowthPerStar（2星=1.55倍，3星=1.55²，以此类推），对主属性统一
     public static AttrInfo GetHeroAttr(HeroConfig heroCfg, int lv)
     {
         var attrInfo = new AttrInfo();

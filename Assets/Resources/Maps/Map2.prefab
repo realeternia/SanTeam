@@ -992,6 +992,15 @@ MonoBehaviour:
   - {fileID: 8966582755094233513}
   - {fileID: 7755072722970315443}
   - {fileID: 5401902264237583733}
+  Castles:
+  - {fileID: 3662820455162399779}
+  - {fileID: 7087299579141814886}
+  - {fileID: 7841165842184593274}
+  - {fileID: 6282090599802122992}
+  - {fileID: 2590572933631509206}
+  - {fileID: 4070700692428022678}
+  - {fileID: 8594213584880408756}
+  - {fileID: 4658089662279230345}
   FormationCellSize: 13
   WallNode: {fileID: 5392608752814234730}
   RegionNode: {fileID: 6434610096104522131}
@@ -1510,7 +1519,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 100000, guid: aec20226064bbcc4d850e8da90e49a4b, type: 3}
       propertyPath: m_Name
-      value: Granary (2)
+      value: Granary5
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: aec20226064bbcc4d850e8da90e49a4b, type: 3}
       propertyPath: m_LocalScale.x
@@ -1573,6 +1582,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: aec20226064bbcc4d850e8da90e49a4b, type: 3}
+--- !u!1 &2590572933631509206 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 100000, guid: aec20226064bbcc4d850e8da90e49a4b, type: 3}
+  m_PrefabInstance: {fileID: 2590572933631476854}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &2590572933631876854 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 400000, guid: aec20226064bbcc4d850e8da90e49a4b, type: 3}
@@ -1588,7 +1602,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 100000, guid: aec20226064bbcc4d850e8da90e49a4b, type: 3}
       propertyPath: m_Name
-      value: Granary (3)
+      value: Granary1
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: aec20226064bbcc4d850e8da90e49a4b, type: 3}
       propertyPath: m_LocalScale.x
@@ -1654,6 +1668,11 @@ PrefabInstance:
 --- !u!4 &3662820455162236931 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 400000, guid: aec20226064bbcc4d850e8da90e49a4b, type: 3}
+  m_PrefabInstance: {fileID: 3662820455162366595}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &3662820455162399779 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 100000, guid: aec20226064bbcc4d850e8da90e49a4b, type: 3}
   m_PrefabInstance: {fileID: 3662820455162366595}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &4068827218953177454
@@ -1740,7 +1759,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 100000, guid: 5921e45280d702e44ad0fb582ac16d26, type: 3}
       propertyPath: m_Name
-      value: Tower_A (1)
+      value: Tower_A6
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 5921e45280d702e44ad0fb582ac16d26, type: 3}
       propertyPath: m_LocalScale.x
@@ -1799,6 +1818,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 5921e45280d702e44ad0fb582ac16d26, type: 3}
+--- !u!1 &4070700692428022678 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 100000, guid: 5921e45280d702e44ad0fb582ac16d26, type: 3}
+  m_PrefabInstance: {fileID: 4070700692427924790}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &4070700692428062646 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 400000, guid: 5921e45280d702e44ad0fb582ac16d26, type: 3}
@@ -1814,7 +1838,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 100000, guid: 5921e45280d702e44ad0fb582ac16d26, type: 3}
       propertyPath: m_Name
-      value: Tower_A (2)
+      value: Tower_A8
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 5921e45280d702e44ad0fb582ac16d26, type: 3}
       propertyPath: m_LocalScale.x
@@ -1873,6 +1897,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 5921e45280d702e44ad0fb582ac16d26, type: 3}
+--- !u!1 &4658089662279230345 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 100000, guid: 5921e45280d702e44ad0fb582ac16d26, type: 3}
+  m_PrefabInstance: {fileID: 4658089662279263529}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &4658089662279401385 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 400000, guid: 5921e45280d702e44ad0fb582ac16d26, type: 3}
@@ -1962,7 +1991,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 100000, guid: 5921e45280d702e44ad0fb582ac16d26, type: 3}
       propertyPath: m_Name
-      value: Tower_A (3)
+      value: Tower_A4
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 5921e45280d702e44ad0fb582ac16d26, type: 3}
       propertyPath: m_LocalScale.x
@@ -2026,6 +2055,11 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 400000, guid: 5921e45280d702e44ad0fb582ac16d26, type: 3}
   m_PrefabInstance: {fileID: 6282090599802156112}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &6282090599802122992 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 100000, guid: 5921e45280d702e44ad0fb582ac16d26, type: 3}
+  m_PrefabInstance: {fileID: 6282090599802156112}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &7087299579141717190
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2036,7 +2070,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 100000, guid: 5921e45280d702e44ad0fb582ac16d26, type: 3}
       propertyPath: m_Name
-      value: Tower_A
+      value: Tower_A2
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 5921e45280d702e44ad0fb582ac16d26, type: 3}
       propertyPath: m_LocalScale.x
@@ -2098,6 +2132,11 @@ PrefabInstance:
 --- !u!4 &7087299579141580358 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 400000, guid: 5921e45280d702e44ad0fb582ac16d26, type: 3}
+  m_PrefabInstance: {fileID: 7087299579141717190}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &7087299579141814886 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 100000, guid: 5921e45280d702e44ad0fb582ac16d26, type: 3}
   m_PrefabInstance: {fileID: 7087299579141717190}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &7649426726458976886
@@ -2184,7 +2223,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 100000, guid: aec20226064bbcc4d850e8da90e49a4b, type: 3}
       propertyPath: m_Name
-      value: Granary
+      value: Granary3
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: aec20226064bbcc4d850e8da90e49a4b, type: 3}
       propertyPath: m_LocalScale.x
@@ -2252,6 +2291,11 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 400000, guid: aec20226064bbcc4d850e8da90e49a4b, type: 3}
   m_PrefabInstance: {fileID: 7841165842184624602}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &7841165842184593274 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 100000, guid: aec20226064bbcc4d850e8da90e49a4b, type: 3}
+  m_PrefabInstance: {fileID: 7841165842184624602}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &8594213584880508436
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2262,7 +2306,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 100000, guid: aec20226064bbcc4d850e8da90e49a4b, type: 3}
       propertyPath: m_Name
-      value: Granary (1)
+      value: Granary7
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: aec20226064bbcc4d850e8da90e49a4b, type: 3}
       propertyPath: m_LocalScale.x
@@ -2325,6 +2369,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: aec20226064bbcc4d850e8da90e49a4b, type: 3}
+--- !u!1 &8594213584880408756 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 100000, guid: aec20226064bbcc4d850e8da90e49a4b, type: 3}
+  m_PrefabInstance: {fileID: 8594213584880508436}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &8594213584880632980 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 400000, guid: aec20226064bbcc4d850e8da90e49a4b, type: 3}

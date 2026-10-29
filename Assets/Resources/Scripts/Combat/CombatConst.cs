@@ -122,14 +122,14 @@ public static class CombatConst
     public const float UnitEffectExtraOffsetY = 4f;
 
     // ---- 卡牌属性成长 ----
-    /// <summary>星级成长倍率：每升1星 ×本值（乘方式，Lv1=×1.0、Lv2=×1.6、Lv3=×1.6²…），作用于 Atk/Ap/Hp</summary>
+    /// <summary>星级成长倍率：每升1星 ×本值（乘方式，Lv1=×1.0、Lv2=×1.55、Lv3=×1.55²…），作用于 Atk/Ap/Hp</summary>
     public const float StarGrowthPerStar = 1.55f;
-    /// <summary>品质系数：每提升1档品质 ×本值（1.50^(Q-1)，Q1=×1.0、Q2=×1.50、Q3=×2.25…），仅作用于 Atk/Hp</summary>
-    public const float QualityAttrFactor = 1.55f;
+    /// <summary>品质系数表（按品质 Q1~Q4 直接取总值，非复利）：Q1=×1.0、Q2=×1.4、Q3=×1.8、Q4=×2.2，仅作用于 Atk/Hp</summary>
+    public static readonly float[] QualityAttrFactors = { 1f, 1.4f, 1.8f, 2.2f };
 
     // ---- 英雄专属技能数值修正 ----
-    /// <summary>技能品质系数：英雄专属技能的 DamageStrength/HealStrength 每提升1档品质 ×本值（^(Q-1)：Q1=×1.0）</summary>
-    public const float QualitySkillFactor = 1.55f;
+    /// <summary>技能品质系数表（按品质 Q1~Q4 直接取总值，非复利）：作用于英雄专属技能 DamageStrength/HealStrength，Q1=×1.0、Q2=×1.4、Q3=×1.8、Q4=×2.2</summary>
+    public static readonly float[] QualitySkillFactors = { 1f, 1.6f, 2.2f, 3f };
     /// <summary>技能MP消耗修正基准：MpCost=本值时系数=1.0，伤害/治疗按 MpCost/本值 等比例放大或缩小（MP消耗越高、释放越慢，单次数值越高）</summary>
     public const float SkillMpStandard = 100f;
     /// <summary>技能MP消耗修正系数下限（MpCost很低时的最小倍率）</summary>

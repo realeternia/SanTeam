@@ -341,6 +341,7 @@
     <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF-Mobile SSD.shader" />
     <None Include="Assets\TextMesh Pro\Resources\LineBreaking Leading Characters.txt" />
     <None Include="Assets\Shaders\WaterUV.shader" />
+    <None Include="Assets\Resources\Shaders\CastleDissolve.shader" />
     <None Include="Assets\SineVFX\TopDownEffects\Shaders\CenterCurve.shader" />
     <None Include="Assets\Epic Toon FX\Shaders\ETFX_PowerboxUnlit.shader" />
     <None Include="Assets\TextMesh Pro\Shaders\TMPro_Properties.cginc" />

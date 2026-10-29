@@ -83,23 +83,24 @@ public static class ConfigManager
             heroCfg.HpRegen = (int)Math.Round(jobCfg.HpRegen * (100f + heroCfg.HpRegen) / 100f);
             heroCfg.MpRegen = (int)Math.Round(jobCfg.MpRegen * (100f + heroCfg.MpRegen) / 100f);
             heroCfg.Ap = (int)Math.Round(jobCfg.Ap * (100f + heroCfg.Ap) / 100f);
-            // 主属性（攻击/生命）：写回 = 职业基准×(1+修正%/100) × 品质系数CombatConst.QualityAttrFactor^(Q-1)，即“1星带品质面板”
+            // 主属性（攻击/生命）：写回 = 职业基准×(1+修正%/100) × 品质系数CombatConst.QualityAttrFactors[Q-1]，即“1星带品质面板”
+            // 品质系数为按档取值（Q1=×1、Q2=×1.4、Q3=×1.8、Q4=×2.2），非复利
             // （图鉴/排行/发卡/AI/排序直接读即为此口径）；星级成长保留到运行时按每星 CombatConst.StarGrowthPerStar 乘
             // 注：法术(Ap) 不乘品质系数（保持次级面板口径），仅攻击/生命参与品质加成；攻击再 ÷ 法术倍率 MagicRate（法系乘1.5下调攻击），生命不参与
-            float qualityFactor = Mathf.Pow(CombatConst.QualityAttrFactor, Mathf.Max(1, heroCfg.Quality) - 1);
+            float qualityFactor = CombatConst.QualityAttrFactors[Mathf.Clamp(heroCfg.Quality, 1, CombatConst.QualityAttrFactors.Length) - 1];
             heroCfg.Atk = (int)Math.Round(jobCfg.Atk * (100f + heroCfg.Atk) / 100f * qualityFactor / magicRate);
             heroCfg.Hp = (int)Math.Round(jobCfg.Hp * (100f + heroCfg.Hp) / 100f * qualityFactor);
 
             // 英雄专属技能（HeroConfig.Skill1 指向的技能缩写）的伤害/治疗基值修正，共三项，写回配置后
             // 战场结算(Skill.GetSkillDamage/GetSkillHeal、DOT)与技能tips(GetSkillDescript)自动统一：
-            //   ①品质：× CombatConst.QualitySkillFactor^(Q-1)，即 Q1=×1、Q2=×1.3、Q3=×1.69、Q4=×2.197
+            //   ①品质：× CombatConst.QualitySkillFactors[Q-1]，即 Q1=×1、Q2=×1.4、Q3=×1.8、Q4=×2.2（按档取值，非复利）
             //   ②MP消耗：× MpCost/CombatConst.SkillMpStandard（基准MpCost=100，钳制到[SkillMpFactorMin,SkillMpFactorMax]），
             //      MP消耗越高、释放越慢，则单次伤害/治疗越高，反之越低
             //   ③法术倍率：× MagicRate（法系技能更强，与英雄攻击÷MagicRate对冲）
             // 技能数值行按 Sname 唯一归属一名英雄；职业兵种技能/好友连锁技能/道具技能的 Sname 非英雄名，不参与该修正。
             if (string.IsNullOrEmpty(heroCfg.Skill1))
                 continue;
-            float qualitySkillFactor = Mathf.Pow(CombatConst.QualitySkillFactor, Mathf.Max(1, heroCfg.Quality) - 1);
+            float qualitySkillFactor = CombatConst.QualitySkillFactors[Mathf.Clamp(heroCfg.Quality, 1, CombatConst.QualitySkillFactors.Length) - 1];
             foreach (var skillCfg in SkillConfig.ConfigList)
             {
                 if (skillCfg.Sname != heroCfg.Skill1)

@@ -24,9 +24,16 @@ public class WorldManager : MonoBehaviour
     private int[] deathOrder = new int[8]; // 记录各阵营的死亡顺序，0表示未死亡
     private int deathCount = 0; // 记录已死亡的阵营数量
     private bool[] sideBattleOver = new bool[8]; // 各阵营战斗是否已结束（无存活敌方：如地图规则0 独立配对中对手先被全灭）
+    private bool[] sideDefeated = new bool[8]; // 各阵营是否已战败（本场参战过且已无存活单位），战败表现只处理一次
+    private bool[] sideHadUnits = new bool[8]; // 各阵营本场是否参战过（避免从未参战的空阵营被判战败）
+    // 城堡被消融替换前的原始材质（Renderer -> 原始材质数组），下一场开局恢复
+    private readonly Dictionary<Renderer, Material[]> castleOriginalMats = new Dictionary<Renderer, Material[]>();
+    // 本场被战败消融隐藏的城堡，下一场开局重新显示
+    private readonly HashSet<GameObject> hiddenCastles = new HashSet<GameObject>();
 
     private bool gameFinish = false;
     private bool hasWin;
+    private int battleVersion = 0; // 每场战斗自增，用于让上一场的城堡消融协程在新一场开始时自动失效
     private MapInfo mapInfo;
     private int[] currentMatch = null; // 本场战斗的1-8号位随机分配结果
     private bool isPveRound = false; // 本场是否为PVE（打怪物拿掉落）
@@ -95,6 +102,7 @@ public class WorldManager : MonoBehaviour
         // 从回合配置表读取本回合可刷地图权重，按权重随机选一张
         gameFinish = false;
         hasWin = false; // 本场重置胜负标记（阵亡处理里不再重置，见 OnUnitDying）
+        battleVersion++;
         currentMatch = null; // 重置号位分配，本场重新随机
         var roundCfg = GameRoundConfig.GetConfig(Math.Min(100, GameManager.Instance.year));
         isPveRound = roundCfg.RoundType == 1;
@@ -133,6 +141,10 @@ public class WorldManager : MonoBehaviour
         deathOrder = new int[8];
         deathCount = 0;
         sideBattleOver = new bool[8]; // 各阵营战斗结束状态本场重置
+        sideDefeated = new bool[8];
+        sideHadUnits = new bool[8];
+        // 同地图复用时不会重新加载地图，需恢复上一场被消融移除的城堡
+        ResetCastles();
         // 清理上一场残留的掉落包
         foreach (var drop in bagDrops)
         {
@@ -149,6 +161,16 @@ public class WorldManager : MonoBehaviour
 
         BattleResultPanel.gameObject.SetActive(false);
         SpawnUnitsInRegions();
+        // 记录本场参战阵营（后续战败判定只对参战过且单位全灭的阵营生效）
+        foreach (var chessComponent in chessList)
+        {
+            if (chessComponent != null && chessComponent.hp > 0 && !chessComponent.isShadow)
+            {
+                int sideIndex = chessComponent.side - 1;
+                if (sideIndex >= 0 && sideIndex < sideHadUnits.Length)
+                    sideHadUnits[sideIndex] = true;
+            }
+        }
         GameLog.Debug("[BattleInit] spawn done");
 
         // 兵种连锁：按同职业英雄数量施加职业被动属性加成（自身加成+全队加成，不走技能系统）
@@ -345,7 +367,7 @@ public class WorldManager : MonoBehaviour
                     SpawnHerosForSide(p, playerCenter, p.GetBattleCardList(), 1);
                     SpawnGongSummonForSide(p, playerCenter, 1);
                     GameLog.Debug("[BattleInit] gongSummon done");
-                    CreateCastleHUD(p, playerCenter);
+                    CreateCastleHUD(p, playerCenter, 1);
                     GameLog.Debug("[BattleInit] castleHud done");
 
                     if (monsterCenter != null)
@@ -368,7 +390,7 @@ public class WorldManager : MonoBehaviour
                     SpawnSoldiersForSide(p, center, side);
                     SpawnHerosForSide(p, center, p.GetBattleCardList(), side);
                     SpawnGongSummonForSide(p, center, side);
-                    CreateCastleHUD(p, center);
+                    CreateCastleHUD(p, center, side);
                 }
             }
         }
@@ -784,12 +806,9 @@ public class WorldManager : MonoBehaviour
     }
 
 
-    // 创建血条HUD
-    private void CreateCastleHUD(PlayerInfo p, Transform center)
+    // 创建城堡HUD（位置跟随阵营城堡）
+    private void CreateCastleHUD(PlayerInfo p, Transform center, int side)
     {
-        // 查找或创建Canvas
-        var canvas = FindObjectOfType<Canvas>();
-
         // 加载Hud预制体
         GameObject hudPrefab = Resources.Load<GameObject>("Prefabs/HudCastle");
 
@@ -797,7 +816,7 @@ public class WorldManager : MonoBehaviour
         GameObject hudObj = Instantiate(hudPrefab, HudNode.transform);
         hudObj.name = "CastleHUD";
 
-        // 获取ChessHUD组件
+        // 获取CastleHUD组件
         var hud = hudObj.GetComponent<CastleHUD>();
         if (hud == null)
         {
@@ -805,8 +824,9 @@ public class WorldManager : MonoBehaviour
             return;
         }
 
-        // 初始化血条显示
-        hud.Init(p, center);
+        // 初始化血条显示：HUD锚定该阵营的城堡
+        GameObject castle = GetCastle(side);
+        hud.Init(p, castle != null ? castle.transform : null, center, side);
         p.castleHUD = hud;
     }
 
@@ -1736,23 +1756,178 @@ public class WorldManager : MonoBehaviour
         return sideBattleOver[side - 1];
     }
 
-    // 重算各阵营战斗结束状态（单位阵亡移除后调用）：某阵营已无存活敌方即视为战斗结束
+    // 重算各阵营战斗结束状态（单位阵亡移除后调用）：某阵营已无存活敌方即视为战斗结束；
+    // 本场参战过且已无存活单位的阵营视为战败，触发城堡燃烧/消融与HUD置灰（每方只处理一次）
     private void RecomputeSideBattleOver()
     {
         for (int side = 1; side <= sideBattleOver.Length; side++)
         {
             bool hasEnemy = false;
+            bool hasSelf = false;
             foreach (var chessComponent in chessList)
             {
-                if (chessComponent != null && chessComponent.hp > 0 && !chessComponent.isShadow
-                    && IsEnemy(side, chessComponent.side))
-                {
+                if (chessComponent == null || chessComponent.hp <= 0 || chessComponent.isShadow)
+                    continue;
+                if (chessComponent.side == side)
+                    hasSelf = true;
+                if (IsEnemy(side, chessComponent.side))
                     hasEnemy = true;
+                if (hasSelf && hasEnemy)
                     break;
-                }
             }
             sideBattleOver[side - 1] = !hasEnemy;
+
+            if (sideHadUnits[side - 1] && !hasSelf && !sideDefeated[side - 1])
+            {
+                sideDefeated[side - 1] = true;
+                HandleSideDefeated(side);
+            }
         }
+    }
+
+    // 某阵营的全部（存活）单位血量合计与血量上限合计：城堡HUD血条用
+    public void GetSideHpSum(int side, out int curHp, out int maxHp)
+    {
+        curHp = 0;
+        maxHp = 0;
+        foreach (var chessComponent in chessList)
+        {
+            if (chessComponent == null || chessComponent.isShadow || chessComponent.side != side)
+                continue;
+            maxHp += chessComponent.maxHp;
+            curHp += Mathf.Max(0, chessComponent.hp);
+        }
+    }
+
+    // 某阵营战败：城堡处播放火焰特效，延迟后城堡消融移除；该阵营玩家的HUD显示失败并置灰
+    private void HandleSideDefeated(int side)
+    {
+        GameLog.Debug($"阵营 {side} 战败，城堡开始燃烧");
+        GameObject castle = GetCastle(side);
+        if (castle != null)
+        {
+            EffectManager.PlayPosSkillEffect(castle.transform.position, 0f, CastleHUD.CastleBurnEffect, CastleHUD.CastleBurnEffectTime);
+            StartCoroutine(DissolveCastleCoroutine(castle));
+        }
+
+        PlayerInfo player = FindPlayerBySide(side);
+        if (player != null && player.castleHUD != null)
+            player.castleHUD.SetDefeated();
+    }
+
+    // 城堡战败表现：延迟 CastleBurnDelay 后把渲染器切到消融材质，按时间推进消融量，结束后隐藏城堡
+    private IEnumerator DissolveCastleCoroutine(GameObject castle)
+    {
+        int version = battleVersion;
+        yield return new WaitForSeconds(CastleHUD.CastleBurnDelay);
+        if (castle == null || version != battleVersion)
+            yield break;
+
+        var shader = Resources.Load<Shader>("Shaders/CastleDissolve");
+        if (shader == null)
+        {
+            GameLog.Error("城堡消融失败：未找到 Resources/Shaders/CastleDissolve 着色器，直接移除城堡");
+            castle.SetActive(false);
+            yield break;
+        }
+
+        var renderers = castle.GetComponentsInChildren<Renderer>();
+        var dissolveMats = new List<Material>();
+        foreach (var rend in renderers)
+        {
+            if (rend == null)
+                continue;
+
+            var srcMats = rend.sharedMaterials;
+            if (!castleOriginalMats.ContainsKey(rend))
+                castleOriginalMats[rend] = srcMats;
+
+            var mats = new Material[srcMats.Length];
+            for (int i = 0; i < srcMats.Length; i++)
+            {
+                var src = srcMats[i];
+                var mat = new Material(shader);
+                if (src != null)
+                {
+                    if (src.HasProperty("_MainTex") && mat.HasProperty("_MainTex"))
+                        mat.SetTexture("_MainTex", src.GetTexture("_MainTex"));
+                    if (src.HasProperty("_BumpMap") && mat.HasProperty("_BumpMap"))
+                        mat.SetTexture("_BumpMap", src.GetTexture("_BumpMap"));
+                    if (src.HasProperty("_Color") && mat.HasProperty("_Color"))
+                        mat.SetColor("_Color", src.GetColor("_Color"));
+                }
+                mats[i] = mat;
+                dissolveMats.Add(mat);
+            }
+            rend.sharedMaterials = mats;
+        }
+
+        float time = 0f;
+        while (time < CastleHUD.CastleDissolveTime && castle != null && version == battleVersion)
+        {
+            time += Time.deltaTime;
+            float amount = Mathf.Clamp01(time / CastleHUD.CastleDissolveTime);
+            foreach (var mat in dissolveMats)
+            {
+                if (mat != null)
+                    mat.SetFloat("_DissolveAmount", amount);
+            }
+            yield return null;
+        }
+
+        if (castle != null && version == battleVersion)
+        {
+            castle.SetActive(false);
+            hiddenCastles.Add(castle);
+        }
+        foreach (var mat in dissolveMats)
+        {
+            if (mat != null)
+                Destroy(mat);
+        }
+    }
+
+    // 新一场开始前恢复上一场被消融移除的城堡（同地图复用不重新加载地图）
+    private void ResetCastles()
+    {
+        foreach (var kv in castleOriginalMats)
+        {
+            if (kv.Key != null)
+                kv.Key.sharedMaterials = kv.Value;
+        }
+        castleOriginalMats.Clear();
+
+        foreach (var castle in hiddenCastles)
+        {
+            if (castle != null)
+                castle.SetActive(true);
+        }
+        hiddenCastles.Clear();
+    }
+
+    // 取阵营对应城堡（Castles 顺序与 SideCenters/阵营编号一致）
+    private GameObject GetCastle(int side)
+    {
+        if (mapInfo == null || mapInfo.Castles == null)
+            return null;
+        int index = side - 1;
+        if (index < 0 || index >= mapInfo.Castles.Length)
+            return null;
+        return mapInfo.Castles[index];
+    }
+
+    // 按阵营号取玩家（battleSide 与阵营编号一致）
+    private PlayerInfo FindPlayerBySide(int side)
+    {
+        var players = GameManager.Instance != null ? GameManager.Instance.players : null;
+        if (players == null)
+            return null;
+        foreach (var player in players)
+        {
+            if (player != null && player.battleSide == side)
+                return player;
+        }
+        return null;
     }
 
     public Chess FindByHeroIdAndSide(int heroId, int side)

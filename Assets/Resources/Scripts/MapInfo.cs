@@ -7,6 +7,7 @@ public class MapInfo : MonoBehaviour
     // 每个势力的布阵中心点（长度8，对应阵营1~8）：
     // 位置 = 5x5布阵图的中心；Y旋转 = 布阵图正上方(最上面一排)在地图中朝向的方向
     public Transform[] SideCenters;
+    public GameObject[] Castles;
 
     // 布阵格子间距(米)，按地图大小调整
     public float FormationCellSize = 13f;
