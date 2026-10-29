@@ -45,6 +45,7 @@ public class WorldManager : MonoBehaviour
     private List<Tuple<Chess, GameManager.DebugHeroEntry>> debugBuffTargets = new List<Tuple<Chess, GameManager.DebugHeroEntry>>();
    
     public HeroInfoGroup heroInfoGroup;
+    public BattleDefeatTip battleDefeatTip;
     public Button buttonRestart;
     public TMP_Text textRestart;
     public Button buttonInfo;
@@ -1389,7 +1390,7 @@ public class WorldManager : MonoBehaviour
         // 后一次死亡会把前一次已判定的结束标记抹掉；而该次死亡后的存活情况可能不再满足结束条件，
         // 导致战斗永不结束、主循环 while(!gameFinish) 空转卡死（全灭后无任何日志，界面看起来永远不动）。
         // gameFinish/hasWin 仅在本场 BattleBegin 时重置。
-        RecomputeSideBattleOver(); // 单位阵亡后重算各阵营"战斗是否已结束"（无存活敌方即结束）
+        RecomputeSideBattleOver(killerPlayerId); // 单位阵亡后重算各阵营"战斗是否已结束"（无存活敌方即结束）
         if (isPveRound)
         {
             HandlePveUnitDying(dieUnit, killerPlayerId);
@@ -1758,7 +1759,7 @@ public class WorldManager : MonoBehaviour
 
     // 重算各阵营战斗结束状态（单位阵亡移除后调用）：某阵营已无存活敌方即视为战斗结束；
     // 本场参战过且已无存活单位的阵营视为战败，触发城堡燃烧/消融与HUD置灰（每方只处理一次）
-    private void RecomputeSideBattleOver()
+    private void RecomputeSideBattleOver(int killerPlayerId)
     {
         for (int side = 1; side <= sideBattleOver.Length; side++)
         {
@@ -1780,7 +1781,7 @@ public class WorldManager : MonoBehaviour
             if (sideHadUnits[side - 1] && !hasSelf && !sideDefeated[side - 1])
             {
                 sideDefeated[side - 1] = true;
-                HandleSideDefeated(side);
+                HandleSideDefeated(side, killerPlayerId);
             }
         }
     }
@@ -1800,7 +1801,7 @@ public class WorldManager : MonoBehaviour
     }
 
     // 某阵营战败：城堡处播放火焰特效，延迟后城堡消融移除；该阵营玩家的HUD显示失败并置灰
-    private void HandleSideDefeated(int side)
+    private void HandleSideDefeated(int side, int killerPlayerId)
     {
         GameLog.Debug($"阵营 {side} 战败，城堡开始燃烧");
         GameObject castle = GetCastle(side);
@@ -1813,6 +1814,72 @@ public class WorldManager : MonoBehaviour
         PlayerInfo player = FindPlayerBySide(side);
         if (player != null && player.castleHUD != null)
             player.castleHUD.SetDefeated();
+
+        ShowDefeatTip(side, killerPlayerId);
+    }
+
+    // 一方全灭时增加一组击败提示：胜者=最后一击击杀者（无击杀归属时取该方任一存活敌方），败者=被消灭的阵营
+    private void ShowDefeatTip(int defeatedSide, int killerPlayerId)
+    {
+        if (battleDefeatTip == null)
+            return;
+
+        // 败者：被消灭阵营对应的玩家；PVE 怪物阵营没有 PlayerInfo，用虚拟玩家999
+        PlayerInfo loser = FindPlayerBySide(defeatedSide);
+        int loserPid = loser != null ? loser.pid : (isPveRound && defeatedSide % 2 == 0 ? PlayerBook.MonsterPlayerId : -1);
+
+        // 胜者：优先取击杀者；无归属（如疲劳/持续伤害致死）时取任一存活敌方
+        int winnerPid = killerPlayerId;
+        if (winnerPid < 0)
+            winnerPid = FindAliveEnemyPid(defeatedSide);
+
+        Sprite winIcon = LoadPlayerIcon(winnerPid);
+        Sprite loseIcon = LoadPlayerIcon(loserPid);
+        if (winIcon == null && loseIcon == null)
+        {
+            GameLog.Warn($"击败提示跳过：阵营{defeatedSide}取不到胜/败者头像（胜者pid={winnerPid}，败者pid={loserPid}）");
+            return;
+        }
+
+        battleDefeatTip.AddDefeatTip(winIcon, loseIcon);
+    }
+
+    // 取某阵营的存活敌方玩家pid（PVE怪物阵营用虚拟玩家999）
+    private int FindAliveEnemyPid(int side)
+    {
+        foreach (var chessComponent in chessList)
+        {
+            if (chessComponent == null || chessComponent.hp <= 0 || chessComponent.isShadow)
+                continue;
+            if (!IsEnemy(side, chessComponent.side))
+                continue;
+
+            PlayerInfo player = FindPlayerBySide(chessComponent.side);
+            if (player != null)
+                return player.pid;
+            if (isPveRound)
+                return PlayerBook.MonsterPlayerId;
+        }
+        return -1;
+    }
+
+    // 按玩家pid取头像：普通玩家走 PlayerInfo.imgPath，虚拟玩家（PVE怪物）走 PlayerConfig
+    private Sprite LoadPlayerIcon(int pid)
+    {
+        if (pid < 0 || GameManager.Instance == null)
+            return null;
+
+        if (pid < GameManager.Instance.players.Length)
+        {
+            PlayerInfo player = GameManager.Instance.GetPlayer(pid);
+            return player != null ? Resources.Load<Sprite>(player.imgPath) : null;
+        }
+
+        if (!PlayerConfig.HasConfig(pid))
+            return null;
+
+        string imgpath = PlayerConfig.GetConfig(pid).Imgpath;
+        return string.IsNullOrEmpty(imgpath) ? null : Resources.Load<Sprite>("Textures/" + imgpath);
     }
 
     // 城堡战败表现：延迟 CastleBurnDelay 后把渲染器切到消融材质，按时间推进消融量，结束后隐藏城堡

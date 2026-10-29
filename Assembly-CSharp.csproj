@@ -62,6 +62,7 @@
   <ItemGroup>
     <Compile Include="Assets\Resources\Scripts\UIs\PickPanelCellControl.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffStealth.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\BattleDefeatTip.cs" />
     <Compile Include="Assets\Lana Studio\Casual RPG VFX\Demo\Scripts\ObjectsSwitcher.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\IconLoader.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\BagCellPointerForwarder.cs" />
