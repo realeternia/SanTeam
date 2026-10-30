@@ -223,7 +223,7 @@ GameObject:
   - component: {fileID: 8383932900475638551}
   - component: {fileID: 842092576730611625}
   m_Layer: 0
-  m_Name: HR3
+  m_Name: HR4
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -433,7 +433,7 @@ GameObject:
   - component: {fileID: 5929184636052639796}
   - component: {fileID: 7060263057886460574}
   m_Layer: 0
-  m_Name: HR4
+  m_Name: HR3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1103,8 +1103,8 @@ MonoBehaviour:
   SideCenters:
   - {fileID: 8564215565997517137}
   - {fileID: 6742831137334787675}
-  - {fileID: 6067680238856523785}
   - {fileID: 1499849381903444596}
+  - {fileID: 6067680238856523785}
   - {fileID: 5869940313971536682}
   - {fileID: 2866308342036905196}
   - {fileID: 776647266872912469}
@@ -1112,8 +1112,8 @@ MonoBehaviour:
   Castles:
   - {fileID: 1291135732543381676}
   - {fileID: 4480154771525556360}
-  - {fileID: 6884217761739676646}
   - {fileID: 988171994093795267}
+  - {fileID: 6884217761739676646}
   - {fileID: 5550263302206904347}
   - {fileID: 1236749391730760380}
   - {fileID: 850035830027735975}
@@ -1187,8 +1187,8 @@ Transform:
   m_Children:
   - {fileID: 1291135732542897292}
   - {fileID: 4480154771525387432}
-  - {fileID: 6884217761739442118}
   - {fileID: 988171994093890531}
+  - {fileID: 6884217761739442118}
   - {fileID: 5550263302206669883}
   - {fileID: 1236749391730919068}
   - {fileID: 850035830028226439}
@@ -1226,8 +1226,8 @@ Transform:
   m_Children:
   - {fileID: 8564215565997517137}
   - {fileID: 6742831137334787675}
-  - {fileID: 6067680238856523785}
   - {fileID: 1499849381903444596}
+  - {fileID: 6067680238856523785}
   - {fileID: 5869940313971536682}
   - {fileID: 2866308342036905196}
   - {fileID: 776647266872912469}
@@ -1630,7 +1630,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 100000, guid: 05035b78d90b21f43854dfe010ccd289, type: 3}
       propertyPath: m_Name
-      value: House4
+      value: House3
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 05035b78d90b21f43854dfe010ccd289, type: 3}
       propertyPath: m_LocalScale.x
@@ -2045,7 +2045,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 100000, guid: 05035b78d90b21f43854dfe010ccd289, type: 3}
       propertyPath: m_Name
-      value: House3
+      value: House4
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 05035b78d90b21f43854dfe010ccd289, type: 3}
       propertyPath: m_LocalScale.x

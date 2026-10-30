@@ -130,8 +130,13 @@ public class PickPanelControl : MonoBehaviour
 
         foreach (var player in GameManager.Instance.players)
         {
-            if (player != null)
-                player.gameObject.SetActive(visible);
+            if (player == null)
+                continue;
+            // 显示时按淘汰状态处理（已淘汰/生命≤0的玩家不能因为开面板重新复活），隐藏时全部隐藏
+            if (visible)
+                player.ApplyEliminatedState();
+            else
+                player.gameObject.SetActive(false);
         }
     }
 

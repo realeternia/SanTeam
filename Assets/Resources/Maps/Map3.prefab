@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 9077521410877998376}
   - component: {fileID: 5324722683049540360}
   m_Layer: 0
-  m_Name: HR5
+  m_Name: HR3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -407,7 +407,7 @@ GameObject:
   - component: {fileID: 4867771128782377562}
   - component: {fileID: 1819602869888075356}
   m_Layer: 0
-  m_Name: HR4
+  m_Name: HR6
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -947,7 +947,7 @@ GameObject:
   - component: {fileID: 6331534300310793378}
   - component: {fileID: 7491073763522838455}
   m_Layer: 0
-  m_Name: HR3
+  m_Name: HR5
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1103,19 +1103,19 @@ MonoBehaviour:
   SideCenters:
   - {fileID: 5887865156012285165}
   - {fileID: 6551633517750141283}
-  - {fileID: 2859629469905389646}
-  - {fileID: 1002987368959257614}
   - {fileID: 9088219232084438824}
   - {fileID: 741742674112668745}
+  - {fileID: 2859629469905389646}
+  - {fileID: 1002987368959257614}
   - {fileID: 7044813828639407842}
   - {fileID: 183827838683137762}
   Castles:
   - {fileID: 6589435683823926875}
   - {fileID: 7045001692050136823}
-  - {fileID: 7304761878947089495}
-  - {fileID: 1030479992679323572}
   - {fileID: 250991778220640357}
   - {fileID: 8785787516738632285}
+  - {fileID: 7304761878947089495}
+  - {fileID: 1030479992679323572}
   - {fileID: 1590410828590417322}
   - {fileID: 4262729762803478532}
   FormationCellSize: 13
@@ -1431,7 +1431,7 @@ GameObject:
   - component: {fileID: 3475401965950942578}
   - component: {fileID: 7365419541206301970}
   m_Layer: 0
-  m_Name: HR6
+  m_Name: HR4
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1545,7 +1545,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 100000, guid: 9bf280570cf5dce45a29b84470a52c7e, type: 3}
       propertyPath: m_Name
-      value: Temple5
+      value: Temple3
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 9bf280570cf5dce45a29b84470a52c7e, type: 3}
       propertyPath: m_LocalScale.x
@@ -1628,7 +1628,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 100000, guid: e2f28d7d7478cb64597ebb9077abfe6e, type: 3}
       propertyPath: m_Name
-      value: Barracks4
+      value: Barracks6
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: e2f28d7d7478cb64597ebb9077abfe6e, type: 3}
       propertyPath: m_LocalScale.x
@@ -2031,7 +2031,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 100000, guid: 9bf280570cf5dce45a29b84470a52c7e, type: 3}
       propertyPath: m_Name
-      value: Temple3
+      value: Temple5
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 9bf280570cf5dce45a29b84470a52c7e, type: 3}
       propertyPath: m_LocalScale.x
@@ -2114,7 +2114,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 100000, guid: e2f28d7d7478cb64597ebb9077abfe6e, type: 3}
       propertyPath: m_Name
-      value: Barracks6
+      value: Barracks4
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: e2f28d7d7478cb64597ebb9077abfe6e, type: 3}
       propertyPath: m_LocalScale.x

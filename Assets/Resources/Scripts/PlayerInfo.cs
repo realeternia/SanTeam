@@ -175,6 +175,8 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         goldText.text = gold.ToString();
         resultText.text = mark.ToString();
         playerBgImg.color = lineColor;
+        // mark≤0 的玩家不显示（生命耗尽即淘汰）
+        ApplyEliminatedState();
     }
 
     public void OnPointerUp(PointerEventData eventData)
@@ -1242,9 +1244,12 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         GameLog.Info($"玩家{pid}({playerName}) 生命值耗尽，已移出游戏");
     }
 
-    // 按淘汰状态同步头像显隐（读档后也需要调用，保证隐藏的玩家不复活）
+    // 按淘汰状态同步头像显隐（读档/刷新后也需要调用，保证隐藏的玩家不复活）
     public void ApplyEliminatedState()
     {
+        // 生命值≤0 一律视为淘汰（兼容手动改值/旧数据未打标记的情况）
+        if (!isEliminated && mark <= 0)
+            isEliminated = true;
         gameObject.SetActive(!isEliminated);
     }
 

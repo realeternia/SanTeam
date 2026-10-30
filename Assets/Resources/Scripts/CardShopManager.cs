@@ -69,6 +69,13 @@ public class CardShopManager : MonoBehaviour
         shopCoroutine = null;
         passBtn.gameObject.SetActive(false);
         refreshBtn.gameObject.SetActive(false);
+
+        // 游戏结束时把剩余存活玩家摆到居中槽位（去掉刚死亡玩家留下的空位）
+        var aliveIds = GameManager.Instance.GetAlivePlayerIds()
+            .OrderBy(pid => GameManager.Instance.GetPlayer(pid).GetComponent<RectTransform>().anchoredPosition.x)
+            .ToArray();
+        LayoutPlayersInCenterSlots(aliveIds);
+
         GameLog.Info("玩家生命值耗尽，游戏结束：已回到商店界面并停止");
     }
 
@@ -327,17 +334,10 @@ public class CardShopManager : MonoBehaviour
     }
 
     // 商店开始时：只对存活玩家按生命值(mark)从低到高排序，生命相同金币少的排前，再相同按pid排
-    // 同时调整玩家位置（第1名排在最左边），回合顺序也按该排序；已淘汰玩家不占位置、不参与轮转
+    // 同时把存活玩家摆到8个原始槽位中居中的那一段（第1名在最左），回合顺序也按该排序；已淘汰玩家不占位、不参与轮转
     private void SortPlayersByScore()
     {
-        var players = GameManager.Instance.players;
-        var alivePlayers = players.Where(p => !p.isEliminated).ToArray();
-
-        // 槽位位置：按存活玩家当前X坐标从左到右排列，即第1名位置在最左
-        var slotPos = alivePlayers
-            .Select(p => p.GetComponent<RectTransform>().anchoredPosition)
-            .OrderBy(pos => pos.x)
-            .ToArray();
+        var alivePlayers = GameManager.Instance.players.Where(p => !p.isEliminated).ToArray();
 
         TurnOrder = alivePlayers
             .OrderBy(p => p.mark)
@@ -346,9 +346,38 @@ public class CardShopManager : MonoBehaviour
             .Select(p => p.pid)
             .ToArray();
 
-        for (int i = 0; i < TurnOrder.Length; i++)
+        LayoutPlayersInCenterSlots(TurnOrder);
+    }
+
+    // 8个头像槽位的原始位置（按X升序），只取一次；之后位置保持不变，不再参与任何间距计算
+    private Vector2[] playerSlotPos;
+    private void CapturePlayerSlotPositions()
+    {
+        playerSlotPos = GameManager.Instance.players
+            .Select(p => p.GetComponent<RectTransform>().anchoredPosition)
+            .OrderBy(pos => pos.x)
+            .ToArray();
+    }
+
+    // 位置不变：按存活人数取8个固定槽位中居中的连续一段，缺人时从两端隐藏格子。
+    // 例：6人用第2~7格（隐藏1、8）；5人用第2~6格（隐藏1、7、8）；7人用第1~7格（隐藏8）
+    private void LayoutPlayersInCenterSlots(int[] orderedPids)
+    {
+        if (orderedPids == null || orderedPids.Length == 0)
+            return;
+        if (playerSlotPos == null || playerSlotPos.Length == 0)
+            CapturePlayerSlotPositions();
+        if (playerSlotPos.Length == 0)
+            return;
+
+        int count = orderedPids.Length;
+        int leftGap = Mathf.Max(0, (playerSlotPos.Length - count) / 2);
+
+        for (int i = 0; i < count; i++)
         {
-            players[TurnOrder[i]].GetComponent<RectTransform>().anchoredPosition = slotPos[i];
+            int slotIndex = Mathf.Min(leftGap + i, playerSlotPos.Length - 1);
+            GameManager.Instance.players[orderedPids[i]].GetComponent<RectTransform>().anchoredPosition
+                = playerSlotPos[slotIndex];
         }
     }
 
@@ -483,6 +512,10 @@ public class CardShopManager : MonoBehaviour
         }
 
         GameLog.Debug("ShopBegin");
+
+        // 进入商店前先同步一次头像显隐：生命值≤0 的玩家一律隐藏（防止未打淘汰标记的0血玩家仍显示）
+        for (int i = 0; i < GameManager.Instance.players.Length; i++)
+            GameManager.Instance.GetPlayer(i).ApplyEliminatedState();
 
         // 新商店阶段：把刷牌权重表重置为全 1（每张卡首次全随机），权重不参与存档，读档后同样回到全 1
         HeroSelectionTool.ResetShopWeights();
