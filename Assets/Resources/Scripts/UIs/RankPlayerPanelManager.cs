@@ -52,7 +52,7 @@ public class RankPlayerPanelManager : MonoBehaviour
         btnMark.onClick.AddListener(() =>
         {
             GameManager.Instance.PlaySound("Sounds/click");
-            GameLog.Debug("点击了btnMark，开始按标记排序");
+            GameLog.Debug("点击了btnMark，开始按生命值排序");
             SortItems("mark");
         });
         closeBtn.onClick.AddListener(() =>
@@ -102,9 +102,13 @@ public class RankPlayerPanelManager : MonoBehaviour
             Destroy(child.gameObject);
         }
 
-        // 为每个英雄配置创建一个RankCell
+        // 为每个存活玩家创建一个RankCell（已淘汰玩家不再显示）
+        int aliveCount = 0;
         foreach (var playerInfo in GameManager.Instance.players)
         {
+            if (playerInfo.isEliminated)
+                continue;
+
             // 实例化RankCell
             GameObject cell = Instantiate(rankCellPrefab, rankParent.transform);
             cell.transform.localScale = Vector3.one;
@@ -115,6 +119,7 @@ public class RankPlayerPanelManager : MonoBehaviour
             {
                 cellInfo.Init(playerInfo);
             }
+            aliveCount++;
         }
         // Get the RectTransform components
          RectTransform rankParentRect = rankParent.GetComponent<RectTransform>();
@@ -123,7 +128,7 @@ public class RankPlayerPanelManager : MonoBehaviour
          if (rankParentRect != null && cellRect != null)
          {
              // Set the height of rankParent based on the number of cells
-             rankParentRect.sizeDelta = new Vector2(rankParentRect.sizeDelta.x, cellRect.sizeDelta.y * GameManager.Instance.players.Length);
+             rankParentRect.sizeDelta = new Vector2(rankParentRect.sizeDelta.x, cellRect.sizeDelta.y * aliveCount);
          }
         // 确保scrollRect不为空，然后滚动到最前面
         if (scrollRect != null)

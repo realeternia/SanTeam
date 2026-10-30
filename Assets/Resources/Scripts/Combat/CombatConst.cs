@@ -190,6 +190,8 @@ public static class CombatConst
     public const int BattleLoseExp = 2;
     /// <summary>背包英雄卡上限（最多持有15种不同英雄，重复卡计入经验不占位）</summary>
     public const int PlayerMaxHeroCards = 15;
+    /// <summary>玩家初始生命值：每轮战斗失败按 GameRoundConfig.DamageCount 扣除，生命≤0 淘汰移出游戏</summary>
+    public const int PlayerInitLife = 100;
     /// <summary>卖卡意向倍率区间：按"同卡堆总价(单价×张数)÷本家最高总价"归一后线性映射，总价越高越不舍得卖</summary>
     public const float SellValueMultiplierMin = 1f;
     public const float SellValueMultiplierMax = 3f;

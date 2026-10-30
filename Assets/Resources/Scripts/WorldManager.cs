@@ -39,6 +39,8 @@ public class WorldManager : MonoBehaviour
     private bool isPveRound = false; // 本场是否为PVE（打怪物拿掉落）
     private List<System.Tuple<int, int>> pveMonsterSpawns = null; // PVE怪物布阵（怪物id, 布阵格0~24：0=左上，24=右下）
     private int pveFightCount = 1; // PVE仅玩家0参战（1号位打2号位怪物），AI不打怪
+    private int oddPlayerSide = 0; // 单数存活玩家时随机选中的玩家号位（0=本场没有）
+    private int oddMonsterSide = 0; // 与该玩家对应的野怪号位（rule0为敌方，rule1为友方助战）
     private List<Tuple<GameObject, PlayerInfo, int>> bagDrops = new List<Tuple<GameObject, PlayerInfo, int>>(); // 怪物掉落包（BagDrop模型，获得玩家，首个掉落物id用于显示图标）
 
     // 调试阵容·开局Buff：记录"调试单位 → 配置条目"，在 BattleBegin 全部技能结算后统一施加（见 ApplyDebugBuffs）
@@ -174,6 +176,10 @@ public class WorldManager : MonoBehaviour
         }
         GameLog.Debug("[BattleInit] spawn done");
 
+        // 存活玩家≤1（其余已淘汰）：没有可匹配的对手，直接判定该玩家获胜，避免无敌人导致战斗永不结束
+        if (!isPveRound && GameManager.Instance.GetAlivePlayerIds().Count <= 1)
+            ResolveBattleWithoutOpponent();
+
         // 兵种连锁：按同职业英雄数量施加职业被动属性加成（自身加成+全队加成，不走技能系统）
         JobLinkManager.ApplyJobLinks();
         GameLog.Debug("[BattleInit] jobLink done");
@@ -255,6 +261,14 @@ public class WorldManager : MonoBehaviour
         }
 
         PanelManager.Instance.ShowShop();
+
+        // 人类玩家生命耗尽：游戏结束，回到商店界面并停住（不再开启新回合商店/新战斗）
+        if (GameManager.Instance.GetPlayer(0).isEliminated)
+        {
+            CardShopManager.Instance.EndGame();
+            return;
+        }
+
         CardShopManager.Instance.ShopBegin();
     }
 
@@ -282,31 +296,147 @@ public class WorldManager : MonoBehaviour
     private int[] GetMatch()
     {
         // 每场战斗随机生成一次1-8号位分配，战斗期间（结算/结果显示）复用同一结果
-        if (currentMatch == null)
-        {
-            currentMatch = new int[] { 0, 1, 2, 3, 4, 5, 6, 7 };
-            for (int i = currentMatch.Length - 1; i > 0; i--)
-            {
-                int j = SysRandom.Range(0, i + 1);
-                int temp = currentMatch[i];
-                currentMatch[i] = currentMatch[j];
-                currentMatch[j] = temp;
-            }
+        if (currentMatch != null)
+            return currentMatch;
 
-            // 玩家(pid=0)永远固定1号位(P1)，其余玩家随机2~8号位；
-            // 商店按积分排序只影响回合顺序turnOrder与UI头像，不改变战场号位
-            for (int i = 0; i < currentMatch.Length; i++)
-            {
-                if (currentMatch[i] == 0)
-                {
-                    int tmp = currentMatch[0];
-                    currentMatch[0] = currentMatch[i];
-                    currentMatch[i] = tmp;
-                    break;
-                }
-            }
+        currentMatch = new int[8];
+        for (int i = 0; i < currentMatch.Length; i++)
+            currentMatch[i] = -1; // -1=该号位无玩家（已淘汰/空位/野怪专用）
+        oddPlayerSide = 0;
+        oddMonsterSide = 0;
+
+        var alive = GameManager.Instance.GetAlivePlayerIds();
+        int n = alive.Count;
+        if (n == 0)
+        {
+            GameLog.Error("战斗匹配失败：已无存活玩家");
+            return currentMatch;
         }
+
+        // 单数存活玩家（3人及以上）：随机挑一名排名第3及以后的玩家（生命值排名，生命高者为前列），
+        // rule0让其对面刷野怪、rule1为其本方刷野怪助战
+        int oddPid = -1;
+        if (!isPveRound && n >= 3 && n % 2 == 1)
+        {
+            var byLife = alive.OrderByDescending(pid => GameManager.Instance.GetPlayer(pid).mark).ToList();
+            var candidates = byLife.Skip(2).ToList();
+            oddPid = candidates.Count > 0
+                ? candidates[SysRandom.Range(0, candidates.Count)]
+                : byLife[byLife.Count - 1];
+        }
+
+        int rule = mapInfo != null ? MapConfig.GetConfig(mapInfo.Mapid).Rule : 0;
+        if (oddPid >= 0 && rule == 1)
+            AssignTeamSlotsWithMonster(alive, oddPid);
+        else if (oddPid >= 0)
+            AssignPairSlotsWithMonster(alive, oddPid);
+        else
+            AssignSequentialSlots(alive);
+
+        GameLog.Debug($"[匹配] 存活{n}人 rule={rule} 选中玩家={oddPid} 野怪号位={oddMonsterSide} 号位=[{string.Join(",", currentMatch)}]");
         return currentMatch;
+    }
+
+    // 普通匹配：存活玩家随机填号位（人类固定1号位）
+    private void AssignSequentialSlots(List<int> alive)
+    {
+        var order = new List<int>(alive);
+        ShufflePids(order);
+        int zeroIndex = order.IndexOf(0);
+        if (zeroIndex > 0)
+        {
+            int tmp = order[0];
+            order[0] = order[zeroIndex];
+            order[zeroIndex] = tmp;
+        }
+        for (int i = 0; i < order.Count; i++)
+            currentMatch[i] = order[i];
+    }
+
+    // rule0独立配对 + 单数玩家：玩家从1号位起连续占位（存活玩家用前面的初始点），
+    // 被选中玩家占最后一个玩家号位、野怪刷在其对面号位（两个号位同属最后一组配对）
+    private void AssignPairSlotsWithMonster(List<int> alive, int oddPid)
+    {
+        int numSides = alive.Count + 1; // 玩家 + 野怪总数（偶数）
+        int specialSlot = numSides - 2; // 被选中玩家的0-based号位（最后一个玩家位）
+        currentMatch[specialSlot] = oddPid;
+        oddPlayerSide = specialSlot + 1;
+        oddMonsterSide = numSides;      // 野怪占最后一号位，与 specialSlot 相邻成对
+
+        var others = alive.Where(pid => pid != oddPid).ToList();
+        ShufflePids(others);
+
+        // 人类(pid0)若不是被选中玩家，固定使用第1号位
+        if (others.Contains(0))
+        {
+            others.Remove(0);
+            currentMatch[0] = 0;
+        }
+
+        // 剩余玩家按1号位起顺序填未被占用的号位（号位连续，不留空洞）
+        int idx = 0;
+        foreach (var pid in others)
+        {
+            while (idx < numSides && currentMatch[idx] >= 0)
+                idx++;
+            if (idx >= numSides)
+            {
+                GameLog.Error($"配对匹配号位不足：玩家{pid}未能分配号位");
+                break;
+            }
+            currentMatch[idx] = pid;
+            idx++;
+        }
+    }
+
+    // rule1团队 + 单数玩家：玩家+助战野怪总数(numSides)从1号位起连续占位（先用前面的初始点），
+    // 按号位奇偶分两队（1/3/5/7 与 2/4/6/8），被选中玩家与其助战野怪同队且占用最后两个同队号位
+    private void AssignTeamSlotsWithMonster(List<int> alive, int oddPid)
+    {
+        int numSides = alive.Count + 1;          // 玩家 + 野怪总数（单数玩家+1后必为偶数）
+        int monsterSlot = numSides - 1;          // 0-based 最后一个号位
+        int specialSlot = numSides - 3;          // 与野怪奇偶相同、同队的前一个号位（被选中玩家）
+
+        currentMatch[specialSlot] = oddPid;
+        currentMatch[monsterSlot] = -1;          // 野怪不占玩家槽位，生成时按 oddMonsterSide 单独刷
+        oddPlayerSide = specialSlot + 1;
+        oddMonsterSide = monsterSlot + 1;
+
+        var others = alive.Where(pid => pid != oddPid).ToList();
+        ShufflePids(others);
+
+        // 人类(pid0)若不是被选中玩家，固定使用第1号位
+        if (others.Contains(0))
+        {
+            others.Remove(0);
+            currentMatch[0] = 0;
+        }
+
+        // 剩余玩家按1号位起顺序填未被占用的号位（号位连续，不留空洞）
+        int idx = 0;
+        foreach (var pid in others)
+        {
+            while (idx < numSides && currentMatch[idx] >= 0)
+                idx++;
+            if (idx >= numSides)
+            {
+                GameLog.Error($"团队匹配号位不足：玩家{pid}未能分配号位");
+                break;
+            }
+            currentMatch[idx] = pid;
+            idx++;
+        }
+    }
+
+    private void ShufflePids(List<int> list)
+    {
+        for (int i = list.Count - 1; i > 0; i--)
+        {
+            int j = SysRandom.Range(0, i + 1);
+            int tmp = list[i];
+            list[i] = list[j];
+            list[j] = tmp;
+        }
     }
 
     private void SpawnUnitsInRegions()
@@ -350,26 +480,41 @@ public class WorldManager : MonoBehaviour
             // 非调试阵容：关闭调试用的满MP开关，避免上一次调试开局的静态值残留影响正常对局
             CombatConst.FullMpAtBattleBegin = false;
             int[] match = GetMatch();
+            // 本场所有玩家先清空参战号位（淘汰/未参战玩家保持0，供胜负判定用）
+            foreach (var player in GameManager.Instance.players)
+                player.battleSide = 0;
+
             if (isPveRound)
             {
                 // PVE：仅显示玩家0打怪局，AI不打怪
                 // 玩家0固定占1号位（GetMatch已保证match[0]=玩家0），怪物刷2号位；其余玩家无战斗单位
                 // 其他玩家（AI）战斗结束一起随机获得装备
                 for (int i = 0; i < 8; i++)
-                    GameManager.Instance.GetPlayer(match[i]).battleSide = i == 0 ? 1 : 0;
+                {
+                    if (match[i] >= 0)
+                        GameManager.Instance.GetPlayer(match[i]).battleSide = i == 0 ? 1 : 0;
+                }
 
                 if (mapInfo.SideCenters != null && mapInfo.SideCenters.Length >= 2 && mapInfo.SideCenters[0] != null)
                 {
                     var playerCenter = mapInfo.SideCenters[0];
                     var monsterCenter = mapInfo.SideCenters[1];
-                    var p = GameManager.Instance.GetPlayer(match[0]);
 
-                    SpawnSoldiersForSide(p, playerCenter, 1);
-                    SpawnHerosForSide(p, playerCenter, p.GetBattleCardList(), 1);
-                    SpawnGongSummonForSide(p, playerCenter, 1);
-                    GameLog.Debug("[BattleInit] gongSummon done");
-                    CreateCastleHUD(p, playerCenter, 1);
-                    GameLog.Debug("[BattleInit] castleHud done");
+                    if (match[0] < 0)
+                    {
+                        GameLog.Error("PVE战斗：1号位没有可用玩家，跳过玩家侧生成");
+                    }
+                    else
+                    {
+                        var p = GameManager.Instance.GetPlayer(match[0]);
+
+                        SpawnSoldiersForSide(p, playerCenter, 1);
+                        SpawnHerosForSide(p, playerCenter, p.GetBattleCardList(), 1);
+                        SpawnGongSummonForSide(p, playerCenter, 1);
+                        GameLog.Debug("[BattleInit] gongSummon done");
+                        CreateCastleHUD(p, playerCenter, 1);
+                        GameLog.Debug("[BattleInit] castleHud done");
+                    }
 
                     if (monsterCenter != null)
                         SpawnMonstersForSide(monsterCenter, 2);
@@ -380,18 +525,40 @@ public class WorldManager : MonoBehaviour
             {
                 for (int i = 0; i < 8; i++)
                 {
-                    GameManager.Instance.GetPlayer(match[i]).battleSide = i + 1;
+                    if (match[i] >= 0)
+                        GameManager.Instance.GetPlayer(match[i]).battleSide = i + 1;
                 }
                 for (int side = 1; side <= 8; side++)
                 {
-                    var p = GameManager.Instance.GetPlayer(match[side - 1]);
+                    int pid = match[side - 1];
+                    if (pid < 0)
+                        continue;
                     if (mapInfo.SideCenters == null || side - 1 >= mapInfo.SideCenters.Length || mapInfo.SideCenters[side - 1] == null)
                         continue;
+                    var p = GameManager.Instance.GetPlayer(pid);
                     var center = mapInfo.SideCenters[side - 1];
                     SpawnSoldiersForSide(p, center, side);
                     SpawnHerosForSide(p, center, p.GetBattleCardList(), side);
                     SpawnGongSummonForSide(p, center, side);
                     CreateCastleHUD(p, center, side);
+                }
+
+                // 单数存活玩家：在 oddMonsterSide 刷一组野怪（rule0为对手、rule1为助战，由号位奇偶决定敌我）
+                if (oddMonsterSide >= 1)
+                {
+                    if (pveMonsterSpawns == null || pveMonsterSpawns.Count == 0)
+                    {
+                        GameLog.Error($"单数玩家匹配：回合{GameManager.Instance.year} SoldierList 为空，无法刷野怪");
+                    }
+                    else if (mapInfo.SideCenters == null || oddMonsterSide - 1 >= mapInfo.SideCenters.Length || mapInfo.SideCenters[oddMonsterSide - 1] == null)
+                    {
+                        GameLog.Error($"单数玩家匹配：{oddMonsterSide}号位没有地图中心点，无法刷野怪");
+                    }
+                    else
+                    {
+                        SpawnMonstersForSide(mapInfo.SideCenters[oddMonsterSide - 1], oddMonsterSide);
+                        GameLog.Debug($"[匹配] 单数玩家{oddPlayerSide}号位，野怪刷{oddMonsterSide}号位");
+                    }
                 }
             }
         }
@@ -400,6 +567,11 @@ public class WorldManager : MonoBehaviour
             // 调试阵容：玩家0占1号位、玩家1占2号位，武将取自 GameManager 配置的调试列表
             // 开局满MP开关由调试阵容窗口的「开局技能MP拉满」控制（默认勾选）
             CombatConst.FullMpAtBattleBegin = GameManager.Instance.debugFullMp;
+            // 调试阵容同步参战号位（胜负判定依赖 player.battleSide）
+            foreach (var player in GameManager.Instance.players)
+                player.battleSide = 0;
+            GameManager.Instance.GetPlayer(0).battleSide = 1;
+            GameManager.Instance.GetPlayer(1).battleSide = 2;
             GameManager.Instance.GetPlayer(0).likeCount = 2;
             GameManager.Instance.GetPlayer(1).likeCount = 2;
             var center1 = mapInfo.SideCenters != null && mapInfo.SideCenters.Length > 0 ? mapInfo.SideCenters[0] : null;
@@ -880,8 +1052,9 @@ public class WorldManager : MonoBehaviour
             if (BattleResultCellPrefab != null)
             {
                 int[] match = GetMatch();
-                // 根据玩家的 mark 进行排序
+                // 根据玩家的 mark（生命值）排序（-1号位为空/已淘汰，不显示）
                 var sortedPlayers = match
+                    .Where(id => id >= 0)
                     .Select(id => new { Id = id, Mark = GameManager.Instance.GetPlayer(id)?.mark ?? 0 })
                     .OrderByDescending(p => p.Mark)
                     .Select(p => p.Id)
@@ -1272,28 +1445,36 @@ public class WorldManager : MonoBehaviour
             int pairIdx = dieUnit.side / 2 - 1;
             if (pairIdx >= 0 && pairIdx < pveFightCount)
             {
-                var p = GameManager.Instance.GetPlayer(match[pairIdx]);
-                var drops = new List<int>();
-                if (SoldierConfig.GetConfig(dieUnit.soldierId).IsDrop)
+                int pid = match[pairIdx];
+                if (pid < 0)
                 {
-                    int dropItemId = RollDropItem(GameManager.Instance.year);
-                    if (dropItemId > 0)
-                        drops.Add(dropItemId);
+                    GameLog.Warn($"PVE怪物死亡：{pairIdx + 1}号配对没有玩家，跳过掉落");
                 }
-                foreach (var itemId in drops)
+                else
                 {
-                    p.AddItemCard(itemId);
-                    var itemName = ItemConfig.HasConfig(itemId) ? ItemConfig.GetConfig(itemId).Name : itemId.ToString();
-                    AddBattleText("掉落:" + itemName, dieUnit.transform.position, new UnityEngine.Vector2(0, 40), Color.yellow, 3);
-                    GameLog.Debug($"[PVE] 玩家{p.pid} 击杀怪物{dieUnit.soldierId} 掉落 {itemName}({itemId})");
-                }
+                    var p = GameManager.Instance.GetPlayer(pid);
+                    var drops = new List<int>();
+                    if (SoldierConfig.GetConfig(dieUnit.soldierId).IsDrop)
+                    {
+                        int dropItemId = RollDropItem(GameManager.Instance.year);
+                        if (dropItemId > 0)
+                            drops.Add(dropItemId);
+                    }
+                    foreach (var itemId in drops)
+                    {
+                        p.AddItemCard(itemId);
+                        var itemName = ItemConfig.HasConfig(itemId) ? ItemConfig.GetConfig(itemId).Name : itemId.ToString();
+                        AddBattleText("掉落:" + itemName, dieUnit.transform.position, new UnityEngine.Vector2(0, 40), Color.yellow, 3);
+                        GameLog.Debug($"[PVE] 玩家{p.pid} 击杀怪物{dieUnit.soldierId} 掉落 {itemName}({itemId})");
+                    }
 
-                // 有掉落时在怪物位置创建掉落包模型，战斗结束时变成卡牌飞向玩家头像
-                if (drops.Count > 0)
-                {
-                    var bagPrefab = Resources.Load<GameObject>("Prefabs/Battles/BagDrop");
-                    var bag = Instantiate(bagPrefab, dieUnit.transform.position, Quaternion.identity, Units.transform);
-                    bagDrops.Add(Tuple.Create(bag, p, drops[0]));
+                    // 有掉落时在怪物位置创建掉落包模型，战斗结束时变成卡牌飞向玩家头像
+                    if (drops.Count > 0)
+                    {
+                        var bagPrefab = Resources.Load<GameObject>("Prefabs/Battles/BagDrop");
+                        var bag = Instantiate(bagPrefab, dieUnit.transform.position, Quaternion.identity, Units.transform);
+                        bagDrops.Add(Tuple.Create(bag, p, drops[0]));
+                    }
                 }
             }
         }
@@ -1320,13 +1501,16 @@ public class WorldManager : MonoBehaviour
         // 全部配对结束：结算参战玩家（玩家存活=击杀全部怪物=胜利），PVE不加分都是0分
         for (int i = 0; i < pveFightCount; i++)
         {
+            if (match[i] < 0)
+                continue;
             bool isWin = sideHasUnits[i * 2];
             GameManager.Instance.GetPlayer(match[i]).onBattleResult(isWin, 0);
         }
 
         gameFinish = true;
-        int player0Idx = Array.IndexOf(match, 0);
-        hasWin = player0Idx >= pveFightCount || sideHasUnits[player0Idx * 2];
+        // 人类玩家胜负按其实际参战号位判定（淘汰玩家 battleSide=0 记为失败）
+        int p0Side = GameManager.Instance.GetPlayer(0).battleSide;
+        hasWin = p0Side >= 1 && sideHasUnits[p0Side - 1];
     }
 
     // PVE：从 ItemConfig 掉落池加权随机一个道具，返回 0 表示无可用掉落。
@@ -1364,6 +1548,8 @@ public class WorldManager : MonoBehaviour
         int[] match = GetMatch();
         for (int i = pveFightCount; i < match.Length; i++)
         {
+            if (match[i] < 0)
+                continue;
             var p = GameManager.Instance.GetPlayer(match[i]);
             foreach (var spawn in pveMonsterSpawns)
             {
@@ -1379,12 +1565,34 @@ public class WorldManager : MonoBehaviour
         }
     }
 
+    // 存活玩家≤1：无对手可匹配，直接给存活玩家判定胜利（不产生战斗过程，但仍然走正常结算/扣血流程）
+    private void ResolveBattleWithoutOpponent()
+    {
+        int[] match = GetMatch();
+        int p0Side = GameManager.Instance.GetPlayer(0).battleSide;
+        for (int i = 0; i < match.Length; i++)
+        {
+            int pid = match[i];
+            if (pid < 0)
+                continue;
+            killMark[pid] = 10;
+            GameManager.Instance.GetPlayer(pid).onBattleResult(true, 10);
+        }
+        hasWin = p0Side >= 1;
+        gameFinish = true;
+        GameLog.Info($"匹配无对手（存活玩家≤1），直接判定存活玩家获胜，共{GameManager.Instance.GetAlivePlayerIds().Count}人");
+    }
+
     public void OnUnitDying(Chess dieUnit, int killerPlayerId)
     {
         if(killerPlayerId >= 0 && killerPlayerId < killMark.Length && dieUnit.isHero)
             killMark[killerPlayerId]++;
         // 从chessList中移除死亡单位
         chessList.Remove(dieUnit);
+
+        // 本场已判定结束：同一 tick 内其余单位阵亡不再重复结算（避免重复扣血/重复计分）
+        if (gameFinish)
+            return;
 
         // 注意：这里绝不能重置 gameFinish/hasWin。同一 tick 内先后有多个单位阵亡时，
         // 后一次死亡会把前一次已判定的结束标记抹掉；而该次死亡后的存活情况可能不再满足结束条件，
@@ -1443,15 +1651,20 @@ public class WorldManager : MonoBehaviour
                 int[] match = GetMatch();
                 for (int i = 0; i < match.Length; i++)
                 {
+                    int pid = match[i];
+                    if (pid < 0)
+                        continue;
                     if (sideHasUnits[i])
-                        killMark[match[i]] = 10;
+                        killMark[pid] = 10;
                     else
-                        killMark[match[i]] = Math.Min(5, killMark[match[i]]);
+                        killMark[pid] = Math.Min(5, killMark[pid]);
 
-                    GameManager.Instance.GetPlayer(match[i]).onBattleResult(sideHasUnits[i], killMark[match[i]]);
+                    GameManager.Instance.GetPlayer(pid).onBattleResult(sideHasUnits[i], killMark[pid]);
                 }
                 gameFinish = true;
-                hasWin = sideHasUnits[0];
+                // 人类玩家的胜负按其实际参战号位判定（人类可能已淘汰，battleSide=0 时记为失败）
+                int p0Side = GameManager.Instance.GetPlayer(0).battleSide;
+                hasWin = p0Side >= 1 && sideHasUnits[p0Side - 1];
             }
         }
         else if (MapConfig.GetConfig(mapInfo.Mapid).Rule == 1)
@@ -1483,19 +1696,25 @@ public class WorldManager : MonoBehaviour
                 int[] match = GetMatch();
                 for (int i = 0; i < match.Length; i++)
                 {
+                    int pid = match[i];
+                    if (pid < 0)
+                        continue;
                     int playerSide = i + 1; // 假设match索引对应阵营1-6
                     bool isTeam1 = playerSide == 1 || playerSide == 3 || playerSide == 5 || playerSide == 7;
                     bool isWinner = (isTeam1 && team1HasUnits) || (!isTeam1 && team2HasUnits);
 
                     if (isWinner)
-                        killMark[match[i]] = 10;
+                        killMark[pid] = 10;
                     else
-                        killMark[match[i]] = Math.Min(5, killMark[match[i]]);
+                        killMark[pid] = Math.Min(5, killMark[pid]);
 
-                    GameManager.Instance.GetPlayer(match[i]).onBattleResult(isWinner, killMark[match[i]]);
+                    GameManager.Instance.GetPlayer(pid).onBattleResult(isWinner, killMark[pid]);
                 }
                 gameFinish = true;
-                hasWin = team1HasUnits;
+                // 人类玩家胜负按其实际参战号位所在的队伍判定（淘汰玩家 battleSide=0 记为失败）
+                int p0Side = GameManager.Instance.GetPlayer(0).battleSide;
+                bool p0Team1 = p0Side == 1 || p0Side == 3 || p0Side == 5 || p0Side == 7;
+                hasWin = p0Side >= 1 && (p0Team1 ? team1HasUnits : team2HasUnits);
             }
         }
        else if (MapConfig.GetConfig(mapInfo.Mapid).Rule == 2)
@@ -1575,6 +1794,8 @@ public class WorldManager : MonoBehaviour
                 for (int i = 0; i < match.Length; i++)
                 {
                     int playerId = match[i];
+                    if (playerId < 0)
+                        continue;
                     int playerSide = i + 1; // 假设match索引对应阵营1-6
                     bool isWinner = (playerSide == winnerSide);
 
@@ -1583,7 +1804,9 @@ public class WorldManager : MonoBehaviour
                 }
 
                 gameFinish = true;
-                hasWin = sideHasUnits[0]; // 假设阵营1是玩家阵营
+                // 人类玩家胜负按其实际参战号位判定（淘汰玩家 battleSide=0 记为失败）
+                int p0Side = GameManager.Instance.GetPlayer(0).battleSide;
+                hasWin = p0Side >= 1 && sideHasUnits[p0Side - 1];
             }
         }
     }

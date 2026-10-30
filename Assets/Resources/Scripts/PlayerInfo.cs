@@ -38,8 +38,12 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     // 上一局是否失败（战斗开始类技能判定用，如「文」的获得道具概率加成；首局默认false=无加成）
     [CustomSerializeField]
     public bool lastBattleLose;
+    // 生命值（沿用字段名 mark）：初始 CombatConst.PlayerInitLife，每轮战斗失败按 GameRoundConfig.DamageCount 扣除
     [CustomSerializeField]
     public int mark;
+    // 是否已淘汰（生命值≤0 后移出游戏：头像隐藏、不再参与商店轮转与战斗匹配）
+    [CustomSerializeField]
+    public bool isEliminated;
     [CustomSerializeField]
     public Dictionary<int, int> cards = new Dictionary<int, int>(); // cardid - > exp（仅英雄卡）
     [CustomSerializeField]
@@ -103,6 +107,9 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         isAI = id > 0;
 
         gold = 0;
+        mark = CombatConst.PlayerInitLife;
+        isEliminated = false;
+        ApplyEliminatedState();
 
         SetPlayerData();
         EnsureSoldierCells();
@@ -1189,15 +1196,56 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 
     public void onBattleResult(bool isWin, int add)
     {
-        if(isWin)
+        if (isEliminated)
+            return;
+
+        if (isWin)
             winCount++;
         else
             loseCount++;
         lastBattleLose = !isWin;
-        mark += add;
+
+        // 每轮战斗失败扣除本回合配置的生命值；生命≤0 淘汰并移出游戏
+        if (!isWin)
+        {
+            int round = Mathf.Clamp(GameManager.Instance.year, 1, 100);
+            int damage = 0;
+            if (GameRoundConfig.HasConfig(round))
+                damage = GameRoundConfig.GetConfig(round).DamageCount;
+            else
+                GameLog.Error($"战斗失败扣血：GameRoundConfig 缺少回合{round}配置，扣血为0");
+
+            mark -= damage;
+            GameLog.Debug($"玩家{pid} 战斗失败，扣除生命{damage}，剩余{mark}");
+            if (mark <= 0)
+            {
+                mark = 0;
+                Eliminate();
+            }
+        }
+
         resultText.text = mark.ToString();
         // 玩家等级体系：战斗获胜/失败获得经验（参考金铲铲，节奏放慢一倍：胜利+2，失败+1）
         AddExp(isWin ? CombatConst.BattleWinExp : CombatConst.BattleLoseExp);
+    }
+
+    // 生命值耗尽：标记淘汰并隐藏头像（顶部玩家列表不再显示，后续商店/匹配都不再参与）
+    private void Eliminate()
+    {
+        if (isEliminated)
+            return;
+
+        isEliminated = true;
+        isOnTurn = false;
+        SetRoundOver(false);
+        ApplyEliminatedState();
+        GameLog.Info($"玩家{pid}({playerName}) 生命值耗尽，已移出游戏");
+    }
+
+    // 按淘汰状态同步头像显隐（读档后也需要调用，保证隐藏的玩家不复活）
+    public void ApplyEliminatedState()
+    {
+        gameObject.SetActive(!isEliminated);
     }
 
     // ---- 玩家等级体系 ----
@@ -1775,6 +1823,11 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         MigrateLegacyItemsToItems();
         // 兼容旧存档：剔除 items 中配置表里已不存在的道具（401002士兵剑/401003士兵甲已移除），避免UI空引用
         RemoveObsoleteItemCards();
+        // 按存档中的淘汰标记同步头像显隐（旧存档没有该字段时默认未淘汰）
+        // 旧存档的 mark 是积分制（可能为0或负数），载入时视为满生命，避免读档后立刻被淘汰
+        if (!isEliminated && mark <= 0)
+            mark = CombatConst.PlayerInitLife;
+        ApplyEliminatedState();
     }
 
     // 兼容旧存档：把 cards 中混入的物品条目迁移到独立的 items 容器（物品无 exp，纯数量）

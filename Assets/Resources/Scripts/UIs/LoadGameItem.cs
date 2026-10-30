@@ -48,7 +48,7 @@ public class LoadGameItem : MonoBehaviour
             string markStr = SysColor.ColorText(summary.mark.ToString(), SysColor.UI.SaveMark);
             string goldStr = SysColor.ColorText(summary.gold.ToString(), SysColor.UI.SaveGold);
             string timeStr = SysColor.ColorText(GetTimeAgo(summary.saveTime), SysColor.UI.SaveTime);
-            infoText.text = yearStr + "  积分:" + markStr + "  金钱:" + goldStr + "  " + timeStr;
+            infoText.text = yearStr + "  生命:" + markStr + "  金钱:" + goldStr + "  " + timeStr;
         }
 
         if (selfBtn != null)

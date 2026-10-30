@@ -29,8 +29,9 @@ public class BattleResultCellControl : MonoBehaviour
     {
         playerName.text = player.playerNameText.text;
 
-        playerRank.text = rank.ToString(); // 假设按match顺序排列
-        playerMark.text = $"<color=white>{player.mark}</color> (<color=green>+{killMark}</color>)";
+        playerRank.text = rank.ToString(); // 按生命值(mark)由高到低排序的名次
+        // mark 现为生命值：失败扣血后直接显示剩余生命（生命≤0 表示已淘汰）
+        playerMark.text = $"生命 <color=white>{player.mark}</color>";
 
 
         playerIcon.sprite = player.playerImage.sprite;

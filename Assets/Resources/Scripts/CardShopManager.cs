@@ -45,6 +45,8 @@ public class CardShopManager : MonoBehaviour
     public int[] TurnOrder { get; private set; } = new int[8];
     /// <summary>本商店阶段是否已结束</summary>
     public bool IsShopEnd { get; set; }
+    /// <summary>游戏是否已结束（人类玩家生命耗尽后置true：回到商店界面并停住，不再开新回合/新战斗）</summary>
+    public bool GameOver { get; private set; }
     /// <summary>当前商店阶段计数（供 AI 评分）</summary>
     public int Era => era;
 
@@ -53,6 +55,22 @@ public class CardShopManager : MonoBehaviour
 
     private Coroutine shopCoroutine;
 
+
+    // 人类玩家生命耗尽：游戏结束，回到商店界面并停住（不再开启新回合、不再进入战斗）
+    public void EndGame()
+    {
+        if (GameOver)
+            return;
+
+        GameOver = true;
+        IsShopEnd = true;
+        if (shopCoroutine != null)
+            StopCoroutine(shopCoroutine);
+        shopCoroutine = null;
+        passBtn.gameObject.SetActive(false);
+        refreshBtn.gameObject.SetActive(false);
+        GameLog.Info("玩家生命值耗尽，游戏结束：已回到商店界面并停止");
+    }
 
     // Start is called before the first frame update
     void Start()
@@ -308,19 +326,20 @@ public class CardShopManager : MonoBehaviour
             mySelect.QuickViewFin();
     }
 
-    // 商店开始时：按积分(mark)从低到高排序玩家，积分相同金币少的排前，再相同按pid排
-    // 同时调整玩家位置（第1名排在最左边），回合顺序也按该排序
+    // 商店开始时：只对存活玩家按生命值(mark)从低到高排序，生命相同金币少的排前，再相同按pid排
+    // 同时调整玩家位置（第1名排在最左边），回合顺序也按该排序；已淘汰玩家不占位置、不参与轮转
     private void SortPlayersByScore()
     {
         var players = GameManager.Instance.players;
+        var alivePlayers = players.Where(p => !p.isEliminated).ToArray();
 
-        // 槽位位置：按当前X坐标从左到右排列，即第1名位置在最左
-        var slotPos = players
+        // 槽位位置：按存活玩家当前X坐标从左到右排列，即第1名位置在最左
+        var slotPos = alivePlayers
             .Select(p => p.GetComponent<RectTransform>().anchoredPosition)
             .OrderBy(pos => pos.x)
             .ToArray();
 
-        TurnOrder = players
+        TurnOrder = alivePlayers
             .OrderBy(p => p.mark)
             .ThenBy(p => p.gold)
             .ThenBy(p => p.pid)
@@ -338,10 +357,15 @@ public class CardShopManager : MonoBehaviour
         if(GameManager.Instance.year <= 2)
             return;
 
-        // 获取所有玩家
+        // 获取所有存活玩家（已淘汰玩家不参与落后补金）
         var players = new List<(int id, int gold)>();
         foreach (var player in GameManager.Instance.players)
-            players.Add((player.pid, player.gold));
+        {
+            if (!player.isEliminated)
+                players.Add((player.pid, player.gold));
+        }
+        if (players.Count < 3)
+            return;
 
         // 按金币数量升序排序
         players.Sort((a, b) => a.gold.CompareTo(b.gold));
@@ -409,17 +433,26 @@ public class CardShopManager : MonoBehaviour
 
     private void BeginEraCommon()
     {
-        // 新商店阶段的公共开场：重置回合/era 状态、记录开局金币、落后补金
+        // 新商店阶段的公共开场：重置回合/era 状态、记录开局金币、落后补金（已淘汰玩家不参与）
         foreach (var player in GameManager.Instance.players)
-            player.OnEra(era);
+        {
+            if (!player.isEliminated)
+                player.OnEra(era);
+        }
 
         eraText.text = ShopCfg.Name;
 
         for (int i = 0; i < 8; i++)
-            GameManager.Instance.GetPlayer(i).SetRoundOver(false);
+        {
+            if (!GameManager.Instance.GetPlayer(i).isEliminated)
+                GameManager.Instance.GetPlayer(i).SetRoundOver(false);
+        }
 
         for (int i = 0; i < 8; i++)
-            playerStartGold[i] = GameManager.Instance.GetPlayer(i).gold; // 记录开局金币
+        {
+            if (!GameManager.Instance.GetPlayer(i).isEliminated)
+                playerStartGold[i] = GameManager.Instance.GetPlayer(i).gold; // 记录开局金币
+        }
 
         CheckEraBonusGold();
 
@@ -442,6 +475,13 @@ public class CardShopManager : MonoBehaviour
 
     public void ShopBegin()
     {
+        // 玩家已生命耗尽、游戏结束：不再开启新回合商店
+        if (GameOver)
+        {
+            GameLog.Warn("游戏已结束，忽略 ShopBegin");
+            return;
+        }
+
         GameLog.Debug("ShopBegin");
 
         // 新商店阶段：把刷牌权重表重置为全 1（每张卡首次全随机），权重不参与存档，读档后同样回到全 1
@@ -460,14 +500,20 @@ public class CardShopManager : MonoBehaviour
         {
             GameLog.Debug("FirstRound ck");
             for(int i = 0; i < 8; i++)
-                GameManager.Instance.GetPlayer(i).FirstRound();
+            {
+                if (!GameManager.Instance.GetPlayer(i).isEliminated)
+                    GameManager.Instance.GetPlayer(i).FirstRound();
+            }
         }
 
         var shopOpenIndex = GameManager.Instance.year; //第几场比赛
         ShopCfg = GameRoundConfig.GetConfig(Math.Min(100, shopOpenIndex + 1));
         var roundGold = ShopCfg.RoundGold;
         for(int i = 0; i < 8; i++)
-            GameManager.Instance.GetPlayer(i).RoundGold(roundGold);
+        {
+            if (!GameManager.Instance.GetPlayer(i).isEliminated)
+                GameManager.Instance.GetPlayer(i).RoundGold(roundGold);
+        }
 
         // 每回合商店阶段重置"当回合已买入卡"记录：当回合买入的新卡当回合不卖
         for (int i = 0; i < 8; i++)
@@ -475,10 +521,20 @@ public class CardShopManager : MonoBehaviour
 
         SortPlayersByScore();
 
+        // 全部玩家都已淘汰：没有可开启商店的对象，直接进入结算流程
+        if (TurnOrder == null || TurnOrder.Length == 0)
+        {
+            GameLog.Error("商店开始失败：已无存活玩家");
+            RequestEnd();
+            return;
+        }
+
         // AI进商店：先把背包里的材料装备随机两两合成高级装备，再给英雄穿装备、自动使用消耗品（三方法内部只对 AI 生效）
         for (int i = 0; i < 8; i++)
         {
             var aiPlayer = GameManager.Instance.GetPlayer(i);
+            if (aiPlayer.isEliminated)
+                continue;
             aiPlayer.AutoCombineItems();
             aiPlayer.AutoEquipItems();
             aiPlayer.AutoUseItems();
@@ -497,7 +553,7 @@ public class CardShopManager : MonoBehaviour
         for (int i = 1; i < 8; i++)
         {
             var aiP = GameManager.Instance.GetPlayer(i);
-            if (aiP.isAI)
+            if (aiP.isAI && !aiP.isEliminated)
                 PlayerAI.ShopBegin(aiP);
         }
 
@@ -509,6 +565,8 @@ public class CardShopManager : MonoBehaviour
     /// <summary>由商店模式在本阶段结束时调用：进入战斗</summary>
     public void RequestEnd()
     {
+        if (GameOver)
+            return;
         if (IsShopEnd)
             return;
         IsShopEnd = true;

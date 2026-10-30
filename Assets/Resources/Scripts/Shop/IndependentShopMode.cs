@@ -24,24 +24,40 @@ public class IndependentShopMode : ShopMode
         humanEnded = false;
         aiShops.Clear();
 
-        // 人类(pid0)私有 5 格（按本人等级概率刷牌，like 走本人收藏池）
-        int humanLevel = GameManager.Instance.GetPlayer(0).level;
-        for (int i = 0; i < SLOT_COUNT; i++)
+        var human = GameManager.Instance.GetPlayer(0);
+        // 人类已淘汰：没有可操作的商店，直接跳过人类阶段
+        if (human.isEliminated)
         {
-            var offer = RollOffer(humanLevel, 0);
-            host.cardViews.Add(host.CreateCardView(offer.cardId));
+            humanEnded = true;
+            host.passBtn.gameObject.SetActive(false);
+            GameLog.Debug("独立买卡商店：人类玩家已淘汰，跳过人类购买阶段");
         }
-        host.LayoutCards(host.cardViews, SLOT_COUNT, 3);
+        else
+        {
+            // 人类(pid0)私有 5 格（按本人等级概率刷牌，like 走本人收藏池）
+            int humanLevel = human.level;
+            for (int i = 0; i < SLOT_COUNT; i++)
+            {
+                var offer = RollOffer(humanLevel, 0);
+                host.cardViews.Add(host.CreateCardView(offer.cardId));
+            }
+            host.LayoutCards(host.cardViews, SLOT_COUNT, 3);
 
-        // AI(pid1~7)各生成私有 5 格（无 UI，各自按本人等级概率刷牌，like 走各自收藏池）
+            host.passBtn.gameObject.SetActive(true);
+            host.SetPassButtonLabel("结束");
+
+            GameManager.Instance.OnPlayerTurn(0);
+            host.mySelect.UpdateCards(human);
+        }
+
+        // AI(pid1~7)各生成私有 5 格（无 UI，各自按本人等级概率刷牌，like 走各自收藏池；已淘汰AI不参与）
         for (int pid = 1; pid < 8; pid++)
-            aiShops[pid] = BuildOffers(GameManager.Instance.GetPlayer(pid).level, SLOT_COUNT, pid);
-
-        host.passBtn.gameObject.SetActive(true);
-        host.SetPassButtonLabel("结束");
-
-        GameManager.Instance.OnPlayerTurn(0);
-        host.mySelect.UpdateCards(GameManager.Instance.GetPlayer(0));
+        {
+            var aiPlayer = GameManager.Instance.GetPlayer(pid);
+            if (aiPlayer.isEliminated)
+                continue;
+            aiShops[pid] = BuildOffers(aiPlayer.level, SLOT_COUNT, pid);
+        }
     }
 
     public override PlayerInfo GetActingPlayer()
@@ -104,7 +120,7 @@ public class IndependentShopMode : ShopMode
                 yield return new WaitForSeconds(0.2f);
 
             var player = GameManager.Instance.GetPlayer(pid);
-            if (player.nextSkip)
+            if (player.isEliminated || player.nextSkip)
                 continue;
 
             int refreshes = 0;

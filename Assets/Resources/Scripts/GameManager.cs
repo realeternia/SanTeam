@@ -135,6 +135,18 @@ public class GameManager : MonoBehaviour
         return players[pid];
     }
 
+    // 存活玩家pid列表（已淘汰玩家不参与商店轮转/战斗匹配，也不再显示在顶部玩家列表）
+    public List<int> GetAlivePlayerIds()
+    {
+        var list = new List<int>();
+        foreach (var p in players)
+        {
+            if (!p.isEliminated)
+                list.Add(p.pid);
+        }
+        return list;
+    }
+
     public PlayerInfo GetFirstNoAiPlayer()
     {
         foreach(var p in players)

@@ -23,8 +23,16 @@ public class SharedShopMode : ShopMode
     {
         host.ClearCards();
 
+        // 全部玩家都已淘汰：没有可轮转的玩家，直接结束本商店阶段
+        if (host.TurnOrder == null || host.TurnOrder.Length == 0)
+        {
+            GameLog.Error("共享商店：无存活玩家，直接结束商店阶段");
+            host.RequestEnd();
+            return;
+        }
+
         var shopCfg = host.ShopCfg;
-        // 进入商店第一个 round：生成共享板走第一个玩家（积分最低者）的 like 判断
+        // 进入商店第一个 round：生成共享板走第一个玩家（生命值最低者）的 like 判断
         int firstPid = host.TurnOrder[0];
         List<int> heroIds = new List<int>();
         int TOTAL_HERO_CARDS = 15;
@@ -210,9 +218,11 @@ public class SharedShopMode : ShopMode
         }
     }
 
-    // 当前回合序号对应的玩家pid（回合顺序按积分低到高）
+    // 当前回合序号对应的玩家pid（回合顺序按生命值低到高，仅包含存活玩家）
     private int GetTurnPid()
     {
+        if (host.TurnOrder == null || host.TurnOrder.Length == 0)
+            return -1;
         return host.TurnOrder[round % host.TurnOrder.Length];
     }
 
@@ -238,8 +248,8 @@ public class SharedShopMode : ShopMode
     {
         NextTurn();
 
-        // 只有一轮选牌：所有玩家都跳过时，选牌阶段结束进入战斗
-        if (passedPlayers >= 8)
+        // 只有一轮选牌：所有存活玩家都跳过时，选牌阶段结束进入战斗
+        if (passedPlayers >= host.TurnOrder.Length)
             host.RequestEnd();
     }
 
