@@ -21,6 +21,8 @@ public class IndependentShopMode : ShopMode
     public override void Begin()
     {
         host.ClearCards();
+        // 独立买卡商店支持卡牌锁定（仅人类私有卡位）
+        host.SetLockMode(true);
         humanEnded = false;
         aiShops.Clear();
 
@@ -35,11 +37,30 @@ public class IndependentShopMode : ShopMode
         else
         {
             // 人类(pid0)私有 5 格（按本人等级概率刷牌，like 走本人收藏池）
+            // 上一商店阶段锁定的卡位在本阶段保持原卡牌与原位置
             int humanLevel = human.level;
             for (int i = 0; i < SLOT_COUNT; i++)
             {
-                var offer = RollOffer(humanLevel, 0);
-                host.cardViews.Add(host.CreateCardView(offer.cardId));
+                int lockedCardId = host.GetLockedCardId(i);
+                int heroId;
+                if (lockedCardId > 0 && HeroConfig.HasConfig(lockedCardId))
+                {
+                    heroId = lockedCardId;
+                }
+                else
+                {
+                    if (lockedCardId > 0)
+                    {
+                        GameLog.Warn($"独立买卡商店：卡位{i}的锁定卡牌 {lockedCardId} 配置不存在，改为随机刷牌");
+                        host.RemoveShopLock(i);
+                    }
+                    heroId = RollOffer(humanLevel, 0).cardId;
+                }
+
+                var view = host.CreateCardView(heroId);
+                view.shopSlotIndex = i;
+                view.SetLocked(lockedCardId > 0 && heroId == lockedCardId);
+                host.cardViews.Add(view);
             }
             host.LayoutCards(host.cardViews, SLOT_COUNT, 3);
 
@@ -165,8 +186,14 @@ public class IndependentShopMode : ShopMode
         {
             for (int i = 0; i < host.cardViews.Count; i++)
             {
+                // 锁定的卡位刷新时保持原卡牌，位置也不变
+                if (host.cardViews[i].isLocked)
+                    continue;
+
                 var offer = RollOffer(player.level, 0);
                 host.ReplaceCardAt(i, offer.cardId);
+                // 新卡位重新登记槽位索引，锁定状态才可存档
+                host.cardViews[i].shopSlotIndex = i;
             }
         }
         else

@@ -22,6 +22,8 @@ public class SharedShopMode : ShopMode
     public override void Begin()
     {
         host.ClearCards();
+        // 共享商店不支持锁定：隐藏锁定按钮并清空锁定记录
+        host.SetLockMode(false);
 
         // 全部玩家都已淘汰：没有可轮转的玩家，直接结束本商店阶段
         if (host.TurnOrder == null || host.TurnOrder.Length == 0)

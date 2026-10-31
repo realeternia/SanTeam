@@ -15,6 +15,14 @@ public class GameManager : MonoBehaviour
         public string name;
         public int[] friendIds;
     }
+
+    /// <summary>商店卡位锁定记录（独立买卡商店：槽位索引 + 锁定的英雄卡Id）</summary>
+    [System.Serializable]
+    public class ShopLockData
+    {
+        public int slotIndex;
+        public int cardId;
+    }
     
     // 用于Unity JsonUtility序列化的辅助类
     [System.Serializable]
@@ -23,6 +31,7 @@ public class GameManager : MonoBehaviour
         public List<string> players = new List<string>();
         public List<FriendRandomData> friendRdData = new List<FriendRandomData>();
         public List<int> heroIds = new List<int>();
+        public List<ShopLockData> shopLocks = new List<ShopLockData>();
         public int year;
     }
 
@@ -58,6 +67,8 @@ public class GameManager : MonoBehaviour
     public PlayerInfo[] players; //不能new，都是配置好的
     public List<FriendRandomData> friendRdData;
     public List<int> heroIds;
+    /// <summary>商店卡位锁定状态（随存档持久化，独立买卡商店的人类私有卡位）</summary>
+    public List<ShopLockData> shopLocks = new List<ShopLockData>();
     public int year;
     /// <summary>当前存档槽位（-1 表示尚未选择/新建）</summary>
     public int currentSaveSlot = -1;
@@ -114,6 +125,7 @@ public class GameManager : MonoBehaviour
     public void ResetPlayersForNewGame()
     {
         year = 0;
+        shopLocks.Clear();
 
         players[0].ResetForNewGame(0, PlayerBook.GetWang());
         var pls = PlayerBook.GetRandomN(7);
@@ -367,6 +379,11 @@ public class GameManager : MonoBehaviour
                 heroIds.AddRange(saveData.heroIds);
             }
 
+            // 加载商店卡位锁定状态
+            shopLocks = saveData.shopLocks != null
+                ? new List<ShopLockData>(saveData.shopLocks)
+                : new List<ShopLockData>();
+
             currentSaveSlot = slot;
             GameLog.Debug("游戏数据加载成功 slot=" + slot + " year=" + year);
         }
@@ -437,6 +454,12 @@ public class GameManager : MonoBehaviour
             if (heroIds != null)
             {
                 saveData.heroIds.AddRange(heroIds);
+            }
+
+            // 保存商店卡位锁定状态
+            if (shopLocks != null)
+            {
+                saveData.shopLocks.AddRange(shopLocks);
             }
             
             // 使用JsonUtility序列化数据

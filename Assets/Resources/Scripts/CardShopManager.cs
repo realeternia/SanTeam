@@ -53,6 +53,9 @@ public class CardShopManager : MonoBehaviour
     /// <summary>当前激活的商店模式</summary>
     public ShopMode Mode { get; private set; }
 
+    /// <summary>当前商店是否启用卡牌锁定（仅独立买卡模式的人类私有卡位）</summary>
+    public bool LockEnabled { get; private set; }
+
     private Coroutine shopCoroutine;
 
 
@@ -164,7 +167,67 @@ public class CardShopManager : MonoBehaviour
         GameObject card = Instantiate(cardViewPrefab, transform);
         CardViewControl cardView = card.GetComponent<CardViewControl>();
         cardView.Init(heroId, true, GameManager.Instance.year);
+        cardView.SetLockButtonVisible(LockEnabled);
         return cardView;
+    }
+
+    /// <summary>设置当前商店是否启用卡牌锁定：不启用时清空锁定记录并隐藏全部锁定按钮</summary>
+    public void SetLockMode(bool enabled)
+    {
+        LockEnabled = enabled;
+        if (!enabled)
+            GameManager.Instance.shopLocks.Clear();
+
+        foreach (var v in cardViews)
+        {
+            if (v != null)
+                v.SetLockButtonVisible(enabled && !v.isSold);
+        }
+    }
+
+    /// <summary>切换卡位锁定状态（仅独立买卡商店人类私有卡位可操作）</summary>
+    public void ToggleLock(CardViewControl view)
+    {
+        if (!LockEnabled || view == null || view.isSold)
+            return;
+
+        SetCardLocked(view, !view.isLocked);
+        GameManager.Instance.PlaySound("Sounds/click");
+        // 锁定状态需要存档：切换后立即写档
+        GameManager.Instance.SaveToFile();
+    }
+
+    /// <summary>设置卡位锁定状态并同步存档记录</summary>
+    public void SetCardLocked(CardViewControl view, bool locked)
+    {
+        if (view == null)
+            return;
+
+        view.SetLocked(locked);
+
+        if (view.shopSlotIndex < 0)
+        {
+            GameLog.Warn($"卡位(卡牌Id={view.cardId})未登记槽位索引，锁定状态不会存档");
+            return;
+        }
+
+        var locks = GameManager.Instance.shopLocks;
+        locks.RemoveAll(l => l.slotIndex == view.shopSlotIndex);
+        if (locked)
+            locks.Add(new GameManager.ShopLockData { slotIndex = view.shopSlotIndex, cardId = view.cardId });
+    }
+
+    /// <summary>读取某卡位锁定的卡牌Id（未锁定返回0）</summary>
+    public int GetLockedCardId(int slotIndex)
+    {
+        var lockData = GameManager.Instance.shopLocks.Find(l => l.slotIndex == slotIndex);
+        return lockData != null ? lockData.cardId : 0;
+    }
+
+    /// <summary>清除某卡位的锁定记录</summary>
+    public void RemoveShopLock(int slotIndex)
+    {
+        GameManager.Instance.shopLocks.RemoveAll(l => l.slotIndex == slotIndex);
     }
 
     /// <summary>按网格排布卡位：perRow 为每行张数，centerRows 用于垂直居中（沿用原共享商店布局公式）</summary>
@@ -332,8 +395,13 @@ public class CardShopManager : MonoBehaviour
             return false;
         }
 
+        // 买走锁定卡后解除该卡位锁定（BuyCard 内部 OnSold 会清空 isLocked，故先记录）
+        bool wasLocked = ctr != null && ctr.isLocked;
+
         if (player.BuyCard(ctr, cardId, isHero, price))
         {
+            if (wasLocked)
+                SetCardLocked(ctr, false);
             mySelect.UpdateCards(player);
             // 通知模式：共享=触发售出倒计时/相邻刷新；独立=无
             Mode?.OnBought(new ShopOffer

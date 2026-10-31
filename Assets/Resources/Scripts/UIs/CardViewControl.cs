@@ -11,6 +11,8 @@ public class CardViewControl : MonoBehaviour, IPointerDownHandler, IPointerUpHan
 {
     public int cardId;
     public bool isSold = false;
+    public bool isLocked = false; // 是否已锁定（仅独立买卡商店的人类私有卡位有效）
+    public int shopSlotIndex = -1; // 商店卡位索引（独立买卡模式使用，-1=未登记）
     public int priceI; //单价
     public int roundLeft;
     public bool isHeroCard;
@@ -42,6 +44,11 @@ public class CardViewControl : MonoBehaviour, IPointerDownHandler, IPointerUpHan
     void Start()
     {
         cardName.raycastTarget = false;
+
+        if (lockButton != null)
+        {
+            lockButton.onClick.AddListener(() => CardShopManager.Instance.ToggleLock(this));
+        }
 
         buyButton.onClick.AddListener(() =>
         {
@@ -101,6 +108,9 @@ public class CardViewControl : MonoBehaviour, IPointerDownHandler, IPointerUpHan
     {
         cardId = cid;
         isHeroCard = isHero;
+        // 新卡默认未锁定；是否显示锁定按钮由商店模式（CardShopManager.SetLockMode）统一控制
+        isLocked = false;
+        SetLockButtonVisible(false);
 
         if (isHero)
         {
@@ -227,6 +237,30 @@ public class CardViewControl : MonoBehaviour, IPointerDownHandler, IPointerUpHan
             roundLeftText.text = roundLeft.ToString();
     }
 
+    // 设置锁定状态并刷新图标颜色（红色=锁定，白色=未锁定）
+    public void SetLocked(bool locked)
+    {
+        isLocked = locked;
+        RefreshLockVisual();
+    }
+
+    // 显示/隐藏锁定按钮（仅独立买卡商店的人类私有卡位显示）
+    public void SetLockButtonVisible(bool visible)
+    {
+        if (lockButton != null)
+            lockButton.gameObject.SetActive(visible);
+    }
+
+    // 锁定图标颜色：锁定红色，未锁定白色
+    private void RefreshLockVisual()
+    {
+        if (lockButton == null)
+            return;
+        var icon = lockButton.targetGraphic;
+        if (icon != null)
+            icon.color = isLocked ? SysColor.Card.LockOn : SysColor.Card.LockOff;
+    }
+
     // 根据玩家0的卡牌/好友情况重算效果标记（卡片刷新后也会重新计算）
     private void UpdateEffects()
     {
@@ -301,7 +335,9 @@ public class CardViewControl : MonoBehaviour, IPointerDownHandler, IPointerUpHan
     {
         // 一次买走整张卡：直接置为已售出
         isSold = true;
+        isLocked = false;
         buyButton.gameObject.SetActive(false);
+        SetLockButtonVisible(false);
         soldImage.gameObject.SetActive(true);
 
         if (effectGreen != null) //道具的情况
@@ -373,6 +409,9 @@ public class CardViewControl : MonoBehaviour, IPointerDownHandler, IPointerUpHan
             if (t != null)
                 t.color = Color.white;
         }
+
+        // 复色后重新按锁定状态着色锁定图标，避免被统一恢复成白色
+        RefreshLockVisual();
     }
 
     // 卡位被刷新前，重置售出状态
@@ -382,6 +421,7 @@ public class CardViewControl : MonoBehaviour, IPointerDownHandler, IPointerUpHan
         RestoreColor();
         soldImage.gameObject.SetActive(false);
         buyButton.gameObject.SetActive(true);
+        SetLockButtonVisible(CardShopManager.Instance != null && CardShopManager.Instance.LockEnabled);
     }
 
     // 买卡后卡牌飞向玩家头像：DoTween 加速曲线（起步慢、越飞越快），同时缩到 50%

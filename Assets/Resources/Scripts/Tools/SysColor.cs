@@ -248,6 +248,8 @@ public static class SysColor
     {
         public static readonly Color SoldGray = new Color(0.3f, 0.3f, 0.3f);            // 售出灰度
         public static readonly Color ItemPanel = new Color(0.6037736f, 0.46531343f, 0.13955145f); // 道具卡面板默认色
+        public static readonly Color LockOn = new Color(1f, 0.2f, 0.2f, 1f);             // 锁定图标-红
+        public static readonly Color LockOff = Color.white;                              // 未锁定图标-白
     }
 
     // 战斗飘字颜色
