@@ -57,7 +57,8 @@ public class SkillAidSneakChangePos : Skill
         float bestDist = -1f;
         foreach (var e in WorldManager.Instance.GetEnemyInRange(owner.transform.position, skillCfg.Range, owner.side))
         {
-            if (e == null || e.hp <= 0 || e.sneakSwapped)
+            // 空中位移中的单位(如吕布·魔神起手飞天)位置在高空，换位会把自身带到空中悬停，排除该目标
+            if (e == null || e.hp <= 0 || e.sneakSwapped || e.isJumping)
                 continue;
 
             float d = WorldManager.Instance.GetRange(owner.transform.position, e.transform.position);

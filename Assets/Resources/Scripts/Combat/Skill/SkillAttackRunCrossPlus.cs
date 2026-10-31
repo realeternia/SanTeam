@@ -12,6 +12,11 @@ public class SkillAttackRunCrossPlus : Skill
 
     public override void OnAttack(Chess defender, int damage)
     {
+        // 空中位移(如吕布·魔神起手飞天)期间位置由该技能接管：此处起跳会把起点连同飞行高度复制下来，
+        // 两套位移互相覆盖，故本次不发动（导弹在跳跃前发射、跳中命中时会走到这里）
+        if (owner.isJumping)
+            return;
+
         // 计算镜像位置
         Vector3 ownerPos = owner.transform.position;
         Vector3 defenderPos = defender.transform.position;

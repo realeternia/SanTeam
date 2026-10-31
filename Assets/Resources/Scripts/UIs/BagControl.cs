@@ -14,16 +14,20 @@ public class BagControl : MonoBehaviour, IPanelEvent
     public Button fieldAutoBtn;
     public Button aiSwitchBtn;
 
+    // 背包区域切换按钮：英雄区 / 士兵区互斥显示
+    public Button bagHeroBtn;
+    public Button bagSoldierBtn;
+
 
     // Start is called before the first frame update
     // 声明一个列表用于缓存 cell 对象
     private List<GameObject> cellCache = new List<GameObject>();
     public GameObject bagHeroRegion;
+    public GameObject bagSoldierRegion;
     public GameObject bagItemRegion;
     public GameObject fieldRegion;
-    public BagRecycler bagRecycler;
-    public BagRecycler bagUnwear; // 卸装区：拖英雄过来脱下所有装备
-    public BagRecycler bagCompose;
+    public BagRecycler bagInfo;
+
     public TMP_Text infoText;
     public TMP_Text expText;
     public Image expBar;
@@ -55,15 +59,31 @@ public class BagControl : MonoBehaviour, IPanelEvent
 
             GameManager.Instance.PlaySound("Sounds/foot");
         });
+        if (bagHeroBtn != null)
+        {
+            bagHeroBtn.onClick.AddListener(() =>
+            {
+                GameManager.Instance.PlaySound("Sounds/click");
+                SwitchBagRegion(true);
+            });
+        }
+        if (bagSoldierBtn != null)
+        {
+            bagSoldierBtn.onClick.AddListener(() =>
+            {
+                GameManager.Instance.PlaySound("Sounds/click");
+                SwitchBagRegion(false);
+            });
+        }
+        SwitchBagRegion(true); // 默认显示英雄区
+
         aiSwitchBtn.onClick.AddListener(() =>
         {
             GameManager.Instance.PlaySound("Sounds/click");
             bindPlayer.isAI = !bindPlayer.isAI;
             aiSwitchBtn.GetComponentInChildren<TMP_Text>().text = bindPlayer.isAI ? "AI模式" : "玩家模式";
-            if (bagRecycler != null)
-                bagRecycler.gameObject.SetActive(!bindPlayer.isAI);
-            if (bagUnwear != null)
-                bagUnwear.gameObject.SetActive(!bindPlayer.isAI);
+            if (bagInfo != null)
+                bagInfo.gameObject.SetActive(!bindPlayer.isAI);
             if (fieldAutoBtn != null)
                 fieldAutoBtn.gameObject.SetActive(!bindPlayer.isAI);
             if (buyExpBtn != null)
@@ -147,10 +167,8 @@ public class BagControl : MonoBehaviour, IPanelEvent
         bindPlayer = p;
         UpdateView();
 
-        if (bagRecycler != null)
-            bagRecycler.gameObject.SetActive(!p.isAI);
-        if (bagUnwear != null)
-            bagUnwear.gameObject.SetActive(!p.isAI);
+        if (bagInfo != null)
+            bagInfo.gameObject.SetActive(!p.isAI);
         if (fieldAutoBtn != null)
             fieldAutoBtn.gameObject.SetActive(!p.isAI);
         if (buyExpBtn != null)
@@ -169,6 +187,28 @@ public class BagControl : MonoBehaviour, IPanelEvent
         var humanCount = GameManager.Instance.players.Count(x => !x.isAI);
         aiSwitchBtn.gameObject.SetActive(bindPlayer.pid != 0 && bindPlayer.playerConfig.CanPlay && (!bindPlayer.isAI || humanCount < 2));
         aiSwitchBtn.GetComponentInChildren<TMP_Text>().text = bindPlayer.isAI ? "AI模式" : "玩家模式";
+    }
+
+    // 切换背包显示区域：true=英雄区，false=士兵区（两个区域互斥占用同一块位置）
+    private void SwitchBagRegion(bool showHero)
+    {
+        if (bagHeroRegion != null)
+            bagHeroRegion.SetActive(showHero);
+        if (bagSoldierRegion != null)
+            bagSoldierRegion.SetActive(!showHero);
+
+        // 选中的页签用金色高亮，未选中的置灰
+        SetTabButtonColor(bagHeroBtn, showHero);
+        SetTabButtonColor(bagSoldierBtn, !showHero);
+    }
+
+    private void SetTabButtonColor(Button button, bool selected)
+    {
+        if (button == null)
+            return;
+        Image img = (button.targetGraphic != null ? button.targetGraphic : button.GetComponent<Image>()) as Image;
+        if (img != null)
+            img.color = selected ? SysColor.UI.CheckBtnSelected : SysColor.UI.BtnClickedGray;
     }
 
     public void SendSignal(string name, string parm1, int parm2)
@@ -533,20 +573,86 @@ public class BagControl : MonoBehaviour, IPanelEvent
         PlayEquipsFlyToBag(heroCardId, equipIds, () => UpdateView());
     }
 
-    // 合成区：拖物品过来 → 侧边栏列出与该物品相关的合成配方（材料不足的置灰排后）
-    public void OpenComposePanel(int itemCardId)
+    // 卖出区：拖道具过来 → 右侧滑出道具操作面板，卖出/分解/改铸都在面板内执行
+    public void OpenItemPanel(int itemCardId)
     {
-        if (itemCardId == 0 || ConfigManager.IsHeroCard(itemCardId))
+        if (itemCardId == 0 || !ItemConfig.HasConfig(itemCardId) || ConfigManager.IsHeroCard(itemCardId))
         {
-            SystemTip.Show("英雄不可合成");
+            SystemTip.Show("该道具无法打开操作面板");
             return;
         }
 
-        SideComposeSelector.SetContext(bindPlayer.pid, itemCardId, OnComposeConfirm);
+        SideItemControl.SetContext(this, itemCardId);
+        PanelManager.Instance.ShowSideBar("SideItemControl");
+    }
+
+    // 合成按钮的显示条件：该道具是任意一条合成配方的材料（材料是否足够由配方面板里置灰提示）
+    public bool CanComposeItem(int itemCardId)
+    {
+        if (bindPlayer == null || itemCardId == 0 || !ItemConfig.HasConfig(itemCardId) || ConfigManager.IsHeroCard(itemCardId))
+            return false;
+
+        foreach (var rcp in ItemCombineConfig.ConfigList)
+        {
+            if (rcp.ItemA == itemCardId || rcp.ItemB == itemCardId)
+                return true;
+        }
+        return false;
+    }
+
+    // 打开合成配方面板：列出与该道具相关的配方（材料不足的置灰），确认后由 ComposeItem 执行
+    public void OpenComposeSelector(int itemCardId)
+    {
+        if (bindPlayer == null)
+            return;
+
+        SideComposeSelector.SetContext(bindPlayer.pid, itemCardId, ComposeItem);
         PanelManager.Instance.ShowSideBar("SideComposeSelector");
     }
 
-    // 分解区：分解状态下拖入合成装备 → 消耗1件该装备与1个分解符，返还合成前的两件材料，成功后背景还原
+    // 确认合成：先收起配方面板，再消耗材料产出结果并刷新背包
+    private void ComposeItem(ItemCombineConfig recipe)
+    {
+        if (recipe == null)
+        {
+            GameLog.Error("BagControl.ComposeItem: 合成配方为空");
+            return;
+        }
+
+        PanelManager.Instance.HideSideBar(() =>
+        {
+            var p1 = GameManager.Instance.GetPlayer(bindPlayer.pid);
+
+            // 两件材料合并特效，播完再真正消耗材料产出结果
+            PlayMergeAnim(recipe.ItemA, recipe.ItemB, recipe.ResultId, () =>
+            {
+                if (!p1.CombineTwoItems(recipe.ItemA, recipe.ItemB))
+                {
+                    SystemTip.Show("材料不足，无法合成");
+                    return;
+                }
+
+                GameManager.Instance.PlaySound("Sounds/compose");
+                UpdateView();
+                UpdateFieldView();
+            });
+        });
+    }
+
+    // 卖出区：拖英雄过来 → 右侧滑出英雄操作面板，卸装与卖出都在面板内执行
+    public void OpenHeroPanel(int heroCardId)
+    {
+        if (heroCardId == 0 || !ConfigManager.IsHeroCard(heroCardId))
+        {
+            SystemTip.Show("只有英雄可以打开此面板");
+            return;
+        }
+
+        SideHeroControl.SetContext(bindPlayer.pid, heroCardId, UnwearHeroEquips, SellCard);
+        PanelManager.Instance.ShowSideBar("SideHeroControl");
+    }
+
+    // 分解：消耗1件该装备与1个分解锤(401011)，返还合成前的两件材料（由 SideItemControl 的分解按钮调用）
     public void DecomposeItem(int itemCardId)
     {
         if (bindPlayer == null)
@@ -567,14 +673,11 @@ public class BagControl : MonoBehaviour, IPanelEvent
         }
         if (p1.GetItemCount(401011) <= 0)
         {
-            SystemTip.Show("缺少分解符，无法分解");
-            if (bagCompose != null)
-                bagCompose.ResetSplitState();
+            SystemTip.Show("缺少分解锤，无法分解");
             return;
         }
-
-        // 先播分解动画：两件材料从分解区以不同速度加速飞回物品区，动画结束再结算并还原背景
-        PlayDecomposeAnim(recipe, () =>
+        // 一分为二特效：装备弹起后碎裂成两件材料，播完再真正消耗与返还
+        PlaySplitAnim(itemCardId, recipe.ItemA, recipe.ItemB, () =>
         {
             if (!p1.DecomposeItem(itemCardId, 401011))
                 return;
@@ -583,9 +686,19 @@ public class BagControl : MonoBehaviour, IPanelEvent
             PlayItemUseSound(ItemConfig.HasConfig(401011) ? ItemConfig.GetConfig(401011) : null); // 分解锤被消耗，播放其使用音效
             UpdateView();
             UpdateFieldView();
-            if (bagCompose != null)
-                bagCompose.ResetSplitState();
         });
+    }
+
+    // 是否可分解：该道具是合成装备、背包有多余副本、且持有分解锤(401011)
+    public bool CanDecomposeItem(int itemCardId)
+    {
+        if (bindPlayer == null || itemCardId == 0 || !ItemConfig.HasConfig(itemCardId) || ConfigManager.IsHeroCard(itemCardId))
+            return false;
+        if (GetCombineRecipe(itemCardId) == null)
+            return false;
+
+        var p1 = GameManager.Instance.GetPlayer(bindPlayer.pid);
+        return p1.GetItemFreeCount(itemCardId) > 0 && p1.GetItemCount(401011) > 0;
     }
 
     // 查找以该道具为结果的合成配方（即是否为合成装备、可分解）
@@ -599,7 +712,7 @@ public class BagControl : MonoBehaviour, IPanelEvent
         return null;
     }
 
-    // 重铸区：重铸状态下拖入装备 → 消耗1件该装备与1个重铸镜，产出同 Id 段的随机装备，成功后背景还原
+    // 改铸：消耗1件该装备与1个西洋镜(401009)，产出同 Id 段的随机装备（由 SideItemControl 的改铸按钮调用）
     public void RerollItem(int itemCardId)
     {
         if (bindPlayer == null)
@@ -609,13 +722,13 @@ public class BagControl : MonoBehaviour, IPanelEvent
 
         if (itemCardId == 0 || !ItemConfig.HasConfig(itemCardId) || ConfigManager.IsHeroCard(itemCardId))
         {
-            SystemTip.Show("该道具不能重铸");
+            SystemTip.Show("该道具不能改铸");
             return;
         }
         int seg = itemCardId / 1000;
         if (seg != 400 && seg != 402 && seg != 403)
         {
-            SystemTip.Show("只能重铸 400/402/403 系列装备");
+            SystemTip.Show("只能改铸 400/402/403 系列装备");
             return;
         }
         if (p1.GetItemFreeCount(itemCardId) <= 0)
@@ -625,183 +738,49 @@ public class BagControl : MonoBehaviour, IPanelEvent
         }
         if (p1.GetItemCount(401009) <= 0)
         {
-            SystemTip.Show("缺少重铸镜，无法重铸");
-            if (bagCompose != null)
-                bagCompose.ResetSplitState();
+            SystemTip.Show("缺少西洋镜，无法改铸");
             return;
         }
         var candidates = p1.GetRerollCandidates(itemCardId);
         if (candidates.Count == 0)
         {
-            SystemTip.Show("没有可重铸的同系列道具");
+            SystemTip.Show("没有可改铸的同系列道具");
             return;
         }
         int newItemId = candidates[SysRandom.Range(0, candidates.Count)];
 
-        // 先播重铸动画，动画结束再结算并还原背景
-        PlayRerollAnim(itemCardId, newItemId, () =>
+        // 两合一特效：装备与西洋镜弹到一起合并，弹出改铸结果再飞回物品区；动画结束后再真正消耗与产出
+        PlayMergeAnim(itemCardId, 401009, newItemId, () =>
         {
             if (!p1.RerollItem(itemCardId, 401009, newItemId))
                 return;
 
             GameManager.Instance.PlaySound("Sounds/compose");
-            PlayItemUseSound(ItemConfig.HasConfig(401009) ? ItemConfig.GetConfig(401009) : null); // 重铸镜被消耗，播放其使用音效
+            PlayItemUseSound(ItemConfig.HasConfig(401009) ? ItemConfig.GetConfig(401009) : null); // 西洋镜被消耗，播放其使用音效
             UpdateView();
             UpdateFieldView();
-            if (bagCompose != null)
-                bagCompose.ResetSplitState();
         });
     }
 
-    // 重铸动画：原装备在重铸区旋转缩小消失，新装备弹出后跳回物品区
-    private void PlayRerollAnim(int srcItemId, int resultItemId, System.Action onComplete)
+    // 两合一动画（合成/改铸通用）：两个来源道具的图标弹起来碰到一起，合并成一个结果道具图标后飞回背包
+    private void PlayMergeAnim(int itemA, int itemB, int resultId, System.Action onComplete)
     {
-        if (bagItemRegion == null || bagCompose == null || !ItemConfig.HasConfig(resultItemId))
+        if (bagItemRegion == null || !ItemConfig.HasConfig(itemA) || !ItemConfig.HasConfig(itemB) || !ItemConfig.HasConfig(resultId))
         {
-            GameLog.Error($"BagControl.PlayRerollAnim: 物品区/重铸区未就绪或产物配置缺失，跳过动画 resultId={resultItemId}");
+            GameLog.Error($"BagControl.PlayMergeAnim: 物品区未就绪或配置缺失，跳过动画 itemA={itemA}, itemB={itemB}, resultId={resultId}");
             onComplete?.Invoke();
             return;
         }
 
         const float iconSize = 80f;
-        const float spinDuration = 0.35f; // 原装备旋转消失 / 新装备弹出
-        const float flyDuration = 0.45f;  // 新装备跳回背包
-        const float jumpPower = 70f;
-
-        GameObject containerObj = new GameObject("RerollAnim", typeof(RectTransform));
-        RectTransform container = containerObj.GetComponent<RectTransform>();
-        container.SetParent(bagItemRegion.transform.parent, false);
-        container.anchoredPosition = Vector2.zero;
-        container.SetAsLastSibling();
-
-        Vector2 start = ToContainerPos(container, bagCompose.transform as RectTransform);
-        Vector2 bagPos = ToContainerPos(container, bagItemRegion.transform as RectTransform);
-
-        Image iconSrc = CreateTempItemIcon(container, srcItemId, start, iconSize);
-        Image iconResult = CreateTempItemIcon(container, resultItemId, start, iconSize);
-        if (iconSrc == null || iconResult == null)
-        {
-            GameLog.Error("BagControl.PlayRerollAnim: 临时图标创建失败，跳过动画");
-            Destroy(containerObj);
-            onComplete?.Invoke();
-            return;
-        }
-        iconResult.rectTransform.localScale = Vector3.zero;
-
-        Sequence seq = DOTween.Sequence().SetUpdate(true);
-        // 原装备旋转并缩小淡出
-        seq.Append(iconSrc.rectTransform.DORotate(new Vector3(0f, 0f, 360f), spinDuration, RotateMode.FastBeyond360).SetEase(Ease.InOutQuad));
-        seq.Join(iconSrc.rectTransform.DOScale(0f, spinDuration).SetEase(Ease.InBack));
-        seq.Join(iconSrc.DOFade(0f, spinDuration));
-        // 新装备在同一位置弹出
-        seq.Join(iconResult.rectTransform.DOScale(1f, spinDuration).SetEase(Ease.OutBack));
-        // 新装备跳回背包
-        seq.Append(iconResult.rectTransform.DOJumpAnchorPos(bagPos, jumpPower, 1, flyDuration));
-        seq.Join(iconResult.rectTransform.DOScale(0.7f, flyDuration));
-        seq.Append(iconResult.DOFade(0f, 0.1f));
-
-        seq.OnComplete(() =>
-        {
-            Destroy(containerObj);
-            onComplete?.Invoke();
-        });
-    }
-
-    // 分解动画：合成装备的两件材料图标从分解区飞回物品区，一件慢、一件快，均带加速下落（Ease.In）
-    private void PlayDecomposeAnim(ItemCombineConfig recipe, System.Action onComplete)
-    {
-        if (recipe == null || bagItemRegion == null || bagCompose == null)
-        {
-            GameLog.Error($"BagControl.PlayDecomposeAnim: 配方/物品区/分解区未就绪，跳过动画 resultId={recipe?.ResultId}");
-            onComplete?.Invoke();
-            return;
-        }
-
-        const float iconSize = 80f;
-        const float slowDuration = 0.9f;  // 慢的一件
-        const float fastDuration = 0.45f; // 快的一件
-        const float startGap = 18f;       // 两件材料起飞点左右错开
-        const float landGap = 34f;        // 落点左右错开，避免完全重叠
-
-        GameObject containerObj = new GameObject("DecomposeAnim", typeof(RectTransform));
-        RectTransform container = containerObj.GetComponent<RectTransform>();
-        container.SetParent(bagItemRegion.transform.parent, false);
-        container.anchoredPosition = Vector2.zero;
-        container.SetAsLastSibling();
-
-        Vector2 start = ToContainerPos(container, bagCompose.transform as RectTransform);
-        Vector2 bagPos = ToContainerPos(container, bagItemRegion.transform as RectTransform);
-
-        Image iconA = CreateTempItemIcon(container, recipe.ItemA, start - new Vector2(startGap, 0f), iconSize);
-        Image iconB = CreateTempItemIcon(container, recipe.ItemB, start + new Vector2(startGap, 0f), iconSize);
-        if (iconA == null || iconB == null)
-        {
-            GameLog.Error("BagControl.PlayDecomposeAnim: 临时图标创建失败，跳过动画");
-            Destroy(containerObj);
-            onComplete?.Invoke();
-            return;
-        }
-
-        Sequence seq = DOTween.Sequence().SetUpdate(true);
-        // 慢件：一开始就出发，缓慢加速
-        seq.Join(iconA.rectTransform.DOAnchorPos(bagPos - new Vector2(landGap, 0f), slowDuration).SetEase(Ease.InQuad));
-        seq.Join(iconA.rectTransform.DOScale(0.6f, slowDuration));
-        // 快件：稍后出发，加速更陡
-        seq.Insert(0.15f, iconB.rectTransform.DOAnchorPos(bagPos + new Vector2(landGap, 0f), fastDuration).SetEase(Ease.InCubic));
-        seq.Insert(0.15f, iconB.rectTransform.DOScale(0.6f, fastDuration));
-        seq.Append(iconA.DOFade(0f, 0.1f));
-        seq.Join(iconB.DOFade(0f, 0.1f));
-
-        seq.OnComplete(() =>
-        {
-            Destroy(containerObj);
-            onComplete?.Invoke();
-        });
-    }
-
-    // 确认合成：先收起侧边栏，等侧边栏滑出后在背包里播合成动画，动画结束才真正合成并刷新
-    private void OnComposeConfirm(ItemCombineConfig recipe)
-    {
-        if (recipe == null)
-        {
-            GameLog.Error("BagControl.OnComposeConfirm: 合成配方为空");
-            return;
-        }
-
-        PanelManager.Instance.HideSideBar(() => PlayComposeAnim(recipe, () =>
-        {
-            var p1 = GameManager.Instance.GetPlayer(bindPlayer.pid);
-            if (!p1.CombineTwoItems(recipe.ItemA, recipe.ItemB))
-            {
-                SystemTip.Show("材料不足，无法合成");
-                return;
-            }
-
-            GameManager.Instance.PlaySound("Sounds/compose");
-            UpdateView(); // 材料消耗、产物进背包，整体刷新
-        }));
-    }
-
-    // 合成动画：两件材料道具的图标跳出来碰到一起，合并成一个结果道具图标（在背包里播）
-    private void PlayComposeAnim(ItemCombineConfig recipe, System.Action onComplete)
-    {
-        if (recipe == null || !ItemConfig.HasConfig(recipe.ResultId) || bagItemRegion == null)
-        {
-            GameLog.Error($"BagControl.PlayComposeAnim: 配方/结果道具配置缺失或物品区未就绪，跳过动画 resultId={recipe?.ResultId}");
-            onComplete?.Invoke();
-            return;
-        }
-
-        const float iconSize = 80f;
-        const float jumpDuration = 0.3f;  // 材料图标弹起来碰到一起
+        const float jumpDuration = 0.4f;  // 两个图标从各自格子飞到屏幕中心
         const float mergeDuration = 0.2f; // 合并出结果图标
-        const float flyDuration = 0.35f;  // 结果道具飞向背包
+        const float flyDuration = 0.35f;  // 结果图标飞向背包
         const float jumpPower = 90f;      // 跳跃高度
-        const float collideRise = 70f;    // 碰撞点相对两材料中点再上抬的高度
-        const float touchGap = 14f;       // 两图标"碰到一起"时的间距
+        const float touchGap = 14f;       // 两个图标"碰到一起"时的间距
 
         // 临时图标容器挂在物品区同层，动画结束后整体销毁
-        GameObject containerObj = new GameObject("ComposeAnim", typeof(RectTransform));
+        GameObject containerObj = new GameObject("MergeAnim", typeof(RectTransform));
         RectTransform container = containerObj.GetComponent<RectTransform>();
         container.SetParent(bagItemRegion.transform.parent, false);
         container.anchoredPosition = Vector2.zero;
@@ -810,18 +789,18 @@ public class BagControl : MonoBehaviour, IPanelEvent
         // 结果道具的落脚点 = 背包物品区中心
         Vector2 bagPos = ToContainerPos(container, bagItemRegion.transform as RectTransform);
 
-        Vector2 startA = GetItemStartAnchored(container, recipe.ItemA, 0, bagPos - new Vector2(120f, 0f));
-        Vector2 startB = GetItemStartAnchored(container, recipe.ItemB, recipe.ItemA == recipe.ItemB ? 1 : 0, bagPos + new Vector2(120f, 0f));
+        Vector2 startA = GetItemStartAnchored(container, itemA, 0, bagPos - new Vector2(120f, 0f));
+        Vector2 startB = GetItemStartAnchored(container, itemB, itemA == itemB ? 1 : 0, bagPos + new Vector2(120f, 0f));
 
-        // 碰撞点 = 两个材料的中点再上抬一点（弹起来在空中互相碰撞）
-        Vector2 meetPos = (startA + startB) * 0.5f + new Vector2(0f, collideRise);
+        // 碰撞点 = 屏幕中心
+        Vector2 meetPos = GetScreenCenterPos(container);
 
-        Image iconA = CreateTempItemIcon(container, recipe.ItemA, startA, iconSize);
-        Image iconB = CreateTempItemIcon(container, recipe.ItemB, startB, iconSize);
-        Image iconResult = CreateTempItemIcon(container, recipe.ResultId, meetPos, iconSize);
+        Image iconA = CreateTempItemIcon(container, itemA, startA, iconSize);
+        Image iconB = CreateTempItemIcon(container, itemB, startB, iconSize);
+        Image iconResult = CreateTempItemIcon(container, resultId, meetPos, iconSize);
         if (iconA == null || iconB == null || iconResult == null)
         {
-            GameLog.Error("BagControl.PlayComposeAnim: 临时图标创建失败，跳过动画");
+            GameLog.Error("BagControl.PlayMergeAnim: 临时图标创建失败，跳过动画");
             Destroy(containerObj);
             onComplete?.Invoke();
             return;
@@ -838,7 +817,7 @@ public class BagControl : MonoBehaviour, IPanelEvent
         seq.Join(iconA.rectTransform.DOJumpAnchorPos(endA, jumpPower, 1, jumpDuration));
         seq.Join(iconB.rectTransform.DOJumpAnchorPos(endB, jumpPower, 1, jumpDuration));
 
-        // 碰到一起后：材料图标缩小淡出，结果道具在碰撞点弹出
+        // 碰到一起后：两个来源图标缩小淡出，结果道具在碰撞点弹出
         seq.Append(iconResult.rectTransform.DOScale(Vector3.one, mergeDuration).SetEase(Ease.OutBack));
         seq.Join(iconA.DOFade(0f, mergeDuration));
         seq.Join(iconB.DOFade(0f, mergeDuration));
@@ -871,6 +850,130 @@ public class BagControl : MonoBehaviour, IPanelEvent
             return fallback;
 
         return ToContainerPos(container, cells[Mathf.Min(index, cells.Count - 1)]);
+    }
+
+    // 一分为二动画（分解）：装备图标弹起后碎裂消失，两件材料在碎裂点弹出并分开飞回背包
+    private void PlaySplitAnim(int itemId, int outA, int outB, System.Action onComplete)
+    {
+        if (bagItemRegion == null || !ItemConfig.HasConfig(itemId) || !ItemConfig.HasConfig(outA) || !ItemConfig.HasConfig(outB))
+        {
+            GameLog.Error($"BagControl.PlaySplitAnim: 物品区未就绪或配置缺失，跳过动画 itemId={itemId}, outA={outA}, outB={outB}");
+            onComplete?.Invoke();
+            return;
+        }
+
+        const float iconSize = 80f;
+        const float jumpDuration = 0.35f; // 装备飞到屏幕中心
+        const float popDuration = 0.2f;    // 装备碎裂 + 材料弹出
+        const float flyDuration = 0.35f;   // 材料飞向背包
+        const float jumpPower = 70f;
+        const float spread = 70f;          // 两件材料向左右分开的距离
+
+        // 临时图标容器挂在物品区同层，动画结束后整体销毁
+        GameObject containerObj = new GameObject("SplitAnim", typeof(RectTransform));
+        RectTransform container = containerObj.GetComponent<RectTransform>();
+        container.SetParent(bagItemRegion.transform.parent, false);
+        container.anchoredPosition = Vector2.zero;
+        container.SetAsLastSibling();
+
+        Vector2 bagPos = ToContainerPos(container, bagItemRegion.transform as RectTransform);
+        Vector2 start = GetItemStartAnchored(container, itemId, 0, bagPos);
+        Vector2 breakPos = GetScreenCenterPos(container); // 碎裂点 = 屏幕中心
+
+        Image iconSrc = CreateTempItemIcon(container, itemId, start, iconSize);
+        Image iconA = CreateTempItemIcon(container, outA, breakPos, iconSize);
+        Image iconB = CreateTempItemIcon(container, outB, breakPos, iconSize);
+        if (iconSrc == null || iconA == null || iconB == null)
+        {
+            GameLog.Error("BagControl.PlaySplitAnim: 临时图标创建失败，跳过动画");
+            Destroy(containerObj);
+            onComplete?.Invoke();
+            return;
+        }
+
+        iconA.rectTransform.localScale = Vector3.zero;
+        iconB.rectTransform.localScale = Vector3.zero;
+
+        Sequence seq = DOTween.Sequence().SetUpdate(true);
+        // 装备弹到碎裂点后消失
+        seq.Append(iconSrc.rectTransform.DOJumpAnchorPos(breakPos, jumpPower, 1, jumpDuration));
+        seq.Insert(jumpDuration, iconSrc.DOFade(0f, popDuration));
+        seq.Insert(jumpDuration, iconSrc.rectTransform.DOScale(0f, popDuration));
+
+        // 两件材料在碎裂点弹出
+        seq.Insert(jumpDuration, iconA.rectTransform.DOScale(Vector3.one, popDuration).SetEase(Ease.OutBack));
+        seq.Insert(jumpDuration, iconB.rectTransform.DOScale(Vector3.one, popDuration).SetEase(Ease.OutBack));
+
+        // 材料向左右分开飞回物品区
+        float flyStart = jumpDuration + popDuration;
+        seq.Insert(flyStart, iconA.rectTransform.DOAnchorPos(bagPos - new Vector2(spread, 0f), flyDuration).SetEase(Ease.InQuad));
+        seq.Insert(flyStart, iconB.rectTransform.DOAnchorPos(bagPos + new Vector2(spread, 0f), flyDuration).SetEase(Ease.InQuad));
+        seq.Insert(flyStart, iconA.rectTransform.DOScale(0.6f, flyDuration));
+        seq.Insert(flyStart, iconB.rectTransform.DOScale(0.6f, flyDuration));
+
+        seq.OnComplete(() =>
+        {
+            Destroy(containerObj);
+            onComplete?.Invoke();
+        });
+    }
+
+    // 是否可改铸：400/402/403 系列装备、背包有多余副本、持有西洋镜(401009)且有同系列其它道具
+    public bool CanRerollItem(int itemCardId)
+    {
+        if (bindPlayer == null || itemCardId == 0 || !ItemConfig.HasConfig(itemCardId) || ConfigManager.IsHeroCard(itemCardId))
+            return false;
+        int seg = itemCardId / 1000;
+        if (seg != 400 && seg != 402 && seg != 403)
+            return false;
+
+        var p1 = GameManager.Instance.GetPlayer(bindPlayer.pid);
+        if (p1.GetItemFreeCount(itemCardId) <= 0 || p1.GetItemCount(401009) <= 0)
+            return false;
+        return p1.GetRerollCandidates(itemCardId).Count > 0;
+    }
+
+    // 卖出1件道具：按品质返还金币，成功后刷新背包
+    public void SellItem(int itemCardId)
+    {
+        if (bindPlayer == null)
+            return;
+
+        var p1 = GameManager.Instance.GetPlayer(bindPlayer.pid);
+        if (p1.isAI)
+            return;
+
+        if (itemCardId == 0 || !ItemConfig.HasConfig(itemCardId) || ConfigManager.IsHeroCard(itemCardId))
+        {
+            SystemTip.Show("该道具不可出售");
+            return;
+        }
+
+        int gold = p1.SellItem(itemCardId);
+        if (gold <= 0)
+        {
+            SystemTip.Show(p1.GetEquippedCount(itemCardId) > 0 ? "该装备已全部装备，需先卸下" : "背包中没有该道具");
+            return;
+        }
+
+        GameManager.Instance.PlaySound("Sounds/gold");
+        UpdateView();
+    }
+
+    // 取屏幕中心（画布中心）在容器内的本地坐标，供合成/分解动画当作撞点
+    private Vector2 GetScreenCenterPos(RectTransform container)
+    {
+        if (container == null)
+            return Vector2.zero;
+
+        Canvas canvas = container.GetComponentInParent<Canvas>();
+        if (canvas == null || canvas.transform is not RectTransform canvasRect)
+        {
+            GameLog.Warn("BagControl.GetScreenCenterPos: 未找到父级 Canvas，退回容器原点");
+            return Vector2.zero;
+        }
+
+        return ToContainerPos(container, canvasRect);
     }
 
     // 目标世界的中心点 → 容器本地坐标（可直接当子图标的 anchoredPosition）

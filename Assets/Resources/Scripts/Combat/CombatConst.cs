@@ -137,6 +137,10 @@ public static class CombatConst
     /// <summary>技能MP消耗修正系数上限（MpCost很高时的最大倍率）</summary>
     public const float SkillMpFactorMax = 2f;
 
+    // ---- 道具卖出 ----
+    /// <summary>道具卖出返还金币（按品质 Q1~Q4 取，装备/消耗品通用；道具仅掉落获得，卖出价低于英雄卡）</summary>
+    public static readonly int[] ItemSellGoldByQuality = { 1, 2, 3, 5 };
+
     // ---- 其他 ----
     /// <summary>近战/远程士兵射程判定阈值</summary>
     public const float MeleeRange = 25f;

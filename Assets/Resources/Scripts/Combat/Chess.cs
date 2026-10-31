@@ -297,6 +297,9 @@ public class Chess : MonoBehaviour
         if (!movedThisTick)
             ResolveUnitSpacing();
 
+        // 兜底落地：移动/间距只改 x/z，y 一旦被写成空中高度就不会自动回落，此处每 tick 校正一次
+        EnsureOnGround();
+
         if (dieAfterLifeTime)
         {
             lifeTime -= deltaTime;
@@ -798,6 +801,31 @@ public class Chess : MonoBehaviour
         if (WorldManager.Instance.CheckPositionBlocked(this, next))
             return; // 推开方向踩墙则本次不动，等下次重规划
         transform.position = next;
+    }
+
+    /// <summary>地面高度容差(米)：y 超出「地面基准 + 该容差」即视为异常悬空</summary>
+    private const float MaxGroundYOffset = 1f;
+
+    /// <summary>
+    /// 兜底落地检查：单位移动/间距/寻路只改 x/z，y 一旦被写成空中高度（如落点取自空中单位的位置、
+    /// 位移协程异常中断未复位）就不会自行回落，会永久悬停在地面上方。
+    /// 对不在空中位移状态、且明显高于自身地面高度的单位贴回地面并告警。
+    /// </summary>
+    private void EnsureOnGround()
+    {
+        // 空中位移(飞行/俯冲/跳跃)与强制位移(抛物线冲刺/击退锁定等)期间高度由对应逻辑接管，不干预
+        if (isJumping || noMoveCount > 0 || jumpCoroutine != null)
+            return;
+
+        var groundY = baseY + heightOffset;
+        var pos = transform.position;
+        if (pos.y <= groundY + MaxGroundYOffset)
+            return;
+
+        var airY = pos.y;
+        pos.y = groundY;
+        transform.position = pos;
+        GameLog.Warn($"单位异常悬空已落回地面 id={id} heroId={heroId} 悬空高度={airY:F2} 地面高度={groundY:F2}");
     }
 
     // 攻击目标

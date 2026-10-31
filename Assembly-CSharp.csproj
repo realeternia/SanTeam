@@ -148,6 +148,7 @@
     <Compile Include="Assets\Resources\Scripts\Combat\EffectManager.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffNoAction.cs" />
     <Compile Include="Assets\Resources\Scripts\Configs\HeroFriendConfig_s.cs" />
+    <Compile Include="Assets\Resources\Scripts\UIs\SideItemControl.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffMoveSpeedAdd.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\TooltipHeroSkill.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidDualLaser.cs" />
@@ -279,6 +280,7 @@
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffDefStack.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\RankPlayerPanelManager.cs" />
     <Compile Include="Assets\Resources\Scripts\Configs\SkillConfig_s.cs" />
+    <Compile Include="Assets\Resources\Scripts\UIs\SideHeroControl.cs" />
     <Compile Include="Assets\Resources\Scripts\Configs\PlayerConfig_s.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffHealBoost.cs" />
     <Compile Include="Assets\DOTween\Modules\DOTweenModuleUIToolkit.cs" />

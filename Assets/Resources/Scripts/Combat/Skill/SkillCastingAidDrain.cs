@@ -50,44 +50,46 @@ public class SkillCastingAidDrain : Skill
         var groundY = owner.baseY + owner.heightOffset;
         var startPos = owner.transform.position;
         startPos.y = groundY;
+        var landPos = startPos;
 
         // 空中位移状态：外部位移技能无法打断，动作必播完
         BeginAirMove();
-
-        // 第一阶段：原地往天上飞
-        var rise = AirMove(FlyUpDuration, t =>
+        // 用 finally 保证空中状态一定复位：isJumping 一旦泄漏，MoveTo 与寻路会永久失效，单位会卡在半空且不再行动
+        try
         {
-            var pos = startPos;
-            pos.y = groundY + FlyUpHeight * t;
-            return pos;
-        });
-        while (rise.MoveNext())
-            yield return rise.Current;
-        if (owner == null || owner.hp <= 0)
+            // 第一阶段：原地往天上飞
+            var rise = AirMove(FlyUpDuration, t =>
+            {
+                var pos = startPos;
+                pos.y = groundY + FlyUpHeight * t;
+                return pos;
+            });
+            while (rise.MoveNext())
+                yield return rise.Current;
+            if (owner == null || owner.hp <= 0)
+                yield break;
+
+            // 第二阶段：从空中快速俯冲到目标身前；目标位置一直在变，落点每步按目标当前位置修正
+            var flyPos = new Vector3(startPos.x, groundY + FlyUpHeight, startPos.z);
+            landPos = CalcLandPos(target, groundY);
+            var dive = AirMove(DashDuration, t =>
+            {
+                if (target != null && target.hp > 0)
+                    landPos = CalcLandPos(target, groundY);
+                return Vector3.Lerp(flyPos, landPos, t);
+            });
+            while (dive.MoveNext())
+                yield return dive.Current;
+            if (owner == null || owner.hp <= 0)
+                yield break;
+
+            owner.transform.position = landPos;
+        }
+        finally
         {
             EndAirMove();
-            yield break;
         }
 
-        // 第二阶段：从空中快速俯冲到目标身前；目标位置一直在变，落点每步按目标当前位置修正
-        var flyPos = new Vector3(startPos.x, groundY + FlyUpHeight, startPos.z);
-        var landPos = CalcLandPos(target, groundY);
-        var dive = AirMove(DashDuration, t =>
-        {
-            if (target != null && target.hp > 0)
-                landPos = CalcLandPos(target, groundY);
-            return Vector3.Lerp(flyPos, landPos, t);
-        });
-        while (dive.MoveNext())
-            yield return dive.Current;
-        if (owner == null || owner.hp <= 0)
-        {
-            EndAirMove();
-            yield break;
-        }
-
-        owner.transform.position = landPos;
-        EndAirMove();
         owner.LockTarget(target);
         // 落地爆裂特效（范围特效，半径取 skillCfg.Area）
         PlayAreaEffect(landPos);

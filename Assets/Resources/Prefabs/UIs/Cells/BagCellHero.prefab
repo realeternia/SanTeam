@@ -949,6 +949,7 @@ MonoBehaviour:
   - {fileID: 8936447406989396998}
   - {fileID: 6761009326867405111}
   - {fileID: 4548356236079284462}
+  heroBorderImg: {fileID: 8649791181019450358}
   cellButton: {fileID: 6027463124662379144}
   bagControl: {fileID: 0}
   expBar: {fileID: 541016607372563787}

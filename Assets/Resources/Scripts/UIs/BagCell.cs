@@ -20,6 +20,7 @@ public class BagCell : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragH
     public Image[] skillImg;
     public Image[] equipImages; // 最多3件装备槽，需在预制体上按槽位顺序拖入引用
     public Image[] equipBorderImages; // 最多3件装备槽，需在预制体上按槽位顺序拖入引用
+    public Image heroBorderImg;
     
     public Button cellButton;
     public BagControl bagControl;
@@ -52,6 +53,10 @@ public class BagCell : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragH
         var heroCfg = HeroConfig.GetConfig(cardId);
         textItemName.text = heroCfg.Name + level;
         textItemName.color = SysColor.GetQualityColor(heroCfg.Quality);
+
+        // 英雄卡外框按品质上色（1白 2绿 3蓝 4紫）
+        if (heroBorderImg != null)
+            heroBorderImg.color = SysColor.GetQualityColor(heroCfg.Quality);
 
         // 显示已装备的装备（最多3个槽位）
         var slots = bagControl.bindPlayer.GetItemIdsOnHero(cardId);
@@ -223,8 +228,6 @@ public class BagCell : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragH
             canvasGroup = gameObject.AddComponent<CanvasGroup>();
         canvasGroup.alpha = 0.5f;
         canvasGroup.blocksRaycasts = false;
-
-        bagControl.OnCellClick(this);
     }
 
     // 拖动过程中调用

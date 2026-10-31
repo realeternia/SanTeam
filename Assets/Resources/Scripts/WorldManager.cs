@@ -1241,6 +1241,9 @@ public class WorldManager : MonoBehaviour
     public bool MoveTo(Chess unit, Vector3 targetPosition, bool isForce = false)
     {
         // 单位移动已改为转向制(短程寻路+互斥力)，不再锁格子；技能强制位移直接落位
+        // 落点高度统一贴回单位自身地面：落点若取自空中单位(跳跃/俯冲/引导起手)的位置，
+        // 会把飞行高度一并复制过来，而移动/间距逻辑只改 x/z，单位会永久悬空在地面上方
+        targetPosition.y = unit.baseY + unit.heightOffset;
         unit.transform.position = targetPosition;
         return true;
     }
