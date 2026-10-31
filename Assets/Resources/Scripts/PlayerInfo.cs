@@ -92,6 +92,9 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     [CustomSerializeField]
     public int lastFightMark;
 
+    // 本回合战斗失败实际扣除的生命值（战斗结算界面显示用，非存档字段）
+    public int lastDamage;
+
     public CastleHUD castleHUD;
 
     // Start is called before the first frame update
@@ -141,6 +144,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         attrAddons.Clear();
         likeCount = 2;
         lastFightMark = 0;
+        lastDamage = 0;
         nextSkip = false;
         boughtThisShopCards.Clear();
         isOnTurn = false;
@@ -1234,10 +1238,12 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         return newResult;
     }
 
-    public void onBattleResult(bool isWin, int add)
+    public void onBattleResult(bool isWin, int add, int damageOverride = -1)
     {
         if (isEliminated)
             return;
+
+        lastDamage = 0;
 
         if (isWin)
             winCount++;
@@ -1245,16 +1251,19 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
             loseCount++;
         lastBattleLose = !isWin;
 
-        // 每轮战斗失败扣除本回合配置的生命值；生命≤0 淘汰并移出游戏
+        // 每轮战斗失败扣除本回合配置的生命值（混战地图按名次传 damageOverride）；生命≤0 淘汰并移出游戏
         if (!isWin)
         {
             int round = Mathf.Clamp(GameManager.Instance.year, 1, 100);
             int damage = 0;
-            if (GameRoundConfig.HasConfig(round))
+            if (damageOverride >= 0)
+                damage = damageOverride;
+            else if (GameRoundConfig.HasConfig(round))
                 damage = GameRoundConfig.GetConfig(round).DamageCount;
             else
                 GameLog.Error($"战斗失败扣血：GameRoundConfig 缺少回合{round}配置，扣血为0");
 
+            lastDamage = damage;
             mark -= damage;
             GameLog.Debug($"玩家{pid} 战斗失败，扣除生命{damage}，剩余{mark}");
             if (mark <= 0)
@@ -1697,6 +1706,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
             // 未随存档持久化的运行时状态先清空，避免切换存档时残留上一局数据
             likeCount = 2;
             nextSkip = false;
+            lastDamage = 0;
             boughtThisShopCards.Clear();
             isOnTurn = false;
             battleSide = 0;

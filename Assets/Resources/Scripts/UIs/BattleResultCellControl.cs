@@ -30,8 +30,10 @@ public class BattleResultCellControl : MonoBehaviour
         playerName.text = player.playerNameText.text;
 
         playerRank.text = rank.ToString(); // 按生命值(mark)由高到低排序的名次
-        // mark 现为生命值：失败扣血后直接显示剩余生命（生命≤0 表示已淘汰）
-        playerMark.text = $"生命 <color=white>{player.mark}</color>";
+        // mark 现为生命值：失败扣血后直接显示剩余生命，本回合扣血量用红色标注（生命≤0 表示已淘汰）
+        playerMark.text = player.lastDamage > 0
+            ? $"HP <color=white>{player.mark}</color> <color=red>(-{player.lastDamage})</color>"
+            : $"HP <color=white>{player.mark}</color>";
 
 
         playerIcon.sprite = player.playerImage.sprite;

@@ -160,7 +160,10 @@ public class WorldManager : MonoBehaviour
 
         // 通知所有玩家开始战斗
         foreach (var player in GameManager.Instance.players)
+        {
+            player.lastDamage = 0;
             player.OnBattleBegin();
+        }
 
         BattleResultPanel.gameObject.SetActive(false);
         SpawnUnitsInRegions();
@@ -1801,7 +1804,28 @@ public class WorldManager : MonoBehaviour
                     bool isWinner = (playerSide == winnerSide);
 
                     killMark[playerId] = scores[i];
-                    GameManager.Instance.GetPlayer(playerId).onBattleResult(isWinner, killMark[playerId]);
+
+                    // 混战地图（Rule=2）按被淘汰顺序扣血：前4被淘汰扣全额，第5~6扣一半，第7扣三分之一（向上取整）
+                    int damage = -1;
+                    if (!isWinner)
+                    {
+                        int baseDamage = 0;
+                        int round = Mathf.Clamp(GameManager.Instance.year, 1, 100);
+                        if (GameRoundConfig.HasConfig(round))
+                            baseDamage = GameRoundConfig.GetConfig(round).DamageCount;
+                        else
+                            GameLog.Error($"混战扣血：GameRoundConfig 缺少回合{round}配置，扣血为0");
+
+                        int order = deathOrder[i];
+                        if (order <= 4)
+                            damage = baseDamage;
+                        else if (order <= 6)
+                            damage = Mathf.CeilToInt(baseDamage / 2f);
+                        else
+                            damage = Mathf.CeilToInt(baseDamage / 3f);
+                    }
+
+                    GameManager.Instance.GetPlayer(playerId).onBattleResult(isWinner, killMark[playerId], damage);
                 }
 
                 gameFinish = true;
