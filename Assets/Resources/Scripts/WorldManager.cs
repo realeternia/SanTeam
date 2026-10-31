@@ -262,10 +262,11 @@ public class WorldManager : MonoBehaviour
 
         PanelManager.Instance.ShowShop();
 
-        // 人类玩家生命耗尽：游戏结束，回到商店界面并停住（不再开启新回合商店/新战斗）
+        // 人类玩家生命耗尽：游戏结束，回到商店界面并停住（不再开启新回合商店/新战斗），并弹出结算面板
         if (GameManager.Instance.GetPlayer(0).isEliminated)
         {
             CardShopManager.Instance.EndGame();
+            PanelManager.Instance.ShowGameResult();
             return;
         }
 
@@ -2047,9 +2048,15 @@ public class WorldManager : MonoBehaviour
         if (battleDefeatTip == null)
             return;
 
-        // 败者：被消灭阵营对应的玩家；PVE 怪物阵营没有 PlayerInfo，用虚拟玩家999
+        // 败者：被消灭阵营对应的玩家；怪物阵营（PVE/单数匹配野怪）没有 PlayerInfo，用虚拟玩家999
         PlayerInfo loser = FindPlayerBySide(defeatedSide);
-        int loserPid = loser != null ? loser.pid : (isPveRound && defeatedSide % 2 == 0 ? PlayerBook.MonsterPlayerId : -1);
+        int loserPid;
+        if (loser != null)
+            loserPid = loser.pid;
+        else if (IsMonsterSide(defeatedSide))
+            loserPid = PlayerBook.MonsterPlayerId;
+        else
+            loserPid = -1;
 
         // 胜者：优先取击杀者；无归属（如疲劳/持续伤害致死）时取任一存活敌方
         int winnerPid = killerPlayerId;
@@ -2080,10 +2087,18 @@ public class WorldManager : MonoBehaviour
             PlayerInfo player = FindPlayerBySide(chessComponent.side);
             if (player != null)
                 return player.pid;
-            if (isPveRound)
+            if (IsMonsterSide(chessComponent.side))
                 return PlayerBook.MonsterPlayerId;
         }
         return -1;
+    }
+
+    // 判断某号位是否为怪物阵营（PVE怪物号位 / 单数匹配刷出的野怪号位）
+    private bool IsMonsterSide(int side)
+    {
+        if (oddMonsterSide > 0 && side == oddMonsterSide)
+            return true;
+        return isPveRound && side % 2 == 0;
     }
 
     // 按玩家pid取头像：普通玩家走 PlayerInfo.imgPath，虚拟玩家（PVE怪物）走 PlayerConfig

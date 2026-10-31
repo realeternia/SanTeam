@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using DG.Tweening;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -14,6 +15,10 @@ public class BattleDefeatTip : MonoBehaviour
     private const float ShowDuration = 2f; // 单组总时长
     private const float FadeStartTime = 1.5f; // 开始渐隐的时间点
     private const float FadeDuration = ShowDuration - FadeStartTime; // 渐隐时长
+    private const float PunchDuration = 0.3f; // 单次震动时长（短促有力）
+    private const float PunchStrength = 26f; // 震动位移幅度（像素）
+    private const int PunchVibrato = 5; // 震动次数
+    private const float PunchElasticity = 0.4f; // 回弹弹性
 
     // 一组击败信息：胜者头像、败者头像
     private struct DefeatInfo
@@ -25,6 +30,12 @@ public class BattleDefeatTip : MonoBehaviour
     private readonly Queue<DefeatInfo> pendingTips = new Queue<DefeatInfo>();
     private CanvasGroup canvasGroup;
     private bool isPlaying = false;
+
+    // 播放期间头像的振动tween，以及头像原始位置（用于振完归位）
+    private Tween winShakeTween;
+    private Tween loseShakeTween;
+    private Vector2 winIconOrigin;
+    private Vector2 loseIconOrigin;
 
     void Awake()
     {
@@ -87,7 +98,7 @@ public class BattleDefeatTip : MonoBehaviour
         Hide();
     }
 
-    // 显示：恢复透明度、开启粒子并播放
+    // 显示：恢复透明度、开启粒子并播放，同时让两个头像振动
     private void Show()
     {
         canvasGroup.alpha = 1f;
@@ -100,6 +111,46 @@ public class BattleDefeatTip : MonoBehaviour
             winParticle.Clear();
             winParticle.Play();
         }
+
+        StartIconShake();
+    }
+
+    // 显示瞬间对两个头像做一次有力的震动（上下单向冲击，不来回晃动）
+    private void StartIconShake()
+    {
+        StopIconShake();
+
+        if (winPlayerIcon != null)
+        {
+            winIconOrigin = winPlayerIcon.rectTransform.anchoredPosition;
+            winShakeTween = winPlayerIcon.rectTransform
+                .DOPunchAnchorPos(new Vector2(0, PunchStrength), PunchDuration, PunchVibrato, PunchElasticity, false);
+        }
+        if (losePlayerIcon != null)
+        {
+            loseIconOrigin = losePlayerIcon.rectTransform.anchoredPosition;
+            loseShakeTween = losePlayerIcon.rectTransform
+                .DOPunchAnchorPos(new Vector2(0, PunchStrength), PunchDuration, PunchVibrato, PunchElasticity, false);
+        }
+    }
+
+    // 停止振动并把头像位置还原
+    private void StopIconShake()
+    {
+        if (winShakeTween != null)
+        {
+            winShakeTween.Kill();
+            winShakeTween = null;
+            if (winPlayerIcon != null)
+                winPlayerIcon.rectTransform.anchoredPosition = winIconOrigin;
+        }
+        if (loseShakeTween != null)
+        {
+            loseShakeTween.Kill();
+            loseShakeTween = null;
+            if (losePlayerIcon != null)
+                losePlayerIcon.rectTransform.anchoredPosition = loseIconOrigin;
+        }
     }
 
     // 隐藏：透明度归零并停掉粒子
@@ -109,7 +160,14 @@ public class BattleDefeatTip : MonoBehaviour
         canvasGroup.blocksRaycasts = false;
         canvasGroup.interactable = false;
 
+        StopIconShake();
+
         if (winParticle != null)
             winParticle.gameObject.SetActive(false);
+    }
+
+    void OnDestroy()
+    {
+        StopIconShake();
     }
 }

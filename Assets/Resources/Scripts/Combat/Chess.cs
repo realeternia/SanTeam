@@ -242,6 +242,10 @@ public class Chess : MonoBehaviour
     // 创建血条HUD
     private void CreateHUD()
     {
+        // 影分身等隐藏单位不显示血条
+        if (isShadow)
+            return;
+
         // 查找或创建Canvas
         canvas = FindObjectOfType<Canvas>();
 

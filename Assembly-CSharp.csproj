@@ -286,6 +286,7 @@
     <Compile Include="Assets\MasterMagicFX\Scripts\Miscs\BulletPreviewerShooter.cs" />
     <Compile Include="Assets\Resources\Scripts\Configs\SoldierConfig_s.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffAtkAdd.cs" />
+    <Compile Include="Assets\Resources\Scripts\UIs\GameResultPanelManager.cs" />
     <Compile Include="Assets\Resources\Scripts\Tools\PlayerBook.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\BagCell.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAttackAddDamage.cs" />

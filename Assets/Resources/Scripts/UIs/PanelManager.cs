@@ -18,6 +18,7 @@ public class PanelManager : MonoBehaviour
     private GameObject pickPanel;
     private GameObject bagPanel;
     private GameObject sideBar;
+    private GameObject gameResultPanel;
 
     public GameObject tipNode;
 
@@ -102,6 +103,11 @@ public class PanelManager : MonoBehaviour
             return;
         cardShopPanel.SetActive(true);
       //  cardShopTxt.SetActive(true);
+
+        // 每次进入商店都重算顶部玩家列表（读档复用面板时不会走 ShopBegin）
+        var shopManager = cardShopPanel.GetComponent<CardShopManager>();
+        if (shopManager != null)
+            shopManager.RefreshPlayerList();
 
         ChangePanelCount(cardShopPanel, true);
     }
@@ -239,6 +245,42 @@ public class PanelManager : MonoBehaviour
             ChangePanelCount(sideBar, false);
             onComplete?.Invoke();
         });
+    }
+
+    public void ShowGameResult()
+    {
+        if (gameResultPanel == null)
+            gameResultPanel = LoadPanel("GameResultPanel");
+        if (gameResultPanel == null)
+            return;
+        gameResultPanel.SetActive(true);
+        gameResultPanel.GetComponent<GameResultPanelManager>().OnShow();
+
+        ChangePanelCount(gameResultPanel, true);
+    }
+
+    public void HideGameResult()
+    {
+        if (gameResultPanel == null)
+            return;
+        gameResultPanel.GetComponent<GameResultPanelManager>().OnHide();
+        gameResultPanel.SetActive(false);
+
+        ChangePanelCount(gameResultPanel, false);
+    }
+
+    // 回到游戏初始界面：关闭商店并重建开始/选牌面板（首次创建会重新走一遍开场与选牌流程）
+    public void BackToStartScreen()
+    {
+        HideShop();
+
+        if (pickPanel != null)
+        {
+            ChangePanelCount(pickPanel, false);
+            Destroy(pickPanel);
+            pickPanel = null;
+        }
+        ShowPick();
     }
 
     public void SendSignal(string name, string parm1, int parm2)

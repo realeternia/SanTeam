@@ -109,6 +109,19 @@ public class GameManager : MonoBehaviour
         // 关闭统一日志系统
         GameLog.Shutdown();
     }
+
+    // 新开一局：重置回合数与全部玩家（回到开始界面后再开新游戏时，不能残留上一局数据）
+    public void ResetPlayersForNewGame()
+    {
+        year = 0;
+
+        players[0].ResetForNewGame(0, PlayerBook.GetWang());
+        var pls = PlayerBook.GetRandomN(7);
+        for (int i = 0; i < 7; i++)
+            players[i + 1].ResetForNewGame(i + 1, pls[i]);
+
+        GameLog.Debug("已重置全部玩家为新游戏初始状态");
+    }
   
 
     // Update is called once per frame
@@ -333,7 +346,10 @@ public class GameManager : MonoBehaviour
                 {
                     players[i].Deserialize(saveData.players[i]);
                     players[i].SetPlayerData();
+                    players[i].EnsureSoldierCells();
                     players[i].UpdateView();
+                    // 按存档中的生命值/淘汰标记重新同步头像显隐
+                    players[i].ApplyEliminatedState();
                 }
             }
 

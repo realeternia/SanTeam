@@ -79,10 +79,33 @@ public class CardShopManager : MonoBehaviour
         GameLog.Info("玩家生命值耗尽，游戏结束：已回到商店界面并停止");
     }
 
+    // 商店面板是运行时动态创建的（选牌阶段还不存在），这里用静态标记让创建时执行一次重置
+    private static bool pendingResetGameState;
+
+    public static void RequestResetGameState()
+    {
+        pendingResetGameState = true;
+        if (Instance != null)
+            Instance.ResetGameState();
+    }
+
+    // 新开一局（新游戏/读档）时重置结束状态，避免上一局 GameOver 卡住商店与战斗
+    public void ResetGameState()
+    {
+        pendingResetGameState = false;
+        GameOver = false;
+        IsShopEnd = false;
+        passBtn.gameObject.SetActive(true);
+        refreshBtn.gameObject.SetActive(true);
+        GameLog.Debug("商店状态已重置（新游戏/读档）");
+    }
+
     // Start is called before the first frame update
     void Start()
     {
         Instance = this;
+        if (pendingResetGameState)
+            ResetGameState();
 
         passBtn.onClick.AddListener(() =>
         {
@@ -115,6 +138,15 @@ public class CardShopManager : MonoBehaviour
         });
 
         ShopBegin();
+    }
+
+    // 每次进入商店时重算顶部玩家列表：同步淘汰显隐 + 按存活人数重新排序/居中摆放
+    // （读档复用已创建的商店面板时不会走 ShopBegin，这里保证列表与存档数据一致）
+    public void RefreshPlayerList()
+    {
+        for (int i = 0; i < GameManager.Instance.players.Length; i++)
+            GameManager.Instance.GetPlayer(i).ApplyEliminatedState();
+        SortPlayersByScore();
     }
 
     public void OnShow()
@@ -624,6 +656,9 @@ public class CardShopManager : MonoBehaviour
             Destroy(img);
 
         PanelManager.Instance.GetTooltip<BaseTooltip>()?.HideTooltip();
+        // 进入战斗前隐藏商店卡片层的特效
+        for (int i = 0; i < cardViews.Count; i++)
+            cardViews[i].ShowEffectLayer(false);
         PanelManager.Instance.HideShop();
         // 商店结束进入战斗
         GameManager.Instance.PlaySound("Sounds/biang");

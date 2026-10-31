@@ -25,12 +25,12 @@ public static class SysColor
     {
         switch (quality)
         {
-            case 1: return new Color(255 / 255f, 255 / 255f, 255 / 255f); // 普通-白
+            case 1: return new Color(200 / 255f, 200 / 255f, 200 / 255f); // 普通-白（略暗，避免与亮底/白字糊在一起）
             case 2: return new Color(30 / 255f, 255 / 255f, 0 / 255f);    // 优秀-绿
             case 3: return new Color(0 / 255f, 112 / 255f, 221 / 255f);   // 精良-蓝
             case 4: return new Color(255 / 255f, 215 / 255f, 0 / 255f);   // 史诗-金
             case 5: return new Color(255 / 255f, 0 / 255f, 0 / 255f);   // 史诗-红
-            default: return new Color(255 / 255f, 255 / 255f, 255 / 255f); // 普通-白
+            default: return new Color(200 / 255f, 200 / 255f, 200 / 255f); // 普通-白
         }
     }
 

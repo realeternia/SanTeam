@@ -327,10 +327,14 @@ public class PickPanelControl : MonoBehaviour
             return;
         }
 
+        // 读档前先整体重置玩家，避免存档中未覆盖的字段沿用上一局残留数据
+        GameManager.Instance.ResetPlayersForNewGame();
+
         if (GameManager.Instance.LoadFromSave(selectedSlot))
         {
             GameManager.Instance.InitFriend(true);
             GameManager.Instance.InitHeros(true);
+            CardShopManager.RequestResetGameState();
             SetPlayerInfoVisible(true);
             PanelManager.Instance.ShowShop();
             PanelManager.Instance.HidePick();
@@ -366,6 +370,9 @@ public class PickPanelControl : MonoBehaviour
         if (GameManager.Instance.currentSaveSlot < 0)
             GameManager.Instance.CreateNewSaveSlot();
 
+        CardShopManager.RequestResetGameState();
+        // 重置全部玩家，避免上一局的卡片/等级/生命等数据残留到新的一局
+        GameManager.Instance.ResetPlayersForNewGame();
         loadGamePanel.SetActive(false);
         GameManager.Instance.InitHeros(false);
         GameManager.Instance.InitFriend(false);

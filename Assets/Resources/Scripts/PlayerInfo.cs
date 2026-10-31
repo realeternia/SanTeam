@@ -116,6 +116,44 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         UpdateView();
     }
 
+    // 新开一局时重置为初始状态（回到开始界面后再开新游戏，不能残留上一局的卡片/等级/生命等数据）
+    public void ResetForNewGame(int id, int pid1)
+    {
+        pid = id;
+        playerId = pid1;
+        isAI = id > 0;
+
+        gold = 0;
+        mark = CombatConst.PlayerInitLife;
+        isEliminated = false;
+        winCount = 0;
+        loseCount = 0;
+        lastBattleLose = false;
+
+        cards.Clear();
+        items.Clear();
+        battleCards = new int[CombatConst.PlayerMaxSlot];
+        level = 1;
+        exp = 0;
+        soldierLevel = 1;
+        goldCostHero = 0;
+        goldCostItem = 0;
+        attrAddons.Clear();
+        likeCount = 2;
+        lastFightMark = 0;
+        nextSkip = false;
+        boughtThisShopCards.Clear();
+        isOnTurn = false;
+        battleSide = 0;
+        castleHUD = null;
+
+        ApplyEliminatedState();
+        SetPlayerData();
+        EnsureSoldierCells();
+        UpdateView();
+        GameLog.Debug($"玩家{pid} 已重置为新游戏初始状态");
+    }
+
     public void FirstRound()
     {
         if (playerConfig.InitGold > 0)
@@ -1655,6 +1693,14 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
             
             // 使用JsonUtility反序列化
             SerializableData serializableData = JsonUtility.FromJson<SerializableData>(json);
+
+            // 未随存档持久化的运行时状态先清空，避免切换存档时残留上一局数据
+            likeCount = 2;
+            nextSkip = false;
+            boughtThisShopCards.Clear();
+            isOnTurn = false;
+            battleSide = 0;
+            castleHUD = null;
             
             // 获取所有带有[CustomSerializeField]属性的字段
             var fields = GetType().GetFields();

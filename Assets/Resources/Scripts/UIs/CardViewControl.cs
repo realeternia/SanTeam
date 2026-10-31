@@ -109,7 +109,8 @@ public class CardViewControl : MonoBehaviour, IPointerDownHandler, IPointerUpHan
             var heroCfg = HeroConfig.GetConfig(cid);
             heroImage.sprite = Resources.Load<Sprite>("Textures/SkinsBig/" + heroCfg.Icon);
             cardName.text = heroCfg.Name;
-            cardName.color = SysColor.GetQualityColor(heroCfg.Quality);
+            // 卡片名字固定白色，不按品质着色
+            cardName.color = Color.white;
 
             // 卡面技能图标：slot0=职业兵种技能，slot1=英雄个人技能分类图标，slot2/3=好友组关联技能图标，无则不显示
             var jobCfg = ConfigManager.GetJobConfig(heroCfg.Job);
@@ -265,6 +266,9 @@ public class CardViewControl : MonoBehaviour, IPointerDownHandler, IPointerUpHan
             else
                 effectGreen.SetActive(false);
         }
+
+        // 刷新的同时同步特效层容器（进入战斗前容器会被隐藏，回到商店换卡后需要重新显示）
+        UpdateEffectLayer();
     }
 
     // 玩家已拥有（卡牌集合中）与指定职业相同的英雄
