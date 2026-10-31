@@ -93,41 +93,71 @@ public static class HeroSelectionTool
         return result;
     }
 
-    // like阶段收藏池（按玩家分别记录）：每个玩家各点赞2张；商店刷新时按 LikeCardRefreshRate 概率从“当前玩家自己”的收藏池随机出一张
-    private static Dictionary<int, List<int>> likeHeroPools = new Dictionary<int, List<int>>();
+    // ---- 许愿(wish)机制：每个玩家在第10/25/40回合各选1个英雄，选中后商店出卡权重×3 ----
 
-    // like阶段结束写入收藏池（按 pid 分玩家收集）
-    public static void SetLikePools(Dictionary<int, List<int>> pools)
+    /// <summary>取玩家许愿槽位英雄Id（未选/槽位非法返回0）</summary>
+    public static int GetWishHeroId(int pid, int slot)
     {
-        likeHeroPools = pools == null ? new Dictionary<int, List<int>>() : pools;
-    }
-
-    // 从指定玩家的收藏池随机出一张卡（池空返回0）；命中后该卡权重 ×0.5
-    public static int GetRandomLikedHeroId(int pid)
-    {
-        if (!likeHeroPools.TryGetValue(pid, out var pool) || pool.Count == 0)
+        var player = GameManager.Instance != null ? GameManager.Instance.GetPlayer(pid) : null;
+        if (player == null)
             return 0;
-        int heroId = pool[SysRandom.Range(0, pool.Count)];
-        DecayShopWeight(heroId);
-        return heroId;
+        return GetWishHeroId(player, slot);
     }
 
-    // 某英雄是否被指定玩家许愿（点赞进其收藏池）
-    public static bool IsLikedHero(int pid, int heroId)
+    /// <summary>取玩家许愿槽位英雄Id（未选/槽位非法返回0）</summary>
+    public static int GetWishHeroId(PlayerInfo player, int slot)
     {
-        return likeHeroPools.TryGetValue(pid, out var pool) && pool != null && pool.Contains(heroId);
+        if (player == null || player.wishHeroes == null)
+            return 0;
+        if (slot < 0 || slot >= player.wishHeroes.Length)
+            return 0;
+        return player.wishHeroes[slot];
     }
 
-    // 刷牌（共享模式）：先按GameRoundConfig品质概率roll出品质，再从该品质的英雄池随机选一张
-    public static int GetRandomHeroIdByQuality(GameRoundConfig shopCfg)
+    /// <summary>写入许愿英雄（选定后由调用方保证不再修改）</summary>
+    public static void SetWishHero(PlayerInfo player, int slot, int heroId)
     {
-        return GetRandomHeroIdByQuality(RollQuality(shopCfg));
+        if (player == null || slot < 0)
+            return;
+        if (player.wishHeroes == null || player.wishHeroes.Length < CombatConst.WishSlotCount)
+            player.wishHeroes = new int[CombatConst.WishSlotCount];
+        if (slot >= player.wishHeroes.Length)
+            return;
+        player.wishHeroes[slot] = heroId;
     }
 
-    // 刷牌（独立买卡）：按玩家等级(PlayerLevelConfig)的品质概率roll出品质，再从该品质英雄池随机选一张
-    public static int GetRandomHeroIdByLevel(int level)
+    /// <summary>许愿槽位是否已到解锁回合（当前商店回合 = GameManager.year）</summary>
+    public static bool IsWishSlotUnlocked(int slot)
     {
-        return GetRandomHeroIdByQuality(RollQualityByLevel(level));
+        if (slot < 0 || slot >= CombatConst.WishUnlockRounds.Length)
+            return false;
+        int round = GameManager.Instance != null ? GameManager.Instance.year : 0;
+        return round >= CombatConst.WishUnlockRounds[slot];
+    }
+
+    /// <summary>玩家是否已经许愿过该英雄（用于避免重复选择）</summary>
+    public static bool IsWishedHero(PlayerInfo player, int heroId)
+    {
+        if (player == null || player.wishHeroes == null || heroId == 0)
+            return false;
+        for (int i = 0; i < player.wishHeroes.Length; i++)
+        {
+            if (player.wishHeroes[i] == heroId)
+                return true;
+        }
+        return false;
+    }
+
+    // 刷牌（共享模式）：先按GameRoundConfig品质概率roll出品质，再从该品质的英雄池随机选一张（pid用于许愿加权）
+    public static int GetRandomHeroIdByQuality(GameRoundConfig shopCfg, int pid)
+    {
+        return GetRandomHeroIdByQuality(RollQuality(shopCfg), pid);
+    }
+
+    // 刷牌（独立买卡）：按玩家等级(PlayerLevelConfig)的品质概率roll出品质，再从该品质英雄池随机选一张（pid用于许愿加权）
+    public static int GetRandomHeroIdByLevel(int level, int pid)
+    {
+        return GetRandomHeroIdByQuality(RollQualityByLevel(level), pid);
     }
 
     // 商店刷牌权重表：每张卡初始权重 1（首次全随机），每次被刷出后 ×ShopWeightDecay（降低连续重复刷新概率）；
@@ -156,7 +186,8 @@ public static class HeroSelectionTool
     }
 
     // 按已定品质从英雄池随机选一张（该品质池为空则回退整池随机）；刷出后该卡权重 ×0.5
-    public static int GetRandomHeroIdByQuality(int quality)
+    // pid>=0 时，该玩家的许愿英雄在此品质内权重 ×3
+    public static int GetRandomHeroIdByQuality(int quality, int pid = -1)
     {
         List<int> candidates = new List<int>();
         foreach (var hero in heroPoolCache)
@@ -171,28 +202,50 @@ public static class HeroSelectionTool
         if (candidates.Count == 0)
             return 0;
 
-        int heroId = WeightedPickHero(candidates);
+        int heroId = WeightedPickHero(candidates, pid);
         DecayShopWeight(heroId);
         return heroId;
     }
 
-    // 按权重随机取一张（权重全部非正时回退等概率）
-    private static int WeightedPickHero(List<int> candidates)
+    // 按权重随机取一张（权重全部非正时回退等概率）；许愿英雄额外乘 WishHeroWeightMultiplier
+    private static int WeightedPickHero(List<int> candidates, int pid)
     {
         float total = 0f;
         for (int i = 0; i < candidates.Count; i++)
-            total += GetShopWeight(candidates[i]);
+            total += GetPickWeight(candidates[i], pid);
         if (total <= 0f)
             return candidates[SysRandom.Range(0, candidates.Count)];
 
         float roll = SysRandom.Range(0f, total);
         for (int i = 0; i < candidates.Count; i++)
         {
-            roll -= GetShopWeight(candidates[i]);
+            roll -= GetPickWeight(candidates[i], pid);
             if (roll < 0f)
                 return candidates[i];
         }
         return candidates[candidates.Count - 1];
+    }
+
+    // 单张卡的综合抽取权重 = 商店衰减权重 ×（该玩家许愿英雄 ? WishHeroWeightMultiplier : 1）
+    private static float GetPickWeight(int heroId, int pid)
+    {
+        float weight = GetShopWeight(heroId);
+        if (pid < 0 || GameManager.Instance == null)
+            return weight;
+
+        var player = GameManager.Instance.GetPlayer(pid);
+        if (player == null)
+            return weight;
+
+        for (int slot = 0; slot < CombatConst.WishSlotCount; slot++)
+        {
+            if (GetWishHeroId(player, slot) == heroId)
+            {
+                weight *= CombatConst.WishHeroWeightMultiplier;
+                break;
+            }
+        }
+        return weight;
     }
 
     // 品质1=100-品质2-品质3-品质4

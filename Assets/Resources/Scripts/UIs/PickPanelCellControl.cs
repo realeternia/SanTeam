@@ -20,13 +20,20 @@ public class PickPanelCellControl : MonoBehaviour
 
     public int likeState; //0，未点赞，非0，玩家对应的点赞（pid+1）
 
+    // 许愿模式：格子仅用于选择一个许愿英雄（点击高亮，最终由面板的“确定”按钮提交）
+    public bool wishMode;
+    public System.Action<PickPanelCellControl> onWishSelected;
+
     // Start is called before the first frame update
     void Start()
     {
         banBtn.onClick.AddListener(() =>
         {
             GameManager.Instance.PlaySound("Sounds/click");
-            LikeBtnClick();
+            if (wishMode)
+                onWishSelected?.Invoke(this);
+            else
+                LikeBtnClick();
         });
 
         // 设置forbidImg不阻挡鼠标点击
@@ -61,6 +68,22 @@ public class PickPanelCellControl : MonoBehaviour
         forbidImg.color = player.lineColor;
         forbidImg.sprite = Resources.Load<Sprite>("Textures/love"); // 点赞显示红心
         forbidImg.gameObject.SetActive(true);
+    }
+
+    // 许愿格子选中高亮：选中用高亮色，取消选中恢复阵营底色
+    public void SetWishHighlight(bool on)
+    {
+        if (bgImg == null)
+            return;
+
+        if (on)
+        {
+            bgImg.color = SysColor.UI.CheckBtnSelected;
+            return;
+        }
+
+        var heroCfg = HeroConfig.GetConfig(heroId);
+        bgImg.color = heroCfg != null ? SysColor.GetSideColor(heroCfg.Side) : Color.white;
     }
 
     private void LikeBtnClick()

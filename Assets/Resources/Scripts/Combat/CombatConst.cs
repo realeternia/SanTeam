@@ -141,9 +141,15 @@ public static class CombatConst
     /// <summary>近战/远程士兵射程判定阈值</summary>
     public const float MeleeRange = 25f;
 
-    // ---- 收藏卡(likecard)机制 ----
-    /// <summary>刷新卡牌时从收藏池中随机出一张的概率(%)，收藏池=like阶段全部玩家点赞，共16张，存于 HeroSelectionTool</summary>
-    public const int LikeCardRefreshRate = 5;
+    // ---- 许愿(wish)机制 ----
+    /// <summary>每名玩家的许愿槽位数量（对应背包 loveBtn 的 3 个按钮）</summary>
+    public const int WishSlotCount = 3;
+    /// <summary>各许愿槽位解锁的回合（第 10/25/40 回合可分别选择一个英雄）</summary>
+    public static readonly int[] WishUnlockRounds = { 10, 25, 40 };
+    /// <summary>许愿英雄在商店的出卡权重倍率（正常为1，许愿为3倍）</summary>
+    public const int WishHeroWeightMultiplier = 3;
+    /// <summary>AI 许愿品质4的概率(%)，其余情况许愿品质3</summary>
+    public const int AiWishQuality4Rate = 75;
 
     // ---- 连线(武将关系) ----
     /// <summary>连线好友数量档位(2/3/4/5/6，供好友收益评估取档)</summary>

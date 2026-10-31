@@ -487,54 +487,19 @@ public class GameManager : MonoBehaviour
 
     public void InitHeros(bool loadSave)
     {
-        if(!loadSave)
-            BuildHeros();
+        // 创建账号不再选牌：所有英雄都进入随机池（读档也统一使用全量池，兼容旧存档）
+        BuildHeros();
 
         HeroSelectionTool.UpdateHeroPoolCache(heroIds);
     }
 
     private void BuildHeros()
     {
-        List<HeroConfig> allHeroes = new List<HeroConfig>(HeroConfig.ConfigList);
+        // 创建账号不再展示选牌界面：HeroConfig 中的所有英雄全部进入随机池
         heroIds = new List<int>();
-
-        // 核心英雄（各势力主公 王）始终进入英雄池
-        List<HeroConfig> tempHeroes = new List<HeroConfig>(allHeroes);
-        foreach (var hero in tempHeroes)
+        foreach (var hero in HeroConfig.ConfigList)
         {
-            if (ConfigManager.IsKingHero(hero.Id))
-            {
-                heroIds.Add(hero.Id);
-                allHeroes.Remove(hero);
-            }
-        }
-
-        // 魏蜀吴之外的4个阵营(4晋/5群/6神/10野)4选2，选中阵营的全部英雄进英雄池
-        int[] sides = {4, 5, 6, 10};
-        int[] pickedSides = new int[2];
-        for (int i = 0; i < 2; i++)
-        {
-            var side = sides[SysRandom.Range(0, sides.Length)];
-            sides = sides.Where(s => s != side).ToArray();
-            pickedSides[i] = side;
-        }
-        foreach (var side in pickedSides)
-        {
-            foreach (var hero in allHeroes.FindAll(h => h.Side == side))
-                heroIds.Add(hero.Id);
-        }
-
-        // side 1/2/3 全部加入英雄池，不做随机筛选
-        List<List<HeroConfig>> sideHeroes = new List<List<HeroConfig>>
-        {
-            allHeroes.FindAll(hero => hero.Side == 1),
-            allHeroes.FindAll(hero => hero.Side == 2),
-            allHeroes.FindAll(hero => hero.Side == 3)
-        };
-
-        foreach (var sideHeroList in sideHeroes)
-        {
-            foreach (var hero in sideHeroList)
+            if (hero != null && hero.Id > 0)
                 heroIds.Add(hero.Id);
         }
     }

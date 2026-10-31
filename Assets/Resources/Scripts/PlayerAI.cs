@@ -11,61 +11,93 @@ using System.Text;
 
 public static class PlayerAI
 {
-    // like阶段：AI 按 playerConfig 的品质偏好 + 低价区间(5~10金) 选取卡牌点赞，共点赞 likeCount 张（默认2张，选不同卡）
-    // （点赞只是把该卡选入收藏池，不移动/移除英雄池；收藏池会以 LikeCardRefreshRate 概率在商店刷新中重新出现）
-    public static void CheckLike(PlayerInfo playerInfo, List<PickPanelCellControl> cellControls)
+    // 许愿阶段（第10/25/40回合）：AI 自动选择1个许愿英雄，参考自身喜好(LikeJob/LikeForce)与当前优势卡职业/阵营。
+    // 一般许愿品质4，其余许愿品质3；选中的英雄在商店出卡权重×3，且同一英雄不会重复许愿。
+    public static void CheckWish(PlayerInfo playerInfo, int wishSlot)
     {
-        var playerConfig = playerInfo.playerConfig;
-        var pid = playerInfo.pid;
+        if (playerInfo == null || playerInfo.isEliminated)
+            return;
+        if (HeroSelectionTool.GetWishHeroId(playerInfo, wishSlot) != 0)
+            return; // 该槽位已许愿，选定后不可修改
+        if (!HeroSelectionTool.IsWishSlotUnlocked(wishSlot))
+            return;
 
-        // 每个玩家可赞 likeCount 张（默认2张），尽量选不同卡
-        int remain = playerInfo.likeCount;
-        while (remain > 0)
+        // 一般许愿品质4，其余品质3
+        int targetQuality = SysRandom.Range(0, 100) < CombatConst.AiWishQuality4Rate ? 4 : 3;
+        int heroId = PickWishHero(playerInfo, targetQuality);
+        if (heroId == 0)
+            heroId = PickWishHero(playerInfo, targetQuality == 4 ? 3 : 4);
+        if (heroId == 0)
+            return;
+
+        HeroSelectionTool.SetWishHero(playerInfo, wishSlot, heroId);
+        var heroCfg = HeroConfig.GetConfig(heroId);
+        GameLog.Debug($"AI玩家{playerInfo.pid} 第{GameManager.Instance.year}回合许愿槽位{wishSlot}选择：{heroCfg.Name}(品质{heroCfg.Quality})");
+    }
+
+    // 在指定品质内根据喜好与当前优势卡加权随机一个许愿英雄
+    private static int PickWishHero(PlayerInfo playerInfo, int quality)
+    {
+        var cfg = playerInfo.playerConfig;
+        List<int> strongCardIds = playerInfo.GetStrongCardList(playerInfo.GetSlotCount())
+            .Select(x => x.Item1).ToList();
+
+        // 当前优势卡的职业/阵营分布
+        Dictionary<string, int> strongJobs = new Dictionary<string, int>();
+        Dictionary<int, int> strongSides = new Dictionary<int, int>();
+        foreach (int cardId in strongCardIds)
         {
-            // 根据playerConfig的配置过滤可点赞的英雄（只选未被该玩家赞过的卡）
-            List<PickPanelCellControl> availableLikes = new List<PickPanelCellControl>();
-            foreach (var cell in cellControls)
-            {
-                if (cell.likeState > 0 || ConfigManager.IsKingHero(cell.heroId))
-                    continue;
-
-                var heroConfig = HeroConfig.GetConfig(cell.heroId);
-
-                // AI 一般只选 5~10 金的卡
-                var price = HeroSelectionTool.GetPrice(heroConfig);
-                if (price < 5 || price > 10)
-                    continue;
-
-                availableLikes.Add(cell);
-            }
-
-            // 从目标列表中随机选择一个进行点赞
-            if (availableLikes.Count > 0)
-            {
-                int randomIndex = SysRandom.Range(0, availableLikes.Count);
-                availableLikes[randomIndex].SetLike(pid);
-            }
-            else
-            {
-                // 如果没有满足所有条件的卡牌，选择一张满足基本条件的卡牌
-                List<PickPanelCellControl> basicAvailableCells = new List<PickPanelCellControl>();
-                foreach (var cell in cellControls)
-                {
-                    if (cell.likeState == 0 && !ConfigManager.IsKingHero(cell.heroId))
-                        basicAvailableCells.Add(cell);
-                }
-                if (basicAvailableCells.Count > 0)
-                {
-                    int randomIndex = SysRandom.Range(0, basicAvailableCells.Count);
-                    basicAvailableCells[randomIndex].SetLike(pid);
-                }
-            }
-
-            // 本轮是否成功点掉一张：likeCount 已被 SetLike 自减
-            if (playerInfo.likeCount >= remain)
-                break; // 没点出去（无可用卡），避免死循环
-            remain = playerInfo.likeCount;
+            var heroCfg = HeroConfig.GetConfig(cardId);
+            if (heroCfg == null || string.IsNullOrEmpty(heroCfg.Job))
+                continue;
+            strongJobs.TryGetValue(heroCfg.Job, out var jc);
+            strongJobs[heroCfg.Job] = jc + 1;
+            strongSides.TryGetValue(heroCfg.Side, out var sc);
+            strongSides[heroCfg.Side] = sc + 1;
         }
+
+        List<int> candidates = new List<int>();
+        List<float> weights = new List<float>();
+        foreach (int heroId in HeroSelectionTool.GetHeroPoolCache())
+        {
+            var heroCfg = HeroConfig.GetConfig(heroId);
+            if (heroCfg == null || heroCfg.Quality != quality)
+                continue;
+            if (ConfigManager.IsKingHero(heroId))
+                continue; // 主公不参与许愿
+            if (HeroSelectionTool.IsWishedHero(playerInfo, heroId))
+                continue; // 不重复许愿同一英雄
+
+            float weight = 1f;
+            // 喜好职业（配置为 JobConfig.Id，需把英雄职业名转成职业Id）
+            var jobCfg = ConfigManager.GetJobConfig(heroCfg.Job);
+            if (jobCfg != null && cfg.LikeJob != null && cfg.LikeJob.Contains(jobCfg.Id))
+                weight += 2f;
+            // 喜好阵营
+            if (cfg.LikeForce != null && cfg.LikeForce.Contains(heroCfg.Side))
+                weight += 2f;
+            // 当前优势卡：同职业/同阵营越多越优先
+            if (strongJobs.TryGetValue(heroCfg.Job, out var jobCount))
+                weight += 1.5f * Mathf.Min(3, jobCount);
+            if (strongSides.TryGetValue(heroCfg.Side, out var sideCount))
+                weight += 0.5f * Mathf.Min(3, sideCount);
+
+            candidates.Add(heroId);
+            weights.Add(weight);
+        }
+
+        if (candidates.Count == 0)
+            return 0;
+
+        float total = weights.Sum();
+        float roll = SysRandom.Range(0f, total);
+        for (int i = 0; i < candidates.Count; i++)
+        {
+            roll -= weights[i];
+            if (roll < 0f)
+                return candidates[i];
+        }
+        return candidates[candidates.Count - 1];
     }
 
 
@@ -333,8 +365,8 @@ public static class PlayerAI
                 // 故"价格"是更可控的价值杠杆——按 (价格/基准)^指数 放大高价卡权重（Q4史诗=最高价）
                 score *= Mathf.Pow((float)pickCard.price / CombatConst.CardPriceBiasBase, CombatConst.CardPriceBiasExponent);
 
-                // 许愿：候选卡是"当前玩家自己许愿(点赞收藏池)的牌"时，拿取意愿 ×2
-                if (HeroSelectionTool.IsLikedHero(playerInfo.pid, pickCard.cardId))
+                // 许愿：候选卡是"当前玩家自己许愿的英雄"时，拿取意愿 ×2
+                if (HeroSelectionTool.IsWishedHero(playerInfo, pickCard.cardId))
                     score *= CombatConst.WishCardBias;
 
                 // 升星导向：重复卡按"距下一星的卡数"加权（越近越高），上阵主力额外加成。

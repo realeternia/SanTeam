@@ -216,6 +216,30 @@ public class PanelManager : MonoBehaviour
         ChangePanelCount(pickPanel, false);
     }
 
+    // 许愿面板：复用选牌面板（隐藏品质1的卡，底部“确定”/右上角“关闭”），onDone 在关闭时回调
+    public void ShowWish(int slot, int pid, System.Action onDone)
+    {
+        if (pickPanel == null)
+            pickPanel = LoadPanel("PickPanelBg");
+        if (pickPanel == null)
+        {
+            GameLog.Error("PanelManager 许愿面板加载失败: Prefabs/UIs/PickPanelBg");
+            onDone?.Invoke();
+            return;
+        }
+
+        pickPanel.SetActive(true);
+        pickPanel.transform.SetAsLastSibling(); // 覆盖在背包等面板之上
+
+        var control = pickPanel.GetComponent<PickPanelControl>();
+        if (control == null)
+            GameLog.Error("PanelManager 选牌面板上缺少 PickPanelControl 组件");
+        else
+            control.ShowWishPanel(slot, pid, onDone);
+
+        ChangePanelCount(pickPanel, true);
+    }
+
     // 右侧滑出侧边栏：首次从 Resources/Prefabs/SideBar 实例化并缓存，子面板预制体按 panelName 加载到 SideBar 内容节点
     public void ShowSideBar(string panelName, System.Action<GameObject> onCreated = null)
     {

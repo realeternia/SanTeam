@@ -19,6 +19,12 @@ public class PickPanelControl : MonoBehaviour
 
     private List<PickPanelCellControl> cellControls = new List<PickPanelCellControl>();
 
+    // ---- 许愿面板运行时状态 ----
+    private int wishSlot = -1;
+    private int wishPid = -1;
+    private System.Action wishDoneCallback;
+    private PickPanelCellControl pendingWishCell;
+
     private Tween startTextTween;
     private const float StartPanelFadeDuration = 1.5f; // 开始面板点击后渐隐时长
     private bool startPanelClicked;
@@ -53,30 +59,16 @@ public class PickPanelControl : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        refreshBtn.onClick.AddListener(() =>
+        // 许愿面板：确定（提交选中的英雄）与关闭（暂时不选）
+        okBtn.onClick.AddListener(() =>
         {
-            GameManager.Instance.PlaySound("Sounds/page");
-            GameManager.Instance.InitHeros(false);
-            GameManager.Instance.InitFriend(false);            
-            RefreshBtnClick();
+            GameManager.Instance.PlaySound("Sounds/click");
+            OnWishConfirm();
         });
         finBtn.onClick.AddListener(() =>
         {
             GameManager.Instance.PlaySound("Sounds/click");
-            finBtn.gameObject.SetActive(false); // 防重复点击；AI 许愿与进入商店由协程接管
-            StartCoroutine(AiLikesThenFinish());
-        });
-        okBtn.onClick.AddListener(() =>
-        {
-            GameManager.Instance.PlaySound("Sounds/click");
-            refreshBtn.gameObject.SetActive(false); // ok后，不能再refresh
-
-            // 许愿阶段：先由玩家 p0 许愿（点红心），玩家点"完成"后再由 AI 批量许愿
-            foreach (var cell in cellControls)
-                cell.canLike = true;
-
-            okBtn.gameObject.SetActive(false);
-            finBtn.gameObject.SetActive(true);
+            OnWishClose();
         });
 
         finBtn.gameObject.SetActive(false);
@@ -335,9 +327,7 @@ public class PickPanelControl : MonoBehaviour
             GameManager.Instance.InitFriend(true);
             GameManager.Instance.InitHeros(true);
             CardShopManager.RequestResetGameState();
-            SetPlayerInfoVisible(true);
-            PanelManager.Instance.ShowShop();
-            PanelManager.Instance.HidePick();
+            EnterShop();
         }
         else
         {
@@ -364,7 +354,7 @@ public class PickPanelControl : MonoBehaviour
         StartNewGame();
     }
 
-    // 开始一局新游戏（更新英雄池/好友池并刷新选牌）
+    // 开始一局新游戏：不再展示选牌/like 面板，所有英雄直接进入随机池并进入商店
     private void StartNewGame()
     {
         if (GameManager.Instance.currentSaveSlot < 0)
@@ -376,7 +366,18 @@ public class PickPanelControl : MonoBehaviour
         loadGamePanel.SetActive(false);
         GameManager.Instance.InitHeros(false);
         GameManager.Instance.InitFriend(false);
-        RefreshBtnClick();
+        EnterShop();
+    }
+
+    // 从开始界面进入商店：面板若已创建（回到开始界面后再开一局）需手动重新走一遍 ShopBegin
+    private void EnterShop()
+    {
+        SetPlayerInfoVisible(true);
+        bool shopExisted = PanelManager.Instance.cardShopPanel != null;
+        PanelManager.Instance.ShowShop();
+        if (shopExisted && PanelManager.Instance.cardShopPanel != null)
+            PanelManager.Instance.cardShopPanel.GetComponent<CardShopManager>()?.ShopBegin();
+        PanelManager.Instance.HidePick();
     }
 
     // 显示开始面板：startText 循环缩放，任意点击后进入选牌流程
@@ -455,146 +456,194 @@ public class PickPanelControl : MonoBehaviour
         
     }
 
-    // 许愿流程：玩家 p0 先许愿，点"完成"后由本协程让 AI 批量许愿，随后进入商店
-    private IEnumerator AiLikesThenFinish()
+    // ---- 许愿面板（复用选牌面板的格子区域；隐藏品质1的卡，确定/关闭按钮见 SetupWishButtons）----
+
+    // 打开许愿面板：由 BagControl 的 loveBtn 调用（PanelManager.ShowWish 已激活本面板）
+    public void ShowWishPanel(int slot, int pid, System.Action onDone)
     {
-        // AI 批量许愿：各 AI 依次点赞 likeCount 张（cellControls 已排除 p0 已点赞的卡）
-        for (int i = 1; i <= 7; i++)
-        {
-            var pid = (i % 7) + 1;
-            var player = GameManager.Instance.GetPlayer(pid);
-            if (player.likeCount > 0)
-                PlayerAI.CheckLike(player, cellControls);
-        }
+        wishSlot = slot;
+        wishPid = pid;
+        wishDoneCallback = onDone;
+        pendingWishCell = null;
 
-        FinishLikePhase();
-        yield break;
-    }    
+        // 隐藏开始/读档面板与刷新按钮，只保留许愿格子和确定/关闭
+        startPanel.SetActive(false);
+        loadGamePanel.SetActive(false);
+        refreshBtn.gameObject.SetActive(false);
 
-    // like阶段结束：把每个玩家（人类+AI）点赞的卡牌按 pid 写入收藏池，
-    // 收藏池会在每次刷新卡牌时有 LikeCardRefreshRate 概率刷出“当前玩家自己”点赞的一张
-    private void FinishLikePhase()
-    {
-        HeroSelectionTool.SetLikePools(GetLikePools());
-
-        // 新游戏like阶段结束进入，存档一次
-        GameManager.Instance.SaveToFile();
-
-        SetPlayerInfoVisible(true);
-        PanelManager.Instance.ShowShop();
-        PanelManager.Instance.HidePick();
+        SetupWishButtons();
+        RefreshWishCells();
     }
 
-    // 收集每个玩家点赞的卡牌（likeState = pid+1），返回 pid → 该玩家点赞的英雄ID列表
-    private Dictionary<int, List<int>> GetLikePools()
+    // 配置确定（底部居中）与关闭（右上角）按钮
+    private void SetupWishButtons()
     {
-        var pools = new Dictionary<int, List<int>>();
-        foreach (var cell in cellControls)
+        var okText = GetButtonText(okBtn);
+        if (okText != null)
+            okText.text = "确定";
+        var finText = GetButtonText(finBtn);
+        if (finText != null)
+            finText.text = "关闭";
+
+        var okRt = okBtn.GetComponent<RectTransform>();
+        if (okRt != null)
         {
-            if (cell.likeState <= 0)
-                continue;
-
-            int pid = cell.likeState - 1;
-            if (!pools.TryGetValue(pid, out var list))
-            {
-                list = new List<int>();
-                pools[pid] = list;
-            }
-            list.Add(cell.heroId);
+            okRt.anchorMin = okRt.anchorMax = new Vector2(0.5f, 0f);
+            okRt.pivot = new Vector2(0.5f, 0f);
+            okRt.anchoredPosition = new Vector2(0f, 24f);
         }
-        return pools;
-    }
 
+        var finRt = finBtn.GetComponent<RectTransform>();
+        if (finRt != null)
+        {
+            finRt.anchorMin = finRt.anchorMax = new Vector2(1f, 1f);
+            finRt.pivot = new Vector2(1f, 1f);
+            finRt.anchoredPosition = new Vector2(-24f, -24f);
+        }
 
-    private void RefreshBtnClick()
-    {
-        RefreshHeroPool();
         okBtn.gameObject.SetActive(true);
-        
-        refreshCount--;
-        refreshText.text = "刷新(" + refreshCount + ")";
-        if (refreshCount <= 0)
-        {
-            refreshBtn.gameObject.SetActive(false);
-        }
-        else
-        {
-            refreshBtn.gameObject.SetActive(true);
-        }
-
+        finBtn.gameObject.SetActive(true);
     }
 
-
-    void RefreshHeroPool()
+    // 刷新许愿格子：展示品质>1且未被该玩家许愿过的英雄
+    private void RefreshWishCells()
     {
-        // 销毁节点下所有子对象
         for (int i = cellParent.childCount - 1; i >= 0; i--)
-        {
             Destroy(cellParent.GetChild(i).gameObject);
-        }
         cellControls.Clear();
 
+        var player = GameManager.Instance.GetPlayer(wishPid);
+        List<int> heroPool = HeroSelectionTool.GetHeroPoolCache()
+            .Where(heroId => HeroConfig.HasConfig(heroId))
+            .Where(heroId => HeroConfig.GetConfig(heroId).Quality > 1) // 隐藏所有品质1的卡
+            .Where(heroId => !ConfigManager.IsKingHero(heroId)) // 主公不参与许愿（与 AI 一致）
+            .Where(heroId => !HeroSelectionTool.IsWishedHero(player, heroId))
+            .ToList();
 
-        // 获取英雄池缓存
-        List<int> heroPool = HeroSelectionTool.GetHeroPoolCache();
-
-        // 王(主公)不参与pick展示与ban，但仍保留在英雄池用于商店卡池
-        heroPool = heroPool.Where(heroId => !ConfigManager.IsKingHero(heroId)).ToList();
-        
-        // 每行显示10个，共5行
         int itemsPerRow = 13;
         int rows = 7;
         int totalItems = Mathf.Min(heroPool.Count, itemsPerRow * rows);
-        
-        // 单元格大小和间距
+
         float cellWidth = 108f;
         float cellHeight = 108f;
         float spacingX = 0f;
         float spacingY = 2f;
 
-        // 创建单元格
         for (int i = 0; i < totalItems; i++)
         {
             int heroId = heroPool[i];
             HeroConfig heroCfg = HeroConfig.GetConfig(heroId);
 
-            // 实例化单元格
             GameObject cell = Instantiate(pickPanelCellPrefab, cellParent);
             cell.transform.localScale = Vector3.one;
 
-            // 计算位置
             int row = i / itemsPerRow;
             int col = i % itemsPerRow;
             float posX = 5 + col * (cellWidth + spacingX) + 60;
-            float posY = -5 -row * (cellHeight + spacingY) - 60;
+            float posY = -5 - row * (cellHeight + spacingY) - 60;
 
-            // 设置位置
             RectTransform rectTransform = cell.GetComponent<RectTransform>();
             rectTransform.anchoredPosition = new Vector2(posX, posY);
 
-            // 设置单元格数据
             PickPanelCellControl cellControl = cell.GetComponent<PickPanelCellControl>();
             cellControl.heroId = heroId;
+            cellControl.wishMode = true;
+            cellControl.onWishSelected = OnWishCellSelected;
             cellControls.Add(cellControl);
-            if (cellControl != null)
-            {
-                // 设置英雄图片
-                cellControl.heroImg.sprite = Resources.Load<Sprite>("Textures/Skins/" + heroCfg.Icon);
-                // 设置job图片（英雄第一个技能图标，与战斗一致按缩写解析）
-                var skillCfgs = ConfigManager.GetHeroSkillConfigs(heroCfg);
-                var icon = skillCfgs.Count > 0 ? skillCfgs[0].Icon : "";
-                cellControl.jobImg.sprite = Resources.Load<Sprite>("Textures/SkillPic/" + icon);
 
-                // 设置英雄名称，颜色按品质
-                cellControl.heroName.text = heroCfg.Name;
-                cellControl.heroName.color = SysColor.GetQualityColor(heroCfg.Quality);
+            cellControl.heroImg.sprite = Resources.Load<Sprite>("Textures/Skins/" + heroCfg.Icon);
+            var skillCfgs = ConfigManager.GetHeroSkillConfigs(heroCfg);
+            var icon = skillCfgs.Count > 0 ? skillCfgs[0].Icon : "";
+            cellControl.jobImg.sprite = Resources.Load<Sprite>("Textures/SkillPic/" + icon);
 
-                cellControl.bgImg.GetComponent<Image>().color = SysColor.GetSideColor(heroCfg.Side);
+            cellControl.heroName.text = heroCfg.Name;
+            cellControl.heroName.color = SysColor.GetQualityColor(heroCfg.Quality);
+            cellControl.bgImg.color = SysColor.GetSideColor(heroCfg.Side);
 
-                // 默认隐藏点赞图标
+            // 隐藏原“点赞/禁用”标记图（预制体里默认激活，会挡住整格点击并让卡片变色）
+            if (cellControl.forbidImg != null)
                 cellControl.forbidImg.gameObject.SetActive(false);
+
+            // 整格可点击：根节点补一个透明按钮（子级按钮除原红心按钮外统一转发为“选中该英雄”）
+            var rootBtn = cell.GetComponent<Button>();
+            if (rootBtn == null)
+            {
+                rootBtn = cell.AddComponent<Button>();
+                rootBtn.transition = Selectable.Transition.None;
+                rootBtn.targetGraphic = cellControl.bgImg;
             }
+            foreach (var btn in cell.GetComponentsInChildren<Button>(true))
+            {
+                if (btn == cellControl.banBtn)
+                    continue;
+                btn.onClick.AddListener(() => OnWishCellSelected(cellControl));
+            }
+
+            cellControl.SetWishHighlight(false);
         }
+    }
+
+    // 许愿格子点击：单选高亮（最终由“确定”提交）
+    private void OnWishCellSelected(PickPanelCellControl cell)
+    {
+        if (wishSlot < 0 || cell == null)
+            return;
+
+        GameManager.Instance.PlaySound("Sounds/click");
+        if (pendingWishCell != null && pendingWishCell != cell)
+            pendingWishCell.SetWishHighlight(false);
+        pendingWishCell = cell;
+        cell.SetWishHighlight(true);
+    }
+
+    // 确定：提交当前选中的英雄到许愿槽位（选定后不可修改）
+    private void OnWishConfirm()
+    {
+        if (wishSlot < 0)
+            return;
+
+        if (pendingWishCell == null)
+        {
+            SystemTip.Show("请先选择一位英雄");
+            return;
+        }
+
+        var player = GameManager.Instance.GetPlayer(wishPid);
+        if (HeroSelectionTool.GetWishHeroId(player, wishSlot) != 0)
+        {
+            SystemTip.Show("该许愿已选择，无法修改");
+            CloseWishPanel();
+            return;
+        }
+
+        HeroSelectionTool.SetWishHero(player, wishSlot, pendingWishCell.heroId);
+        GameLog.Debug($"玩家{wishPid} 许愿槽位{wishSlot}选择英雄 {pendingWishCell.heroId}({HeroConfig.GetConfig(pendingWishCell.heroId).Name})");
+        // 许愿结果立即写档
+        GameManager.Instance.SaveToFile();
+        CloseWishPanel();
+    }
+
+    // 关闭：暂时不选，直接关闭面板
+    private void OnWishClose()
+    {
+        if (wishSlot < 0)
+            return;
+        CloseWishPanel();
+    }
+
+    private void CloseWishPanel()
+    {
+        wishSlot = -1;
+        wishPid = -1;
+        pendingWishCell = null;
+
+        okBtn.gameObject.SetActive(false);
+        finBtn.gameObject.SetActive(false);
+        PanelManager.Instance.HidePick();
+
+        var callback = wishDoneCallback;
+        wishDoneCallback = null;
+        callback?.Invoke();
     }
 
 }

@@ -75,6 +75,9 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     public string imgPath{ get { return "Textures/" + playerConfig.Imgpath; } }
     public Color lineColor;
     public int likeCount = 2; //最多两张
+    // 许愿英雄：3个槽位分别在第10/25/40回合解锁，0=未选；选定后不可修改，商店出卡权重×3
+    [CustomSerializeField]
+    public int[] wishHeroes = new int[CombatConst.WishSlotCount];
     public int battleSide;
 
     public bool nextSkip = false; //下一轮skip
@@ -143,6 +146,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         goldCostItem = 0;
         attrAddons.Clear();
         likeCount = 2;
+        wishHeroes = new int[CombatConst.WishSlotCount];
         lastFightMark = 0;
         lastDamage = 0;
         nextSkip = false;
@@ -1705,6 +1709,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 
             // 未随存档持久化的运行时状态先清空，避免切换存档时残留上一局数据
             likeCount = 2;
+            wishHeroes = new int[CombatConst.WishSlotCount];
             nextSkip = false;
             lastDamage = 0;
             boughtThisShopCards.Clear();

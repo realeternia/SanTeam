@@ -333,29 +333,16 @@ public class CardShopManager : MonoBehaviour
         rateText.text = sb.ToString();
     }
 
-    // 刷新卡位出卡：先按 LikeCardRefreshRate 概率从"该玩家自己"的收藏池随机出一张（收藏池=like阶段各玩家各自点赞的卡），
-    // 未命中（或该玩家收藏池空）则按 GameRoundConfig 品质概率随机出一张
+    // 刷新卡位出卡：按 GameRoundConfig 品质概率随机出一张，该玩家的许愿英雄在同品质内权重×3
     public int GetRandomShopHeroId(GameRoundConfig shopCfg, int pid)
     {
-        if (SysRandom.Range(0, 100) < CombatConst.LikeCardRefreshRate)
-        {
-            var likeId = HeroSelectionTool.GetRandomLikedHeroId(pid);
-            if (likeId != 0)
-                return likeId;
-        }
-        return HeroSelectionTool.GetRandomHeroIdByQuality(shopCfg);
+        return HeroSelectionTool.GetRandomHeroIdByQuality(shopCfg, pid);
     }
 
-    // 独立买卡模式刷牌：先按 LikeCardRefreshRate 概率从"该玩家自己"的收藏池出一张，否则按玩家等级(PlayerLevelConfig)品质概率出一张
+    // 独立买卡模式刷牌：按玩家等级(PlayerLevelConfig)品质概率出一张，该玩家的许愿英雄在同品质内权重×3
     public int GetRandomShopHeroIdByLevel(int level, int pid)
     {
-        if (SysRandom.Range(0, 100) < CombatConst.LikeCardRefreshRate)
-        {
-            var likeId = HeroSelectionTool.GetRandomLikedHeroId(pid);
-            if (likeId != 0)
-                return likeId;
-        }
-        return HeroSelectionTool.GetRandomHeroIdByLevel(level);
+        return HeroSelectionTool.GetRandomHeroIdByLevel(level, pid);
     }
 
     // ---- 购买入口 ----
@@ -688,6 +675,16 @@ public class CardShopManager : MonoBehaviour
             var aiP = GameManager.Instance.GetPlayer(i);
             if (aiP.isAI && !aiP.isEliminated)
                 PlayerAI.ShopBegin(aiP);
+        }
+
+        // 第10/25/40回合：AI 自动许愿（先于商店生成，许愿英雄在本回合同样×3权重）
+        for (int i = 1; i < 8; i++)
+        {
+            var aiP = GameManager.Instance.GetPlayer(i);
+            if (!aiP.isAI || aiP.isEliminated)
+                continue;
+            for (int slot = 0; slot < CombatConst.WishSlotCount; slot++)
+                PlayerAI.CheckWish(aiP, slot);
         }
 
         Mode.Begin();

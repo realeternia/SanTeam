@@ -34,6 +34,7 @@ public class BagControl : MonoBehaviour, IPanelEvent
     public Button buyExpBtn;
     public TMP_Text sodInfoText;
     public Button sodLvupBtn;
+    public Button[] loveBtn;
 
     public PlayerInfo bindPlayer;
     public MySelectControl mySelect;
@@ -76,6 +77,9 @@ public class BagControl : MonoBehaviour, IPanelEvent
             });
         }
         SwitchBagRegion(true); // 默认显示英雄区
+
+        // 许愿按钮：第10/25/40回合各解锁1个，点击打开许愿面板
+        InitLoveButtons();
 
         aiSwitchBtn.onClick.AddListener(() =>
         {
@@ -187,6 +191,103 @@ public class BagControl : MonoBehaviour, IPanelEvent
         var humanCount = GameManager.Instance.players.Count(x => !x.isAI);
         aiSwitchBtn.gameObject.SetActive(bindPlayer.pid != 0 && bindPlayer.playerConfig.CanPlay && (!bindPlayer.isAI || humanCount < 2));
         aiSwitchBtn.GetComponentInChildren<TMP_Text>().text = bindPlayer.isAI ? "AI模式" : "玩家模式";
+
+        RefreshWishButtons();
+    }
+
+    // 初始化许愿按钮：注册点击
+    private void InitLoveButtons()
+    {
+        if (loveBtn == null)
+            return;
+
+        for (int i = 0; i < loveBtn.Length; i++)
+        {
+            if (loveBtn[i] == null)
+                continue;
+
+            int slot = i;
+            loveBtn[i].onClick.AddListener(() =>
+            {
+                GameManager.Instance.PlaySound("Sounds/click");
+                OnLoveBtnClick(slot);
+            });
+        }
+    }
+
+    // 点击许愿按钮：未解锁/已选择给出提示，否则打开许愿面板
+    private void OnLoveBtnClick(int slot)
+    {
+        if (slot < 0 || slot >= CombatConst.WishUnlockRounds.Length)
+        {
+            GameLog.Warn($"BagControl.OnLoveBtnClick: 许愿槽位{slot}超出配置范围，忽略");
+            return;
+        }
+
+        if (bindPlayer == null)
+        {
+            GameLog.Warn("BagControl.OnLoveBtnClick: 未绑定玩家，忽略许愿");
+            return;
+        }
+
+        if (!HeroSelectionTool.IsWishSlotUnlocked(slot))
+        {
+            int unlockRound = CombatConst.WishUnlockRounds[slot];
+            int currentRound = GameManager.Instance.year;
+            SystemTip.Show($"第{unlockRound}回合解锁许愿，还需{Mathf.Max(1, unlockRound - currentRound)}回合");
+            return;
+        }
+
+        if (HeroSelectionTool.GetWishHeroId(bindPlayer, slot) != 0)
+        {
+            SystemTip.Show("该许愿已选择，无法修改");
+            return;
+        }
+
+        PanelManager.Instance.ShowWish(slot, bindPlayer.pid, RefreshWishButtons);
+    }
+
+    // 刷新3个许愿按钮：已选择显示对应英雄头像；可点击显示 okk；未解锁显示 error
+    private void RefreshWishButtons()
+    {
+        if (loveBtn == null || bindPlayer == null)
+            return;
+
+        for (int i = 0; i < loveBtn.Length; i++)
+        {
+            if (loveBtn[i] == null)
+                continue;
+
+            Image img = loveBtn[i].GetComponent<Image>();
+            if (img == null)
+                continue;
+
+            int heroId = HeroSelectionTool.GetWishHeroId(bindPlayer, i);
+            if (heroId != 0 && HeroConfig.HasConfig(heroId))
+            {
+                img.sprite = Resources.Load<Sprite>("Textures/Skins/" + HeroConfig.GetConfig(heroId).Icon);
+            }
+            else if (HeroSelectionTool.IsWishSlotUnlocked(i))
+            {
+                // 已到达许愿回合且尚未选择：可以点击
+                img.sprite = LoadLoveBtnSprite("Textures/okk");
+            }
+            else
+            {
+                // 未到许愿回合：不可点击
+                img.sprite = LoadLoveBtnSprite("Textures/error");
+            }
+
+            img.color = Color.white;
+        }
+    }
+
+    private Sprite LoadLoveBtnSprite(string path)
+    {
+        var sprite = Resources.Load<Sprite>(path);
+        if (sprite == null)
+            GameLog.Error("BagControl 加载许愿按钮图标失败: " + path);
+        return sprite;
     }
 
     // 切换背包显示区域：true=英雄区，false=士兵区（两个区域互斥占用同一块位置）
