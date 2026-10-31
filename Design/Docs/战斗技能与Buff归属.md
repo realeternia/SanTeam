@@ -47,6 +47,7 @@
 | SkillAidSelfShield | 5 | 连接 | 温良 |
 | SkillAidShadowSplit | 5 | 召唤 | 分兵 |
 | SkillAidSkyFall | 5 | 群伤 | 天降恶来 |
+| SkillAidSneakChangePos | 5 | 连接 | 偷袭 |
 | SkillAreaBuff | 45 | 单增、群增、连接 | 奇才、洛神、鼓舞、国色、忠勇… |
 | SkillAreaDamageDeBuff | 60 | 群伤、群控 | 乱阵、连锁、困敌、乱射、双射… |
 | SkillAreaHeal | 15 | 单疗、群疗 | 安乐、青囊、天书 |
@@ -87,7 +88,6 @@
 | SkillInitMpFill | 5 | 连接 | 王佐 |
 | SkillInitNoEquipAttr | 5 | 连接 | 异禀 |
 | SkillInitShieldValue | 3 | 道具 | 玄盾、文润、玄武 |
-| SkillInitSneakChangePos | 5 | 连接 | 偷袭 |
 | SkillInitSoldierBuff | 5 | 连接 | 安民 |
 | SkillJumpChain | 10 | 群伤、群疗 | 妖疗、明断 |
 | SkillKillGain | 7 | 连接、道具 | 枭雄、凶威 |

@@ -78,6 +78,7 @@
     <Compile Include="Assets\Resources\Scripts\Combat\Missile.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffNoMove.cs" />
     <Compile Include="Assets\Resources\Scripts\Test\EffectTestInit.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidSneakChangePos.cs" />
     <Compile Include="Assets\Resources\Scripts\Shop\ShopMode.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillModifyShootSpeed.cs" />
     <Compile Include="Assets\Resources\Scripts\Configs\JobConfig_s.cs" />
@@ -216,7 +217,6 @@
     <Compile Include="Assets\MasterMagicFX\Scripts\Miscs\BillBoardParticle.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\FactionShieldManager.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillInitAddItem.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillInitSneakChangePos.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillDefFeedback.cs" />
     <Compile Include="Assets\DOTween\Modules\DOTweenModuleSprite.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffAtkDown.cs" />
