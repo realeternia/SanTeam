@@ -192,7 +192,6 @@
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillCastingAidAreaHeal.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffLock.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidFireWall.cs" />
-    <Compile Include="Assets\Resources\Scripts\UIs\PickPanelControl.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\RankPanelManager.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffHpRegenAdd.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffDecayDef.cs" />
@@ -266,6 +265,7 @@
     <Compile Include="Assets\MasterMagicFX\Scripts\Miscs\SubEmitterByTime.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillInitAddItemChance.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffMpRegenAdd.cs" />
+    <Compile Include="Assets\Resources\Scripts\UIs\SaveLoadPanelControl.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillInitAttrChange.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillInitEnemyRandomBuff.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidSelfShield.cs" />
@@ -276,6 +276,7 @@
     <Compile Include="Assets\DOTween\Modules\DOTweenModuleEPOOutline.cs" />
     <Compile Include="Assets\Resources\Scripts\Tools\BGMPlayer.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidManaShare.cs" />
+    <Compile Include="Assets\Resources\Scripts\UIs\LikeHeroPanelControl.cs" />
     <Compile Include="Assets\Resources\Scripts\Effect\GlowBeamController.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffDefStack.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\RankPlayerPanelManager.cs" />

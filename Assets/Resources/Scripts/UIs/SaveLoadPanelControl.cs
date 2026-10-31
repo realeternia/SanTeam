@@ -1,37 +1,24 @@
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using DG.Tweening;
-using CommonConfig;
 
-public class PickPanelControl : MonoBehaviour
+/// <summary>
+/// 登录/存档面板：开始画面点击后展示存档列表（读档或新游戏），进入商店后隐藏。
+/// 该脚本由 PanelManager 在加载 SaveLoadPanel 预制体时动态补挂，节点引用在 Awake 中按预制体结构查找。
+/// </summary>
+public class SaveLoadPanelControl : MonoBehaviour
 {
-    public GameObject pickPanelCellPrefab; // 引用PickPanelCell预制体
-    public Transform cellParent; // 用于放置单元格的父容器
-
-    public Button refreshBtn;
-    public TMP_Text refreshText;
-    public Button okBtn;
-    private int refreshCount = 4;
-
-    private List<PickPanelCellControl> cellControls = new List<PickPanelCellControl>();
-
-    // ---- 许愿面板运行时状态 ----
-    private int wishSlot = -1;
-    private int wishPid = -1;
-    private System.Action wishDoneCallback;
-    private PickPanelCellControl pendingWishCell;
+    private GameObject startPanel;
+    private TMP_Text startText;
+    private GameObject loadGamePanel;
+    private Button loadGameBtn;
+    private Button newGameBtn;
 
     private Tween startTextTween;
     private const float StartPanelFadeDuration = 1.5f; // 开始面板点击后渐隐时长
     private bool startPanelClicked;
-
-    public GameObject loadGamePanel;
-    public Button loadGameBtn;
-    public Button newGameBtn;
 
     // 存档列表容器（运行时创建）与生成的存档项
     private RectTransform loadItemRoot;
@@ -45,35 +32,24 @@ public class PickPanelControl : MonoBehaviour
     private string loadGameBtnOriginText;
     private string newGameBtnOriginText;
 
-    public GameObject startPanel;
-    public TMP_Text startText;
-
-    public Button finBtn;
-
-
     private void Awake()
     {
+        // 预制体未绑定脚本，节点引用按固定结构在运行时查找
+        startPanel = transform.Find("StartPanel") != null ? transform.Find("StartPanel").gameObject : null;
+        startText = transform.Find("StartPanel/Text (TMP)") != null ? transform.Find("StartPanel/Text (TMP)").GetComponent<TMP_Text>() : null;
+        loadGamePanel = transform.Find("LoadSavePanel") != null ? transform.Find("LoadSavePanel").gameObject : null;
+        loadGameBtn = transform.Find("LoadSavePanel/ButtonLoad") != null ? transform.Find("LoadSavePanel/ButtonLoad").GetComponent<Button>() : null;
+        newGameBtn = transform.Find("LoadSavePanel/Cancel") != null ? transform.Find("LoadSavePanel/Cancel").GetComponent<Button>() : null;
 
+        if (startPanel == null || startText == null || loadGamePanel == null || loadGameBtn == null || newGameBtn == null)
+            GameLog.Error("SaveLoadPanelControl 子节点绑定失败，请检查 SaveLoadPanel 预制体结构");
     }
- 
+
     // Start is called before the first frame update
     void Start()
     {
-        // 许愿面板：确定（提交选中的英雄）与关闭（暂时不选）
-        okBtn.onClick.AddListener(() =>
-        {
-            GameManager.Instance.PlaySound("Sounds/click");
-            OnWishConfirm();
-        });
-        finBtn.onClick.AddListener(() =>
-        {
-            GameManager.Instance.PlaySound("Sounds/click");
-            OnWishClose();
-        });
-
-        finBtn.gameObject.SetActive(false);
-        okBtn.gameObject.SetActive(false);
-        refreshBtn.gameObject.SetActive(false);
+        if (startPanel == null || loadGamePanel == null || loadGameBtn == null || newGameBtn == null)
+            return;
 
         // 存档面板：读档按钮默认隐藏，选中某个存档项后再显示
         loadGameBtn.onClick.AddListener(() =>
@@ -94,9 +70,7 @@ public class PickPanelControl : MonoBehaviour
         loadGameBtnOriginText = loadGameBtnText != null ? loadGameBtnText.text : "";
         newGameBtnOriginText = newGameBtnText != null ? newGameBtnText.text : "";
 
-        PanelManager.Instance.ShowPick();
-
-        // 启动画面（Unity 内置）结束后进入开始面板：隐藏读档/新游戏面板（含 loadGameBtn、newGameBtn）、开始面板与上方玩家信息
+        // 启动画面（Unity 内置）结束后进入开始面板：隐藏读档/新游戏面板、开始面板与上方玩家信息
         loadGamePanel.SetActive(false);
         startPanel.SetActive(false);
         SetPlayerInfoVisible(false);
@@ -116,7 +90,7 @@ public class PickPanelControl : MonoBehaviour
     {
         if (GameManager.Instance == null || GameManager.Instance.players == null)
         {
-            GameLog.Warn("PickPanelControl 获取玩家列表失败，跳过上方玩家信息显隐");
+            GameLog.Warn("SaveLoadPanelControl 获取玩家列表失败，跳过上方玩家信息显隐");
             return;
         }
 
@@ -132,7 +106,7 @@ public class PickPanelControl : MonoBehaviour
         }
     }
 
-    // 点击开始面板后的原有选牌流程（读档 / 新游戏 → 刷新英雄池）
+    // 点击开始面板后的流程（读档 / 新游戏 → 进入商店）
     private void BeginSelection()
     {
         if (GameManager.Instance.GetUsedSaveSlots().Count > 0)
@@ -175,7 +149,7 @@ public class PickPanelControl : MonoBehaviour
         var prefab = Resources.Load<GameObject>("Prefabs/UIs/Cells/LoadGameItem");
         if (prefab == null)
         {
-            GameLog.Error("PickPanelControl 加载存档项预制体失败: Prefabs/UIs/Cells/LoadGameItem");
+            GameLog.Error("SaveLoadPanelControl 加载存档项预制体失败: Prefabs/UIs/Cells/LoadGameItem");
             return;
         }
 
@@ -281,7 +255,7 @@ public class PickPanelControl : MonoBehaviour
 
         var text = btn.GetComponentInChildren<TMP_Text>(true);
         if (text == null)
-            GameLog.Warn("PickPanelControl 按钮未找到文本子节点: " + btn.name);
+            GameLog.Warn("SaveLoadPanelControl 按钮未找到文本子节点: " + btn.name);
         return text;
     }
 
@@ -315,7 +289,7 @@ public class PickPanelControl : MonoBehaviour
 
         if (selectedSlot < 0)
         {
-            GameLog.Warn("PickPanelControl 未选中任何存档，忽略读档");
+            GameLog.Warn("SaveLoadPanelControl 未选中任何存档，忽略读档");
             return;
         }
 
@@ -331,7 +305,7 @@ public class PickPanelControl : MonoBehaviour
         }
         else
         {
-            GameLog.Error("PickPanelControl 读档失败 slot=" + selectedSlot);
+            GameLog.Error("SaveLoadPanelControl 读档失败 slot=" + selectedSlot);
         }
     }
 
@@ -377,10 +351,10 @@ public class PickPanelControl : MonoBehaviour
         PanelManager.Instance.ShowShop();
         if (shopExisted && PanelManager.Instance.cardShopPanel != null)
             PanelManager.Instance.cardShopPanel.GetComponent<CardShopManager>()?.ShopBegin();
-        PanelManager.Instance.HidePick();
+        PanelManager.Instance.HideSaveLoad();
     }
 
-    // 显示开始面板：startText 循环缩放，任意点击后进入选牌流程
+    // 显示开始面板：startText 循环缩放，任意点击后进入读档/新游戏流程
     private void ShowStartPanel()
     {
         startPanel.SetActive(true);
@@ -409,7 +383,7 @@ public class PickPanelControl : MonoBehaviour
     {
         if (startText == null)
         {
-            GameLog.Warn("PickPanelControl.startText 未绑定，跳过开始文字动画");
+            GameLog.Warn("SaveLoadPanelControl.startText 未绑定，跳过开始文字动画");
             return;
         }
 
@@ -449,201 +423,4 @@ public class PickPanelControl : MonoBehaviour
             BeginSelection();
         });
     }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-
-    // ---- 许愿面板（复用选牌面板的格子区域；隐藏品质1的卡，确定/关闭按钮见 SetupWishButtons）----
-
-    // 打开许愿面板：由 BagControl 的 loveBtn 调用（PanelManager.ShowWish 已激活本面板）
-    public void ShowWishPanel(int slot, int pid, System.Action onDone)
-    {
-        wishSlot = slot;
-        wishPid = pid;
-        wishDoneCallback = onDone;
-        pendingWishCell = null;
-
-        // 隐藏开始/读档面板与刷新按钮，只保留许愿格子和确定/关闭
-        startPanel.SetActive(false);
-        loadGamePanel.SetActive(false);
-        refreshBtn.gameObject.SetActive(false);
-
-        SetupWishButtons();
-        RefreshWishCells();
-    }
-
-    // 配置确定（底部居中）与关闭（右上角）按钮
-    private void SetupWishButtons()
-    {
-        var okText = GetButtonText(okBtn);
-        if (okText != null)
-            okText.text = "确定";
-        var finText = GetButtonText(finBtn);
-        if (finText != null)
-            finText.text = "关闭";
-
-        var okRt = okBtn.GetComponent<RectTransform>();
-        if (okRt != null)
-        {
-            okRt.anchorMin = okRt.anchorMax = new Vector2(0.5f, 0f);
-            okRt.pivot = new Vector2(0.5f, 0f);
-            okRt.anchoredPosition = new Vector2(0f, 24f);
-        }
-
-        var finRt = finBtn.GetComponent<RectTransform>();
-        if (finRt != null)
-        {
-            finRt.anchorMin = finRt.anchorMax = new Vector2(1f, 1f);
-            finRt.pivot = new Vector2(1f, 1f);
-            finRt.anchoredPosition = new Vector2(-24f, -24f);
-        }
-
-        okBtn.gameObject.SetActive(true);
-        finBtn.gameObject.SetActive(true);
-    }
-
-    // 刷新许愿格子：展示品质>1且未被该玩家许愿过的英雄
-    private void RefreshWishCells()
-    {
-        for (int i = cellParent.childCount - 1; i >= 0; i--)
-            Destroy(cellParent.GetChild(i).gameObject);
-        cellControls.Clear();
-
-        var player = GameManager.Instance.GetPlayer(wishPid);
-        List<int> heroPool = HeroSelectionTool.GetHeroPoolCache()
-            .Where(heroId => HeroConfig.HasConfig(heroId))
-            .Where(heroId => HeroConfig.GetConfig(heroId).Quality > 1) // 隐藏所有品质1的卡
-            .Where(heroId => !ConfigManager.IsKingHero(heroId)) // 主公不参与许愿（与 AI 一致）
-            .Where(heroId => !HeroSelectionTool.IsWishedHero(player, heroId))
-            .ToList();
-
-        int itemsPerRow = 13;
-        int rows = 7;
-        int totalItems = Mathf.Min(heroPool.Count, itemsPerRow * rows);
-
-        float cellWidth = 108f;
-        float cellHeight = 108f;
-        float spacingX = 0f;
-        float spacingY = 2f;
-
-        for (int i = 0; i < totalItems; i++)
-        {
-            int heroId = heroPool[i];
-            HeroConfig heroCfg = HeroConfig.GetConfig(heroId);
-
-            GameObject cell = Instantiate(pickPanelCellPrefab, cellParent);
-            cell.transform.localScale = Vector3.one;
-
-            int row = i / itemsPerRow;
-            int col = i % itemsPerRow;
-            float posX = 5 + col * (cellWidth + spacingX) + 60;
-            float posY = -5 - row * (cellHeight + spacingY) - 60;
-
-            RectTransform rectTransform = cell.GetComponent<RectTransform>();
-            rectTransform.anchoredPosition = new Vector2(posX, posY);
-
-            PickPanelCellControl cellControl = cell.GetComponent<PickPanelCellControl>();
-            cellControl.heroId = heroId;
-            cellControl.wishMode = true;
-            cellControl.onWishSelected = OnWishCellSelected;
-            cellControls.Add(cellControl);
-
-            cellControl.heroImg.sprite = Resources.Load<Sprite>("Textures/Skins/" + heroCfg.Icon);
-            var skillCfgs = ConfigManager.GetHeroSkillConfigs(heroCfg);
-            var icon = skillCfgs.Count > 0 ? skillCfgs[0].Icon : "";
-            cellControl.jobImg.sprite = Resources.Load<Sprite>("Textures/SkillPic/" + icon);
-
-            cellControl.heroName.text = heroCfg.Name;
-            cellControl.heroName.color = SysColor.GetQualityColor(heroCfg.Quality);
-            cellControl.bgImg.color = SysColor.GetSideColor(heroCfg.Side);
-
-            // 隐藏原“点赞/禁用”标记图（预制体里默认激活，会挡住整格点击并让卡片变色）
-            if (cellControl.forbidImg != null)
-                cellControl.forbidImg.gameObject.SetActive(false);
-
-            // 整格可点击：根节点补一个透明按钮（子级按钮除原红心按钮外统一转发为“选中该英雄”）
-            var rootBtn = cell.GetComponent<Button>();
-            if (rootBtn == null)
-            {
-                rootBtn = cell.AddComponent<Button>();
-                rootBtn.transition = Selectable.Transition.None;
-                rootBtn.targetGraphic = cellControl.bgImg;
-            }
-            foreach (var btn in cell.GetComponentsInChildren<Button>(true))
-            {
-                if (btn == cellControl.banBtn)
-                    continue;
-                btn.onClick.AddListener(() => OnWishCellSelected(cellControl));
-            }
-
-            cellControl.SetWishHighlight(false);
-        }
-    }
-
-    // 许愿格子点击：单选高亮（最终由“确定”提交）
-    private void OnWishCellSelected(PickPanelCellControl cell)
-    {
-        if (wishSlot < 0 || cell == null)
-            return;
-
-        GameManager.Instance.PlaySound("Sounds/click");
-        if (pendingWishCell != null && pendingWishCell != cell)
-            pendingWishCell.SetWishHighlight(false);
-        pendingWishCell = cell;
-        cell.SetWishHighlight(true);
-    }
-
-    // 确定：提交当前选中的英雄到许愿槽位（选定后不可修改）
-    private void OnWishConfirm()
-    {
-        if (wishSlot < 0)
-            return;
-
-        if (pendingWishCell == null)
-        {
-            SystemTip.Show("请先选择一位英雄");
-            return;
-        }
-
-        var player = GameManager.Instance.GetPlayer(wishPid);
-        if (HeroSelectionTool.GetWishHeroId(player, wishSlot) != 0)
-        {
-            SystemTip.Show("该许愿已选择，无法修改");
-            CloseWishPanel();
-            return;
-        }
-
-        HeroSelectionTool.SetWishHero(player, wishSlot, pendingWishCell.heroId);
-        GameLog.Debug($"玩家{wishPid} 许愿槽位{wishSlot}选择英雄 {pendingWishCell.heroId}({HeroConfig.GetConfig(pendingWishCell.heroId).Name})");
-        // 许愿结果立即写档
-        GameManager.Instance.SaveToFile();
-        CloseWishPanel();
-    }
-
-    // 关闭：暂时不选，直接关闭面板
-    private void OnWishClose()
-    {
-        if (wishSlot < 0)
-            return;
-        CloseWishPanel();
-    }
-
-    private void CloseWishPanel()
-    {
-        wishSlot = -1;
-        wishPid = -1;
-        pendingWishCell = null;
-
-        okBtn.gameObject.SetActive(false);
-        finBtn.gameObject.SetActive(false);
-        PanelManager.Instance.HidePick();
-
-        var callback = wishDoneCallback;
-        wishDoneCallback = null;
-        callback?.Invoke();
-    }
-
 }

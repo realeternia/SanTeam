@@ -15,7 +15,8 @@ public class PanelManager : MonoBehaviour
     public GameObject cardShopPanel;
     private GameObject rankPanel;
     private GameObject rankPlayerPanel;
-    private GameObject pickPanel;
+    private GameObject saveLoadPanel;
+    private GameObject likeHeroPanel;
     private GameObject bagPanel;
     private GameObject sideBar;
     private GameObject gameResultPanel;
@@ -31,9 +32,9 @@ public class PanelManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        // 面板已改为动态加载，开局先创建选牌面板（其 Start 会继续走游戏初始化流程）
+        // 面板已改为动态加载，开局先创建登录/存档面板（其 Start 会继续走游戏初始化流程）
         // Tooltip 按需创建：首次经 GetTooltip() 实例化并挂到 tipNode 下，调用入口统一走 PanelManager
-        // 配置了调试阵容时跳过选牌面板，由 WorldManager 直接开战
+        // 配置了调试阵容时跳过登录面板，由 WorldManager 直接开战
         if (GameManager.Instance != null && GameManager.Instance.HasDebugLineup())
         {
             // 根节点本身是满屏遮罩图，正常流程由面板开关（ChangePanelCount）在无面板时关掉；
@@ -41,7 +42,7 @@ public class PanelManager : MonoBehaviour
             gameObject.SetActive(false);
             return;
         }
-        ShowPick();
+        ShowSaveLoad();
     }
 
     // 从 Resources/Prefabs 动态加载并实例化 Tooltip（挂到 tipNode 下，每种只创建一次）
@@ -194,50 +195,63 @@ public class PanelManager : MonoBehaviour
         ChangePanelCount(rankPlayerPanel, false);        
     }
 
-    public void ShowPick()
+    // 登录/存档面板：开始画面 + 读档/新游戏。预制体未绑定脚本，首次加载时动态补挂 SaveLoadPanelControl
+    public void ShowSaveLoad()
     {
-      //  GameManager.Instance.PlaySound("Sounds/deck");
-        if (pickPanel == null)
-            pickPanel = LoadPanel("PickPanelBg");
-        if (pickPanel == null)
+        if (saveLoadPanel == null)
+            saveLoadPanel = LoadPanel("SaveLoadPanel");
+        if (saveLoadPanel == null)
             return;
-        pickPanel.SetActive(true);
 
-        ChangePanelCount(pickPanel, true);
+        if (saveLoadPanel.GetComponent<SaveLoadPanelControl>() == null)
+            saveLoadPanel.AddComponent<SaveLoadPanelControl>();
+
+        saveLoadPanel.SetActive(true);
+        saveLoadPanel.transform.SetAsLastSibling();
+
+        ChangePanelCount(saveLoadPanel, true);
     }
 
-    public void HidePick()
+    public void HideSaveLoad()
     {
-        if (pickPanel == null)
+        if (saveLoadPanel == null)
             return;
-     //   GameManager.Instance.PlaySound("Sounds/deck");
-        pickPanel.SetActive(false);
+        saveLoadPanel.SetActive(false);
 
-        ChangePanelCount(pickPanel, false);
+        ChangePanelCount(saveLoadPanel, false);
     }
 
-    // 许愿面板：复用选牌面板（隐藏品质1的卡，底部“确定”/右上角“关闭”），onDone 在关闭时回调
+    // 许愿面板（LikeHeroPanel）：隐藏品质1的卡，底部“确定”/右上角“关闭”，onDone 在关闭时回调
     public void ShowWish(int slot, int pid, System.Action onDone)
     {
-        if (pickPanel == null)
-            pickPanel = LoadPanel("PickPanelBg");
-        if (pickPanel == null)
+        if (likeHeroPanel == null)
+            likeHeroPanel = LoadPanel("LikeHeroPanel");
+        if (likeHeroPanel == null)
         {
-            GameLog.Error("PanelManager 许愿面板加载失败: Prefabs/UIs/PickPanelBg");
+            GameLog.Error("PanelManager 许愿面板加载失败: Prefabs/UIs/LikeHeroPanel");
             onDone?.Invoke();
             return;
         }
 
-        pickPanel.SetActive(true);
-        pickPanel.transform.SetAsLastSibling(); // 覆盖在背包等面板之上
+        likeHeroPanel.SetActive(true);
+        likeHeroPanel.transform.SetAsLastSibling(); // 覆盖在背包等面板之上
 
-        var control = pickPanel.GetComponent<PickPanelControl>();
+        var control = likeHeroPanel.GetComponent<LikeHeroPanelControl>();
         if (control == null)
-            GameLog.Error("PanelManager 选牌面板上缺少 PickPanelControl 组件");
+            GameLog.Error("PanelManager 许愿面板上缺少 LikeHeroPanelControl 组件");
         else
             control.ShowWishPanel(slot, pid, onDone);
 
-        ChangePanelCount(pickPanel, true);
+        ChangePanelCount(likeHeroPanel, true);
+    }
+
+    public void HideLikeHero()
+    {
+        if (likeHeroPanel == null)
+            return;
+        likeHeroPanel.SetActive(false);
+
+        ChangePanelCount(likeHeroPanel, false);
     }
 
     // 右侧滑出侧边栏：首次从 Resources/Prefabs/SideBar 实例化并缓存，子面板预制体按 panelName 加载到 SideBar 内容节点
@@ -293,18 +307,24 @@ public class PanelManager : MonoBehaviour
         ChangePanelCount(gameResultPanel, false);
     }
 
-    // 回到游戏初始界面：关闭商店并重建开始/选牌面板（首次创建会重新走一遍开场与选牌流程）
+    // 回到游戏初始界面：关闭商店并重建登录/存档面板（首次创建会重新走一遍开场流程）
     public void BackToStartScreen()
     {
         HideShop();
 
-        if (pickPanel != null)
+        if (saveLoadPanel != null)
         {
-            ChangePanelCount(pickPanel, false);
-            Destroy(pickPanel);
-            pickPanel = null;
+            ChangePanelCount(saveLoadPanel, false);
+            Destroy(saveLoadPanel);
+            saveLoadPanel = null;
         }
-        ShowPick();
+        if (likeHeroPanel != null)
+        {
+            ChangePanelCount(likeHeroPanel, false);
+            Destroy(likeHeroPanel);
+            likeHeroPanel = null;
+        }
+        ShowSaveLoad();
     }
 
     public void SendSignal(string name, string parm1, int parm2)
