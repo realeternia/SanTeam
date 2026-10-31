@@ -223,6 +223,10 @@ public static class CombatConst
     public const int AiSharedMaxRefreshPerShop = 1;
     /// <summary>AI 刷新商店后须保留的最低金币：支付刷新费(CardShopManager.RefreshGoldCost)后剩余 >= 本值才允许刷新，避免刷完买不起</summary>
     public const int AiRefreshMinRemainGold = 6;
+    /// <summary>AI 锁卡门槛：买不起的卡中评分最高的那张，分数达到第二名的该倍数才锁定（品质3/4已在用的上阵卡不受此限制）</summary>
+    public const float AiLockScoreRatio = 2f;
+    /// <summary>AI 每个商店阶段最多锁定的卡位数（独立买卡商店私有5格）；锁定时长为1回合，下回合结束自动解锁</summary>
+    public const int AiLockMaxPerShop = 1;
     /// <summary>"金币充裕"判定阈值：金币 >= 本值视为"钱多"，允许额外刷新与加大买经验预算（通用规则，不改配置类）</summary>
     public const int RichGoldThreshold = 15;
     /// <summary>"钱多"时每个商店阶段额外允许的刷新次数（叠加在 AiSharedMaxRefreshPerShop / AiMaxShopRefreshPerShop 之上）</summary>
@@ -261,6 +265,10 @@ public static class CombatConst
     /// <summary>价格偏好基准价与指数：score ×= (卡价/本基准)^本指数。阵容价值=价格×星级，星级受出卡随机性限制（多数卡只能到2星），价格是更可控的价值杠杆</summary>
     public const float CardPriceBiasBase = 6f;
     public const float CardPriceBiasExponent = 2f;
+    /// <summary>热门卡线性惩罚：每多一名存活对手持有该卡，评分折损 = 本值 × PlayerConfig.OwnTooMuchCardRate（该值越大越回避热门卡）</summary>
+    public const float HotCardPenaltyPerPlayer = 0.12f;
+    /// <summary>热门卡惩罚下限：无论多少对手持有，评分最多折损到本值，避免热门核心卡被整体挤出候选池</summary>
+    public const float HotCardPenaltyFloor = 0.55f;
     // ---- 买经验（预留：金铲铲4金币买4经验，1金币=1经验；UI后续接入） ----
     /// <summary>购买经验所需金币</summary>
     public const int ExpBuyGoldCost = 4;

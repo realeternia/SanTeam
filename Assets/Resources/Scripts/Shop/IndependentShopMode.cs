@@ -18,6 +18,22 @@ public class IndependentShopMode : ShopMode
     private bool humanEnded = false;
     private readonly Dictionary<int, List<ShopOffer>> aiShops = new Dictionary<int, List<ShopOffer>>();
 
+    // AI 私有商店锁卡：pid → 锁定卡位；锁定时长1回合（锁定当回合结束生效，下回合结束自动解锁）
+    private class AiShopLock
+    {
+        public int slotIndex;
+        public int cardId;
+        public int lockRound; // 锁定的回合：下次进入商店(year=lockRound+1)时生效
+    }
+
+    // 静态存储：商店模式对象每回合重建，锁卡记录需跨回合保留（新开一局时由 GameManager.ResetPlayersForNewGame 清空）
+    private static readonly Dictionary<int, List<AiShopLock>> aiLocks = new Dictionary<int, List<AiShopLock>>();
+
+    public static void ClearAiLocks()
+    {
+        aiLocks.Clear();
+    }
+
     public override void Begin()
     {
         host.ClearCards();
@@ -77,7 +93,7 @@ public class IndependentShopMode : ShopMode
             var aiPlayer = GameManager.Instance.GetPlayer(pid);
             if (aiPlayer.isEliminated)
                 continue;
-            aiShops[pid] = BuildOffers(aiPlayer.level, SLOT_COUNT, pid);
+            aiShops[pid] = BuildAiOffers(pid, aiPlayer);
         }
     }
 
@@ -168,10 +184,90 @@ public class IndependentShopMode : ShopMode
                 break;
             }
 
+            // 回合末锁卡：买不起但评分明显领先（或需要升星的品质3/4上阵卡）时锁到下回合，下回合结束自动解锁
+            TryLockAiCard(pid, player);
+
             yield return new WaitForSeconds(SysRandom.Range(0.25f, 0.5f));
         }
 
         host.RequestEnd();
+    }
+
+    // 买卡阶段结束后判定是否锁卡：每个 AI 最多锁 AiLockMaxPerShop 个卡位
+    private void TryLockAiCard(int pid, PlayerInfo player)
+    {
+        var activeLocks = GetActiveLocks(pid);
+        if (activeLocks != null && activeLocks.Count >= CombatConst.AiLockMaxPerShop)
+            return;
+
+        if (!PlayerAI.TryAiLockCard(player, GetOffers(pid), out int lockHeroId))
+            return;
+
+        if (!aiShops.TryGetValue(pid, out var offers))
+        {
+            GameLog.Warn($"AI玩家{pid} 锁卡失败：私有商店不存在");
+            return;
+        }
+
+        int slot = offers.FindIndex(o => o.cardId == lockHeroId && !o.sold);
+        if (slot < 0)
+        {
+            GameLog.Warn($"AI玩家{pid} 锁卡失败：商店中找不到英雄 {lockHeroId} 的可售卡位");
+            return;
+        }
+
+        aiLocks[pid] = new List<AiShopLock>
+        {
+            new AiShopLock { slotIndex = slot, cardId = lockHeroId, lockRound = GameManager.Instance.year }
+        };
+        GameLog.Debug($"AI玩家{pid} 锁定卡位{slot}(英雄{lockHeroId})，下回合保留，下回合结束后自动解锁");
+    }
+
+    // 当前回合有效的锁定记录（上回合锁定、本回合生效）；过期锁定直接清除
+    private static List<AiShopLock> GetActiveLocks(int pid)
+    {
+        if (!aiLocks.TryGetValue(pid, out var locks))
+            return null;
+
+        int year = GameManager.Instance.year;
+        locks.RemoveAll(l => l.lockRound + 1 != year); // 只锁1回合：过了下回合即失效
+        if (locks.Count == 0)
+        {
+            aiLocks.Remove(pid);
+            return null;
+        }
+        return locks;
+    }
+
+    // 生成 AI 私有商店，并保留本回合有效的锁定卡（位置不变）
+    private List<ShopOffer> BuildAiOffers(int pid, PlayerInfo player)
+    {
+        var list = BuildOffers(player.level, SLOT_COUNT, pid);
+        var locks = GetActiveLocks(pid);
+        if (locks == null)
+            return list;
+
+        foreach (var l in locks)
+        {
+            if (l.slotIndex < 0 || l.slotIndex >= list.Count)
+            {
+                GameLog.Warn($"AI玩家{pid} 锁定卡位 {l.slotIndex} 超出商店范围，忽略该锁定");
+                continue;
+            }
+            if (!HeroConfig.HasConfig(l.cardId))
+            {
+                GameLog.Warn($"AI玩家{pid} 锁定卡牌 {l.cardId} 配置不存在，忽略该锁定");
+                continue;
+            }
+            var heroCfg = HeroConfig.GetConfig(l.cardId);
+            list[l.slotIndex] = new ShopOffer
+            {
+                cardId = l.cardId,
+                isHero = true,
+                price = HeroSelectionTool.GetPrice(heroCfg),
+            };
+        }
+        return list;
     }
 
     // 花 2 金重掷某玩家自己的全部 5 格
@@ -198,7 +294,7 @@ public class IndependentShopMode : ShopMode
         }
         else
         {
-            aiShops[pid] = BuildOffers(player.level, SLOT_COUNT, pid);
+            aiShops[pid] = BuildAiOffers(pid, player);
         }
 
         GameManager.Instance.PlaySound("Sounds/page");

@@ -126,6 +126,7 @@ public class GameManager : MonoBehaviour
     {
         year = 0;
         shopLocks.Clear();
+        IndependentShopMode.ClearAiLocks(); // 新开一局时清空 AI 私有商店的锁卡记录
 
         players[0].ResetForNewGame(0, PlayerBook.GetWang());
         var pls = PlayerBook.GetRandomN(7);
@@ -379,10 +380,11 @@ public class GameManager : MonoBehaviour
                 heroIds.AddRange(saveData.heroIds);
             }
 
-            // 加载商店卡位锁定状态
+            // 加载商店卡位锁定状态（AI 锁卡不存档，读档时清空，避免沿用上一局的锁定记录）
             shopLocks = saveData.shopLocks != null
                 ? new List<ShopLockData>(saveData.shopLocks)
                 : new List<ShopLockData>();
+            IndependentShopMode.ClearAiLocks();
 
             currentSaveSlot = slot;
             GameLog.Debug("游戏数据加载成功 slot=" + slot + " year=" + year);
