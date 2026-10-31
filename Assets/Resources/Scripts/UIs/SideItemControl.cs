@@ -3,15 +3,14 @@ using UnityEngine.UI;
 using TMPro;
 using CommonConfig;
 
-// 侧边栏·道具操作面板：展示道具图标/名称/说明，提供卖出；
-// 存在可完成的合成配方时显示"合成"，持有分解锤且道具可分解时显示"分解"，持有西洋镜且道具可改铸时显示"改铸"
+// 侧边栏·道具操作面板：展示道具图标/名称/说明（道具不可卖出，不提供卖出按钮）；
+// 道具参与合成配方时显示"合成"，持有分解锤且道具可分解时显示"分解"，持有西洋镜且道具可改铸时显示"改铸"
 // 打开流程：背包卖出区(BagRecycler)拖入道具 → BagControl.OpenItemPanel → ShowSideBar("SideItemControl")
 public class SideItemControl : MonoBehaviour
 {
     public Image itemIcon;
     public TMP_Text itemName;
     public TMP_Text itemDes;
-    public Button sellButton;
     public Button composeButton;
     public Button decomposeButton;
     public Button rerollButton;
@@ -36,8 +35,6 @@ public class SideItemControl : MonoBehaviour
 
     void Start()
     {
-        if (sellButton != null)
-            sellButton.onClick.AddListener(OnSell);
         if (composeButton != null)
             composeButton.onClick.AddListener(OnCompose);
         if (decomposeButton != null)
@@ -94,7 +91,6 @@ public class SideItemControl : MonoBehaviour
     private void ApplyButtonLayout()
     {
         float y = ButtonStartY;
-        PlaceButton(sellButton, ref y);
         PlaceButton(composeButton, ref y);
         PlaceButton(decomposeButton, ref y);
         PlaceButton(rerollButton, ref y);
@@ -108,20 +104,11 @@ public class SideItemControl : MonoBehaviour
         if (button.transform is RectTransform rt)
             rt.anchoredPosition = new Vector2(rt.anchoredPosition.x, y);
         y -= ButtonSpacing;
-    }
 
-    // 卖出1个该道具：先收起侧边栏，再由背包移除并按品质返还金币
-    void OnSell()
-    {
-        if (bagControl == null)
-        {
-            GameLog.Warn("SideItemControl.OnSell: 未设置背包上下文，直接关闭侧边栏");
-            PanelManager.Instance.HideSideBar();
-            return;
-        }
-
-        GameManager.Instance.PlaySound("Sounds/click");
-        PanelManager.Instance.HideSideBar(() => bagControl.SellItem(currentItemId));
+        // 按钮底图统一染成金色，避免露出 prefab 里的灰底
+        Image img = (button.targetGraphic != null ? button.targetGraphic : button.GetComponent<Image>()) as Image;
+        if (img != null)
+            img.color = SysColor.UI.CheckBtnSelected;
     }
 
     // 合成：收起道具面板后打开合成配方面板，由玩家选择一条材料足够的配方

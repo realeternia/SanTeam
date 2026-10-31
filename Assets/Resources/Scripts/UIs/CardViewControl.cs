@@ -20,6 +20,7 @@ public class CardViewControl : MonoBehaviour, IPointerDownHandler, IPointerUpHan
     public TMP_Text roundLeftText;
     public GameObject roundLeftIconNode;
     public Button buyButton;
+    public Button lockButton;
 
     public GameObject isHeroCardNode;
     public GameObject isItemCardNode;

@@ -1556,30 +1556,6 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         return true;
     }
 
-    // 卖出1件道具：按品质返还金币并移除1个背包副本，返回返还金币数（0=失败，不扣除）
-    public int SellItem(int itemCardId)
-    {
-        if (itemCardId <= 0 || !ItemConfig.HasConfig(itemCardId) || ConfigManager.IsHeroCard(itemCardId))
-        {
-            GameLog.Warn(string.Format("道具卖出失败：非法道具 {0}，玩家{1}", itemCardId, pid));
-            return 0;
-        }
-        if (GetItemFreeCount(itemCardId) <= 0)
-        {
-            GameLog.Warn(string.Format("道具卖出失败：背包没有空闲副本 {0}，玩家{1}", itemCardId, pid));
-            return 0;
-        }
-
-        var cfg = ItemConfig.GetConfig(itemCardId);
-        int quality = Mathf.Clamp(cfg.Quality, 1, CombatConst.ItemSellGoldByQuality.Length);
-        int gold = CombatConst.ItemSellGoldByQuality[quality - 1];
-
-        RemoveItemInstances(itemCardId, 1);
-        AddGold(gold);
-        GameLog.Debug(string.Format("道具卖出：玩家{0} 卖出{1} 获得{2}金币", pid, itemCardId, gold));
-        return gold;
-    }
-
     // 消耗指定数量的物品实例（优先背包副本，不足再移除已装备的），不触发自动合成
     private void ConsumeItemCount(int itemId, int count)
     {

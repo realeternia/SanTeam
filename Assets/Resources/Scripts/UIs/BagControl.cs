@@ -485,7 +485,7 @@ public class BagControl : MonoBehaviour, IPanelEvent
         // 分解符只能在合成区使用，拖到英雄身上无效
         if (itemCfg.Effect == "tpsplit")
         {
-            SystemTip.Show($"「{itemCfg.Name}」需拖到合成区使用");
+            SystemTip.Show($"道具{itemCfg.Name}需拖到合成区使用");
             return;
         }
 
@@ -493,9 +493,9 @@ public class BagControl : MonoBehaviour, IPanelEvent
         if (!p1.CanUseItemToHero(heroCardId, itemCardId))
         {
             if (itemCfg.Effect == "tpexp")
-                SystemTip.Show($"英雄已满级，无法使用「{itemCfg.Name}」");
+                SystemTip.Show($"英雄已满级，无法使用道具{itemCfg.Name}");
             else
-                SystemTip.Show($"只能对拥有「{itemCfg.LimitSkillSname}」的英雄使用");
+                SystemTip.Show($"只能对拥有{itemCfg.LimitSkillSname}羁绊的英雄使用");
             return;
         }
 
@@ -504,7 +504,7 @@ public class BagControl : MonoBehaviour, IPanelEvent
         {
             if (ConfigManager.HeroHasFriendSkill(heroCardId, itemCfg.RefSkillSname))
             {
-                SystemTip.Show($"该英雄已拥有此羁绊，无法装备「{itemCfg.Name}」");
+                SystemTip.Show($"该英雄已拥有此羁绊，无法装备道具{itemCfg.Name}");
                 return;
             }
             if (p1.GetItemIdsOnHero(heroCardId).Contains(itemCardId))
@@ -931,33 +931,6 @@ public class BagControl : MonoBehaviour, IPanelEvent
         if (p1.GetItemFreeCount(itemCardId) <= 0 || p1.GetItemCount(401009) <= 0)
             return false;
         return p1.GetRerollCandidates(itemCardId).Count > 0;
-    }
-
-    // 卖出1件道具：按品质返还金币，成功后刷新背包
-    public void SellItem(int itemCardId)
-    {
-        if (bindPlayer == null)
-            return;
-
-        var p1 = GameManager.Instance.GetPlayer(bindPlayer.pid);
-        if (p1.isAI)
-            return;
-
-        if (itemCardId == 0 || !ItemConfig.HasConfig(itemCardId) || ConfigManager.IsHeroCard(itemCardId))
-        {
-            SystemTip.Show("该道具不可出售");
-            return;
-        }
-
-        int gold = p1.SellItem(itemCardId);
-        if (gold <= 0)
-        {
-            SystemTip.Show(p1.GetEquippedCount(itemCardId) > 0 ? "该装备已全部装备，需先卸下" : "背包中没有该道具");
-            return;
-        }
-
-        GameManager.Instance.PlaySound("Sounds/gold");
-        UpdateView();
     }
 
     // 取屏幕中心（画布中心）在容器内的本地坐标，供合成/分解动画当作撞点

@@ -495,7 +495,10 @@ public class TooltipHero : BaseTooltip
     internal static SkillConfig GetFriendShowSkill(HeroFriendConfig friendCfg, int presentCount, out int level)
     {
         level = CombatConst.FriendSpecialBaseLevel + presentCount;
-        return ConfigManager.GetSkillConfig(friendCfg.SkillId, Mathf.Max(1, level));
+        // 档位上限为 Lv5：人数或代友道具叠加超过5时按最高档展示（否则取不到配置会导致图标与说明全空）
+        if (level > 5)
+            level = 5;
+        return ConfigManager.GetSkillConfig(friendCfg.SkillId, Mathf.Max(1, level)) ?? ConfigManager.GetSkillConfig(friendCfg.SkillId, 1);
     }
 
     // 拼英雄名字列表（职业/好友列表共用）：按品质倒排（同品质保持原顺序），名字只保留最后一个字；
