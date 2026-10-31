@@ -172,10 +172,22 @@ public static class CombatConst
     public const int FormationGridSize = 5;
     /// <summary>布阵图总格数</summary>
     public const int FormationCellCount = FormationGridSize * FormationGridSize; // 25
-    /// <summary>近战小兵占用的布阵格(布阵图第0行全部5格)</summary>
-    public static readonly int[] SoldierMeleeCells = { 0, 1, 2, 3, 4 };
-    /// <summary>远程小兵占用的布阵格(布阵图第4行第1、3、5格)</summary>
-    public static readonly int[] SoldierRangedCells = { 20, 22, 24 };
+    /// <summary>近战小兵所在行(布阵图第0行，前排)</summary>
+    public const int SoldierMeleeRow = 0;
+    /// <summary>远程小兵所在行(布阵图第4行，后排)</summary>
+    public const int SoldierRangedRow = 4;
+    /// <summary>
+    /// 小兵按数量(1~5人)在5列行内摆放的列号(0基，从左到右)：
+    /// 1人居中(第3列)；2人占2、4列；3人占1、3、5列；4人占1~4列；5人满列
+    /// </summary>
+    public static readonly int[][] SoldierColumnsByCount =
+    {
+        new[] { 2 },
+        new[] { 1, 3 },
+        new[] { 0, 2, 4 },
+        new[] { 0, 1, 2, 3 },
+        new[] { 0, 1, 2, 3, 4 },
+    };
     /// <summary>英雄自动布阵占用的格(中间3x3区域，最多9格)</summary>
     public static readonly int[] HeroCells = { 6, 7, 8, 11, 12, 13, 16, 17, 18 };
 

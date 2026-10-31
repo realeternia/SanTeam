@@ -1986,25 +1986,57 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         if (meleeCount >= cfg.MeleeCount && rangedCount >= cfg.RangedCount)
             return;
 
-        for (int i = 0; i < CombatConst.SoldierMeleeCells.Length && meleeCount < cfg.MeleeCount; i++)
+        FillSoldierRow(CombatConst.SoldierMeleeRow, 500001, cfg.MeleeCount, meleeCount);
+        FillSoldierRow(CombatConst.SoldierRangedRow, 500002, cfg.RangedCount, rangedCount);
+    }
+
+    // 把某一列行的小兵摆到理想列位：1人居中、奇数占1/3/5列、偶数占2/4列、4人占1~4列
+    // 本行已有小兵会挪到理想列；被玩家挪到其他行的不动，只按缺口补新兵
+    private void FillSoldierRow(int row, int soldierId, int target, int existing)
+    {
+        if (existing >= target)
+            return;
+        int basePos = row * CombatConst.FormationGridSize;
+        int columnsIndex = Mathf.Clamp(target, 1, CombatConst.SoldierColumnsByCount.Length) - 1;
+        int[] columns = CombatConst.SoldierColumnsByCount[columnsIndex];
+
+        var idealPos = new HashSet<int>();
+        for (int i = 0; i < columns.Length; i++)
+            idealPos.Add(basePos + columns[i]);
+        var stray = new List<int>();
+        int placed = 0;
+        for (int col = 0; col < CombatConst.FormationGridSize; col++)
         {
-            int pos = CombatConst.SoldierMeleeCells[i];
-            if (battleCards[pos] == 500001 || battleCards[pos] == 500002)
+            int pos = basePos + col;
+            if (battleCards[pos] != soldierId)
                 continue;
-            if (battleCards[pos] > 0)
-                MoveHeroToEmpty(pos);
-            battleCards[pos] = 500001;
-            meleeCount++;
+            if (idealPos.Contains(pos))
+                placed++;
+            else
+                stray.Add(pos);
         }
-        for (int i = 0; i < CombatConst.SoldierRangedCells.Length && rangedCount < cfg.RangedCount; i++)
+
+        // 本行理想列上需要的数量：目标总数减去已被放到其他行的同类型小兵
+        int needInRow = target - (existing - placed - stray.Count);
+        if (needInRow <= 0)
+            return;
+
+        int strayIdx = 0;
+        int filled = placed;
+        for (int i = 0; i < columns.Length && filled < needInRow; i++)
         {
-            int pos = CombatConst.SoldierRangedCells[i];
+            int pos = basePos + columns[i];
+            if (battleCards[pos] == soldierId)
+                continue; // 已在理想列上
             if (battleCards[pos] == 500001 || battleCards[pos] == 500002)
-                continue;
+                continue; // 被另一类小兵占用，跳过
             if (battleCards[pos] > 0)
                 MoveHeroToEmpty(pos);
-            battleCards[pos] = 500002;
-            rangedCount++;
+            // 优先把本行跑偏的小兵挪过来，不足再补新兵
+            if (strayIdx < stray.Count)
+                battleCards[stray[strayIdx++]] = 0;
+            battleCards[pos] = soldierId;
+            filled++;
         }
     }
 

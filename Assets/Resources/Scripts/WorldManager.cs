@@ -512,8 +512,9 @@ public class WorldManager : MonoBehaviour
                     {
                         var p = GameManager.Instance.GetPlayer(match[0]);
 
+                        var cards = p.GetBattleCardList(); // AI 侧会据此重算英雄/小兵布阵，需先于小兵生成
                         SpawnSoldiersForSide(p, playerCenter, 1);
-                        SpawnHerosForSide(p, playerCenter, p.GetBattleCardList(), 1);
+                        SpawnHerosForSide(p, playerCenter, cards, 1);
                         SpawnGongSummonForSide(p, playerCenter, 1);
                         GameLog.Debug("[BattleInit] gongSummon done");
                         CreateCastleHUD(p, playerCenter, 1);
@@ -541,8 +542,9 @@ public class WorldManager : MonoBehaviour
                         continue;
                     var p = GameManager.Instance.GetPlayer(pid);
                     var center = mapInfo.SideCenters[side - 1];
+                    var cards = p.GetBattleCardList(); // AI 侧会据此重算英雄/小兵布阵，需先于小兵生成
                     SpawnSoldiersForSide(p, center, side);
-                    SpawnHerosForSide(p, center, p.GetBattleCardList(), side);
+                    SpawnHerosForSide(p, center, cards, side);
                     SpawnGongSummonForSide(p, center, side);
                     CreateCastleHUD(p, center, side);
                 }

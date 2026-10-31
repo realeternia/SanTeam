@@ -17,6 +17,7 @@ public class BagCell : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragH
 
     public Image itemImage;
     public Image jobImage;
+    public Image[] skillImg;
     public Image[] equipImages; // 最多3件装备槽，需在预制体上按槽位顺序拖入引用
     public Image[] equipBorderImages; // 最多3件装备槽，需在预制体上按槽位顺序拖入引用
     
@@ -81,7 +82,63 @@ public class BagCell : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragH
                 jobImage.sprite = Resources.Load<Sprite>("Textures/SkillPic/" + skillCfgs[0].Icon);
         }
 
+        // 技能图标：slot0=国家图标，slot1/2=好友羁绊图标（无则隐藏）
+        if (skillImg != null)
+        {
+            foreach (var img in skillImg)
+            {
+                if (img != null)
+                    GetSkillIconNode(img).SetActive(false);
+            }
+
+            // slot0：英雄所属势力的国家图标（野势力无图标，隐藏）
+            var forceCfg = ForceConfig.HasConfig(heroCfg.Side) ? ForceConfig.GetConfig(heroCfg.Side) : null;
+            if (forceCfg != null && !string.IsNullOrEmpty(forceCfg.Icon) && skillImg[0] != null)
+            {
+                skillImg[0].sprite = Resources.Load<Sprite>("Textures/Icons/" + forceCfg.Icon);
+                GetSkillIconNode(skillImg[0]).SetActive(true);
+            }
+
+            // slot1/2：好友组关联技能图标（羁绊），按组 Id 升序保证展示稳定
+            var bondIcons = GetFriendBondIcons(cardId);
+            for (int i = 0; i < bondIcons.Count && i + 1 < skillImg.Length; i++)
+            {
+                if (skillImg[i + 1] == null)
+                    continue;
+                skillImg[i + 1].sprite = Resources.Load<Sprite>("Textures/SkillPic/" + bondIcons[i]);
+                GetSkillIconNode(skillImg[i + 1]).SetActive(true);
+            }
+        }
+
         expBar.rectTransform.sizeDelta = new Vector2(140 * HeroSelectionTool.GetExpRate(count, true), 20);
+    }
+
+    // 技能图标外层通常套了一圈容器(外框+图标)，显示/隐藏时操作父节点，避免外框残留
+    // 父节点是本卡根节点（图标直接挂在卡上）时退回操作图标自身
+    private GameObject GetSkillIconNode(Image img)
+    {
+        var parent = img.transform.parent;
+        return parent != null && parent != transform ? parent.gameObject : img.gameObject;
+    }
+
+    // 好友羁绊图标：英雄所在好友组的关联技能图标（无关联技能/无图标则跳过）
+    private List<string> GetFriendBondIcons(int heroId)
+    {
+        var icons = new List<string>();
+        var friendInfo = ConfigManager.GetHeroFriendInfo(heroId);
+        if (friendInfo == null)
+            return icons;
+
+        foreach (var relId in friendInfo.OrderBy(id => id))
+        {
+            var relCfg = HeroFriendConfig.GetConfig(relId);
+            if (relCfg == null || string.IsNullOrEmpty(relCfg.SkillId))
+                continue;
+            var relSkillCfg = ConfigManager.GetSkillConfig(relCfg.SkillId);
+            if (relSkillCfg != null && !string.IsNullOrEmpty(relSkillCfg.Icon))
+                icons.Add(relSkillCfg.Icon);
+        }
+        return icons;
     }
 
 
