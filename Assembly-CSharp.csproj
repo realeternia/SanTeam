@@ -102,8 +102,6 @@
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillShockWaveMulti.cs" />
     <Compile Include="Assets\Lana Studio\Casual RPG VFX\Demo\Scripts\_InputKeyBoard.cs" />
     <Compile Include="Assets\Resources\Scripts\Tools\GameLog.cs" />
-    <Compile Include="Assets\Resources\Scripts\Tools\AIConst.cs" />
-    <Compile Include="Assets\Resources\Scripts\Tools\GameConst.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffArmorDown.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffTimeDamage.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffLifeLink.cs" />
@@ -161,6 +159,7 @@
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffFrenzy.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillSingleDamage.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\SideBar.cs" />
+    <Compile Include="Assets\Resources\Scripts\Tools\AIConst.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidFeint.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\SideBarAlphaGradient.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAttackRunCross.cs" />
@@ -212,6 +211,7 @@
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAttackStackBuffer.cs" />
     <Compile Include="Assets\Resources\Scripts\PO\BuffTime.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\SideComposeSelector.cs" />
+    <Compile Include="Assets\Resources\Scripts\Tools\GameConst.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\BattleResultCellControl.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\HeroInfoGroup.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffChaos.cs" />
