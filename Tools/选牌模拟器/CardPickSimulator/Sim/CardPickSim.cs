@@ -78,10 +78,7 @@ public class CardPickSim
             // 3) 构建无头场景：8 名玩家 + 世界 + 面板 + 商店宿主
             BuildScene();
 
-            // 3.5) like 许愿阶段（开局一次）：各 AI 点赞写入收藏池，供商店刷新出"自己许愿的牌"
-            RunLikePhase();
-
-            // 4) 逐回合驱动商店
+            // 4) 逐回合驱动商店（第10/25/40回合的 AI 许愿由 CardShopManager.BeginShop 内部触发）
             for (int round = 1; round <= Rounds; round++)
             {
                 RunOneRound(round);
@@ -155,56 +152,6 @@ public class CardPickSim
             var st = new PlayerState { info = p, lastGold = p.gold };
             st.lastCards = new Dictionary<int, int>(p.cards);
             states.Add(st);
-        }
-    }
-
-    // like 许愿阶段：开局每个 AI 玩家按 likeCount(默认2张) 各点赞若干张，写入 HeroSelectionTool 收藏池。
-    // 收藏池会在商店刷新时按 LikeCardRefreshRate 概率出"该玩家自己许愿的牌"，AI 评分对许愿牌拿取意愿 ×2。
-    // 与真机 PickPanelControl.AllPlayerLikes 同口径（复用 PlayerAI.CheckLike），区别：模拟器 8 人全 AI，故 pid0~7 都点赞。
-    private void RunLikePhase()
-    {
-        // 点赞格：覆盖本局全部可出英雄；CheckLike 内部自行按品质/价格/主公过滤，SetLike 落格时再校验
-        var cells = new List<PickPanelCellControl>();
-        foreach (int heroId in GameManager.Instance.heroIds)
-        {
-            var go = new GameObject("LikeCell" + heroId);
-            var cell = go.AddComponent<PickPanelCellControl>();
-            cell.heroId = heroId;
-            cell.canLike = true;
-            cells.Add(cell);
-        }
-
-        foreach (var p in GameManager.Instance.players)
-        {
-            if (p.likeCount > 0)
-                PlayerAI.CheckLike(p, cells);
-        }
-
-        // 收集 likeState(pid+1) → pid → 许愿英雄列表，写入收藏池
-        var pools = new Dictionary<int, List<int>>();
-        foreach (var cell in cells)
-        {
-            if (cell.likeState <= 0)
-                continue;
-            int pid = cell.likeState - 1;
-            if (!pools.TryGetValue(pid, out var list))
-            {
-                list = new List<int>();
-                pools[pid] = list;
-            }
-            list.Add(cell.heroId);
-        }
-        HeroSelectionTool.SetLikePools(pools);
-
-        // 打印许愿结果，便于核对结算里的 ♥ 标记
-        foreach (var st in states)
-        {
-            if (!pools.TryGetValue(st.info.pid, out var list) || list.Count == 0)
-                continue;
-            var names = new List<string>();
-            foreach (int id in list)
-                names.Add(HeroName(id));
-            Log($"  P{st.info.pid} 许愿(♥)：{string.Join("、", names)}");
         }
     }
 
@@ -322,7 +269,7 @@ public class CardPickSim
             int gained = after - preTotalExp[i];
             if (gained <= 0)
                 continue;
-            int times = Math.Max(1, gained / CombatConst.ExpBuyAmount);
+            int times = Math.Max(1, gained / GameConst.ExpBuyAmount);
             Log($"  [第{round}回合] P{st.info.pid} 买经验x{times}（花费{gained}金，总经验{preTotalExp[i]}→{after}）");
             st.buyExpCount += times;
             totalBuyExps += times;
@@ -368,7 +315,7 @@ public class CardPickSim
 
     // ---------------- 等级近似推进 ----------------
 
-    // 真机规则：每回合商店后进入一场战斗，胜+3经验/负+2经验（CombatConst.BattleWinExp/LoseExp），
+    // 真机规则：每回合商店后进入一场战斗，胜+3经验/负+2经验（GameConst.BattleWinExp/LoseExp），
     // 经验曲线与升级逻辑完全复用 PlayerInfo.AddExp / onBattleResult，仅"胜负"为近似：
     // 8 名玩家洗牌后两两配对，按阵容战力(价格×卡等级)占比决定胜率（收敛到 0.3~0.7 避免碾压）。
     private void AdvanceLevelOneRound(int round)
@@ -444,7 +391,7 @@ public class CardPickSim
                 continue;
 
             // 买不动：收益评估（当前无可用卡）+ 买得起 才刷新自己的 5 格后重试（与 IndependentShopMode 中 AI 的处理一致）
-            if (refreshes < CombatConst.AiMaxShopRefreshPerShop
+            if (refreshes < AIConst.AiMaxShopRefreshPerShop
                 && PlayerAI.ShouldAiRefresh(human, offers))
             {
                 shop.Mode.OnHumanRefresh();
@@ -603,8 +550,8 @@ public class CardPickSim
     {
         int exp = p.cards.TryGetValue(cardId, out var e) ? e : 0;
         int level = HeroSelectionTool.GetCardLevel(exp, true);
-        // 英雄名前缀：♥=自己许愿(点赞收藏池)的牌，★=命中玩家喜好（LikeForce 势力 / LikeJob 职业 / LikeFriend 好友组）
-        string name = (HeroSelectionTool.IsLikedHero(p.pid, cardId) ? "♥" : "")
+        // 英雄名前缀：♥=自己许愿的牌，★=命中玩家喜好（LikeForce 势力 / LikeJob 职业 / LikeFriend 好友组）
+        string name = (HeroSelectionTool.IsWishedHero(p, cardId) ? "♥" : "")
             + (IsLikedByPlayer(p, cardId) ? "★" : "") + HeroName(cardId);
         if (level >= HeroSelectionTool.MaxHeroCardLevel)
             return $"{name}Lv{level}(MAX)";
@@ -759,7 +706,7 @@ public class CardPickSim
             // 经济汇总：上阵/预备阵容价值（Σ单价×卡等级）、刷新+升级(买经验)消耗、卖卡折扣损失
             int lineupValue = CalcLineupValue(lineupIds, p);
             int benchValue = CalcLineupValue(benchIds, p);
-            int refreshExpSpend = st.refreshCount * CardShopManager.RefreshGoldCost + st.buyExpCount * CombatConst.ExpBuyGoldCost;
+            int refreshExpSpend = st.refreshCount * CardShopManager.RefreshGoldCost + st.buyExpCount * GameConst.ExpBuyGoldCost;
 
             Log($"P{p.pid}（{p.playerConfig.Name}） {levelText} 上阵格={p.GetSlotCount()} 金币={p.gold} 英雄卡={heroCards}张 " +
                 $"买入={st.buyCount} 卖出={st.sellCount} 刷新={st.refreshCount} 买经验={st.buyExpCount}");

@@ -113,6 +113,22 @@ namespace UnityEngine
             return new Vector3(a.x + (b.x - a.x) * t, a.y + (b.y - a.y) * t, a.z + (b.z - a.z) * t);
         }
 
+        // 与 Unity 一致：原地归一化（返回 void），零向量保持为零
+        public void Normalize()
+        {
+            float m = magnitude;
+            if (m < 1e-6f)
+            {
+                x = 0f;
+                y = 0f;
+                z = 0f;
+                return;
+            }
+            x /= m;
+            y /= m;
+            z /= m;
+        }
+
         public static Vector3 ProjectOnPlane(Vector3 vector, Vector3 planeNormal)
         {
             float d = Dot(vector, planeNormal);

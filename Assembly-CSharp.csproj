@@ -102,6 +102,8 @@
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillShockWaveMulti.cs" />
     <Compile Include="Assets\Lana Studio\Casual RPG VFX\Demo\Scripts\_InputKeyBoard.cs" />
     <Compile Include="Assets\Resources\Scripts\Tools\GameLog.cs" />
+    <Compile Include="Assets\Resources\Scripts\Tools\AIConst.cs" />
+    <Compile Include="Assets\Resources\Scripts\Tools\GameConst.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffArmorDown.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffTimeDamage.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffLifeLink.cs" />

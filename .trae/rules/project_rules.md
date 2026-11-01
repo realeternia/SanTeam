@@ -10,7 +10,7 @@ Unity (C#) | JsonUtility | UGUI | TextMeshPro
 
 ## 目录结构
 
-- 脚本：`Assets/Resources/Scripts/`，其中 `Configs/`（配置类）、`Combat/`（战斗层：Chess、Skill/、Buff/、各 Manager）、`PO/`（纯数据对象）
+- 脚本：`Assets/Resources/Scripts/`，其中 `Configs/`（配置类）、`Combat/`（战斗层：Chess、Skill/、Buff/、各 Manager，常量类 `CombatConst`）、`PO/`（纯数据对象）、`Tools/`（工具类与常量类：`AIConst`、`GameConst`）
 - 资源：`Assets/Resources/` 下按类型分目录（Skins/ SkinsBig/ ItemPic/ SkillPic/ PlayerPic/ BGMs/ Anims/ Prefabs/ Maps/）
 - Editor 脚本：`Assets/Editor/`
 - 文档：`Design/Docs/`（所有项目 `.md` 文档统一存放，见「文档规范」）
@@ -27,7 +27,7 @@ Unity (C#) | JsonUtility | UGUI | TextMeshPro
 ### 单例模式
 
 - Manager 类：MonoBehaviour 单例，`public static XxxManager Instance`，`Awake()` 中赋值 `Instance = this`
-- 静态工具类：`static class`（如 `SysRandom`, `SysColor`, `CombatConst`, `ConfigManager`, `JobLinkManager`）
+- 静态工具类：`static class`（如 `SysRandom`, `SysColor`, `CombatConst`, `AIConst`, `GameConst`, `ConfigManager`, `JobLinkManager`）
 - 日志单例：`GameLog.Instance`（线程安全懒加载，不要模仿它写新单例）
 
 ### 日志规范
@@ -37,6 +37,16 @@ Unity (C#) | JsonUtility | UGUI | TextMeshPro
 ### 随机数规范
 
 统一使用 `SysRandom`（Range/Value/Next/InsideUnitCircle，支持 Seed）。禁止 `UnityEngine.Random`，也不要散落 `new System.Random()`。
+
+### 常量归类（CombatConst / AIConst / GameConst）
+
+三个常量类职责严格分离，新增数值先判定归属再落文件，禁止在调用方硬编码：
+
+- `Combat/CombatConst.cs` → `CombatConst`：**只在战斗中生效**的内容——技能/Buff Id、伤害类型/标签、Buff 叠加模式、抗性/移动避障/单位间距、召唤物 Id、范围特效、星级/品质成长、技能 MP 修正、疲劳机制等
+- `Tools/AIConst.cs` → `AIConst`：**AI 决策策略**相关数值——许愿品质偏好、评分倍率、买卖卡意向、淘汰清仓、商店刷新、锁卡、聚焦、羁绊信任倍率
+- `Tools/GameConst.cs` → `GameConst`：**非战斗的通用玩法规则**——许愿槽位/解锁回合/出卡权重、好友每回合金币、5x5 布阵图（格数/行列/英雄格）、玩家等级/经验/生命/卡上限、买经验、士兵等级
+
+约定：单个数值用 `public const`，数组/二维数组用 `public static readonly`，全部加中文 `/// <summary>` 说明；常量类只放数值，不放业务方法（需要逻辑时放调用方或独立静态类）。
 
 ## 核心架构
 
@@ -69,7 +79,7 @@ Unity (C#) | JsonUtility | UGUI | TextMeshPro
 ### 连锁/羁绊机制
 
 - 兵种连锁 `JobLinkManager`（静态类）：上阵同职业 1/2/3/4/5 人对应职业技能 Lv1~5 档位，LinkSelf=连接英雄自身加成，LinkTeam=全队总量加成（配置即总量，不乘人数），数值全部走 SkillConfig，不硬编码
-- 数值档位（如阵营护盾 3/5/7/9、好友连线 2~7 人）统一放 `CombatConst` 的数组常量
+- 数值档位数组常量按归属放置：阵营护盾 `FactionShieldCounts` 在 `CombatConst`（战斗内生效），好友连线档位 `FriendLineCounts` 在 `AIConst`（AI 评分用）；具体技能数值全部走 SkillConfig，不硬编码
 
 ### 纯数据对象 - PO
 
@@ -122,7 +132,7 @@ UI 图标统一走 `IconLoader` 组件（Inspector 配 sourceType：Path / HeroA
 - 禁止配置类使用属性，用公共字段
 - 禁止在配置类（`XxxConfig_s.cs`）中添加模板之外的任何方法（业务/工具/静态便捷/重载），配表由工具模板生成，重新生成会覆盖丢失
 - 禁止硬编码颜色，用 `SysColor`（含嵌套类）
-- 禁止在战斗代码中硬编码技能/Buff Id 和机制数值，提取到 `CombatConst`
+- 禁止在战斗中硬编码技能/Buff Id 和机制数值：战斗相关提取到 `CombatConst`，AI 策略数值提取到 `AIConst`，非战斗玩法数值提取到 `GameConst`
 - 新增 `.cs` 文件必须在 `Assembly-CSharp.csproj` 添加 `<Compile Include>`（Editor 脚本加到 `Assembly-CSharp-Editor.csproj`）
 - 新增配置类必须在 `ConfigManager.Init()` 中注册 Load
 - 禁止静默 null check return，必须记录日志

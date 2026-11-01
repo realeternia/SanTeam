@@ -1,6 +1,6 @@
 # AI 选牌与买卖策略（PlayerAI）
 
-> 整理日期：2026-10-27（按当前 [PlayerAI.cs](../../Assets/Resources/Scripts/PlayerAI.cs) 与 [CombatConst.cs](../../Assets/Resources/Scripts/Combat/CombatConst.cs) 重写）
+> 整理日期：2026-10-27（按当前 [PlayerAI.cs](../../Assets/Resources/Scripts/PlayerAI.cs) 与 [AIConst.cs](../../Assets/Resources/Scripts/Tools/AIConst.cs) 重写）
 > 范围：点赞（like）、商店开场、买卡评分、卖卡/淘汰、刷新决策、聚焦机制
 > 相关文档：[职业与兵种连锁配置](./职业与兵种连锁配置.md)、[好友羁绊与武将分组](./好友羁绊与武将分组.md)、[done 商店双模式抽象方案](./done%20商店双模式抽象方案.md)
 
@@ -138,5 +138,5 @@
 | 聚焦 | [PlayerAI.cs](../../Assets/Resources/Scripts/PlayerAI.cs) `DeriveFocusTargets` / `GetFocusGain` / `IsFocusMember` |
 | 卖卡 | [PlayerAI.cs](../../Assets/Resources/Scripts/PlayerAI.cs) `FindWeakCard` / `GetLineupValue` / `GetSellCostBias` |
 | 刷新判定 | [PlayerAI.cs](../../Assets/Resources/Scripts/PlayerAI.cs) `ShouldAiRefresh` / `GetShopRefreshLimit` |
-| 全部 AI 常量 | [CombatConst.cs](../../Assets/Resources/Scripts/Combat/CombatConst.cs) `AI / 淘汰 / 聚焦 / 羁绊信任` 段 |
+| 全部 AI 常量 | [AIConst.cs](../../Assets/Resources/Scripts/Tools/AIConst.cs) |
 | 玩家 AI 参数 | [PlayerConfig_s.cs](../../Assets/Resources/Scripts/Configs/PlayerConfig_s.cs) |

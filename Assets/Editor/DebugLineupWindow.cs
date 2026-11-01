@@ -432,10 +432,10 @@ public class DebugLineupWindow : EditorWindow
     {
         if (gm == null)
             return;
-        int over = Mathf.Max(gm.debugHeroesSide1.Count, gm.debugHeroesSide2.Count) - CombatConst.FormationCellCount;
+        int over = Mathf.Max(gm.debugHeroesSide1.Count, gm.debugHeroesSide2.Count) - GameConst.FormationCellCount;
         if (over > 0)
             EditorGUILayout.HelpBox(
-                "布阵格只有 " + CombatConst.FormationCellCount + " 格，超出的 " + over + " 名武将不会生成。",
+                "布阵格只有 " + GameConst.FormationCellCount + " 格，超出的 " + over + " 名武将不会生成。",
                 MessageType.Warning);
     }
 

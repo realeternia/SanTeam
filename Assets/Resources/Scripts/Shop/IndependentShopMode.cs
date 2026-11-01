@@ -173,7 +173,7 @@ public class IndependentShopMode : ShopMode
 
                 // 买不动：满足"收益评估（当前无可用卡）+ 买得起（刷新后余额≥AiRefreshMinRemainGold）"才刷新，否则结束
                 // 刷新上限：基础上限，金币充裕("钱多")时额外放开（PlayerAI.GetShopRefreshLimit）
-                int refreshLimit = PlayerAI.GetShopRefreshLimit(player, CombatConst.AiMaxShopRefreshPerShop);
+                int refreshLimit = PlayerAI.GetShopRefreshLimit(player, AIConst.AiMaxShopRefreshPerShop);
                 if (refreshes < refreshLimit
                     && PlayerAI.ShouldAiRefresh(player, offers))
                 {
@@ -197,7 +197,7 @@ public class IndependentShopMode : ShopMode
     private void TryLockAiCard(int pid, PlayerInfo player)
     {
         var activeLocks = GetActiveLocks(pid);
-        if (activeLocks != null && activeLocks.Count >= CombatConst.AiLockMaxPerShop)
+        if (activeLocks != null && activeLocks.Count >= AIConst.AiLockMaxPerShop)
             return;
 
         if (!PlayerAI.TryAiLockCard(player, GetOffers(pid), out int lockHeroId))

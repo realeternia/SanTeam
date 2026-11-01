@@ -48,7 +48,8 @@
   </ItemGroup>
   <ItemGroup>
     <!-- 游戏战斗源码（链接引用，零修改） -->
-    <Compile Include="..\..\..\Assets\Resources\Scripts\Combat\**\*.cs" Link="Game\Combat\%(RecursiveDir)%(Filename)%(Extension)" />
+    <!-- BattleDefeatTip 是纯 UI 表现脚本（CanvasGroup/粒子/DOTween 震屏），战斗模拟器无 UI 层，排除 -->
+    <Compile Include="..\..\..\Assets\Resources\Scripts\Combat\**\*.cs" Exclude="..\..\..\Assets\Resources\Scripts\Combat\BattleDefeatTip.cs" Link="Game\Combat\%(RecursiveDir)%(Filename)%(Extension)" />
     <Compile Include="..\..\..\Assets\Resources\Scripts\Configs\*.cs" Link="Game\Configs\%(Filename)%(Extension)" />
     <Compile Include="..\..\..\Assets\Resources\Scripts\PO\*.cs" Link="Game\PO\%(Filename)%(Extension)" />
     <Compile Include="..\..\..\Assets\Resources\Scripts\Tools\SysRandom.cs" Link="Game\Tools\SysRandom.cs" />
@@ -56,6 +57,8 @@
     <Compile Include="..\..\..\Assets\Resources\Scripts\Tools\PlayerBook.cs" Link="Game\Tools\PlayerBook.cs" />
     <Compile Include="..\..\..\Assets\Resources\Scripts\Tools\HeroSelectionTool.cs" Link="Game\Tools\HeroSelectionTool.cs" />
     <Compile Include="..\..\..\Assets\Resources\Scripts\Tools\GameLog.cs" Link="Game\Tools\GameLog.cs" />
+    <Compile Include="..\..\..\Assets\Resources\Scripts\Tools\AIConst.cs" Link="Game\Tools\AIConst.cs" />
+    <Compile Include="..\..\..\Assets\Resources\Scripts\Tools\GameConst.cs" Link="Game\Tools\GameConst.cs" />
     <!-- 模拟器自身源码 -->
     <Compile Include="UnityStub\**\*.cs" />
     <Compile Include="Harness\**\*.cs" />

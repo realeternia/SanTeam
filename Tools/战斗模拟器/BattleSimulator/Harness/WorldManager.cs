@@ -97,11 +97,11 @@ public class WorldManager : MonoBehaviour
     // 计算布阵图中第pos格(0~24)的世界坐标：row=pos/5 从上到下，col=pos%5 从左到右
     private Vector3 GetFormationCellPos(Transform center, int pos)
     {
-        int row = pos / CombatConst.FormationGridSize;
-        int col = pos % CombatConst.FormationGridSize;
+        int row = pos / GameConst.FormationGridSize;
+        int col = pos % GameConst.FormationGridSize;
         Vector3 forward = Vector3.ProjectOnPlane(center.forward, Vector3.up).normalized;
         Vector3 right = Vector3.ProjectOnPlane(center.right, Vector3.up).normalized;
-        float half = (CombatConst.FormationGridSize - 1) * 0.5f;
+        float half = (GameConst.FormationGridSize - 1) * 0.5f;
         return center.position + forward * (row - half) * 13f + right * (col - half) * 13f;
     }
 
@@ -111,7 +111,7 @@ public class WorldManager : MonoBehaviour
     public List<int> GetFormationPosOrderFrontToBack(int side)
     {
         var result = new List<int>();
-        for (int pos = 0; pos < CombatConst.FormationCellCount; pos++)
+        for (int pos = 0; pos < GameConst.FormationCellCount; pos++)
             result.Add(pos);
 
         var myCenter = side == 1 ? _center1 : _center2;
@@ -142,7 +142,7 @@ public class WorldManager : MonoBehaviour
     // 生成一个势力的英雄：按布阵面板英雄摆放位置生成（索引=格子，跳过非英雄格）
     private void SpawnHerosForSide(PlayerInfo p, Transform center, List<Tuple<int, int>> cards, int side)
     {
-        for (int i = 0; i < cards.Count && i < CombatConst.FormationCellCount; i++)
+        for (int i = 0; i < cards.Count && i < GameConst.FormationCellCount; i++)
         {
             if (cards[i] == null || !ConfigManager.IsHeroCard(cards[i].Item1))
                 continue;
@@ -169,7 +169,7 @@ public class WorldManager : MonoBehaviour
 
         var occupied = new HashSet<int>();
         foreach (var u in units)
-            if (u != null && u.pos >= 0 && u.pos < CombatConst.FormationCellCount)
+            if (u != null && u.pos >= 0 && u.pos < GameConst.FormationCellCount)
                 occupied.Add(u.pos);
 
         var spawnList = BuildGongSummonList(lv);
@@ -186,7 +186,7 @@ public class WorldManager : MonoBehaviour
             {
                 int pos;
                 if (!TryPickFreePos(occupied, rowMin, rowMax, out pos)
-                    && !TryPickFreePos(occupied, 0, CombatConst.FormationGridSize - 1, out pos))
+                    && !TryPickFreePos(occupied, 0, GameConst.FormationGridSize - 1, out pos))
                     continue;
                 occupied.Add(pos);
                 SpawnUnitsForRegion(p, item.Item1, pos, GetFormationCellPos(center, pos), side, img);
@@ -226,7 +226,7 @@ public class WorldManager : MonoBehaviour
     // 在指定行范围内挑选一个未被占用的随机布阵格(pos=row*5+col)，范围无空位返回false
     private bool TryPickFreePos(HashSet<int> occupied, int rowMin, int rowMax, out int pos)
     {
-        var size = CombatConst.FormationGridSize;
+        var size = GameConst.FormationGridSize;
         var candidates = new List<int>();
         for (var row = rowMin; row <= rowMax; row++)
             for (var col = 0; col < size; col++)

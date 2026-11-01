@@ -101,7 +101,7 @@ public class BagControl : MonoBehaviour, IPanelEvent
                 return;
             if (!bindPlayer.BuyExp())
             {
-                SystemTip.Show($"金币不足，购买经验需要{CombatConst.ExpBuyGoldCost}金币");
+                SystemTip.Show($"金币不足，购买经验需要{GameConst.ExpBuyGoldCost}金币");
                 return;
             }
             UpdateExpView();
@@ -113,9 +113,9 @@ public class BagControl : MonoBehaviour, IPanelEvent
                 return;
             if (!bindPlayer.SodLvup())
             {
-                SystemTip.Show(bindPlayer.soldierLevel >= CombatConst.SoldierMaxLevel
+                SystemTip.Show(bindPlayer.soldierLevel >= GameConst.SoldierMaxLevel
                     ? "士兵等级已满"
-                    : $"金币不足，升级士兵需要{CombatConst.SodLvupGoldCost}金币");
+                    : $"金币不足，升级士兵需要{GameConst.SodLvupGoldCost}金币");
                 return;
             }
             UpdateSodView();
@@ -126,8 +126,8 @@ public class BagControl : MonoBehaviour, IPanelEvent
         // 5x5布阵图：最上面一行前3格、最后面一行后2格为小兵格，其余可布阵英雄
         // FieldUnit 缩小为 80x80，格子间距调小为原来的 2/3
         float cellGap = 160f * 2f / 3f;
-        float half = (CombatConst.FormationGridSize - 1) * cellGap * 0.5f;
-        for (int i = 0; i < CombatConst.FormationCellCount; i++)
+        float half = (GameConst.FormationGridSize - 1) * cellGap * 0.5f;
+        for (int i = 0; i < GameConst.FormationCellCount; i++)
         {
             GameObject fieldUnit = Instantiate(Resources.Load<GameObject>("Prefabs/UIs/Cells/FieldUnit"), fieldRegion.transform);
             var fieldUnitControl = fieldUnit.GetComponent<BagFieldUnitControl>();
@@ -136,8 +136,8 @@ public class BagControl : MonoBehaviour, IPanelEvent
 
             fieldUnit.GetComponent<RectTransform>().sizeDelta = new Vector2(80, 80);
             // 以原3x3网格中心(250,-331)为基准，向两侧扩展为5x5
-            float xOff = cellGap * (i % CombatConst.FormationGridSize);
-            float yOff = cellGap * (i / CombatConst.FormationGridSize);
+            float xOff = cellGap * (i % GameConst.FormationGridSize);
+            float yOff = cellGap * (i / GameConst.FormationGridSize);
             fieldUnit.transform.localPosition = new Vector3(260 - half + xOff, -261 + half - yOff, 0);
         }
 
@@ -218,7 +218,7 @@ public class BagControl : MonoBehaviour, IPanelEvent
     // 点击许愿按钮：未解锁/已选择给出提示，否则打开许愿面板
     private void OnLoveBtnClick(int slot)
     {
-        if (slot < 0 || slot >= CombatConst.WishUnlockRounds.Length)
+        if (slot < 0 || slot >= GameConst.WishUnlockRounds.Length)
         {
             GameLog.Warn($"BagControl.OnLoveBtnClick: 许愿槽位{slot}超出配置范围，忽略");
             return;
@@ -232,7 +232,7 @@ public class BagControl : MonoBehaviour, IPanelEvent
 
         if (!HeroSelectionTool.IsWishSlotUnlocked(slot))
         {
-            int unlockRound = CombatConst.WishUnlockRounds[slot];
+            int unlockRound = GameConst.WishUnlockRounds[slot];
             int currentRound = GameManager.Instance.year;
             SystemTip.Show($"第{unlockRound}回合解锁许愿，还需{Mathf.Max(1, unlockRound - currentRound)}回合");
             return;
@@ -322,7 +322,7 @@ public class BagControl : MonoBehaviour, IPanelEvent
     private void UpdateExpView()
     {
         var expNext = bindPlayer.GetExpToNext();
-        if (bindPlayer.level >= CombatConst.PlayerMaxLevel)
+        if (bindPlayer.level >= GameConst.PlayerMaxLevel)
         {
             expText.text = "满级";
             expBar.rectTransform.sizeDelta = new Vector2(250, expBar.rectTransform.sizeDelta.y);

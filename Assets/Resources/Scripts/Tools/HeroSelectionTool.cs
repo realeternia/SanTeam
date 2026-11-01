@@ -119,8 +119,8 @@ public static class HeroSelectionTool
     {
         if (player == null || slot < 0)
             return;
-        if (player.wishHeroes == null || player.wishHeroes.Length < CombatConst.WishSlotCount)
-            player.wishHeroes = new int[CombatConst.WishSlotCount];
+        if (player.wishHeroes == null || player.wishHeroes.Length < GameConst.WishSlotCount)
+            player.wishHeroes = new int[GameConst.WishSlotCount];
         if (slot >= player.wishHeroes.Length)
             return;
         player.wishHeroes[slot] = heroId;
@@ -129,10 +129,10 @@ public static class HeroSelectionTool
     /// <summary>许愿槽位是否已到解锁回合（当前商店回合 = GameManager.year）</summary>
     public static bool IsWishSlotUnlocked(int slot)
     {
-        if (slot < 0 || slot >= CombatConst.WishUnlockRounds.Length)
+        if (slot < 0 || slot >= GameConst.WishUnlockRounds.Length)
             return false;
         int round = GameManager.Instance != null ? GameManager.Instance.year : 0;
-        return round >= CombatConst.WishUnlockRounds[slot];
+        return round >= GameConst.WishUnlockRounds[slot];
     }
 
     /// <summary>玩家是否已经许愿过该英雄（用于避免重复选择）</summary>
@@ -237,11 +237,11 @@ public static class HeroSelectionTool
         if (player == null)
             return weight;
 
-        for (int slot = 0; slot < CombatConst.WishSlotCount; slot++)
+        for (int slot = 0; slot < GameConst.WishSlotCount; slot++)
         {
             if (GetWishHeroId(player, slot) == heroId)
             {
-                weight *= CombatConst.WishHeroWeightMultiplier;
+                weight *= GameConst.WishHeroWeightMultiplier;
                 break;
             }
         }
@@ -257,7 +257,7 @@ public static class HeroSelectionTool
     // 独立买卡：按玩家等级配置的品质概率roll
     private static int RollQualityByLevel(int level)
     {
-        var cfg = PlayerLevelConfig.GetConfig(Mathf.Clamp(level, 1, CombatConst.PlayerMaxLevel));
+        var cfg = PlayerLevelConfig.GetConfig(Mathf.Clamp(level, 1, GameConst.PlayerMaxLevel));
         return RollQualityRate(cfg.Quality2Rate, cfg.Quality3Rate, cfg.Quality4Rate);
     }
 

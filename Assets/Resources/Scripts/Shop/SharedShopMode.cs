@@ -190,7 +190,7 @@ public class SharedShopMode : ShopMode
 
                 // 买不动时：在"刷新收益 + 买得起"门槛内刷新共享店再重估；
                 // 金币充裕("钱多")时上限额外放开（PlayerAI.GetShopRefreshLimit），故用循环允许多刷几次
-                int refreshLimit = PlayerAI.GetShopRefreshLimit(playerInfo, CombatConst.AiSharedMaxRefreshPerShop);
+                int refreshLimit = PlayerAI.GetShopRefreshLimit(playerInfo, AIConst.AiSharedMaxRefreshPerShop);
                 while (!result)
                 {
                     int refreshed = aiRefreshCount.TryGetValue(currentPlayerId, out var rc) ? rc : 0;

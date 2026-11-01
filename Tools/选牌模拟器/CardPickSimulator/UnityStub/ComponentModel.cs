@@ -424,6 +424,18 @@ namespace UnityEngine
             return GetComponentsInChildren<T>(true);
         }
 
+        // 桩：GetComponents<T> 只取本对象上的同类型组件（EffectManager 规范粒子缩放模式用）
+        public T[] GetComponents<T>() where T : Component, new()
+        {
+            var result = new List<T>();
+            foreach (var c in _components)
+            {
+                if (c is T t)
+                    result.Add(t);
+            }
+            return result.ToArray();
+        }
+
         public T[] GetComponentsInChildren<T>(bool includeInactive) where T : Component, new()
         {
             var result = new List<T>();
@@ -615,6 +627,39 @@ namespace UnityEngine
 
         public void SetTexture(string name, Texture value) { _textures[name] = value; }
         public Texture GetTexture(string name) { return _textures.ContainsKey(name) ? _textures[name] : null; }
+
+        // 桩：属性存在性统一返回 true（headless 无 shader，让染色/切材质分支正常走完）
+        public bool HasProperty(string name) { return true; }
+
+        public void SetVector(string name, Vector4 value) { _vectors[name] = value; }
+        public Vector4 GetVector(string name) { return _vectors.ContainsKey(name) ? _vectors[name] : default(Vector4); }
+
+        private readonly Dictionary<string, Vector4> _vectors = new Dictionary<string, Vector4>();
+    }
+
+    // 桩：镜像 Unity 粒子缩放模式枚举（0=Hierarchy 跟随父级层级 / 1=Local 仅自身 localScale）
+    public enum ParticleSystemScalingMode { Hierarchy = 0, Local = 1, Shape = 2 }
+
+    // 桩：镜像 Unity 停止行为枚举（BattleDefeatTip 等 UI 脚本不再链接，此处仅满足战斗层调用）
+    public enum ParticleSystemStopBehavior { StopEmittingAndClear = 0, StopEmitting = 1 }
+
+    // 粒子系统桩：headless 不做真实粒子模拟，只提供战斗层用到的成员
+    public class ParticleSystem : Component
+    {
+        // MainModule 用属性（而非字段）镜像 Unity：`var main = ps.main; main.loop = true;` 可正常编译
+        public struct MainModule
+        {
+            public bool loop { get; set; }
+        }
+
+        public MainModule main { get; set; }
+
+        public ParticleSystemScalingMode scalingMode { get; set; }
+
+        public void Play() { }
+        public void Stop() { }
+        public void Stop(bool withChildren, ParticleSystemStopBehavior stopBehavior) { }
+        public void Clear() { }
     }
 
     public class Texture : Object

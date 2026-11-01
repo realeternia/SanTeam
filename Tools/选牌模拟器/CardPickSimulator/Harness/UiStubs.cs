@@ -34,6 +34,8 @@ namespace UnityEngine.UI
     {
         public ButtonClickedEvent onClick = new ButtonClickedEvent();
         public bool interactable = true;
+        // 锁定图标染色用（CardViewControl.RefreshLockVisual）
+        public Graphic targetGraphic = new Image();
     }
 }
 

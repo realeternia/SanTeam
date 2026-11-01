@@ -38,7 +38,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     // 上一局是否失败（战斗开始类技能判定用，如「文」的获得道具概率加成；首局默认false=无加成）
     [CustomSerializeField]
     public bool lastBattleLose;
-    // 生命值（沿用字段名 mark）：初始 CombatConst.PlayerInitLife，每轮战斗失败按 GameRoundConfig.DamageCount 扣除
+    // 生命值（沿用字段名 mark）：初始 GameConst.PlayerInitLife，每轮战斗失败按 GameRoundConfig.DamageCount 扣除
     [CustomSerializeField]
     public int mark;
     // 是否已淘汰（生命值≤0 后移出游戏：头像隐藏、不再参与商店轮转与战斗匹配）
@@ -49,7 +49,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     [CustomSerializeField]
     public List<SerializableItemSlot> items = new List<SerializableItemSlot>(); // 物品实例列表：每件物品一条记录(ItemId + HeroId)，HeroId=0表示在背包未装备，非0表示装备在该英雄上；多个同 id 物品各自一条
     [CustomSerializeField]
-    public int[] battleCards = new int[CombatConst.PlayerMaxSlot];
+    public int[] battleCards = new int[GameConst.PlayerMaxSlot];
     [CustomSerializeField]
     public bool isAI = false;
     // 玩家等级体系：等级(1~10)与经验（参考金铲铲，节奏放慢一倍；10级后9个格子全解锁）
@@ -77,7 +77,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     public int likeCount = 2; //最多两张
     // 许愿英雄：3个槽位分别在第10/25/40回合解锁，0=未选；选定后不可修改，商店出卡权重×3
     [CustomSerializeField]
-    public int[] wishHeroes = new int[CombatConst.WishSlotCount];
+    public int[] wishHeroes = new int[GameConst.WishSlotCount];
     public int battleSide;
 
     public bool nextSkip = false; //下一轮skip
@@ -113,7 +113,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         isAI = id > 0;
 
         gold = 0;
-        mark = CombatConst.PlayerInitLife;
+        mark = GameConst.PlayerInitLife;
         isEliminated = false;
         ApplyEliminatedState();
 
@@ -130,7 +130,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         isAI = id > 0;
 
         gold = 0;
-        mark = CombatConst.PlayerInitLife;
+        mark = GameConst.PlayerInitLife;
         isEliminated = false;
         winCount = 0;
         loseCount = 0;
@@ -138,7 +138,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 
         cards.Clear();
         items.Clear();
-        battleCards = new int[CombatConst.PlayerMaxSlot];
+        battleCards = new int[GameConst.PlayerMaxSlot];
         level = 1;
         exp = 0;
         soldierLevel = 1;
@@ -146,7 +146,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         goldCostItem = 0;
         attrAddons.Clear();
         likeCount = 2;
-        wishHeroes = new int[CombatConst.WishSlotCount];
+        wishHeroes = new int[GameConst.WishSlotCount];
         lastFightMark = 0;
         lastDamage = 0;
         nextSkip = false;
@@ -285,14 +285,14 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
             foreach (int relId in relIds)
             {
                 var relCfg = HeroFriendConfig.GetConfig(relId);
-                if (relCfg == null || relCfg.SkillId != CombatConst.FriendGoldSkillSname)
+                if (relCfg == null || relCfg.SkillId != GameConst.FriendGoldSkillSname)
                     continue;
                 // 同一英雄可能属于多个关系组，只计一次
                 count++;
                 break;
             }
         }
-        if (count < CombatConst.FriendGoldMinCount)
+        if (count < GameConst.FriendGoldMinCount)
             return 0;
 
         int bonus = GetFriendGoldBonus(count);
@@ -306,11 +306,11 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         int lv = count - 1; // 济组在场人数→技能等级（2人Lv1…6人Lv5）
         if (lv < 1) lv = 1;
         if (lv > 5) lv = 5;
-        var goldCfg = ConfigManager.GetSkillConfig(CombatConst.FriendGoldSkillSname, lv);
+        var goldCfg = ConfigManager.GetSkillConfig(GameConst.FriendGoldSkillSname, lv);
         if (goldCfg == null)
         {
-            GameLog.Error($"济世技能配置缺失: Sname={CombatConst.FriendGoldSkillSname} Lv={lv}，回退每名+1");
-            return count * CombatConst.FriendGoldPerMember;
+            GameLog.Error($"济世技能配置缺失: Sname={GameConst.FriendGoldSkillSname} Lv={lv}，回退每名+1");
+            return count * GameConst.FriendGoldPerMember;
         }
         return (int)ConfigManager.GetSlotValue(goldCfg.Strength2, "gold");
     }
@@ -513,7 +513,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         failReason = null;
 
         // 可在5x5布阵图的任意格子自由摆放
-        if(pos < 0 || pos >= CombatConst.FormationCellCount)
+        if(pos < 0 || pos >= GameConst.FormationCellCount)
         {
             GameLog.Warn($"SetBattlePos: 布阵格越界 pos={pos}");
             failReason = "超出布阵范围";
@@ -567,7 +567,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     // 布阵格之间交换单位（英雄/小兵自由交换，数量守恒）
     public void SwapBattleUnits(int fromPos, int toPos)
     {
-        if(fromPos < 0 || fromPos >= CombatConst.FormationCellCount || toPos < 0 || toPos >= CombatConst.FormationCellCount)
+        if(fromPos < 0 || fromPos >= GameConst.FormationCellCount || toPos < 0 || toPos >= GameConst.FormationCellCount)
             return;
         if(fromPos == toPos)
             return;
@@ -674,9 +674,9 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         }
 
         // 背包英雄卡上限：新英雄（尚未拥有）会占用一个卡位，达到上限不能再买
-        if (isHero && !cards.ContainsKey(cardId) && GetHeroCardList().Count >= CombatConst.PlayerMaxHeroCards)
+        if (isHero && !cards.ContainsKey(cardId) && GetHeroCardList().Count >= GameConst.PlayerMaxHeroCards)
         {
-            GameLog.Warn($"英雄背包已满({CombatConst.PlayerMaxHeroCards}张)，无法购买新英雄 cardId={cardId}");
+            GameLog.Warn($"英雄背包已满({GameConst.PlayerMaxHeroCards}张)，无法购买新英雄 cardId={cardId}");
             return false;
         }
 
@@ -720,7 +720,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     {
         if (!CanAutoEquipHero(heroId))
             return;
-        foreach (int pos in CombatConst.HeroCells)
+        foreach (int pos in GameConst.HeroCells)
         {
             if (battleCards[pos] == 0)
             {
@@ -807,8 +807,8 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     {
         // 复用 GetBattleCardList(true) 的 RearrangePos 逻辑：英雄填到中间9格(HeroCells)
         var strongCardIds = GetBattleCardList(true);
-        battleCards = new int[CombatConst.FormationCellCount];
-        for(int i = 0; i < strongCardIds.Count && i < CombatConst.FormationCellCount; i++)
+        battleCards = new int[GameConst.FormationCellCount];
+        for(int i = 0; i < strongCardIds.Count && i < GameConst.FormationCellCount; i++)
         {
             battleCards[i] = strongCardIds[i] == null ? 0 : strongCardIds[i].Item1;
         }
@@ -820,7 +820,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         if(!isTest && !isAI && battleCards.Any(c => c > 0 && ConfigManager.IsHeroCard(c)))
         {
             // 返回长度25的列表，索引=布阵格位置(null=空位)，供战斗按格子坐标生成
-            var cardList = new List<Tuple<int, int>>(new Tuple<int, int>[CombatConst.FormationCellCount]);
+            var cardList = new List<Tuple<int, int>>(new Tuple<int, int>[GameConst.FormationCellCount]);
             for(int i = 0; i < battleCards.Length; i++)
             {
                 if (battleCards[i] > 0 && ConfigManager.IsHeroCard(battleCards[i]))
@@ -838,12 +838,12 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
             AutoCheckItem(strongCardIds);
         if(!isTest)
             UpdateFightMark(strongCardIds);
-        var results = RearrangePos(strongCardIds, CombatConst.FormationCellCount);
+        var results = RearrangePos(strongCardIds, GameConst.FormationCellCount);
 
         if (isAI)
         {
             //把results保存到battleCards（随后补默认小兵）
-            battleCards = new int[CombatConst.FormationCellCount];
+            battleCards = new int[GameConst.FormationCellCount];
             for (int i = 0; i < results.Count; i++)
                 battleCards[i] = results[i] == null ? 0 : results[i].Item1;
             EnsureSoldierCells();
@@ -1190,7 +1190,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         List<Tuple<int, int>> newResult = new List<Tuple<int, int>>(count);
         for (int i = 0; i < count; i++)
             newResult.Add(null);
-        var heroCells = CombatConst.HeroCells;
+        var heroCells = GameConst.HeroCells;
         List<Tuple<int, int>> pos123 = new List<Tuple<int, int>>();
         List<Tuple<int, int>> pos456 = new List<Tuple<int, int>>();
 
@@ -1279,7 +1279,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 
         resultText.text = mark.ToString();
         // 玩家等级体系：战斗获胜/失败获得经验（参考金铲铲，节奏放慢一倍：胜利+2，失败+1）
-        AddExp(isWin ? CombatConst.BattleWinExp : CombatConst.BattleLoseExp);
+        AddExp(isWin ? GameConst.BattleWinExp : GameConst.BattleLoseExp);
     }
 
     // 生命值耗尽：标记淘汰并隐藏头像（顶部玩家列表不再显示，后续商店/匹配都不再参与）
@@ -1309,16 +1309,16 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     // 当前等级可用的上阵格子数（10级后9个格子全解锁）
     public int GetSlotCount()
     {
-        var lv = Mathf.Clamp(level, 1, CombatConst.PlayerMaxLevel);
+        var lv = Mathf.Clamp(level, 1, GameConst.PlayerMaxLevel);
         if (PlayerLevelConfig.HasConfig(lv))
-            return Mathf.Min(PlayerLevelConfig.GetConfig(lv).SlotCount, CombatConst.PlayerMaxSlot);
-        return Mathf.Min(lv, CombatConst.PlayerMaxSlot);
+            return Mathf.Min(PlayerLevelConfig.GetConfig(lv).SlotCount, GameConst.PlayerMaxSlot);
+        return Mathf.Min(lv, GameConst.PlayerMaxSlot);
     }
 
     // 升到下一级所需经验（满级返回0）
     public int GetExpToNext()
     {
-        if (level >= CombatConst.PlayerMaxLevel)
+        if (level >= GameConst.PlayerMaxLevel)
             return 0;
         if (PlayerLevelConfig.HasConfig(level))
             return PlayerLevelConfig.GetConfig(level).ExpToNext;
@@ -1341,11 +1341,11 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     // 增加经验并处理升级（经验溢出顺延到下一级）
     public void AddExp(int add)
     {
-        if (add <= 0 || level >= CombatConst.PlayerMaxLevel)
+        if (add <= 0 || level >= GameConst.PlayerMaxLevel)
             return;
         exp += add;
         var lv = level;
-        while (lv < CombatConst.PlayerMaxLevel)
+        while (lv < GameConst.PlayerMaxLevel)
         {
             if (!PlayerLevelConfig.HasConfig(lv))
                 break;
@@ -1360,7 +1360,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
             int gained = lv - level;
             level = lv;
             // 士兵随玩家升级自然升级（上限 SoldierMaxLevel）；额外花金币升级由 SodLvup 追加
-            soldierLevel = Mathf.Min(soldierLevel + gained, CombatConst.SoldierMaxLevel);
+            soldierLevel = Mathf.Min(soldierLevel + gained, GameConst.SoldierMaxLevel);
             if (playerLevelText != null)
                 playerLevelText.text = level.ToString();
             EnsureSoldierCells(); // 玩家等级提升可能解锁更多士兵，补齐布阵格
@@ -1374,8 +1374,8 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     // 用金币购买经验（参考金铲铲：4金币=4经验；UI后续接入）
     public bool BuyExp()
     {
-        var cost = CombatConst.ExpBuyGoldCost;
-        var amount = CombatConst.ExpBuyAmount;
+        var cost = GameConst.ExpBuyGoldCost;
+        var amount = GameConst.ExpBuyAmount;
         if (gold < cost)
             return false;
         SubGold(cost, false);
@@ -1395,23 +1395,23 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     }
     public int GetSoldierMeleeCount()
     {
-        var lv = Mathf.Clamp(level, 1, CombatConst.PlayerMaxLevel);
+        var lv = Mathf.Clamp(level, 1, GameConst.PlayerMaxLevel);
         return PlayerLevelConfig.HasConfig(lv) ? PlayerLevelConfig.GetConfig(lv).MeleeCount : 0;
     }
     public int GetSoldierRangedCount()
     {
-        var lv = Mathf.Clamp(level, 1, CombatConst.PlayerMaxLevel);
+        var lv = Mathf.Clamp(level, 1, GameConst.PlayerMaxLevel);
         return PlayerLevelConfig.HasConfig(lv) ? PlayerLevelConfig.GetConfig(lv).RangedCount : 0;
     }
 
     // 花金币额外提升1级士兵等级（最高30级，成长由 SoldierConfig.AtkP/HpP 决定；数量由玩家等级决定）
     public bool SodLvup()
     {
-        if (soldierLevel >= CombatConst.SoldierMaxLevel)
+        if (soldierLevel >= GameConst.SoldierMaxLevel)
             return false;
-        if (gold < CombatConst.SodLvupGoldCost)
+        if (gold < GameConst.SodLvupGoldCost)
             return false;
-        SubGold(CombatConst.SodLvupGoldCost, false);
+        SubGold(GameConst.SodLvupGoldCost, false);
         soldierLevel++;
         return true;
     }
@@ -1709,7 +1709,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 
             // 未随存档持久化的运行时状态先清空，避免切换存档时残留上一局数据
             likeCount = 2;
-            wishHeroes = new int[CombatConst.WishSlotCount];
+            wishHeroes = new int[GameConst.WishSlotCount];
             nextSkip = false;
             lastDamage = 0;
             boughtThisShopCards.Clear();
@@ -1892,7 +1892,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         // 按存档中的淘汰标记同步头像显隐（旧存档没有该字段时默认未淘汰）
         // 旧存档的 mark 是积分制（可能为0或负数），载入时视为满生命，避免读档后立刻被淘汰
         if (!isEliminated && mark <= 0)
-            mark = CombatConst.PlayerInitLife;
+            mark = GameConst.PlayerInitLife;
         ApplyEliminatedState();
     }
 
@@ -1947,13 +1947,13 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     {
         if (battleCards == null)
         {
-            battleCards = new int[CombatConst.PlayerMaxSlot];
+            battleCards = new int[GameConst.PlayerMaxSlot];
             return;
         }
-        if (battleCards.Length != CombatConst.PlayerMaxSlot)
+        if (battleCards.Length != GameConst.PlayerMaxSlot)
         {
-            var cards = new int[CombatConst.PlayerMaxSlot];
-            for (int i = 0; i < Math.Min(battleCards.Length, CombatConst.PlayerMaxSlot); i++)
+            var cards = new int[GameConst.PlayerMaxSlot];
+            for (int i = 0; i < Math.Min(battleCards.Length, GameConst.PlayerMaxSlot); i++)
                 cards[i] = battleCards[i];
             battleCards = cards;
         }
@@ -1967,18 +1967,18 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     {
         if (battleCards == null)
         {
-            battleCards = new int[CombatConst.PlayerMaxSlot];
+            battleCards = new int[GameConst.PlayerMaxSlot];
         }
-        else if (battleCards.Length != CombatConst.PlayerMaxSlot)
+        else if (battleCards.Length != GameConst.PlayerMaxSlot)
         {
             // 兼容旧长度(场景序列化的旧存档可能为9格)
-            var cards = new int[CombatConst.PlayerMaxSlot];
-            for (int i = 0; i < Math.Min(battleCards.Length, CombatConst.PlayerMaxSlot); i++)
+            var cards = new int[GameConst.PlayerMaxSlot];
+            for (int i = 0; i < Math.Min(battleCards.Length, GameConst.PlayerMaxSlot); i++)
                 cards[i] = battleCards[i];
             battleCards = cards;
         }
 
-        var cfg = PlayerLevelConfig.GetConfig(Mathf.Clamp(level, 1, CombatConst.PlayerMaxLevel));
+        var cfg = PlayerLevelConfig.GetConfig(Mathf.Clamp(level, 1, GameConst.PlayerMaxLevel));
         int meleeCount = 0;
         int rangedCount = 0;
         for (int i = 0; i < battleCards.Length; i++)
@@ -1991,8 +1991,8 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         if (meleeCount >= cfg.MeleeCount && rangedCount >= cfg.RangedCount)
             return;
 
-        FillSoldierRow(CombatConst.SoldierMeleeRow, 500001, cfg.MeleeCount, meleeCount);
-        FillSoldierRow(CombatConst.SoldierRangedRow, 500002, cfg.RangedCount, rangedCount);
+        FillSoldierRow(GameConst.SoldierMeleeRow, 500001, cfg.MeleeCount, meleeCount);
+        FillSoldierRow(GameConst.SoldierRangedRow, 500002, cfg.RangedCount, rangedCount);
     }
 
     // 把某一列行的小兵摆到理想列位：1人居中、奇数占1/3/5列、偶数占2/4列、4人占1~4列
@@ -2001,16 +2001,16 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     {
         if (existing >= target)
             return;
-        int basePos = row * CombatConst.FormationGridSize;
-        int columnsIndex = Mathf.Clamp(target, 1, CombatConst.SoldierColumnsByCount.Length) - 1;
-        int[] columns = CombatConst.SoldierColumnsByCount[columnsIndex];
+        int basePos = row * GameConst.FormationGridSize;
+        int columnsIndex = Mathf.Clamp(target, 1, GameConst.SoldierColumnsByCount.Length) - 1;
+        int[] columns = GameConst.SoldierColumnsByCount[columnsIndex];
 
         var idealPos = new HashSet<int>();
         for (int i = 0; i < columns.Length; i++)
             idealPos.Add(basePos + columns[i]);
         var stray = new List<int>();
         int placed = 0;
-        for (int col = 0; col < CombatConst.FormationGridSize; col++)
+        for (int col = 0; col < GameConst.FormationGridSize; col++)
         {
             int pos = basePos + col;
             if (battleCards[pos] != soldierId)

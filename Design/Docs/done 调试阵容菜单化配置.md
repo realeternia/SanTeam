@@ -30,7 +30,7 @@
 - **编辑字段**：`new SerializedObject(gm)` + `FindProperty("debugHeroesSide1"/"debugHeroesSide2")`（字段是 `[HideInInspector]`，只能这样改），每次改动后 `ApplyModifiedProperties()`；实例失效时重建 SerializedObject。
 - **落盘**：改动后 `EditorSceneManager.MarkSceneDirty(scene)`，否则场景不会保存。
 - **刷新**：`OnEnable/OnDisable` 订阅/退订 `EditorApplication.playModeStateChanged`，进出 Play 时 `Repaint()` 刷新按钮可用态。
-- 阵容超过 `CombatConst.FormationCellCount`(25) 时提示会被裁剪。
+- 阵容超过 `GameConst.FormationCellCount`(25) 时提示会被裁剪。
 
 ### 2. 删除旧入口
 

@@ -16,8 +16,9 @@ public class PlayerInfo
 
     public Dictionary<int, int> cards = new Dictionary<int, int>();   // 英雄卡 id → exp
     public List<SerializableItemSlot> items = new List<SerializableItemSlot>();
-    public int[] battleCards = new int[CombatConst.PlayerMaxSlot];    // 25 格布阵
+    public int[] battleCards = new int[GameConst.PlayerMaxSlot];    // 25 格布阵
     public Dictionary<int, AttrInfo> attrAddons = new Dictionary<int, AttrInfo>();
+    public int[] wishHeroes = new int[GameConst.WishSlotCount];   // 许愿英雄（每回合按 WishUnlockRounds 解锁）
 
     public int battleSide;
     public Color lineColor = Color.blue;
@@ -53,8 +54,8 @@ public class PlayerInfo
     // 布阵英雄列表：按 battleCards 返回长度 25 的列表（索引=格子，null=空位）
     public List<Tuple<int, int>> GetBattleCardList(bool isTest = false)
     {
-        var cardList = new List<Tuple<int, int>>(new Tuple<int, int>[CombatConst.FormationCellCount]);
-        for (int i = 0; i < battleCards.Length && i < CombatConst.FormationCellCount; i++)
+        var cardList = new List<Tuple<int, int>>(new Tuple<int, int>[GameConst.FormationCellCount]);
+        for (int i = 0; i < battleCards.Length && i < GameConst.FormationCellCount; i++)
         {
             int heroId = battleCards[i];
             if (heroId <= 0 || !ConfigManager.IsHeroCard(heroId))

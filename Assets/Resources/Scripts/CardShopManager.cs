@@ -305,7 +305,7 @@ public class CardShopManager : MonoBehaviour
         if (Mode != null && Mode.Type == ShopModeType.Independent)
         {
             int level = GameManager.Instance.GetPlayer(0).level;
-            var cfg = PlayerLevelConfig.GetConfig(Mathf.Clamp(level, 1, CombatConst.PlayerMaxLevel));
+            var cfg = PlayerLevelConfig.GetConfig(Mathf.Clamp(level, 1, GameConst.PlayerMaxLevel));
             q2 = cfg.Quality2Rate;
             q3 = cfg.Quality3Rate;
             q4 = cfg.Quality4Rate;
@@ -403,7 +403,7 @@ public class CardShopManager : MonoBehaviour
 
         // 金币足够时唯一的失败原因是新英雄卡超出背包上限
         if (showTip)
-            SystemTip.Show($"英雄卡已满({CombatConst.PlayerMaxHeroCards}张)，无法购买新英雄");
+            SystemTip.Show($"英雄卡已满({GameConst.PlayerMaxHeroCards}张)，无法购买新英雄");
         return false;
     }
 
@@ -683,7 +683,7 @@ public class CardShopManager : MonoBehaviour
             var aiP = GameManager.Instance.GetPlayer(i);
             if (!aiP.isAI || aiP.isEliminated)
                 continue;
-            for (int slot = 0; slot < CombatConst.WishSlotCount; slot++)
+            for (int slot = 0; slot < GameConst.WishSlotCount; slot++)
                 PlayerAI.CheckWish(aiP, slot);
         }
 

@@ -614,7 +614,7 @@ public class WorldManager : MonoBehaviour
                 melee.Add(hero);
         }
 
-        var heroCells = CombatConst.HeroCells;
+        var heroCells = GameConst.HeroCells;
         var occupied = new HashSet<int>();
         // 近战：HeroCells 顶排往下填(前排)
         int mi = 0;
@@ -634,7 +634,7 @@ public class WorldManager : MonoBehaviour
             ri++;
         }
         // 溢出：剩余武将按布阵格顺序补空位
-        for (int pos = 0; pos < CombatConst.FormationCellCount && (mi < melee.Count || ri < ranged.Count); pos++)
+        for (int pos = 0; pos < GameConst.FormationCellCount && (mi < melee.Count || ri < ranged.Count); pos++)
         {
             if (occupied.Contains(pos))
                 continue;
@@ -657,11 +657,11 @@ public class WorldManager : MonoBehaviour
     // 布阵图最上面一行(row0)朝向 center 的 forward 方向，即布阵图正上方在地图中的朝向(Y旋转决定)
     private Vector3 GetFormationCellPos(Transform center, int pos)
     {
-        int row = pos / CombatConst.FormationGridSize;
-        int col = pos % CombatConst.FormationGridSize;
+        int row = pos / GameConst.FormationGridSize;
+        int col = pos % GameConst.FormationGridSize;
         Vector3 forward = Vector3.ProjectOnPlane(center.forward, Vector3.up).normalized;
         Vector3 right = Vector3.ProjectOnPlane(center.right, Vector3.up).normalized;
-        float half = (CombatConst.FormationGridSize - 1) * 0.5f;
+        float half = (GameConst.FormationGridSize - 1) * 0.5f;
         return center.position + forward * (row - half) * mapInfo.FormationCellSize + right * (col - half) * mapInfo.FormationCellSize;
     }
 
@@ -678,7 +678,7 @@ public class WorldManager : MonoBehaviour
     // 生成一个势力的英雄：按布阵面板英雄摆放位置生成（索引=格子，跳过非英雄格）
     private void SpawnHerosForSide(PlayerInfo p, Transform center, List<System.Tuple<int, int>> cards, int side)
     {
-        for (int i = 0; i < cards.Count && i < CombatConst.FormationCellCount; i++)
+        for (int i = 0; i < cards.Count && i < GameConst.FormationCellCount; i++)
         {
             if (cards[i] == null || !ConfigManager.IsHeroCard(cards[i].Item1))
                 continue;
@@ -706,7 +706,7 @@ public class WorldManager : MonoBehaviour
         // 已占用布阵格（士兵/英雄），召唤单位落在空格上
         var occupied = new HashSet<int>();
         foreach (var u in units)
-            if (u != null && u.pos >= 0 && u.pos < CombatConst.FormationCellCount)
+            if (u != null && u.pos >= 0 && u.pos < GameConst.FormationCellCount)
                 occupied.Add(u.pos);
 
         var spawnList = BuildGongSummonList(lv);
@@ -723,7 +723,7 @@ public class WorldManager : MonoBehaviour
             {
                 int pos;
                 if (!TryPickFreePos(occupied, rowMin, rowMax, out pos)
-                    && !TryPickFreePos(occupied, 0, CombatConst.FormationGridSize - 1, out pos))
+                    && !TryPickFreePos(occupied, 0, GameConst.FormationGridSize - 1, out pos))
                     continue;
                 occupied.Add(pos);
                 SpawnUnitsForRegion(p, item.Item1, pos, GetFormationCellPos(center, pos), side, img);
@@ -734,7 +734,7 @@ public class WorldManager : MonoBehaviour
     // 在指定行范围内挑选一个未被占用的随机布阵格(pos=row*5+col)，范围无空位返回false
     private bool TryPickFreePos(HashSet<int> occupied, int rowMin, int rowMax, out int pos)
     {
-        var size = CombatConst.FormationGridSize;
+        var size = GameConst.FormationGridSize;
         var candidates = new List<int>();
         for (var row = rowMin; row <= rowMax; row++)
             for (var col = 0; col < size; col++)
@@ -841,7 +841,7 @@ public class WorldManager : MonoBehaviour
             int id, pos;
             if (!int.TryParse(parts[0].Trim(), out id) || !int.TryParse(parts[1].Trim(), out pos))
                 continue;
-            if (pos < 0 || pos >= CombatConst.FormationCellCount)
+            if (pos < 0 || pos >= GameConst.FormationCellCount)
                 continue;
             result.Add(System.Tuple.Create(id, pos));
         }

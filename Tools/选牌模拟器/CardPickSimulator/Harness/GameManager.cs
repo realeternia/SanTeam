@@ -20,10 +20,33 @@ public class GameManager
 
     public static GameManager Instance;
 
+    /// <summary>商店卡位锁定记录（独立买卡商店：槽位索引 + 锁定的英雄卡Id）</summary>
+    [System.Serializable]
+    public class ShopLockData
+    {
+        public int slotIndex;
+        public int cardId;
+    }
+
     public PlayerInfo[] players;
     public List<FriendRandomData> friendRdData = new List<FriendRandomData>();
     public List<int> heroIds = new List<int>();
+    public List<ShopLockData> shopLocks = new List<ShopLockData>();
     public int year = 0;
+
+    // 存活玩家pid列表（已淘汰玩家不参与商店轮转/战斗匹配）
+    public List<int> GetAlivePlayerIds()
+    {
+        var list = new List<int>();
+        if (players == null)
+            return list;
+        foreach (var p in players)
+        {
+            if (p != null && !p.isEliminated)
+                list.Add(p.pid);
+        }
+        return list;
+    }
 
     public PlayerInfo GetPlayer(int pid)
     {
