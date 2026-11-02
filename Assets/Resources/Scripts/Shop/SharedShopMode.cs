@@ -17,12 +17,12 @@ public class SharedShopMode : ShopMode
     private bool[] playerPassed = new bool[8]; // 记录每个玩家是否pass过
     private int passedPlayers = 0;             // 记录pass的玩家数量
     private int round = 10000;                 // 回合序号（配合 host.TurnOrder 取当前玩家）
-    private readonly Dictionary<int, int> aiRefreshCount = new Dictionary<int, int>(); // 本商店阶段各AI已刷新次数（每次选择最多 AiSharedMaxRefreshPerShop 次）
 
     public override void Begin()
     {
         host.ClearCards();
-        // 共享商店不支持锁定：隐藏锁定按钮并清空锁定记录
+        // 共享商店不支持锁定：只隐藏锁定按钮。人类私有卡位的锁定记录必须保留，
+        // 否则独立买卡回合锁定的卡会在本共享回合被清掉，下次独立商店就找不回来了
         host.SetLockMode(false);
 
         // 全部玩家都已淘汰：没有可轮转的玩家，直接结束本商店阶段
@@ -33,7 +33,6 @@ public class SharedShopMode : ShopMode
             return;
         }
 
-        var shopCfg = host.ShopCfg;
         // 进入商店第一个 round：生成共享板走第一个玩家（生命值最低者）的 like 判断
         int firstPid = host.TurnOrder[0];
         List<int> heroIds = new List<int>();
@@ -45,7 +44,7 @@ public class SharedShopMode : ShopMode
         while (heroIds.Count < TOTAL_HERO_CARDS && attempt < maxAttempts)
         {
             attempt++;
-            var heroId = host.GetRandomShopHeroId(shopCfg, firstPid);
+            var heroId = host.GetRandomShopHeroId(firstPid);
             if (heroId == 0)
                 break; // 卡池为空，无法再生成，跳出避免死循环
             if (heroIds.Contains(heroId))
@@ -60,11 +59,10 @@ public class SharedShopMode : ShopMode
         host.passBtn.gameObject.SetActive(true);
         host.SetPassButtonLabel("跳过");
 
-        // 重置所有玩家的pass状态与AI刷新计数
+        // 重置所有玩家的pass状态
         for (int i = 0; i < playerPassed.Length; i++)
             playerPassed[i] = false;
         passedPlayers = 0;
-        aiRefreshCount.Clear();
 
         // 每轮固定从积分最低的玩家开始（TurnOrder 已按 mark 从低到高排序）
         round = 0;
@@ -188,16 +186,14 @@ public class SharedShopMode : ShopMode
                 var offers = GetOffers(currentPlayerId);
                 var result = PlayerAI.AiCheckBuyCard(playerInfo, host.Era, offers);
 
-                // 买不动时：在"刷新收益 + 买得起"门槛内刷新共享店再重估；
-                // 金币充裕("钱多")时上限额外放开（PlayerAI.GetShopRefreshLimit），故用循环允许多刷几次
-                int refreshLimit = PlayerAI.GetShopRefreshLimit(playerInfo, AIConst.AiSharedMaxRefreshPerShop);
-                while (!result)
+                // 买不动时：当前无可用卡（或"钱多"）且付得起刷新费就继续刷新共享店再重估；
+                // 否则留钱到下回合。迭代上限按金币推算，仅作防死循环保护；
+                // 剩余卡全部售出时刷新无意义（RefreshSharedBoard 只刷未售出卡），直接停止
+                int guard = playerInfo.gold / CardShopManager.RefreshGoldCost + 10;
+                while (!result && guard-- > 0
+                       && PlayerAI.ShouldAiRefresh(playerInfo, offers)
+                       && host.cardViews.Exists(v => !v.isSold))
                 {
-                    int refreshed = aiRefreshCount.TryGetValue(currentPlayerId, out var rc) ? rc : 0;
-                    if (refreshed >= refreshLimit || !PlayerAI.ShouldAiRefresh(playerInfo, offers))
-                        break;
-
-                    aiRefreshCount[currentPlayerId] = refreshed + 1;
                     RefreshSharedBoard(playerInfo);
                     offers = GetOffers(currentPlayerId);
                     result = PlayerAI.AiCheckBuyCard(playerInfo, host.Era, offers);
@@ -306,9 +302,8 @@ public class SharedShopMode : ShopMode
             return;
         }
 
-        var shopCfg = host.ShopCfg;
         // 按当前品质概率随机刷新，允许重复；每张卡有 LikeCardRefreshRate 概率替换为收藏卡
-        var heroId = host.GetRandomShopHeroId(shopCfg, pid);
+        var heroId = host.GetRandomShopHeroId(pid);
         host.ReplaceCardAt(index, heroId);
     }
 

@@ -104,11 +104,6 @@ public class SideItemControl : MonoBehaviour
         if (button.transform is RectTransform rt)
             rt.anchoredPosition = new Vector2(rt.anchoredPosition.x, y);
         y -= ButtonSpacing;
-
-        // 按钮底图统一染成金色，避免露出 prefab 里的灰底
-        Image img = (button.targetGraphic != null ? button.targetGraphic : button.GetComponent<Image>()) as Image;
-        if (img != null)
-            img.color = SysColor.UI.CheckBtnSelected;
     }
 
     // 合成：收起道具面板后打开合成配方面板，由玩家选择一条材料足够的配方

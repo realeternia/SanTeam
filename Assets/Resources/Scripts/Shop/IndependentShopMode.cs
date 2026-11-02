@@ -160,9 +160,10 @@ public class IndependentShopMode : ShopMode
             if (player.isEliminated || player.nextSkip)
                 continue;
 
-            int refreshes = 0;
-            int guard = 0;
-            while (guard++ < 20)
+            // 买卡/刷新循环：刷新次数不设上限，金币花光（付不起刷新费）自然结束；
+            // 迭代上限按初始金币推算（每次买卡或刷新至少消耗 RefreshGoldCost），仅作防死循环保护
+            int guard = player.gold / CardShopManager.RefreshGoldCost + 10;
+            while (guard-- > 0)
             {
                 // 每次购买后重新拉取报价：AI 隐藏商店买入会把报价标记为已售出，需过滤，避免重复买同一张
                 var offers = GetOffers(pid);
@@ -171,14 +172,10 @@ public class IndependentShopMode : ShopMode
                 if (PlayerAI.AiCheckBuyCard(player, host.Era, offers))
                     continue;
 
-                // 买不动：满足"收益评估（当前无可用卡）+ 买得起（刷新后余额≥AiRefreshMinRemainGold）"才刷新，否则结束
-                // 刷新上限：基础上限，金币充裕("钱多")时额外放开（PlayerAI.GetShopRefreshLimit）
-                int refreshLimit = PlayerAI.GetShopRefreshLimit(player, AIConst.AiMaxShopRefreshPerShop);
-                if (refreshes < refreshLimit
-                    && PlayerAI.ShouldAiRefresh(player, offers))
+                // 买不动：当前无可用卡（或"钱多"）且付得起刷新费就继续刷新，否则留钱到下回合
+                if (PlayerAI.ShouldAiRefresh(player, offers))
                 {
                     RefreshShopFor(pid);
-                    refreshes++;
                     continue;
                 }
                 break;

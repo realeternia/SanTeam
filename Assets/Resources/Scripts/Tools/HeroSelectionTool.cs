@@ -148,10 +148,10 @@ public static class HeroSelectionTool
         return false;
     }
 
-    // 刷牌（共享模式）：先按GameRoundConfig品质概率roll出品质，再从该品质的英雄池随机选一张（pid用于许愿加权）
-    public static int GetRandomHeroIdByQuality(GameRoundConfig shopCfg, int pid)
+    // 刷牌（共享模式）：先按共享商店品质概率（存活最高玩家等级+高品质加成）roll出品质，再从该品质的英雄池随机选一张（pid用于许愿加权）
+    public static int GetRandomHeroIdForSharedShop(int pid)
     {
-        return GetRandomHeroIdByQuality(RollQuality(shopCfg), pid);
+        return GetRandomHeroIdByQuality(RollQuality(), pid);
     }
 
     // 刷牌（独立买卡）：按玩家等级(PlayerLevelConfig)的品质概率roll出品质，再从该品质英雄池随机选一张（pid用于许愿加权）
@@ -249,9 +249,51 @@ public static class HeroSelectionTool
     }
 
     // 品质1=100-品质2-品质3-品质4
-    private static int RollQuality(GameRoundConfig shopCfg)
+    private static int RollQuality()
     {
-        return RollQualityRate(shopCfg.Quality2Rate, shopCfg.Quality3Rate, shopCfg.Quality4Rate);
+        int q2, q3, q4;
+        GetSharedShopQualityRates(out q2, out q3, out q4);
+        return RollQualityRate(q2, q3, q4);
+    }
+
+    // 共享商店品质概率：按存活玩家中的最高等级取 PlayerLevelConfig 作为基准，高品质再小幅加成：
+    // 品质3 = max(基准×1.3, 基准+4)，品质4 = max(基准×1.5, 基准+2)（取较大值）。
+    // 共享商店面向所有玩家共用一个牌面，无法按个人等级出卡，用最高等级代表整体节奏，
+    // 让共享商店的高品质节奏略快于玩家个人商店，但不会大幅超前。
+    public static void GetSharedShopQualityRates(out int q2, out int q3, out int q4)
+    {
+        var lvCfg = PlayerLevelConfig.GetConfig(Mathf.Clamp(GetAliveMaxLevel(), 1, GameConst.PlayerMaxLevel));
+        q2 = lvCfg.Quality2Rate;
+        q3 = Mathf.Max(Mathf.RoundToInt(lvCfg.Quality3Rate * 1.3f), lvCfg.Quality3Rate + 4);
+        q4 = Mathf.Max(Mathf.RoundToInt(lvCfg.Quality4Rate * 1.5f), lvCfg.Quality4Rate + 2);
+
+        // 防御：三档合计不超过100（否则品质1会归零、roll 全部偏向最高品质）；
+        // 超出时按比例同时收缩品质3/品质4，保持两档的加成关系
+        int remain = Math.Max(0, 100 - q2);
+        if (q3 + q4 > remain)
+        {
+            float scale = remain / (float)(q3 + q4);
+            q3 = Mathf.FloorToInt(q3 * scale);
+            q4 = remain - q3;
+        }
+    }
+
+    // 存活玩家中的最高等级（无存活玩家或数据未就绪返回 1）
+    private static int GetAliveMaxLevel()
+    {
+        var gm = GameManager.Instance;
+        if (gm == null || gm.players == null)
+            return 1;
+
+        int max = 0;
+        foreach (var p in gm.players)
+        {
+            if (p == null || p.isEliminated)
+                continue;
+            if (p.level > max)
+                max = p.level;
+        }
+        return max > 0 ? max : 1;
     }
 
     // 独立买卡：按玩家等级配置的品质概率roll

@@ -291,24 +291,20 @@ public static class PlayerAI
         return playerInfo != null && playerInfo.gold >= AIConst.RichGoldThreshold;
     }
 
-    // 本商店阶段允许的刷新次数上限：金币充裕时在基础上限上额外放开 RichExtraRefreshPerShop 次（共享/独立模式共用）
-    public static int GetShopRefreshLimit(PlayerInfo playerInfo, int baseLimit)
-    {
-        return baseLimit + (IsRichGold(playerInfo) ? AIConst.RichExtraRefreshPerShop : 0);
-    }
-
-    // AI 是否值得花 2 金刷新当前商店（共享/独立模式共用）：
-    //   1) 收益评估：当前"可用卡"为 0——一张能买/该买的卡都没有（全被满级/淘汰/买不起滤掉）。
-    //      刷新出的新卡与旧卡同源、品质期望不变，"收益"只来自把"结构性无效"的这批卡换掉；
-    //      若已有可用卡，"钱多"时仍允许刷新（有钱追求更好的卡），金币不充裕则不刷。
-    //   2) 买得起：支付刷新费后剩余金币 >= AiRefreshMinRemainGold，避免刷完买不起。
+    // AI 是否继续花 2 金刷新当前商店（共享/独立模式共用）：
+    //   1) 收益评估：当前"可用卡"为 0（一张能买/该买的卡都没有：全被满级/淘汰/买不起滤掉）才值得刷——
+    //      刷新出的新卡与旧卡同源、品质期望不变，收益只来自把这批无效卡换掉；
+    //      若已有可用卡，说明买不动是卡包容量/金币不足导致的，刷新解决不了，继续刷只是烧金币，
+    //      余额留到下回合买更强的卡（金币跨回合累积，不是丢失）。
+    //   2) "钱多"时仍允许刷新求更好的卡；买得起刷新费即可，不设保留金门槛（想留的卡交给锁卡）。
+    //   nextSkip 玩家本轮主动跳过，刷新没有意义。
     public static bool ShouldAiRefresh(PlayerInfo playerInfo, List<ShopOffer> offers)
     {
-        if (playerInfo == null)
+        if (playerInfo == null || playerInfo.nextSkip)
             return false;
         if (FilterOffers(playerInfo, offers).Count > 0 && !IsRichGold(playerInfo))
             return false;
-        return playerInfo.gold - CardShopManager.RefreshGoldCost >= AIConst.AiRefreshMinRemainGold;
+        return playerInfo.gold >= CardShopManager.RefreshGoldCost;
     }
 
     public static bool AiCheckBuyCard(PlayerInfo playerInfo, int era, List<ShopOffer> offers)
@@ -381,7 +377,7 @@ public static class PlayerAI
         {
             var card = scoredCards[i];
             var logCfg = HeroConfig.GetConfig(card.card.cardId);
-            sb.AppendLine($"  [{i+1}] 卡片ID: {card.card.cardId}, 名称: {logCfg.Name}, 分数: {card.score}, 价格: {card.card.price}, 品质: {logCfg.Quality}, 品质系数: {GetQualityBias(logCfg.Quality, year, playerInfo):F2}");
+            sb.AppendLine($"  [{i+1}] 卡片ID: {card.card.cardId}, 名称: {logCfg.Name}, 分数: {card.score}, 价格: {card.card.price}, 品质: {logCfg.Quality}, 品质系数: {GetQualityBias(logCfg.Quality, playerInfo):F2}");
         }
 
         // 聪明度越高候选池越窄（只在最优的几张里挑）；越低越宽（更容易随机到次优卡）
@@ -448,9 +444,9 @@ public static class PlayerAI
     }
 
     // 品质偏好系数：按当前商店实际出卡概率线性插值——概率最高的品质取 QualityBiasMax(2.0)、最低取 QualityBiasMin(0.5)
-    // 概率来源与真实刷牌一致：独立买卡(ShopType=1)按该玩家等级读 PlayerLevelConfig；共享轮换按回合读 GameRoundConfig
+    // 概率来源与真实刷牌一致：独立买卡(ShopType=1)按该玩家等级读 PlayerLevelConfig；共享轮换按存活最高玩家等级推算
     // 品质1概率 = 100 - 品质2 - 品质3 - 品质4
-    private static float GetQualityBias(int quality, int year, PlayerInfo playerInfo)
+    private static float GetQualityBias(int quality, PlayerInfo playerInfo)
     {
         int q2, q3, q4;
         var shopMgr = CardShopManager.Instance;
@@ -465,12 +461,8 @@ public static class PlayerAI
         }
         else
         {
-            var roundCfg = GameRoundConfig.GetConfig(Mathf.Clamp(year, 1, 100));
-            if (roundCfg == null)
-                return 1f;
-            q2 = roundCfg.Quality2Rate;
-            q3 = roundCfg.Quality3Rate;
-            q4 = roundCfg.Quality4Rate;
+            // 共享商店：与真实出卡同一口径
+            HeroSelectionTool.GetSharedShopQualityRates(out q2, out q3, out q4);
         }
 
         float[] rates =
@@ -715,7 +707,7 @@ public static class PlayerAI
                 }
             }
             // 品质偏好：按本回合商店实际出卡概率提升——概率最高的品质系数 2.0、最低 0.5，中间线性插值
-            score *= GetQualityBias(heroCfg.Quality, year, playerInfo);
+            score *= GetQualityBias(heroCfg.Quality, playerInfo);
             // 价格偏好：阵容价值=价格×星级，星级受出卡随机性限制（多数卡只能到 2 星），
             // 故"价格"是更可控的价值杠杆——按 (价格/基准)^指数 放大高价卡权重（Q4史诗=最高价）
             score *= Mathf.Pow((float)pickCard.price / AIConst.CardPriceBiasBase, AIConst.CardPriceBiasExponent);

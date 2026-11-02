@@ -19,16 +19,8 @@ public static class AIConst
     public const int EliminateMaxSellPerRound = 1;
 
     // ---- 商店刷新 / 金币预算 ----
-    /// <summary>独立买卡商店中，AI 每回合最多刷新自己私有商店的次数（避免 AI 刷金失控）</summary>
-    public const int AiMaxShopRefreshPerShop = 2;
-    /// <summary>共享轮换商店中，AI 每个商店阶段最多刷新次数（每次选择最多刷一次）</summary>
-    public const int AiSharedMaxRefreshPerShop = 1;
-    /// <summary>AI 刷新商店后须保留的最低金币：支付刷新费(CardShopManager.RefreshGoldCost)后剩余 >= 本值才允许刷新，避免刷完买不起</summary>
-    public const int AiRefreshMinRemainGold = 8;
-    /// <summary>"金币充裕"判定阈值：金币 >= 本值视为"钱多"，允许额外刷新与加大买经验预算（通用规则，不改配置类）</summary>
+    /// <summary>"金币充裕"判定阈值：金币 >= 本值视为"钱多"，允许刷新与加大买经验预算（通用规则，不改配置类）</summary>
     public const int RichGoldThreshold = 12;
-    /// <summary>"钱多"时每个商店阶段额外允许的刷新次数（叠加在 AiSharedMaxRefreshPerShop / AiMaxShopRefreshPerShop 之上）</summary>
-    public const int RichExtraRefreshPerShop = 2;
     /// <summary>买经验的金币预算比例：默认取 Normal，金币充裕("钱多")时取 Rich</summary>
     public const float NormalExpBuyGoldRate = 0.3f;
     public const float RichExpBuyGoldRate = 0.35f;

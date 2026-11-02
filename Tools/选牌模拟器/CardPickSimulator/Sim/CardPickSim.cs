@@ -27,8 +27,6 @@ public class CardPickSim
     private const float StepDt = 0.05f;
     /// <summary>单回合最大推进步数（防死循环）</summary>
     private const int MaxStepsPerRound = 20000;
-    /// <summary>独立买卡模式下 pid0 代打的最大购买次数</summary>
-    private const int MaxHumanShopBuys = 30;
 
     /// <summary>日志回调（逐行输出到界面）</summary>
     public Action<string> OnLog;
@@ -377,25 +375,23 @@ public class CardPickSim
     }
 
     // 独立买卡模式：pid0 用 AI 评分逻辑买牌，然后结束（等价于人类点"结束"）
-    // 刷新次数与 AI(pid1~7) 对齐：买不动且还有余钱时刷新自己 5 格再重试，保证 P0 与 AI 购买机会对等
+    // 刷新策略与 AI(pid1~7) 对齐：买不动且付得起刷新费时刷新自己 5 格再重试，刷新次数不设上限，金币花光自然结束
     private void DriveHumanByAI()
     {
         var human = GameManager.Instance.GetPlayer(0);
-        int refreshes = 0;
-        int guard = 0;
-        while (guard++ < MaxHumanShopBuys)
+        // 迭代上限按金币推算（每次买卡或刷新至少消耗 RefreshGoldCost），仅作防死循环保护
+        int guard = human.gold / CardShopManager.RefreshGoldCost + 10;
+        while (guard-- > 0)
         {
             var offers = shop.Mode.GetOffers(0);
             // 复用游戏 AI 选牌/购买（返回真实购买结果，买得动就继续买）
             if (offers != null && offers.Count > 0 && PlayerAI.AiCheckBuyCard(human, shop.Era, offers))
                 continue;
 
-            // 买不动：收益评估（当前无可用卡）+ 买得起 才刷新自己的 5 格后重试（与 IndependentShopMode 中 AI 的处理一致）
-            if (refreshes < AIConst.AiMaxShopRefreshPerShop
-                && PlayerAI.ShouldAiRefresh(human, offers))
+            // 买不动：当前无可用卡（或钱多）且付得起刷新费才刷新自己的 5 格后重试（与 IndependentShopMode 中 AI 的处理一致）
+            if (PlayerAI.ShouldAiRefresh(human, offers))
             {
                 shop.Mode.OnHumanRefresh();
-                refreshes++;
                 continue;
             }
             break;

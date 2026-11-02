@@ -14,7 +14,7 @@
 | 商店阶段开始（AI） | `PlayerAI.ShopBegin` | ① 淘汰清仓 ② 经验检查买经验 |
 | AI 回合买卡 | `PlayerAI.AiCheckBuyCard` | 对 `ShopOffer` 列表评分，加权随机选一张，失败换下一张 |
 | 需要腾位时 | `PlayerAI.FindWeakCard` | 按"阵容价值"找最该卖的卡 |
-| 买不动时 | `PlayerAI.ShouldAiRefresh` | 判断是否值得花 2 金刷新 |
+| 买不动时 | `PlayerAI.ShouldAiRefresh` | 无可用卡（或"钱多"≥12）且付得起 2 金才刷新；否则留钱到下回合 |
 
 两种商店模式（共享轮换 / 独立买卡）共用同一套 `ShopOffer` 报价与评分代码，见 [done 商店双模式抽象方案](./done%20商店双模式抽象方案.md)。
 
@@ -137,6 +137,6 @@
 | 买卡评分与购买 | [PlayerAI.cs](../../Assets/Resources/Scripts/PlayerAI.cs) `AiCheckBuyCard` |
 | 聚焦 | [PlayerAI.cs](../../Assets/Resources/Scripts/PlayerAI.cs) `DeriveFocusTargets` / `GetFocusGain` / `IsFocusMember` |
 | 卖卡 | [PlayerAI.cs](../../Assets/Resources/Scripts/PlayerAI.cs) `FindWeakCard` / `GetLineupValue` / `GetSellCostBias` |
-| 刷新判定 | [PlayerAI.cs](../../Assets/Resources/Scripts/PlayerAI.cs) `ShouldAiRefresh` / `GetShopRefreshLimit` |
+| 刷新判定 | [PlayerAI.cs](../../Assets/Resources/Scripts/PlayerAI.cs) `ShouldAiRefresh` |
 | 全部 AI 常量 | [AIConst.cs](../../Assets/Resources/Scripts/Tools/AIConst.cs) |
 | 玩家 AI 参数 | [PlayerConfig_s.cs](../../Assets/Resources/Scripts/Configs/PlayerConfig_s.cs) |

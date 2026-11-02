@@ -171,12 +171,14 @@ public class CardShopManager : MonoBehaviour
         return cardView;
     }
 
-    /// <summary>设置当前商店是否启用卡牌锁定：不启用时清空锁定记录并隐藏全部锁定按钮</summary>
+    /// <summary>
+    /// 设置当前商店是否启用卡牌锁定：只控制锁定按钮的显示与可操作性。
+    /// 锁定记录跨回合保留，共享商店回合只隐藏按钮、绝不清空 GameManager.shopLocks，
+    /// 否则人类在独立买卡回合锁定的卡会在共享商店回合后丢失。
+    /// </summary>
     public void SetLockMode(bool enabled)
     {
         LockEnabled = enabled;
-        if (!enabled)
-            GameManager.Instance.shopLocks.Clear();
 
         foreach (var v in cardViews)
         {
@@ -293,7 +295,7 @@ public class CardShopManager : MonoBehaviour
     private static readonly string[] QualityNames = { "普通", "稀有", "优秀", "卓越" };
 
     /// <summary>
-    /// 刷新稀有度概率文本：共享模式读回合配置(GameRoundConfig)，独立模式读玩家等级配置(PlayerLevelConfig)，
+    /// 刷新稀有度概率文本：独立模式读玩家等级配置(PlayerLevelConfig)，共享模式按存活最高玩家等级推算，
     /// 每段文本按对应品质颜色着色。触发时机：新回合开始 / 玩家(pid0)等级提升。
     /// </summary>
     public void RefreshRateText()
@@ -310,15 +312,10 @@ public class CardShopManager : MonoBehaviour
             q3 = cfg.Quality3Rate;
             q4 = cfg.Quality4Rate;
         }
-        else if (ShopCfg != null)
-        {
-            q2 = ShopCfg.Quality2Rate;
-            q3 = ShopCfg.Quality3Rate;
-            q4 = ShopCfg.Quality4Rate;
-        }
         else
         {
-            return;
+            // 共享商店：按存活最高玩家等级出卡并加成高品质，显示与实际出卡一致的概率
+            HeroSelectionTool.GetSharedShopQualityRates(out q2, out q3, out q4);
         }
 
         int[] rates = { Mathf.Max(0, 100 - q2 - q3 - q4), q2, q3, q4 };
@@ -333,10 +330,10 @@ public class CardShopManager : MonoBehaviour
         rateText.text = sb.ToString();
     }
 
-    // 刷新卡位出卡：按 GameRoundConfig 品质概率随机出一张，该玩家的许愿英雄在同品质内权重×3
-    public int GetRandomShopHeroId(GameRoundConfig shopCfg, int pid)
+    // 刷新卡位出卡：按共享商店品质概率随机出一张，该玩家的许愿英雄在同品质内权重×3
+    public int GetRandomShopHeroId(int pid)
     {
-        return HeroSelectionTool.GetRandomHeroIdByQuality(shopCfg, pid);
+        return HeroSelectionTool.GetRandomHeroIdForSharedShop(pid);
     }
 
     // 独立买卡模式刷牌：按玩家等级(PlayerLevelConfig)品质概率出一张，该玩家的许愿英雄在同品质内权重×3
