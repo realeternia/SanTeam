@@ -23,7 +23,7 @@ public class Skill
 
     public int skillId{ get{ return skillCfg.Id; } }
 
-    public float mp; // 当前技能MP，开局按 SkillConfig.StartMpRate 填充（默认0=从0充能），满值=MpCost
+    public float mp; // 当前技能MP，开局按 SkillConfig.StartMpRate 填充（默认0），之后由普攻/受击获取法力，满值=MpCost
     /// <summary>本次发动前的MP累积量（CheckBurst 清零 mp 前记录，供"清空/转移全部法力"类技能读取）</summary>
     public float mpBeforeBurst;
 
@@ -224,8 +224,8 @@ public class Skill
         return Time.time < lastUpdateTime + skillCfg.CD;
     }
 
-    // 法力回复属性（mpRegen）为技能持续充能：正=回复，负=倒扣，范围[0, MpCost]
-    public void AddRegenMp(float add)
+    // 为技能增加法力（普攻/受击获取、法力分享等共用），结果裁剪到 [0, MpCost]
+    public void AddMp(float add)
     {
         if (skillCfg.MpCost <= 0)
             return;

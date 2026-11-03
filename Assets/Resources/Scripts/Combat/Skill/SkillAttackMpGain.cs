@@ -3,8 +3,9 @@ using CommonConfig;
 using UnityEngine;
 
 /// <summary>
-/// 儒雅（儒将风范）：攻击命中时按 skillCfg.Rate 概率为自身回复 skillCfg key "mpGain" 点法力（配置为1，即每次回1点mp）。
-/// 回复对象为首个有蓝耗的主动技能。对应技能：儒雅（2010151~2010155，「儒」连锁）。
+/// 儒雅（儒将风范）：攻击命中时按 skillCfg.Rate 概率为自身额外获取法力。
+/// Strength2 key "mpGain" 为普攻基础法力（CombatConst.MpPerAttack）的倍率（1=1倍、0.5=0.5倍），
+/// 经棋子 mpRegen 百分比加成后施加到自身所有 MpCost>0 的技能。对应技能：儒雅（2010151~2010155，「儒」连锁）。
 /// </summary>
 public class SkillAttackMpGain : Skill
 {
@@ -26,19 +27,8 @@ public class SkillAttackMpGain : Skill
             return;
         }
 
-        Skill active = null;
-        foreach (var s in owner.skills)
-        {
-            if (s.skillCfg.MpCost > 0)
-            {
-                active = s;
-                break;
-            }
-        }
-        if (active == null)
-            return;
-
-        active.mp = Mathf.Min(active.skillCfg.MpCost, active.mp + gain);
-        GameLog.Debug($"儒雅 武将{owner.heroId} 攻击回蓝{gain} 至{(int)active.mp}/{active.skillCfg.MpCost}");
+        // mpGain 为普攻基础法力的倍率；走统一入口，乘 mpRegen 百分比加成后加到所有 MpCost>0 的技能
+        owner.GainMp(CombatConst.MpPerAttack * gain);
+        GameLog.Debug($"儒雅 武将{owner.heroId} 攻击额外回蓝{CombatConst.MpPerAttack * gain * owner.MpGainMultiplier:0.##}");
     }
 }

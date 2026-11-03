@@ -4,7 +4,7 @@ using UnityEngine;
 /// <summary>
 /// 袁绍·名门（统帅）：使我方全体其他单位（不含施法者自身）一次性回复技能法力。
 /// 回复量取 Strength2 的键 "mpAdd"，按每个单位各自有蓝耗(MpCost>0)的技能逐一充能，
-/// 由 Skill.AddRegenMp 按 [0, MpCost] 裁剪；已满蓝的技能跳过。
+/// 由 Skill.AddMp 按 [0, MpCost] 裁剪；已满蓝的技能跳过。
 /// </summary>
 public class SkillAidManaRally : Skill
 {
@@ -33,7 +33,7 @@ public class SkillAidManaRally : Skill
             {
                 if (s.skillCfg == null || s.skillCfg.MpCost <= 0 || s.IsMpFull())
                     continue;
-                s.AddRegenMp(add);
+                s.AddMp(add);
                 given = true;
             }
             if (given && !string.IsNullOrEmpty(skillCfg.HitEffect))

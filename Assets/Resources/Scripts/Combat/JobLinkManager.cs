@@ -264,7 +264,7 @@ public static class JobLinkManager
                 unit.critDamageMulti += value;
                 break;
             case "mpRegen":
-                // 相/扇·法力回复
+                // 扇·法力获取加成（百分比）
                 unit.mpRegen += value;
                 break;
             case "hpRegen":

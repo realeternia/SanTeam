@@ -11,7 +11,7 @@ public class AttrInfo
     public int MagicRes;     // 魔抗
     public float AttackSpeedRate; // 攻速比例加成（如 0.1=+10%，乘算 attackSpeed）
     public float CritRate;   // 暴击率（比例，如 0.15=+15%）
-    public float MpRegen;    // 法力回复/秒
+    public float MpRegen;    // 法力获取加成（百分比，如 40=+40%，乘算普攻/受击获得法力）
     public float HpRegen;    // 生命回复/秒
     public int MoveSpeed;    // 移动速度（绝对值，直接叠加到战斗单位移速）
 

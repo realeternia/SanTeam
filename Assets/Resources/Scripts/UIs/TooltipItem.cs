@@ -196,6 +196,12 @@ public class TooltipItem : BaseTooltip
         if (string.IsNullOrEmpty(key) || value == 0)
             return;
         keys.Add(key);
+        if (key == "mpRegen")
+        {
+            // 法力获取加成按百分比配置（40=+40%），直接显示百分号
+            vals.Add(value.ToString("0.##") + "%");
+            return;
+        }
         bool isPercent = key == "atkspeed" || key == "crit";
         vals.Add(isPercent ? Mathf.RoundToInt(value * 100) + "%" : value.ToString("0.##"));
     }

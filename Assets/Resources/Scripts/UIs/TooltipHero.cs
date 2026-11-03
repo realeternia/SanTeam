@@ -193,6 +193,14 @@ public class TooltipHero : BaseTooltip
         return baseVal + " + " + SysColor.ColorText(bonus.ToString(), SysColor.UI.NextLv);
     }
 
+    // 法力获取加成等百分比属性：数值即百分数（40=+40%），显示为 "40% + 20%"
+    private static string AppendEquipPercent(int baseVal, int bonus)
+    {
+        if (bonus <= 0)
+            return baseVal + "%";
+        return baseVal + "% + " + SysColor.ColorText(bonus + "%", SysColor.UI.NextLv);
+    }
+
     // 攻速/暴击类比例属性：装备给的是比例（0.1=+10%），显示为 "+20%"
     private static string AppendEquipSpeed(int baseVal, float bonusRate)
     {
@@ -269,7 +277,7 @@ public class TooltipHero : BaseTooltip
             AppendEquipSpeed(heroCfg.AtkSpeed, eAtkSpeedRate + attr.AttackSpeedRate),
             AppendEquip(attr.Ap, eAp),
             // 消耗品加成（attrAddons，如万民书 armor+1/magicres+1）与装备加成一起以淡绿附加显示
-            AppendEquip(heroCfg.MpRegen, (int)(eMpRegen + attr.MpRegen)),
+            AppendEquipPercent(heroCfg.MpRegen, (int)(eMpRegen + attr.MpRegen)),
             AppendEquip(attr.Hp, eHp),
             AppendEquip(heroCfg.HpRegen, (int)(eHpRegen + attr.HpRegen)),
             AppendEquip(heroCfg.Armor, eArmor + attr.Armor),

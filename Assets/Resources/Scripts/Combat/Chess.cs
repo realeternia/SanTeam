@@ -137,7 +137,7 @@ public class Chess : MonoBehaviour
 
     private float secondTimer; //每秒事件计时，满1s触发一次OnSecond
     public float hpRegen; //生命回复/秒（正=回复，负=扣减；来源：属性羁绊或复原/药仙技能加成，OnSecond事件结算）
-    public float mpRegen; //法力回复/秒（为设置了MpCost的技能持续充能，可为负=倒扣，OnSecond事件结算）
+    public float mpRegen; //法力获取加成（百分比，0=无加成；普攻/受击获得法力时 ×(1+mpRegen/100)，可为负）
 
     // Start is called before the first frame update
     void Start()
@@ -310,10 +310,10 @@ public class Chess : MonoBehaviour
         }
     }
 
-    // 每秒事件：hpRegen/mpRegen 等按秒结算的逻辑统一在此处理
+    // 每秒事件：hpRegen 等按秒结算的逻辑统一在此处理
     private void OnSecond()
     {
-        // 战斗已结束的一方（自身无存活敌方）冻结：不再回血/回蓝
+        // 战斗已结束的一方（自身无存活敌方）冻结：不再回血
         var world = WorldManager.Instance;
         if (world != null && world.IsSideBattleOver(side))
             return;
@@ -326,18 +326,27 @@ public class Chess : MonoBehaviour
             if (hp <= 0)
                 Ondying();
         }
+    }
 
-        if (mpRegen != 0)
-        {
-            // 处于控制状态（BuffConfig.IsControl）期间，技能不回复蓝量
-            bool controlled = buffs.Exists(b => BuffConfig.GetConfig(b.id).IsControl);
-            if (!controlled)
-            {
-                // 法力回复属性：为所有设置了MpCost的技能持续充能（可为负=充能倒扣）
-                foreach (var skill in skills)
-                    skill.AddRegenMp(mpRegen);
-            }
-        }
+    /// <summary>法力获取加成倍率：1 + mpRegen/100（mpRegen 为百分比属性，最低 0 倍）</summary>
+    public float MpGainMultiplier
+    {
+        get { return Mathf.Max(0f, 1f + mpRegen / 100f); }
+    }
+
+    /// <summary>
+    /// 法力获取统一入口（金铲铲式）：基础获取量 × mpRegen 百分比加成后，施加到自身所有 MpCost>0 的技能。
+    /// 普攻命中、受到伤害等来源都走这里；MpCost<=0 的技能不受影响。
+    /// </summary>
+    public void GainMp(float baseGain)
+    {
+        if (baseGain <= 0f)
+            return;
+        var gain = baseGain * MpGainMultiplier;
+        if (gain <= 0f)
+            return;
+        foreach (var skill in skills)
+            skill.AddMp(gain);
     }
 
 
@@ -365,7 +374,8 @@ public class Chess : MonoBehaviour
         // 装备加成在下方继续累加
         armor = heroConfig.Armor + attr.Armor;
         magicRes = heroConfig.MagicRes + attr.MagicRes;
-        // 生命/魔法回复同样由 PostModify 写回职业基准（OnSecond 中按秒结算）；消耗品/装备加成累加
+        // 生命回复由 PostModify 写回职业基准（OnSecond 中按秒结算）；法力获取加成（%）为职业基准 + 修正，
+        // 仅在普攻/受击获取法力时作为百分比倍率；消耗品/装备加成在此累加
         hpRegen = heroConfig.HpRegen + attr.HpRegen;
         mpRegen = heroConfig.MpRegen + attr.MpRegen;
         attackSpeedRate = attr.AttackSpeedRate;
@@ -834,6 +844,9 @@ public class Chess : MonoBehaviour
         if (victim == null)
             return;
 
+        // 本次受击的盾吸收量先清零：闪避分支不进来，避免沿用上一次结算的残留值
+        victim.lastShieldAbsorb = 0;
+
         // 普攻伤害类型：默认物理(atk)，可被 buff（如威震"震"）覆写为真实伤害
         var atkDamageType = GetBasicAttackDamageType();
 
@@ -864,9 +877,8 @@ public class Chess : MonoBehaviour
                 SkillManager.BeforeCalDamaged(this, victim, null, ref damageBase, ref damageMulti, ref effect, "", false);
             damage = (int)(damageBase * damageMulti);
             // 结算阶段·受击方：只做伤害吸收（护盾），不做伤害放大
-            victim.lastShieldAbsorb = 0; // 记录本次结算的盾吸收量，供战斗模拟器日志区分
-                // 真实伤害普攻：护盾不吸收（与技能真实伤害一致）
-                SkillManager.DuringCalDamage(this, victim, null, ref damage, "", false, atkDamageType == CombatConst.DamageTypeReal);
+            // 真实伤害普攻：护盾不吸收（与技能真实伤害一致）
+            SkillManager.DuringCalDamage(this, victim, null, ref damage, "", false, atkDamageType == CombatConst.DamageTypeReal);
         }
 
         if (damage > 0 || victim.lastShieldAbsorb > 0)
@@ -892,6 +904,11 @@ public class Chess : MonoBehaviour
                     WorldManager.Instance.AddBattleText("-" + damage, victim.transform.position, new UnityEngine.Vector2(0, 60), SysColor.BattleText.RealDamage, 3);
             }
             victim.lastDamageType = atkDamageType; // 记录本次伤害类型（真实伤害普攻飘紫字）
+            // 金铲铲式法力获取：攻击者命中得固定法力，受击者按计入伤害（含护盾吸收）得法力
+            GainMp(CombatConst.MpPerAttack);
+            victim.GainMp(Mathf.Min((damage + victim.lastShieldAbsorb) * CombatConst.MpPerDamageRate,
+                CombatConst.MpPerDamageCap));
+
             var evt = OnDamageDealt;
             if (evt != null) evt(this, victim, damage, 0);
         }
@@ -960,6 +977,11 @@ public class Chess : MonoBehaviour
                     WorldManager.Instance.AddBattleText("-" + damage, transform.position, new UnityEngine.Vector2(0, 60), SysColor.BattleText.RealDamage, 3);
             }
             lastDamageType = skillCfg != null ? skillCfg.DamageType : CombatConst.DamageTypeAttack; // 记录本次伤害类型
+            // 金铲铲式受击法力：按计入伤害（含护盾吸收）获得法力；连锁/破盾等派生伤害不再触发，避免反复派生
+            if (!CombatConst.IsDerivedHurtTag(hurtTag))
+                GainMp(Mathf.Min((damage + lastShieldAbsorb) * CombatConst.MpPerDamageRate,
+                    CombatConst.MpPerDamageCap));
+
             var evt = OnDamageDealt;
             if (evt != null) evt(caster, this, damage, skillId);
         }

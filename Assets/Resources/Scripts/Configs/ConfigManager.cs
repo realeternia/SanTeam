@@ -87,14 +87,16 @@ public static class ConfigManager
             // 法术倍率：英雄配置为0时继承职业值，非0时用英雄值覆盖（法系 扇/相/棋/鼓/琴/医 职业值为1.5）
             float magicRate = Mathf.Approximately(heroCfg.MagicRate, 0f) ? jobCfg.MagicRate : heroCfg.MagicRate;
 
-            // 次级面板（移速/射程/攻速/护甲/魔抗/生命回复/魔法回复）：写回 = 职业基准×(1+修正%/100)，不乘品质系数
+            // 次级面板（移速/射程/攻速/护甲/魔抗/生命回复）：写回 = 职业基准×(1+修正%/100)，不乘品质系数
             heroCfg.MoveSpeed = (int)Math.Round(jobCfg.MoveSpeed * (100f + heroCfg.MoveSpeed) / 100f);
             heroCfg.Range = (int)Math.Round(jobCfg.Range * (100f + heroCfg.Range) / 100f);
             heroCfg.AtkSpeed = (int)Math.Round(jobCfg.AtkSpeed * (100f + heroCfg.AtkSpeed) / 100f);
             heroCfg.Armor = (int)Math.Round(jobCfg.Armor * (100f + heroCfg.Armor) / 100f);
             heroCfg.MagicRes = (int)Math.Round(jobCfg.MagicRes * (100f + heroCfg.MagicRes) / 100f);
             heroCfg.HpRegen = (int)Math.Round(jobCfg.HpRegen * (100f + heroCfg.HpRegen) / 100f);
-            heroCfg.MpRegen = (int)Math.Round(jobCfg.MpRegen * (100f + heroCfg.MpRegen) / 100f);
+            // 法力回复加成（%）为百分比语义：职业基准 + 英雄修正（加法叠加，不做基准倍乘），
+            // 避免职业基准为 0 时英雄修正被清零
+            heroCfg.MpRegen = jobCfg.MpRegen + heroCfg.MpRegen;
             heroCfg.Ap = (int)Math.Round(jobCfg.Ap * (100f + heroCfg.Ap) / 100f);
             // 主属性（攻击/生命）：写回 = 职业基准×(1+修正%/100) × 品质系数CombatConst.QualityAttrFactors[Q-1]，即“1星带品质面板”
             // 品质系数为按档取值（Q1=×1、Q2=×1.4、Q3=×1.8、Q4=×2.2），非复利

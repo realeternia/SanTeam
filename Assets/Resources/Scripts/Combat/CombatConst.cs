@@ -57,6 +57,14 @@ public static class CombatConst
     /// <summary>战斗开始时技能MP是否直接拉满（默认关闭；开启则所有技能从满MP开局，关闭则按常规从0开始充能）</summary>
     public static bool FullMpAtBattleBegin = false;
 
+    // ---- 法力获取（金铲铲式：普攻与受击获取，mpRegen 为百分比加成） ----
+    /// <summary>每次普攻命中为攻击者提供的基础法力（未计 mpRegen 加成）</summary>
+    public const float MpPerAttack = 10f;
+    /// <summary>受到伤害时按伤害量获得法力的比例（0.05=每点伤害回 0.05 点法力，护盾吸收部分同样计入）</summary>
+    public const float MpPerDamageRate = 0.05f;
+    /// <summary>单次受击最多获得的法力（防止一次高伤害直接回满）</summary>
+    public const float MpPerDamageCap = 20f;
+
     // ---- 调试阵容·开局Buff ----
     /// <summary>
     /// 调试阵容给武将挂Buff时使用的临时技能配置Id：Buff 的效果数值统一取自 SkillConfig，

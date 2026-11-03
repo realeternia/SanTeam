@@ -147,7 +147,7 @@ namespace CommonConfig
             config[30] = new ItemCombineConfig(30, 402002, 1, 402002, 1, 400034, 1); // 皮革甲+皮革甲 → 重装玄甲(armor+40)
             config[31] = new ItemCombineConfig(31, 402003, 1, 402003, 1, 400035, 1); // 檀木弓+檀木弓 → 连环弩(atkspeed+30%)
             config[32] = new ItemCombineConfig(32, 402004, 1, 402004, 1, 400036, 1); // 斗篷+斗篷 → 玄光法袍(magicres+40)
-            config[33] = new ItemCombineConfig(33, 402005, 1, 402005, 1, 400037, 1); // 葫芦+葫芦 → 玉京葫芦(mpRegen+4)
+            config[33] = new ItemCombineConfig(33, 402005, 1, 402005, 1, 400037, 1); // 葫芦+葫芦 → 玉玺(mpRegen+40%)
             config[34] = new ItemCombineConfig(34, 402006, 1, 402006, 1, 400038, 1); // 护手+护手 → 风雷双护手(crit+35%)
             config[35] = new ItemCombineConfig(35, 402007, 1, 402007, 1, 400039, 1); // 羽扇+羽扇 → 鹤骨羽扇(ap+25)
             config[36] = new ItemCombineConfig(36, 402008, 1, 402008, 1, 400040, 1); // 名马+名马 → 天外飞驹(hp+500)

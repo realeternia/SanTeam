@@ -55,7 +55,7 @@ namespace CommonConfig
             {"HpP", new FieldMetaInfo("生命成长百分比（每星）", "int", 60)},
             {"AtkSpeed", new FieldMetaInfo("攻速（0=职业基准，>0与职业相加；30=每秒攻击1次，攻速20=1.5秒/次，15=2秒/次）", "int", 83)},
             {"HpRegen", new FieldMetaInfo("生命回复/秒（0=职业基准，非0=相对职业基准±%）", "int", 60)},
-            {"MpRegen", new FieldMetaInfo("魔法回复/秒（0=职业基准，非0=相对职业基准±%）", "int", 60)},
+            {"MpRegen", new FieldMetaInfo("法力获取加成（%，加法叠加到职业基准；如 +20=额外+20%）", "int", 60)},
             {"Armor", new FieldMetaInfo("护甲（0=职业基准，>0与职业相加）", "int", 60)},
             {"MagicRes", new FieldMetaInfo("魔抗（0=职业基准，>0与职业相加）", "int", 79)},
             {"Price", new FieldMetaInfo("价格（配表数据，2-10）", "int", 60, "9-10:#FF9900,7-8:#995500,5-6:#33CC33,3-4:#3333CC")},
@@ -131,7 +131,7 @@ namespace CommonConfig
         /// </summary>
         public int HpRegen;
         /// <summary>
-        ///魔法回复/秒（0=职业基准，非0=相对职业基准±%）
+        ///法力获取加成（%，加法叠加到职业基准值；普攻/受击获得法力时按此百分比提升）
         /// </summary>
         public int MpRegen;
         /// <summary>

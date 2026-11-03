@@ -4,7 +4,7 @@ using UnityEngine;
 /// <summary>
 /// 刘备·仁德（王）：发动时把本技能累积的全部 MP 均分给我方全体英雄（含施法者自身）。
 /// 分享总量 = 本次发动前累积 MP × (100 + ap) / 100 × Strength2[shareRate]（法强加成让总量更多），
-/// 每位英雄分得 总量 / 英雄数，按各自未满的蓝耗技能逐一充能（与名门共用 AddRegenMp 入口）。
+/// 每位英雄分得 总量 / 英雄数，按各自未满的蓝耗技能逐一充能（与名门共用 AddMp 入口）。
 /// MP 的清零由 Skill.CheckBurst 在发动瞬间完成，脚本通过 mpBeforeBurst 读取清零前的累积量。
 /// </summary>
 public class SkillAidManaShare : Skill
@@ -46,7 +46,7 @@ public class SkillAidManaShare : Skill
             {
                 if (s.skillCfg == null || s.skillCfg.MpCost <= 0 || s.IsMpFull())
                     continue;
-                s.AddRegenMp(share);
+                s.AddMp(share);
                 given = true;
             }
             if (given && ally != owner && !string.IsNullOrEmpty(skillCfg.HitEffect))

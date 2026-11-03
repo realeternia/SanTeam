@@ -122,7 +122,7 @@ namespace CommonConfig
             config[9] = new HeroAttrConfig(9, "range", "射程", "", "", "attrrange", false);
             config[10] = new HeroAttrConfig(10, "crit", "暴击", "", "", "attrcrit", false);
             config[11] = new HeroAttrConfig(11, "dodge", "闪避", "", "", "attrdodge", false);
-            config[12] = new HeroAttrConfig(12, "mpRegen", "法力回复", "", "", "attrmpgen", false);
+            config[12] = new HeroAttrConfig(12, "mpRegen", "法力回复加成", "", "", "attrmpgen", false);
             config[13] = new HeroAttrConfig(13, "hpRegen", "生命回复", "", "", "attrhpgen", false);
             config[17] = new HeroAttrConfig(17, "soldierAtk", "士兵攻", "", "", "attratk", false);
             config[18] = new HeroAttrConfig(18, "soldierHp", "士兵生命", "", "", "attrhp", false);

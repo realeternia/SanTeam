@@ -40,7 +40,7 @@ description: 《三国卡牌》(金铲铲式) SkillConfig 表的配置方法与�
 | --- | --- | --- |
 | `Rate` | float | 发动概率 0~1。**`<=0` = 必然发动**；`(0,1)` 时 `SysRandom.Value < Rate` |
 | `CD` | float | 发动冷却（秒），`0` = 无冷却；与 `MpCost` 二选一或叠加，不要在脚本里另写死冷却 |
-| `MpCost` | int | 技能 MP 上限。`0` = 不用蓝随时可发；`>0` 靠棋子 `mpRegen` 每秒充能，满才发动，发动后清空。见 [MP法力系统说明](../../Design/Docs/MP法力系统说明.md) |
+| `MpCost` | int | 技能 MP 上限。`0` = 不用蓝随时可发；`>0` 靠普攻命中/受伤获取法力（`mpRegen` 为百分比加成），满才发动，发动后清空。见 [MP法力系统说明](../../Design/Docs/MP法力系统说明.md) |
 | `StartMpRate` | float | 0~1 开局法力比例：`0` 从零充能（默认），`1` 开局满蓝 |
 | `TriggerCondition` | string | 满足才触发，空 = 无条件。格式 `key<数值`，多条件 `;` 分隔且需**全部满足**；key 走 `Chess.GetAttr`（如 `hprate<50` = 自身生命低于 50%）。解析失败会 `GameLog.Warn` 并**判定为不触发** |
 | `HurtTag` | string | 伤害标签，`AntiShield` = 绕过护盾直接打血（破盾类）；空 = 无 |
@@ -131,7 +131,7 @@ description: 《三国卡牌》(金铲铲式) SkillConfig 表的配置方法与�
 
 | 列 | 类型 | 配置方法 |
 | --- | --- | --- |
-| `LinkSelf` | string | 只给**连接英雄本人**的加成串（`atk+0.2,armor+0.3` 或 `mpRegen+0.5`） |
+| `LinkSelf` | string | 只给**连接英雄本人**的加成串（`atk+0.2,armor+0.3` 或 `mpRegen+5`，mpRegen 为百分比） |
 | `LinkTeam` | string | 给我方其他英雄（不含本人）的加成，**配置即总量，不乘人数** |
 | `AuroAttrs` | string | 光环技能的持续光环属性串，由光环脚本按帧/秒施加 |
 

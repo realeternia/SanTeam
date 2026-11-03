@@ -1,7 +1,7 @@
 using System;
 
 /// <summary>
-/// 法力回复提升（"蓝"，BuffConfig 300018）：按 StrengthBuff1 语义 key "mpRegen" 提升每秒法力回复，移除时还原。
+/// 法力回复提升（"蓝"，BuffConfig 300018）：按 StrengthBuff1 语义 key "mpRegen" 提升法力获取加成（百分比），移除时还原。
 /// </summary>
 public class BuffMpRegenAdd : Buff
 {
