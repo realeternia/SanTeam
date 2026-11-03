@@ -583,6 +583,13 @@ public class BagControl : MonoBehaviour, IPanelEvent
         var p1 = GameManager.Instance.GetPlayer(bindPlayer.pid);
         var itemCfg = ItemConfig.GetConfig(itemCardId);
 
+        // 改铸锤（西洋镜）：拖到英雄卡上使用，把该英雄的所有装备随机改铸，不参与装备/消耗逻辑
+        if (itemCfg.Effect == "tpreroll")
+        {
+            RerollHeroEquips(heroCardId);
+            return;
+        }
+
         // 分解符只能在合成区使用，拖到英雄身上无效
         if (itemCfg.Effect == "tpsplit")
         {
@@ -674,7 +681,7 @@ public class BagControl : MonoBehaviour, IPanelEvent
         PlayEquipsFlyToBag(heroCardId, equipIds, () => UpdateView());
     }
 
-    // 卖出区：拖道具过来 → 右侧滑出道具操作面板，卖出/分解/改铸都在面板内执行
+    // 卖出区：拖道具过来 → 右侧滑出道具操作面板，卖出/分解在面板内执行（改铸锤改为直接拖到英雄卡上使用）
     public void OpenItemPanel(int itemCardId)
     {
         if (itemCardId == 0 || !ItemConfig.HasConfig(itemCardId) || ConfigManager.IsHeroCard(itemCardId))
@@ -813,57 +820,165 @@ public class BagControl : MonoBehaviour, IPanelEvent
         return null;
     }
 
-    // 改铸：消耗1件该装备与1个西洋镜(401009)，产出同 Id 段的随机装备（由 SideItemControl 的改铸按钮调用）
-    public void RerollItem(int itemCardId)
+    // 改铸：把改铸锤（西洋镜 401009）拖到英雄卡上使用，消耗1个改铸锤，该英雄身上所有装备随机改铸为同系列的另一件
+    public void RerollHeroEquips(int heroCardId)
     {
         if (bindPlayer == null)
             return;
 
         var p1 = GameManager.Instance.GetPlayer(bindPlayer.pid);
-
-        if (itemCardId == 0 || !ItemConfig.HasConfig(itemCardId) || ConfigManager.IsHeroCard(itemCardId))
+        var equipIds = p1.GetItemIdsOnHero(heroCardId);
+        if (equipIds.Count == 0)
         {
-            SystemTip.Show("该道具不能改铸");
-            return;
-        }
-        int seg = itemCardId / 1000;
-        if (seg != 400 && seg != 402 && seg != 403)
-        {
-            SystemTip.Show("只能改铸 400/402/403 系列装备");
-            return;
-        }
-        if (p1.GetItemFreeCount(itemCardId) <= 0)
-        {
-            SystemTip.Show(p1.GetEquippedCount(itemCardId) > 0 ? "该装备已全部装备，需先卸下" : "背包中没有该装备");
+            SystemTip.Show("该英雄没有装备");
             return;
         }
         if (p1.GetItemCount(401009) <= 0)
         {
-            SystemTip.Show("缺少西洋镜，无法改铸");
+            SystemTip.Show("缺少改铸锤，无法改铸");
             return;
         }
-        var candidates = p1.GetRerollCandidates(itemCardId);
-        if (candidates.Count == 0)
+
+        // 逐件生成改铸结果：同 Id 段内随机另一件装备；没有候选的装备保持原样
+        var newIds = new List<int>();
+        int changedCount = 0;
+        foreach (int itemId in equipIds)
         {
-            SystemTip.Show("没有可改铸的同系列道具");
+            int seg = itemId / 1000;
+            var candidates = (seg == 400 || seg == 402 || seg == 403) ? p1.GetRerollCandidates(itemId) : null;
+            if (candidates == null || candidates.Count == 0)
+            {
+                newIds.Add(itemId);
+                continue;
+            }
+            newIds.Add(candidates[SysRandom.Range(0, candidates.Count)]);
+            changedCount++;
+        }
+        if (changedCount == 0)
+        {
+            SystemTip.Show("该英雄的装备无法改铸");
             return;
         }
-        int newItemId = candidates[SysRandom.Range(0, candidates.Count)];
 
-        // 两合一特效：装备与西洋镜弹到一起合并，弹出改铸结果再飞回物品区；动画结束后再真正消耗与产出
-        PlayMergeAnim(itemCardId, 401009, newItemId, () =>
+        // 先结算数据（消耗改铸锤并替换装备），再播动画：动画期间隐藏英雄卡上的旧装备图标，结束后统一刷新
+        if (!p1.RerollHeroEquips(heroCardId, 401009, newIds))
+            return;
+
+        PlayItemUseSound(ItemConfig.HasConfig(401009) ? ItemConfig.GetConfig(401009) : null); // 改铸锤被消耗，播放其使用音效
+
+        // 装备图标从卡上飞出 → 换成改铸结果 → 以不同速度飞回各自槽位
+        PlayHeroEquipRerollAnim(heroCardId, equipIds, newIds, () =>
         {
-            if (!p1.RerollItem(itemCardId, 401009, newItemId))
-                return;
-
-            GameManager.Instance.PlaySound("Sounds/compose");
-            PlayItemUseSound(ItemConfig.HasConfig(401009) ? ItemConfig.GetConfig(401009) : null); // 西洋镜被消耗，播放其使用音效
             UpdateView();
             UpdateFieldView();
         });
     }
 
-    // 两合一动画（合成/改铸通用）：两个来源道具的图标弹起来碰到一起，合并成一个结果道具图标后飞回背包
+    // 改铸动画：每件装备从英雄卡槽位向外飞出并放大，飞出后换成改铸结果图标，再以不同速度飞回原槽位
+    private void PlayHeroEquipRerollAnim(int heroCardId, List<int> oldIds, List<int> newIds, System.Action onComplete)
+    {
+        BagCell heroCell = FindHeroCell(heroCardId);
+        if (heroCell == null || heroCell.equipImages == null || bagHeroRegion == null
+            || oldIds == null || newIds == null || oldIds.Count == 0 || oldIds.Count != newIds.Count)
+        {
+            GameLog.Warn($"BagControl.PlayHeroEquipRerollAnim: 英雄卡未找到或装备数据不一致，跳过动画 heroCardId={heroCardId}");
+            onComplete?.Invoke();
+            return;
+        }
+
+        const float iconSize = 60f;
+        const float baseOutDuration = 0.3f;   // 飞出槽位的基础时长
+        const float outDurationStep = 0.08f;  // 每件装备飞出的时长差（多件装备快慢不同）
+        const float holdDuration = 0.1f;      // 飞出后换成结果图标的停顿
+        const float baseBackDuration = 0.35f; // 飞回槽位的基础时长
+        const float backDurationStep = 0.15f; // 每件装备飞回的时长差（多件装备快慢不同）
+        const float startDelayStep = 0.06f;   // 多件装备依次出发的间隔
+        const float flyOutRadius = 150f;      // 飞出槽位的距离
+
+        // 临时图标容器挂在英雄区同层，动画结束整体销毁
+        GameObject containerObj = new GameObject("EquipRerollAnim", typeof(RectTransform));
+        RectTransform container = containerObj.GetComponent<RectTransform>();
+        container.SetParent(bagHeroRegion.transform.parent, false);
+        container.anchoredPosition = Vector2.zero;
+        container.SetAsLastSibling();
+
+        RectTransform heroRt = heroCell.transform as RectTransform;
+        Vector2 cardCenter = ToContainerPos(container, heroRt);
+
+        int total = 0;
+        int done = 0;
+        int slots = oldIds.Count;
+        for (int i = 0; i < slots; i++)
+        {
+            RectTransform slotRt = null;
+            if (i < heroCell.equipImages.Length && heroCell.equipImages[i] != null)
+                slotRt = heroCell.equipImages[i].rectTransform;
+            Vector2 start = slotRt != null ? ToContainerPos(container, slotRt) : cardCenter + new Vector2(-30f * i, 0f);
+
+            // 动画期间隐藏卡上的原装备图标（含品质边框），由临时图标代替；动画结束后 UpdateView 重建卡片
+            if (slotRt != null)
+                heroCell.equipImages[i].enabled = false;
+            if (heroCell.equipBorderImages != null && i < heroCell.equipBorderImages.Length && heroCell.equipBorderImages[i] != null)
+                heroCell.equipBorderImages[i].enabled = false;
+
+            Image icon = CreateTempItemIcon(container, oldIds[i], start, iconSize);
+            if (icon == null)
+                continue;
+            total++;
+
+            // 以正上方为中心扇形向外飞，避免多件装备飞出后互相重叠
+            float angle = Mathf.PI * 0.5f + (i - (slots - 1) * 0.5f) * 0.6f;
+            Vector2 outPos = start + new Vector2(Mathf.Cos(angle), Mathf.Sin(angle)) * flyOutRadius;
+
+            float outDuration = baseOutDuration + outDurationStep * i;
+            float backDuration = baseBackDuration + backDurationStep * (i % 2);
+            int index = i;
+
+            Sequence seq = DOTween.Sequence().SetUpdate(true).SetDelay(startDelayStep * i);
+            seq.Append(icon.rectTransform.DOAnchorPos(outPos, outDuration).SetEase(Ease.OutQuad));
+            seq.Join(icon.rectTransform.DOScale(1.2f, outDuration));
+            // 飞到最高点后换成改铸结果，再稍作停顿
+            seq.AppendCallback(() =>
+            {
+                if (ItemConfig.HasConfig(newIds[index]))
+                    icon.sprite = ItemIconLoader.Load(ItemConfig.GetConfig(newIds[index]).Icon);
+            });
+            seq.AppendInterval(holdDuration);
+            seq.Append(icon.rectTransform.DOAnchorPos(start, backDuration).SetEase(Ease.InQuad));
+            seq.Join(icon.rectTransform.DOScale(1f, backDuration));
+            seq.OnComplete(() =>
+            {
+                done++;
+                if (done >= total)
+                {
+                    Destroy(containerObj);
+                    onComplete?.Invoke();
+                }
+            });
+        }
+
+        if (total == 0)
+        {
+            Destroy(containerObj);
+            onComplete?.Invoke();
+        }
+    }
+
+    // 在背包英雄区查找英雄卡（找不到返回 null）
+    private BagCell FindHeroCell(int heroCardId)
+    {
+        if (bagHeroRegion == null)
+            return null;
+        foreach (Transform child in bagHeroRegion.transform)
+        {
+            var cell = child.GetComponent<BagCell>();
+            if (cell != null && cell.cardId == heroCardId)
+                return cell;
+        }
+        return null;
+    }
+
+    // 两合一动画（合成）：两个来源道具的图标弹起来碰到一起，合并成一个结果道具图标后飞回背包
     private void PlayMergeAnim(int itemA, int itemB, int resultId, System.Action onComplete)
     {
         if (bagItemRegion == null || !ItemConfig.HasConfig(itemA) || !ItemConfig.HasConfig(itemB) || !ItemConfig.HasConfig(resultId))
@@ -1019,21 +1134,6 @@ public class BagControl : MonoBehaviour, IPanelEvent
         });
     }
 
-    // 是否可改铸：400/402/403 系列装备、背包有多余副本、持有西洋镜(401009)且有同系列其它道具
-    public bool CanRerollItem(int itemCardId)
-    {
-        if (bindPlayer == null || itemCardId == 0 || !ItemConfig.HasConfig(itemCardId) || ConfigManager.IsHeroCard(itemCardId))
-            return false;
-        int seg = itemCardId / 1000;
-        if (seg != 400 && seg != 402 && seg != 403)
-            return false;
-
-        var p1 = GameManager.Instance.GetPlayer(bindPlayer.pid);
-        if (p1.GetItemFreeCount(itemCardId) <= 0 || p1.GetItemCount(401009) <= 0)
-            return false;
-        return p1.GetRerollCandidates(itemCardId).Count > 0;
-    }
-
     // 取屏幕中心（画布中心）在容器内的本地坐标，供合成/分解动画当作撞点
     private Vector2 GetScreenCenterPos(RectTransform container)
     {
@@ -1105,17 +1205,8 @@ public class BagControl : MonoBehaviour, IPanelEvent
         Vector2 bagPos = ToContainerPos(container, bagItemRegion.transform as RectTransform);
 
         // 起点：英雄卡的装备槽位（找不到英雄卡则退化到物品区中心，仅起点不同不影响飞行动画）
-        RectTransform heroRt = null;
-        foreach (Transform child in bagHeroRegion.transform)
-        {
-            var cell = child.GetComponent<BagCell>();
-            if (cell != null && cell.cardId == heroCardId && child is RectTransform rt)
-            {
-                heroRt = rt;
-                break;
-            }
-        }
-        var heroCell = heroRt != null ? heroRt.GetComponent<BagCell>() : null;
+        var heroCell = FindHeroCell(heroCardId);
+        RectTransform heroRt = heroCell != null ? heroCell.transform as RectTransform : null;
 
         int done = 0;
         int total = 0;

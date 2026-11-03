@@ -211,7 +211,7 @@ public class BagCell : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragH
         else
         {
             var effect = ItemConfig.GetConfig(cardId).Effect;
-            // attr/tpattr 为英雄装备/消耗品，tpexp 为经验消耗品，tpsplit 为分解符，tpreroll 为重铸镜，friendrep 为代友道具（均可拖到合成区/英雄）
+            // attr/tpattr 为英雄装备/消耗品，tpexp 为经验消耗品，tpsplit 为分解符，tpreroll 为改铸锤(西洋镜，拖到英雄卡上改铸其全部装备)，friendrep 为代友道具（均可拖到合成区/英雄）
             if(effect != "attr" && effect != "tpattr" && effect != "tpexp" && effect != "tpsplit" && effect != "tpreroll" && effect != CombatConst.FriendProxyItemEffect)
                 return;
             dragImage.sprite = itemImage.sprite;

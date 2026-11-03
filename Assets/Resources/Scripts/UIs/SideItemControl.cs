@@ -4,7 +4,8 @@ using TMPro;
 using CommonConfig;
 
 // 侧边栏·道具操作面板：展示道具图标/名称/说明（道具不可卖出，不提供卖出按钮）；
-// 道具参与合成配方时显示"合成"，持有分解锤且道具可分解时显示"分解"，持有西洋镜且道具可改铸时显示"改铸"
+// 道具参与合成配方时显示"合成"，持有分解锤且道具可分解时显示"分解"
+// 改铸不在此面板操作：改铸锤(西洋镜)直接拖到英雄卡上使用
 // 打开流程：背包卖出区(BagRecycler)拖入道具 → BagControl.OpenItemPanel → ShowSideBar("SideItemControl")
 public class SideItemControl : MonoBehaviour
 {
@@ -13,7 +14,6 @@ public class SideItemControl : MonoBehaviour
     public TMP_Text itemDes;
     public Button composeButton;
     public Button decomposeButton;
-    public Button rerollButton;
 
     // 按钮纵向排布：第一个按钮的 y 坐标与按钮间距（隐藏的按钮不占位置）
     private const float ButtonStartY = -760f;
@@ -23,7 +23,7 @@ public class SideItemControl : MonoBehaviour
     private static int currentItemId;
 
     /// <summary>
-    /// 打开侧边栏前调用：bag 提供"可否卖出/分解/改铸"的判断与执行，itemId 为拖入卖出区的道具
+    /// 打开侧边栏前调用：bag 提供"可否卖出/分解"的判断与执行，itemId 为拖入卖出区的道具
     /// </summary>
     public static void SetContext(BagControl bag, int itemId)
     {
@@ -39,8 +39,6 @@ public class SideItemControl : MonoBehaviour
             composeButton.onClick.AddListener(OnCompose);
         if (decomposeButton != null)
             decomposeButton.onClick.AddListener(OnDecompose);
-        if (rerollButton != null)
-            rerollButton.onClick.AddListener(OnReroll);
 
         RefreshView();
     }
@@ -66,18 +64,16 @@ public class SideItemControl : MonoBehaviour
 
         if (bagControl == null)
         {
-            GameLog.Error("SideItemControl.RefreshView: 未设置背包上下文，隐藏合成/分解/改铸按钮");
+            GameLog.Error("SideItemControl.RefreshView: 未设置背包上下文，隐藏合成/分解按钮");
             SetButtonActive(composeButton, false);
             SetButtonActive(decomposeButton, false);
-            SetButtonActive(rerollButton, false);
             ApplyButtonLayout();
             return;
         }
 
-        // 合成/分解/改铸按钮按当前持有道具与条件动态显示
+        // 合成/分解按钮按当前持有道具与条件动态显示
         SetButtonActive(composeButton, bagControl.CanComposeItem(currentItemId));
         SetButtonActive(decomposeButton, bagControl.CanDecomposeItem(currentItemId));
-        SetButtonActive(rerollButton, bagControl.CanRerollItem(currentItemId));
         ApplyButtonLayout();
     }
 
@@ -93,7 +89,6 @@ public class SideItemControl : MonoBehaviour
         float y = ButtonStartY;
         PlaceButton(composeButton, ref y);
         PlaceButton(decomposeButton, ref y);
-        PlaceButton(rerollButton, ref y);
     }
 
     private void PlaceButton(Button button, ref float y)
@@ -132,19 +127,5 @@ public class SideItemControl : MonoBehaviour
 
         GameManager.Instance.PlaySound("Sounds/click");
         PanelManager.Instance.HideSideBar(() => bagControl.DecomposeItem(currentItemId));
-    }
-
-    // 改铸：消耗1件该装备与1个西洋镜，随机产出同系列的另一件装备
-    void OnReroll()
-    {
-        if (bagControl == null)
-        {
-            GameLog.Warn("SideItemControl.OnReroll: 未设置背包上下文，直接关闭侧边栏");
-            PanelManager.Instance.HideSideBar();
-            return;
-        }
-
-        GameManager.Instance.PlaySound("Sounds/click");
-        PanelManager.Instance.HideSideBar(() => bagControl.RerollItem(currentItemId));
     }
 }

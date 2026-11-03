@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -40,8 +40,9 @@ namespace CommonConfig
 
         private static Dictionary<string, FieldMetaInfo> fieldMeta = new Dictionary<string, FieldMetaInfo>()
         {
-            {"Id", new FieldMetaInfo("势力Id（对应 HeroConfig.Side：1蜀 2魏 3吴 4董 5晋 6袁 10野）", "int", 60)},
+            {"Id", new FieldMetaInfo("势力Id（对应 HeroConfig.Side：1蜀 2魏 3吴 4董 5晋 6袁 7刘璋 8刘表 10野）", "int", 60)},
             {"Name", new FieldMetaInfo("势力名", "string", 0)},
+            {"Names", new FieldMetaInfo("势力短名（剧本字段 品质:短名 使用，如 蜀/魏/吴/董/晋/袁/璋/表/野）", "string", 0)},
             {"Colorstr", new FieldMetaInfo("势力主色（十六进制，如#284600，用于阵营背景/图标）", "string", 0)},
             {"KingId", new FieldMetaInfo("主公英雄Id（HeroConfig.Id，无主公为0）", "int", 60)},
             {"Icon", new FieldMetaInfo("图标", "string", 0)},
@@ -54,13 +55,17 @@ namespace CommonConfig
         public static List<CellMeta> CellMetas { get { return cellMeta; } }
 
         /// <summary>
-        ///势力Id（对应 HeroConfig.Side：1蜀 2魏 3吴 4董 5晋 6袁 10野）
+        ///势力Id（对应 HeroConfig.Side：1蜀 2魏 3吴 4董 5晋 6袁 7刘璋 8刘表 10野）
         /// </summary>
         public int Id;
         /// <summary>
         ///势力名
         /// </summary>
         public string Name;
+        /// <summary>
+        ///势力短名（剧本字段 品质:短名 使用，如 蜀/魏/吴/董/晋/袁/璋/表/野）
+        /// </summary>
+        public string Names;
         /// <summary>
         ///势力主色（十六进制，如#284600，用于阵营背景/图标）
         /// </summary>
@@ -79,10 +84,11 @@ namespace CommonConfig
         public bool JoinFactionShield;
 
 
-        public ForceConfig(int Id, string Name, string Colorstr, int KingId, string Icon, bool JoinFactionShield)
+        public ForceConfig(int Id, string Name, string Names, string Colorstr, int KingId, string Icon, bool JoinFactionShield)
         {
             this.Id = Id;
             this.Name = Name;
+            this.Names = Names;
             this.Colorstr = Colorstr;
             this.KingId = KingId;
             this.Icon = Icon;
@@ -107,14 +113,15 @@ namespace CommonConfig
         public static void Load()
         {
             config.Clear();
-            // 势力名与主公/英雄阵营必须一致：1蜀(刘备 100001)、2魏(曹操 100002)、3吴(孙权)、4董(董卓)、5晋(司马炎)、6袁(袁绍)
-            config[1] = new ForceConfig(1, "蜀国", "#284600", 100001, "side1", true);
-            config[2] = new ForceConfig(2, "魏国", "#002364", 100002, "side2", true);
-            config[3] = new ForceConfig(3, "吴国", "#640000", 100003, "side3", true);
-            config[4] = new ForceConfig(4, "董侯", "#1E646E", 100004, "side4", true);
-            config[5] = new ForceConfig(5, "晋国", "#5A326E", 100005, "side5", true);
-            config[6] = new ForceConfig(6, "袁氏", "#785A1E", 100006, "side6", true);
-            config[10] = new ForceConfig(10, "野", "#323232", 0, "", false);
+            config[1] = new ForceConfig(1, "蜀国", "蜀", "#284600", 100001, "side1", true);
+            config[2] = new ForceConfig(2, "魏国", "魏", "#002364", 100002, "side2", true);
+            config[3] = new ForceConfig(3, "吴国", "吴", "#640000", 100003, "side3", true);
+            config[4] = new ForceConfig(4, "董侯", "董", "#1E646E", 100004, "side4", true);
+            config[5] = new ForceConfig(5, "晋国", "晋", "#5A326E", 100005, "side5", true);
+            config[6] = new ForceConfig(6, "袁氏", "袁", "#785A1E", 100006, "side6", true);
+            config[7] = new ForceConfig(7, "刘璋", "璋", "#4C6A2E", 0, "", true);
+            config[8] = new ForceConfig(8, "刘表", "表", "#2E5A7A", 0, "", true);
+            config[10] = new ForceConfig(10, "野", "野", "#323232", 0, "", false);
 
             RebuildIndex();
 

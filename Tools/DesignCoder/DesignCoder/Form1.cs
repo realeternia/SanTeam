@@ -26,6 +26,8 @@ namespace DesignCoder
             Path.Combine(ConfigDir, @"..\Combat\Skill"));
         // 字段规则里带该标记的列按“特效字段”显示：格子右侧多一个选图按钮
         private const string EffectFieldRule = "effect";
+        // 字段规则里带该标记的列按“品质:阵营短名”分两半上色（Scenario1~3）
+        private const string QualitySideFieldRule = "qs";
         private const int HeaderRowCount = 3;
         // 数据区左侧冻结的列数（与顶部 3 行表头一起固定，横向滚动时保持可见）
         private const int FrozenDataColumnCount = 4;
@@ -50,6 +52,9 @@ namespace DesignCoder
         // 技能脚本源码缓存（key: 脚本名）与“脚本是否引用某特效字段”判定缓存（key: 脚本名|字段名）
         private readonly Dictionary<string, string> scriptTextCache = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         private readonly Dictionary<string, bool> effectRefCache = new Dictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
+        // 势力短名/势力名 -> 势力主色（来自 ForceConfig.Names / ForceConfig.Colorstr），懒加载缓存
+        private bool forceColorsLoaded = false;
+        private readonly Dictionary<string, Color> forceColorByName = new Dictionary<string, Color>();
 
         // 搜索状态：关键字变化时从表头下方重新开始，关键字不变时循环定位到下一个匹配
         private string lastSearchText = null;
@@ -199,6 +204,8 @@ namespace DesignCoder
             // 切换/重载配置后脚本引用判定需要重新读取
             scriptTextCache.Clear();
             effectRefCache.Clear();
+            forceColorsLoaded = false;
+            forceColorByName.Clear();
 
             foreach (DataGridViewColumn col in dataGridView1.Columns)
                 col.Frozen = false;
@@ -793,6 +800,151 @@ namespace DesignCoder
                     return true;
             }
             return false;
+        }
+
+        // 字段规则里带 qs 标记的列按“品质:阵营短名”分两半上色（Scenario1~3）
+        private bool IsQualitySideField(int fieldIdx)
+        {
+            if (currentConfig == null || fieldIdx < 0 || fieldIdx >= currentConfig.Fields.Count) return false;
+            string rule = currentConfig.Fields[fieldIdx].FieldRule;
+            if (string.IsNullOrEmpty(rule)) return false;
+            foreach (string part in rule.Split(','))
+            {
+                if (part.Trim().Equals(QualitySideFieldRule, StringComparison.OrdinalIgnoreCase))
+                    return true;
+            }
+            return false;
+        }
+
+        // 解析“品质:阵营短名”，如 3:蜀
+        private static bool TrySplitQualitySide(string value, out int quality, out string sideName)
+        {
+            quality = 0;
+            sideName = "";
+            if (string.IsNullOrEmpty(value)) return false;
+            int colon = value.IndexOf(':');
+            if (colon <= 0 || colon >= value.Length - 1) return false;
+            if (!int.TryParse(value.Substring(0, colon).Trim(), out quality)) return false;
+            sideName = value.Substring(colon + 1).Trim();
+            return sideName.Length > 0;
+        }
+
+        // 从字段规则解析品质色：qs,1:#666666,2:#33CC33,3:#3333FF,4:#FFD700
+        private Dictionary<int, Color> ParseQualityColors(string rule)
+        {
+            var map = new Dictionary<int, Color>();
+            if (string.IsNullOrEmpty(rule)) return map;
+            foreach (string part in rule.Split(','))
+            {
+                string item = part.Trim();
+                if (item.Length == 0) continue;
+                int colon = item.IndexOf(':');
+                if (colon <= 0) continue;
+                int quality;
+                if (!int.TryParse(item.Substring(0, colon).Trim(), out quality)) continue;
+                Color? color = TryParseColorString(item.Substring(colon + 1).Trim());
+                if (color.HasValue) map[quality] = color.Value;
+            }
+            return map;
+        }
+
+        // 势力短名/势力名 -> 主色：优先用已加载的 ForceConfig（含未保存修改），否则读取配表文件
+        private void EnsureForceColors()
+        {
+            if (forceColorsLoaded) return;
+            forceColorsLoaded = true;
+            forceColorByName.Clear();
+
+            ConfigData forceData = null;
+            if (loadedConfigs.ContainsKey("Force"))
+            {
+                forceData = loadedConfigs["Force"];
+            }
+            else
+            {
+                string path = Path.Combine(ConfigDir, "ForceConfig_s.cs");
+                if (!File.Exists(path)) return;
+                try
+                {
+                    forceData = ConfigData.Parse(File.ReadAllText(path, Encoding.UTF8));
+                }
+                catch
+                {
+                    return;
+                }
+            }
+
+            foreach (var row in forceData.Rows)
+            {
+                string colorStr = row.ContainsKey("Colorstr") ? row["Colorstr"] : "";
+                Color? color = TryParseColorString(colorStr);
+                if (!color.HasValue) continue;
+                string names = row.ContainsKey("Names") ? row["Names"] : "";
+                string name = row.ContainsKey("Name") ? row["Name"] : "";
+                if (!string.IsNullOrEmpty(names)) forceColorByName[names] = color.Value;
+                if (!string.IsNullOrEmpty(name)) forceColorByName[name] = color.Value;
+            }
+        }
+
+        // 剧本字段：左半格品质色 + 右半格势力色，中间分隔线，文字白字黑描边
+        private void PaintQualitySideCell(DataGridViewCellPaintingEventArgs e, int quality, string sideName)
+        {
+            int fieldIdx = GetFieldIndexFromColumnIndex(e.ColumnIndex);
+            string rule = fieldIdx >= 0 && fieldIdx < currentConfig.Fields.Count ? currentConfig.Fields[fieldIdx].FieldRule : "";
+            Dictionary<int, Color> qualityColors = ParseQualityColors(rule);
+            EnsureForceColors();
+
+            Color qualityColor = qualityColors.ContainsKey(quality) ? qualityColors[quality] : Color.FromArgb(70, 70, 70);
+            Color sideColor = forceColorByName.ContainsKey(sideName) ? forceColorByName[sideName] : Color.FromArgb(70, 70, 70);
+
+            Rectangle bounds = e.CellBounds;
+            int midX = bounds.Left + bounds.Width / 2;
+            Rectangle leftRect = new Rectangle(bounds.Left, bounds.Top, midX - bounds.Left, bounds.Height);
+            Rectangle rightRect = new Rectangle(midX, bounds.Top, bounds.Right - midX, bounds.Height);
+
+            using (Brush leftBrush = new SolidBrush(qualityColor))
+            {
+                e.Graphics.FillRectangle(leftBrush, leftRect);
+            }
+            using (Brush rightBrush = new SolidBrush(sideColor))
+            {
+                e.Graphics.FillRectangle(rightBrush, rightRect);
+            }
+
+            if ((e.State & DataGridViewElementStates.Selected) == DataGridViewElementStates.Selected)
+            {
+                using (Brush selBrush = new SolidBrush(Color.FromArgb(110, e.CellStyle.SelectionBackColor)))
+                {
+                    e.Graphics.FillRectangle(selBrush, bounds);
+                }
+            }
+
+            using (Pen midPen = new Pen(Color.FromArgb(120, 0, 0, 0)))
+            {
+                e.Graphics.DrawLine(midPen, midX, bounds.Top, midX, bounds.Bottom - 1);
+            }
+
+            string text = e.Value != null ? e.Value.ToString() : "";
+            using (var sf = new StringFormat { LineAlignment = StringAlignment.Center, Alignment = StringAlignment.Center })
+            {
+                Rectangle shadowRect = new Rectangle(bounds.X + 1, bounds.Y + 1, bounds.Width, bounds.Height);
+                e.Graphics.DrawString(text, e.CellStyle.Font, Brushes.Black, shadowRect, sf);
+                e.Graphics.DrawString(text, e.CellStyle.Font, Brushes.White, bounds, sf);
+            }
+
+            bool isHighlighted = (e.RowIndex == selectedRowIndex) || (e.ColumnIndex == selectedColumnIndex);
+            if (isHighlighted)
+            {
+                using (Pen hlPen = new Pen(Color.FromArgb(245, 235, 150), 2))
+                {
+                    e.Graphics.DrawRectangle(hlPen, new Rectangle(bounds.X, bounds.Y, bounds.Width - 1, bounds.Height - 1));
+                }
+            }
+
+            using (Pen borderPen = new Pen(dataGridView1.GridColor))
+            {
+                e.Graphics.DrawRectangle(borderPen, new Rectangle(bounds.X, bounds.Y, bounds.Width - 1, bounds.Height - 1));
+            }
         }
 
         // 特效字段格子右侧的选图按钮区域（绘制与点击判定共用同一套计算）
@@ -1954,6 +2106,15 @@ namespace DesignCoder
                 if (IsEffectField(fieldIdx))
                 {
                     PaintEffectFieldCell(e);
+                    e.Handled = true;
+                    return;
+                }
+                // 剧本字段：左半品质色 + 右半势力色（空值或格式不对时按普通格子显示）
+                int qualityValue;
+                string sideShortName;
+                if (IsQualitySideField(fieldIdx) && TrySplitQualitySide(cellValue, out qualityValue, out sideShortName))
+                {
+                    PaintQualitySideCell(e, qualityValue, sideShortName);
                     e.Handled = true;
                     return;
                 }

@@ -25,6 +25,7 @@ public static class ConfigManager
         hasInit = true;
         
         HeroConfig.Load();
+        ScenarioConfig.Load();
         SkillConfig.Load();
         BuffConfig.Load();
         ItemConfig.Load();
@@ -59,6 +60,18 @@ public static class ConfigManager
             // 每个技能在配置表中展开为1-5级多行，按缩写去重时优先取5级作为代表（数值各级相同）
             if (!skillDict.ContainsKey(skillCfg.Sname) || skillCfg.Lv == 5)
                 skillDict[skillCfg.Sname] = skillCfg;
+        }
+
+        // 剧本系统尚未接入：英雄运行时 Quality/Side 统一由剧本字段解析（默认按剧本2，空则依次取剧本1/3），
+        // 保证商店/AI/展示等旧逻辑仍按原品质与阵营运行；接入剧本后改为按当前剧本取对应字段。
+        foreach (var heroCfg in HeroConfig.ConfigList)
+        {
+            string qualitySide = heroCfg.Scenario2;
+            if (string.IsNullOrEmpty(qualitySide))
+                qualitySide = heroCfg.Scenario1;
+            if (string.IsNullOrEmpty(qualitySide))
+                qualitySide = heroCfg.Scenario3;
+            ParseHeroQualitySide(heroCfg, qualitySide);
         }
 
         // 数值写回（百分比语义）：HeroConfig 数值列 = 相对 JobConfig 职业基准的百分比修正（0=无修正用基准，非0=±%）
@@ -308,6 +321,49 @@ public static class ConfigManager
             return value;
         }
         return null;
+    }
+
+    // 解析剧本字段「品质:阵营」（如 3:蜀），写回英雄运行时 Quality/Side；剧本系统接入前供旧逻辑使用
+    private static void ParseHeroQualitySide(HeroConfig heroCfg, string qualitySide)
+    {
+        if (string.IsNullOrEmpty(qualitySide))
+        {
+            GameLog.Error(string.Format("ConfigManager.PostModify: 英雄[{0}]三个剧本的品质:阵营均为空，无法初始化默认品质/阵营", heroCfg.Name));
+            return;
+        }
+        string[] parts = qualitySide.Split(':');
+        if (parts.Length != 2)
+        {
+            GameLog.Error(string.Format("ConfigManager.PostModify: 英雄[{0}]剧本字段[{1}]格式错误，应为 品质:阵营（如3:蜀）", heroCfg.Name, qualitySide));
+            return;
+        }
+        int quality;
+        if (!int.TryParse(parts[0].Trim(), out quality))
+        {
+            GameLog.Error(string.Format("ConfigManager.PostModify: 英雄[{0}]剧本字段[{1}]品质不是整数", heroCfg.Name, qualitySide));
+            return;
+        }
+        int side = ParseSideName(parts[1].Trim());
+        if (side == 0)
+        {
+            GameLog.Error(string.Format("ConfigManager.PostModify: 英雄[{0}]剧本字段[{1}]阵营无法识别（可用：蜀/魏/吴/董/晋/袁/璋/表/野）", heroCfg.Name, qualitySide));
+            return;
+        }
+        heroCfg.Quality = quality;
+        heroCfg.Side = side;
+    }
+
+    // 剧本阵营短名转阵营Id：统一按 ForceConfig.Names 匹配，新增势力只需配表，无需改代码
+    private static int ParseSideName(string sideName)
+    {
+        if (string.IsNullOrEmpty(sideName))
+            return 0;
+        foreach (var forceCfg in ForceConfig.ConfigList)
+        {
+            if (!string.IsNullOrEmpty(forceCfg.Names) && sideName.StartsWith(forceCfg.Names))
+                return forceCfg.Id;
+        }
+        return 0;
     }
 
     // 势力配置：按阵营Id(HeroConfig.Side)取，未登记返回 null

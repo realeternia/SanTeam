@@ -616,7 +616,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &270001
 RectTransform:
   m_ObjectHideFlags: 0
@@ -912,7 +912,6 @@ MonoBehaviour:
   itemDes: {fileID: 240003}
   composeButton: {fileID: 290004}
   decomposeButton: {fileID: 260004}
-  rerollButton: {fileID: 270004}
 --- !u!1 &290000
 GameObject:
   m_ObjectHideFlags: 0

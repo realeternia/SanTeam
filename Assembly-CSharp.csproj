@@ -255,6 +255,7 @@
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillBacklineStrike.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAttackMagicDamage.cs" />
     <Compile Include="Assets\Resources\Scripts\Configs\ForceConfig_s.cs" />
+    <Compile Include="Assets\Resources\Scripts\Configs\ScenarioConfig_s.cs" />
     <Compile Include="Assets\Resources\Scripts\Tools\HeroSelectionTool.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\LoopScrollRect.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\BattleStatManager.cs" />

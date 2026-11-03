@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>剧本英雄分布</title>
+<style>
+:root{
+  --bg:#14161a; --card:#1d2127; --card2:#22272f; --line:#2b313a;
+  --text:#e7ebf1; --muted:#8b93a1; --accent:#d4a24a;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  background:radial-gradient(1200px 500px at 50% -10%, #1f2733 0%, var(--bg) 60%) var(--bg);
+  color:var(--text);
+  font-family:"Microsoft YaHei","PingFang SC","Segoe UI",system-ui,sans-serif;
+  min-height:100vh;
+  padding:32px 24px 56px;
+}
+.header{max-width:1180px;margin:0 auto 22px;}
+.header h1{margin:0;font-size:26px;letter-spacing:1px;font-weight:700;}
+.header h1 span{color:var(--accent);}
+.header .meta{margin-top:8px;color:var(--muted);font-size:13px;}
+.tabs{max-width:1180px;margin:0 auto 18px;display:flex;gap:10px;flex-wrap:wrap;}
+.tab{
+  border:1px solid var(--line);background:var(--card);color:var(--muted);
+  padding:10px 22px;border-radius:10px;cursor:pointer;font-size:15px;
+  transition:.18s;display:flex;align-items:center;gap:10px;
+}
+.tab .badge{
+  font-size:12px;color:var(--muted);background:#2c333d;border-radius:99px;
+  padding:2px 9px;transition:.18s;
+}
+.tab:hover{border-color:#3d4652;color:var(--text);}
+.tab.active{
+  background:linear-gradient(180deg,#3a3323,#2a2519);
+  border-color:var(--accent);color:#ffdd9a;
+  box-shadow:0 0 0 1px rgba(212,162,74,.35),0 6px 20px rgba(0,0,0,.35);
+}
+.tab.active .badge{background:rgba(212,162,74,.22);color:#ffdd9a;}
+.panel{max-width:1180px;margin:0 auto;display:none;}
+.panel.active{display:block;animation:fade .25s ease;}
+@keyframes fade{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin-bottom:14px;}
+.stat{
+  background:linear-gradient(180deg,var(--card2),var(--card));
+  border:1px solid var(--line);border-radius:12px;padding:18px 20px;
+}
+.stat .num{font-size:30px;font-weight:700;color:var(--accent);line-height:1.1;}
+.stat .lbl{margin-top:6px;font-size:13px;color:var(--muted);}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(420px,1fr));gap:14px;}
+.card{
+  background:linear-gradient(180deg,var(--card2),var(--card));
+  border:1px solid var(--line);border-radius:12px;padding:16px 18px 18px;
+}
+.card-head{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:12px;}
+.card-head h2{margin:0;font-size:16px;font-weight:700;}
+.card-head .sub{font-size:12px;color:var(--muted);}
+.bars{display:flex;flex-direction:column;gap:8px;}
+.row{display:grid;grid-template-columns:112px 1fr 96px;align-items:center;gap:10px;}
+.row .label{font-size:13px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.row .track{height:14px;background:#161a20;border-radius:99px;overflow:hidden;border:1px solid #232830;}
+.row .fill{height:100%;border-radius:99px;transition:width .6s cubic-bezier(.2,.7,.3,1);}
+.row .val{text-align:right;font-size:12px;color:var(--muted);white-space:nowrap;}
+.row .val b{color:var(--text);font-size:13px;margin-right:4px;}
+.row .val em{font-style:normal;color:#6f7785;}
+.legend{margin:16px 0 0;font-size:12.5px;color:var(--muted);line-height:1.9;}
+.legend code{color:#ffdd9a;background:rgba(212,162,74,.12);padding:1px 6px;border-radius:5px;}
+@media (max-width:560px){
+  .row{grid-template-columns:86px 1fr 84px;}
+}
+</style>
+</head>
+<body>
+<div class="header">
+<h1>剧本 <span>英雄分布</span></h1>
+<div class="meta">数据源：HeroConfig_s.cs / HeroFriendConfig_s.cs / ForceConfig_s.cs / JobConfig_s.cs · 共 110 位英雄、31 个好友羁绊组 · 生成于 2026-11-03 08:45</div>
+</div>
+<div class="tabs"><button class="tab active" data-target="panel-1">群雄割据<span class="badge">81人</span></button><button class="tab" data-target="panel-2">三国鼎立<span class="badge">75人</span></button><button class="tab" data-target="panel-3">三家归晋<span class="badge">50人</span></button></div>
+<section class="panel active" id="panel-1" data-scenario="1">
+<div class="stats">
+<div class="stat"><div class="num">81</div><div class="lbl">总英雄数</div></div>
+<div class="stat"><div class="num">9</div><div class="lbl">势力数</div></div>
+<div class="stat"><div class="num">18</div><div class="lbl">职业数</div></div>
+<div class="stat"><div class="num">31</div><div class="lbl">有成员的羁绊组</div></div>
+</div>
+<div class="grid">
+<div class="card"><div class="card-head"><h2>国家分布</h2><span class="sub">9 个势力</span></div><div class="bars"><div class="row" title="魏：18 位英雄"><span class="label">魏</span><div class="track"><div class="fill" style="width:100.0%;background:linear-gradient(90deg,#0046C844,#0046C8)"></div></div><span class="val"><b>18</b><em>22.2%</em></span></div>
+<div class="row" title="吴：17 位英雄"><span class="label">吴</span><div class="track"><div class="fill" style="width:94.4%;background:linear-gradient(90deg,#C8000044,#C80000)"></div></div><span class="val"><b>17</b><em>21.0%</em></span></div>
+<div class="row" title="董：11 位英雄"><span class="label">董</span><div class="track"><div class="fill" style="width:61.1%;background:linear-gradient(90deg,#37B6C844,#37B6C8)"></div></div><span class="val"><b>11</b><em>13.6%</em></span></div>
+<div class="row" title="袁：9 位英雄"><span class="label">袁</span><div class="track"><div class="fill" style="width:50.0%;background:linear-gradient(90deg,#C8963244,#C89632)"></div></div><span class="val"><b>9</b><em>11.1%</em></span></div>
+<div class="row" title="野：8 位英雄"><span class="label">野</span><div class="track"><div class="fill" style="width:44.4%;background:linear-gradient(90deg,#C8C8C844,#C8C8C8)"></div></div><span class="val"><b>8</b><em>9.9%</em></span></div>
+<div class="row" title="蜀：7 位英雄"><span class="label">蜀</span><div class="track"><div class="fill" style="width:38.9%;background:linear-gradient(90deg,#72C80044,#72C800)"></div></div><span class="val"><b>7</b><em>8.6%</em></span></div>
+<div class="row" title="璋：5 位英雄"><span class="label">璋</span><div class="track"><div class="fill" style="width:27.8%;background:linear-gradient(90deg,#8FC85744,#8FC857)"></div></div><span class="val"><b>5</b><em>6.2%</em></span></div>
+<div class="row" title="表：5 位英雄"><span class="label">表</span><div class="track"><div class="fill" style="width:27.8%;background:linear-gradient(90deg,#4B94C844,#4B94C8)"></div></div><span class="val"><b>5</b><em>6.2%</em></span></div>
+<div class="row" title="群：1 位英雄"><span class="label">群</span><div class="track"><div class="fill" style="width:5.6%;background:linear-gradient(90deg,#7A829044,#7A8290)"></div></div><span class="val"><b>1</b><em>1.2%</em></span></div></div></div>
+<div class="card"><div class="card-head"><h2>品质分布</h2><span class="sub">4 个品质档</span></div><div class="bars"><div class="row" title="普通：9 位英雄"><span class="label">Q1 普通</span><div class="track"><div class="fill" style="width:28.1%;background:linear-gradient(90deg,#A0A0A044,#A0A0A0)"></div></div><span class="val"><b>9</b><em>11.1%</em></span></div>
+<div class="row" title="优秀：23 位英雄"><span class="label">Q2 优秀</span><div class="track"><div class="fill" style="width:71.9%;background:linear-gradient(90deg,#33CC3344,#33CC33)"></div></div><span class="val"><b>23</b><em>28.4%</em></span></div>
+<div class="row" title="精良：32 位英雄"><span class="label">Q3 精良</span><div class="track"><div class="fill" style="width:100.0%;background:linear-gradient(90deg,#5B7FFF44,#5B7FFF)"></div></div><span class="val"><b>32</b><em>39.5%</em></span></div>
+<div class="row" title="史诗：17 位英雄"><span class="label">Q4 史诗</span><div class="track"><div class="fill" style="width:53.1%;background:linear-gradient(90deg,#FFD70044,#FFD700)"></div></div><span class="val"><b>17</b><em>21.0%</em></span></div></div></div>
+<div class="card"><div class="card-head"><h2>职业分布</h2><span class="sub">18 个职业</span></div><div class="bars"><div class="row" title="卫士（士）：6 位英雄"><span class="label">卫士（士）</span><div class="track"><div class="fill" style="width:100.0%;background:linear-gradient(90deg,#62DA9A44,#62DA9A)"></div></div><span class="val"><b>6</b><em>7.4%</em></span></div>
+<div class="row" title="枪兵（枪）：6 位英雄"><span class="label">枪兵（枪）</span><div class="track"><div class="fill" style="width:100.0%;background:linear-gradient(90deg,#DA62A244,#DA62A2)"></div></div><span class="val"><b>6</b><em>7.4%</em></span></div>
+<div class="row" title="棋手（棋）：6 位英雄"><span class="label">棋手（棋）</span><div class="track"><div class="fill" style="width:100.0%;background:linear-gradient(90deg,#627ADA44,#627ADA)"></div></div><span class="val"><b>6</b><em>7.4%</em></span></div>
+<div class="row" title="诸侯（王）：5 位英雄"><span class="label">诸侯（王）</span><div class="track"><div class="fill" style="width:83.3%;background:linear-gradient(90deg,#DA9A6244,#DA9A62)"></div></div><span class="val"><b>5</b><em>6.2%</em></span></div>
+<div class="row" title="战车（车）：5 位英雄"><span class="label">战车（车）</span><div class="track"><div class="fill" style="width:83.3%;background:linear-gradient(90deg,#CADA6244,#CADA62)"></div></div><span class="val"><b>5</b><em>6.2%</em></span></div>
+<div class="row" title="戟兵（戟）：5 位英雄"><span class="label">戟兵（戟）</span><div class="track"><div class="fill" style="width:83.3%;background:linear-gradient(90deg,#DA627A44,#DA627A)"></div></div><span class="val"><b>5</b><em>6.2%</em></span></div>
+<div class="row" title="弓手（弓）：5 位英雄"><span class="label">弓手（弓）</span><div class="track"><div class="fill" style="width:83.3%;background:linear-gradient(90deg,#A2DA6244,#A2DA62)"></div></div><span class="val"><b>5</b><em>6.2%</em></span></div>
+<div class="row" title="智士（扇）：5 位英雄"><span class="label">智士（扇）</span><div class="track"><div class="fill" style="width:83.3%;background:linear-gradient(90deg,#62CADA44,#62CADA)"></div></div><span class="val"><b>5</b><em>6.2%</em></span></div>
+<div class="row" title="丞相（相）：5 位英雄"><span class="label">丞相（相）</span><div class="track"><div class="fill" style="width:83.3%;background:linear-gradient(90deg,#62A2DA44,#62A2DA)"></div></div><span class="val"><b>5</b><em>6.2%</em></span></div>
+<div class="row" title="弩手（弩）：5 位英雄"><span class="label">弩手（弩）</span><div class="track"><div class="fill" style="width:83.3%;background:linear-gradient(90deg,#7ADA6244,#7ADA62)"></div></div><span class="val"><b>5</b><em>6.2%</em></span></div>
+<div class="row" title="骑士（马）：4 位英雄"><span class="label">骑士（马）</span><div class="track"><div class="fill" style="width:66.7%;background:linear-gradient(90deg,#DAC26244,#DAC262)"></div></div><span class="val"><b>4</b><em>4.9%</em></span></div>
+<div class="row" title="鼓手（鼓）：4 位英雄"><span class="label">鼓手（鼓）</span><div class="track"><div class="fill" style="width:66.7%;background:linear-gradient(90deg,#7262DA44,#7262DA)"></div></div><span class="val"><b>4</b><em>4.9%</em></span></div>
+<div class="row" title="锤兵（锤）：4 位英雄"><span class="label">锤兵（锤）</span><div class="track"><div class="fill" style="width:66.7%;background:linear-gradient(90deg,#DA62CA44,#DA62CA)"></div></div><span class="val"><b>4</b><em>4.9%</em></span></div>
+<div class="row" title="医士（医）：4 位英雄"><span class="label">医士（医）</span><div class="track"><div class="fill" style="width:66.7%;background:linear-gradient(90deg,#C262DA44,#C262DA)"></div></div><span class="val"><b>4</b><em>4.9%</em></span></div>
+<div class="row" title="炮手（炮）：3 位英雄"><span class="label">炮手（炮）</span><div class="track"><div class="fill" style="width:50.0%;background:linear-gradient(90deg,#62DA7244,#62DA72)"></div></div><span class="val"><b>3</b><em>3.7%</em></span></div>
+<div class="row" title="盾兵（盾）：3 位英雄"><span class="label">盾兵（盾）</span><div class="track"><div class="fill" style="width:50.0%;background:linear-gradient(90deg,#62DAC244,#62DAC2)"></div></div><span class="val"><b>3</b><em>3.7%</em></span></div>
+<div class="row" title="工匠（工）：3 位英雄"><span class="label">工匠（工）</span><div class="track"><div class="fill" style="width:50.0%;background:linear-gradient(90deg,#DA726244,#DA7262)"></div></div><span class="val"><b>3</b><em>3.7%</em></span></div>
+<div class="row" title="琴手（琴）：3 位英雄"><span class="label">琴手（琴）</span><div class="track"><div class="fill" style="width:50.0%;background:linear-gradient(90deg,#9A62DA44,#9A62DA)"></div></div><span class="val"><b>3</b><em>3.7%</em></span></div></div></div>
+<div class="card"><div class="card-head"><h2>好友羁绊人数</h2><span class="sub">31 个羁绊组</span></div><div class="bars"><div class="row" title="严明：6 人（马超、高顺、程昱、李严、曹仁、高览）"><span class="label">严明</span><div class="track"><div class="fill" style="width:100.0%;background:linear-gradient(90deg,#7D96C844,#7D96C8)"></div></div><span class="val"><b>6</b><em>7.4%</em></span></div>
+<div class="row" title="安民：6 人（沮授、刘备、田丰、荀攸、韩当、孙尚香）"><span class="label">安民</span><div class="track"><div class="fill" style="width:100.0%;background:linear-gradient(90deg,#43C84344,#43C843)"></div></div><span class="val"><b>6</b><em>7.4%</em></span></div>
+<div class="row" title="温良：6 人（荀彧、蒋钦、小乔、孙乾、于吉、夏侯惇）"><span class="label">温良</span><div class="track"><div class="fill" style="width:100.0%;background:linear-gradient(90deg,#A0C87844,#A0C878)"></div></div><span class="val"><b>6</b><em>7.4%</em></span></div>
+<div class="row" title="义胆：5 人（赵云、周仓、张任、陈宫、貂蝉）"><span class="label">义胆</span><div class="track"><div class="fill" style="width:83.3%;background:linear-gradient(90deg,#795DC844,#795DC8)"></div></div><span class="val"><b>5</b><em>6.2%</em></span></div>
+<div class="row" title="仁德：5 人（华佗、刘备、张梁、鲁肃、大乔）"><span class="label">仁德</span><div class="track"><div class="fill" style="width:83.3%;background:linear-gradient(90deg,#FFAA3344,#FFAA33)"></div></div><span class="val"><b>5</b><em>6.2%</em></span></div>
+<div class="row" title="异禀：5 人（孙权、左慈、张角、张松、马良）"><span class="label">异禀</span><div class="track"><div class="fill" style="width:83.3%;background:linear-gradient(90deg,#FFCC0044,#FFCC00)"></div></div><span class="val"><b>5</b><em>6.2%</em></span></div>
+<div class="row" title="无双：5 人（关羽、张飞、吕布、许褚、典韦）"><span class="label">无双</span><div class="track"><div class="fill" style="width:83.3%;background:linear-gradient(90deg,#3399CC44,#3399CC)"></div></div><span class="val"><b>5</b><em>6.2%</em></span></div>
+<div class="row" title="智勇：5 人（太史慈、徐晃、孙权、陈宫、徐庶）"><span class="label">智勇</span><div class="track"><div class="fill" style="width:83.3%;background:linear-gradient(90deg,#CC99CC44,#CC99CC)"></div></div><span class="val"><b>5</b><em>6.2%</em></span></div>
+<div class="row" title="望族：5 人（孙坚、袁绍、法正、孙策、夏侯惇）"><span class="label">望族</span><div class="track"><div class="fill" style="width:83.3%;background:linear-gradient(90deg,#C8854344,#C88543)"></div></div><span class="val"><b>5</b><em>6.2%</em></span></div>
+<div class="row" title="益壮：5 人（黄忠、严颜、黄盖、程普、许褚）"><span class="label">益壮</span><div class="track"><div class="fill" style="width:83.3%;background:linear-gradient(90deg,#CC7A0044,#CC7A00)"></div></div><span class="val"><b>5</b><em>6.2%</em></span></div>
+<div class="row" title="迅捷：5 人（周泰、颜良、张郃、华雄、典韦）"><span class="label">迅捷</span><div class="track"><div class="fill" style="width:83.3%;background:linear-gradient(90deg,#43C84344,#43C843)"></div></div><span class="val"><b>5</b><em>6.2%</em></span></div>
+<div class="row" title="铁骑：5 人（马超、颜良、文丑、庞德、夏侯渊）"><span class="label">铁骑</span><div class="track"><div class="fill" style="width:83.3%;background:linear-gradient(90deg,#FF993344,#FF9933)"></div></div><span class="val"><b>5</b><em>6.2%</em></span></div>
+<div class="row" title="偷袭：4 人（甘宁、张辽、魏延、潘璋）"><span class="label">偷袭</span><div class="track"><div class="fill" style="width:66.7%;background:linear-gradient(90deg,#C8787844,#C87878)"></div></div><span class="val"><b>4</b><em>4.9%</em></span></div>
+<div class="row" title="奇才：4 人（曹操、刘晔、周瑜、左慈）"><span class="label">奇才</span><div class="track"><div class="fill" style="width:66.7%;background:linear-gradient(90deg,#6600CC44,#6600CC)"></div></div><span class="val"><b>4</b><em>4.9%</em></span></div>
+<div class="row" title="悍将：4 人（关羽、许攸、华雄、文丑）"><span class="label">悍将</span><div class="track"><div class="fill" style="width:66.7%;background:linear-gradient(90deg,#FF339944,#FF3399)"></div></div><span class="val"><b>4</b><em>4.9%</em></span></div>
+<div class="row" title="权奸：4 人（董卓、李儒、郭图、鞠义）"><span class="label">权奸</span><div class="track"><div class="fill" style="width:66.7%;background:linear-gradient(90deg,#C8006444,#C80064)"></div></div><span class="val"><b>4</b><em>4.9%</em></span></div>
+<div class="row" title="枭雄：4 人（董卓、张角、孙坚、马腾）"><span class="label">枭雄</span><div class="track"><div class="fill" style="width:66.7%;background:linear-gradient(90deg,#CC000044,#CC0000)"></div></div><span class="val"><b>4</b><em>4.9%</em></span></div>
+<div class="row" title="深谋：4 人（于禁、李儒、田丰、张昭）"><span class="label">深谋</span><div class="track"><div class="fill" style="width:66.7%;background:linear-gradient(90deg,#0000FF44,#0000FF)"></div></div><span class="val"><b>4</b><em>4.9%</em></span></div>
+<div class="row" title="王佐：4 人（诸葛瑾、荀攸、荀彧、徐庶）"><span class="label">王佐</span><div class="track"><div class="fill" style="width:66.7%;background:linear-gradient(90deg,#C8A00044,#C8A000)"></div></div><span class="val"><b>4</b><em>4.9%</em></span></div>
+<div class="row" title="背水：4 人（乐进、张飞、庞德、张宝）"><span class="label">背水</span><div class="track"><div class="fill" style="width:66.7%;background:linear-gradient(90deg,#9C45C844,#9C45C8)"></div></div><span class="val"><b>4</b><em>4.9%</em></span></div>
+<div class="row" title="自守：4 人（张郃、曹仁、大乔、魏延）"><span class="label">自守</span><div class="track"><div class="fill" style="width:66.7%;background:linear-gradient(90deg,#C89C7244,#C89C72)"></div></div><span class="val"><b>4</b><em>4.9%</em></span></div>
+<div class="row" title="野火：4 人（郭嘉、周瑜、贾诩、庞统）"><span class="label">野火</span><div class="track"><div class="fill" style="width:66.7%;background:linear-gradient(90deg,#FF000044,#FF0000)"></div></div><span class="val"><b>4</b><em>4.9%</em></span></div>
+<div class="row" title="风华：4 人（貂蝉、孙策、郭嘉、孙尚香）"><span class="label">风华</span><div class="track"><div class="fill" style="width:66.7%;background:linear-gradient(90deg,#398DC844,#398DC8)"></div></div><span class="val"><b>4</b><em>4.9%</em></span></div>
+<div class="row" title="善守：3 人（黄忠、曹洪、张绣）"><span class="label">善守</span><div class="track"><div class="fill" style="width:50.0%;background:linear-gradient(90deg,#50C80044,#50C800)"></div></div><span class="val"><b>3</b><em>3.7%</em></span></div>
+<div class="row" title="文采：3 人（曹操、法正、诸葛瑾）"><span class="label">文采</span><div class="track"><div class="fill" style="width:50.0%;background:linear-gradient(90deg,#8564C844,#8564C8)"></div></div><span class="val"><b>3</b><em>3.7%</em></span></div>
+<div class="row" title="济世：3 人（张昭、陈群、庞统）"><span class="label">济世</span><div class="track"><div class="fill" style="width:50.0%;background:linear-gradient(90deg,#FFD70044,#FFD700)"></div></div><span class="val"><b>3</b><em>3.7%</em></span></div>
+<div class="row" title="虎狼：3 人（吕布、周泰、夏侯渊）"><span class="label">虎狼</span><div class="track"><div class="fill" style="width:50.0%;background:linear-gradient(90deg,#FF336644,#FF3366)"></div></div><span class="val"><b>3</b><em>3.7%</em></span></div>
+<div class="row" title="陷阵：3 人（张辽、赵云、徐晃）"><span class="label">陷阵</span><div class="track"><div class="fill" style="width:50.0%;background:linear-gradient(90deg,#FF660044,#FF6600)"></div></div><span class="val"><b>3</b><em>3.7%</em></span></div>
+<div class="row" title="骑射：3 人（太史慈、甘宁、张绣）"><span class="label">骑射</span><div class="track"><div class="fill" style="width:50.0%;background:linear-gradient(90deg,#0077FF44,#0077FF)"></div></div><span class="val"><b>3</b><em>3.7%</em></span></div>
+<div class="row" title="儒将：2 人（李典、马谡）"><span class="label">儒将</span><div class="track"><div class="fill" style="width:33.3%;background:linear-gradient(90deg,#4385C844,#4385C8)"></div></div><span class="val"><b>2</b><em>2.5%</em></span></div>
+<div class="row" title="将相：2 人（鲁肃、贾诩）"><span class="label">将相</span><div class="track"><div class="fill" style="width:33.3%;background:linear-gradient(90deg,#64A0C844,#64A0C8)"></div></div><span class="val"><b>2</b><em>2.5%</em></span></div></div></div>
+</div>
+</section>
+<section class="panel" id="panel-2" data-scenario="2">
+<div class="stats">
+<div class="stat"><div class="num">75</div><div class="lbl">总英雄数</div></div>
+<div class="stat"><div class="num">3</div><div class="lbl">势力数</div></div>
+<div class="stat"><div class="num">18</div><div class="lbl">职业数</div></div>
+<div class="stat"><div class="num">30</div><div class="lbl">有成员的羁绊组</div></div>
+</div>
+<div class="grid">
+<div class="card"><div class="card-head"><h2>国家分布</h2><span class="sub">3 个势力</span></div><div class="bars"><div class="row" title="魏：27 位英雄"><span class="label">魏</span><div class="track"><div class="fill" style="width:100.0%;background:linear-gradient(90deg,#0046C844,#0046C8)"></div></div><span class="val"><b>27</b><em>36.0%</em></span></div>
+<div class="row" title="蜀：25 位英雄"><span class="label">蜀</span><div class="track"><div class="fill" style="width:92.6%;background:linear-gradient(90deg,#72C80044,#72C800)"></div></div><span class="val"><b>25</b><em>33.3%</em></span></div>
+<div class="row" title="吴：23 位英雄"><span class="label">吴</span><div class="track"><div class="fill" style="width:85.2%;background:linear-gradient(90deg,#C8000044,#C80000)"></div></div><span class="val"><b>23</b><em>30.7%</em></span></div></div></div>
+<div class="card"><div class="card-head"><h2>品质分布</h2><span class="sub">4 个品质档</span></div><div class="bars"><div class="row" title="普通：15 位英雄"><span class="label">Q1 普通</span><div class="track"><div class="fill" style="width:68.2%;background:linear-gradient(90deg,#A0A0A044,#A0A0A0)"></div></div><span class="val"><b>15</b><em>20.0%</em></span></div>
+<div class="row" title="优秀：18 位英雄"><span class="label">Q2 优秀</span><div class="track"><div class="fill" style="width:81.8%;background:linear-gradient(90deg,#33CC3344,#33CC33)"></div></div><span class="val"><b>18</b><em>24.0%</em></span></div>
+<div class="row" title="精良：20 位英雄"><span class="label">Q3 精良</span><div class="track"><div class="fill" style="width:90.9%;background:linear-gradient(90deg,#5B7FFF44,#5B7FFF)"></div></div><span class="val"><b>20</b><em>26.7%</em></span></div>
+<div class="row" title="史诗：22 位英雄"><span class="label">Q4 史诗</span><div class="track"><div class="fill" style="width:100.0%;background:linear-gradient(90deg,#FFD70044,#FFD700)"></div></div><span class="val"><b>22</b><em>29.3%</em></span></div></div></div>
+<div class="card"><div class="card-head"><h2>职业分布</h2><span class="sub">18 个职业</span></div><div class="bars"><div class="row" title="盾兵（盾）：6 位英雄"><span class="label">盾兵（盾）</span><div class="track"><div class="fill" style="width:100.0%;background:linear-gradient(90deg,#62DAC244,#62DAC2)"></div></div><span class="val"><b>6</b><em>8.0%</em></span></div>
+<div class="row" title="卫士（士）：5 位英雄"><span class="label">卫士（士）</span><div class="track"><div class="fill" style="width:83.3%;background:linear-gradient(90deg,#62DA9A44,#62DA9A)"></div></div><span class="val"><b>5</b><em>6.7%</em></span></div>
+<div class="row" title="枪兵（枪）：5 位英雄"><span class="label">枪兵（枪）</span><div class="track"><div class="fill" style="width:83.3%;background:linear-gradient(90deg,#DA62A244,#DA62A2)"></div></div><span class="val"><b>5</b><em>6.7%</em></span></div>
+<div class="row" title="战车（车）：5 位英雄"><span class="label">战车（车）</span><div class="track"><div class="fill" style="width:83.3%;background:linear-gradient(90deg,#CADA6244,#CADA62)"></div></div><span class="val"><b>5</b><em>6.7%</em></span></div>
+<div class="row" title="弩手（弩）：5 位英雄"><span class="label">弩手（弩）</span><div class="track"><div class="fill" style="width:83.3%;background:linear-gradient(90deg,#7ADA6244,#7ADA62)"></div></div><span class="val"><b>5</b><em>6.7%</em></span></div>
+<div class="row" title="锤兵（锤）：5 位英雄"><span class="label">锤兵（锤）</span><div class="track"><div class="fill" style="width:83.3%;background:linear-gradient(90deg,#DA62CA44,#DA62CA)"></div></div><span class="val"><b>5</b><em>6.7%</em></span></div>
+<div class="row" title="骑士（马）：4 位英雄"><span class="label">骑士（马）</span><div class="track"><div class="fill" style="width:66.7%;background:linear-gradient(90deg,#DAC26244,#DAC262)"></div></div><span class="val"><b>4</b><em>5.3%</em></span></div>
+<div class="row" title="工匠（工）：4 位英雄"><span class="label">工匠（工）</span><div class="track"><div class="fill" style="width:66.7%;background:linear-gradient(90deg,#DA726244,#DA7262)"></div></div><span class="val"><b>4</b><em>5.3%</em></span></div>
+<div class="row" title="炮手（炮）：4 位英雄"><span class="label">炮手（炮）</span><div class="track"><div class="fill" style="width:66.7%;background:linear-gradient(90deg,#62DA7244,#62DA72)"></div></div><span class="val"><b>4</b><em>5.3%</em></span></div>
+<div class="row" title="戟兵（戟）：4 位英雄"><span class="label">戟兵（戟）</span><div class="track"><div class="fill" style="width:66.7%;background:linear-gradient(90deg,#DA627A44,#DA627A)"></div></div><span class="val"><b>4</b><em>5.3%</em></span></div>
+<div class="row" title="弓手（弓）：4 位英雄"><span class="label">弓手（弓）</span><div class="track"><div class="fill" style="width:66.7%;background:linear-gradient(90deg,#A2DA6244,#A2DA62)"></div></div><span class="val"><b>4</b><em>5.3%</em></span></div>
+<div class="row" title="棋手（棋）：4 位英雄"><span class="label">棋手（棋）</span><div class="track"><div class="fill" style="width:66.7%;background:linear-gradient(90deg,#627ADA44,#627ADA)"></div></div><span class="val"><b>4</b><em>5.3%</em></span></div>
+<div class="row" title="智士（扇）：4 位英雄"><span class="label">智士（扇）</span><div class="track"><div class="fill" style="width:66.7%;background:linear-gradient(90deg,#62CADA44,#62CADA)"></div></div><span class="val"><b>4</b><em>5.3%</em></span></div>
+<div class="row" title="丞相（相）：4 位英雄"><span class="label">丞相（相）</span><div class="track"><div class="fill" style="width:66.7%;background:linear-gradient(90deg,#62A2DA44,#62A2DA)"></div></div><span class="val"><b>4</b><em>5.3%</em></span></div>
+<div class="row" title="鼓手（鼓）：4 位英雄"><span class="label">鼓手（鼓）</span><div class="track"><div class="fill" style="width:66.7%;background:linear-gradient(90deg,#7262DA44,#7262DA)"></div></div><span class="val"><b>4</b><em>5.3%</em></span></div>
+<div class="row" title="琴手（琴）：4 位英雄"><span class="label">琴手（琴）</span><div class="track"><div class="fill" style="width:66.7%;background:linear-gradient(90deg,#9A62DA44,#9A62DA)"></div></div><span class="val"><b>4</b><em>5.3%</em></span></div>
+<div class="row" title="诸侯（王）：3 位英雄"><span class="label">诸侯（王）</span><div class="track"><div class="fill" style="width:50.0%;background:linear-gradient(90deg,#DA9A6244,#DA9A62)"></div></div><span class="val"><b>3</b><em>4.0%</em></span></div>
+<div class="row" title="医士（医）：1 位英雄"><span class="label">医士（医）</span><div class="track"><div class="fill" style="width:16.7%;background:linear-gradient(90deg,#C262DA44,#C262DA)"></div></div><span class="val"><b>1</b><em>1.3%</em></span></div></div></div>
+<div class="card"><div class="card-head"><h2>好友羁绊人数</h2><span class="sub">31 个羁绊组</span></div><div class="bars"><div class="row" title="偷袭：6 人（甘宁、张辽、邓艾、魏延、潘璋、曹彰）"><span class="label">偷袭</span><div class="track"><div class="fill" style="width:100.0%;background:linear-gradient(90deg,#C8787844,#C87878)"></div></div><span class="val"><b>6</b><em>8.0%</em></span></div>
+<div class="row" title="文采：5 人（曹操、诸葛亮、蔡文姬、法正、诸葛瑾）"><span class="label">文采</span><div class="track"><div class="fill" style="width:83.3%;background:linear-gradient(90deg,#8564C844,#8564C8)"></div></div><span class="val"><b>5</b><em>6.7%</em></span></div>
+<div class="row" title="智勇：5 人（曹真、太史慈、徐晃、孙权、徐庶）"><span class="label">智勇</span><div class="track"><div class="fill" style="width:83.3%;background:linear-gradient(90deg,#CC99CC44,#CC99CC)"></div></div><span class="val"><b>5</b><em>6.7%</em></span></div>
+<div class="row" title="温良：5 人（荀彧、蒋钦、小乔、孙乾、夏侯惇）"><span class="label">温良</span><div class="track"><div class="fill" style="width:83.3%;background:linear-gradient(90deg,#A0C87844,#A0C878)"></div></div><span class="val"><b>5</b><em>6.7%</em></span></div>
+<div class="row" title="王佐：5 人（姜维、诸葛瑾、荀攸、荀彧、徐庶）"><span class="label">王佐</span><div class="track"><div class="fill" style="width:83.3%;background:linear-gradient(90deg,#C8A00044,#C8A000)"></div></div><span class="val"><b>5</b><em>6.7%</em></span></div>
+<div class="row" title="益壮：5 人（黄忠、严颜、黄盖、程普、许褚）"><span class="label">益壮</span><div class="track"><div class="fill" style="width:83.3%;background:linear-gradient(90deg,#CC7A0044,#CC7A00)"></div></div><span class="val"><b>5</b><em>6.7%</em></span></div>
+<div class="row" title="自守：5 人（张郃、曹仁、大乔、刘禅、魏延）"><span class="label">自守</span><div class="track"><div class="fill" style="width:83.3%;background:linear-gradient(90deg,#C89C7244,#C89C72)"></div></div><span class="val"><b>5</b><em>6.7%</em></span></div>
+<div class="row" title="严明：4 人（马超、程昱、李严、曹仁）"><span class="label">严明</span><div class="track"><div class="fill" style="width:66.7%;background:linear-gradient(90deg,#7D96C844,#7D96C8)"></div></div><span class="val"><b>4</b><em>5.3%</em></span></div>
+<div class="row" title="仁德：4 人（刘备、蒋琬、鲁肃、大乔）"><span class="label">仁德</span><div class="track"><div class="fill" style="width:66.7%;background:linear-gradient(90deg,#FFAA3344,#FFAA33)"></div></div><span class="val"><b>4</b><em>5.3%</em></span></div>
+<div class="row" title="儒将：4 人（陆逊、姜维、李典、马谡）"><span class="label">儒将</span><div class="track"><div class="fill" style="width:66.7%;background:linear-gradient(90deg,#4385C844,#4385C8)"></div></div><span class="val"><b>4</b><em>5.3%</em></span></div>
+<div class="row" title="善守：4 人（司马懿、朱桓、黄忠、曹洪）"><span class="label">善守</span><div class="track"><div class="fill" style="width:66.7%;background:linear-gradient(90deg,#50C80044,#50C800)"></div></div><span class="val"><b>4</b><em>5.3%</em></span></div>
+<div class="row" title="奇才：4 人（曹操、刘晔、周瑜、吕蒙）"><span class="label">奇才</span><div class="track"><div class="fill" style="width:66.7%;background:linear-gradient(90deg,#6600CC44,#6600CC)"></div></div><span class="val"><b>4</b><em>5.3%</em></span></div>
+<div class="row" title="安民：4 人（刘备、荀攸、韩当、孙尚香）"><span class="label">安民</span><div class="track"><div class="fill" style="width:66.7%;background:linear-gradient(90deg,#43C84344,#43C843)"></div></div><span class="val"><b>4</b><em>5.3%</em></span></div>
+<div class="row" title="异禀：4 人（孙权、张松、马良、邓艾）"><span class="label">异禀</span><div class="track"><div class="fill" style="width:66.7%;background:linear-gradient(90deg,#FFCC0044,#FFCC00)"></div></div><span class="val"><b>4</b><em>5.3%</em></span></div>
+<div class="row" title="无双：4 人（关羽、张飞、许褚、典韦）"><span class="label">无双</span><div class="track"><div class="fill" style="width:66.7%;background:linear-gradient(90deg,#3399CC44,#3399CC)"></div></div><span class="val"><b>4</b><em>5.3%</em></span></div>
+<div class="row" title="望族：4 人（孙坚、甄宓、法正、夏侯惇）"><span class="label">望族</span><div class="track"><div class="fill" style="width:66.7%;background:linear-gradient(90deg,#C8854344,#C88543)"></div></div><span class="val"><b>4</b><em>5.3%</em></span></div>
+<div class="row" title="济世：4 人（张昭、陈群、费祎、庞统）"><span class="label">济世</span><div class="track"><div class="fill" style="width:66.7%;background:linear-gradient(90deg,#FFD70044,#FFD700)"></div></div><span class="val"><b>4</b><em>5.3%</em></span></div>
+<div class="row" title="背水：4 人（乐进、张飞、庞德、孟获）"><span class="label">背水</span><div class="track"><div class="fill" style="width:66.7%;background:linear-gradient(90deg,#9C45C844,#9C45C8)"></div></div><span class="val"><b>4</b><em>5.3%</em></span></div>
+<div class="row" title="虎狼：4 人（马岱、周泰、丁奉、夏侯渊）"><span class="label">虎狼</span><div class="track"><div class="fill" style="width:66.7%;background:linear-gradient(90deg,#FF336644,#FF3366)"></div></div><span class="val"><b>4</b><em>5.3%</em></span></div>
+<div class="row" title="野火：4 人（诸葛亮、郭嘉、周瑜、庞统）"><span class="label">野火</span><div class="track"><div class="fill" style="width:66.7%;background:linear-gradient(90deg,#FF000044,#FF0000)"></div></div><span class="val"><b>4</b><em>5.3%</em></span></div>
+<div class="row" title="陷阵：4 人（张辽、凌统、赵云、徐晃）"><span class="label">陷阵</span><div class="track"><div class="fill" style="width:66.7%;background:linear-gradient(90deg,#FF660044,#FF6600)"></div></div><span class="val"><b>4</b><em>5.3%</em></span></div>
+<div class="row" title="义胆：3 人（赵云、周仓、文鸯）"><span class="label">义胆</span><div class="track"><div class="fill" style="width:50.0%;background:linear-gradient(90deg,#795DC844,#795DC8)"></div></div><span class="val"><b>3</b><em>4.0%</em></span></div>
+<div class="row" title="将相：3 人（司马懿、鲁肃、陆逊）"><span class="label">将相</span><div class="track"><div class="fill" style="width:50.0%;background:linear-gradient(90deg,#64A0C844,#64A0C8)"></div></div><span class="val"><b>3</b><em>4.0%</em></span></div>
+<div class="row" title="深谋：3 人（吕蒙、于禁、张昭）"><span class="label">深谋</span><div class="track"><div class="fill" style="width:50.0%;background:linear-gradient(90deg,#0000FF44,#0000FF)"></div></div><span class="val"><b>3</b><em>4.0%</em></span></div>
+<div class="row" title="迅捷：3 人（周泰、张郃、典韦）"><span class="label">迅捷</span><div class="track"><div class="fill" style="width:50.0%;background:linear-gradient(90deg,#43C84344,#43C843)"></div></div><span class="val"><b>3</b><em>4.0%</em></span></div>
+<div class="row" title="铁骑：3 人（马超、庞德、夏侯渊）"><span class="label">铁骑</span><div class="track"><div class="fill" style="width:50.0%;background:linear-gradient(90deg,#FF993344,#FF9933)"></div></div><span class="val"><b>3</b><em>4.0%</em></span></div>
+<div class="row" title="风华：3 人（黄月英、郭嘉、孙尚香）"><span class="label">风华</span><div class="track"><div class="fill" style="width:50.0%;background:linear-gradient(90deg,#398DC844,#398DC8)"></div></div><span class="val"><b>3</b><em>4.0%</em></span></div>
+<div class="row" title="骑射：3 人（太史慈、甘宁、曹彰）"><span class="label">骑射</span><div class="track"><div class="fill" style="width:50.0%;background:linear-gradient(90deg,#0077FF44,#0077FF)"></div></div><span class="val"><b>3</b><em>4.0%</em></span></div>
+<div class="row" title="悍将：2 人（关羽、徐盛）"><span class="label">悍将</span><div class="track"><div class="fill" style="width:33.3%;background:linear-gradient(90deg,#FF339944,#FF3399)"></div></div><span class="val"><b>2</b><em>2.7%</em></span></div>
+<div class="row" title="枭雄：2 人（孟获、孙坚）"><span class="label">枭雄</span><div class="track"><div class="fill" style="width:33.3%;background:linear-gradient(90deg,#CC000044,#CC0000)"></div></div><span class="val"><b>2</b><em>2.7%</em></span></div>
+<div class="row" style="opacity:.35" title="权奸：0 人（本剧本无成员）"><span class="label">权奸</span><div class="track"><div class="fill" style="width:0.0%;background:linear-gradient(90deg,#C8006444,#C80064)"></div></div><span class="val"><b>0</b><em>0.0%</em></span></div></div></div>
+</div>
+</section>
+<section class="panel" id="panel-3" data-scenario="3">
+<div class="stats">
+<div class="stat"><div class="num">50</div><div class="lbl">总英雄数</div></div>
+<div class="stat"><div class="num">4</div><div class="lbl">势力数</div></div>
+<div class="stat"><div class="num">18</div><div class="lbl">职业数</div></div>
+<div class="stat"><div class="num">31</div><div class="lbl">有成员的羁绊组</div></div>
+</div>
+<div class="grid">
+<div class="card"><div class="card-head"><h2>国家分布</h2><span class="sub">4 个势力</span></div><div class="bars"><div class="row" title="蜀：15 位英雄"><span class="label">蜀</span><div class="track"><div class="fill" style="width:100.0%;background:linear-gradient(90deg,#72C80044,#72C800)"></div></div><span class="val"><b>15</b><em>30.0%</em></span></div>
+<div class="row" title="魏：13 位英雄"><span class="label">魏</span><div class="track"><div class="fill" style="width:86.7%;background:linear-gradient(90deg,#0046C844,#0046C8)"></div></div><span class="val"><b>13</b><em>26.0%</em></span></div>
+<div class="row" title="吴：12 位英雄"><span class="label">吴</span><div class="track"><div class="fill" style="width:80.0%;background:linear-gradient(90deg,#C8000044,#C80000)"></div></div><span class="val"><b>12</b><em>24.0%</em></span></div>
+<div class="row" title="晋：10 位英雄"><span class="label">晋</span><div class="track"><div class="fill" style="width:66.7%;background:linear-gradient(90deg,#A45BC844,#A45BC8)"></div></div><span class="val"><b>10</b><em>20.0%</em></span></div></div></div>
+<div class="card"><div class="card-head"><h2>品质分布</h2><span class="sub">4 个品质档</span></div><div class="bars"><div class="row" title="普通：9 位英雄"><span class="label">Q1 普通</span><div class="track"><div class="fill" style="width:50.0%;background:linear-gradient(90deg,#A0A0A044,#A0A0A0)"></div></div><span class="val"><b>9</b><em>18.0%</em></span></div>
+<div class="row" title="优秀：10 位英雄"><span class="label">Q2 优秀</span><div class="track"><div class="fill" style="width:55.6%;background:linear-gradient(90deg,#33CC3344,#33CC33)"></div></div><span class="val"><b>10</b><em>20.0%</em></span></div>
+<div class="row" title="精良：13 位英雄"><span class="label">Q3 精良</span><div class="track"><div class="fill" style="width:72.2%;background:linear-gradient(90deg,#5B7FFF44,#5B7FFF)"></div></div><span class="val"><b>13</b><em>26.0%</em></span></div>
+<div class="row" title="史诗：18 位英雄"><span class="label">Q4 史诗</span><div class="track"><div class="fill" style="width:100.0%;background:linear-gradient(90deg,#FFD70044,#FFD700)"></div></div><span class="val"><b>18</b><em>36.0%</em></span></div></div></div>
+<div class="card"><div class="card-head"><h2>职业分布</h2><span class="sub">18 个职业</span></div><div class="bars"><div class="row" title="诸侯（王）：4 位英雄"><span class="label">诸侯（王）</span><div class="track"><div class="fill" style="width:100.0%;background:linear-gradient(90deg,#DA9A6244,#DA9A62)"></div></div><span class="val"><b>4</b><em>8.0%</em></span></div>
+<div class="row" title="锤兵（锤）：4 位英雄"><span class="label">锤兵（锤）</span><div class="track"><div class="fill" style="width:100.0%;background:linear-gradient(90deg,#DA62CA44,#DA62CA)"></div></div><span class="val"><b>4</b><em>8.0%</em></span></div>
+<div class="row" title="炮手（炮）：4 位英雄"><span class="label">炮手（炮）</span><div class="track"><div class="fill" style="width:100.0%;background:linear-gradient(90deg,#62DA7244,#62DA72)"></div></div><span class="val"><b>4</b><em>8.0%</em></span></div>
+<div class="row" title="弩手（弩）：4 位英雄"><span class="label">弩手（弩）</span><div class="track"><div class="fill" style="width:100.0%;background:linear-gradient(90deg,#7ADA6244,#7ADA62)"></div></div><span class="val"><b>4</b><em>8.0%</em></span></div>
+<div class="row" title="卫士（士）：3 位英雄"><span class="label">卫士（士）</span><div class="track"><div class="fill" style="width:75.0%;background:linear-gradient(90deg,#62DA9A44,#62DA9A)"></div></div><span class="val"><b>3</b><em>6.0%</em></span></div>
+<div class="row" title="骑士（马）：3 位英雄"><span class="label">骑士（马）</span><div class="track"><div class="fill" style="width:75.0%;background:linear-gradient(90deg,#DAC26244,#DAC262)"></div></div><span class="val"><b>3</b><em>6.0%</em></span></div>
+<div class="row" title="工匠（工）：3 位英雄"><span class="label">工匠（工）</span><div class="track"><div class="fill" style="width:75.0%;background:linear-gradient(90deg,#DA726244,#DA7262)"></div></div><span class="val"><b>3</b><em>6.0%</em></span></div>
+<div class="row" title="战车（车）：3 位英雄"><span class="label">战车（车）</span><div class="track"><div class="fill" style="width:75.0%;background:linear-gradient(90deg,#CADA6244,#CADA62)"></div></div><span class="val"><b>3</b><em>6.0%</em></span></div>
+<div class="row" title="鼓手（鼓）：3 位英雄"><span class="label">鼓手（鼓）</span><div class="track"><div class="fill" style="width:75.0%;background:linear-gradient(90deg,#7262DA44,#7262DA)"></div></div><span class="val"><b>3</b><em>6.0%</em></span></div>
+<div class="row" title="棋手（棋）：3 位英雄"><span class="label">棋手（棋）</span><div class="track"><div class="fill" style="width:75.0%;background:linear-gradient(90deg,#627ADA44,#627ADA)"></div></div><span class="val"><b>3</b><em>6.0%</em></span></div>
+<div class="row" title="盾兵（盾）：3 位英雄"><span class="label">盾兵（盾）</span><div class="track"><div class="fill" style="width:75.0%;background:linear-gradient(90deg,#62DAC244,#62DAC2)"></div></div><span class="val"><b>3</b><em>6.0%</em></span></div>
+<div class="row" title="枪兵（枪）：2 位英雄"><span class="label">枪兵（枪）</span><div class="track"><div class="fill" style="width:50.0%;background:linear-gradient(90deg,#DA62A244,#DA62A2)"></div></div><span class="val"><b>2</b><em>4.0%</em></span></div>
+<div class="row" title="戟兵（戟）：2 位英雄"><span class="label">戟兵（戟）</span><div class="track"><div class="fill" style="width:50.0%;background:linear-gradient(90deg,#DA627A44,#DA627A)"></div></div><span class="val"><b>2</b><em>4.0%</em></span></div>
+<div class="row" title="弓手（弓）：2 位英雄"><span class="label">弓手（弓）</span><div class="track"><div class="fill" style="width:50.0%;background:linear-gradient(90deg,#A2DA6244,#A2DA62)"></div></div><span class="val"><b>2</b><em>4.0%</em></span></div>
+<div class="row" title="丞相（相）：2 位英雄"><span class="label">丞相（相）</span><div class="track"><div class="fill" style="width:50.0%;background:linear-gradient(90deg,#62A2DA44,#62A2DA)"></div></div><span class="val"><b>2</b><em>4.0%</em></span></div>
+<div class="row" title="智士（扇）：2 位英雄"><span class="label">智士（扇）</span><div class="track"><div class="fill" style="width:50.0%;background:linear-gradient(90deg,#62CADA44,#62CADA)"></div></div><span class="val"><b>2</b><em>4.0%</em></span></div>
+<div class="row" title="琴手（琴）：2 位英雄"><span class="label">琴手（琴）</span><div class="track"><div class="fill" style="width:50.0%;background:linear-gradient(90deg,#9A62DA44,#9A62DA)"></div></div><span class="val"><b>2</b><em>4.0%</em></span></div>
+<div class="row" title="医士（医）：1 位英雄"><span class="label">医士（医）</span><div class="track"><div class="fill" style="width:25.0%;background:linear-gradient(90deg,#C262DA44,#C262DA)"></div></div><span class="val"><b>1</b><em>2.0%</em></span></div></div></div>
+<div class="card"><div class="card-head"><h2>好友羁绊人数</h2><span class="sub">31 个羁绊组</span></div><div class="bars"><div class="row" title="自守：5 人（张郃、曹仁、刘禅、司马昭、魏延）"><span class="label">自守</span><div class="track"><div class="fill" style="width:100.0%;background:linear-gradient(90deg,#C89C7244,#C89C72)"></div></div><span class="val"><b>5</b><em>10.0%</em></span></div>
+<div class="row" title="陷阵：5 人（张辽、凌统、赵云、陈泰、徐晃）"><span class="label">陷阵</span><div class="track"><div class="fill" style="width:100.0%;background:linear-gradient(90deg,#FF660044,#FF6600)"></div></div><span class="val"><b>5</b><em>10.0%</em></span></div>
+<div class="row" title="偷袭：4 人（甘宁、张辽、邓艾、魏延）"><span class="label">偷袭</span><div class="track"><div class="fill" style="width:80.0%;background:linear-gradient(90deg,#C8787844,#C87878)"></div></div><span class="val"><b>4</b><em>8.0%</em></span></div>
+<div class="row" title="将相：4 人（司马懿、钟会、鲁肃、陆逊）"><span class="label">将相</span><div class="track"><div class="fill" style="width:80.0%;background:linear-gradient(90deg,#64A0C844,#64A0C8)"></div></div><span class="val"><b>4</b><em>8.0%</em></span></div>
+<div class="row" title="文采：4 人（曹操、诸葛亮、蔡文姬、法正）"><span class="label">文采</span><div class="track"><div class="fill" style="width:80.0%;background:linear-gradient(90deg,#8564C844,#8564C8)"></div></div><span class="val"><b>4</b><em>8.0%</em></span></div>
+<div class="row" title="益壮：4 人（黄忠、黄盖、程普、许褚）"><span class="label">益壮</span><div class="track"><div class="fill" style="width:80.0%;background:linear-gradient(90deg,#CC7A0044,#CC7A00)"></div></div><span class="val"><b>4</b><em>8.0%</em></span></div>
+<div class="row" title="仁德：3 人（刘备、蒋琬、鲁肃）"><span class="label">仁德</span><div class="track"><div class="fill" style="width:60.0%;background:linear-gradient(90deg,#FFAA3344,#FFAA33)"></div></div><span class="val"><b>3</b><em>6.0%</em></span></div>
+<div class="row" title="儒将：3 人（陆逊、姜维、司马昭）"><span class="label">儒将</span><div class="track"><div class="fill" style="width:60.0%;background:linear-gradient(90deg,#4385C844,#4385C8)"></div></div><span class="val"><b>3</b><em>6.0%</em></span></div>
+<div class="row" title="安民：3 人（刘备、韩当、孙尚香）"><span class="label">安民</span><div class="track"><div class="fill" style="width:60.0%;background:linear-gradient(90deg,#43C84344,#43C843)"></div></div><span class="val"><b>3</b><em>6.0%</em></span></div>
+<div class="row" title="无双：3 人（关羽、张飞、许褚）"><span class="label">无双</span><div class="track"><div class="fill" style="width:60.0%;background:linear-gradient(90deg,#3399CC44,#3399CC)"></div></div><span class="val"><b>3</b><em>6.0%</em></span></div>
+<div class="row" title="智勇：3 人（曹真、徐晃、孙权）"><span class="label">智勇</span><div class="track"><div class="fill" style="width:60.0%;background:linear-gradient(90deg,#CC99CC44,#CC99CC)"></div></div><span class="val"><b>3</b><em>6.0%</em></span></div>
+<div class="row" title="王佐：3 人（姜维、荀彧、杜预）"><span class="label">王佐</span><div class="track"><div class="fill" style="width:60.0%;background:linear-gradient(90deg,#C8A00044,#C8A000)"></div></div><span class="val"><b>3</b><em>6.0%</em></span></div>
+<div class="row" title="背水：3 人（张飞、庞德、孟获）"><span class="label">背水</span><div class="track"><div class="fill" style="width:60.0%;background:linear-gradient(90deg,#9C45C844,#9C45C8)"></div></div><span class="val"><b>3</b><em>6.0%</em></span></div>
+<div class="row" title="风华：3 人（黄月英、郭嘉、孙尚香）"><span class="label">风华</span><div class="track"><div class="fill" style="width:60.0%;background:linear-gradient(90deg,#398DC844,#398DC8)"></div></div><span class="val"><b>3</b><em>6.0%</em></span></div>
+<div class="row" title="严明：2 人（马超、曹仁）"><span class="label">严明</span><div class="track"><div class="fill" style="width:40.0%;background:linear-gradient(90deg,#7D96C844,#7D96C8)"></div></div><span class="val"><b>2</b><em>4.0%</em></span></div>
+<div class="row" title="义胆：2 人（赵云、文鸯）"><span class="label">义胆</span><div class="track"><div class="fill" style="width:40.0%;background:linear-gradient(90deg,#795DC844,#795DC8)"></div></div><span class="val"><b>2</b><em>4.0%</em></span></div>
+<div class="row" title="善守：2 人（司马懿、黄忠）"><span class="label">善守</span><div class="track"><div class="fill" style="width:40.0%;background:linear-gradient(90deg,#50C80044,#50C800)"></div></div><span class="val"><b>2</b><em>4.0%</em></span></div>
+<div class="row" title="奇才：2 人（曹操、吕蒙）"><span class="label">奇才</span><div class="track"><div class="fill" style="width:40.0%;background:linear-gradient(90deg,#6600CC44,#6600CC)"></div></div><span class="val"><b>2</b><em>4.0%</em></span></div>
+<div class="row" title="异禀：2 人（孙权、邓艾）"><span class="label">异禀</span><div class="track"><div class="fill" style="width:40.0%;background:linear-gradient(90deg,#FFCC0044,#FFCC00)"></div></div><span class="val"><b>2</b><em>4.0%</em></span></div>
+<div class="row" title="悍将：2 人（关羽、王双）"><span class="label">悍将</span><div class="track"><div class="fill" style="width:40.0%;background:linear-gradient(90deg,#FF339944,#FF3399)"></div></div><span class="val"><b>2</b><em>4.0%</em></span></div>
+<div class="row" title="望族：2 人（甄宓、法正）"><span class="label">望族</span><div class="track"><div class="fill" style="width:40.0%;background:linear-gradient(90deg,#C8854344,#C88543)"></div></div><span class="val"><b>2</b><em>4.0%</em></span></div>
+<div class="row" title="济世：2 人（费祎、司马炎）"><span class="label">济世</span><div class="track"><div class="fill" style="width:40.0%;background:linear-gradient(90deg,#FFD70044,#FFD700)"></div></div><span class="val"><b>2</b><em>4.0%</em></span></div>
+<div class="row" title="虎狼：2 人（周泰、丁奉）"><span class="label">虎狼</span><div class="track"><div class="fill" style="width:40.0%;background:linear-gradient(90deg,#FF336644,#FF3366)"></div></div><span class="val"><b>2</b><em>4.0%</em></span></div>
+<div class="row" title="迅捷：2 人（周泰、张郃）"><span class="label">迅捷</span><div class="track"><div class="fill" style="width:40.0%;background:linear-gradient(90deg,#43C84344,#43C843)"></div></div><span class="val"><b>2</b><em>4.0%</em></span></div>
+<div class="row" title="野火：2 人（诸葛亮、郭嘉）"><span class="label">野火</span><div class="track"><div class="fill" style="width:40.0%;background:linear-gradient(90deg,#FF000044,#FF0000)"></div></div><span class="val"><b>2</b><em>4.0%</em></span></div>
+<div class="row" title="铁骑：2 人（马超、庞德）"><span class="label">铁骑</span><div class="track"><div class="fill" style="width:40.0%;background:linear-gradient(90deg,#FF993344,#FF9933)"></div></div><span class="val"><b>2</b><em>4.0%</em></span></div>
+<div class="row" title="骑射：2 人（甘宁、王濬）"><span class="label">骑射</span><div class="track"><div class="fill" style="width:40.0%;background:linear-gradient(90deg,#0077FF44,#0077FF)"></div></div><span class="val"><b>2</b><em>4.0%</em></span></div>
+<div class="row" title="权奸：1 人（司马师）"><span class="label">权奸</span><div class="track"><div class="fill" style="width:20.0%;background:linear-gradient(90deg,#C8006444,#C80064)"></div></div><span class="val"><b>1</b><em>2.0%</em></span></div>
+<div class="row" title="枭雄：1 人（孟获）"><span class="label">枭雄</span><div class="track"><div class="fill" style="width:20.0%;background:linear-gradient(90deg,#CC000044,#CC0000)"></div></div><span class="val"><b>1</b><em>2.0%</em></span></div>
+<div class="row" title="深谋：1 人（吕蒙）"><span class="label">深谋</span><div class="track"><div class="fill" style="width:20.0%;background:linear-gradient(90deg,#0000FF44,#0000FF)"></div></div><span class="val"><b>1</b><em>2.0%</em></span></div>
+<div class="row" title="温良：1 人（荀彧）"><span class="label">温良</span><div class="track"><div class="fill" style="width:20.0%;background:linear-gradient(90deg,#A0C87844,#A0C878)"></div></div><span class="val"><b>1</b><em>2.0%</em></span></div></div></div>
+</div>
+</section>
+<div class="legend">说明：剧本字段格式为 <code>品质:势力</code>（如 <code>3:蜀</code>），留空表示该英雄在该剧本不出场；好友羁绊人数按 <code>HeroFriendConfig</code> 分组成员在本剧本中的出场数量统计。</div>
+<script>
+(function(){
+  var tabs = Array.prototype.slice.call(document.querySelectorAll('.tab'));
+  var panels = Array.prototype.slice.call(document.querySelectorAll('.panel'));
+  tabs.forEach(function(tab){
+    tab.addEventListener('click', function(){
+      var id = tab.getAttribute('data-target');
+      tabs.forEach(function(t){ t.classList.toggle('active', t === tab); });
+      panels.forEach(function(p){ p.classList.toggle('active', p.id === id); });
+    });
+  });
+})();
+</script>
+</body>
+</html>

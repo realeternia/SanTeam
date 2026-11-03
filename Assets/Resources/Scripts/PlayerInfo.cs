@@ -1540,23 +1540,50 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         return list;
     }
 
-    // 重铸装备：消耗1件该装备与1个重铸符，产出同 Id 段的另一件随机装备（不触发自动合成）
-    public bool RerollItem(int itemCardId, int rerollItemId, int newItemId)
+    // 重铸英雄装备：消耗1个重铸符，按 newIds 顺序替换该英雄已装备的装备（顺序与 GetItemIdsOnHero 一致，与旧值相同的项视为未改铸）
+    public bool RerollHeroEquips(int heroId, int rerollItemId, List<int> newIds)
     {
-        if (GetItemFreeCount(itemCardId) <= 0 || GetItemCount(rerollItemId) <= 0)
+        if (GetItemCount(rerollItemId) <= 0)
         {
-            GameLog.Warn(string.Format("重铸失败：背包缺少装备{0}或重铸符{1}，玩家{2}", itemCardId, rerollItemId, pid));
+            GameLog.Warn(string.Format("改铸失败：背包缺少重铸符{0}，玩家{1}", rerollItemId, pid));
             return false;
         }
-        if (newItemId <= 0 || newItemId / 1000 != itemCardId / 1000 || newItemId == itemCardId)
+
+        var oldIds = GetItemIdsOnHero(heroId);
+        if (oldIds.Count == 0)
         {
-            GameLog.Warn(string.Format("重铸失败：产物{0}与原料{1}不在同一 Id 段，玩家{2}", newItemId, itemCardId, pid));
+            GameLog.Warn(string.Format("改铸失败：英雄{0}没有装备，玩家{1}", heroId, pid));
             return false;
         }
-        ConsumeItemCount(itemCardId, 1);
+        if (newIds == null || newIds.Count != oldIds.Count)
+        {
+            GameLog.Warn(string.Format("改铸失败：改铸结果数量({0})与英雄{1}的装备数量({2})不一致，玩家{3}",
+                newIds == null ? 0 : newIds.Count, heroId, oldIds.Count, pid));
+            return false;
+        }
+        for (int i = 0; i < newIds.Count; i++)
+        {
+            int newId = newIds[i];
+            if (!ItemConfig.HasConfig(newId) || (newId != oldIds[i] && newId / 1000 != oldIds[i] / 1000))
+            {
+                GameLog.Warn(string.Format("改铸失败：产物{0}与原料{1}不在同一 Id 段，玩家{2}", newId, oldIds[i], pid));
+                return false;
+            }
+        }
+
         ConsumeItemCount(rerollItemId, 1);
-        AddItemCountDirect(newItemId, 1);
-        GameLog.Debug(string.Format("背包重铸：玩家{0} 装备{1} → {2}", pid, itemCardId, newItemId));
+
+        // 按 items 遍历顺序改写该英雄的装备实例（与 GetItemIdsOnHero 的遍历顺序一致）
+        int index = 0;
+        foreach (var slot in items)
+        {
+            if (slot.HeroId != heroId)
+                continue;
+            slot.ItemId = newIds[index];
+            index++;
+        }
+        GameLog.Debug(string.Format("改铸英雄装备：玩家{0} 英雄{1} 装备{2} → {3}",
+            pid, heroId, string.Join(",", oldIds), string.Join(",", newIds)));
         return true;
     }
 
