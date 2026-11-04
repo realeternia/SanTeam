@@ -12,6 +12,7 @@ ScenarioConfig_s.cs，统计三个剧本里的英雄分布，并生成一个单�
   3. 品质分布
   4. 职业分布
   5. 各好友羁绊（HeroFriendConfig 组）人数
+  6. 各羁绊组合规检查（同品质 ≤2、同职业 ≤2、同国家 ≤3、同一对武将不得在多个组重复）
 
 用法：
   python Tools/hero_distribution_report.py
@@ -26,6 +27,7 @@ import html
 import re
 from collections import defaultdict
 from datetime import datetime
+from itertools import combinations
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -47,6 +49,11 @@ QUALITY_COLORS = {
 }
 QUALITY_NAMES = {1: "普通", 2: "优秀", 3: "精良", 4: "史诗", 5: "传说"}
 JOB_HUE_OFFSET = 28
+
+# 羁绊组合规阈值：同一组内同品质、同职业、同国家的出场人数上限
+BOND_MAX_QUALITY = 2
+BOND_MAX_JOB = 2
+BOND_MAX_SIDE = 3
 
 
 def job_color(index: int, total: int) -> str:
@@ -271,21 +278,103 @@ def build_panel(scenario_id, heroes, force_map, job_map, friend_groups, hero_by_
         )
     job_rows.sort(key=lambda r: (-r["count"],))
 
-    # 好友羁绊人数
-    hero_ids_in_scenario = {item["hero"]["id"] for item in in_scenario}
+    # 好友羁绊人数 + 合规检查
     bond_rows = []
+    group_members = []
     for g in friend_groups:
-        members = [hero_by_id[i]["name"] for i in g["heroIds"] if i in hero_ids_in_scenario and i in hero_by_id]
+        members = [item for item in in_scenario if item["hero"]["id"] in g["heroIds"]]
+        group_members.append((g, members))
+        names = [item["hero"]["name"] for item in members]
         bond_rows.append(
             {
                 "label": g["name"],
                 "count": len(members),
                 "color": brighten(g["lineColor"] or "#5B9BD5"),
                 "title": f"{g['name']}：{len(members)} 人"
-                + (f"（{'、'.join(members)}）" if members else "（本剧本无成员）"),
+                + (f"（{'、'.join(names)}）" if names else "（本剧本无成员）"),
             }
         )
+
+    # 每对武将同时出现在哪些羁绊组（用于重复羁绊对检查）
+    pair_groups = defaultdict(set)
+    for g, members in group_members:
+        ids = sorted(item["hero"]["id"] for item in members)
+        for a, b in combinations(ids, 2):
+            pair_groups[(a, b)].add(g["name"])
+
+    violations = []
+    for g, members in group_members:
+        checks = []
+        bad_names = set()
+        # 同品质 > BOND_MAX_QUALITY
+        quality_map = defaultdict(list)
+        for item in members:
+            if item["quality"] > 0:
+                quality_map[item["quality"]].append(item["hero"]["name"])
+        for q, ns in sorted(quality_map.items()):
+            if len(ns) > BOND_MAX_QUALITY:
+                checks.append(f"品质 Q{q}×{len(ns)}（{'、'.join(ns)}）")
+                bad_names.update(ns)
+
+        # 同职业 > BOND_MAX_JOB
+        job_members = defaultdict(list)
+        for item in members:
+            job_members[item["hero"]["job"] or "未知"].append(item["hero"]["name"])
+        for short, ns in sorted(job_members.items()):
+            if len(ns) > BOND_MAX_JOB:
+                job = job_map.get(short)
+                label = job["name"] if job else (short or "未知")
+                checks.append(f"职业 {label}×{len(ns)}（{'、'.join(ns)}）")
+                bad_names.update(ns)
+
+        # 同国家 > BOND_MAX_SIDE
+        side_members = defaultdict(list)
+        for item in members:
+            side_members[item["side"] or "未知"].append(item["hero"]["name"])
+        for side, ns in sorted(side_members.items()):
+            if len(ns) > BOND_MAX_SIDE:
+                checks.append(f"国家 {side}×{len(ns)}（{'、'.join(ns)}）")
+                bad_names.update(ns)
+
+        # 同一对武将还在别的羁绊组中同时出现
+        name_by_id = {item["hero"]["id"]: item["hero"]["name"] for item in members}
+        dup_pairs = []
+        for a, b in combinations(sorted(name_by_id), 2):
+            others = pair_groups[(a, b)] - {g["name"]}
+            if others:
+                dup_pairs.append(
+                    f"{name_by_id[a]}-{name_by_id[b]}（{'/'.join(sorted(others))}）"
+                )
+        if dup_pairs:
+            shown = "、".join(dup_pairs[:3])
+            more = f" 等{len(dup_pairs)}对" if len(dup_pairs) > 3 else ""
+            checks.append(f"重复羁绊对 {len(dup_pairs)} 对：{shown}{more}")
+
+        if checks:
+            member_rows = []
+            for item in members:
+                short = item["hero"]["job"] or ""
+                job = job_map.get(short)
+                member_rows.append(
+                    {
+                        "name": item["hero"]["name"],
+                        "bad": item["hero"]["name"] in bad_names,
+                        "quality": item["quality"],
+                        "job": job["name"] if job else (short or "未知"),
+                        "side": item["side"] or "未知",
+                    }
+                )
+            violations.append(
+                {
+                    "name": g["name"],
+                    "count": len(members),
+                    "checks": checks,
+                    "members": member_rows,
+                }
+            )
+
     bond_rows.sort(key=lambda r: (-r["count"], r["label"]))
+    violations.sort(key=lambda v: (-len(v["checks"]), v["name"]))
     bond_groups_active = sum(1 for r in bond_rows if r["count"] > 0)
 
     panel = [
@@ -297,16 +386,71 @@ def build_panel(scenario_id, heroes, force_map, job_map, friend_groups, hero_by_
         f'<div class="stat"><div class="num">{len(side_counts)}</div><div class="lbl">势力数</div></div>',
         f'<div class="stat"><div class="num">{len(job_counts)}</div><div class="lbl">职业数</div></div>',
         f'<div class="stat"><div class="num">{bond_groups_active}</div><div class="lbl">有成员的羁绊组</div></div>',
+        f'<div class="stat"><div class="num">{len(violations)}</div><div class="lbl">不合规羁绊组</div></div>',
         "</div>",
         '<div class="grid">',
         render_card("国家分布", f"{len(side_counts)} 个势力", side_rows, total),
         render_card("品质分布", f"{len(quality_rows)} 个品质档", quality_rows, total),
         render_card("职业分布", f"{len(job_counts)} 个职业", job_rows, total),
         render_card("好友羁绊人数", f"{len(friend_groups)} 个羁绊组", bond_rows, total),
+        render_violation_card(violations, len(friend_groups)),
         "</div>",
         "</section>",
     ]
-    return "\n".join(panel), total
+    return "\n".join(panel), total, len(violations)
+
+
+def render_violation_card(violations, total_groups: int) -> str:
+    """渲染羁绊组合规检查：列出超标的品质/职业/国家/重复羁绊对及对应武将。"""
+    type_counts = defaultdict(int)
+    for v in violations:
+        hit = set()
+        for c in v["checks"]:
+            for key in ("品质", "职业", "国家", "重复羁绊对"):
+                if c.startswith(key):
+                    hit.add(key)
+        for key in hit:
+            type_counts[key] += 1
+    summary = " · ".join(
+        f"{key} {type_counts[key]} 组" for key in ("品质", "职业", "国家", "重复羁绊对")
+    )
+    if violations:
+        items = []
+        for v in violations:
+            tags = "".join(
+                f'<span class="tag">{html.escape(c)}</span>' for c in v["checks"]
+            )
+            members = "".join(
+                '<span class="member{}">{}<em>Q{}·{}·{}</em></span>'.format(
+                    " bad" if m["bad"] else "",
+                    html.escape(m["name"]),
+                    m["quality"] if m["quality"] > 0 else "?",
+                    html.escape(m["job"]),
+                    html.escape(m["side"]),
+                )
+                for m in v["members"]
+            )
+            items.append(
+                '<div class="viol-item">'
+                f'<div class="viol-head"><b>{html.escape(v["name"])}</b><span>{v["count"]} 人</span></div>'
+                f'<div class="viol-tags">{tags}</div>'
+                f'<div class="viol-members">{members}</div>'
+                "</div>"
+            )
+        body = "\n".join(items)
+        sub = f"{len(violations)} / {total_groups} 组不合规"
+    else:
+        body = '<div class="viol-ok">全部羁绊组合规</div>'
+        sub = f"0 / {total_groups} 组不合规"
+    return (
+        '<div class="card">'
+        f'<div class="card-head"><h2>羁绊组合规检查</h2><span class="sub">{sub}</span></div>'
+        f'<div class="rules"><b>违规统计：</b>{summary}<br>'
+        f'规则：同品质 ≤{BOND_MAX_QUALITY} 人、同职业 ≤{BOND_MAX_JOB} 人、同国家 ≤{BOND_MAX_SIDE} 人；'
+        "同一对武将不得在多个羁绊组中同时出现（按本剧本出场成员统计）</div>"
+        f'<div class="viol">{body}</div>'
+        "</div>"
+    )
 
 
 def render_card(title: str, sub: str, rows, total: int) -> str:
@@ -359,21 +503,25 @@ body{
 .header .meta{margin-top:8px;color:var(--muted);font-size:13px;}
 .tabs{max-width:1180px;margin:0 auto 18px;display:flex;gap:10px;flex-wrap:wrap;}
 .tab{
-  border:1px solid var(--line);background:var(--card);color:var(--muted);
+  border:1px solid var(--tab-line,var(--line));background:var(--tab-bg,var(--card));
+  color:var(--tab-text,var(--muted));
   padding:10px 22px;border-radius:10px;cursor:pointer;font-size:15px;
   transition:.18s;display:flex;align-items:center;gap:10px;
 }
+.tab[data-scenario="1"]{--tab-bg:linear-gradient(180deg,#2b261c,#211d16);--tab-line:#5a4a2c;--tab-text:#d8c79f;--tab-bg-a:linear-gradient(180deg,#3a3323,#2a2519);--tab-accent:#d4a24a;--tab-active-text:#ffdd9a;--tab-glow:rgba(212,162,74,.35);--tab-badge:rgba(212,162,74,.22);}
+.tab[data-scenario="2"]{--tab-bg:linear-gradient(180deg,#1c2731,#171e26);--tab-line:#2f4a5e;--tab-text:#9fc3d8;--tab-bg-a:linear-gradient(180deg,#22384a,#182731);--tab-accent:#4fa3d1;--tab-active-text:#bfe3ff;--tab-glow:rgba(79,163,209,.35);--tab-badge:rgba(79,163,209,.2);}
+.tab[data-scenario="3"]{--tab-bg:linear-gradient(180deg,#271f2f,#1d1823);--tab-line:#4a3560;--tab-text:#c3a8dd;--tab-bg-a:linear-gradient(180deg,#362745,#251c30);--tab-accent:#a87bd6;--tab-active-text:#e3ccff;--tab-glow:rgba(168,123,214,.35);--tab-badge:rgba(168,123,214,.2);}
 .tab .badge{
-  font-size:12px;color:var(--muted);background:#2c333d;border-radius:99px;
+  font-size:12px;color:var(--tab-text,var(--muted));background:#2c333d;border-radius:99px;
   padding:2px 9px;transition:.18s;
 }
-.tab:hover{border-color:#3d4652;color:var(--text);}
+.tab:hover{border-color:var(--tab-accent,var(--accent));color:var(--tab-active-text,var(--text));}
 .tab.active{
-  background:linear-gradient(180deg,#3a3323,#2a2519);
-  border-color:var(--accent);color:#ffdd9a;
-  box-shadow:0 0 0 1px rgba(212,162,74,.35),0 6px 20px rgba(0,0,0,.35);
+  background:var(--tab-bg-a,linear-gradient(180deg,#3a3323,#2a2519));
+  border-color:var(--tab-accent,var(--accent));color:var(--tab-active-text,#ffdd9a);
+  box-shadow:0 0 0 1px var(--tab-glow,rgba(212,162,74,.35)),0 6px 20px rgba(0,0,0,.35);
 }
-.tab.active .badge{background:rgba(212,162,74,.22);color:#ffdd9a;}
+.tab.active .badge{background:var(--tab-badge,rgba(212,162,74,.22));color:var(--tab-active-text,#ffdd9a);}
 .panel{max-width:1180px;margin:0 auto;display:none;}
 .panel.active{display:block;animation:fade .25s ease;}
 @keyframes fade{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
@@ -402,6 +550,20 @@ body{
 .row .val em{font-style:normal;color:#6f7785;}
 .legend{margin:16px 0 0;font-size:12.5px;color:var(--muted);line-height:1.9;}
 .legend code{color:#ffdd9a;background:rgba(212,162,74,.12);padding:1px 6px;border-radius:5px;}
+.rules{margin:-4px 0 10px;font-size:12px;color:var(--muted);line-height:1.6;}
+.viol{display:flex;flex-direction:column;gap:10px;}
+.viol-item{background:#1a1f26;border:1px solid #2b313a;border-left:3px solid #e0a94f;border-radius:8px;padding:10px 12px;}
+.viol-head{display:flex;justify-content:space-between;align-items:baseline;font-size:13px;margin-bottom:7px;}
+.viol-head b{color:var(--text);}
+.viol-head span{color:var(--muted);font-size:12px;}
+.viol-tags{display:flex;flex-wrap:wrap;gap:6px;}
+.tag{font-size:11.5px;color:#ffd9a0;background:rgba(224,169,79,.14);border:1px solid rgba(224,169,79,.35);border-radius:6px;padding:2px 7px;line-height:1.6;}
+.viol-members{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;padding-top:8px;border-top:1px dashed #2b313a;}
+.member{display:inline-flex;align-items:baseline;gap:5px;font-size:11.5px;color:#9aa4b1;background:#141920;border:1px solid #262c35;border-radius:6px;padding:2px 7px;line-height:1.6;}
+.member em{font-style:normal;font-size:10.5px;color:#6b7683;}
+.member.bad{color:#ffb3a7;background:rgba(224,169,79,.08);border-color:rgba(224,169,79,.35);}
+.member.bad em{color:#c79a6b;}
+.viol-ok{color:#7ed6a5;font-size:13px;background:rgba(126,214,165,.08);border:1px solid rgba(126,214,165,.25);border-radius:8px;padding:10px 12px;}
 @media (max-width:560px){
   .row{grid-template-columns:86px 1fr 84px;}
 }
@@ -428,8 +590,8 @@ def build_html(scenario_names, panels, heroes, friend_groups, generated_at) -> s
         total = panels[sid][1]
         active = " active" if sid == min(scenario_names) else ""
         tabs.append(
-            '<button class="tab{}" data-target="panel-{}">{}<span class="badge">{}人</span></button>'.format(
-                active, sid, html.escape(scenario_names[sid]), total
+            '<button class="tab{}" data-target="panel-{}" data-scenario="{}">{}<span class="badge">{}人</span></button>'.format(
+                active, sid, sid, html.escape(scenario_names[sid]), total
             )
         )
     bodies = [panels[sid][0] for sid in sorted(scenario_names)]
@@ -448,7 +610,10 @@ def build_html(scenario_names, panels, heroes, friend_groups, generated_at) -> s
             "\n".join(bodies) + "\n",
             '<div class="legend">',
             "说明：剧本字段格式为 <code>品质:势力</code>（如 <code>3:蜀</code>），留空表示该英雄在该剧本不出场；",
-            "好友羁绊人数按 <code>HeroFriendConfig</code> 分组成员在本剧本中的出场数量统计。",
+            "好友羁绊人数按 <code>HeroFriendConfig</code> 分组成员在本剧本中的出场数量统计；",
+            "合规检查按本剧本出场成员统计：同一组内同品质 ≤2 人、同职业 ≤2 人、同国家 ≤3 人；",
+            "同一对武将若在多个羁绊组中同时出现（重复羁绊对），也计为不合规；",
+            "违规组下方列出全部出场成员的 <code>Q品质·职业·势力</code>，其中触发违规则的高亮显示。",
             "</div>\n",
             "<script>",
             JS,
@@ -483,12 +648,14 @@ def main():
     hero_by_id = {h["id"]: h for h in heroes}
 
     panels = {}
+    panel_violations = {}
     for sid in sorted(scenario_names):
-        block, total = build_panel(
+        block, total, violations = build_panel(
             sid, heroes, force_map, job_map, friend_groups, hero_by_id,
             active=(sid == min(scenario_names)),
         )
         panels[sid] = (block, total)
+        panel_violations[sid] = violations
 
     html_text = build_html(
         scenario_names, panels, heroes, friend_groups,
@@ -501,7 +668,7 @@ def main():
 
     print(f"英雄 {len(heroes)} 位 / 好友羁绊组 {len(friend_groups)} 个 / 势力 {len(forces)} 个 / 职业 {len(jobs)} 个")
     for sid in sorted(scenario_names):
-        print(f"  剧本{sid} {scenario_names[sid]}：{panels[sid][1]} 位英雄")
+        print(f"  剧本{sid} {scenario_names[sid]}：{panels[sid][1]} 位英雄 · 不合规羁绊组 {panel_violations[sid]} 组")
     print(f"已生成：{out_path}")
 
 
