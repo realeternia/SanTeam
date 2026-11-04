@@ -33,10 +33,10 @@ public static class FactionShieldManager
                 continue;
 
             var heroCfg = HeroConfig.GetConfig(unit.heroId);
-            var forceCfg = ConfigManager.GetForceConfig(heroCfg.Side);
+            var forceCfg = ConfigManager.GetForceConfig(HeroScenario.GetSide(heroCfg));
             if (forceCfg == null || !forceCfg.JoinFactionShield)
                 continue;
-            var faction = heroCfg.Side;
+            var faction = HeroScenario.GetSide(heroCfg);
             factionCount[faction] = factionCount.TryGetValue(faction, out var c) ? c + 1 : 1;
         }
 
@@ -59,7 +59,7 @@ public static class FactionShieldManager
             {
                 if (unit.hp <= 0 || !unit.isHero)
                     continue;
-                if (HeroConfig.GetConfig(unit.heroId).Side != kv.Key)
+                if (HeroScenario.GetSide(unit.heroId) != kv.Key)
                     continue;
 
                 unit.AddSkill(skillId, skillId, level);

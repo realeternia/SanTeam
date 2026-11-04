@@ -61,7 +61,7 @@ public class RankCellInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandle
         }
 
         heroName.text = heroConfig.Name;
-        heroName.color = SysColor.GetQualityColor(heroConfig.Quality);
+        heroName.color = SysColor.GetQualityColor(HeroScenario.GetQuality(heroConfig));
         heroId = (int)heroConfig.Id;
         // 排行展示统一口径：HeroConfig 主数值经 PostModify 写回为 1星带品质面板（无双强度已并入 Atk，Str 列不再有数据）
         str = 0;
@@ -71,7 +71,7 @@ public class RankCellInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandle
         price = HeroSelectionTool.GetPrice(heroConfig);
 
         var bg = GetComponent<Image>();
-        bg.color = SysColor.GetSideColor(heroConfig.Side);
+        bg.color = SysColor.GetSideColor(HeroScenario.GetSide(heroConfig));
 
         // 不在卡池中的英雄名字置灰（池中单元格每次绑定都要刷新）
         if (!HeroSelectionTool.HasHeroInPool(heroId))

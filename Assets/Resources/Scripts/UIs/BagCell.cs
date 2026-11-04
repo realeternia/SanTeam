@@ -52,11 +52,11 @@ public class BagCell : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragH
     {
         var heroCfg = HeroConfig.GetConfig(cardId);
         textItemName.text = heroCfg.Name + level;
-        textItemName.color = SysColor.GetQualityColor(heroCfg.Quality);
+        textItemName.color = SysColor.GetQualityColor(HeroScenario.GetQuality(heroCfg));
 
         // 英雄卡外框按品质上色（1白 2绿 3蓝 4紫）
         if (heroBorderImg != null)
-            heroBorderImg.color = SysColor.GetQualityColor(heroCfg.Quality);
+            heroBorderImg.color = SysColor.GetQualityColor(HeroScenario.GetQuality(heroCfg));
 
         // 显示已装备的装备（最多3个槽位）
         var slots = bagControl.bindPlayer.GetItemIdsOnHero(cardId);
@@ -97,7 +97,7 @@ public class BagCell : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragH
             }
 
             // slot0：英雄所属势力的国家图标（野势力无图标，隐藏）
-            var forceCfg = ForceConfig.HasConfig(heroCfg.Side) ? ForceConfig.GetConfig(heroCfg.Side) : null;
+            var forceCfg = ForceConfig.HasConfig(HeroScenario.GetSide(heroCfg)) ? ForceConfig.GetConfig(HeroScenario.GetSide(heroCfg)) : null;
             if (forceCfg != null && !string.IsNullOrEmpty(forceCfg.Icon) && skillImg[0] != null)
             {
                 skillImg[0].sprite = Resources.Load<Sprite>("Textures/Icons/" + forceCfg.Icon);

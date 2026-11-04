@@ -55,7 +55,7 @@ public class SideHeroControl : MonoBehaviour
         if (textHeroName != null)
         {
             textHeroName.text = heroCfg.Name;
-            textHeroName.color = SysColor.GetQualityColor(heroCfg.Quality);
+            textHeroName.color = SysColor.GetQualityColor(HeroScenario.GetQuality(heroCfg));
         }
 
         // 英雄大图：与背包卡面共用 SkinsBig 资源

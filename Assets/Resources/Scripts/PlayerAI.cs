@@ -32,7 +32,7 @@ public static class PlayerAI
 
         HeroSelectionTool.SetWishHero(playerInfo, wishSlot, heroId);
         var heroCfg = HeroConfig.GetConfig(heroId);
-        GameLog.Debug($"AI玩家{playerInfo.pid} 第{GameManager.Instance.year}回合许愿槽位{wishSlot}选择：{heroCfg.Name}(品质{heroCfg.Quality})");
+        GameLog.Debug($"AI玩家{playerInfo.pid} 第{GameManager.Instance.year}回合许愿槽位{wishSlot}选择：{heroCfg.Name}(品质{HeroScenario.GetQuality(heroCfg)})");
     }
 
     // 在指定品质内根据自身喜好(LikeJob/LikeForce/LikeFriend)与当前手上的英雄加权随机一个许愿英雄
@@ -55,8 +55,8 @@ public static class PlayerAI
             int vote = lineupSet.Contains(cardId) ? 2 : 1;
             ownedJobs.TryGetValue(heroCfg.Job, out var jc);
             ownedJobs[heroCfg.Job] = jc + vote;
-            ownedSides.TryGetValue(heroCfg.Side, out var sc);
-            ownedSides[heroCfg.Side] = sc + vote;
+            ownedSides.TryGetValue(HeroScenario.GetSide(heroCfg), out var sc);
+            ownedSides[HeroScenario.GetSide(heroCfg)] = sc + vote;
         }
 
         List<int> candidates = new List<int>();
@@ -64,7 +64,7 @@ public static class PlayerAI
         foreach (int heroId in HeroSelectionTool.GetHeroPoolCache())
         {
             var heroCfg = HeroConfig.GetConfig(heroId);
-            if (heroCfg == null || heroCfg.Quality != quality)
+            if (heroCfg == null || HeroScenario.GetQuality(heroCfg) != quality)
                 continue;
             if (ConfigManager.IsKingHero(heroId))
                 continue; // 主公不参与许愿
@@ -75,14 +75,14 @@ public static class PlayerAI
             // 自身喜好：职业 / 阵营 / 好友组命中即加权（与买卡评分同一口径）
             if (LikeHasJob(cfg.LikeJob, heroCfg))
                 weight += 2f;
-            if (LikeHasForce(cfg.LikeForce, heroCfg.Side))
+            if (LikeHasForce(cfg.LikeForce, HeroScenario.GetSide(heroCfg)))
                 weight += 2f;
             if (LikeHasFriend(cfg.LikeFriend, heroId))
                 weight += 2f;
             // 当前手上的英雄：同职业/同阵营越多越优先（主力占两票）
             if (ownedJobs.TryGetValue(heroCfg.Job, out var jobCount))
                 weight += 1.5f * Mathf.Min(3, jobCount);
-            if (ownedSides.TryGetValue(heroCfg.Side, out var sideCount))
+            if (ownedSides.TryGetValue(HeroScenario.GetSide(heroCfg), out var sideCount))
                 weight += 0.5f * Mathf.Min(3, sideCount);
 
             candidates.Add(heroId);
@@ -243,7 +243,7 @@ public static class PlayerAI
     private static int GetCardQuality(int cardId)
     {
         var cfg = HeroConfig.GetConfig(cardId);
-        return cfg == null ? 0 : cfg.Quality;
+        return cfg == null ? 0 : HeroScenario.GetQuality(cfg);
     }
 
     // 过滤出"当前真正可考虑购买"的卡：买得起 + 英雄卡 + 非满级同卡 + 通过淘汰过滤。
@@ -377,7 +377,7 @@ public static class PlayerAI
         {
             var card = scoredCards[i];
             var logCfg = HeroConfig.GetConfig(card.card.cardId);
-            sb.AppendLine($"  [{i+1}] 卡片ID: {card.card.cardId}, 名称: {logCfg.Name}, 分数: {card.score}, 价格: {card.card.price}, 品质: {logCfg.Quality}, 品质系数: {GetQualityBias(logCfg.Quality, playerInfo):F2}");
+            sb.AppendLine($"  [{i+1}] 卡片ID: {card.card.cardId}, 名称: {logCfg.Name}, 分数: {card.score}, 价格: {card.card.price}, 品质: {HeroScenario.GetQuality(logCfg)}, 品质系数: {GetQualityBias(HeroScenario.GetQuality(logCfg), playerInfo):F2}");
         }
 
         // 聪明度越高候选池越窄（只在最优的几张里挑）；越低越宽（更容易随机到次优卡）
@@ -707,7 +707,7 @@ public static class PlayerAI
                 }
             }
             // 品质偏好：按本回合商店实际出卡概率提升——概率最高的品质系数 2.0、最低 0.5，中间线性插值
-            score *= GetQualityBias(heroCfg.Quality, playerInfo);
+            score *= GetQualityBias(HeroScenario.GetQuality(heroCfg), playerInfo);
             // 价格偏好：阵容价值=价格×星级，星级受出卡随机性限制（多数卡只能到 2 星），
             // 故"价格"是更可控的价值杠杆——按 (价格/基准)^指数 放大高价卡权重（Q4史诗=最高价）
             score *= Mathf.Pow((float)pickCard.price / AIConst.CardPriceBiasBase, AIConst.CardPriceBiasExponent);
@@ -731,7 +731,7 @@ public static class PlayerAI
             // 羁绊信任固定倍率：命中即加成。friend Bias 最大、job 次之、force(强卡/国家护盾)最小；
             // 命中 Like 且该路为"当前上阵人数最多"的那一路时，job 0.6→1、friend 0.8→1.5
             // force：候选卡所属势力命中 LikeForce 时，按推进同阵营护盾档位(2/3/4/5/6人→Lv1~5)计
-            if (LikeHasForce(playerConfig.LikeForce, heroCfg.Side))
+            if (LikeHasForce(playerConfig.LikeForce, HeroScenario.GetSide(heroCfg)))
                 score *= 1f + AIConst.ForceBias * GetForceGain(ctx, heroCfg, isNewHero);
             // job：候选卡所属职业命中 LikeJob 时，按推进或达成职业连锁档位(1/2/3/4/5人→Lv1~5)计
             if (LikeHasJob(playerConfig.LikeJob, heroCfg))
@@ -821,7 +821,7 @@ public static class PlayerAI
 
         var topCfg = HeroConfig.GetConfig(top.card.cardId);
         // 需要升星的卡：品质3/4且已拥有且在上阵名单，直接锁（确定性收益，不看分差）
-        bool needStarUp = topCfg != null && topCfg.Quality >= 3
+        bool needStarUp = topCfg != null && HeroScenario.GetQuality(topCfg) >= 3
             && cards.ContainsKey(top.card.cardId) && strongList.Contains(top.card.cardId);
         // 明星卡：评分达到第二名的 AiLockScoreRatio 倍
         bool dominant = scored.Count >= 2 && top.score >= scored[1].score * AIConst.AiLockScoreRatio;
@@ -923,7 +923,7 @@ public static class PlayerAI
         foreach (var heroId in strongList)
         {
             var heroCfg = HeroConfig.GetConfig(heroId);
-            ctx.sideCount[heroCfg.Side] = ctx.GetSideCount(heroCfg.Side) + 1;
+            ctx.sideCount[HeroScenario.GetSide(heroCfg)] = ctx.GetSideCount(HeroScenario.GetSide(heroCfg)) + 1;
             ctx.jobCount[heroCfg.Job] = ctx.GetJobCount(heroCfg.Job) + 1;
             if (HeroSelectionTool.IsMeleeHero(heroCfg))
                 ctx.meleeCount++;
@@ -986,7 +986,7 @@ public static class PlayerAI
                     friendOwned[relId] = fc + 1;
                 }
             }
-            if (heroCfg.Quality == AIConst.FocusCoreQuality)
+            if (HeroScenario.GetQuality(heroCfg) == AIConst.FocusCoreQuality)
                 coreIds.Add(kv.Key);
         }
         if (coreIds.Count == 0)
@@ -1165,17 +1165,17 @@ public static class PlayerAI
     // force 命中度：品质4强卡直接命中(1)，否则按推进同阵营护盾档位计（SideFactor 已并入 force 信任）
     private static float GetForceGain(AiContext ctx, HeroConfig heroCfg, bool isNewHero)
     {
-        if (heroCfg.Quality == 4)
+        if (HeroScenario.GetQuality(heroCfg) == 4)
             return 1f;
         return GetSideGain(ctx, heroCfg, isNewHero);
     }
 
     private static float GetSideGain(AiContext ctx, HeroConfig heroCfg, bool isNewHero)
     {
-        if (!isNewHero || !IsShieldSide(heroCfg.Side))
+        if (!isNewHero || !IsShieldSide(HeroScenario.GetSide(heroCfg)))
             return 0f;
 
-        int count = ctx.GetSideCount(heroCfg.Side);
+        int count = ctx.GetSideCount(HeroScenario.GetSide(heroCfg));
         int curLv = GetTierLevel(count, CombatConst.FactionShieldCounts);
         int newLv = GetTierLevel(count + 1, CombatConst.FactionShieldCounts);
 
@@ -1327,8 +1327,8 @@ public static class PlayerAI
     {
         float price = HeroSelectionTool.GetPrice(heroCfg);
 
-        int sideCount = ctx.GetSideCount(heroCfg.Side);
-        float sideContrib = IsShieldSide(heroCfg.Side) && sideCount >= 2 ? Mathf.Min(sideCount - 1, 5) / 5f : 0f;
+        int sideCount = ctx.GetSideCount(HeroScenario.GetSide(heroCfg));
+        float sideContrib = IsShieldSide(HeroScenario.GetSide(heroCfg)) && sideCount >= 2 ? Mathf.Min(sideCount - 1, 5) / 5f : 0f;
 
         int jobCount = ctx.GetJobCount(heroCfg.Job);
         float jobContrib = jobCount >= 2 ? Mathf.Min(jobCount - 1, 5) / 5f : 0f;
@@ -1342,9 +1342,9 @@ public static class PlayerAI
         float friendContrib = Mathf.Min(friendCount, 5) / 5f;
 
         // 羁绊信任固定倍率与选卡评分一致：命中即按 Bias×贡献计价。force(强卡/护盾)最小、job 次之、friend 最大
-        float forceContrib = heroCfg.Quality == 4 ? 1f : sideContrib;
+        float forceContrib = HeroScenario.GetQuality(heroCfg) == 4 ? 1f : sideContrib;
         float syn = 0f;
-        if (LikeHasForce(ctx.cfg.LikeForce, heroCfg.Side))
+        if (LikeHasForce(ctx.cfg.LikeForce, HeroScenario.GetSide(heroCfg)))
             syn += AIConst.ForceBias * forceContrib;
         if (LikeHasJob(ctx.cfg.LikeJob, heroCfg))
             syn += AIConst.JobChainBias * jobContrib;

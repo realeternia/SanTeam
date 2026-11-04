@@ -59,7 +59,7 @@ public class PickPanelCellControl : MonoBehaviour
             return;
 
         // 品质1的卡不进入许愿（收藏）池：较弱，避免占用许愿名额并在商店重复刷出
-        if(HeroConfig.GetConfig(heroId).Quality == 1)
+        if(HeroScenario.GetQuality(heroId) == 1)
             return;
 
         likeState = pid + 1;
@@ -83,7 +83,7 @@ public class PickPanelCellControl : MonoBehaviour
         }
 
         var heroCfg = HeroConfig.GetConfig(heroId);
-        bgImg.color = heroCfg != null ? SysColor.GetSideColor(heroCfg.Side) : Color.white;
+        bgImg.color = heroCfg != null ? SysColor.GetSideColor(HeroScenario.GetSide(heroCfg)) : Color.white;
     }
 
     private void LikeBtnClick()

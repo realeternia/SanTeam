@@ -136,14 +136,15 @@ public class DebugLineupWindow : EditorWindow
         foreach (var cfg in HeroConfig.ConfigList)
         {
             if (cfg == null || cfg.Id <= 0) continue;
-            var force = ConfigManager.GetForceConfig(cfg.Side);
+            var side = HeroScenario.GetSide(cfg);
+            var force = ConfigManager.GetForceConfig(side);
             heroes.Add(new HeroItem
             {
                 Id = cfg.Id,
                 Name = cfg.Name,
-                Side = cfg.Side,
-                SideName = force != null ? force.Name : ("阵营" + cfg.Side),
-                Quality = cfg.Quality
+                Side = side,
+                SideName = force != null ? force.Name : ("阵营" + side),
+                Quality = HeroScenario.GetQuality(cfg)
             });
         }
         // 按阵营分组，同阵营内按品质倒排（品质相同再按 ID 升序），方便下拉菜单分组显示

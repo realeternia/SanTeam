@@ -71,12 +71,12 @@ public class LikeHeroPanelControl : MonoBehaviour
 
         var player = GameManager.Instance.GetPlayer(wishPid);
         List<int> heroPool = HeroSelectionTool.GetHeroPoolCache()
-            .Where(heroId => HeroConfig.HasConfig(heroId))
-            .Where(heroId => HeroConfig.GetConfig(heroId).Quality > 1) // 隐藏所有品质1的卡
+            .Where(heroId => HeroConfig.HasConfig(heroId) && HeroScenario.IsAvailable(heroId))
+            .Where(heroId => HeroScenario.GetQuality(heroId) > 1) // 隐藏所有品质1的卡
             .Where(heroId => !ConfigManager.IsKingHero(heroId)) // 主公不参与许愿（与 AI 一致）
             // 排序：品质高的在前，同品质按阵营，再按英雄 Id
-            .OrderByDescending(heroId => HeroConfig.GetConfig(heroId).Quality)
-            .ThenBy(heroId => HeroConfig.GetConfig(heroId).Side)
+            .OrderByDescending(heroId => HeroScenario.GetQuality(heroId))
+            .ThenBy(heroId => HeroScenario.GetSide(heroId))
             .ThenBy(heroId => heroId)
             .ToList();
 
@@ -118,8 +118,8 @@ public class LikeHeroPanelControl : MonoBehaviour
             cellControl.jobImg.sprite = Resources.Load<Sprite>("Textures/SkillPic/" + icon);
 
             cellControl.heroName.text = heroCfg.Name;
-            cellControl.heroName.color = SysColor.GetQualityColor(heroCfg.Quality);
-            cellControl.bgImg.color = SysColor.GetSideColor(heroCfg.Side);
+            cellControl.heroName.color = SysColor.GetQualityColor(HeroScenario.GetQuality(heroCfg));
+            cellControl.bgImg.color = SysColor.GetSideColor(HeroScenario.GetSide(heroCfg));
 
             // 隐藏原“点赞/禁用”标记图（预制体里默认激活，会挡住整格点击并让卡片变色）
             if (cellControl.forbidImg != null)

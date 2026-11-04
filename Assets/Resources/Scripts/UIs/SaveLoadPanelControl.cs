@@ -335,6 +335,8 @@ public class SaveLoadPanelControl : MonoBehaviour
             GameManager.Instance.CreateNewSaveSlot();
 
         CardShopManager.RequestResetGameState();
+        // 新游戏默认剧本（后续若增加剧本选择，在这里写入所选剧本Id）
+        GameManager.Instance.scenarioId = GameConst.DefaultScenarioId;
         // 重置全部玩家，避免上一局的卡片/等级/生命等数据残留到新的一局
         GameManager.Instance.ResetPlayersForNewGame();
         loadGamePanel.SetActive(false);

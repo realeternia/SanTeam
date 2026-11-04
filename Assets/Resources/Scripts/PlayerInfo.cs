@@ -176,11 +176,11 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 
         // 每局开局：随机发一张品质1且攻+法总面板240以下魏蜀吴(阵营1/2/3)的卡片
         var starterCandidates = HeroConfig.ConfigList
-            .Where(x => x.Side >= 1 && x.Side <= 3 && x.Quality == 1)
+            .Where(x => HeroScenario.IsAvailable(x.Id) && HeroScenario.GetSide(x) >= 1 && HeroScenario.GetSide(x) <= 3 && HeroScenario.GetQuality(x) == 1)
             .ToList();
         // 校验：列出被排除的240及以上强卡(仅魏蜀吴阵营)（无双强度已在 PostModify 并入 Atk，Might=0）
         var excludedStrongCards = HeroConfig.ConfigList
-            .Where(x => x.Side >= 1 && x.Side <= 3 && x.Atk + x.Ap >= 240)
+            .Where(x => HeroScenario.IsAvailable(x.Id) && HeroScenario.GetSide(x) >= 1 && HeroScenario.GetSide(x) <= 3 && x.Atk + x.Ap >= 240)
             .OrderBy(x => x.Atk + x.Ap)
             .Select(x => string.Format("{0}({1})总={2}", x.Name, x.Id, x.Atk + x.Ap))
             .ToList();
@@ -196,7 +196,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
                 cards[starterHero.Id] = 1;
             GameLog.Debug(string.Format(
                 "[开局发卡] pid={0} 随机到：{1}(id={2}, 阵营={3}, 总属性={4})",
-                pid, starterHero.Name, starterHero.Id, starterHero.Side, starterHero.Atk + starterHero.Ap));
+                pid, starterHero.Name, starterHero.Id, HeroScenario.GetSide(starterHero), starterHero.Atk + starterHero.Ap));
             // 开局发的随机卡直接上阵（场上英雄少于上限时）
             AutoEquipBoughtHero(starterHero.Id);
         }
@@ -1052,7 +1052,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
                     if (!CanUseItemToHero(h, itemId))
                         continue;
                     var heroCfg = HeroConfig.GetConfig(h);
-                    int quality = heroCfg == null ? 0 : heroCfg.Quality;
+                    int quality = HeroScenario.GetQuality(heroCfg);
                     // heroOrder 已按 exp 降序，同品质只保留第一个即为该品质下经验最高的
                     if (quality > bestQuality)
                     {

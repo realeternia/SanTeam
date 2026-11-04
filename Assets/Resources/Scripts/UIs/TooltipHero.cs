@@ -308,7 +308,7 @@ public class TooltipHero : BaseTooltip
         // 英雄名字 + 等级行（名字按品质上色；等级=卡片等级）
         if (textName != null)
         {
-            string nameHex = ColorUtility.ToHtmlStringRGB(SysColor.GetQualityColor(heroCfg.Quality));
+            string nameHex = ColorUtility.ToHtmlStringRGB(SysColor.GetQualityColor(HeroScenario.GetQuality(heroCfg)));
             textName.text = "<color=#" + nameHex + ">" + heroCfg.Name + "</color> Lv" + cardLv;
             textName.gameObject.SetActive(true);
         }
@@ -348,7 +348,7 @@ public class TooltipHero : BaseTooltip
                 // 列表：配置表里所有同职业英雄（含自己，与好友组一致）
                 foreach (var cfg in HeroConfig.ConfigList)
                 {
-                    if (cfg.Job == heroJob)
+                    if (HeroScenario.IsAvailable(cfg.Id) && cfg.Job == heroJob)
                         jobHeroIds.Add(cfg.Id);
                 }
             }
@@ -522,12 +522,12 @@ public class TooltipHero : BaseTooltip
         }
 
         var parts = new List<string>();
-        foreach (var hid in valid.OrderByDescending(id => HeroConfig.GetConfig(id).Quality))
+        foreach (var hid in valid.OrderByDescending(id => HeroScenario.GetQuality(id)))
         {
             var cfg = HeroConfig.GetConfig(hid);
             string name = cfg.Name.Substring(cfg.Name.Length - 1);
             if (isShopCard || (player != null && player.battleCards.Contains(hid)))
-                name = "<color=#" + ColorUtility.ToHtmlStringRGB(SysColor.GetQualityColor(cfg.Quality)) + ">" + name + "</color>";
+                name = "<color=#" + ColorUtility.ToHtmlStringRGB(SysColor.GetQualityColor(HeroScenario.GetQuality(cfg))) + ">" + name + "</color>";
             parts.Add(name);
         }
         return string.Join(" ", parts);

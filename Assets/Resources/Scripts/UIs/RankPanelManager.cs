@@ -141,8 +141,8 @@ public class RankPanelManager : MonoBehaviour
             loopScroll.Clear();
         }
 
-        // 获取所有英雄配置
-        var heroConfigs = HeroConfig.ConfigList;
+        // 获取当前剧本全部可用英雄配置
+        var heroConfigs = HeroConfig.ConfigList.Where(cfg => HeroScenario.IsAvailable(cfg.Id)).ToList();
         float cellHeight = rankCellPrefab.GetComponent<RectTransform>().sizeDelta.y;
 
         // 使用循环列表加载：只实例化视口内可见的单元格

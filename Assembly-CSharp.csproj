@@ -151,6 +151,7 @@
     <Compile Include="Assets\Resources\Scripts\UIs\SideItemControl.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffMoveSpeedAdd.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\TooltipHeroSkill.cs" />
+    <Compile Include="Assets\Resources\Scripts\Tools\HeroScenario.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidDualLaser.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffEvasion.cs" />
     <Compile Include="Assets\Resources\Scripts\Tools\ItemIconLoader.cs" />

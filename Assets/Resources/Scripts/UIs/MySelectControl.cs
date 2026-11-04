@@ -134,7 +134,7 @@ public class MySelectControl : MonoBehaviour
                 skillIcon = skillCfgs[0].Icon;
             }
             selectNode.cardId = cardId;
-            selectNode.UpdateExp(checkPlayer.pid, cardCfg.Name, checkPlayer.cards[cardId], skillIcon, cardCfg.Quality);
+            selectNode.UpdateExp(checkPlayer.pid, cardCfg.Name, checkPlayer.cards[cardId], skillIcon, HeroScenario.GetQuality(cardCfg));
 
             i++;
         }
@@ -176,6 +176,8 @@ public class MySelectControl : MonoBehaviour
         var jobAllHeroes = new Dictionary<string, List<int>>();
         foreach (var cfg in HeroConfig.ConfigList)
         {
+            if (!HeroScenario.IsAvailable(cfg.Id))
+                continue;
             if (!jobAllHeroes.TryGetValue(cfg.Job, out var list))
             {
                 list = new List<int>();
@@ -241,7 +243,7 @@ public class MySelectControl : MonoBehaviour
         var forceCounts = new Dictionary<int, int>();
         foreach (var id in battleHeroes)
         {
-            var side = HeroConfig.GetConfig(id).Side;
+            var side = HeroScenario.GetSide(id);
             forceCounts.TryGetValue(side, out var c);
             forceCounts[side] = c + 1;
         }
@@ -254,7 +256,7 @@ public class MySelectControl : MonoBehaviour
             var sideHeroes = new List<int>();
             foreach (var id in battleHeroes)
             {
-                if (HeroConfig.GetConfig(id).Side == kv.Key)
+                if (HeroScenario.GetSide(id) == kv.Key)
                     sideHeroes.Add(id);
             }
             entries.Add(new BondTipData

@@ -51,6 +51,7 @@ public static class ConfigManager
 
     public static void PostModify()
     {
+        HeroScenario.Reset();
         foreach (var jobCfg in JobConfig.ConfigList)
         {
             jobDict.Add(jobCfg.NameS, jobCfg);
@@ -62,18 +63,7 @@ public static class ConfigManager
                 skillDict[skillCfg.Sname] = skillCfg;
         }
 
-        // 剧本系统尚未接入：英雄运行时 Quality/Side 统一由剧本字段解析（默认按剧本2，空则依次取剧本1/3），
-        // 保证商店/AI/展示等旧逻辑仍按原品质与阵营运行；接入剧本后改为按当前剧本取对应字段。
-        foreach (var heroCfg in HeroConfig.ConfigList)
-        {
-            string qualitySide = heroCfg.Scenario2;
-            if (string.IsNullOrEmpty(qualitySide))
-                qualitySide = heroCfg.Scenario1;
-            if (string.IsNullOrEmpty(qualitySide))
-                qualitySide = heroCfg.Scenario3;
-            ParseHeroQualitySide(heroCfg, qualitySide);
-        }
-
+        // 英雄品质/阵营不再写回 HeroConfig，统一由 HeroScenario 按当前剧本的 Scenario1/2/3 字段解析。
         // 数值写回（百分比语义）：HeroConfig 数值列 = 相对 JobConfig 职业基准的百分比修正（0=无修正用基准，非0=±%）
         foreach (var heroCfg in HeroConfig.ConfigList)
         {
@@ -98,35 +88,33 @@ public static class ConfigManager
             // 避免职业基准为 0 时英雄修正被清零
             heroCfg.MpRegen = jobCfg.MpRegen + heroCfg.MpRegen;
             heroCfg.Ap = (int)Math.Round(jobCfg.Ap * (100f + heroCfg.Ap) / 100f);
-            // 主属性（攻击/生命）：写回 = 职业基准×(1+修正%/100) × 品质系数CombatConst.QualityAttrFactors[Q-1]，即“1星带品质面板”
-            // 品质系数为按档取值（Q1=×1、Q2=×1.4、Q3=×1.8、Q4=×2.2），非复利
-            // （图鉴/排行/发卡/AI/排序直接读即为此口径）；星级成长保留到运行时按每星 CombatConst.StarGrowthPerStar 乘
-            // 注：法术(Ap) 不乘品质系数（保持次级面板口径），仅攻击/生命参与品质加成；攻击再 ÷ 法术倍率 MagicRate（法系乘1.5下调攻击），生命不参与
-            float qualityFactor = CombatConst.QualityAttrFactors[Mathf.Clamp(heroCfg.Quality, 1, CombatConst.QualityAttrFactors.Length) - 1];
-            heroCfg.Atk = (int)Math.Round(jobCfg.Atk * (100f + heroCfg.Atk) / 100f * qualityFactor / magicRate);
-            heroCfg.Hp = (int)Math.Round(jobCfg.Hp * (100f + heroCfg.Hp) / 100f * qualityFactor);
+            // 主属性（攻击/生命）：先缓存“品质无关基准” = 职业基准×(1+修正%/100)（攻击再÷法术倍率 MagicRate），
+            // 实际面板由 HeroScenario 按当前剧本品质乘以 CombatConst.QualityAttrFactors[Q-1]（Q1=×1、Q2=×1.4、Q3=×1.8、Q4=×2.2）
+            // 注：法术(Ap) 不乘品质系数（保持次级面板口径），仅攻击/生命参与品质加成
+            float baseAtk = jobCfg.Atk * (100f + heroCfg.Atk) / 100f / magicRate;
+            float baseHp = jobCfg.Hp * (100f + heroCfg.Hp) / 100f;
+            HeroScenario.RegisterBaseHeroPanel(heroCfg.Id, baseAtk, baseHp);
 
-            // 英雄专属技能（HeroConfig.Skill1 指向的技能缩写）的伤害/治疗基值修正，共三项，写回配置后
-            // 战场结算(Skill.GetSkillDamage/GetSkillHeal、DOT)与技能tips(GetSkillDescript)自动统一：
-            //   ①品质：× CombatConst.QualitySkillFactors[Q-1]，即 Q1=×1、Q2=×1.4、Q3=×1.8、Q4=×2.2（按档取值，非复利）
-            //   ②MP消耗：× MpCost/CombatConst.SkillMpStandard（基准MpCost=100，钳制到[SkillMpFactorMin,SkillMpFactorMax]），
-            //      MP消耗越高、释放越慢，则单次伤害/治疗越高，反之越低
+            // 英雄专属技能（HeroConfig.Skill1 指向的技能缩写）的伤害/治疗基值修正：
+            //   ①品质：× CombatConst.QualitySkillFactors[Q-1]（由 HeroScenario 按当前剧本品质应用）
+            //   ②MP消耗：× MpCost/CombatConst.SkillMpStandard（基准MpCost=100，钳制到[SkillMpFactorMin,SkillMpFactorMax]）
             //   ③法术倍率：× MagicRate（法系技能更强，与英雄攻击÷MagicRate对冲）
+            // 这里只缓存原始强度与②③系数，切换剧本时由 HeroScenario 重新烘焙，保证技能数值与当前剧本品质一致。
             // 技能数值行按 Sname 唯一归属一名英雄；职业兵种技能/好友连锁技能/道具技能的 Sname 非英雄名，不参与该修正。
             if (string.IsNullOrEmpty(heroCfg.Skill1))
                 continue;
-            float qualitySkillFactor = CombatConst.QualitySkillFactors[Mathf.Clamp(heroCfg.Quality, 1, CombatConst.QualitySkillFactors.Length) - 1];
             foreach (var skillCfg in SkillConfig.ConfigList)
             {
                 if (skillCfg.Sname != heroCfg.Skill1)
                     continue;
                 float mpFactor = Mathf.Clamp(skillCfg.MpCost / CombatConst.SkillMpStandard,
                     CombatConst.SkillMpFactorMin, CombatConst.SkillMpFactorMax);
-                float factor = qualitySkillFactor * mpFactor * magicRate;
-                skillCfg.DamageStrength *= factor;
-                skillCfg.HealStrength *= factor;
+                HeroScenario.RegisterBaseSkillStrength(heroCfg.Id, skillCfg, skillCfg.DamageStrength, skillCfg.HealStrength, mpFactor * magicRate);
             }
         }
+
+        // 按当前剧本烘焙英雄面板与专属技能强度（新游戏/读档切换剧本时由 HeroScenario.SetCurrent 再次调用）
+        HeroScenario.SetCurrent(HeroScenario.CurrentId);
     }
 
     public static void InitFriend()
@@ -325,38 +313,8 @@ public static class ConfigManager
         return null;
     }
 
-    // 解析剧本字段「品质:阵营」（如 3:蜀），写回英雄运行时 Quality/Side；剧本系统接入前供旧逻辑使用
-    private static void ParseHeroQualitySide(HeroConfig heroCfg, string qualitySide)
-    {
-        if (string.IsNullOrEmpty(qualitySide))
-        {
-            GameLog.Error(string.Format("ConfigManager.PostModify: 英雄[{0}]三个剧本的品质:阵营均为空，无法初始化默认品质/阵营", heroCfg.Name));
-            return;
-        }
-        string[] parts = qualitySide.Split(':');
-        if (parts.Length != 2)
-        {
-            GameLog.Error(string.Format("ConfigManager.PostModify: 英雄[{0}]剧本字段[{1}]格式错误，应为 品质:阵营（如3:蜀）", heroCfg.Name, qualitySide));
-            return;
-        }
-        int quality;
-        if (!int.TryParse(parts[0].Trim(), out quality))
-        {
-            GameLog.Error(string.Format("ConfigManager.PostModify: 英雄[{0}]剧本字段[{1}]品质不是整数", heroCfg.Name, qualitySide));
-            return;
-        }
-        int side = ParseSideName(parts[1].Trim());
-        if (side == 0)
-        {
-            GameLog.Error(string.Format("ConfigManager.PostModify: 英雄[{0}]剧本字段[{1}]阵营无法识别（可用：蜀/魏/吴/董/晋/袁/璋/表/野）", heroCfg.Name, qualitySide));
-            return;
-        }
-        heroCfg.Quality = quality;
-        heroCfg.Side = side;
-    }
-
     // 剧本阵营短名转阵营Id：统一按 ForceConfig.Names 匹配，新增势力只需配表，无需改代码
-    private static int ParseSideName(string sideName)
+    public static int ParseSideName(string sideName)
     {
         if (string.IsNullOrEmpty(sideName))
             return 0;

@@ -16,7 +16,7 @@ public static class HeroSelectionTool
         // 假设HeroConfig有一个方法GetAllConfigs()返回所有英雄配置
         foreach (var config in HeroConfig.ConfigList)
         {
-            if (config.Side == side)
+            if (HeroScenario.IsAvailable(config.Id) && HeroScenario.GetSide(config) == side)
             {
                 heroIds.Add((int)config.Id);
             }
@@ -62,7 +62,7 @@ public static class HeroSelectionTool
         {
             var configA = HeroConfig.GetConfig(a.Item1);
             var configB = HeroConfig.GetConfig(b.Item1);
-            int sideCompare = configA.Side.CompareTo(configB.Side);
+            int sideCompare = HeroScenario.GetSide(configA).CompareTo(HeroScenario.GetSide(configB));
             if (sideCompare != 0)
             {
                 return sideCompare;
@@ -192,7 +192,7 @@ public static class HeroSelectionTool
         List<int> candidates = new List<int>();
         foreach (var hero in heroPoolCache)
         {
-            if (HeroConfig.GetConfig(hero.Item1).Quality == quality)
+            if (HeroScenario.GetQuality(hero.Item1) == quality)
                 candidates.Add(hero.Item1);
         }
 

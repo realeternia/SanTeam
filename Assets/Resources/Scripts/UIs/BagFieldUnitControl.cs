@@ -77,14 +77,14 @@ public class BagFieldUnitControl : MonoBehaviour, IDropHandler, IBeginDragHandle
                 var cfg = HeroConfig.GetConfig(id);
                 if (cfg.Job == heroCfg.Job)
                     jobCount++;
-                if (cfg.Side == heroCfg.Side)
+                if (HeroScenario.GetSide(cfg) == HeroScenario.GetSide(heroCfg))
                     forceCount++;
             }
 
             // 职业：同职业英雄数>=2 才点亮（默认不亮）
             showJob = jobCount >= 2;
             // 国家：同阵营英雄数>=2 才点亮（默认不亮）；与 FactionShieldManager 一致，不参与同阵营护盾的势力（野=10）不显示
-            var forceCfg = ConfigManager.GetForceConfig(heroCfg.Side);
+            var forceCfg = ConfigManager.GetForceConfig(HeroScenario.GetSide(heroCfg));
             showForce = forceCfg != null && forceCfg.JoinFactionShield && forceCount - 1 >= 1;
         }
 

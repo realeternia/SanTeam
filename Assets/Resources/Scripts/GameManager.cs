@@ -33,6 +33,8 @@ public class GameManager : MonoBehaviour
         public List<int> heroIds = new List<int>();
         public List<ShopLockData> shopLocks = new List<ShopLockData>();
         public int year;
+        /// <summary>剧本Id（1/2/3；0 = 老存档，英雄池取剧本1+2并集）</summary>
+        public int scenarioId;
     }
 
     // 存档摘要解析用：镜像 PlayerInfo 序列化结构 { playerData:[{key,value}] }
@@ -72,6 +74,8 @@ public class GameManager : MonoBehaviour
     public int year;
     /// <summary>当前存档槽位（-1 表示尚未选择/新建）</summary>
     public int currentSaveSlot = -1;
+    /// <summary>当前剧本Id（1/2/3；0 = 老存档，英雄池取剧本1+2并集）</summary>
+    public int scenarioId = GameConst.DefaultScenarioId;
 
     // 调试阵容条目：武将ID + 等级（星级，1~HeroSelectionTool.MaxHeroCardLevel）+ 开局自动挂载的Buff（最多一个）
     [System.Serializable]
@@ -127,6 +131,7 @@ public class GameManager : MonoBehaviour
         year = 0;
         shopLocks.Clear();
         IndependentShopMode.ClearAiLocks(); // 新开一局时清空 AI 私有商店的锁卡记录
+        HeroScenario.SetCurrent(scenarioId); // 按当前剧本重算英雄面板/技能强度
 
         players[0].ResetForNewGame(0, PlayerBook.GetWang());
         var pls = PlayerBook.GetRandomN(7);
@@ -351,6 +356,9 @@ public class GameManager : MonoBehaviour
             string json = File.ReadAllText(savePath);
             SaveData saveData = JsonUtility.FromJson<SaveData>(json);
             year = saveData.year;
+            // 剧本Id：老存档没有该字段，JsonUtility 读出 0，按“剧本1+2并集”兼容
+            scenarioId = saveData.scenarioId;
+            HeroScenario.SetCurrent(scenarioId);
 
             // 确保players数组不为null且长度足够
             if (saveData.players != null)
@@ -432,6 +440,7 @@ public class GameManager : MonoBehaviour
             SaveData saveData = new SaveData();
 
             saveData.year = year;
+            saveData.scenarioId = scenarioId;
 
             // 序列化每个PlayerInfo对象
             foreach (PlayerInfo player in players)
@@ -489,7 +498,7 @@ public class GameManager : MonoBehaviour
 
     public void InitHeros(bool loadSave)
     {
-        // 创建账号不再选牌：所有英雄都进入随机池（读档也统一使用全量池，兼容旧存档）
+        // 英雄池按当前剧本生成：剧本1/2/3 只取该剧本出场英雄；老存档(0) 取剧本1+2并集
         BuildHeros();
 
         HeroSelectionTool.UpdateHeroPoolCache(heroIds);
@@ -497,12 +506,7 @@ public class GameManager : MonoBehaviour
 
     private void BuildHeros()
     {
-        // 创建账号不再展示选牌界面：HeroConfig 中的所有英雄全部进入随机池
-        heroIds = new List<int>();
-        foreach (var hero in HeroConfig.ConfigList)
-        {
-            if (hero != null && hero.Id > 0)
-                heroIds.Add(hero.Id);
-        }
+        heroIds = HeroScenario.GetHeroIds();
+        GameLog.Debug("英雄池已按剧本生成: " + HeroScenario.GetScenarioName(HeroScenario.CurrentId) + " 共" + heroIds.Count + "名");
     }
 }

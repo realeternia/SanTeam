@@ -175,10 +175,10 @@ public class CardViewControl : MonoBehaviour, IPointerDownHandler, IPointerUpHan
             }
 
             // 卡面底图按卡片品质着色（原为按阵营着色）
-            gameObject.GetComponent<Image>().color = SysColor.GetQualityColor(heroCfg.Quality);
+            gameObject.GetComponent<Image>().color = SysColor.GetQualityColor(HeroScenario.GetQuality(heroCfg));
 
             // 国家图标：显示英雄所属势力图标（野势力无图标，隐藏）
-            var forceCfg = ForceConfig.HasConfig(heroCfg.Side) ? ForceConfig.GetConfig(heroCfg.Side) : null;
+            var forceCfg = ForceConfig.HasConfig(HeroScenario.GetSide(heroCfg)) ? ForceConfig.GetConfig(HeroScenario.GetSide(heroCfg)) : null;
             bool hasKingdomIcon = forceCfg != null && !string.IsNullOrEmpty(forceCfg.Icon);
             if (kingdomImage != null)
             {

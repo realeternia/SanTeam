@@ -134,7 +134,7 @@ public class ChessHUD : MonoBehaviour
         {
             var heroCfg = HeroConfig.GetConfig(chessUnit.heroId);
             if (heroCfg != null)
-                qualityBgImg.color = SysColor.GetQualityColor(heroCfg.Quality);
+                qualityBgImg.color = SysColor.GetQualityColor(HeroScenario.GetQuality(heroCfg));
             else
                 GameLog.Error("英雄配置不存在，无法设置品质底色 heroId=" + chessUnit.heroId);
         }
