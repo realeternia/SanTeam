@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -113,12 +113,12 @@ namespace CommonConfig
             config[4] = new HeroFriendConfig(4, "风华", 1, new int[]{104004,103001,101023,102001,103014,103008,102024}, "华", "#3789C2");
             config[5] = new HeroFriendConfig(5, "仁德", 1, new int[]{110003,100001,101015,110009,103007,103016}, "仁", "#FFAA33");
             config[6] = new HeroFriendConfig(6, "异禀", 1, new int[]{100003,110011,110007,101014,101019,105001}, "异", "#FFCC00");
-            config[7] = new HeroFriendConfig(7, "济世", 1, new int[]{103012,102020,101017,100005,101012,105003,102022,101019}, "济", "#FFD700");
+            config[7] = new HeroFriendConfig(7, "济世", 1, new int[]{103012,102020,101017,100005,101012,102022,101019}, "济", "#FFD700");
             config[8] = new HeroFriendConfig(8, "益壮", 1, new int[]{101008,101022,103005,103022,102005}, "老", "#CC7A00");
             config[9] = new HeroFriendConfig(9, "陷阵", 1, new int[]{102004,103019,101001,105006,102009}, "破", "#FF6600");
             config[10] = new HeroFriendConfig(10, "深谋", 1, new int[]{103010,102011,104007,106003,103012,106008,102016}, "谋", "#0000FF");
             config[11] = new HeroFriendConfig(11, "严明", 1, new int[]{101003,104006,102017,101013,102012,106006,102021}, "律", "#556688");
-            config[12] = new HeroFriendConfig(12, "王佐", 1, new int[]{101010,103013,102010,102003,101006,105007,103011,101018}, "佐", "#AA8800");
+            config[12] = new HeroFriendConfig(12, "王佐", 1, new int[]{101010,103013,102010,102003,101006,105007,103011}, "佐", "#AA8800");
             config[13] = new HeroFriendConfig(13, "迅捷", 1, new int[]{103006,106001,102008,104002,102007}, "连", "#339933");
             config[14] = new HeroFriendConfig(14, "悍将", 1, new int[]{101005,106005,105009,104002,103021,106002,102013}, "穿", "#FF3399");
             config[15] = new HeroFriendConfig(15, "义胆", 1, new int[]{101001,101009,110002,104008,104004,102018,103015}, "护", "#453572");
@@ -128,9 +128,9 @@ namespace CommonConfig
             config[21] = new HeroFriendConfig(21, "温良", 1, new int[]{102003,103009,103017,101016,110006,102002}, "俭", "#88AA66");
             config[22] = new HeroFriendConfig(22, "背水", 1, new int[]{102015,101002,102014,110008,101024}, "背", "#773599");
             config[23] = new HeroFriendConfig(23, "偷袭", 1, new int[]{103003,102004,105001,101007,103020,102023,103010}, "偷", "#553333");
-            config[24] = new HeroFriendConfig(24, "文采", 1, new int[]{100002,101004,102024,101020,103013}, "文", "#7A5CB8");
+            config[24] = new HeroFriendConfig(24, "文采", 1, new int[]{100002,102024,101020,103013,105003,101018}, "文", "#7A5CB8");
             config[26] = new HeroFriendConfig(26, "铁骑", 1, new int[]{101003,106001,106002,102014,102006,104009}, "冲", "#FF9933");
-            config[27] = new HeroFriendConfig(27, "智勇", 1, new int[]{102019,103004,102009,100003,104008,101006,101010,101018}, "镜", "#CC99CC");
+            config[27] = new HeroFriendConfig(27, "智勇", 1, new int[]{102019,103004,102009,100003,104008,101006,101010}, "镜", "#CC99CC");
             config[29] = new HeroFriendConfig(29, "虎狼", 1, new int[]{101011,104001,103006,103018,102006,100004}, "突", "#FF3366");
             config[31] = new HeroFriendConfig(31, "枭雄", 1, new int[]{100004,110007,101024,103002,110005,104007}, "枭", "#CC0000");
             config[32] = new HeroFriendConfig(32, "安民", 1, new int[]{106007,100001,106003,102010,103023,103014}, "民", "#339933");
