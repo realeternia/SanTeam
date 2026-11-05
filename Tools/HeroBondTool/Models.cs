@@ -46,6 +46,24 @@ namespace HeroBondTool
         {
             return GetQuality(scenarioId) > 0 && !string.IsNullOrEmpty(GetSide(scenarioId));
         }
+
+        /// <summary>不在场时用于灰显参考的品质：取第一个有出场剧本的品质。</summary>
+        public int GetReferenceQuality()
+        {
+            for (int i = 1; i <= 3; i++)
+                if (IsPresent(i))
+                    return GetQuality(i);
+            return 0;
+        }
+
+        /// <summary>不在场时用于灰显参考的阵营：取第一个有出场剧本的阵营。</summary>
+        public string GetReferenceSide()
+        {
+            for (int i = 1; i <= 3; i++)
+                if (IsPresent(i))
+                    return GetSide(i);
+            return "";
+        }
     }
 
     /// <summary>好友羁绊组（HeroFriendConfig_s.cs 一行）。</summary>

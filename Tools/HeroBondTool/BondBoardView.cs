@@ -203,17 +203,38 @@ namespace HeroBondTool
                 changed = true;
             }
 
+            // 展示顺序：本剧本出场品质从高到低；同品质保持配置顺序；不在场的排最后
+            List<int> ordered = new List<int>(group.Heros);
+            var sortQuality = new Dictionary<int, int>();
+            var sortIndex = new Dictionary<int, int>();
+            for (int i = 0; i < ordered.Count; i++)
+            {
+                int id = ordered[i];
+                sortIndex[id] = i;
+                HeroInfo h = store.HeroById.ContainsKey(id) ? store.HeroById[id] : null;
+                sortQuality[id] = h != null && h.IsPresent(analysis.ScenarioId)
+                    ? h.GetQuality(analysis.ScenarioId)
+                    : -1;
+            }
+            ordered.Sort((x, y) =>
+            {
+                if (sortQuality[x] != sortQuality[y])
+                    return sortQuality[y] - sortQuality[x];
+                return sortIndex[x] - sortIndex[y];
+            });
+
             bool badGroup = checks.Count > 0;
             int index = 0;
-            foreach (int heroId in group.Heros)
+            foreach (int heroId in ordered)
             {
                 HeroInfo hero = store.HeroById.ContainsKey(heroId) ? store.HeroById[heroId] : null;
                 if (hero == null)
                     continue;
 
                 bool isPresent = hero.IsPresent(analysis.ScenarioId);
-                int quality = isPresent ? hero.GetQuality(analysis.ScenarioId) : 0;
-                string side = isPresent ? hero.GetSide(analysis.ScenarioId) : "";
+                // 不在场的成员也显示品质/国家，取其它剧本的值并灰显
+                int quality = isPresent ? hero.GetQuality(analysis.ScenarioId) : hero.GetReferenceQuality();
+                string side = isPresent ? hero.GetSide(analysis.ScenarioId) : hero.GetReferenceSide();
 
                 HeroCell cell;
                 if (!cellById.TryGetValue(heroId, out cell))
