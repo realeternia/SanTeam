@@ -133,7 +133,7 @@ public static class ConfigManager
         foreach(var f in GameManager.Instance.friendRdData)
         {
             GameLog.Debug($"创建{f.id} / {f.name} 配对: {string.Join(",", f.friendIds.Select(id => HeroConfig.GetConfig(id).Name))}");
-            var config = new HeroFriendConfig(f.id, f.name, 2, f.friendIds, "", "");
+            var config = new HeroFriendConfig(f.id, f.name, 2, "", f.friendIds, "", "");
             HeroFriendConfig.Add(f.id, config);
         }
 
