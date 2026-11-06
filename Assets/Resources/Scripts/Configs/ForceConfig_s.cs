@@ -44,7 +44,6 @@ namespace CommonConfig
             {"Name", new FieldMetaInfo("势力名", "string", 0)},
             {"Names", new FieldMetaInfo("势力短名（剧本字段 品质:短名 使用，如 蜀/魏/吴/董/晋/袁/璋/表/马/野）", "string", 0)},
             {"Colorstr", new FieldMetaInfo("势力主色（十六进制，如#284600，用于阵营背景/图标）", "string", 0)},
-            {"KingId", new FieldMetaInfo("主公英雄Id（HeroConfig.Id，无主公为0）", "int", 60)},
             {"Icon", new FieldMetaInfo("图标", "string", 0)},
             {"JoinFactionShield", new FieldMetaInfo("是否参与同阵营护盾机制（野=10不参与）", "bool", 0)},
         };
@@ -71,10 +70,6 @@ namespace CommonConfig
         /// </summary>
         public string Colorstr;
         /// <summary>
-        ///主公英雄Id（HeroConfig.Id，无主公为0）
-        /// </summary>
-        public int KingId;
-        /// <summary>
         ///图标
         /// </summary>
         public string Icon;
@@ -84,13 +79,12 @@ namespace CommonConfig
         public bool JoinFactionShield;
 
 
-        public ForceConfig(int Id, string Name, string Names, string Colorstr, int KingId, string Icon, bool JoinFactionShield)
+        public ForceConfig(int Id, string Name, string Names, string Colorstr, string Icon, bool JoinFactionShield)
         {
             this.Id = Id;
             this.Name = Name;
             this.Names = Names;
             this.Colorstr = Colorstr;
-            this.KingId = KingId;
             this.Icon = Icon;
             this.JoinFactionShield = JoinFactionShield;
         }
@@ -113,16 +107,16 @@ namespace CommonConfig
         public static void Load()
         {
             config.Clear();
-            config[1] = new ForceConfig(1, "蜀国", "蜀", "#284600", 100001, "side1", true);
-            config[2] = new ForceConfig(2, "魏国", "魏", "#002364", 100002, "side2", true);
-            config[3] = new ForceConfig(3, "吴国", "吴", "#640000", 100003, "side3", true);
-            config[4] = new ForceConfig(4, "董侯", "董", "#1E646E", 100004, "side4", true);
-            config[5] = new ForceConfig(5, "晋国", "晋", "#5A326E", 100005, "side5", true);
-            config[6] = new ForceConfig(6, "袁氏", "袁", "#785A1E", 100006, "side6", true);
-            config[7] = new ForceConfig(7, "刘璋", "璋", "#4C6A2E", 100007, "", true);
-            config[8] = new ForceConfig(8, "刘表", "表", "#2E5A7A", 100008, "", true);
-            config[9] = new ForceConfig(9, "马腾", "马", "#8B5A2B", 100009, "", true);
-            config[10] = new ForceConfig(10, "野", "野", "#323232", 0, "", false);
+            config[1] = new ForceConfig(1, "蜀国", "蜀", "#284600", "side1", true);
+            config[2] = new ForceConfig(2, "魏国", "魏", "#002364", "side2", true);
+            config[3] = new ForceConfig(3, "吴国", "吴", "#640000", "side3", true);
+            config[4] = new ForceConfig(4, "董侯", "董", "#1E646E", "side4", true);
+            config[5] = new ForceConfig(5, "晋国", "晋", "#5A326E", "side5", true);
+            config[6] = new ForceConfig(6, "袁氏", "袁", "#785A1E", "side6", true);
+            config[7] = new ForceConfig(7, "刘璋", "璋", "#4C6A2E", "", true);
+            config[8] = new ForceConfig(8, "刘表", "表", "#2E5A7A", "", true);
+            config[9] = new ForceConfig(9, "马腾", "马", "#8B5A2B", "", true);
+            config[10] = new ForceConfig(10, "野", "野", "#323232", "", false);
 
             RebuildIndex();
 

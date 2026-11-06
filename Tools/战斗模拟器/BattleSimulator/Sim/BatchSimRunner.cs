@@ -649,11 +649,12 @@ public static class BatchSimRunner
         return HeroSelectionTool.GetCardLevel(copies, true);
     }
 
-    // 卡片价格（HeroConfig.Price，2~10；取不到按0）
+    // 卡片价格：按当前剧本品质动态计算（2/4/6/8 金；取不到按0）
     private static int HeroPrice(int heroId)
     {
-        var cfg = HeroConfig.GetConfig(heroId);
-        return cfg != null ? cfg.Price : 0;
+        if (!HeroConfig.HasConfig(heroId))
+            return 0;
+        return HeroSelectionTool.GetPrice(HeroConfig.GetConfig(heroId));
     }
 
     private static string ItemName(int itemId)

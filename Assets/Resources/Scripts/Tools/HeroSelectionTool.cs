@@ -337,9 +337,10 @@ public static class HeroSelectionTool
         return count;
     }
 
+    // 价格不配表，按当前剧本品质动态计算：品质1~4 → 2/4/6/8 金
     public static int GetPrice(HeroConfig heroCfg)
     {
-        return heroCfg.Price;
+        return heroCfg == null ? 0 : HeroScenario.GetQuality(heroCfg) * 2;
     }
 
     // 英雄近战/远程判定：HeroConfig.Range 经 ConfigManager.PostModify 写回为 职业基准×(1+修正%/100)

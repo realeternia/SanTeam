@@ -18,6 +18,9 @@ public static class ConfigManager
 
     private static bool hasInit = false;
 
+    /// <summary>主公（王）的职业短名</summary>
+    private const string KingJobName = "王";
+
     public static void Init()
     {
         if (hasInit)
@@ -332,22 +335,31 @@ public static class ConfigManager
         return ForceConfig.HasConfig(side) ? ForceConfig.GetConfig(side) : null;
     }
 
-    // 势力主公英雄Id（未登记返回0）
+    // 势力主公英雄Id：不再配表，按当前剧本动态取该势力可用英雄中职业为“王”且Id最小者（未登记返回0）
     public static int GetKingHeroId(int side)
     {
-        var forceCfg = GetForceConfig(side);
-        return forceCfg != null ? forceCfg.KingId : 0;
+        int kingId = 0;
+        foreach (var heroCfg in HeroConfig.ConfigList)
+        {
+            if (!HeroScenario.IsAvailable(heroCfg.Id))
+                continue;
+            if (HeroScenario.GetSide(heroCfg) != side)
+                continue;
+            if (heroCfg.Job != KingJobName)
+                continue;
+            if (kingId == 0 || heroCfg.Id < kingId)
+                kingId = heroCfg.Id;
+        }
+        return kingId;
     }
 
-    // 是否某势力的主公（王）：主公Id登记在 ForceConfig.KingId
+    // 是否某势力的主公（王）：当前剧本中职业为“王”的英雄即主公
+    // （剧本3 三家归晋的主公为 刘禅/曹叡/孙皓，不同剧本主公不同，故按英雄职业判定而非固定Id）
     public static bool IsKingHero(int heroId)
     {
-        foreach (var forceCfg in ForceConfig.ConfigList)
-        {
-            if (forceCfg.KingId == heroId)
-                return true;
-        }
-        return false;
+        if (!HeroConfig.HasConfig(heroId))
+            return false;
+        return HeroConfig.GetConfig(heroId).Job == KingJobName;
     }
 
     public static SkillConfig GetSkillConfig(string skillName)
