@@ -40,9 +40,9 @@ namespace CommonConfig
 
         private static Dictionary<string, FieldMetaInfo> fieldMeta = new Dictionary<string, FieldMetaInfo>()
         {
-            {"Id", new FieldMetaInfo("势力Id（对应 HeroConfig.Side：1蜀 2魏 3吴 4董 5晋 6袁 7刘璋 8刘表 10野）", "int", 60)},
+            {"Id", new FieldMetaInfo("势力Id（对应 HeroConfig.Side：1蜀 2魏 3吴 4董 5晋 6袁 7刘璋 8刘表 9马腾 10野）", "int", 60)},
             {"Name", new FieldMetaInfo("势力名", "string", 0)},
-            {"Names", new FieldMetaInfo("势力短名（剧本字段 品质:短名 使用，如 蜀/魏/吴/董/晋/袁/璋/表/野）", "string", 0)},
+            {"Names", new FieldMetaInfo("势力短名（剧本字段 品质:短名 使用，如 蜀/魏/吴/董/晋/袁/璋/表/马/野）", "string", 0)},
             {"Colorstr", new FieldMetaInfo("势力主色（十六进制，如#284600，用于阵营背景/图标）", "string", 0)},
             {"KingId", new FieldMetaInfo("主公英雄Id（HeroConfig.Id，无主公为0）", "int", 60)},
             {"Icon", new FieldMetaInfo("图标", "string", 0)},
@@ -119,8 +119,9 @@ namespace CommonConfig
             config[4] = new ForceConfig(4, "董侯", "董", "#1E646E", 100004, "side4", true);
             config[5] = new ForceConfig(5, "晋国", "晋", "#5A326E", 100005, "side5", true);
             config[6] = new ForceConfig(6, "袁氏", "袁", "#785A1E", 100006, "side6", true);
-            config[7] = new ForceConfig(7, "刘璋", "璋", "#4C6A2E", 0, "", true);
-            config[8] = new ForceConfig(8, "刘表", "表", "#2E5A7A", 0, "", true);
+            config[7] = new ForceConfig(7, "刘璋", "璋", "#4C6A2E", 100007, "", true);
+            config[8] = new ForceConfig(8, "刘表", "表", "#2E5A7A", 100008, "", true);
+            config[9] = new ForceConfig(9, "马腾", "马", "#8B5A2B", 100009, "", true);
             config[10] = new ForceConfig(10, "野", "野", "#323232", 0, "", false);
 
             RebuildIndex();
