@@ -56,6 +56,8 @@ public class GameManager : MonoBehaviour
     public struct SaveSummary
     {
         public int year;
+        /// <summary>剧本Id（决定开始年份与英雄池）</summary>
+        public int scenarioId;
         public int gold;
         public int mark;
         public List<int> lineHeroes;
@@ -76,6 +78,8 @@ public class GameManager : MonoBehaviour
     public int currentSaveSlot = -1;
     /// <summary>当前剧本Id（1/2/3；0 = 老存档，英雄池取剧本1+2并集）</summary>
     public int scenarioId = GameConst.DefaultScenarioId;
+    /// <summary>新开局进入首个商店时补一次存档标记（ShopBegin 消费后清零）</summary>
+    public bool pendingNewGameSave;
 
     // 调试阵容条目：武将ID + 等级（星级，1~HeroSelectionTool.MaxHeroCardLevel）+ 开局自动挂载的Buff（最多一个）
     [System.Serializable]
@@ -298,6 +302,7 @@ public class GameManager : MonoBehaviour
             string json = File.ReadAllText(savePath);
             SaveData saveData = JsonUtility.FromJson<SaveData>(json);
             summary.year = saveData.year;
+            summary.scenarioId = saveData.scenarioId;
 
             if (saveData.players != null && saveData.players.Count > 0)
             {

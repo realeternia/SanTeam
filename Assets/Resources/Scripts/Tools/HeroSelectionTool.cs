@@ -257,15 +257,20 @@ public static class HeroSelectionTool
     }
 
     // 共享商店品质概率：按存活玩家中的最高等级取 PlayerLevelConfig 作为基准，高品质再小幅加成：
-    // 品质3 = max(基准×1.3, 基准+4)，品质4 = max(基准×1.5, 基准+2)（取较大值）。
+    // 品质3 = max(基准×1.3, 基准+4)，品质4 = max(基准×1.5, 基准+2)（取较大值）；基准为 0 的档位不加成。
     // 共享商店面向所有玩家共用一个牌面，无法按个人等级出卡，用最高等级代表整体节奏，
     // 让共享商店的高品质节奏略快于玩家个人商店，但不会大幅超前。
     public static void GetSharedShopQualityRates(out int q2, out int q3, out int q4)
     {
         var lvCfg = PlayerLevelConfig.GetConfig(Mathf.Clamp(GetAliveMaxLevel(), 1, GameConst.PlayerMaxLevel));
         q2 = lvCfg.Quality2Rate;
-        q3 = Mathf.Max(Mathf.RoundToInt(lvCfg.Quality3Rate * 1.3f), lvCfg.Quality3Rate + 4);
-        q4 = Mathf.Max(Mathf.RoundToInt(lvCfg.Quality4Rate * 1.5f), lvCfg.Quality4Rate + 2);
+        // 基准为 0 的档位不加成：避免低等级（如开局1级）凭空刷出高品质卡
+        q3 = lvCfg.Quality3Rate > 0
+            ? Mathf.Max(Mathf.RoundToInt(lvCfg.Quality3Rate * 1.3f), lvCfg.Quality3Rate + 4)
+            : 0;
+        q4 = lvCfg.Quality4Rate > 0
+            ? Mathf.Max(Mathf.RoundToInt(lvCfg.Quality4Rate * 1.5f), lvCfg.Quality4Rate + 2)
+            : 0;
 
         // 防御：三档合计不超过100（否则品质1会归零、roll 全部偏向最高品质）；
         // 超出时按比例同时收缩品质3/品质4，保持两档的加成关系

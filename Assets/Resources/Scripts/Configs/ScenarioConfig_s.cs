@@ -42,6 +42,9 @@ namespace CommonConfig
         {
             {"Id", new FieldMetaInfo("剧本Id（对应 HeroConfig.Scenario1/2/3）", "int", 60)},
             {"Name", new FieldMetaInfo("剧本名", "string", 0)},
+            {"Pic", new FieldMetaInfo("剧本图片（Textures/Scenario 下文件名，如 s1）", "string", 0)},
+            {"Des", new FieldMetaInfo("剧本历史描述（年份与历史差异，选择时展示）", "string", 300)},
+            {"StartYear", new FieldMetaInfo("剧本开始年份（第1回合对应此年份）", "int", 60)},
         };
 
         public static Dictionary<string, FieldMetaInfo> FieldMeta { get { return fieldMeta; } }
@@ -57,12 +60,27 @@ namespace CommonConfig
         ///剧本名
         /// </summary>
         public string Name;
+        /// <summary>
+        ///剧本图片（Textures/Scenario 下文件名，如 s1）
+        /// </summary>
+        public string Pic;
+        /// <summary>
+        ///剧本历史描述（年份与历史差异，选择时展示）
+        /// </summary>
+        public string Des;
+        /// <summary>
+        ///剧本开始年份（第1回合对应此年份）
+        /// </summary>
+        public int StartYear;
 
 
-        public ScenarioConfig(int Id, string Name)
+        public ScenarioConfig(int Id, string Name, string Pic, string Des, int StartYear)
         {
             this.Id = Id;
             this.Name = Name;
+            this.Pic = Pic;
+            this.Des = Des;
+            this.StartYear = StartYear;
         }
 
         public ScenarioConfig() { }
@@ -83,9 +101,9 @@ namespace CommonConfig
         public static void Load()
         {
             config.Clear();
-            config[1] = new ScenarioConfig(1, "群雄割据");
-            config[2] = new ScenarioConfig(2, "三国鼎立");
-            config[3] = new ScenarioConfig(3, "三家归晋");
+            config[1] = new ScenarioConfig(1, "群雄割据", "s1", "184年·群雄割据：黄巾之乱后汉室衰微，董卓入京、天下大乱，州郡拥兵自立，曹操、袁绍、刘备、孙坚等诸侯并起，群雄逐鹿中原。", 184);
+            config[2] = new ScenarioConfig(2, "三国鼎立", "s2", "220年·三国鼎立：曹丕代汉建魏，刘备成都称帝，孙权受封吴王，魏蜀吴三分天下、互相对峙，名将与谋臣辈出、各据一方。", 220);
+            config[3] = new ScenarioConfig(3, "三家归晋", "s3", "263年·三家归晋：魏灭蜀，265年司马炎代魏建晋，280年晋军灭吴，天下重归一统，开国名将相继凋零，守成之将登上舞台。", 263);
 
             RebuildIndex();
 

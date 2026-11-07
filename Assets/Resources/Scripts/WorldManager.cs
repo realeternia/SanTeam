@@ -111,7 +111,7 @@ public class WorldManager : MonoBehaviour
         isPveRound = roundCfg.RoundType == 1;
         pveMonsterSpawns = ParsePveMonsterSpawns(roundCfg.SoldierList);
         if (isPveRound)
-            GameLog.Debug($"[PVE] 回合{GameManager.Instance.year} {roundCfg.Name} 怪物布阵: {(string.IsNullOrEmpty(roundCfg.SoldierList) ? "(空!请在GameRoundConfig填SoldierList)" : roundCfg.SoldierList)} 解析到{pveMonsterSpawns.Count}只");
+            GameLog.Debug($"[PVE] 回合{GameManager.Instance.year} {ConfigManager.GetYearName(GameManager.Instance.scenarioId, GameManager.Instance.year)} 怪物布阵: {(string.IsNullOrEmpty(roundCfg.SoldierList) ? "(空!请在GameRoundConfig填SoldierList)" : roundCfg.SoldierList)} 解析到{pveMonsterSpawns.Count}只");
         // 调试阵容（测试战斗）固定使用 MapConfig 中 IsTestDefault 标记的地图（多个 true 取第一个），未标记时按权重随机
         MapConfig testMapCfg = null;
         if (GameManager.Instance.HasDebugLineup())

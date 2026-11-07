@@ -11,6 +11,9 @@ using System.Text;
 
 public static class PlayerAI
 {
+    // 已告警过的缺失好友组Id（PlayerConfig.LikeFriend 可能引用配置表中不存在的组，避免重复刷日志）
+    private static readonly HashSet<int> warnedMissingFriendGroups = new HashSet<int>();
+
     // 许愿阶段（第10/25/40回合）：AI 自动选择1个许愿英雄，参考自身喜好(LikeJob/LikeForce)与当前优势卡职业/阵营。
     // 一般许愿品质4，其余许愿品质3；选中的英雄在商店出卡权重×3，且同一英雄不会重复许愿。
     public static void CheckWish(PlayerInfo playerInfo, int wishSlot)
@@ -556,11 +559,11 @@ public static class PlayerAI
         return false;
     }
 
-    // 某好友组当前上阵成员数
+    // 某好友组当前上阵成员数（组配置缺失时返回0，避免 LikeFriend 引用无效Id 抛异常）
     private static int CountFriendMembersInLineup(AiContext ctx, int friendRelId)
     {
-        var relCfg = HeroFriendConfig.GetConfig(friendRelId);
-        if (relCfg == null)
+        var relCfg = GetFriendConfigSafe(friendRelId);
+        if (relCfg == null || relCfg.Heros == null)
             return 0;
 
         int present = 0;
@@ -570,6 +573,17 @@ public static class PlayerAI
                 present++;
         }
         return present;
+    }
+
+    // 好友组配置安全获取：LikeFriend 等数据可能引用配置表中不存在的Id，缺失时告警一次并返回 null
+    private static HeroFriendConfig GetFriendConfigSafe(int friendRelId)
+    {
+        if (HeroFriendConfig.HasConfig(friendRelId))
+            return HeroFriendConfig.GetConfig(friendRelId);
+
+        if (warnedMissingFriendGroups.Add(friendRelId))
+            GameLog.Warn("好友组配置缺失id=" + friendRelId + "（疑似 PlayerConfig.LikeFriend 引用了不存在的组），AI 忽略该组");
+        return null;
     }
 
     private static float GetSellCostBias(int cardPrice, int year, PlayerConfig cfg)
@@ -1055,10 +1069,10 @@ public static class PlayerAI
         return result;
     }
 
-    // 某好友组当前已拥有的成员数（供聚焦候选评分 / 成组保护复用）
+    // 某好友组当前已拥有的成员数（供聚焦候选评分 / 成组保护复用；组配置缺失返回0）
     private static int CountOwnedInFriendGroup(PlayerInfo playerInfo, int friendRelId)
     {
-        var relCfg = HeroFriendConfig.GetConfig(friendRelId);
+        var relCfg = GetFriendConfigSafe(friendRelId);
         if (relCfg == null || relCfg.Heros == null)
             return 0;
 

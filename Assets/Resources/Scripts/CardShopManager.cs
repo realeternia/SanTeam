@@ -553,7 +553,7 @@ public class CardShopManager : MonoBehaviour
                 player.OnEra(era);
         }
 
-        eraText.text = ShopCfg.Name;
+        eraText.text = ConfigManager.GetYearName(GameManager.Instance.scenarioId, ShopCfg.Id);
 
         for (int i = 0; i < 8; i++)
         {
@@ -607,8 +607,11 @@ public class CardShopManager : MonoBehaviour
         // 调试：每次商店阶段开始（含开局与战后回商店）给人类玩家按掉落规则随机发 10 个道具
         DebugGiveRandomItems();
 
-        if(hasEnterBattle) //存档拉起进入游戏，不会重复存储
+        if(hasEnterBattle || GameManager.Instance.pendingNewGameSave) //存档拉起进入游戏不重复存储；新开局首次进商店补存一次
+        {
             GameManager.Instance.SaveToFile();
+            GameManager.Instance.pendingNewGameSave = false;
+        }
 
         // 商店阶段 BGM：shop1~shop4 随机一首
         BGMPlayer.Instance.PlaySound("BGMs/shop" + (SysRandom.Range(0, 4) + 1));

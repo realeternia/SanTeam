@@ -383,6 +383,23 @@ public static class ConfigManager
         return null;
     }
 
+    // 按剧本开始年份 + 回合序号计算年份：round 为 1 基回合（第 1 回合 = 剧本开始年份）
+    public static int GetYear(int scenarioId, int round)
+    {
+        int startYear = GameConst.DefaultScenarioStartYear;
+        if (ScenarioConfig.HasConfig(scenarioId))
+            startYear = ScenarioConfig.GetConfig(scenarioId).StartYear;
+        else
+            GameLog.Warn("剧本配置不存在id=" + scenarioId + "，年份回退为 " + startYear);
+        return startYear + Math.Max(1, round) - 1;
+    }
+
+    // 年份名（如 "184年"），供回合日志与存档列表展示
+    public static string GetYearName(int scenarioId, int round)
+    {
+        return GetYear(scenarioId, round) + "年";
+    }
+
     // 技能完整描述：Lv1 的 Descript 为模板（内联 /字段名 动态引用，如 /strength2-1、/strengthbuff1-2、/damagestrength、/range、/rate，
     // 以及 /linkself-xxx、/linkteam-xxx、/auroattrs-xxx 子字段），引擎把其中动态引用替换为该等级行对应字段值；
     // 其余等级 Descript 留空时自动回退 Lv1 模板并按本级字段替换；无动态引用的整型文案（结构兜底）原样返回。

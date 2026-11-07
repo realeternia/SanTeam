@@ -7,6 +7,8 @@ public static class GameConst
     // ---- 剧本(Scenario) ----
     /// <summary>新游戏的默认剧本Id（1 群雄割据；老存档为0，英雄池取剧本1+2并集）</summary>
     public const int DefaultScenarioId = 1;
+    /// <summary>剧本配置缺失时的兜底开始年份</summary>
+    public const int DefaultScenarioStartYear = 184;
 
     // ---- 许愿(wish)机制 ----
     /// <summary>每名玩家的许愿槽位数量（对应背包 loveBtn 的 3 个按钮）</summary>

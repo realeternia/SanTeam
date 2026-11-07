@@ -96,6 +96,13 @@ public static class HeroScenario
         return info == null ? 0 : ResolveQuality(info, currentId);
     }
 
+    /// <summary>英雄在指定剧本的品质（用于剧本选择预览，0 为老存档口径）</summary>
+    public static int GetQuality(int heroId, int scenarioId)
+    {
+        var info = GetInfo(heroId);
+        return info == null ? 0 : ResolveQuality(info, scenarioId);
+    }
+
     /// <summary>英雄当前剧本阵营Id（不可用返回0）</summary>
     public static int GetSide(HeroConfig heroCfg)
     {

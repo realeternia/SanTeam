@@ -37,8 +37,8 @@ public class SharedShopMode : ShopMode
         int firstPid = host.TurnOrder[0];
         List<int> heroIds = new List<int>();
         int TOTAL_HERO_CARDS = 15;
-        // 防死循环：卡池中某品质（第一回合恒为品质1）人数可能不足15张，
-        // 命中重复卡会原地打转，故用 while + 尝试上限，凑不满则生成已有的全部不重复卡后结束。
+        // 先尽量出不同英雄：卡池中某品质（第一回合恒为品质1）可售英雄可能不足15张，
+        // 命中重复卡会原地打转，故用 while + 尝试上限，凑不满不重复的部分再允许重复补满（刷新逻辑本就不限制重复）。
         int maxAttempts = TOTAL_HERO_CARDS * 20;
         int attempt = 0;
         while (heroIds.Count < TOTAL_HERO_CARDS && attempt < maxAttempts)
@@ -48,7 +48,15 @@ public class SharedShopMode : ShopMode
             if (heroId == 0)
                 break; // 卡池为空，无法再生成，跳出避免死循环
             if (heroIds.Contains(heroId))
-                continue; // 重复卡：重新抽取，商店同一英雄只出售 1 张
+                continue; // 重复卡：先重新抽取，优先保证开局牌面不重复
+            heroIds.Add(heroId);
+        }
+        // 可售英雄不足15张：允许重复出卡补满牌面（与刷新规则一致）
+        while (heroIds.Count < TOTAL_HERO_CARDS)
+        {
+            var heroId = host.GetRandomShopHeroId(firstPid);
+            if (heroId == 0)
+                break;
             heroIds.Add(heroId);
         }
 

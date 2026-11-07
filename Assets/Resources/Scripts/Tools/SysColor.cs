@@ -125,6 +125,8 @@ public static class SysColor
         public static readonly Color CellDisabled = new Color(0.1f, 0.1f, 0.1f, 0.5f);
         public static readonly Color ActedHeroTextColor = new Color(0.5f, 0.5f, 0.5f, 1f);
         public static readonly Color DisabledTextColor = new Color(0.75f, 0.75f, 0.75f, 1f); // 禁用/置灰文字（需保证可读）
+        public static readonly Color ScenarioSelected = new Color(1f, 1f, 1f, 1f);           // 剧本按钮-选中（高亮）
+        public static readonly Color ScenarioNormal = new Color(0.4f, 0.4f, 0.4f, 1f);       // 剧本按钮-未选中（暗调）
     }
 
     public static class UI

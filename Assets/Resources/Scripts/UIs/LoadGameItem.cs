@@ -44,11 +44,12 @@ public class LoadGameItem : MonoBehaviour
 
         if (infoText != null)
         {
-            string yearStr = GetYearText(summary.year);
+            string yearStr = GetYearText(summary.year, summary.scenarioId);
+            string scenarioStr = GetScenarioText(summary.scenarioId);
             string markStr = SysColor.ColorText(summary.mark.ToString(), SysColor.UI.SaveMark);
             string goldStr = SysColor.ColorText(summary.gold.ToString(), SysColor.UI.SaveGold);
             string timeStr = SysColor.ColorText(GetTimeAgo(summary.saveTime), SysColor.UI.SaveTime);
-            infoText.text = yearStr + "  生命:" + markStr + "  金钱:" + goldStr + "  " + timeStr;
+            infoText.text = scenarioStr + "  " + yearStr + "  生命:" + markStr + "  " + timeStr;
         }
 
         if (selfBtn != null)
@@ -112,16 +113,19 @@ public class LoadGameItem : MonoBehaviour
         deleteVisualCached = true;
     }
 
-    // 年份显示走 GameRoundConfig：存档里的 year 是"已完成回合数"（0 基），
-    // 当前回合对应 year+1（如 year=0 → 180年，year=2 → 182年）；配置缺失时回退原始年份
-    private string GetYearText(int year)
+    // 剧本名：老存档（scenarioId=0）无剧本配置时显示"旧版"
+    private string GetScenarioText(int scenarioId)
     {
-        int round = year + 1;
-        if (GameRoundConfig.HasConfig(round))
-            return GameRoundConfig.GetConfig(round).Name;
-        if (GameRoundConfig.HasConfig(year))
-            return GameRoundConfig.GetConfig(year).Name;
-        return year + "年";
+        if (ScenarioConfig.HasConfig(scenarioId))
+            return ScenarioConfig.GetConfig(scenarioId).Name;
+        return "旧版";
+    }
+
+    // 年份按剧本开始年份动态计算：存档里的 year 是"已完成回合数"（0 基），
+    // 当前回合对应 year+1，年份 = ScenarioConfig.StartYear + 回合号 - 1
+    private string GetYearText(int year, int scenarioId)
+    {
+        return ConfigManager.GetYearName(scenarioId, year + 1);
     }
 
     // 存档时间显示：刚刚 / x分钟前 / x小时前 / x天前

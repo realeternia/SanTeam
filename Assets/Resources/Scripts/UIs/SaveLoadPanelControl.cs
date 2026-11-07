@@ -1,8 +1,10 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using DG.Tweening;
+using CommonConfig;
 
 /// <summary>
 /// 登录/存档面板：开始画面点击后展示存档列表（读档或新游戏），进入商店后隐藏。
@@ -31,6 +33,24 @@ public class SaveLoadPanelControl : MonoBehaviour
     private TMP_Text newGameBtnText;
     private string loadGameBtnOriginText;
     private string newGameBtnOriginText;
+
+    // 剧本选择面板（新游戏时展示，运行时创建）：3 个剧本图按钮 + 描述 + 高品质武将头像 + 确定按钮
+    private GameObject scenarioPanel;
+    private readonly List<int> scenarioIds = new List<int>();
+    private readonly List<RawImage> scenarioImages = new List<RawImage>();
+    private int selectedScenarioId = -1;
+    private TMP_Text scenarioDesText;
+    private RectTransform scenarioAvatarRoot;
+
+    private const float ScenarioImageWidth = 432f;  // 剧本图宽（720:320 = 72:32 等比）
+    private const float ScenarioImageHeight = 192f; // 剧本图高（432:192 = 72:32）
+    private const float ScenarioImageGap = 48f;     // 剧本按钮横向间距
+    private const float ScenarioRowY = 120f;        // 剧本按钮行相对面板中心Y偏移
+    private const float ScenarioDesY = -60f;        // 剧本历史描述相对面板中心Y偏移
+    private const float ScenarioAvatarY = -150f;    // 高品质武将头像行相对面板中心Y偏移
+    private const float ScenarioAvatarSize = 96f;   // 武将头像尺寸
+    private const float ScenarioAvatarGap = 10f;    // 武将头像横向间距
+    private const int ScenarioAvatarCount = 10;     // 预览的高品质武将数量
 
     private void Awake()
     {
@@ -116,7 +136,7 @@ public class SaveLoadPanelControl : MonoBehaviour
         }
         else
         {
-            StartNewGame();
+            ShowScenarioPanel();
         }
     }
 
@@ -270,7 +290,7 @@ public class SaveLoadPanelControl : MonoBehaviour
         if (GameManager.Instance.GetUsedSaveSlots().Count == 0)
         {
             loadGamePanel.SetActive(false);
-            StartNewGame();
+            ShowScenarioPanel();
         }
         else
         {
@@ -325,23 +345,269 @@ public class SaveLoadPanelControl : MonoBehaviour
             GameManager.Instance.currentSaveSlot = overwrite;
             GameLog.Warn("存档槽位已满，新游戏将覆盖槽位 " + overwrite);
         }
-        StartNewGame();
+        ShowScenarioPanel();
+    }
+
+    // 新游戏剧本选择：3 个剧本图按钮（选中高亮、未选中暗调）+ 确定进入游戏
+    private void ShowScenarioPanel()
+    {
+        loadGamePanel.SetActive(false);
+        if (scenarioPanel == null)
+            BuildScenarioPanel();
+        scenarioPanel.SetActive(true);
+        scenarioPanel.transform.SetAsLastSibling();
+        SelectScenario(GameConst.DefaultScenarioId);
+    }
+
+    // 运行时创建剧本选择面板（预制体未提供该节点，全部按代码布局）
+    private void BuildScenarioPanel()
+    {
+        scenarioPanel = new GameObject("ScenarioPanel", typeof(RectTransform), typeof(Image));
+        scenarioPanel.transform.SetParent(transform, false);
+
+        var panelRt = scenarioPanel.GetComponent<RectTransform>();
+        panelRt.anchorMin = Vector2.zero;
+        panelRt.anchorMax = Vector2.one;
+        panelRt.offsetMin = Vector2.zero;
+        panelRt.offsetMax = Vector2.zero;
+
+        var panelImg = scenarioPanel.GetComponent<Image>();
+        panelImg.color = SysColor.Theme.CellNormalDark;
+        panelImg.raycastTarget = true;
+
+        CreateScenarioText("ScenarioTitle", "选择剧本", new Vector2(0, 300), new Vector2(800, 90), 60);
+        scenarioDesText = CreateScenarioText("ScenarioDes", "", new Vector2(0, ScenarioDesY), new Vector2(1200, 100), 30);
+        scenarioAvatarRoot = CreateScenarioAvatarRoot();
+
+        scenarioIds.Clear();
+        scenarioImages.Clear();
+
+        var scenarios = ScenarioConfig.ConfigList.OrderBy(c => c.Id).ToList();
+        if (scenarios.Count == 0)
+        {
+            GameLog.Error("SaveLoadPanelControl 剧本配置为空，跳过剧本按钮创建");
+            return;
+        }
+
+        float totalWidth = scenarios.Count * ScenarioImageWidth + (scenarios.Count - 1) * ScenarioImageGap;
+        for (int i = 0; i < scenarios.Count; i++)
+        {
+            var cfg = scenarios[i];
+            int scenarioId = cfg.Id;
+
+            var go = new GameObject("Scenario_" + scenarioId, typeof(RectTransform), typeof(RawImage), typeof(Button));
+            go.transform.SetParent(scenarioPanel.transform, false);
+
+            var rt = go.GetComponent<RectTransform>();
+            rt.anchorMin = rt.anchorMax = new Vector2(0.5f, 0.5f);
+            rt.pivot = new Vector2(0.5f, 0.5f);
+            rt.sizeDelta = new Vector2(ScenarioImageWidth, ScenarioImageHeight);
+            rt.anchoredPosition = new Vector2(
+                -totalWidth / 2 + ScenarioImageWidth / 2 + i * (ScenarioImageWidth + ScenarioImageGap),
+                ScenarioRowY);
+
+            var rawImg = go.GetComponent<RawImage>();
+            rawImg.texture = Resources.Load<Texture2D>("Textures/Scenario/" + cfg.Pic);
+            if (rawImg.texture == null)
+                GameLog.Error("SaveLoadPanelControl 剧本图片加载失败: Textures/Scenario/" + cfg.Pic);
+            rawImg.raycastTarget = true;
+
+            var btn = go.GetComponent<Button>();
+            btn.transition = Selectable.Transition.None;
+            btn.targetGraphic = rawImg;
+            btn.onClick.AddListener(() =>
+            {
+                GameManager.Instance.PlaySound("Sounds/click");
+                SelectScenario(scenarioId);
+            });
+
+            scenarioIds.Add(scenarioId);
+            scenarioImages.Add(rawImg);
+        }
+
+        BuildScenarioConfirmButton();
+    }
+
+    // 复用存档面板按钮上的 TMP 文本节点创建文本，保证字体资源一致
+    private TMP_Text CreateScenarioText(string name, string content, Vector2 anchoredPos, Vector2 size, int fontSize)
+    {
+        var template = newGameBtnText != null ? newGameBtnText : loadGameBtnText;
+        if (template == null)
+        {
+            GameLog.Warn("SaveLoadPanelControl 未找到可用文本模板，跳过剧本文本创建: " + name);
+            return null;
+        }
+
+        var go = Instantiate(template.gameObject, scenarioPanel.transform);
+        go.name = name;
+
+        var rt = go.GetComponent<RectTransform>();
+        rt.anchorMin = rt.anchorMax = new Vector2(0.5f, 0.5f);
+        rt.pivot = new Vector2(0.5f, 0.5f);
+        rt.anchoredPosition = anchoredPos;
+        rt.sizeDelta = size;
+
+        var text = go.GetComponent<TMP_Text>();
+        if (text == null)
+        {
+            GameLog.Warn("SaveLoadPanelControl 文本模板缺少 TMP_Text 组件: " + name);
+            return null;
+        }
+
+        text.text = content;
+        text.fontSize = fontSize;
+        text.alignment = TextAlignmentOptions.Center;
+        return text;
+    }
+
+    // 高品质武将头像容器（选中剧本后按该剧本重建头像）
+    private RectTransform CreateScenarioAvatarRoot()
+    {
+        var go = new GameObject("ScenarioAvatars", typeof(RectTransform));
+        go.transform.SetParent(scenarioPanel.transform, false);
+
+        var rt = go.GetComponent<RectTransform>();
+        rt.anchorMin = rt.anchorMax = new Vector2(0.5f, 0.5f);
+        rt.pivot = new Vector2(0.5f, 0.5f);
+        rt.anchoredPosition = new Vector2(0, ScenarioAvatarY);
+        rt.sizeDelta = new Vector2(
+            ScenarioAvatarCount * ScenarioAvatarSize + (ScenarioAvatarCount - 1) * ScenarioAvatarGap,
+            ScenarioAvatarSize);
+        return rt;
+    }
+
+    // 按剧本重建前 10 名高品质武将头像（品质降序，同品质按英雄Id）
+    private void BuildScenarioAvatars(int scenarioId)
+    {
+        if (scenarioAvatarRoot == null)
+            return;
+
+        for (int i = scenarioAvatarRoot.childCount - 1; i >= 0; i--)
+            Destroy(scenarioAvatarRoot.GetChild(i).gameObject);
+
+        var heroes = HeroConfig.ConfigList
+            .Where(c => c != null && c.Id > 0 && HeroScenario.IsAvailable(c.Id, scenarioId))
+            .OrderByDescending(c => HeroScenario.GetQuality(c.Id, scenarioId))
+            .ThenBy(c => c.Id)
+            .Take(ScenarioAvatarCount)
+            .ToList();
+
+        float totalWidth = heroes.Count * ScenarioAvatarSize + (heroes.Count - 1) * ScenarioAvatarGap;
+        for (int i = 0; i < heroes.Count; i++)
+        {
+            var heroCfg = heroes[i];
+
+            var go = new GameObject("Avatar_" + heroCfg.Id, typeof(RectTransform), typeof(Image));
+            go.transform.SetParent(scenarioAvatarRoot, false);
+
+            var rt = go.GetComponent<RectTransform>();
+            rt.anchorMin = rt.anchorMax = new Vector2(0.5f, 0.5f);
+            rt.pivot = new Vector2(0.5f, 0.5f);
+            rt.sizeDelta = new Vector2(ScenarioAvatarSize, ScenarioAvatarSize);
+            rt.anchoredPosition = new Vector2(
+                -totalWidth / 2 + ScenarioAvatarSize / 2 + i * (ScenarioAvatarSize + ScenarioAvatarGap),
+                0);
+
+            var img = go.GetComponent<Image>();
+            img.sprite = Resources.Load<Sprite>("Textures/Skins/" + heroCfg.Icon);
+            if (img.sprite == null)
+                GameLog.Warn("SaveLoadPanelControl 武将头像加载失败: Textures/Skins/" + heroCfg.Icon);
+            img.preserveAspect = true;
+            img.raycastTarget = false;
+        }
+    }
+
+    // 确定按钮：复用存档面板的绿色按钮，点击后按所选剧本进入游戏
+    private void BuildScenarioConfirmButton()
+    {
+        if (loadGameBtn == null)
+        {
+            GameLog.Error("SaveLoadPanelControl 缺少按钮模板，无法创建剧本确定按钮");
+            return;
+        }
+
+        var confirmGo = Instantiate(loadGameBtn.gameObject, scenarioPanel.transform);
+        confirmGo.name = "ScenarioConfirm";
+        confirmGo.SetActive(true);
+
+        var confirmRt = confirmGo.GetComponent<RectTransform>();
+        confirmRt.anchorMin = confirmRt.anchorMax = new Vector2(0.5f, 0.5f);
+        confirmRt.pivot = new Vector2(0.5f, 0.5f);
+        confirmRt.anchoredPosition = new Vector2(0, -300);
+        confirmRt.sizeDelta = new Vector2(200, 80);
+
+        var confirmText = confirmGo.GetComponentInChildren<TMP_Text>(true);
+        if (confirmText != null)
+            confirmText.text = "确定";
+
+        var confirmBtn = confirmGo.GetComponent<Button>();
+        if (confirmBtn == null)
+        {
+            GameLog.Error("SaveLoadPanelControl 确定按钮缺少 Button 组件");
+            return;
+        }
+        confirmBtn.onClick.RemoveAllListeners();
+        confirmBtn.onClick.AddListener(() =>
+        {
+            GameManager.Instance.PlaySound("Sounds/click");
+            OnScenarioConfirm();
+        });
+    }
+
+    // 选中剧本：选中高亮、未选中暗调
+    private void SelectScenario(int scenarioId)
+    {
+        if (!scenarioIds.Contains(scenarioId))
+        {
+            GameLog.Warn("SaveLoadPanelControl 剧本Id[" + scenarioId + "]不在可选列表中，改为选中第一个");
+            scenarioId = scenarioIds.Count > 0 ? scenarioIds[0] : GameConst.DefaultScenarioId;
+        }
+
+        selectedScenarioId = scenarioId;
+        for (int i = 0; i < scenarioImages.Count; i++)
+        {
+            if (scenarioImages[i] == null)
+                continue;
+            bool selected = scenarioIds[i] == scenarioId;
+            scenarioImages[i].color = selected ? SysColor.Theme.ScenarioSelected : SysColor.Theme.ScenarioNormal;
+        }
+
+        // 切换剧本时刷新历史描述与该剧本的高品质武将头像
+        if (scenarioDesText != null)
+            scenarioDesText.text = ScenarioConfig.HasConfig(scenarioId) ? ScenarioConfig.GetConfig(scenarioId).Des : "";
+        BuildScenarioAvatars(scenarioId);
+    }
+
+    // 点击确定：隐藏剧本面板并按所选剧本开始新游戏
+    private void OnScenarioConfirm()
+    {
+        if (selectedScenarioId < 0)
+        {
+            GameLog.Warn("SaveLoadPanelControl 未选中剧本，使用默认剧本 " + GameConst.DefaultScenarioId);
+            selectedScenarioId = GameConst.DefaultScenarioId;
+        }
+
+        if (scenarioPanel != null)
+            scenarioPanel.SetActive(false);
+        StartNewGame(selectedScenarioId);
     }
 
     // 开始一局新游戏：不再展示选牌/like 面板，所有英雄直接进入随机池并进入商店
-    private void StartNewGame()
+    private void StartNewGame(int scenarioId)
     {
         if (GameManager.Instance.currentSaveSlot < 0)
             GameManager.Instance.CreateNewSaveSlot();
 
         CardShopManager.RequestResetGameState();
-        // 新游戏默认剧本（后续若增加剧本选择，在这里写入所选剧本Id）
-        GameManager.Instance.scenarioId = GameConst.DefaultScenarioId;
+        // 所选剧本决定英雄池（ResetPlayersForNewGame 内按剧本重算），进而影响商店出卡
+        GameManager.Instance.scenarioId = scenarioId;
         // 重置全部玩家，避免上一局的卡片/等级/生命等数据残留到新的一局
         GameManager.Instance.ResetPlayersForNewGame();
         loadGamePanel.SetActive(false);
         GameManager.Instance.InitHeros(false);
         GameManager.Instance.InitFriend(false);
+        // 新开局首次进入商店时写一次存档（由 ShopBegin 消费该标记）
+        GameManager.Instance.pendingNewGameSave = true;
         EnterShop();
     }
 
