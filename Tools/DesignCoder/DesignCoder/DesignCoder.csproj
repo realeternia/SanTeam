@@ -56,6 +56,9 @@
     <Compile Include="EffectPickerForm.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="FilterForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
     </Compile>

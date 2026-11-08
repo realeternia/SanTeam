@@ -156,11 +156,14 @@ namespace HeroBondTool
 
         private static void ParseScenarios(string text, DataStore store)
         {
-            foreach (Match m in Regex.Matches(text, @"new\s+ScenarioConfig\s*\(\s*(\d+)\s*,\s*""([^""]*)""\s*\)"))
+            foreach (Match m in IterRows(text, "ScenarioConfig"))
             {
+                List<string> args = SplitArgs(m.Groups[1].Value);
+                if (args.Count < 2)
+                    continue;
                 var scenario = new ScenarioInfo();
-                scenario.Id = int.Parse(m.Groups[1].Value);
-                scenario.Name = m.Groups[2].Value;
+                scenario.Id = ParseInt(args[0]);
+                scenario.Name = Unquote(args[1]);
                 store.Scenarios.Add(scenario);
             }
             store.Scenarios.Sort((a, b) => a.Id.CompareTo(b.Id));

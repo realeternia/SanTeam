@@ -82,11 +82,22 @@ namespace DesignCoder
         private Dictionary<string, int> highlightColCache = new Dictionary<string, int>();
         private Dictionary<string, int> highlightRowCache = new Dictionary<string, int>();
 
+        // 列筛选条件（Excel 式自动筛选）：字段名 -> 允许显示的单元格值集合；不存在表示该列不筛选
+        private readonly Dictionary<string, HashSet<string>> columnFilters = new Dictionary<string, HashSet<string>>();
+        // 表头第一行右侧筛选按钮区域的宽度
+        private const int FilterButtonWidth = 18;
+
+        // 表头右键菜单里的筛选项（运行时创建，避免改动 Designer）
+        private ToolStripMenuItem menuFilterColumn;
+        private ToolStripMenuItem menuClearFilterColumn;
+        private ToolStripMenuItem menuClearAllFilters;
+
         public Form1()
         {
             InitializeComponent();
             this.KeyPreview = true;
             this.KeyDown += Form1_KeyDown;
+            SetupFilterMenuItems();
         }
 
         private void Form1_KeyDown(object sender, KeyEventArgs e)
@@ -172,6 +183,8 @@ namespace DesignCoder
             try
             {
                 currentConfigName = configName;
+                // 切换配置时清空列筛选（筛选条件按表独立，避免串表）
+                columnFilters.Clear();
 
                 if (loadedConfigs.ContainsKey(configName) && modifiedConfigs.Contains(configName))
                 {
@@ -251,6 +264,7 @@ namespace DesignCoder
             }
 
             dataGridView1.DataSource = dataTable;
+            ApplyRowFilter();
         }
 
         private void SetupDataGridView()
@@ -453,10 +467,22 @@ namespace DesignCoder
         private void SyncCellMetasToConfig()
         {
             if (currentConfig == null) return;
-            currentConfig.CellMetas.Clear();
+            if (dataTable == null)
+            {
+                currentConfig.CellMetas.Clear();
+                return;
+            }
+
+            // 筛选后显示行号与数据行号不一致，按 DataBoundItem 反查真实数据行号
+            var visibleDataRows = new HashSet<int>();
+            var metas = new List<CellMeta>();
 
             for (int rowIdx = HeaderRowCount; rowIdx < dataGridView1.Rows.Count; rowIdx++)
             {
+                int dataRowIdx = GetDataRowIndexFromDisplayRow(rowIdx);
+                if (dataRowIdx < 0) continue;
+                visibleDataRows.Add(dataRowIdx);
+
                 for (int colIdx = 0; colIdx < dataGridView1.Columns.Count; colIdx++)
                 {
                     if (!dataGridView1.Columns[colIdx].Visible) continue;
@@ -468,14 +494,20 @@ namespace DesignCoder
                     if (hasForeColor || hasBackColor)
                     {
                         var cm = new CellMeta();
-                        cm.Row = rowIdx - HeaderRowCount;
+                        cm.Row = dataRowIdx - HeaderRowCount;
                         cm.Col = colIdx;
                         if (hasForeColor) cm.ForeColor = cell.Style.ForeColor.ToArgb();
                         if (hasBackColor) cm.BackColor = cell.Style.BackColor.ToArgb();
-                        currentConfig.CellMetas.Add(cm);
+                        metas.Add(cm);
                     }
                 }
             }
+
+            // 被筛选隐藏的数据行保留原配色记录，避免整体覆盖时丢失
+            var kept = currentConfig.CellMetas.Where(cm => !visibleDataRows.Contains(cm.Row + HeaderRowCount)).ToList();
+            currentConfig.CellMetas.Clear();
+            currentConfig.CellMetas.AddRange(kept);
+            currentConfig.CellMetas.AddRange(metas);
         }
 
         private void SyncColumnWidthsToConfig()
@@ -571,9 +603,16 @@ namespace DesignCoder
             {
                 row[field.Name] = "";
             }
+            int beforeCount = dataTable.DefaultView.Count;
             dataTable.Rows.Add(row);
             SyncDataTableToConfig();
             MarkCurrentConfigModified();
+            // 筛选状态下新增行如果不满足条件会被隐藏，提示一下避免误以为没加上
+            if (columnFilters.Count > 0 && dataTable.DefaultView.Count == beforeCount)
+            {
+                MessageBox.Show("新行不满足当前筛选条件，已被隐藏；清除筛选后即可看到。",
+                    "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
         }
 
         private void btnDeleteRow_Click(object sender, EventArgs e)
@@ -596,9 +635,12 @@ namespace DesignCoder
 
             dataGridView1.EndEdit();
 
-            int srcRowIdx = selectedRowIndex;
-            if (srcRowIdx < HeaderRowCount || srcRowIdx >= dataGridView1.Rows.Count || dataGridView1.Rows[srcRowIdx].IsNewRow)
-                srcRowIdx = dataGridView1.CurrentCell != null ? dataGridView1.CurrentCell.RowIndex : -1;
+            int displayRowIdx = selectedRowIndex;
+            if (displayRowIdx < HeaderRowCount || displayRowIdx >= dataGridView1.Rows.Count || dataGridView1.Rows[displayRowIdx].IsNewRow)
+                displayRowIdx = dataGridView1.CurrentCell != null ? dataGridView1.CurrentCell.RowIndex : -1;
+
+            // 筛选后显示行号与数据行号不一致，先换算成真实数据行号
+            int srcRowIdx = GetDataRowIndexFromDisplayRow(displayRowIdx);
 
             if (srcRowIdx < HeaderRowCount || srcRowIdx >= dataTable.Rows.Count ||
                 (dataTable.Rows[srcRowIdx]["_RowTag_"] as string) != "Data")
@@ -671,11 +713,13 @@ namespace DesignCoder
                 if (cm.Row >= insertedDataIdx) cm.Row++;
             }
 
-            selectedRowIndex = insertIdx;
+            int displayInsertIdx = GetDisplayRowIndexFromDataRow(insertIdx);
+            selectedRowIndex = displayInsertIdx;
             SyncDataTableToConfig();
             MarkCurrentConfigModified();
             dataGridView1.Invalidate();
-            GotoCell(insertIdx, dataGridView1.Columns["Id"].Index);
+            if (displayInsertIdx >= HeaderRowCount)
+                GotoCell(displayInsertIdx, dataGridView1.Columns["Id"].Index);
         }
 
         private void btnBatchFill_Click(object sender, EventArgs e)
@@ -1581,6 +1625,7 @@ namespace DesignCoder
                 dataGridView1.DataSource = dataTable;
                 SetupDataGridView();
                 ApplyColors();
+                ApplyRowFilter();
                 dataGridView1.Invalidate();
 
                 MarkCurrentConfigModified();
@@ -1672,6 +1717,10 @@ namespace DesignCoder
 
                 currentConfig.Fields.RemoveAt(fieldIdx);
 
+                // 删列前先清空行筛选表达式，避免表达式引用已删除的列
+                dataTable.DefaultView.RowFilter = "";
+                columnFilters.Remove(fieldName);
+
                 foreach (var row in currentConfig.Rows)
                 {
                     if (row.ContainsKey(fieldName))
@@ -1694,6 +1743,7 @@ namespace DesignCoder
                 dataGridView1.DataSource = dataTable;
                 SetupDataGridView();
                 ApplyColors();
+                ApplyRowFilter();
                 dataGridView1.Invalidate();
 
                 MarkCurrentConfigModified();
@@ -1752,6 +1802,11 @@ namespace DesignCoder
             menuMoveColLeft.Enabled = isDataColumn && fieldIdx > 0;
             menuMoveColRight.Enabled = isDataColumn && fieldIdx < currentConfig.Fields.Count - 1;
             menuViewDistribution.Enabled = isIntColumn;
+
+            string fieldName = isDataColumn ? currentConfig.Fields[fieldIdx].Name : null;
+            menuFilterColumn.Enabled = isDataColumn;
+            menuClearFilterColumn.Enabled = isDataColumn && fieldName != null && columnFilters.ContainsKey(fieldName);
+            menuClearAllFilters.Enabled = columnFilters.Count > 0;
         }
 
         private void menuMoveColLeft_Click(object sender, EventArgs e)
@@ -1796,6 +1851,7 @@ namespace DesignCoder
                 dataGridView1.DataSource = dataTable;
                 SetupDataGridView();
                 ApplyColors();
+                ApplyRowFilter();
                 dataGridView1.Invalidate();
 
                 MarkCurrentConfigModified();
@@ -1810,9 +1866,25 @@ namespace DesignCoder
         {
             if (currentConfig == null || currentConfig.CellMetas == null || currentConfig.CellMetas.Count == 0) return;
 
+            // 数据行号 -> 显示行号（筛选隐藏的行走不到，直接跳过）
+            var displayRowByDataRow = new Dictionary<int, int>();
+            if (dataTable != null)
+            {
+                foreach (DataGridViewRow row in dataGridView1.Rows)
+                {
+                    var drv = row.DataBoundItem as DataRowView;
+                    if (drv == null) continue;
+                    int dataRowIdx = dataTable.Rows.IndexOf(drv.Row);
+                    if (dataRowIdx >= 0)
+                        displayRowByDataRow[dataRowIdx] = row.Index;
+                }
+            }
+
             foreach (var cm in currentConfig.CellMetas)
             {
-                int rowIdx = cm.Row + HeaderRowCount;
+                int dataRowIdx = cm.Row + HeaderRowCount;
+                int rowIdx;
+                if (!displayRowByDataRow.TryGetValue(dataRowIdx, out rowIdx)) continue;
                 int colIdx = cm.Col;
 
                 if (rowIdx >= HeaderRowCount && rowIdx < dataGridView1.Rows.Count &&
@@ -1882,6 +1954,23 @@ namespace DesignCoder
 
         private void dataGridView1_CellMouseDown(object sender, DataGridViewCellMouseEventArgs e)
         {
+            // 表头第一行右侧的筛选按钮：点击打开该列的筛选面板（Excel 式自动筛选）
+            if (e.Button == MouseButtons.Left && e.RowIndex == 0 && e.ColumnIndex >= 0)
+            {
+                int fieldIdx = GetFieldIndexFromColumnIndex(e.ColumnIndex);
+                if (fieldIdx >= 0)
+                {
+                    Rectangle cellRect = dataGridView1.GetCellDisplayRectangle(e.ColumnIndex, e.RowIndex, false);
+                    Rectangle glyphRect = GetFilterGlyphBounds(cellRect);
+                    var clickPoint = new Point(cellRect.X + e.X, cellRect.Y + e.Y);
+                    if (glyphRect.Contains(clickPoint))
+                    {
+                        ShowColumnFilterDialog(e.ColumnIndex);
+                        return;
+                    }
+                }
+            }
+
             // 特效字段右侧的“选”按钮：点击打开特效截图选择面板
             if (e.Button == MouseButtons.Left && e.RowIndex >= HeaderRowCount && e.ColumnIndex >= 0)
             {
@@ -2081,11 +2170,22 @@ namespace DesignCoder
                 else
                 {
                     string cellValue = e.Value != null ? e.Value.ToString() : "";
+                    Rectangle textRect = e.CellBounds;
+                    // 第一行右侧留有筛选按钮的位置，文字不压住图标
+                    if (e.RowIndex == 0 && GetFieldIndexFromColumnIndex(e.ColumnIndex) >= 0)
+                        textRect.Width -= FilterButtonWidth;
                     using (Brush brush = new SolidBrush(headerText))
                     {
                         StringFormat sf = new StringFormat { LineAlignment = StringAlignment.Center, Alignment = StringAlignment.Center };
-                        e.Graphics.DrawString(cellValue, e.CellStyle.Font, brush, e.CellBounds, sf);
+                        e.Graphics.DrawString(cellValue, e.CellStyle.Font, brush, textRect, sf);
                     }
+                }
+
+                // 字段名行右侧画筛选按钮（漏斗），该列已筛选时高亮
+                if (e.RowIndex == 0 && fieldIdx >= 0 && fieldIdx < currentConfig.Fields.Count)
+                {
+                    bool filterActive = columnFilters.ContainsKey(currentConfig.Fields[fieldIdx].Name);
+                    DrawFilterGlyph(e.Graphics, e.CellBounds, filterActive, isSelectedCol);
                 }
 
                 using (Pen borderPen = new Pen(Color.FromArgb(60, 60, 65)))
@@ -2554,6 +2654,231 @@ namespace DesignCoder
                 }
                 e.Handled = true;
             }
+        }
+
+        // ---------- 列筛选（Excel 式自动筛选） ----------
+
+        private void SetupFilterMenuItems()
+        {
+            menuFilterColumn = new ToolStripMenuItem("筛选此列…");
+            menuFilterColumn.Click += (s, e) => OpenFilterForCurrentColumn();
+
+            menuClearFilterColumn = new ToolStripMenuItem("清除此列筛选");
+            menuClearFilterColumn.Click += (s, e) => ClearCurrentColumnFilter();
+
+            menuClearAllFilters = new ToolStripMenuItem("清除全部筛选");
+            menuClearAllFilters.Click += (s, e) =>
+            {
+                if (columnFilters.Count == 0) return;
+                columnFilters.Clear();
+                ApplyRowFilter(true);
+            };
+
+            contextMenuStrip1.Items.Add(new ToolStripSeparator());
+            contextMenuStrip1.Items.Add(menuFilterColumn);
+            contextMenuStrip1.Items.Add(menuClearFilterColumn);
+            contextMenuStrip1.Items.Add(menuClearAllFilters);
+        }
+
+        private void OpenFilterForCurrentColumn()
+        {
+            if (dataGridView1.CurrentCell == null) return;
+            ShowColumnFilterDialog(dataGridView1.CurrentCell.ColumnIndex);
+        }
+
+        private void ClearCurrentColumnFilter()
+        {
+            if (dataGridView1.CurrentCell == null) return;
+            string name = dataGridView1.Columns[dataGridView1.CurrentCell.ColumnIndex].Name;
+            if (columnFilters.Remove(name))
+                ApplyRowFilter(true);
+        }
+
+        // 表头第一行右侧筛选按钮的命中区域（绘制与点击共用）
+        private static Rectangle GetFilterGlyphBounds(Rectangle cellBounds)
+        {
+            int height = Math.Max(10, cellBounds.Height - 8);
+            return new Rectangle(cellBounds.Right - FilterButtonWidth - 2, cellBounds.Y + 4, FilterButtonWidth, height);
+        }
+
+        private void DrawFilterGlyph(Graphics g, Rectangle cellBounds, bool active, bool selectedColumn)
+        {
+            Rectangle rect = GetFilterGlyphBounds(cellBounds);
+            Color color = active
+                ? Color.FromArgb(255, 205, 90)
+                : (selectedColumn ? Color.FromArgb(70, 58, 20) : Color.FromArgb(200, 215, 235));
+
+            int w = 9;
+            int h = 6;
+            Point[] points =
+            {
+                new Point(rect.X + (rect.Width - w) / 2, rect.Y + (rect.Height - h) / 2),
+                new Point(rect.X + (rect.Width + w) / 2, rect.Y + (rect.Height - h) / 2),
+                new Point(rect.X + rect.Width / 2, rect.Y + (rect.Height + h) / 2)
+            };
+            using (Brush brush = new SolidBrush(color))
+                g.FillPolygon(brush, points);
+        }
+
+        // 打开某列的筛选面板；确定后仅显示勾选值对应的数据行
+        private void ShowColumnFilterDialog(int columnIndex)
+        {
+            if (currentConfig == null || dataTable == null) return;
+            if (columnIndex < 0 || columnIndex >= dataGridView1.Columns.Count) return;
+
+            string fieldName = dataGridView1.Columns[columnIndex].Name;
+            if (fieldName == "_RowTag_") return;
+
+            dataGridView1.EndEdit();
+            SyncDataTableToConfig();
+
+            List<string> values = GetDistinctColumnValues(fieldName);
+            HashSet<string> current = columnFilters.ContainsKey(fieldName) ? columnFilters[fieldName] : null;
+
+            string chinese = dataTable.Rows.Count > 1 && dataTable.Rows[1][fieldName] != null
+                ? dataTable.Rows[1][fieldName].ToString() : "";
+            string title = string.IsNullOrEmpty(chinese) ? fieldName : string.Format("{0}（{1}）", fieldName, chinese);
+
+            using (var dlg = new FilterForm(title, values, current))
+            {
+                if (dlg.ShowDialog(this) != DialogResult.OK) return;
+
+                if (dlg.Cleared || dlg.SelectedValues == null || dlg.SelectedValues.Count >= values.Count)
+                    columnFilters.Remove(fieldName);
+                else
+                    columnFilters[fieldName] = dlg.SelectedValues;
+
+                ApplyRowFilter(true);
+            }
+        }
+
+        // 该列现有全部数据值（仅统计数据行），数字优先排序，空值放最后
+        private List<string> GetDistinctColumnValues(string fieldName)
+        {
+            var set = new HashSet<string>(StringComparer.Ordinal);
+            if (dataTable != null && dataTable.Columns.Contains(fieldName))
+            {
+                foreach (DataRow row in dataTable.Rows)
+                {
+                    if ((row["_RowTag_"] as string) != "Data") continue;
+                    string value = row[fieldName] == DBNull.Value ? "" : row[fieldName].ToString();
+                    set.Add(value);
+                }
+            }
+            var values = new List<string>(set);
+            values.Sort(CompareFilterValues);
+            return values;
+        }
+
+        private static int CompareFilterValues(string a, string b)
+        {
+            bool emptyA = string.IsNullOrEmpty(a);
+            bool emptyB = string.IsNullOrEmpty(b);
+            if (emptyA || emptyB)
+                return (emptyA && emptyB) ? 0 : (emptyA ? 1 : -1);
+
+            int intA, intB;
+            if (int.TryParse(a, out intA) && int.TryParse(b, out intB))
+                return intA.CompareTo(intB);
+            return string.CompareOrdinal(a, b);
+        }
+
+        // 应用筛选并刷新标题栏统计；resetRowHighlight 用于筛选条件变化时丢弃已失效的行高亮
+        private void ApplyRowFilter(bool resetRowHighlight = false)
+        {
+            if (dataTable == null) return;
+
+            try
+            {
+                dataTable.DefaultView.RowFilter = BuildRowFilterExpression();
+            }
+            catch (Exception ex)
+            {
+                dataTable.DefaultView.RowFilter = "";
+                columnFilters.Clear();
+                MessageBox.Show("筛选条件无效，已清除筛选：" + ex.Message, "筛选", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+
+            if (resetRowHighlight)
+                selectedRowIndex = -1;
+            UpdateFilterCaption();
+            // 筛选变化后数据行对象会重建，重新上色，避免隐藏行重新显示时颜色丢失
+            ApplyColors();
+            if (dataGridView1 != null)
+                dataGridView1.Invalidate();
+        }
+
+        // 表头 3 行始终保留，数据行按各列勾选值做 AND/OR 组合
+        private string BuildRowFilterExpression()
+        {
+            if (dataTable == null || columnFilters.Count == 0) return "";
+
+            var andParts = new List<string>();
+            foreach (KeyValuePair<string, HashSet<string>> kv in columnFilters)
+            {
+                if (!dataTable.Columns.Contains(kv.Key)) continue;
+
+                string column = "[" + kv.Key.Replace("]", "]]") + "]";
+                var orParts = new List<string>();
+                foreach (string value in kv.Value)
+                    orParts.Add(column + " = '" + EscapeFilterValue(value) + "'");
+
+                if (orParts.Count == 0)
+                {
+                    andParts.Add("1 = 0");
+                    continue;
+                }
+                andParts.Add("(" + string.Join(" OR ", orParts.ToArray()) + ")");
+            }
+
+            if (andParts.Count == 0) return "";
+            return "_RowTag_ <> 'Data' OR (" + string.Join(" AND ", andParts.ToArray()) + ")";
+        }
+
+        private static string EscapeFilterValue(string value)
+        {
+            return value == null ? "" : value.Replace("'", "''");
+        }
+
+        private void UpdateFilterCaption()
+        {
+            string baseText = currentConfigName != null ? "ConfigCoder - " + currentConfigName : "ConfigCoder";
+            if (dataTable == null || columnFilters.Count == 0)
+            {
+                Text = baseText;
+                return;
+            }
+
+            int shown = Math.Max(0, dataTable.DefaultView.Count - HeaderRowCount);
+            int total = 0;
+            foreach (DataRow row in dataTable.Rows)
+                if ((row["_RowTag_"] as string) == "Data") total++;
+
+            Text = string.Format("{0}  [筛选 {1} 列 · 显示 {2}/{3} 行]",
+                baseText, columnFilters.Count, shown, total);
+        }
+
+        // 显示行号 -> 数据行号（筛选后两者不一致；无效返回 -1）
+        private int GetDataRowIndexFromDisplayRow(int displayRowIdx)
+        {
+            if (dataTable == null) return -1;
+            if (displayRowIdx < 0 || displayRowIdx >= dataGridView1.Rows.Count) return -1;
+            var view = dataGridView1.Rows[displayRowIdx].DataBoundItem as DataRowView;
+            return view == null ? -1 : dataTable.Rows.IndexOf(view.Row);
+        }
+
+        // 数据行号 -> 显示行号（被筛选隐藏的行返回 -1）
+        private int GetDisplayRowIndexFromDataRow(int dataRowIdx)
+        {
+            if (dataTable == null) return -1;
+            if (dataRowIdx < 0 || dataRowIdx >= dataTable.Rows.Count) return -1;
+            DataRow target = dataTable.Rows[dataRowIdx];
+            foreach (DataGridViewRow row in dataGridView1.Rows)
+            {
+                var view = row.DataBoundItem as DataRowView;
+                if (view != null && view.Row == target) return row.Index;
+            }
+            return -1;
         }
     }
 }
