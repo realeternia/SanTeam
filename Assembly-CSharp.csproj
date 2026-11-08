@@ -131,6 +131,7 @@
     <Compile Include="Assets\Lana Studio\Casual RPG VFX\Scripts\UVscroll.cs" />
     <Compile Include="Assets\SineVFX\TopDownEffects\Scripts\SineUIControllerTopDownEffects.cs" />
     <Compile Include="Assets\MasterMagicFX\Scripts\Miscs\MUtils.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffFireCloak.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillSelfBuff.cs" />
     <Compile Include="Assets\SineVFX\TopDownEffects\Scripts\RampGeneratorTDE.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAreaBuff.cs" />
@@ -169,6 +170,7 @@
     <Compile Include="Assets\MasterMagicFX\Scripts\Miscs\CameraRotater.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAttackedTeleport.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\BattleResultHeroCellControl.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidExplode.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillInitSoldierBuff.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\LoadGameItem.cs" />
     <Compile Include="Assets\MasterMagicFX\Scripts\Miscs\ParticlePreviewer.cs" />
@@ -192,6 +194,7 @@
     <Compile Include="Assets\Resources\Scripts\Combat\FatigueManager.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillInitShieldValue.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillCastingAidAreaHeal.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidManaBurn.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffLock.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidFireWall.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\RankPanelManager.cs" />
@@ -240,9 +243,6 @@
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffReflect.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidAmbush.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAreaDamageDeBuff.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidExplode.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidManaBurn.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffFireCloak.cs" />
     <Compile Include="Assets\Resources\Scripts\Configs\PlayerLevelConfig_s.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAttackSpeedAttack.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidBackstepShot.cs" />
