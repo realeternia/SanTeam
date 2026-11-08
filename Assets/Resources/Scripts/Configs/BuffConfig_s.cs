@@ -179,6 +179,7 @@ namespace CommonConfig
             config[300107] = new BuffConfig(300107, "望族", "望", "提升/strength点护甲、/strength2点魔抗，每3秒衰减1/5，15秒后归零", true, true, false, 4, "BuffDecayDef", "", "", "", "", "");
             config[300108] = new BuffConfig(300108, "兼资", "兼", "攻击叠层：每层提升/strength攻击、/strength2法术强度，持续攻击刷新，停手后层数清零", true, true, false, 4, "BuffStackBuf", "", "", "", "", "");
             config[300109] = new BuffConfig(300109, "威震", "震", "携带者普攻按概率眩晕目标，且普攻转为真实伤害", true, false, false, 4, "BuffVengefulStance", "#0000CC", "#660099", "", "", "");
+            config[300110] = new BuffConfig(300110, "焰衣", "焰", "每秒对周围敌人造成伤害", true, true, false, 4, "BuffFireCloak", "", "", "Par_FireField", "", "");
             config[300128] = new BuffConfig(300128, "护驾", "护", "受到的回复效果提升/strength%", true, false, false, 4, "BuffHealBoost", "", "", "", "", "");
             config[301001] = new BuffConfig(301001, "眩晕", "乱", "眩晕，无法行动", false, true, true, 3, "BuffNoAction", "", "", "StunnedCirclingStarsSimple", "", "");
             config[301003] = new BuffConfig(301003, "增伤", "伤", "受到的伤害按比例增加", false, true, false, 1, "BuffDamagedAddRate", "", "", "StunnedDamageUp", "", "");
