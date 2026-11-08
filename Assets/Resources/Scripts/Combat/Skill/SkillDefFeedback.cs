@@ -22,7 +22,7 @@ public class SkillDefFeedback : Skill
         if (skillCfg.Range > 0)
         {
             // 配置表重生成后已无 RangeOut 列：Range 表示反弹生效范围（范围内才触发，对应旧表 RangeOut=false 语义，刺甲适用）
-            var isInRange = WorldManager.Instance.CheckInRange(owner.transform.position, attacker.transform.position, skillCfg.Range);
+            var isInRange = WorldManager.Instance.CheckInRange(owner, attacker, skillCfg.Range);
             if (!isInRange)
                 return;
         }

@@ -17,7 +17,7 @@ public class SkillAidExplode : Skill
         var target = owner.targetChess;
         if (target == null || target.hp <= 0)
             return false;
-        if (skillCfg.Range > 0f && !WorldManager.Instance.CheckInRange(owner.transform.position, target.transform.position, skillCfg.Range))
+        if (skillCfg.Range > 0f && !WorldManager.Instance.CheckInRange(owner, target, skillCfg.Range))
             return false;
         if (!CheckBurst(target))
             return false;

@@ -48,7 +48,7 @@ namespace CommonConfig
             {"Ap", new FieldMetaInfo("法术强度（职业基准模板）", "int", 60)},
             {"MagicRate", new FieldMetaInfo("法术倍率（1=无修正；≠1时本职业英雄技能伤害/治疗×本值、英雄攻击÷本值。法系 扇/相/棋/鼓/琴/医=1.5）", "float", 60)},
             {"Hp", new FieldMetaInfo("生命（职业基准值）", "int", 60)},
-            {"Range", new FieldMetaInfo("射程（近战17 弓50 弩70 炮50 扇/相/棋/鼓/琴/医/工35）", "int", 60)},
+            {"Range", new FieldMetaInfo("射程（近战7 弓35 弩50 炮35 扇/相/棋/鼓/琴/医/工25）", "int", 60)},
             {"AtkSpeed", new FieldMetaInfo("攻速（30=每秒攻击1次，攻速20=1.5秒/次，15=2秒/次）", "int", 60)},
             {"HpRegen", new FieldMetaInfo("生命回复/秒（职业基准值）", "int", 60)},
             {"MpRegen", new FieldMetaInfo("法力获取加成（%，职业基准值；普攻/受击获得法力时按此百分比提升）", "int", 60)},
@@ -98,7 +98,8 @@ namespace CommonConfig
         /// </summary>
         public int Hp;
         /// <summary>
-        ///射程（近战17 弓50 弩70 炮50 扇/相/棋/鼓/琴/医/工35）
+        ///射程（近战7 弓35 弩50 炮35 扇/相/棋/鼓/琴/医/工25）；
+        ///命中判距为「射程+双方占位半径」，已按新口径下调10（近战职业）
         /// </summary>
         public int Range;
         /// <summary>
@@ -179,24 +180,24 @@ namespace CommonConfig
         public static void Load()
         {
             config.Clear();
-            config[1] = new JobConfig(1, "诸侯", "王", new string[]{"atk","ap","hp"}, 50, 0, 1f, 550, 17, 20, 2, 0, 30, 30, 10, 0, 0f, "SwordHitYellowCritical");
-            config[101] = new JobConfig(101, "骑士", "马", new string[]{"atk","hp","atkspeed"}, 60, 0, 1f, 480, 17, 20, 2, 0, 28, 28, 12, 0, 0f, "SwordHitYellowCritical");
-            config[102] = new JobConfig(102, "战车", "车", new string[]{"atk","armor","hp"}, 55, 0, 1f, 520, 17, 20, 2, 0, 30, 30, 12, 0, 0f, "SwordHitYellowCritical");
-            config[201] = new JobConfig(201, "弓手", "弓", new string[]{"atk","atkspeed","crit"}, 42, 0, 1f, 450, 45, 20, 2, 0, 15, 30, 8, 20, 1.5f, "BulletExplosionBlue");
-            config[202] = new JobConfig(202, "弩手", "弩", new string[]{"atk","crit","atkspeed"}, 35, 0, 1f, 400, 60, 25, 2, 0, 15, 30, 8, 25, 0f, "BulletExplosionBlue");
-            config[203] = new JobConfig(203, "炮手", "炮", new string[]{"ap","atk","atkspeed"}, 40, 0, 1f, 450, 45, 20, 2, 0, 20, 20, 8, 13, 2.5f, "GasShootFire");
-            config[301] = new JobConfig(301, "卫士", "士", new string[]{"armor","hp","magicres"}, 47, 0, 1f, 630, 17, 15, 2, 0, 30, 20, 10, 0, 0f, "SwordHitYellowCritical");
-            config[302] = new JobConfig(302, "盾兵", "盾", new string[]{"hp","armor","magicres"}, 40, 0, 1f, 740, 17, 15, 2, 0, 40, 10, 10, 0, 0f, "SwordHitYellowCritical");
-            config[401] = new JobConfig(401, "智士", "扇", new string[]{"ap","mpRegen","hp"}, 40, 0, 1.5f, 450, 35, 20, 2, 0, 15, 35, 8, 15, 0f, "StormExplosion");
-            config[402] = new JobConfig(402, "丞相", "相", new string[]{"ap","magicres","mpRegen"}, 45, 0, 1.5f, 500, 35, 20, 2, 0, 15, 35, 8, 18, 0f, "SharpExplosionGreen");
-            config[403] = new JobConfig(403, "棋手", "棋", new string[]{"ap","crit","mpRegen"}, 50, 0, 1.5f, 450, 35, 20, 2, 0, 15, 35, 8, 15, 0f, "LightningExplosionBlue");
-            config[501] = new JobConfig(501, "鼓手", "鼓", new string[]{"ap","hp","mpRegen"}, 45, 0, 1.5f, 495, 35, 20, 2, 0, 25, 40, 8, 15, 0f, "SharpExplosionGreen");
-            config[502] = new JobConfig(502, "琴手", "琴", new string[]{"ap","mpRegen","atkspeed"}, 45, 0, 1.5f, 480, 35, 20, 2, 0, 20, 40, 8, 15, 0f, "StormExplosion");
-            config[503] = new JobConfig(503, "医士", "医", new string[]{"ap","hpRegen","mpRegen"}, 45, 0, 1.5f, 480, 35, 20, 2, 0, 20, 30, 8, 14, 0f, "ShadowExplosionGreen");
-            config[601] = new JobConfig(601, "锤兵", "锤", new string[]{"atk","hp","armor"}, 55, 0, 1f, 550, 17, 15, 2, 0, 25, 15, 10, 0, 0f, "SwordHitYellowCritical");
-            config[602] = new JobConfig(602, "枪兵", "枪", new string[]{"atk","atkspeed","hp"}, 55, 0, 1f, 550, 17, 20, 2, 0, 25, 25, 10, 0, 0f, "SwordHitYellowCritical");
-            config[603] = new JobConfig(603, "戟兵", "戟", new string[]{"atk","armor","hp"}, 50, 0, 1f, 600, 17, 20, 2, 0, 20, 20, 10, 0, 0f, "SwordHitYellowCritical");
-            config[701] = new JobConfig(701, "工匠", "工", new string[]{"ap","atkspeed","hp"}, 42, 0, 1f, 480, 35, 20, 2, 0, 15, 40, 8, 18, 1f, "ToolExplosion");
+            config[1] = new JobConfig(1, "诸侯", "王", new string[]{"atk","ap","hp"}, 50, 0, 1f, 550, 7, 20, 2, 0, 30, 30, 10, 0, 0f, "SwordHitYellowCritical");
+            config[101] = new JobConfig(101, "骑士", "马", new string[]{"atk","hp","atkspeed"}, 60, 0, 1f, 480, 7, 20, 2, 0, 28, 28, 12, 0, 0f, "SwordHitYellowCritical");
+            config[102] = new JobConfig(102, "战车", "车", new string[]{"atk","armor","hp"}, 55, 0, 1f, 520, 7, 20, 2, 0, 30, 30, 12, 0, 0f, "SwordHitYellowCritical");
+            config[201] = new JobConfig(201, "弓手", "弓", new string[]{"atk","atkspeed","crit"}, 42, 0, 1f, 450, 35, 20, 2, 0, 15, 30, 8, 20, 1.5f, "BulletExplosionBlue");
+            config[202] = new JobConfig(202, "弩手", "弩", new string[]{"atk","crit","atkspeed"}, 35, 0, 1f, 400, 50, 25, 2, 0, 15, 30, 8, 25, 0f, "BulletExplosionBlue");
+            config[203] = new JobConfig(203, "炮手", "炮", new string[]{"ap","atk","atkspeed"}, 40, 0, 1f, 450, 35, 20, 2, 0, 20, 20, 8, 13, 2.5f, "GasShootFire");
+            config[301] = new JobConfig(301, "卫士", "士", new string[]{"armor","hp","magicres"}, 47, 0, 1f, 630, 7, 15, 2, 0, 30, 20, 10, 0, 0f, "SwordHitYellowCritical");
+            config[302] = new JobConfig(302, "盾兵", "盾", new string[]{"hp","armor","magicres"}, 40, 0, 1f, 740, 7, 15, 2, 0, 40, 10, 10, 0, 0f, "SwordHitYellowCritical");
+            config[401] = new JobConfig(401, "智士", "扇", new string[]{"ap","mpRegen","hp"}, 40, 0, 1.5f, 450, 25, 20, 2, 0, 15, 35, 8, 15, 0f, "StormExplosion");
+            config[402] = new JobConfig(402, "丞相", "相", new string[]{"ap","magicres","mpRegen"}, 45, 0, 1.5f, 500, 25, 20, 2, 0, 15, 35, 8, 18, 0f, "SharpExplosionGreen");
+            config[403] = new JobConfig(403, "棋手", "棋", new string[]{"ap","crit","mpRegen"}, 50, 0, 1.5f, 450, 25, 20, 2, 0, 15, 35, 8, 15, 0f, "LightningExplosionBlue");
+            config[501] = new JobConfig(501, "鼓手", "鼓", new string[]{"ap","hp","mpRegen"}, 45, 0, 1.5f, 495, 25, 20, 2, 0, 25, 40, 8, 15, 0f, "SharpExplosionGreen");
+            config[502] = new JobConfig(502, "琴手", "琴", new string[]{"ap","mpRegen","atkspeed"}, 45, 0, 1.5f, 480, 25, 20, 2, 0, 20, 40, 8, 15, 0f, "StormExplosion");
+            config[503] = new JobConfig(503, "医士", "医", new string[]{"ap","hpRegen","mpRegen"}, 45, 0, 1.5f, 480, 25, 20, 2, 0, 20, 30, 8, 14, 0f, "ShadowExplosionGreen");
+            config[601] = new JobConfig(601, "锤兵", "锤", new string[]{"atk","hp","armor"}, 55, 0, 1f, 550, 7, 15, 2, 0, 25, 15, 10, 0, 0f, "SwordHitYellowCritical");
+            config[602] = new JobConfig(602, "枪兵", "枪", new string[]{"atk","atkspeed","hp"}, 55, 0, 1f, 550, 7, 20, 2, 0, 25, 25, 10, 0, 0f, "SwordHitYellowCritical");
+            config[603] = new JobConfig(603, "戟兵", "戟", new string[]{"atk","armor","hp"}, 50, 0, 1f, 600, 7, 20, 2, 0, 20, 20, 10, 0, 0f, "SwordHitYellowCritical");
+            config[701] = new JobConfig(701, "工匠", "工", new string[]{"ap","atkspeed","hp"}, 42, 0, 1f, 480, 25, 20, 2, 0, 15, 40, 8, 18, 1f, "ToolExplosion");
 
             RebuildIndex();
 

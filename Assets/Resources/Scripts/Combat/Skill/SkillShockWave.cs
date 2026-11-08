@@ -20,7 +20,7 @@ public class SkillShockWave : Skill
         if (owner.targetChess == null)
             return false;
 
-        if (!WorldManager.Instance.CheckInRange(owner.transform.position, owner.targetChess.transform.position, skillCfg.Range))
+        if (!WorldManager.Instance.CheckInRange(owner, owner.targetChess, skillCfg.Range))
             return false;
 
         if (!CheckBurst(null))

@@ -43,6 +43,7 @@ namespace CommonConfig
             {"Id", new FieldMetaInfo("序列", "int", 60)},
             {"Name", new FieldMetaInfo("名字", "string", 0)},
             {"Lv", new FieldMetaInfo("等级", "int", 60)},
+            {"EntitySize", new FieldMetaInfo("实体尺寸（水平占位尺寸，米；英雄默认10，小兵默认5=UnitBing/UnitBing2/UnitSpell 的水平缩放；与模型预制体缩放不一致时按比例缩放 x/z，y 不变）", "float", 60)},
             {"Atk", new FieldMetaInfo("攻击力", "int", 60)},
             {"Hp", new FieldMetaInfo("生命", "int", 60)},
             {"AtkP", new FieldMetaInfo("每级攻击成长（士兵等级每级提升的攻击）", "float", 60)},
@@ -55,7 +56,7 @@ namespace CommonConfig
             {"MissileSpeed", new FieldMetaInfo("导弹速度", "int", 60)},
             {"MissileHight", new FieldMetaInfo("导弹高度", "float", 60)},
             {"IsShadow", new FieldMetaInfo("是否隐藏", "bool", 0)},
-            {"Skills", new FieldMetaInfo("技能", "int[]", 0)},
+            {"Skill", new FieldMetaInfo("技能（技能缩写Sname，与英雄 Skill1 同口径）", "string", 0)},
             {"Model", new FieldMetaInfo("模型", "string", 0)},
             {"HitEffect", new FieldMetaInfo("hit", "string", 0)},
             {"IsDrop", new FieldMetaInfo("是否掉落（死亡时从 ItemConfig 掉落池按回合与权重随机一个道具）", "bool", 0)},
@@ -79,6 +80,11 @@ namespace CommonConfig
         ///等级
         /// </summary>
         public int Lv;
+        /// <summary>
+        ///实体尺寸（水平占位尺寸，米）：英雄默认10、小兵默认5；与模型预制体水平缩放不一致时按比例缩放 x/z（y 不变），
+        ///并用于攻击/技能命中距离（双方半径+射程）与移动重叠间距计算
+        /// </summary>
+        public float EntitySize;
         /// <summary>
         ///攻击力
         /// </summary>
@@ -130,7 +136,7 @@ namespace CommonConfig
         /// <summary>
         ///技能
         /// </summary>
-        public int[] Skills;
+        public string Skill;
         /// <summary>
         ///模型
         /// </summary>
@@ -149,11 +155,12 @@ namespace CommonConfig
         public string Img;
 
 
-        public SoldierConfig(int Id, string Name, int Lv, int Atk, int Hp, float AtkP, float HpP, int AtkSpeed, int Armor, int MagicRes, int MoveSpeed, int Range, int MissileSpeed, float MissileHight, bool IsShadow, int[] Skills, string Model, string HitEffect, bool IsDrop, string Img)
+        public SoldierConfig(int Id, string Name, int Lv, float EntitySize, int Atk, int Hp, float AtkP, float HpP, int AtkSpeed, int Armor, int MagicRes, int MoveSpeed, int Range, int MissileSpeed, float MissileHight, bool IsShadow, string Skill, string Model, string HitEffect, bool IsDrop, string Img)
         {
             this.Id = Id;
             this.Name = Name;
             this.Lv = Lv;
+            this.EntitySize = EntitySize;
             this.Atk = Atk;
             this.Hp = Hp;
             this.AtkP = AtkP;
@@ -166,7 +173,7 @@ namespace CommonConfig
             this.MissileSpeed = MissileSpeed;
             this.MissileHight = MissileHight;
             this.IsShadow = IsShadow;
-            this.Skills = Skills;
+            this.Skill = Skill;
             this.Model = Model;
             this.HitEffect = HitEffect;
             this.IsDrop = IsDrop;
@@ -191,16 +198,20 @@ namespace CommonConfig
         public static void Load()
         {
             config.Clear();
-            config[500001] = new SoldierConfig(500001, "小兵", 1, 18, 240, 5.5f, 70f, 15, 0, 0, 10, 12, 0, 0f, false, new int[0], "UnitBing", "SwordHitBlue", false, "");
-            config[500002] = new SoldierConfig(500002, "远程小兵", 1, 24, 140, 7f, 50f, 15, 0, 0, 7, 35, 15, 1.5f, false, new int[0], "UnitBing2", "BulletExplosionFire", false, "");
-            config[501001] = new SoldierConfig(501001, "法术场", 1, 0, 9999, 0f, 0f, 15, 0, 0, 0, 0, 0, 0f, true, new int[0], "UnitSpell", "", false, "");
-            config[501002] = new SoldierConfig(501002, "关羽影子", 1, 2, 2, 0f, 0f, 15, 0, 0, 10, 17, 0, 0f, false, new int[0], "UnitHero", "SwordHitYellowCritical", false, "");
-            config[502001] = new SoldierConfig(502001, "木牛流马lv1", 1, 12, 420, 0f, 0f, 12, 10, 8, 6, 9, 0, 0f, false, new int[0], "UnitBing", "SwordHitBlue", false, "");
-            config[502002] = new SoldierConfig(502002, "木牛流马lv2", 2, 16, 620, 0f, 0f, 12, 14, 12, 6, 9, 0, 0f, false, new int[0], "UnitBing", "SwordHitBlue", false, "");
-            config[502003] = new SoldierConfig(502003, "喷火兽lv1", 1, 22, 160, 0f, 0f, 15, 2, 0, 9, 38, 15, 1.5f, false, new int[0], "UnitBing2", "BulletExplosionFire", false, "");
-            config[502004] = new SoldierConfig(502004, "机巧辅助lv1", 1, 8, 240, 0f, 0f, 14, 4, 6, 8, 12, 0, 0f, false, new int[0], "UnitBing", "SwordHitYellowCritical", false, "");
-            config[502005] = new SoldierConfig(502005, "喷火兽lv2", 2, 30, 220, 0f, 0f, 16, 3, 0, 9, 40, 16, 1.5f, false, new int[0], "UnitBing2", "BulletExplosionFire", false, "");
-            config[590001] = new SoldierConfig(590001, "野怪", 1, 40, 400, 0f, 0f, 15, 10, 5, 9, 14, 0, 0f, false, new int[0], "UnitBing", "SwordHitYellowCritical", true, "MonsterPic/wolf");
+            config[500001] = new SoldierConfig(500001, "小兵", 1, 5f, 18, 240, 5.5f, 70f, 15, 0, 0, 10, 6, 0, 0f, false, "", "UnitBing", "SwordHitBlue", false, "");
+            config[500002] = new SoldierConfig(500002, "远程小兵", 1, 5f, 24, 140, 7f, 50f, 15, 0, 0, 7, 29, 15, 1.5f, false, "", "UnitBing2", "BulletExplosionFire", false, "");
+            config[501001] = new SoldierConfig(501001, "法术场", 1, 5f, 0, 9999, 0f, 0f, 15, 0, 0, 0, 0, 0, 0f, true, "", "UnitSpell", "", false, "");
+            config[501002] = new SoldierConfig(501002, "关羽影子", 1, 10f, 2, 2, 0f, 0f, 15, 0, 0, 10, 11, 0, 0f, false, "", "UnitHero", "SwordHitYellowCritical", false, "");
+            config[502001] = new SoldierConfig(502001, "木牛流马lv1", 1, 5f, 12, 420, 0f, 0f, 12, 10, 8, 6, 3, 0, 0f, false, "", "UnitBing", "SwordHitBlue", false, "Textures/UnitPic/MuNiuLiMa");
+            config[502002] = new SoldierConfig(502002, "木牛流马lv2", 2, 5f, 16, 620, 0f, 0f, 12, 14, 12, 6, 3, 0, 0f, false, "", "UnitBing", "SwordHitBlue", false, "Textures/UnitPic/MuNiuLiMa");
+            config[502003] = new SoldierConfig(502003, "喷火兽lv1", 1, 5f, 22, 160, 0f, 0f, 15, 2, 0, 9, 32, 15, 1.5f, false, "喷火", "UnitBing2", "BulletExplosionFire", false, "Textures/UnitPic/SpitFireBeast");
+            config[502004] = new SoldierConfig(502004, "机巧辅助lv1", 1, 5f, 8, 240, 0f, 0f, 14, 4, 6, 8, 6, 0, 0f, false, "机巧疗", "UnitBing", "SwordHitYellowCritical", false, "Textures/UnitPic/GongAux");
+            config[502005] = new SoldierConfig(502005, "喷火兽lv2", 2, 5f, 30, 220, 0f, 0f, 16, 3, 0, 9, 34, 16, 1.5f, false, "喷火", "UnitBing2", "BulletExplosionFire", false, "Textures/UnitPic/SpitFireBeast");
+            config[590001] = new SoldierConfig(590001, "狼", 1, 5f, 40, 400, 0f, 0f, 15, 10, 5, 9, 8, 0, 0f, false, "", "UnitBing", "SwordHitYellowCritical", true, "Textures/UnitPic/wolf");
+            config[590002] = new SoldierConfig(590002, "猿猴", 1, 5f, 30, 300, 0f, 0f, 12, 4, 0, 9, 35, 15, 1.5f, false, "", "UnitBing2", "BulletExplosionStone", true, "Textures/UnitPic/Monkey");
+            config[590003] = new SoldierConfig(590003, "猪怪", 1, 9f, 55, 1400, 0f, 0f, 10, 40, 25, 6, 12, 0, 0f, false, "", "UnitBing", "SwordHitYellowCritical", true, "Textures/UnitPic/Boar");
+            config[590004] = new SoldierConfig(590004, "蛇怪", 1, 6f, 42, 520, 0f, 0f, 14, 6, 8, 9, 40, 16, 1.5f, false, "蛇毒", "UnitBing2", "BulletExplosionGreen", true, "Textures/UnitPic/Snake");
+            config[590005] = new SoldierConfig(590005, "老虎怪", 1, 10f, 95, 2400, 0f, 0f, 10, 60, 40, 7, 12, 0, 0f, false, "", "UnitBing", "SwordHitYellowCritical", true, "Textures/UnitPic/Tiger");
 
             RebuildIndex();
 

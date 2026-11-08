@@ -109,9 +109,26 @@ public class WorldManager : MonoBehaviour
         currentMatch = null; // 重置号位分配，本场重新随机
         var roundCfg = GameRoundConfig.GetConfig(Math.Min(100, GameManager.Instance.year));
         isPveRound = roundCfg.RoundType == 1;
-        pveMonsterSpawns = ParsePveMonsterSpawns(roundCfg.SoldierList);
+        // GameRoundConfig 只维护 PVE 回合（RoundType=1）的怪物布阵；PVP 回合（含单数玩家补位野怪）
+        // 往前找最近一个 PVE 回合的阵容复用，避免每一行都重复填同一套 SoldierList。
+        var pveLineupCfg = roundCfg;
+        if (!isPveRound)
+        {
+            for (int y = Math.Min(100, GameManager.Instance.year) - 1; y >= 1; y--)
+            {
+                var prevCfg = GameRoundConfig.GetConfig(y);
+                if (prevCfg != null && prevCfg.RoundType == 1 && !string.IsNullOrEmpty(prevCfg.SoldierList))
+                {
+                    pveLineupCfg = prevCfg;
+                    break;
+                }
+            }
+        }
+        pveMonsterSpawns = ParsePveMonsterSpawns(pveLineupCfg.SoldierList);
+        if (!isPveRound && pveMonsterSpawns.Count > 0)
+            GameLog.Debug($"[PVE] 补位阵容复用回合{pveLineupCfg.Id}：{pveLineupCfg.SoldierList}");
         if (isPveRound)
-            GameLog.Debug($"[PVE] 回合{GameManager.Instance.year} {ConfigManager.GetYearName(GameManager.Instance.scenarioId, GameManager.Instance.year)} 怪物布阵: {(string.IsNullOrEmpty(roundCfg.SoldierList) ? "(空!请在GameRoundConfig填SoldierList)" : roundCfg.SoldierList)} 解析到{pveMonsterSpawns.Count}只");
+            GameLog.Debug($"[PVE] 回合{GameManager.Instance.year} {ConfigManager.GetYearName(GameManager.Instance.scenarioId, GameManager.Instance.year)} 怪物布阵: {(string.IsNullOrEmpty(pveLineupCfg.SoldierList) ? "(空!请在GameRoundConfig填SoldierList)" : pveLineupCfg.SoldierList)} 解析到{pveMonsterSpawns.Count}只");
         // 调试阵容（测试战斗）固定使用 MapConfig 中 IsTestDefault 标记的地图（多个 true 取第一个），未标记时按权重随机
         MapConfig testMapCfg = null;
         if (GameManager.Instance.HasDebugLineup())
@@ -799,7 +816,8 @@ public class WorldManager : MonoBehaviour
             chessComponent.id = idCounter;
             chessComponent.isHero = false;
             chessComponent.side = side;
-            chessComponent.chessName = imgPath;
+            // 兵种配置了 Img（如机巧召唤的木牛流马/喷火兽/机巧辅助）时优先用该贴图，否则沿用玩家头像
+            chessComponent.chessName = string.IsNullOrEmpty(soldierConfig.Img) ? imgPath : soldierConfig.Img;
             chessComponent.maxHp = soldierConfig.Hp;
             chessComponent.moveSpeed = soldierConfig.MoveSpeed;
             chessComponent.attackRange = soldierConfig.Range;
@@ -1841,11 +1859,24 @@ public class WorldManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// 单位射程判定：格点中心距离 ≤ 射程 + 攻击方半径 + 目标半径（size/2）。
+    /// 普攻与技能判距统一口径；任一方为空时返回 false。
+    /// </summary>
+    public bool CheckInRange(Chess from, Chess to, float range)
+    {
+        if (from == null || to == null)
+            return false;
+        Vector2Int pos1a = WorldManager.Instance.WorldToGridPosition(from.transform.position, true);
+        Vector2Int pos2a = WorldManager.Instance.WorldToGridPosition(to.transform.position, true);
+        return Vector2Int.Distance(pos1a, pos2a) <= range + from.UnitRadius + to.UnitRadius;
+    }
+
+    /// <summary>点到点射程判定（不做单位尺寸补偿）：用于导弹等非单位位置的距离判断</summary>
     public bool CheckInRange(Vector3 pos1, Vector3 pos2, float range)
     {
         Vector2Int pos1a = WorldManager.Instance.WorldToGridPosition(pos1, true);
         Vector2Int pos2a = WorldManager.Instance.WorldToGridPosition(pos2, true);
-
         return Vector2Int.Distance(pos1a, pos2a) <= range;
     }
 

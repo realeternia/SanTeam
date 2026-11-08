@@ -91,8 +91,6 @@ public static class CombatConst
     }
 
     // ---- 移动避障(转向制：互斥力+短程寻路，不再锁单位格子) ----
-    /// <summary>单位间距小于该值(米)时触发分离推力，防止贴脸卡住</summary>
-    public const float MoveSeparationDist = 9f;
     /// <summary>敌方(非目标)单位分离推力权重(0~1，线性衰减，顺滑擦身而过)</summary>
     public const float MoveSeparationForce = 1.0f;
     /// <summary>同阵营单位恒定推力(必须>1才能压住前进意图，防止跟屁股堆叠黏在一起)</summary>
@@ -107,6 +105,8 @@ public static class CombatConst
     public const int MovePathMaxDepth = 6;
 
     // ---- 单位间距松弛(位置级硬约束：射程内/被位移后的单位同样互斥，防止堆叠) ----
+    /// <summary>英雄实体尺寸(米)：对应 UnitHero 预制体水平缩放10；无头模拟器无预制体缩放时以此为准</summary>
+    public const float HeroEntitySize = 10f;
     /// <summary>单位占位半径兜底值(米)：取不到实际模型尺寸时使用</summary>
     public const float DefaultUnitRadius = 3f;
     /// <summary>单位间距余量(米)：最小中心距 = 两单位占位半径之和 + 该余量</summary>

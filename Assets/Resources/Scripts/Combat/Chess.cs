@@ -73,14 +73,38 @@ public class Chess : MonoBehaviour
     public float baseY;
     public float heightOffset;
 
-    /// <summary>单位占位半径(米)：按模型水平缩放估算(英雄scale10→半径5米)，士兵随等级放大；供单位间距计算</summary>
+    /// <summary>单位实体尺寸(米)：水平占位尺寸，英雄默认10、士兵由 SoldierConfig.EntitySize 决定；用于命中判距与移动重叠</summary>
+    public float entitySize = 10f;
+
+    /// <summary>单位占位半径(米)：实体尺寸的一半(英雄10→半径5，小兵5→半径2.5，不足兜底)；供命中判距与单位间距计算</summary>
     public float UnitRadius
     {
-        get
-        {
-            var s = transform.localScale;
-            return Mathf.Max(CombatConst.DefaultUnitRadius, Mathf.Max(s.x, s.z) * 0.5f);
-        }
+        get { return Mathf.Max(CombatConst.DefaultUnitRadius, entitySize * 0.5f); }
+    }
+
+    /// <summary>
+    /// 普攻/技能命中判定：中心距离 ≤ 射程 + 自身半径 + 目标半径（即"双方 size 各取一半"折算到边到边距离）。
+    /// 技能判距统一走这里，避免普攻扩距后近战技能反而打不到。
+    /// </summary>
+    public bool CheckInAttackRange(Chess target, float range)
+    {
+        return WorldManager.Instance.CheckInRange(this, target, range);
+    }
+
+    /// <summary>
+    /// 应用士兵配置的实体尺寸：按「配置值 / 预制体水平缩放」比例缩放 x/z（y 不缩放），
+    /// 使不同模型的士兵在世界中的水平占位与配置一致；与预制体原生尺寸一致或未配置(<=0)时不缩放。
+    /// </summary>
+    private void ApplyEntitySize(float size)
+    {
+        if (size <= 0f)
+            return;
+        var s = transform.localScale;
+        var native = Mathf.Max(s.x, s.z);
+        if (native <= 0f || Mathf.Abs(size - native) < 0.01f)
+            return;
+        var factor = size / native;
+        transform.localScale = new Vector3(s.x * factor, s.y, s.z * factor);
     }
 
     // 是否正在使用偏移路径
@@ -150,6 +174,17 @@ public class Chess : MonoBehaviour
     {
         playerId = pid;
         pos = posId;
+        if (isHero)
+        {
+            // 英雄实体尺寸固定为预制体 UnitHero 的水平缩放(10)；无头模拟器没有预制体缩放也能取到同一口径
+            entitySize = CombatConst.HeroEntitySize;
+        }
+        else
+        {
+            // 士兵实体尺寸：配置值与本模型预制体水平缩放不一致时按比例缩放 x/z（高度 y 保持不变）
+            ApplyEntitySize(SoldierConfig.GetConfig(soldierId).EntitySize);
+            entitySize = Mathf.Max(transform.localScale.x, transform.localScale.z);
+        }
         // 侧向错位方向按id奇偶分边，避免同向部队整齐排队成一条线
         laneBias = id % 2 == 0 ? 1f : -1f;
         // 记录地面基准高度并微调y错开：贴脸单位高度差0.15m三档，避免模型重叠z-fighting闪面
@@ -205,6 +240,22 @@ public class Chess : MonoBehaviour
             materialFlag.mainTexture = Resources.Load<Texture>(playerInfo.imgPath);
             rendFlag.material = materialFlag;
             GameLog.Debug("Init Hero done " + heroId);
+        }
+        else
+        {
+            // 士兵/召唤物技能：SoldierConfig.Skill 填技能缩写（Sname，与英雄 Skill1 同口径），
+            // 按单位等级取对应等级行（如喷火兽lv2 → 喷火 Lv2；无该等级行时回退默认行）。
+            var soldierCfg = SoldierConfig.GetConfig(soldierId);
+            if (soldierCfg != null && !string.IsNullOrEmpty(soldierCfg.Skill))
+            {
+                var soldierSkillLv = Mathf.Max(1, soldierCfg.Lv);
+                var soldierSkillCfg = ConfigManager.GetSkillConfig(soldierCfg.Skill, soldierSkillLv)
+                    ?? ConfigManager.GetSkillConfig(soldierCfg.Skill);
+                if (soldierSkillCfg != null)
+                    skills.Add(SkillManager.CreateSkill(soldierSkillCfg.Id, this));
+                else
+                    GameLog.Error($"Chess.Init: 士兵[{soldierCfg.Name}]配置的技能[{soldierCfg.Skill}]不存在（Lv={soldierSkillLv}）");
+            }
         }
 
         if (!hasSKill)
@@ -497,9 +548,11 @@ public class Chess : MonoBehaviour
 
         // 获取最近单位的距离
         float nearestDistance = validTargets[0].distance;
+        // 判定"射程内"同样叠加双方占位半径，与 CheckInAttackRange 的命中口径保持一致
+        float nearestReach = attackRange + UnitRadius + validTargets[0].chess.UnitRadius;
         List<(Chess chess, float distance)> filteredTargets = null;
-        if(nearestDistance <= attackRange)
-            filteredTargets = validTargets.Where(t => t.distance <= attackRange).ToList(); //如果有射程内的，就继续找一个射程内的
+        if (nearestDistance <= nearestReach)
+            filteredTargets = validTargets.Where(t => t.distance <= attackRange + UnitRadius + t.chess.UnitRadius).ToList(); //如果有射程内的，就继续找一个射程内的
         else
             filteredTargets = validTargets.Where(t => t.distance <= nearestDistance + 10f).ToList();
 
@@ -595,8 +648,8 @@ public class Chess : MonoBehaviour
         if (SkillManager.CheckAidSkill(this))
             return;
 
-        // 检查目标是否在攻击范围内
-        if (WorldManager.Instance.CheckInRange(transform.position, targetChess.transform.position, attackRange))
+        // 检查目标是否在攻击范围内（射程 + 双方占位半径，见 CheckInAttackRange）
+        if (CheckInAttackRange(targetChess, attackRange))
         {
             attackPoint += deltaTime * attackSpeed * (1 + attackSpeedRate);
             // 检查攻击冷却（攻击频率累积满1次即可出手，attackSpeed=攻速值/30，attackSpeedRate为乘法比例加成）
@@ -749,8 +802,9 @@ public class Chess : MonoBehaviour
     private Vector3 GetSeparationPush()
     {
         Vector3 push = Vector3.zero;
-        // 获取单位尺寸尺度内的敌我双方单位，再按米级距离过滤(范围需覆盖最大单位直径，否则重叠不触发)
-        var nearUnits = WorldManager.Instance.GetUnitsInRangeAll(transform.position, CombatConst.UnitSpacingQueryMeters);
+        // 邻居查询半径按自身占位尺寸扩展，确保大体积单位也能扫到会重叠的对象
+        var queryRange = Mathf.Max(CombatConst.UnitSpacingQueryMeters, UnitRadius * 2f + CombatConst.UnitSpacingPadding);
+        var nearUnits = WorldManager.Instance.GetUnitsInRangeAll(transform.position, queryRange);
         foreach (var other in nearUnits)
         {
             if (other == this || other == targetChess || other.hp <= 0 || other.isShadow)
@@ -758,13 +812,15 @@ public class Chess : MonoBehaviour
             Vector3 offset = transform.position - other.transform.position;
             offset.y = 0;
             float dist = offset.magnitude;
-            if (dist < 0.01f || dist >= CombatConst.MoveSeparationDist)
+            // 间距阈值按双方占位半径计算（与 ResolveUnitSpacing 的最小中心距同一口径）
+            float minDist = UnitRadius + other.UnitRadius + CombatConst.UnitSpacingPadding;
+            if (dist < 0.01f || dist >= minDist)
                 continue;
             // 同阵营：恒定强推力(>1 压住前进意图)，防止跟屁股堆叠黏住；
             // 敌方(非目标)：线性衰减推开，顺滑擦身而过
             float strength = other.side == side
                 ? CombatConst.MoveSeparationAllyForce
-                : CombatConst.MoveSeparationForce * (1f - dist / CombatConst.MoveSeparationDist);
+                : CombatConst.MoveSeparationForce * (1f - dist / minDist);
             push += offset / dist * strength;
         }
         return push;
@@ -778,7 +834,8 @@ public class Chess : MonoBehaviour
         if (moveSpeed <= 0 || isShadow || noMoveCount > 0)
             return;
 
-        var nearUnits = WorldManager.Instance.GetUnitsInRangeAll(transform.position, CombatConst.UnitSpacingQueryMeters);
+        var queryRange = Mathf.Max(CombatConst.UnitSpacingQueryMeters, UnitRadius * 2f + CombatConst.UnitSpacingPadding);
+        var nearUnits = WorldManager.Instance.GetUnitsInRangeAll(transform.position, queryRange);
         Vector3 push = Vector3.zero;
         Vector3 self = transform.position;
         foreach (var other in nearUnits)

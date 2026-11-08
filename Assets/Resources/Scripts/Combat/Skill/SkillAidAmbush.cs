@@ -16,7 +16,7 @@ public class SkillAidAmbush : Skill
         var target = owner.targetChess;
         if (target == null || target.hp <= 0)
             return false;
-        if (!WorldManager.Instance.CheckInRange(owner.transform.position, target.transform.position, skillCfg.Range))
+        if (!WorldManager.Instance.CheckInRange(owner, target, skillCfg.Range))
             return false;
 
         // BuffId 逗号分隔：第 1 个=目标减速，其余=自身回血/魔抗；缺配置时不发动，避免白吃 CD

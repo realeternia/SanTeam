@@ -408,6 +408,15 @@ public class WorldManager : MonoBehaviour
         return new Vector2Int(x, z);
     }
 
+    /// <summary>单位射程判定：中心距离 ≤ 射程 + 双方半径（size/2），与游戏内 WorldManager 同口径</summary>
+    public bool CheckInRange(Chess from, Chess to, float range)
+    {
+        if (from == null || to == null)
+            return false;
+        return GetRange(from.transform.position, to.transform.position) <= range + from.UnitRadius + to.UnitRadius;
+    }
+
+    /// <summary>点到点射程判定（不做单位尺寸补偿）：用于导弹等非单位位置的距离判断</summary>
     public bool CheckInRange(Vector3 pos1, Vector3 pos2, float range)
     {
         return GetRange(pos1, pos2) <= range;

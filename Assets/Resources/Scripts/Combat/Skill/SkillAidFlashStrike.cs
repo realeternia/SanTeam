@@ -41,7 +41,7 @@ public class SkillAidFlashStrike : Skill
     {
         var cur = owner.targetChess;
         if (cur != null && cur.hp > 0 && cur.isHero
-            && WorldManager.Instance.CheckInRange(owner.transform.position, cur.transform.position, skillCfg.Range))
+            && WorldManager.Instance.CheckInRange(owner, cur, skillCfg.Range))
             return cur;
 
         var heroes = WorldManager.Instance.GetEnemyInRange(owner.transform.position, skillCfg.Range, owner.side);

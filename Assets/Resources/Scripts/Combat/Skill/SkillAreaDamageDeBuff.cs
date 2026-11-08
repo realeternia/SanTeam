@@ -29,7 +29,7 @@ public class SkillAreaDamageDeBuff : Skill
 
         // 中心点：TargetType="self"=自身中心（无需射程校验）；缺省=锁定目标中心（需目标在 Range 射程内，Range<=0 视为不限射程）
         var selfCenter = HasSkillFlag("self");
-        if (!selfCenter && skillCfg.Range > 0f && !WorldManager.Instance.CheckInRange(owner.transform.position, target.transform.position, skillCfg.Range))
+        if (!selfCenter && skillCfg.Range > 0f && !WorldManager.Instance.CheckInRange(owner, target, skillCfg.Range))
             return false;
         if (!CheckBurst(target))
             return false;

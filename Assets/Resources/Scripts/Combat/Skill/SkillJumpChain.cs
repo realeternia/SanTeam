@@ -118,7 +118,7 @@ public class SkillJumpChain : Skill
         var first = owner.targetChess;
         if (first == null || first.hp <= 0)
             return false;
-        if (!WorldManager.Instance.CheckInRange(owner.transform.position, first.transform.position, skillCfg.Range))
+        if (!WorldManager.Instance.CheckInRange(owner, first, skillCfg.Range))
             return false;
         if (!CheckBurst(first))
             return false;

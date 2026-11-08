@@ -24,7 +24,7 @@ public class SkillShockWaveMulti : Skill
 
         var start = owner.transform.position;
         var targetPos = target.transform.position;
-        if (!WorldManager.Instance.CheckInRange(start, targetPos, skillCfg.Range))
+        if (!WorldManager.Instance.CheckInRange(owner, target, skillCfg.Range))
             return false;
 
         if (!CheckBurst(null))

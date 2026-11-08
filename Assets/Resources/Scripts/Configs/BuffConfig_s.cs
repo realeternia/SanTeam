@@ -192,6 +192,7 @@ namespace CommonConfig
             config[301010] = new BuffConfig(301010, "嘲讽", "嘲", "成为敌对单位强制优先攻击的目标", false, true, true, 3, "BuffTaunt", "", "", "Character_status_taunt", "", "");
             config[301011] = new BuffConfig(301011, "叛逃", "叛", "不受控制，向初始位置后退，移动速度减半", false, true, true, 3, "BuffDefect", "", "", "Character_status_sleep", "", "");
             config[301012] = new BuffConfig(301012, "混乱", "惑", "不受控制，攻击最近的友方单位", false, true, true, 3, "BuffChaos", "", "", "Character_status_fight", "", "");
+            config[301013] = new BuffConfig(301013, "中毒", "毒", "每秒持续损失生命", false, true, false, 1, "BuffTimeDamage", "", "", "PoisonExplosionSoft", "", "");
             config[301102] = new BuffConfig(301102, "连锁", "锁", "被攻击时，向范围内同样带连锁的友军传递同比例伤害", false, true, false, 4, "BuffLock", "", "", "StunnedLock", "", "");
 
             RebuildIndex();

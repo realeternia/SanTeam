@@ -19,7 +19,7 @@ public class SkillCastingAidLastStrategy : Skill
         var target = owner.targetChess;
         if (target == null || target.hp <= 0)
             return false;
-        if (!WorldManager.Instance.CheckInRange(owner.transform.position, target.transform.position, skillCfg.Range))
+        if (!WorldManager.Instance.CheckInRange(owner, target, skillCfg.Range))
             return false;
         if (!CheckBurst(target))
             return false;

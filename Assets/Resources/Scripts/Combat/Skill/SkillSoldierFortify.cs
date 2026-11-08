@@ -51,7 +51,7 @@ public class SkillSoldierFortify : Skill
     {
         var cur = owner.targetChess;
         if (cur != null && cur.hp > 0 && cur.isHero && WorldManager.Instance.IsEnemy(cur.side, owner.side)
-            && WorldManager.Instance.CheckInRange(owner.transform.position, cur.transform.position, skillCfg.Area))
+            && WorldManager.Instance.CheckInRange(owner, cur, skillCfg.Area))
             return cur;
 
         Chess nearest = null;

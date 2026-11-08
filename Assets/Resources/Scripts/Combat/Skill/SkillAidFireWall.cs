@@ -25,7 +25,7 @@ public class SkillAidFireWall : Skill
         if (target == null || target.hp <= 0)
             return false;
         // Range<=0 视为不限射程（与配置表一致）
-        if (skillCfg.Range > 0f && !WorldManager.Instance.CheckInRange(owner.transform.position, target.transform.position, skillCfg.Range))
+        if (skillCfg.Range > 0f && !WorldManager.Instance.CheckInRange(owner, target, skillCfg.Range))
             return false;
         if (!CheckBurst(target))
             return false;

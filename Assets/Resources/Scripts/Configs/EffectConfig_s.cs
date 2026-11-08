@@ -146,6 +146,7 @@ namespace CommonConfig
             config[10000] = new EffectConfig(10000, "BulletExplosionBlue", "蓝色子弹爆裂特效", "伤害", "目标", "Effect/BulletExplosionBlue", "Missile/BulletExplosionBlue", 8f, 1f, 12f, 1f, "");
             config[10001] = new EffectConfig(10001, "BulletExplosionFire", "火焰子弹爆裂特效", "伤害", "目标", "Effect/BulletExplosionBlue", "Missile/BulletExplosionFire", 8f, 1f, 12f, 1f, "#FF7A00");
             config[10002] = new EffectConfig(10002, "BulletExplosionGreen", "绿色子弹爆裂特效", "伤害", "目标", "Effect/BulletExplosionBlue", "Missile/BulletExplosionGreen", 8f, 1f, 12f, 1f, "#A7FF00");
+            config[10003] = new EffectConfig(10003, "BulletExplosionStone", "石块爆裂特效（猿猴投石）", "伤害", "目标", "Effect/BulletExplosionBlue", "Missile/BulletExplosionBlue", 8f, 1f, 12f, 1f, "#9E9E9E");
             config[10010] = new EffectConfig(10010, "ExplosionFireballFire", "火球爆炸特效", "伤害", "目标", "Effect/ExplosionFireballFire", "Missile/ExplosionFireballFire", 5f, 1f, 8f, 1f, "");
             config[10020] = new EffectConfig(10020, "FanExplosion", "扇子爆裂特效", "伤害", "目标", "Effect/FanExplosion", "Missile/FanExplosion", 5f, 1f, 8f, 1f, "");
             config[10030] = new EffectConfig(10030, "FrostExplosionBlue", "蓝色冰冻爆裂特效", "伤害", "目标", "Effect/FrostExplosionBlue", "Missile/FrostExplosionBlue", 5f, 1f, 8f, 1f, "");
