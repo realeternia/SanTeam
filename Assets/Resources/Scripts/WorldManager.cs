@@ -201,15 +201,25 @@ public class WorldManager : MonoBehaviour
             ResolveBattleWithoutOpponent();
 
         // 兵种连锁：按同职业英雄数量施加职业被动属性加成（自身加成+全队加成，不走技能系统）
-        JobLinkManager.ApplyJobLinks();
+        // 调试阵容下可由「调试阵容配置窗口」的开关单独关闭，便于对比验证
+        if (!GameManager.Instance.HasDebugLineup() || GameManager.Instance.debugJobLink)
+            JobLinkManager.ApplyJobLinks();
+        else
+            GameLog.Info("[BattleInit] 调试阵容已关闭职业连锁，跳过 JobLinkManager");
         GameLog.Debug("[BattleInit] jobLink done");
 
         // 好友连锁·特殊：在场好友数量提升关联(助益)技能等级并创建连线特效（每多一个+1级）
-        FriendLineManager.ApplyFriendSpecialSkills();
+        if (!GameManager.Instance.HasDebugLineup() || GameManager.Instance.debugFriendLine)
+            FriendLineManager.ApplyFriendSpecialSkills();
+        else
+            GameLog.Info("[BattleInit] 调试阵容已关闭好友连锁，跳过 FriendLineManager");
         GameLog.Debug("[BattleInit] friendSpecial done");
 
         // 国家护盾：同阵营英雄数量达到档位后授予对应等级的国家护盾技能（效果由技能在 BattleBegin 施加）
-        FactionShieldManager.ApplyFactionShields();
+        if (!GameManager.Instance.HasDebugLineup() || GameManager.Instance.debugFactionShield)
+            FactionShieldManager.ApplyFactionShields();
+        else
+            GameLog.Info("[BattleInit] 调试阵容已关闭国家护盾，跳过 FactionShieldManager");
         GameLog.Debug("[BattleInit] factionShield done");
 
         // 战斗开始技能：必须等在好友特殊技能授予之后，否则 BattleBegin 型技能（如偷袭/智勇）取不到技能
@@ -602,6 +612,9 @@ public class WorldManager : MonoBehaviour
 
             SpawnDebugHeroes(GameManager.Instance.GetPlayer(0), center1, GameManager.Instance.debugHeroesSide1, 1);
             SpawnDebugHeroes(GameManager.Instance.GetPlayer(1), center2, GameManager.Instance.debugHeroesSide2, 2);
+            // 调试阵容同样结算工·机巧召唤：按本侧上阵"工"职业英雄数刷召唤兽（与非调试分支一致）
+            SpawnGongSummonForSide(GameManager.Instance.GetPlayer(0), center1, 1);
+            SpawnGongSummonForSide(GameManager.Instance.GetPlayer(1), center2, 2);
         }
 
     }
@@ -707,6 +720,8 @@ public class WorldManager : MonoBehaviour
     // 写死在该侧布阵空格上刷召唤单位（近战前排/远程后排，按单位射程划分随机空格）。
     private void SpawnGongSummonForSide(PlayerInfo p, Transform center, int side)
     {
+        if (center == null)
+            return;
         var units = GetUnitsMySide(side);
         int gongCount = 0;
         foreach (var u in units)

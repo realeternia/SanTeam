@@ -2990,11 +2990,41 @@ MonoBehaviour:
   - {fileID: 2065831910}
   friendRdData: []
   heroIds: 
+  shopLocks: []
   year: 0
   currentSaveSlot: -1
-  debugHeroesSide1: []
-  debugHeroesSide2: []
+  scenarioId: 1
+  pendingNewGameSave: 0
+  debugHeroesSide1:
+  - heroId: 101004
+    level: 1
+    buffId: 0
+    buffTime: 10
+  - heroId: 101023
+    level: 1
+    buffId: 0
+    buffTime: 10
+  - heroId: 105014
+    level: 1
+    buffId: 0
+    buffTime: 10
+  debugHeroesSide2:
+  - heroId: 102002
+    level: 1
+    buffId: 0
+    buffTime: 10
+  - heroId: 102023
+    level: 1
+    buffId: 0
+    buffTime: 10
+  - heroId: 102032
+    level: 1
+    buffId: 0
+    buffTime: 10
   debugFullMp: 1
+  debugJobLink: 1
+  debugFactionShield: 1
+  debugFriendLine: 1
 --- !u!114 &1788356929
 MonoBehaviour:
   m_ObjectHideFlags: 0

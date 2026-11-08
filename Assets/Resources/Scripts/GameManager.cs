@@ -96,6 +96,9 @@ public class GameManager : MonoBehaviour
     [HideInInspector] public List<DebugHeroEntry> debugHeroesSide1 = new List<DebugHeroEntry>(); // 左侧(1号位)武将，按近战/远程分前后排摆入中间英雄格
     [HideInInspector] public List<DebugHeroEntry> debugHeroesSide2 = new List<DebugHeroEntry>(); // 右侧(2号位)武将，按近战/远程分前后排摆入中间英雄格
     [HideInInspector] public bool debugFullMp = true; // 调试阵容：开战时所有技能MP直接拉满（默认勾选）
+    [HideInInspector] public bool debugJobLink = true; // 调试阵容：开战时是否结算职业连锁（兵种羁绊）
+    [HideInInspector] public bool debugFactionShield = true; // 调试阵容：开战时是否结算国家护盾（同阵营羁绊）
+    [HideInInspector] public bool debugFriendLine = true; // 调试阵容：开战时是否结算好友连锁（好友羁绊）
 
     /// <summary>是否配置了调试阵容（任一方填入武将即视为调试开局）</summary>
     public bool HasDebugLineup()

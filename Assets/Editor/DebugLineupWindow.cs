@@ -14,6 +14,7 @@ using UnityEngine.SceneManagement;
 /// 武将按各自配置的品质标记（阵营色块 + 品质色块 + 品质文本），下拉菜单按阵营分组、组内按品质倒排。
 /// 武将按近战/远程分前后排摆入中间英雄格（近战顶排=前排、远程底排=后排），等级取各自配置值(1~5级)。
 /// 每名武将可在同行末尾另配 1 个开局Buff（BuffConfig 全表下拉 + 时长，默认10秒），进战斗后自动挂载。
+/// 英雄列表与下拉菜单同时显示职业；「羁绊起效」区可分别开关职业连锁 / 国家护盾 / 好友连锁（默认全部生效）。
 /// 「随机阵容」可一键为两侧各生成 3 近战 + 3 远程，共 12 名互不重复的 1 级武将。
 /// </summary>
 public class DebugLineupWindow : EditorWindow
@@ -23,6 +24,9 @@ public class DebugLineupWindow : EditorWindow
     private const string PropSide1 = "debugHeroesSide1";
     private const string PropSide2 = "debugHeroesSide2";
     private const string PropFullMp = "debugFullMp";
+    private const string PropJobLink = "debugJobLink";
+    private const string PropFactionShield = "debugFactionShield";
+    private const string PropFriendLine = "debugFriendLine";
 
     // 面板配色
     private static readonly Color SectionBg = new Color(0.24f, 0.26f, 0.34f, 0.6f);
@@ -38,6 +42,8 @@ public class DebugLineupWindow : EditorWindow
         public int Side;
         public string SideName;
         public int Quality;
+        public string Job;      // 职业短名（HeroConfig.Job，如"枪"）
+        public string JobName;  // 职业全名（JobConfig.Name，如"枪兵"）
     }
 
     private class BuffItem
@@ -138,13 +144,16 @@ public class DebugLineupWindow : EditorWindow
             if (cfg == null || cfg.Id <= 0) continue;
             var side = HeroScenario.GetSide(cfg);
             var force = ConfigManager.GetForceConfig(side);
+            var jobCfg = ConfigManager.GetJobConfig(cfg.Job);
             heroes.Add(new HeroItem
             {
                 Id = cfg.Id,
                 Name = cfg.Name,
                 Side = side,
                 SideName = force != null ? force.Name : ("阵营" + side),
-                Quality = HeroScenario.GetQuality(cfg)
+                Quality = HeroScenario.GetQuality(cfg),
+                Job = cfg.Job,
+                JobName = jobCfg != null ? jobCfg.Name : cfg.Job
             });
         }
         // 按阵营分组，同阵营内按品质倒排（品质相同再按 ID 升序），方便下拉菜单分组显示
@@ -266,23 +275,33 @@ public class DebugLineupWindow : EditorWindow
         GUILayout.Space(2);
     }
 
-    // 调试选项：开局是否直接拉满技能MP
+    // 调试选项：开局是否直接拉满技能MP / 三类羁绊机制是否生效
     private void DrawOptions()
     {
         SerializedProperty fullMpProp = so.FindProperty(PropFullMp);
-        if (fullMpProp == null)
+        SerializedProperty jobLinkProp = so.FindProperty(PropJobLink);
+        SerializedProperty factionShieldProp = so.FindProperty(PropFactionShield);
+        SerializedProperty friendLineProp = so.FindProperty(PropFriendLine);
+        if (fullMpProp == null || jobLinkProp == null || factionShieldProp == null || friendLineProp == null)
         {
-            GameLog.Error($"DebugLineupWindow 未找到字段 {PropFullMp}");
+            GameLog.Error($"DebugLineupWindow 未找到调试字段 {PropFullMp}/{PropJobLink}/{PropFactionShield}/{PropFriendLine}");
             return;
         }
 
         EditorGUILayout.BeginVertical(EditorStyles.helpBox);
         EditorGUI.BeginChangeCheck();
         fullMpProp.boolValue = EditorGUILayout.ToggleLeft("开局技能MP拉满", fullMpProp.boolValue);
-        if (EditorGUI.EndChangeCheck())
-            MarkSceneDirty();
-        GUILayout.Label("勾选后调试战斗开局所有技能即为满MP（默认勾选）。", hintStyle);
+        GUILayout.Space(2);
+        GUILayout.Label("羁绊起效（仅调试阵容生效，正常对局不受影响）", EditorStyles.boldLabel);
+        jobLinkProp.boolValue = EditorGUILayout.ToggleLeft("职业连锁（同职业 Hero 数 → 职业技能档位/属性加成）", jobLinkProp.boolValue);
+        factionShieldProp.boolValue = EditorGUILayout.ToggleLeft("国家护盾（同阵营 Hero 数 → 阵营护盾）", factionShieldProp.boolValue);
+        friendLineProp.boolValue = EditorGUILayout.ToggleLeft("好友连锁（在场好友数 → 关联技能/连线）", friendLineProp.boolValue);
+        bool changed = EditorGUI.EndChangeCheck();
         EditorGUILayout.EndVertical();
+
+        if (changed)
+            MarkSceneDirty();
+        GUILayout.Label("勾选后调试战斗开局所有技能即为满MP（默认勾选）。三项羁绊开关默认全部起效，取消勾选可在调试战斗中单独关闭对应机制做对比验证。", hintStyle);
     }
 
     private void DrawHeroList(string title, string propName, Color accent)
@@ -412,7 +431,7 @@ public class DebugLineupWindow : EditorWindow
     {
         var h = GetHero(heroId);
         if (h != null)
-            return string.Format("{0}·{1}  品质{2}  ({3})", h.SideName, h.Name, h.Quality, heroId);
+            return string.Format("{0}·{1}  职业{2}  品质{3}  ({4})", h.SideName, h.Name, h.JobName, h.Quality, heroId);
         return heroId > 0 ? ("未知英雄 (" + heroId + ")") : "（未选择）";
     }
 
@@ -423,7 +442,7 @@ public class DebugLineupWindow : EditorWindow
         foreach (var h in GetHeroes())
         {
             int id = h.Id;
-            menu.AddItem(new GUIContent(string.Format("{0}/{1}  品质{2} ({3})", h.SideName, h.Name, h.Quality, id)), false, () => onPick(id));
+            menu.AddItem(new GUIContent(string.Format("{0}/{1}  职业{2}  品质{3} ({4})", h.SideName, h.Name, h.JobName, h.Quality, id)), false, () => onPick(id));
         }
         menu.ShowAsContext();
     }
