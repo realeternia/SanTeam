@@ -16,6 +16,7 @@ using UnityEngine;
 /// · lowestHp           = 按生命比例升序取前 N（周仓·忠勇 / 李严·护军）
 /// · highestHp          = 按生命比例降序取前 N（甄宓·洛神 / 大乔·国色 / 袁绍·名门）
 /// · highestArmor       = 按护甲降序取前 N（张梁·黄天）
+/// · highestAp          = 按法强降序取前 N（阮籍·长啸）
 /// · rangedOnly         = 远程优先：远程单位排在前，无远程时回退到其余单位（attackRange >= CombatConst.MeleeRange，甄宓·洛神）
 /// · meleeOnly          = 近战优先：近战单位排在前，无近战时回退到其余单位（attackRange < CombatConst.MeleeRange，大乔·国色）
 /// · fullHpSkip         = 跳过满血友军（周仓 / 张梁）
@@ -48,6 +49,7 @@ public class SkillAreaBuff : Skill
         var lowestHp = HasSkillFlag("lowestHp");
         var highestHp = HasSkillFlag("highestHp");
         var highestArmor = HasSkillFlag("highestArmor");
+        var highestAp = HasSkillFlag("highestAp");
         var preferRanged = HasSkillFlag("rangedOnly");
         var preferMelee = HasSkillFlag("meleeOnly");
         var fullHpSkip = HasSkillFlag("fullHpSkip");
@@ -89,8 +91,10 @@ public class SkillAreaBuff : Skill
                 units.Sort((a, b) => { var r = preferRank(a) - preferRank(b); return r != 0 ? r : b.HpRate.CompareTo(a.HpRate); });
             else if (highestArmor)
                 units.Sort((a, b) => { var r = preferRank(a) - preferRank(b); return r != 0 ? r : b.armor.CompareTo(a.armor); });
+            else if (highestAp)
+                units.Sort((a, b) => { var r = preferRank(a) - preferRank(b); return r != 0 ? r : b.ap.CompareTo(a.ap); });
 
-            if (lowestHp || highestHp || highestArmor)
+            if (lowestHp || highestHp || highestArmor || highestAp)
             {
                 if (units.Count > skillCfg.TargetCount)
                     units.RemoveRange(skillCfg.TargetCount, units.Count - skillCfg.TargetCount);
