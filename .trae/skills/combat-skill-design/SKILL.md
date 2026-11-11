@@ -1,6 +1,6 @@
 ---
 name: combat-skill-design
-description: 《三国卡牌》(金铲铲式) SkillConfig 表的配置方法与战斗技能设计规范。当需要新增/修改一条技能配置（SkillConfig_s.cs 的 39 列）、分配技能 Id 段、按 Lv1~5 展开、写 Descript 动态引用、配伤害/治疗/护盾/MP/Buff/特效/召唤/连线字段，或排查配置不生效时使用。纯 Buff/BuffConfig、羁绊、物品掉落配置请另用对应技能。
+description: 《三国卡牌》(金铲铲式) SkillConfig 表的配置方法与战斗技能设计规范。当需要新增/修改一条技能配置（SkillConfig_s.cs 的 41 列）、分配技能 Id 段、按 Lv1~5 展开、写 Descript 动态引用、配伤害/治疗/护盾/MP/Buff/特效/召唤/连线字段、维护技能模板表与模板组件表（SkillTemplateConfig / SkillTemplateComponentConfig，Template + Modules 组合），或排查配置不生效时使用。纯 Buff/BuffConfig、羁绊、物品掉落配置请另用对应技能。
 ---
 
 # SkillConfig 表配置方法
@@ -10,16 +10,17 @@ description: 《三国卡牌》(金铲铲式) SkillConfig 表的配置方法与�
 ## 一、落地流程（新增一个技能）
 
 1. **定形态**：单伤 / 群伤 / 单控 / 群控 / 单疗 / 群疗 / 自增 / 群增 / 光环 / 召唤 / 兵增 / 连击。
-2. **选脚本**：先找现成通用脚本（见第八节），形态一致直接复用；确实没有才新建 `Combat/Skill/SkillXxx.cs`（英文类名，一技能一文件，继承 `Skill`）。
-3. **取 Id**：按第三节段位取下一个空号，同一技能的 5 个等级必须**连号**。
-4. **写 5 行数据**：`Sname` 相同、`Lv` 1~5，除数值字段外其余列**逐行保持一致**。
-5. **写 Descript**：只在 Lv1 写模板，其余 4 行留空。
-6. **注册**：新建 `.cs` 必须在 `Assembly-CSharp.csproj` 加 `<Compile Include>`（Editor 脚本加 `Assembly-CSharp-Editor.csproj`）。
-7. **自检**：跑 `scripts/dump_skill.py <Sname>`（见第十节），确认 5 行齐全、Id 连号、脚本/Buff/特效存在。
+2. **套模板**：形态由「模板 + 组件」可表达时（见 2.10），配 `Template` + `Modules` 即可，不要为一组变体新建模板。
+3. **选脚本**：先找现成通用脚本（见第八节），形态一致直接复用；确实没有才新建 `Combat/Skill/SkillXxx.cs`（英文类名，一技能一文件，继承 `Skill`）。
+4. **取 Id**：按第三节段位取下一个空号，同一技能的 5 个等级必须**连号**。
+5. **写 5 行数据**：`Sname` 相同、`Lv` 1~5，除数值字段外其余列**逐行保持一致**。
+6. **写 Descript**：只在 Lv1 写模板，其余 4 行留空。
+7. **注册**：新建 `.cs` 必须在 `Assembly-CSharp.csproj` 加 `<Compile Include>`（Editor 脚本加 `Assembly-CSharp-Editor.csproj`）。
+8. **自检**：跑 `scripts/dump_skill.py <Sname>`（见第十节），确认 5 行齐全、Id 连号、脚本/Buff/特效存在。
 
 > 构造函数**无默认参数**：新增列必须插到 `SkillConfig` 构造签名对应位置，并同步为**全部数据行**补值，否则编译即失败。
 
-## 二、39 列逐列配置方法
+## 二、41 列逐列配置方法
 
 ### 2.1 身份与分类
 
@@ -30,6 +31,8 @@ description: 《三国卡牌》(金铲铲式) SkillConfig 表的配置方法与�
 | `Sname` | string | 技能缩写，是 `GetSkillConfig(sname, lv)`、`SetLevel`、好友/职业连锁的索引键。**英雄专属技能 Sname = 英雄名**（110 个英雄全部如此，`HeroConfig.Skill1` 挂它）；**Sname 全局唯一归属，禁止两个英雄共用**（`ConfigManager.PostModify` 会按英雄重复放大数值） |
 | `Version` | float | 数据版本：老技能 `1.0f`，新增武将批次 `1.1f`。只作批次标记，不参与战斗逻辑 |
 | `Type` | string | 分类标签，只影响展示/统计，不驱动逻辑。现用值：`单伤 群伤 单控 群控 单增 群增 自增 单疗 群疗 光环 召唤 兵增 职业 连接 道具` |
+| `Template` | string | 技能模板名（对应 `SkillTemplateConfig.Name`；空=不使用模板、走原有各列；非空=基于模板+组件初始化，其余效果列可不配） |
+| `Modules` | string[] | 组件名列表（对应 `SkillTemplateComponentConfig.Name`；空=使用模板默认组件） |
 | `Lv` | int | 1~5；同 Sname 每级一行 |
 | `ScriptName` | string | 业务脚本类名（反射创建，构造签名固定 `(int skillId, Chess owner)`）；必须与 `Combat/Skill/` 下的类名完全一致 |
 
@@ -138,6 +141,29 @@ description: 《三国卡牌》(金铲铲式) SkillConfig 表的配置方法与�
 
 - 子字段可被描述引用：`/linkself-atk`、`/linkteam-mpRegen`、`/auroattrs-atk`。
 - 连锁数值改动只改配置，禁止写进 `JobLinkManager` 等代码；机制档位常量放 `CombatConst`。
+
+### 2.10 技能模板 / 组件（Template / Modules）
+
+两张表：`SkillTemplateConfig_s.cs`（模板，标准形态 + 主数值）、`SkillTemplateComponentConfig_s.cs`（组件，机制与形态修饰）。引用一律用**名字**，不用 Id。
+
+- `SkillConfig.Template` = 模板名（对应 `SkillTemplateConfig.Name`，空=不用模板）；`SkillConfig.Modules` = 组件名数组（对应 `SkillTemplateComponentConfig.Name`，空=用模板默认 `Modules`）。基于模板时其余效果列可留空。
+
+**归模板 vs 归组件（判定顺序）**
+
+| 内容 | 归属 | 说明 |
+| --- | --- | --- |
+| 伤害档位 / 治疗量 / 护盾量等主数值 | **模板 `Values`** | 模板 `Values` 就是 Lv1~5 主数值，**不要再建“伤害档位/治疗量”组件** |
+| 伤害倍率（按属性成长） | 组件 | 与固定基值分列，避免重复计价 |
+| 控制/减益（减速、减防、减攻、减疗、增伤、眩晕、定身、混乱） | **组件** | 单控 = 单体伤害模板 + 眩晕/定身/混乱；群控 = 群体伤害模板 + 同批控制组件，**不建“单体控制”模板** |
+| 施法射程、施放中心（自身中心）、AoE 范围大小（小/中/大范围） | **组件** | 不按“射程×范围×中心”给模板拆变体 |
+| 连击、持续伤害、持续施法、持续区域、目标筛选、特殊机制 | 组件 | — |
+| MP消耗、CD、概率、触发条件 | 组件（施放节奏） | 作为频率修正项，不与单次效果成本混为一项 |
+
+**模板集合保持最小（当前 9 条）**：单体伤害大 / 单体伤害中 / 单体伤害小 / 群体伤害近距离小范围 / 单体治疗 / 范围治疗 / 持续区域 / 自身强化 / 光环。变体一律靠组件叠加，新增模板前先确认“不能由现有模板 + 组件表达”。
+
+**模板字段口径**：`Values`=标准态主数值（五级逗号分隔）；`Range`=射程（0=默认攻击距离）；`MpCost`/`CD`=标准态节奏；`Score`=标准态总分（标准态=10 分，降档按数值比例下调）。组件 `Values`/`Score` 为单项值，与模板分累加时注意不要对同一项重复计价。
+
+**一致性自检**：模板 `Modules` 里的每个组件名必须存在于组件表；组件 `Templates` 里的每个模板名必须存在于模板表；改模板名要同步改所有组件的 `Templates` 引用（改名会让引用悬空）。
 
 ## 三、Id 段（当前实际占用）
 

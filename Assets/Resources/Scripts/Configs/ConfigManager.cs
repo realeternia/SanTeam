@@ -30,6 +30,8 @@ public static class ConfigManager
         HeroConfig.Load();
         ScenarioConfig.Load();
         SkillConfig.Load();
+        SkillTemplateConfig.Load();
+        SkillTemplateComponentConfig.Load();
         BuffConfig.Load();
         ItemConfig.Load();
         SoldierConfig.Load();
