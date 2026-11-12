@@ -131,15 +131,12 @@ namespace CommonConfig
         public static void Load()
         {
             config.Clear();
-            config[10] = new SkillTemplateComponentConfig(10, "伤害倍率", "数值", new string[]{"单体伤害大","单体伤害中","单体伤害小","群体伤害近距离","单体治疗","范围治疗","持续区域","自身强化","群体伤害自身中心","跳跃弹射"}, "10,15,25,40,60", 2, 2f, "按属性成长的伤害倍率", "与固定基值分开计量，避免重复计价", false);
-            config[30] = new SkillTemplateComponentConfig(30, "施法射程", "射程", new string[]{"单体伤害大","单体伤害中","单体伤害小","群体伤害近距离","单体治疗","范围治疗","持续区域","自身强化","光环","单体友方增益","群体友方增益","召唤技能场","跳跃弹射"}, "30,40,50,65,80", 1, 1f, "增加施法距离 Range，决定目标是否可被触达", "与攻击射程、AoE 半径区分，按可触达目标和触发成功率估值", false);
-            config[40] = new SkillTemplateComponentConfig(40, "最大目标数", "目标数", new string[]{"单体伤害大","单体伤害中","单体伤害小","群体伤害近距离","单体治疗","范围治疗","持续区域","群体伤害自身中心","群体友方增益","兵种增益","跳跃弹射"}, "2,3,3,4,5", 2, 1.5f, "最多命中 N 个目标", "有限目标数与范围内全部目标分开；TargetCount<=0 在不同脚本中可能表示不限，不可按零成本处理", false);
-            config[50] = new SkillTemplateComponentConfig(50, "中范围", "范围档", new string[]{"群体伤害近距离","范围治疗","持续区域","群体伤害自身中心"}, "30,30,30,30,30", 1, 1f, "中半径 AoE 范围档（模板默认小范围=20，本组件改为30）", "按实际预期命中数估值，不按半径线性估价", false);
+            config[10] = new SkillTemplateComponentConfig(10, "伤害倍率", "数值", new string[]{"单体伤害大","单体伤害中","单体伤害小","群体伤害近距离","单体治疗","范围治疗","自身强化","群体伤害自身中心","跳跃弹射"}, "10,15,25,40,60", 2, 2f, "按属性成长的伤害倍率", "与固定基值分开计量，避免重复计价", false);
+            config[30] = new SkillTemplateComponentConfig(30, "施法射程", "射程", new string[]{"单体伤害大","单体伤害中","单体伤害小","群体伤害近距离","单体治疗","范围治疗","自身强化","光环","单体友方增益","群体友方增益","跳跃弹射"}, "30,40,50,65,80", 1, 1f, "增加施法距离 Range，决定目标是否可被触达", "与攻击射程、AoE 半径区分，按可触达目标和触发成功率估值", false);
+            config[40] = new SkillTemplateComponentConfig(40, "最大目标数", "目标数", new string[]{"单体伤害大","单体伤害中","单体伤害小","群体伤害近距离","单体治疗","范围治疗","群体伤害自身中心","群体友方增益","兵种增益","跳跃弹射"}, "2,3,3,4,5", 2, 1.5f, "最多命中 N 个目标", "有限目标数与范围内全部目标分开；TargetCount<=0 在不同脚本中可能表示不限，不可按零成本处理", false);
+            config[50] = new SkillTemplateComponentConfig(50, "中范围", "范围档", new string[]{"群体伤害近距离","范围治疗","群体伤害自身中心"}, "30,30,30,30,30", 1, 1f, "中半径 AoE 范围档（模板默认小范围=20，本组件改为30）", "按实际预期命中数估值，不按半径线性估价", false);
             config[51] = new SkillTemplateComponentConfig(51, "大范围", "范围档", new string[]{"群体伤害近距离","群体伤害自身中心"}, "40,40,40,40,40", 2, 2f, "大半径 AoE 范围档（模板默认小范围=20，本组件改为40）", "按实际预期命中数估值，不按半径线性估价", false);
             config[90] = new SkillTemplateComponentConfig(90, "连击", "持续", new string[]{"单体伤害大","单体伤害中","单体伤害小","群体伤害近距离","群体伤害自身中心"}, "2,2,3,3,4", 3, 3f, "同一次施放结算多段", "按预期总段数估价，避免只按单次伤害估值", false);
-            config[91] = new SkillTemplateComponentConfig(91, "持续伤害", "持续", new string[]{"单体伤害大","单体伤害中","单体伤害小","群体伤害近距离","持续区域","群体伤害自身中心"}, "20,30,50,80,120", 3, 2.5f, "按周期结算的持续伤害（毒/败）", "按持续结算次数与目标滞留时间估价", false);
-            config[92] = new SkillTemplateComponentConfig(92, "持续施法", "持续", new string[]{"群体伤害近距离","持续区域","群体伤害自身中心"}, "3,3,4,4,5", 2, 2f, "施法期间持续结算", "按总结算次数与目标是否持续处于范围估价", false);
-            config[93] = new SkillTemplateComponentConfig(93, "持续区域", "持续", new string[]{"持续区域","召唤技能场"}, "2,2.5,3,3.5,4", 3, 3f, "创建持续一段时间的区域，周期结算伤害/控制", "按持续结算次数与目标是否持续留在范围估价", false);
             config[120] = new SkillTemplateComponentConfig(120, "MP小增加", "施放节奏", new string[]{}, "4,4,4,4,4", 1, -0.5f, "技能 MP 上限小幅提高（MpCost），发动频率略降", "负向项：节奏成本，按实际发动频率抵减技能总价值", false);
             config[121] = new SkillTemplateComponentConfig(121, "MP中增加", "施放节奏", new string[]{}, "7,7,7,7,7", 1, -1f, "技能 MP 上限中等提高（MpCost），标准节奏", "负向项：节奏成本，按实际发动频率抵减技能总价值", false);
             config[122] = new SkillTemplateComponentConfig(122, "MP大增加", "施放节奏", new string[]{}, "10,10,10,10,10", 1, -1.5f, "技能 MP 上限大幅提高（MpCost），发动频率明显下降", "负向项：节奏成本，按实际发动频率抵减技能总价值", false);
@@ -242,7 +239,7 @@ namespace CommonConfig
             config[9010] = new SkillTemplateComponentConfig(9010, "驱散", "特殊机制", new string[]{"单体伤害大","单体伤害中","单体伤害小","群体伤害近距离","单体治疗","范围治疗","群体伤害自身中心"}, "1,1,2,2,3", 3, 3f, "移除目标增益/减益", "特殊机制，人工评审", true);
             config[9020] = new SkillTemplateComponentConfig(9020, "破盾", "特殊机制", new string[]{"单体伤害大","单体伤害中","单体伤害小","群体伤害近距离","群体伤害自身中心"}, "30,40,50,60,80", 2, 2f, "绕过或击破护盾", "特殊机制，人工评审", true);
             config[9030] = new SkillTemplateComponentConfig(9030, "位移", "特殊机制", new string[]{"单体伤害大","单体伤害中","单体伤害小","群体伤害近距离","群体伤害自身中心"}, "1,1,2,2,3", 2, 1.5f, "击退/拉近/换位", "特殊机制，人工评审", true);
-            config[9040] = new SkillTemplateComponentConfig(9040, "召唤", "特殊机制", new string[]{"持续区域","召唤技能场"}, "20,25,30,35,40", 4, 4f, "召唤单位或技能场", "特殊机制，人工评审", true);
+            config[9040] = new SkillTemplateComponentConfig(9040, "召唤", "特殊机制", new string[]{}, "20,25,30,35,40", 4, 4f, "召唤单位或技能场", "特殊机制，人工评审", true);
             config[9050] = new SkillTemplateComponentConfig(9050, "永久成长", "特殊机制", new string[]{"自身强化"}, "2,3,4,5,6", 3, 3f, "永久属性成长", "特殊机制，人工评审", true);
             config[9060] = new SkillTemplateComponentConfig(9060, "复制", "特殊机制", new string[]{"自身强化"}, "30,40,50,60,70", 4, 4f, "复制效果或单位", "特殊机制，人工评审", true);
             config[9070] = new SkillTemplateComponentConfig(9070, "溅射", "特殊机制", new string[]{"单体伤害大","单体伤害中","单体伤害小"}, "30,35,40,50,60", 2, 2f, "主目标附近溅射伤害", "主目标与溅射目标伤害分别计量，溅射不是纯单体模板", false);
