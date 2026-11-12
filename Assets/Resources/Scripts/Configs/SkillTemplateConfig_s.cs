@@ -40,15 +40,15 @@ namespace CommonConfig
 
         private static Dictionary<string, FieldMetaInfo> fieldMeta = new Dictionary<string, FieldMetaInfo>()
         {
-            {"Id", new FieldMetaInfo("模板Id", "int", 94, "", true)},
-            {"Name", new FieldMetaInfo("模板名", "string", 0)},
-            {"Des", new FieldMetaInfo("模板描述(基本语义与计价口径)", "string", 420)},
-            {"Modules", new FieldMetaInfo("默认组件名列表(逗号分隔,对应技能模板组件表Name;技能Modules为空时使用)", "string", 240)},
+            {"Id", new FieldMetaInfo("序列", "int", 94)},
+            {"Name", new FieldMetaInfo("模板名", "string", 0, "", true)},
+            {"Des", new FieldMetaInfo("说明", "string", 300)},
+            {"Modules", new FieldMetaInfo("默认组件名列表(逗号分隔)", "string", 300)},
             {"Values", new FieldMetaInfo("标准态主数值(Lv1~5逗号分隔;伤害模板填伤害值,治疗模板填治疗量)", "string", 150)},
             {"Quality", new FieldMetaInfo("品质(1~4)", "int", 60, "qs,1:#666666,2:#33CC33,3:#3333FF,4:#FFD700")},
             {"Score", new FieldMetaInfo("标准态评分(分,标准态=10分)", "float", 90)},
-            {"Range", new FieldMetaInfo("射程(0=默认攻击距离;目标中心群体模板必填)", "float", 80)},
-            {"Area", new FieldMetaInfo("范围半径(默认小范围=20;0=无范围)", "float", 80)},
+            {"Range", new FieldMetaInfo("标准态射程(0=使用默认攻击距离)", "float", 70)},
+            {"Area", new FieldMetaInfo("标准态范围半径(0=非范围技能,默认小范围=20)", "float", 80)},
             {"MpCost", new FieldMetaInfo("标准态MP消耗", "int", 80)},
             {"CD", new FieldMetaInfo("标准态冷却(秒)", "float", 80)},
         };
@@ -59,7 +59,7 @@ namespace CommonConfig
         public static List<CellMeta> CellMetas { get { return cellMeta; } }
 
         /// <summary>
-        ///模板Id
+        ///序列
         /// </summary>
         public int Id;
         /// <summary>
@@ -67,15 +67,15 @@ namespace CommonConfig
         /// </summary>
         public string Name;
         /// <summary>
-        ///模板描述(基本语义与计价口径)
+        ///说明
         /// </summary>
         public string Des;
         /// <summary>
-        ///默认组件名列表(逗号分隔,对应技能模板组件表Name;技能Modules为空时使用)
+        ///默认组件名列表
         /// </summary>
         public string Modules;
         /// <summary>
-        ///标准态主数值(Lv1~5逗号分隔;伤害模板填伤害值,治疗模板填治疗量)
+        ///标准态主数值
         /// </summary>
         public string Values;
         /// <summary>
@@ -87,11 +87,11 @@ namespace CommonConfig
         /// </summary>
         public float Score;
         /// <summary>
-        ///射程(0=默认攻击距离;目标中心群体模板必填)
+        ///标准态射程
         /// </summary>
         public float Range;
         /// <summary>
-        ///范围半径(默认小范围=20;0=无范围)
+        ///标准态范围半径
         /// </summary>
         public float Area;
         /// <summary>
@@ -137,27 +137,31 @@ namespace CommonConfig
         public static void Load()
         {
             config.Clear();
-            config[10] = new SkillTemplateConfig(10, "单体伤害大", "对一个敌方单位结算一次高额伤害，标准输出基准（10分）。", "施法射程,MP消耗,CD", "100,150,250,400,600", 3, 10f, 0f, 0f, 7, 2f);
-            config[11] = new SkillTemplateConfig(11, "单体伤害中", "对一个敌方单位结算一次中等伤害，数值降档，评分按同比例下调。", "施法射程,MP消耗,CD", "80,120,200,320,480", 2, 8f, 0f, 0f, 6, 2f);
-            config[12] = new SkillTemplateConfig(12, "单体伤害小", "对一个敌方单位结算一次低额伤害，适合高频或附带其他效果的单体技能。", "施法射程,MP消耗,CD", "60,90,150,240,360", 1, 6f, 0f, 0f, 5, 1.5f);
-            config[20] = new SkillTemplateConfig(20, "群体伤害近距离", "在近距离目标点（Range=40）对默认小范围（Area=20）敌人结算伤害，标准群体输出基准（10分）。", "最大目标数,施法射程,MP消耗,CD", "70,105,175,280,420", 3, 10f, 40f, 20f, 7, 2f);
-            config[21] = new SkillTemplateConfig(21, "群体伤害自身中心", "以施法者自身为中心（Range=0）对默认小范围（Area=20）敌人结算伤害，省射程但需贴身。", "最大目标数,MP消耗,CD", "70,105,175,280,420", 3, 10f, 0f, 20f, 7, 2f);
-            config[30] = new SkillTemplateConfig(30, "单体治疗", "选择一个友方单位进行治疗，数值口径与单体伤害对称。", "治疗量,属性增益,施法射程,MP消耗,CD", "100,150,250,400,600", 3, 10f, 0f, 0f, 7, 2f);
-            config[31] = new SkillTemplateConfig(31, "范围治疗", "对默认小范围（Area=20）内友方单位施加治疗，覆盖人数与溢出效果共同影响价值。", "治疗量,最大目标数,施法射程,MP消耗,CD", "70,105,175,280,420", 4, 11f, 0f, 20f, 9, 3f);
-            config[40] = new SkillTemplateConfig(40, "持续区域", "在目标点创建持续区域（Area=20），按周期结算伤害，需要射程列（Range=60）。", "持续区域,持续伤害,施法射程,MP消耗,CD", "40,60,100,160,240", 4, 11f, 60f, 20f, 9, 4f);
-            config[50] = new SkillTemplateConfig(50, "自身强化", "对施法者自身施加短时属性增益/护盾，主要看持续时间和成长性。", "属性增益,护盾,永久成长", "20,30,50,80,120", 2, 8f, 0f, 0f, 6, 3f);
-            config[60] = new SkillTemplateConfig(60, "光环", "对我方单位持续或全局生效的属性光环，按覆盖人数和持续时间估值。", "属性增益", "5,8,12,18,26", 2, 9f, 0f, 0f, 0, 0f);
-
+            config[10] = new SkillTemplateConfig(10, "单体伤害大", "对一个敌方单位结算一次高额伤害，标准输出基准（10分）。", "施法射程,MP中增加,CD中增加", "100,150,250,400,600", 3, 10f, 0f, 0f, 7, 2f);
+            config[11] = new SkillTemplateConfig(11, "单体伤害中", "对一个敌方单位结算一次中等伤害，数值降档，评分按同比例下调。", "施法射程,MP中增加,CD中增加", "80,120,200,320,480", 2, 8f, 0f, 0f, 6, 2f);
+            config[12] = new SkillTemplateConfig(12, "单体伤害小", "对一个敌方单位结算一次低额伤害，适合高频或附带其他效果的单体技能。", "施法射程,MP中增加,CD中增加", "60,90,150,240,360", 1, 6f, 0f, 0f, 5, 1.5f);
+            config[20] = new SkillTemplateConfig(20, "群体伤害近距离", "在近距离目标点（Range=40）对默认小范围（Area=20）敌人结算伤害，标准群体输出基准（10分）。", "最大目标数,施法射程,MP中增加,CD中增加", "70,105,175,280,420", 3, 10f, 40f, 20f, 7, 2f);
+            config[21] = new SkillTemplateConfig(21, "群体伤害自身中心", "以施法者自身为中心（Range=0）对默认小范围（Area=20）敌人结算伤害，省射程但需贴身。", "最大目标数,MP中增加,CD中增加", "70,105,175,280,420", 3, 10f, 0f, 20f, 7, 2f);
+            config[30] = new SkillTemplateConfig(30, "单体治疗", "选择一个友方单位进行治疗，数值口径与单体伤害对称。", "属性增益中,施法射程,MP中增加,CD中增加", "100,150,250,400,600", 3, 10f, 0f, 0f, 7, 2f);
+            config[31] = new SkillTemplateConfig(31, "范围治疗", "对默认小范围（Area=20）内友方单位施加治疗，覆盖人数与溢出效果共同影响价值。", "最大目标数,施法射程,MP中增加,CD中增加", "70,105,175,280,420", 4, 11f, 0f, 20f, 9, 3f);
+            config[40] = new SkillTemplateConfig(40, "持续区域", "在目标点创建持续区域（Area=20），按周期结算伤害，需要射程列（Range=60）。", "持续区域,持续伤害,施法射程,MP中增加,CD中增加", "40,60,100,160,240", 4, 11f, 60f, 20f, 9, 4f);
+            config[50] = new SkillTemplateConfig(50, "自身强化", "对施法者自身施加短时属性增益/护盾，主要看持续时间和成长性。", "属性增益中,护盾中,永久成长", "20,30,50,80,120", 2, 8f, 0f, 0f, 6, 3f);
+            config[60] = new SkillTemplateConfig(60, "光环", "对我方单位持续或全局生效的属性光环，按覆盖人数和持续时间估值。", "属性增益中", "5,8,12,18,26", 2, 9f, 0f, 0f, 0, 0f);
+            config[70] = new SkillTemplateConfig(70, "单体友方增益", "对一个友方单位施加属性增益或护盾，价值由强度、持续时间与目标选择共同决定。", "属性增益中,护盾中,低血筛选,施法射程,MP中增加,CD中增加", "10,15,25,40,60", 3, 9f, 50f, 0f, 6, 3f);
+            config[80] = new SkillTemplateConfig(80, "群体友方增益", "对范围内多名友方施加属性增益或护盾，按覆盖人数与溢出价值估值。", "属性增益中,护盾中,最大目标数,低血筛选,施法射程,MP中增加,CD中增加", "8,12,20,32,48", 4, 11f, 0f, 20f, 8, 4f);
+            config[90] = new SkillTemplateConfig(90, "兵种增益", "对己方士兵施加属性增益，数值按士兵基础属性折算。", "加攻中,加护甲中,加魔抗中,最大目标数,MP中增加,CD中增加", "10,15,25,40,60", 3, 9f, 0f, 20f, 7, 4f);
+            config[100] = new SkillTemplateConfig(100, "召唤技能场", "在目标区域投放召唤物或技能场，按周期结算伤害/治疗，价值由数量、持续与结算频率决定。", "召唤,持续区域,施法射程,MP中增加,CD中增加", "20,25,30,35,40", 4, 12f, 40f, 30f, 9, 5f);
+            config[110] = new SkillTemplateConfig(110, "跳跃弹射", "在多个目标之间跳跃结算伤害或治疗，每跳递减，价值由跳数、单跳数值与搜索半径决定。", "伤害倍率,最大目标数,施法射程,MP中增加,CD中增加", "60,90,150,240,360", 4, 12f, 30f, 60f, 8, 3f);
             RebuildIndex();
 
         }
 
         private static void RebuildIndex()
         {
-            idxId.Clear();
+            idxName.Clear();
             foreach (var kv in config)
             {
-                idxId[kv.Value.Id] = kv.Key;
+                if (!string.IsNullOrEmpty(kv.Value.Name)) idxName[kv.Value.Name] = kv.Key;
             }
         }
 
@@ -171,10 +175,10 @@ namespace CommonConfig
             throw new NullReferenceException(string.Format("配置表SkillTemplateConfig不存在id={0}", id));
         }
 
-        private static Dictionary<int, int> idxId = new Dictionary<int, int>();
-        public static SkillTemplateConfig GetConfigById(int val)
+        private static Dictionary<string, int> idxName = new Dictionary<string, int>();
+        public static SkillTemplateConfig GetConfigByName(string val)
         {
-            return GetConfig(idxId[val]);
+            return GetConfig(idxName[val]);
         }
 
 
