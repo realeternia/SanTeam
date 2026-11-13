@@ -288,6 +288,7 @@
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffDefStack.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\RankPlayerPanelManager.cs" />
     <Compile Include="Assets\Resources\Scripts\Configs\SkillConfig_s.cs" />
+    <Compile Include="Assets\Resources\Scripts\Configs\SkillBaseConfig_s.cs" />
     <Compile Include="Assets\Resources\Scripts\Configs\SkillTemplateConfig_s.cs" />
     <Compile Include="Assets\Resources\Scripts\Configs\SkillTemplateComponentConfig_s.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\SideHeroControl.cs" />

@@ -30,6 +30,7 @@ public static class ConfigManager
         HeroConfig.Load();
         ScenarioConfig.Load();
         SkillConfig.Load();
+        SkillBaseConfig.Load();
         SkillTemplateConfig.Load();
         SkillTemplateComponentConfig.Load();
         BuffConfig.Load();
@@ -57,6 +58,7 @@ public static class ConfigManager
     public static void PostModify()
     {
         HeroScenario.Reset();
+        ApplySkillBase();
         foreach (var jobCfg in JobConfig.ConfigList)
         {
             jobDict.Add(jobCfg.NameS, jobCfg);
@@ -120,6 +122,62 @@ public static class ConfigManager
 
         // 按当前剧本烘焙英雄面板与专属技能强度（新游戏/读档切换剧本时由 HeroScenario.SetCurrent 再次调用）
         HeroScenario.SetCurrent(HeroScenario.CurrentId);
+    }
+
+    /// <summary>
+    /// 模板化技能的数据替换：SkillConfig 行只保留身份列（Id/Name/Sname/Version/Descript/Type/Template/Modules/Lv），
+    /// 效果列一律从同 Id 的 SkillBaseConfig 行覆盖。SkillBaseConfig 由模板 + 组件展开生成。
+    /// </summary>
+    private static void ApplySkillBase()
+    {
+        int applied = 0;
+        foreach (var skillCfg in SkillConfig.ConfigList)
+        {
+            if (string.IsNullOrEmpty(skillCfg.Template))
+                continue;
+            if (!SkillBaseConfig.HasConfig(skillCfg.Id))
+            {
+                GameLog.Warn(string.Format("ConfigManager.ApplySkillBase: 技能[{0}]({1}) 引用了模板[{2}]，但缺少同 Id 的 SkillBaseConfig，沿用原有数值",
+                    skillCfg.Name, skillCfg.Id, skillCfg.Template));
+                continue;
+            }
+
+            var baseCfg = SkillBaseConfig.GetConfig(skillCfg.Id);
+            skillCfg.Rate = baseCfg.Rate;
+            skillCfg.CD = baseCfg.CD;
+            skillCfg.MpCost = baseCfg.MpCost;
+            skillCfg.StartMpRate = baseCfg.StartMpRate;
+            skillCfg.TriggerCondition = baseCfg.TriggerCondition;
+            skillCfg.DamageType = baseCfg.DamageType;
+            skillCfg.HurtTag = baseCfg.HurtTag;
+            skillCfg.Range = baseCfg.Range;
+            skillCfg.Area = baseCfg.Area;
+            skillCfg.TargetType = baseCfg.TargetType;
+            skillCfg.TargetCount = baseCfg.TargetCount;
+            skillCfg.DamageStrength = baseCfg.DamageStrength;
+            skillCfg.HealStrength = baseCfg.HealStrength;
+            skillCfg.Strength2 = baseCfg.Strength2;
+            skillCfg.StrengthBuff1 = baseCfg.StrengthBuff1;
+            skillCfg.BuffId = baseCfg.BuffId;
+            skillCfg.BuffTime = baseCfg.BuffTime;
+            skillCfg.SummonTag = baseCfg.SummonTag;
+            skillCfg.SummonCount = baseCfg.SummonCount;
+            skillCfg.SummonTime = baseCfg.SummonTime;
+            skillCfg.SummonHitInterval = baseCfg.SummonHitInterval;
+            skillCfg.SummonSpeed = baseCfg.SummonSpeed;
+            skillCfg.ItemId = baseCfg.ItemId;
+            skillCfg.ScriptName = baseCfg.ScriptName;
+            skillCfg.Action = baseCfg.Action;
+            skillCfg.SelfEffect = baseCfg.SelfEffect;
+            skillCfg.HitEffect = baseCfg.HitEffect;
+            skillCfg.AreaEffect = baseCfg.AreaEffect;
+            skillCfg.Icon = baseCfg.Icon;
+            skillCfg.LinkSelf = baseCfg.LinkSelf;
+            skillCfg.LinkTeam = baseCfg.LinkTeam;
+            skillCfg.AuroAttrs = baseCfg.AuroAttrs;
+            applied++;
+        }
+        GameLog.Debug(string.Format("ConfigManager.ApplySkillBase: 模板化技能数据替换 {0} 行", applied));
     }
 
     public static void InitFriend()
