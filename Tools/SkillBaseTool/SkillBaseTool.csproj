@@ -9,6 +9,11 @@
     <LangVersion>latest</LangVersion>
     <RootNamespace>SkillBaseTool</RootNamespace>
     <AssemblyName>SkillBaseTool</AssemblyName>
+    <ApplicationIcon>SkillBaseTool.ico</ApplicationIcon>
   </PropertyGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="SkillBaseTool.ico" LogicalName="SkillBaseTool.SkillBaseTool.ico" />
+  </ItemGroup>
 
 </Project>

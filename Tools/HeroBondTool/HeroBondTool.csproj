@@ -2,13 +2,18 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net8.0-windows</TargetFramework>
+    <TargetFramework>net10.0-windows7.0</TargetFramework>
     <UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>disable</ImplicitUsings>
     <Nullable>disable</Nullable>
     <LangVersion>latest</LangVersion>
     <RootNamespace>HeroBondTool</RootNamespace>
     <AssemblyName>HeroBondTool</AssemblyName>
+    <ApplicationIcon>HeroBondTool.ico</ApplicationIcon>
   </PropertyGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="HeroBondTool.ico" LogicalName="HeroBondTool.HeroBondTool.ico" />
+  </ItemGroup>
 
 </Project>

@@ -89,6 +89,11 @@ namespace SkillBaseTool
             status.Controls.Add(lblStatus);
         }
 
+        private void InitializeComponent()
+        {
+
+        }
+
         private void Reload()
         {
             try

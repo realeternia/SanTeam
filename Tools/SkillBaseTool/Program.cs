@@ -1,4 +1,6 @@
 using System;
+using System.Drawing;
+using System.IO;
 using System.Windows.Forms;
 
 namespace SkillBaseTool
@@ -10,7 +12,23 @@ namespace SkillBaseTool
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new MainForm());
+            using (var form = new MainForm())
+            {
+                form.Icon = LoadAppIcon();
+                Application.Run(form);
+            }
+        }
+
+        private static Icon LoadAppIcon()
+        {
+            using (Stream stream = typeof(Program).Assembly.GetManifestResourceStream("SkillBaseTool.SkillBaseTool.ico"))
+            {
+                if (stream != null)
+                {
+                    return new Icon(stream, SystemInformation.IconSize);
+                }
+            }
+            return Icon.ExtractAssociatedIcon(Application.ExecutablePath);
         }
     }
 }

@@ -243,6 +243,11 @@ namespace HeroBondTool
             }
         }
 
+        private void InitializeComponent()
+        {
+
+        }
+
         private void SaveChanges()
         {
             if (store == null)
