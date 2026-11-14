@@ -51,6 +51,13 @@ namespace SkillBaseTool
             { "乱", "眩晕" }, { "停", "定身" }, { "惑", "混乱" }, { "硬", "减伤" }, { "暴", "暴击" },
             { "攻", "加攻" }, { "甲", "加护甲" }, { "术", "加法强" }, { "抗", "加魔抗" },
             { "快", "加攻速" }, { "速", "加移速" }, { "重", "自身增伤" }, { "盾", "护盾" },
+            { "败", "持续伤害" }, { "吸", "吸血" }, { "闪", "闪避" },
+        };
+
+        /// <summary>Buff 短名 → 无档位组件名（唯一形态，直接命中组件）。</summary>
+        private static readonly Dictionary<string, string> TokenDirectModule = new Dictionary<string, string>
+        {
+            { "叛", "叛逃" }, { "链", "生命链接" }, { "锁", "连锁扩散" }, { "守", "受击叠防" },
         };
 
         /// <summary>组件族 → (StrengthBuff1 键, 百分比换算)。空键表示无独立数值。</summary>
@@ -72,6 +79,9 @@ namespace SkillBaseTool
                 { "加移速", new KeyValuePair<string, int>("moveSpeed", 100) },
                 { "自身增伤", new KeyValuePair<string, int>("damageUp", 100) },
                 { "护盾", new KeyValuePair<string, int>("shield", 1) },
+                { "持续伤害", new KeyValuePair<string, int>("dot", 1) },
+                { "吸血", new KeyValuePair<string, int>("suck", 100) },
+                { "闪避", new KeyValuePair<string, int>("evade", 100) },
                 { "眩晕", new KeyValuePair<string, int>("", 0) },
                 { "定身", new KeyValuePair<string, int>("", 0) },
                 { "混乱", new KeyValuePair<string, int>("", 0) },
@@ -87,7 +97,7 @@ namespace SkillBaseTool
         private static readonly Dictionary<string, string> SelectFirstModules = new Dictionary<string, string>
         {
             { "lowestHp", "低血筛选" }, { "highestHp", "最高血量" }, { "highestAp", "最高法强" },
-            { "rangedFirst", "远程优先" }, { "meleeFirst", "近战优先" },
+            { "rangedFirst", "远程优先" }, { "meleeFirst", "近战优先" }, { "farthest", "后排筛选" },
         };
 
         /// <summary>TargetType 仅保留脚本私有行为标记（目标筛选已迁到 SelectOnly/SelectFirst）。</summary>
@@ -102,6 +112,8 @@ namespace SkillBaseTool
             { "antiShield", "破盾" }, { "armorIgnore", "破盾" }, { "dispel", "驱散" },
             { "doubleChance", "概率双击" }, { "selfHurt", "自损" }, { "mpBurn", "燃烧法力" },
             { "shieldBonus", "按护盾加成伤害" }, { "vsJob", "兵种克制" },
+            { "missile", "弹道" }, { "maxHpBonus", "最大生命伤害" }, { "missingHp", "残血增伤" },
+            { "execute", "斩杀" },
         };
 
         public static bool IsDamageTemplate(string t)
@@ -123,39 +135,41 @@ namespace SkillBaseTool
             float heal = a.HealStrength;
 
             if (script == "SkillAura")
-                return "光环小";
-            if (script == "SkillSoldierGrow" || script == "SkillSoldierArcherBuff" || script == "SkillSoldierBless" || script == "SkillSoldierFortify")
+                return "光环中";
+            if (script == "SkillSoldierBless")
                 return "兵种增益";
             if (script == "SkillJumpChain")
                 return (heal > 0 || a.TargetType.Contains("heal")) ? "跳跃弹射-治疗" : "跳跃弹射-伤害";
-            if (script == "SkillSelfBuff" || script == "SkillAttackedShield")
+            if (script == "SkillSelfBuff")
                 return "自身强化";
+            if (script == "SkillAidHitRegion")
+                return "持续伤害";
             if (heal > 0)
             {
                 if (script == "SkillCastingAidAreaHeal")
+                    return "持续治疗";
+                if (script != "SkillAreaHeal")
                     return null;
-                if (type == "单疗" || script == "SkillAidCurseHeal")
-                    return "单体治疗";
-                return "范围治疗";
+                return type == "单疗" ? "单体治疗" : "范围治疗";
             }
-            if (type == "单增" || type == "群增" || script == "SkillAreaBuff")
-            {
-                if (script == "SkillAidCraftBuff")
-                    return null;
+            if (script == "SkillAreaBuff")
                 return type == "群增" ? "群体友方增益" : "单体友方增益";
-            }
             if (dmg > 0)
             {
                 if (script.StartsWith("SkillAreaDamage", StringComparison.Ordinal))
                     return a.TargetType.Contains("self") ? "群体伤害自身中心" : "群体伤害近距离";
                 if (script == "SkillShockWave")
                     return "冲击波伤害";
-                if (script == "SkillAidChargeImpale" || script == "SkillTaunt")
-                    return "群体伤害近距离";
-                if (script == "SkillSingleDamage" || script == "SkillAidAddBuff" || script == "SkillAidExplode")
-                    return dmg >= 90 ? "单体伤害大" : (dmg >= 60 ? "单体伤害中" : "单体伤害小");
+                if (script == "SkillSingleDamage")
+                    return DamageSize(dmg);
             }
             return null;
+        }
+
+        /// <summary>单体伤害按基值分档：≥90 大、≥60 中、其余小。</summary>
+        private static string DamageSize(float dmg)
+        {
+            return dmg >= 90 ? "单体伤害大" : (dmg >= 60 ? "单体伤害中" : "单体伤害小");
         }
 
         /// <summary>从手配 BuffId / TargetType / 标签反推组件（按出现顺序去重）。</summary>
@@ -165,6 +179,19 @@ namespace SkillBaseTool
             string sb = a.StrengthBuff1;
             foreach (string tok in a.BuffId.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
             {
+                if (tok == "伤" && a.ScriptName == "SkillSelfBuff")
+                {
+                    if (!result.Contains("自身易伤"))
+                        result.Add("自身易伤");
+                    continue;
+                }
+                string direct;
+                if (TokenDirectModule.TryGetValue(tok, out direct))
+                {
+                    if (!result.Contains(direct))
+                        result.Add(direct);
+                    continue;
+                }
                 string family;
                 if (!TokenFamily.TryGetValue(tok, out family))
                     continue;
@@ -173,6 +200,8 @@ namespace SkillBaseTool
                 if (!string.IsNullOrEmpty(fk.Key))
                 {
                     var m = Regex.Match(sb, Regex.Escape(fk.Key) + @":(-?\d+\.?\d*)");
+                    if (!m.Success)
+                        m = Regex.Match(a.Strength2, Regex.Escape(fk.Key) + @":(-?\d+\.?\d*)");
                     if (m.Success)
                         hand = CfgUtil.ParseFloat(m.Groups[1].Value) * (fk.Value == 100 ? 100f : 1f);
                 }
@@ -196,6 +225,18 @@ namespace SkillBaseTool
 
             if (a.ScriptName == "SkillSelfBuff" && a.BuffId.Contains("反") && !result.Contains("伤害反射"))
                 result.Add("伤害反射");
+            if (a.ScriptName == "SkillAidManaShare" && !result.Contains("法力共享"))
+                result.Add("法力共享");
+            if (a.ScriptName == "SkillAidCraftBuff" && !result.Contains("永久属性"))
+                result.Add("永久属性");
+            if (a.ScriptName == "SkillAidBackstepShot" && !result.Contains("二段射击"))
+                result.Add("二段射击");
+            if (a.ScriptName == "SkillCastingAidFrontalFlaming" && !result.Contains("持续施法"))
+                result.Add("持续施法");
+            if (a.ScriptName == "SkillAidHitRegion" && a.Strength2.Contains("moveDist") && !result.Contains("持续场移动"))
+                result.Add("持续场移动");
+            if ((a.Strength2.Contains("pushMin") || a.Strength2.Contains("pushMax")) && !result.Contains("位移"))
+                result.Add("位移");
             if (a.ScriptName == "SkillTaunt")
             {
                 string tier = PickTier(store, "嘲讽", a.BuffTime);
@@ -225,7 +266,7 @@ namespace SkillBaseTool
             return tiers.OrderBy(t => Math.Abs(PrimaryValue(store.ComponentByName[t].Effect, 1) - handValue.Value)).First();
         }
 
-        /// <summary>为品质 1/2 英雄技能自动填 Template / Modules，返回被改动的行 Id。</summary>
+        /// <summary>为品质 1~4 英雄技能自动填 Template / Modules，返回被改动的行 Id。</summary>
         public static HashSet<int> AutoAssign(DataStore store, out int assignedGroups, out List<string> skipped)
         {
             var changed = new HashSet<int>();
@@ -234,7 +275,7 @@ namespace SkillBaseTool
             foreach (var group in store.Skills.GroupBy(s => s.Sname))
             {
                 var lv1 = group.FirstOrDefault(s => s.Lv == 1) ?? group.First();
-                if (lv1.Quality != 1 && lv1.Quality != 2)
+                if (lv1.Quality < 1 || lv1.Quality > 4)
                     continue;
                 string t = PickTemplate(lv1);
                 if (string.IsNullOrEmpty(t) || !store.TemplateByName.ContainsKey(t))

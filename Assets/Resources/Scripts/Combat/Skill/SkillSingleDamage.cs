@@ -11,6 +11,7 @@ using UnityEngine;
 /// 通过 TargetType 标记列表扩展同族行为（多项逗号分隔，空=默认）：
 /// · selfBuff   = BuffId 全部挂给自身（高览·御守 / 陈泰·扬鞭 / 乐进·御斩 / 程普·横扫；护盾类自动写护盾值）
 /// · bothBuff   = BuffId[0] 挂目标、其余挂自身（马腾·腾驾 "慑,攻"）
+/// · pushMin/pushMax = 命中后沿"自身→目标"方向击退 pushMin~pushMax（司马懿·隐忍 / 贾充）
 /// · execute    = 目标生命比例 &lt; 键"execHp" 时伤害 × 键"execRate"（颜良·斩杀）
 /// · shieldBonus= 目标带吸收盾时伤害 × 键"shieldBonusRate"（曹洪·裂盾）
 /// · missingHp  = 伤害 += 伤害 × 键"missingHpRate" × 已损生命比例（孟获·蛮勇）
@@ -74,6 +75,9 @@ public class SkillSingleDamage : Skill
         if (HasSkillFlag("mpBurn"))
             BurnMpToTarget(target, GetStr2("mpBurn"));
 
+        // 击退：按 Strength2 的 pushMin/pushMax 随机取推远距离，未配置则不做处理
+        PushBack(target);
+
         // 苦肉反噬：按本次造成的伤害比例扣自身生命，濒死不致死
         if (HasSkillFlag("selfHurt"))
             HurtSelf(dmg);
@@ -86,6 +90,32 @@ public class SkillSingleDamage : Skill
         if (!string.IsNullOrEmpty(skillCfg.HitEffect))
             EffectManager.PlaySkillEffect(target, skillCfg.HitEffect);
         return true;
+    }
+
+    /// <summary>
+    /// 击退：按 Strength2 的 pushMin/pushMax 随机取推远距离，沿"自身→目标"方向把目标推离自身；未配置则不做处理。
+    /// </summary>
+    private void PushBack(Chess target)
+    {
+        var maxDistance = GetStr2("pushMax");
+        if (maxDistance <= 0f)
+            return;
+        var minDistance = Mathf.Min(GetStr2("pushMin"), maxDistance);
+
+        // 跳跃中的目标不受位移打断
+        if (target.isJumping)
+            return;
+
+        var dir = target.transform.position - owner.transform.position;
+        dir.y = 0f;
+        if (dir.sqrMagnitude < 0.0001f)
+            dir = owner.transform.forward;
+
+        var pushPos = target.transform.position + dir.normalized * SysRandom.Range(minDistance, maxDistance);
+        pushPos.y = target.transform.position.y;
+        // 落点踩墙则原地不动，避免被推穿墙体
+        if (!WorldManager.Instance.CheckPositionBlocked(target, pushPos))
+            target.transform.position = pushPos;
     }
 
     /// <summary>

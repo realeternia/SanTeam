@@ -70,7 +70,7 @@ namespace SkillBaseTool
             canvas.Invalidate();
         }
 
-        /// <summary>按模板 / 组件分组重建大方块（只统计 Q1–Q2 英雄技能）。</summary>
+        /// <summary>按模板 / 组件分组重建大方块（只统计 Q1–Q4 英雄技能）。</summary>
         private void RebuildBlocks()
         {
             blocks = new List<Block>();
@@ -79,7 +79,7 @@ namespace SkillBaseTool
                 lblSummary.Text = "";
                 return;
             }
-            var skills = store.Quality12HeroSkills.ToList();
+            var skills = store.QualityHeroSkills.ToList();
             if (mode == Mode.Template)
             {
                 foreach (var tpl in store.Templates)
@@ -89,7 +89,7 @@ namespace SkillBaseTool
                         blocks.Add(MakeBlock(tpl.Name, tpl.Quality, tpl.Score, used, true));
                 }
                 int unassigned = skills.Count(s => string.IsNullOrEmpty(s.TemplateName));
-                lblSummary.Text = string.Format("模板视角：{0} 个模板 / {1} 个 Q1–Q2 英雄技能（未模板化 {2}）",
+                lblSummary.Text = string.Format("模板视角：{0} 个模板 / {1} 个 Q1–Q4 英雄技能（未模板化 {2}）",
                     blocks.Count, skills.Count, unassigned);
             }
             else
@@ -100,7 +100,7 @@ namespace SkillBaseTool
                     if (used.Count > 0)
                         blocks.Add(MakeBlock(comp.Name, comp.Quality, comp.Score, used, false));
                 }
-                lblSummary.Text = string.Format("组件视角：{0} 个组件 / {1} 个 Q1–Q2 英雄技能（一个技能可同时出现在多个组件方块中）",
+                lblSummary.Text = string.Format("组件视角：{0} 个组件 / {1} 个 Q1–Q4 英雄技能（一个技能可同时出现在多个组件方块中）",
                     blocks.Count, skills.Count);
             }
             // treemap 要求按面积（技能数）降序

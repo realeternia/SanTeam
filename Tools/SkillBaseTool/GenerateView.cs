@@ -206,7 +206,7 @@ namespace SkillBaseTool
                 return;
             Theme.BeginBulkFill(grid);
             rowSkills.Clear();
-            var skills = store.Quality12HeroSkills
+            var skills = store.QualityHeroSkills
                 .OrderBy(s => s.Quality)
                 .ThenBy(s => s.Sname)
                 .ToList();
@@ -242,7 +242,7 @@ namespace SkillBaseTool
                     grid.Rows[idx].DefaultCellStyle.BackColor = Theme.RowWarn;
             }
             Theme.EndBulkFill(grid);
-            lblStats.Text = string.Format("品质 1/2 英雄技能 {0} 个：已模板化 {1}，SkillBase 行 {2}",
+            lblStats.Text = string.Format("品质 1~4 英雄技能 {0} 个：已模板化 {1}，SkillBase 行 {2}",
                 skills.Count, templated, store.BaseRows.Count);
         }
 
@@ -260,7 +260,7 @@ namespace SkillBaseTool
         {
             if (store == null)
                 return;
-            if (MessageBox.Show(this, "将按技能脚本/类型为品质 1/2 英雄技能自动写入 Template 与 Modules（同 Sname 五级一起），并保存 SkillConfig。继续？",
+            if (MessageBox.Show(this, "将按技能脚本/类型为品质 1~4 英雄技能自动写入 Template 与 Modules（同 Sname 五级一起），并保存 SkillConfig。继续？",
                     "自动分配模板", MessageBoxButtons.OKCancel, MessageBoxIcon.Question) != DialogResult.OK)
                 return;
             int groups;

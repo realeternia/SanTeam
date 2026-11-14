@@ -67,7 +67,6 @@
     <Compile Include="Assets\Resources\Scripts\UIs\IconLoader.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\BagCellPointerForwarder.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\TooltipHero.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillSoldierSingle.cs" />
     <Compile Include="Assets\Resources\Scripts\Configs\SystemAttrConfig_s.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAttackMpGain.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffRevive.cs" />
@@ -107,7 +106,6 @@
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffLifeLink.cs" />
     <Compile Include="Assets\Resources\Scripts\Tools\SysColor.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\BagControl.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillSoldierGrow.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillMultiHit.cs" />
     <Compile Include="Assets\Resources\Scripts\CardShopManager.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillSoldierFortify.cs" />
@@ -168,7 +166,6 @@
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidFlashStrike.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAttackShieldPierce.cs" />
     <Compile Include="Assets\MasterMagicFX\Scripts\Miscs\CameraRotater.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAttackedTeleport.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\BattleResultHeroCellControl.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidExplode.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillInitSoldierBuff.cs" />
@@ -178,7 +175,6 @@
     <Compile Include="Assets\Resources\Scripts\UIs\TooltipFriend.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\MySelectControl.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffShield.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidEnduranceStrike.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\RankPlayerCellInfo.cs" />
     <Compile Include="Assets\MasterMagicFX\Scripts\Miscs\LaserShooter.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidCurseHeal.cs" />
@@ -229,7 +225,6 @@
     <Compile Include="Assets\MasterMagicFX\Scripts\Miscs\ParticleMappingController.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillHitArea.cs" />
     <Compile Include="Assets\Resources\Scripts\Configs\GameRoundConfig_s.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidManaRally.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAttackSpinAttack.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillShockWave.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAttackArmorPierce.cs" />
@@ -240,12 +235,10 @@
     <Compile Include="Assets\Resources\Scripts\Configs\HeroAttrConfig_s.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAreaHeal.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffReflect.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidAmbush.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAreaDamageDeBuff.cs" />
     <Compile Include="Assets\Resources\Scripts\Configs\PlayerLevelConfig_s.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAttackSpeedAttack.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidBackstepShot.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidChargeImpale.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillInitDecayDef.cs" />
     <Compile Include="Assets\Resources\Scripts\Configs\ItemCombineConfig_s.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffHealDown.cs" />

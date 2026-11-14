@@ -266,9 +266,9 @@ namespace SkillBaseTool
             get { return Skills.Where(s => s.Lv == 1); }
         }
 
-        public IEnumerable<SkillRow> Quality12HeroSkills
+        public IEnumerable<SkillRow> QualityHeroSkills
         {
-            get { return LevelOneSkills.Where(s => s.Quality == 1 || s.Quality == 2); }
+            get { return LevelOneSkills.Where(s => s.Quality >= 1 && s.Quality <= 4); }
         }
     }
 }

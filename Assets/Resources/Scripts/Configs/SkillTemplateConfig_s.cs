@@ -151,17 +151,17 @@ namespace CommonConfig
             config[1020] = new SkillTemplateConfig(1020, "跳跃弹射-伤害", "在多个敌人之间跳跃结算伤害，每跳递减，价值由跳数、单跳数值与搜索半径决定。", "伤害倍率,MP中增加,CD中增加", "SelectOnly:enemy;DamageStrength=60,90,150,240,360", 4, 12f, 30f, 60f, 3, 8, 3f);
             config[1030] = new SkillTemplateConfig(1030, "冲击波伤害", "朝目标方向射出冲击波导弹，命中路径上最多 TargetCount 名敌人并逐个结算伤害；可选手配 BuffId（减速等）与 Strength2 pushMin/pushMax（击退）。", "伤害倍率,MP中增加,CD中增加", "SelectOnly:enemy;DamageStrength=60,85,130,220,330", 3, 10f, 40f, 15f, 3, 7, 2f);
             config[1040] = new SkillTemplateConfig(1040, "持续伤害", "在落点投放持续存在的伤害场，数字为场持续与结算间隔；召唤物标签、范围与单次伤害仍由技能行配置。", "", "SummonTime=5.2;SummonHitInterval=1", 3, 9f, 40f, 0f, 3, 9, 2.5f);
-            config[2000] = new SkillTemplateConfig(2000, "单体治疗", "选择一个友方单位进行治疗，数值口径与单体伤害对称。", "属性增益中,MP中增加,CD中增加", "SelectOnly:ally;HealStrength=100,150,250,400,600", 3, 10f, 40f, 0f, 1, 7, 2f);
+            config[2000] = new SkillTemplateConfig(2000, "单体治疗", "选择一个友方单位进行治疗，数值口径与单体伤害对称。", "MP中增加,CD中增加", "SelectOnly:ally;HealStrength=100,150,250,400,600", 3, 10f, 40f, 0f, 1, 7, 2f);
             config[2010] = new SkillTemplateConfig(2010, "范围治疗", "对默认小范围（Area=20）内友方单位施加治疗，覆盖人数与溢出效果共同影响价值。", "MP中增加,CD中增加", "SelectOnly:ally;HealStrength=70,105,175,280,420", 4, 11f, 40f, 20f, 3, 9, 3f);
             config[2020] = new SkillTemplateConfig(2020, "跳跃弹射-治疗", "在多个友军之间跳跃结算治疗，每跳递减，价值由跳数、单跳治疗量与搜索半径决定。", "MP中增加,CD中增加", "SelectOnly:ally;HealStrength=60,90,150,240,360", 4, 12f, 30f, 60f, 3, 8, 3f);
             config[2030] = new SkillTemplateConfig(2030, "持续治疗", "在落点投放持续存在的治疗场，数字为场持续与结算间隔；治疗量与范围仍由技能行配置。", "", "SummonTime=5;SummonHitInterval=1", 3, 9f, 40f, 0f, 3, 14, 2.5f);
-            config[3000] = new SkillTemplateConfig(3000, "自身强化", "对施法者自身施加短时属性增益/护盾，主要看持续时间和成长性。", "属性增益中,护盾中,永久成长", "None", 2, 8f, 0f, 0f, 1, 6, 3f);
-            config[3010] = new SkillTemplateConfig(3010, "光环小", "开启后每3秒对半径25内按 SelectOnly/SelectFirst 选中的单位挂Buff（可指向敌方）；无MP消耗常开，有MP消耗则MP满开启、每秒消耗1点MP。", "属性增益中", "SelectOnly:ally", 2, 3f, 0f, 25f, 3, 10, 2.5f);
-            config[3020] = new SkillTemplateConfig(3020, "单体友方增益", "对一个友方单位施加属性增益或护盾，价值由强度、持续时间与目标选择共同决定。", "属性增益中,护盾中,低血筛选,MP中增加,CD中增加", "SelectOnly:ally", 3, 9f, 40f, 0f, 1, 6, 3f);
-            config[3030] = new SkillTemplateConfig(3030, "群体友方增益", "对范围内多名友方施加属性增益或护盾，按覆盖人数与溢出价值估值。", "属性增益中,护盾中,低血筛选,MP中增加,CD中增加", "SelectOnly:ally", 4, 11f, 40f, 20f, 3, 8, 4f);
-            config[3031] = new SkillTemplateConfig(3031, "群体友方增益-自身小", "以自身为中心，半径25内的友方获得属性增益或护盾。", "属性增益中,护盾中,低血筛选,MP中增加,CD中增加", "SelectOnly:ally", 3, 6f, 0f, 25f, 3, 8, 4f);
-            config[3032] = new SkillTemplateConfig(3032, "群体友方增益-目标小", "以选中的首个友军目标为中心，半径25内的友方获得属性增益或护盾。", "属性增益中,护盾中,低血筛选,MP中增加,CD中增加", "SelectOnly:ally;TargetType:targetCenter", 3, 7f, 40f, 25f, 3, 8, 4f);
-            config[3033] = new SkillTemplateConfig(3033, "全体友军增益", "全图范围内所有友方获得属性增益或护盾，不受距离限制。", "属性增益中,护盾中,MP中增加,CD中增加", "SelectOnly:ally;TargetType:wholeMap", 4, 12f, 0f, 0f, 3, 8, 4f);
+            config[3000] = new SkillTemplateConfig(3000, "自身强化", "对施法者自身施加短时属性增益/护盾，主要看持续时间和成长性。", "护盾中,永久成长", "None", 2, 8f, 0f, 0f, 1, 6, 3f);
+            config[3010] = new SkillTemplateConfig(3010, "光环中", "开启后每3秒对半径40内按 SelectOnly/SelectFirst 选中的单位挂Buff（可指向敌方），不限制目标数；无MP消耗常开，有MP消耗则MP满开启、每秒消耗1点MP。", "", "SelectOnly:ally", 2, 3f, 0f, 40f, 0, 10, 2.5f);
+            config[3020] = new SkillTemplateConfig(3020, "单体友方增益", "对一个友方单位施加属性增益或护盾，价值由强度、持续时间与目标选择共同决定。", "护盾中,低血筛选,MP中增加,CD中增加", "SelectOnly:ally", 3, 9f, 40f, 0f, 1, 6, 3f);
+            config[3030] = new SkillTemplateConfig(3030, "群体友方增益", "对范围内多名友方施加属性增益或护盾，按覆盖人数与溢出价值估值。", "护盾中,低血筛选,MP中增加,CD中增加", "SelectOnly:ally", 4, 11f, 40f, 20f, 3, 8, 4f);
+            config[3031] = new SkillTemplateConfig(3031, "群体友方增益-自身小", "以自身为中心，半径25内的友方获得属性增益或护盾。", "护盾中,低血筛选,MP中增加,CD中增加", "SelectOnly:ally", 3, 6f, 0f, 25f, 3, 8, 4f);
+            config[3032] = new SkillTemplateConfig(3032, "群体友方增益-目标小", "以选中的首个友军目标为中心，半径25内的友方获得属性增益或护盾。", "护盾中,低血筛选,MP中增加,CD中增加", "SelectOnly:ally;TargetType:targetCenter", 3, 7f, 40f, 25f, 3, 8, 4f);
+            config[3033] = new SkillTemplateConfig(3033, "全体友军增益", "全图范围内所有友方获得属性增益或护盾，不受距离限制。", "护盾中,MP中增加,CD中增加", "SelectOnly:ally;TargetType:wholeMap", 4, 12f, 0f, 0f, 3, 8, 4f);
             config[3040] = new SkillTemplateConfig(3040, "兵种增益", "对己方士兵施加属性增益，数值按士兵基础属性折算。", "加攻中,加护甲中,加魔抗中,MP中增加,CD中增加", "SelectOnly:ally", 3, 9f, 40f, 20f, 3, 7, 4f);
 
             RebuildIndex();
