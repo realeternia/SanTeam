@@ -33,15 +33,37 @@ namespace SkillBaseTool
         private string pendingType;
         private string pendingScript;
         private bool templateChanged;
+        /// <summary>组件名 → 当前配置中引用它的技能数（按 Lv1 行统计，一个技能只计一次）。</summary>
+        private readonly Dictionary<string, int> moduleUsage = new Dictionary<string, int>();
 
         public ScoreView(DataStore data, SkillRow target)
         {
             store = data;
             skill = target;
+            BuildModuleUsage();
             BackColor = Theme.Bg;
             BuildUi();
             FillTemplates();
             RebuildComponents(skill.Modules);
+        }
+
+        /// <summary>统计每个组件当前被多少技能引用，供选择列表右侧展示。</summary>
+        private void BuildModuleUsage()
+        {
+            moduleUsage.Clear();
+            foreach (var row in store.Skills)
+            {
+                if (row.Lv != 1)
+                    continue;
+                foreach (string name in row.Modules)
+                {
+                    if (string.IsNullOrEmpty(name))
+                        continue;
+                    int n;
+                    moduleUsage.TryGetValue(name, out n);
+                    moduleUsage[name] = n + 1;
+                }
+            }
         }
 
         private void BuildUi()
@@ -95,9 +117,9 @@ namespace SkillBaseTool
             panes.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50f));
             panes.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50f));
             panes.RowStyles.Add(new RowStyle(SizeType.Percent, 100f));
-            panes.Controls.Add(BuildPane("目标选取", "目标筛选组件（勾选后写入 Modules）",
+            panes.Controls.Add(BuildPane("目标选取", "目标筛选组件（勾选后写入 Modules；×N=已被 N 个技能引用）",
                 out clbSelect, out txtSearchSelect), 0, 0);
-            panes.Controls.Add(BuildPane("特殊效果", "状态 / 特殊机制 / 数值与节奏组件",
+            panes.Controls.Add(BuildPane("特殊效果", "状态 / 特殊机制 / 数值与节奏组件（×N=已被 N 个技能引用）",
                 out clbEffect, out txtSearchEffect), 1, 0);
 
             var leftBottom = new Panel { Dock = DockStyle.Bottom, Height = 70, BackColor = Theme.Card };
@@ -278,11 +300,30 @@ namespace SkillBaseTool
             bool check = checkedNames.Contains(comp.Name);
             Color color = Theme.QualityColor(comp.Quality);
             string leftText = (check ? "☑ " : "☐ ") + comp.Name;
-            var leftRect = new Rectangle(e.Bounds.X + 4, e.Bounds.Y, e.Bounds.Width - 96, e.Bounds.Height);
+            var leftRect = new Rectangle(e.Bounds.X + 4, e.Bounds.Y, e.Bounds.Width - 146, e.Bounds.Height);
+            var countRect = new Rectangle(e.Bounds.Right - 140, e.Bounds.Y, 50, e.Bounds.Height);
             var priceRect = new Rectangle(e.Bounds.Right - 88, e.Bounds.Y, 82, e.Bounds.Height);
             TextRenderer.DrawText(e.Graphics, leftText, Theme.Base, leftRect, color,
                 TextFormatFlags.VerticalCenter | TextFormatFlags.Left | TextFormatFlags.EndEllipsis);
+            int used;
+            moduleUsage.TryGetValue(comp.Name, out used);
+            TextRenderer.DrawText(e.Graphics, "×" + used, Theme.Small, countRect, UsageColor(used),
+                TextFormatFlags.VerticalCenter | TextFormatFlags.Right);
             DrawPrice(e.Graphics, comp.Score, priceRect, Theme.Bold);
+        }
+
+        /// <summary>引用次数配色：0 灰、1-3 白、4-6 绿、7-10 黄、10 以上红。</summary>
+        private static Color UsageColor(int count)
+        {
+            if (count <= 0)
+                return Theme.Faint;
+            if (count <= 3)
+                return Theme.Text;
+            if (count <= 6)
+                return Theme.Ok;
+            if (count <= 10)
+                return Theme.Warn;
+            return Theme.Danger;
         }
 
         /// <summary>已选模块明细：名字按品质染色，价格右对齐加粗放大。</summary>
