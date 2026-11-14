@@ -18,7 +18,9 @@ public class SkillAidRaidCamp : Skill
 
     public override bool CheckAidSkill()
     {
-        var target = BacklineEnemy();
+        // 目标：按 SelectOnly / SelectFirst 选（典型 enemy + farthest，近似敌方后排）
+        var picked = SelectTargets(owner.transform.position, skillCfg.Area, false, 1);
+        var target = picked.Count > 0 ? picked[0] : null;
         if (target == null)
             return false;
         if (!CheckBurst(target))
@@ -39,26 +41,6 @@ public class SkillAidRaidCamp : Skill
 
         EffectManager.PlaySkillEffect(target, skillCfg.HitEffect);
         return true;
-    }
-
-    // 射程内最远的存活敌方单位（近似后排）
-    private Chess BacklineEnemy()
-    {
-        var enemies = WorldManager.Instance.GetEnemyInRange(owner.transform.position, skillCfg.Area, owner.side);
-        Chess best = null;
-        float bestDist = -1f;
-        foreach (var e in enemies)
-        {
-            if (e == null || e.hp <= 0)
-                continue;
-            float d = WorldManager.Instance.GetRange(owner.transform.position, e.transform.position);
-            if (d > bestDist)
-            {
-                bestDist = d;
-                best = e;
-            }
-        }
-        return best;
     }
 
     // 突进到目标身后（沿自身→目标方向越过目标 DashOffset 距离），落点踩墙则原地不动

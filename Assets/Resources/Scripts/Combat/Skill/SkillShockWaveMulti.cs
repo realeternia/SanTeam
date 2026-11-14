@@ -18,14 +18,13 @@ public class SkillShockWaveMulti : Skill
 
     public override bool CheckAidSkill()
     {
-        var target = owner.targetChess;
-        if (target == null || target.hp <= 0)
+        // 单体技能同样走 SelectOnly / SelectFirst（未配 SelectFirst 时沿用当前索敌目标）
+        var target = SelectSingleTarget(skillCfg.Range);
+        if (target == null)
             return false;
 
         var start = owner.transform.position;
         var targetPos = target.transform.position;
-        if (!WorldManager.Instance.CheckInRange(owner, target, skillCfg.Range))
-            return false;
 
         if (!CheckBurst(null))
             return false;

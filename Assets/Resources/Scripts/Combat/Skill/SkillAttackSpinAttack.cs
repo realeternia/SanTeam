@@ -18,10 +18,9 @@ public class SkillAttackSpinAttack : Skill
         if(CheckBurst(defender))
         {
             owner.PlayerAnim(skillCfg.Action);
-            var unitsInRange = WorldManager.Instance.GetEnemyInRange(owner.transform.position, skillCfg.Area, owner.side);
-            unitsInRange.Remove(defender);
-            WorldManager.Instance.RandomSelect(unitsInRange, skillCfg.TargetCount);
-            foreach(var unit in unitsInRange)
+            // 旋风范围：按 SelectOnly / SelectFirst 选（默认敌方，排除被普攻命中的单位）
+            var unitsInRange = SelectTargets(owner.transform.position, skillCfg.Area, false, skillCfg.TargetCount, defender);
+            foreach (var unit in unitsInRange)
             {
                 var spinDamage = (int)(damage * GetStr2("splashRate"));
                 unit.OnSkillDamaged(owner, skillId, spinDamage);

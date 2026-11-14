@@ -56,6 +56,7 @@
     <Compile Include="..\..\..\Assets\Resources\Scripts\Tools\SysColor.cs" Link="Game\Tools\SysColor.cs" />
     <Compile Include="..\..\..\Assets\Resources\Scripts\Tools\PlayerBook.cs" Link="Game\Tools\PlayerBook.cs" />
     <Compile Include="..\..\..\Assets\Resources\Scripts\Tools\HeroSelectionTool.cs" Link="Game\Tools\HeroSelectionTool.cs" />
+    <Compile Include="..\..\..\Assets\Resources\Scripts\Tools\HeroScenario.cs" Link="Game\Tools\HeroScenario.cs" />
     <Compile Include="..\..\..\Assets\Resources\Scripts\Tools\GameLog.cs" Link="Game\Tools\GameLog.cs" />
     <Compile Include="..\..\..\Assets\Resources\Scripts\Tools\AIConst.cs" Link="Game\Tools\AIConst.cs" />
     <Compile Include="..\..\..\Assets\Resources\Scripts\Tools\GameConst.cs" Link="Game\Tools\GameConst.cs" />

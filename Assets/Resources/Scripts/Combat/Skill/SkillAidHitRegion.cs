@@ -18,10 +18,9 @@ public class SkillAidHitRegion : Skill
 
     public override bool CheckAidSkill()
     {
-        var target = owner.targetChess;
-        if (target == null || target.hp <= 0)
-            return false;
-        if (!WorldManager.Instance.CheckInRange(owner, target, skillCfg.Range))
+        // 单体技能同样走 SelectOnly / SelectFirst（未配 SelectFirst 时沿用当前索敌目标）
+        var target = SelectSingleTarget(skillCfg.Range);
+        if (target == null)
             return false;
         if (!CheckBurst(target))
             return false;
@@ -59,10 +58,10 @@ public class SkillAidHitRegion : Skill
             if (owner == null || owner.hp <= 0)
                 yield break;
 
-            var unitsInRange = WorldManager.Instance.GetEnemyInRange(curPos, skillCfg.Area, owner.side);
+            // 每跳范围选取：按 SelectOnly / SelectFirst 选（默认敌方，随机取 TargetCount 名）
+            var unitsInRange = SelectTargets(curPos, skillCfg.Area, false, skillCfg.TargetCount);
             if (unitsInRange.Count > 0)
             {
-                WorldManager.Instance.RandomSelect(unitsInRange, skillCfg.TargetCount);
                 var damage = GetSkillDamage(); // 固定系数 + 比例系数×关联属性
                 foreach (var unit in unitsInRange)
                 {

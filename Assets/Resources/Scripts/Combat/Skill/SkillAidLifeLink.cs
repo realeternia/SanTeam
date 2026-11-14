@@ -19,16 +19,9 @@ public class SkillAidLifeLink : Skill
         if (!CheckBurst(null))
             return false;
 
-        // 找生命比例最低的友军
-        var allies = WorldManager.Instance.GetMySideInRange(owner.transform.position, 0f, owner.side);
-        Chess lowest = null;
-        foreach (var a in allies)
-        {
-            if (a == null || a.hp <= 0 || a == owner)
-                continue;
-            if (lowest == null || a.HpRate < lowest.HpRate)
-                lowest = a;
-        }
+        // 目标：按 SelectOnly / SelectFirst 选（典型 ally;notSelf + lowestHp，全图范围）
+        var picked = SelectTargets(owner.transform.position, 0f, true, 1, owner);
+        var lowest = picked.Count > 0 ? picked[0] : null;
         if (lowest == null)
             return false;
 

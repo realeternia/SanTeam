@@ -43,11 +43,11 @@ public class SkillTaunt : Skill
             }
         }
 
-        // 范围伤害（DamageStrength=0 时 GetSkillDamage 为 0，自动跳过）
+        // 范围伤害（DamageStrength=0 时 GetSkillDamage 为 0，自动跳过）；选人规则见 SelectOnly / SelectFirst
         var damage = GetSkillDamage();
         if (damage > 0)
         {
-            var enemies = WorldManager.Instance.GetEnemyInRange(owner.transform.position, skillCfg.Area, owner.side);
+            var enemies = SelectTargets(owner.transform.position, skillCfg.Area, false, skillCfg.TargetCount);
             foreach (var e in enemies)
             {
                 if (e == null || e.hp <= 0)

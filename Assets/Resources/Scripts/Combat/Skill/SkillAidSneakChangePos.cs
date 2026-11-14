@@ -18,7 +18,10 @@ public class SkillAidSneakChangePos : Skill
         if (owner == null || owner.hp <= 0)
             return false;
 
-        var target = FarthestEnemyInRange();
+        // 目标：按 SelectOnly / SelectFirst 选（典型 enemy + farthest）；换过位与空中位移中的单位不参与
+        var picked = SelectTargets(owner.transform.position, skillCfg.Range, false, 1, null,
+            x => !x.sneakSwapped && !x.isJumping);
+        var target = picked.Count > 0 ? picked[0] : null;
         if (target == null)
             return false;
 
@@ -48,26 +51,5 @@ public class SkillAidSneakChangePos : Skill
         target.MoveTo(ownerPos, true);
         WorldManager.Instance.AddBattleText("偷袭换位!", target.transform.position, new Vector2(0, 80), Color.yellow, 3);
         return true;
-    }
-
-    // 技能射程内距离自身最远、且未被换过位的存活敌方单位
-    private Chess FarthestEnemyInRange()
-    {
-        Chess best = null;
-        float bestDist = -1f;
-        foreach (var e in WorldManager.Instance.GetEnemyInRange(owner.transform.position, skillCfg.Range, owner.side))
-        {
-            // 空中位移中的单位(如吕布·魔神起手飞天)位置在高空，换位会把自身带到空中悬停，排除该目标
-            if (e == null || e.hp <= 0 || e.sneakSwapped || e.isJumping)
-                continue;
-
-            float d = WorldManager.Instance.GetRange(owner.transform.position, e.transform.position);
-            if (d > bestDist)
-            {
-                bestDist = d;
-                best = e;
-            }
-        }
-        return best;
     }
 }

@@ -174,11 +174,12 @@ public static class HeroLineup
             var cfg = HeroConfig.GetConfig(id);
             if (cfg == null)
                 continue;
+            var side = HeroScenario.GetSide(cfg);
             List<int> list;
-            if (!map.TryGetValue(cfg.Side, out list))
+            if (!map.TryGetValue(side, out list))
             {
                 list = new List<int>();
-                map[cfg.Side] = list;
+                map[side] = list;
             }
             list.Add(id);
         }

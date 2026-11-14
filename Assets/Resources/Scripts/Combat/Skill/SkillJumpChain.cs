@@ -37,20 +37,9 @@ public class SkillJumpChain : Skill
 
     private bool StartHealChain()
     {
-        // 首跳目标：Area 内生命比例最低的友方英雄
-        var units = WorldManager.Instance.GetMySideInRange(owner.transform.position, skillCfg.Area, owner.side)
-            .FindAll(x => x.isHero && x.IsInFight() && x.hp < x.maxHp);
-
-        Chess first = null;
-        var lowest = float.MaxValue;
-        foreach (var u in units)
-        {
-            if (u.HpRate < lowest)
-            {
-                lowest = u.HpRate;
-                first = u;
-            }
-        }
+        // 首跳目标：按 SelectOnly / SelectFirst 选出（典型 ally;hero;notFullHp + lowestHp）
+        var picked = SelectTargets(owner.transform.position, skillCfg.Area, true, 1);
+        var first = picked.Count > 0 ? picked[0] : null;
         if (first == null)
             return false;
 
@@ -82,32 +71,20 @@ public class SkillJumpChain : Skill
             GameLog.Debug($"妖疗 技能id={id} 等级={Level} 第{i + 1}跳 治疗={currentHeal} 目标={current.heroId}");
             healedList.Add(current);
 
-            // 下一跳：Area 内最近的、尚未被治疗的友方英雄
-            current = FindNextHealTarget(current, healedList);
+            // 下一跳：按 SelectOnly / SelectFirst 在 Area 内选（典型 ally;hero;notFullHp + lowestHp），跳过已治疗过的
+            current = FindNextTarget(current.transform.position, healedList);
             currentHeal = Mathf.RoundToInt(currentHeal * JumpDecay);
 
             yield return new WaitForSeconds(HealInterval);
         }
     }
 
-    // 在 from 周围 Area 内找最近的、未治疗过的友方英雄（不给士兵）
-    private Chess FindNextHealTarget(Chess from, List<Chess> healedList)
+    // 在 from 周围 Area 内按选人规则找下一个目标（跳过已结算过的单位）
+    private Chess FindNextTarget(Vector3 from, List<Chess> skipList)
     {
-        var units = WorldManager.Instance.GetMySideInRange(from.transform.position, skillCfg.Area, owner.side)
-            .FindAll(x => x.isHero && x.hp < x.maxHp && !healedList.Contains(x));
-
-        Chess nearest = null;
-        var minDist = float.MaxValue;
-        foreach (var u in units)
-        {
-            var dist = WorldManager.Instance.GetRange(from.transform.position, u.transform.position);
-            if (dist < minDist)
-            {
-                minDist = dist;
-                nearest = u;
-            }
-        }
-        return nearest;
+        var defaultAlly = HasSkillFlag("heal");
+        var picked = SelectTargets(from, skillCfg.Area, defaultAlly, 1, null, x => !skipList.Contains(x));
+        return picked.Count > 0 ? picked[0] : null;
     }
 
     // ---------- 伤害链 ----------
@@ -171,31 +148,11 @@ public class SkillJumpChain : Skill
             GameLog.Debug($"明断 技能id={id} 等级={Level} 第{i + 1}跳 伤害={currentDamage} 目标={current.heroId}");
             hitList.Add(current);
 
-            // 下一跳：Area 内最近的、尚未被命中的敌方单位
-            current = FindNextDamageTarget(pos, hitList);
+            // 下一跳：按 SelectOnly / SelectFirst 在 Area 内选（典型 enemy + nearest），跳过已命中过的
+            current = FindNextTarget(pos, hitList);
             currentDamage = Mathf.RoundToInt(currentDamage * JumpDecay);
 
             yield return new WaitForSeconds(DamageInterval);
         }
-    }
-
-    // 在 fromPos 周围 Area 内找最近的、未命中过的敌方单位
-    private Chess FindNextDamageTarget(Vector3 fromPos, List<Chess> hitList)
-    {
-        var units = WorldManager.Instance.GetEnemyInRange(fromPos, skillCfg.Area, owner.side)
-            .FindAll(x => x.hp > 0 && !hitList.Contains(x));
-
-        Chess nearest = null;
-        var minDist = float.MaxValue;
-        foreach (var u in units)
-        {
-            var dist = WorldManager.Instance.GetRange(fromPos, u.transform.position);
-            if (dist < minDist)
-            {
-                minDist = dist;
-                nearest = u;
-            }
-        }
-        return nearest;
     }
 }

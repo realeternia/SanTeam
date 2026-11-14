@@ -13,10 +13,9 @@ public class SkillAidAmbush : Skill
 
     public override bool CheckAidSkill()
     {
-        var target = owner.targetChess;
-        if (target == null || target.hp <= 0)
-            return false;
-        if (!WorldManager.Instance.CheckInRange(owner, target, skillCfg.Range))
+        // 单体技能同样走 SelectOnly / SelectFirst（未配 SelectFirst 时沿用当前索敌目标）
+        var target = SelectSingleTarget(skillCfg.Range);
+        if (target == null)
             return false;
 
         // BuffId 逗号分隔：第 1 个=目标减速，其余=自身回血/魔抗；缺配置时不发动，避免白吃 CD

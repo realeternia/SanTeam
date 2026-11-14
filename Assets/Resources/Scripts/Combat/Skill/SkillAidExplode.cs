@@ -14,10 +14,9 @@ public class SkillAidExplode : Skill
 
     public override bool CheckAidSkill()
     {
-        var target = owner.targetChess;
-        if (target == null || target.hp <= 0)
-            return false;
-        if (skillCfg.Range > 0f && !WorldManager.Instance.CheckInRange(owner, target, skillCfg.Range))
+        // 单体技能同样走 SelectOnly / SelectFirst（未配 SelectFirst 时沿用当前索敌目标）
+        var target = SelectSingleTarget(skillCfg.Range);
+        if (target == null)
             return false;
         if (!CheckBurst(target))
             return false;
@@ -39,11 +38,10 @@ public class SkillAidExplode : Skill
         if (splash <= 0)
             return true;
 
-        var enemies = WorldManager.Instance.GetEnemyInRange(center, skillCfg.Area, owner.side);
+        // 溅射目标：按 SelectOnly / SelectFirst 选（limit<=0 = 范围内全打，排除主目标）
+        var enemies = SelectTargets(center, skillCfg.Area, false, 0, target);
         foreach (var u in enemies)
         {
-            if (u == null || u == target || u.hp <= 0)
-                continue;
             u.OnSkillDamaged(owner, id, splash);
             if (!string.IsNullOrEmpty(skillCfg.HitEffect))
                 EffectManager.PlaySkillEffect(u, skillCfg.HitEffect);

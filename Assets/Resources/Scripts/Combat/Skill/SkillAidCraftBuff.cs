@@ -19,15 +19,10 @@ public class SkillAidCraftBuff : Skill
         if (!CheckBurst(null))
             return false;
 
-        // 我方英雄列表（排除自身，需在战斗中）
-        var allies = WorldManager.Instance.GetMySideInRange(owner.transform.position, skillCfg.Area, owner.side)
-            .FindAll(x => x != owner && x.isHero && x.IsInFight());
-
+        // 选人规则见 SelectOnly / SelectFirst（典型 ally;hero;notSelf;inFight + lowestHp）；取生命比例最低的两名
+        var allies = SelectTargets(owner.transform.position, skillCfg.Area, true, 2);
         if (allies.Count == 0)
             return false;
-
-        // 按生命比例升序（最低在前）
-        allies.Sort((a, b) => (a.hp / (float)a.maxHp).CompareTo(b.hp / (float)b.maxHp));
 
         owner.PlayerAnim(skillCfg.Action);
         PlaySelfEffect();

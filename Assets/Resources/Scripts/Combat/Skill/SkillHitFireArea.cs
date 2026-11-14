@@ -60,10 +60,8 @@ public class SkillHitFireArea : Skill
     // 在 Range 范围内随机敌人位置放火
     private void SpreadFire(Vector3 center, List<Vector3> posList)
     {
-        var enemies = WorldManager.Instance.GetEnemyInRange(center, skillCfg.Area, owner.side);
-        if (enemies.Count <= 0)
-            return;
-        WorldManager.Instance.RandomSelect(enemies, Math.Max(1, skillCfg.TargetCount));
+        // 在 Area 内按 SelectOnly / SelectFirst 选敌人位置放火（默认敌方，随机取 TargetCount 名，至少 1 名）
+        var enemies = SelectTargets(center, skillCfg.Area, false, Math.Max(1, skillCfg.TargetCount));
         foreach (var unit in enemies)
             AddFire(unit.transform.position, posList);
     }
@@ -80,8 +78,8 @@ public class SkillHitFireArea : Skill
             var unitList = new List<Chess>();
             foreach (var pos in posList)
             {
-                var unitsInRange = WorldManager.Instance.GetEnemyInRange(pos, skillCfg.Area * 1.5f, owner.side);
-                WorldManager.Instance.RandomSelect(unitsInRange, skillCfg.TargetCount);
+                // 每段火焰范围选取：按 SelectOnly / SelectFirst 选（默认敌方，随机取 TargetCount 名）
+                var unitsInRange = SelectTargets(pos, skillCfg.Area * 1.5f, false, skillCfg.TargetCount);
                 foreach (var unit in unitsInRange)
                 {
                     if (!unitList.Contains(unit))

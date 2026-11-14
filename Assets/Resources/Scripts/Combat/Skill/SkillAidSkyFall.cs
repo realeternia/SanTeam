@@ -5,8 +5,8 @@ using UnityEngine;
 
 /// <summary>
 /// 典韦·天降恶来：从天而降，从施法点正上方加速砸落（参考吕布·魔神的下落段）。
-/// 施法点：Range 内敌人英雄 ≥2 时，先取距自身最远者为第一目标，再取其 Area 内距第一目标最远者为第二目标，取两者中点；
-/// 仅有 1 个目标时，落点取在距该目标 SingleTargetDistance（&lt;10）的位置。
+/// 施法点：Range 内敌人英雄 ≥2 时，先按 SelectOnly / SelectFirst（典型 enemy;hero + farthest）取距自身最远者为第一目标，
+/// 再取其 Area 内距第一目标最远者为第二目标，取两者中点；仅有 1 个目标时，落点取在距该目标 SingleTargetDistance（&lt;10）的位置。
 /// 落地对 Area 范围内最多 TargetCount 个敌人（由近到远）造成 GetSkillDamage 伤害，并给自身挂「甲」Buff 提升 StrengthBuff1-armor 点护甲，持续 BuffTime 秒。
 /// </summary>
 public class SkillAidSkyFall : Skill
@@ -27,14 +27,11 @@ public class SkillAidSkyFall : Skill
         if (owner.hp <= 0)
             return false;
 
-        // Range 内敌人英雄
-        var targets = WorldManager.Instance.GetEnemyInRange(owner.transform.position, skillCfg.Range, owner.side)
-            .FindAll(u => u != null && u.hp > 0 && u.isHero);
-        if (targets.Count == 0)
+        // 第一目标：Range 内距自身最远的敌人英雄（选人规则见 SelectOnly / SelectFirst，典型 enemy;hero + farthest）
+        var picked = SelectTargets(owner.transform.position, skillCfg.Range, false, 1);
+        var primary = picked.Count > 0 ? picked[0] : null;
+        if (primary == null)
             return false;
-
-        // 第一目标：距自身最远的敌人英雄
-        var primary = FindFarthest(targets, owner.transform.position);
         if (!CheckBurst(primary))
             return false;
 
@@ -49,8 +46,9 @@ public class SkillAidSkyFall : Skill
         var groundY = owner.baseY + owner.heightOffset;
         var primaryPos = primary.transform.position;
 
-        // 第二目标：第一目标 Area 内距其最远的敌人英雄；没有则视为单目标
-        var second = FindFarthestInArea(primary, primaryPos);
+        // 第二目标：第一目标 Area 内距其最远的敌人英雄（排除第一目标）；没有则视为单目标
+        var secondPick = SelectTargets(primaryPos, skillCfg.Area, false, 1, primary);
+        var second = secondPick.Count > 0 ? secondPick[0] : null;
         if (second == null)
         {
             // 仅一个目标：从自身一侧落到距目标 SingleTargetDistance 处
@@ -67,49 +65,6 @@ public class SkillAidSkyFall : Skill
         var mid = (primaryPos + second.transform.position) * 0.5f;
         mid.y = groundY;
         return mid;
-    }
-
-    /// <summary>取第一目标 Area 内、距第一目标最远的其他敌人英雄；没有则返回 null</summary>
-    private Chess FindFarthestInArea(Chess primary, Vector3 primaryPos)
-    {
-        Chess farthest = null;
-        var best = -1f;
-        var units = WorldManager.Instance.GetEnemyInRange(primaryPos, skillCfg.Area, owner.side);
-        foreach (var u in units)
-        {
-            if (u == null || u == primary || u.hp <= 0 || !u.isHero)
-                continue;
-            var d = FlatDistance(u.transform.position, primaryPos);
-            if (d > best)
-            {
-                best = d;
-                farthest = u;
-            }
-        }
-        return farthest;
-    }
-
-    private static Chess FindFarthest(List<Chess> units, Vector3 from)
-    {
-        Chess farthest = null;
-        var best = -1f;
-        foreach (var u in units)
-        {
-            var d = FlatDistance(u.transform.position, from);
-            if (d > best)
-            {
-                best = d;
-                farthest = u;
-            }
-        }
-        return farthest;
-    }
-
-    private static float FlatDistance(Vector3 a, Vector3 b)
-    {
-        a.y = 0f;
-        b.y = 0f;
-        return Vector3.Distance(a, b);
     }
 
     // 从天而降：正上方固定水平位置，按 t² 加速下落，落地结算范围伤害与自身护甲
@@ -147,15 +102,10 @@ public class SkillAidSkyFall : Skill
         var skillDamage = GetSkillDamage();
         if (skillDamage > 0)
         {
-            // 按落点由近到远排序，最多命中 TargetCount 个目标（0 表示不限）
-            var targets = WorldManager.Instance.GetEnemyInRange(castPos, skillCfg.Area, owner.side)
-                .FindAll(u => u != null && u.hp > 0);
-            targets.Sort((a, b) => FlatDistance(a.transform.position, castPos)
-                .CompareTo(FlatDistance(b.transform.position, castPos)));
-            var maxTargets = skillCfg.TargetCount > 0 ? Mathf.Min(skillCfg.TargetCount, targets.Count) : targets.Count;
-            for (var i = 0; i < maxTargets; i++)
+            // 落地伤害：次要场景固定 "enemy + nearest"（距落点由近到远），最多命中 TargetCount 个（<=0 不限）
+            var targets = SelectTargetsWithRules(castPos, skillCfg.Area, false, skillCfg.TargetCount, "enemy", "nearest");
+            foreach (var u in targets)
             {
-                var u = targets[i];
                 u.OnSkillDamaged(owner, id, skillDamage);
                 if (!string.IsNullOrEmpty(skillCfg.HitEffect))
                     EffectManager.PlaySkillEffect(u, skillCfg.HitEffect);

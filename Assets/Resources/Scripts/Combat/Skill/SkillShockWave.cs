@@ -17,16 +17,15 @@ public class SkillShockWave : Skill
 
     public override bool CheckAidSkill()
     {
-        if (owner.targetChess == null)
-            return false;
-
-        if (!WorldManager.Instance.CheckInRange(owner, owner.targetChess, skillCfg.Range))
+        // 单体技能同样走 SelectOnly / SelectFirst（未配 SelectFirst 时沿用当前索敌目标）
+        var target = SelectSingleTarget(skillCfg.Range);
+        if (target == null)
             return false;
 
         if (!CheckBurst(null))
             return false;
 
-        var targetPos = owner.targetChess.transform.position; // 使用目标位置而不是自身位置
+        var targetPos = target.transform.position; // 使用目标位置而不是自身位置
 
         owner.PlayerAnim(skillCfg.Action);
         PlaySelfEffect();

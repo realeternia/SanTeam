@@ -23,16 +23,11 @@ public class SkillSoldierGrow : Skill
             return false;
         }
 
-        // 目标：范围内生命比例最低的友方英雄
-        var heroes = WorldManager.Instance.GetMySideInRange(owner.transform.position, skillCfg.Area, owner.side)
-            .FindAll(x => x.isHero && x.IsInFight());
-        if (heroes.Count == 0)
+        // 目标：按 SelectOnly / SelectFirst 选（典型 ally;hero;inFight + lowestHp）
+        var picked = SelectTargets(owner.transform.position, skillCfg.Area, true, 1);
+        if (picked.Count == 0)
             return false;
-
-        Chess target = null;
-        foreach (var h in heroes)
-            if (target == null || h.HpRate < target.HpRate)
-                target = h;
+        var target = picked[0];
 
         owner.PlayerAnim(skillCfg.Action);
         PlaySelfEffect();

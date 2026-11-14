@@ -622,11 +622,11 @@ public static class BatchSimRunner
         return cfg != null ? cfg.Name : ("hero" + heroId);
     }
 
-    // 卡片品质（HeroConfig.Quality，取不到按1）
+    // 卡片品质（当前剧本口径，取不到按1）
     private static int HeroQuality(int heroId)
     {
         var cfg = HeroConfig.GetConfig(heroId);
-        return cfg != null ? cfg.Quality : 1;
+        return cfg != null ? HeroScenario.GetQuality(cfg) : 1;
     }
 
     // 职业名：HeroConfig.Job 为职业缩写（如"王"），取 JobConfig 全称（如"诸侯"）；取不到则用缩写本身

@@ -37,26 +37,11 @@ public class SkillAidFeint : Skill
         return true;
     }
 
-    /// <summary>选前排高血量武将：距最近敌人更近者优先，同距离取生命上限更高者</summary>
+    /// <summary>选前排武将：按 SelectOnly / SelectFirst 选（典型 ally;hero;notSelf;inFight + 站位最靠前）</summary>
     private Chess PickFrontlineHero()
     {
-        Chess best = null;
-        var bestDist = float.MaxValue;
-        foreach (var ally in WorldManager.Instance.GetUnitsMySide(owner.side))
-        {
-            if (ally == null || ally == owner || !ally.isHero || !ally.IsInFight())
-                continue;
-            var nearest = NearestEnemy(ally);
-            var dist = nearest == null
-                ? float.MaxValue
-                : WorldManager.Instance.GetRange(ally.transform.position, nearest.transform.position);
-            if (best == null || dist < bestDist || (Mathf.Approximately(dist, bestDist) && ally.maxHp > best.maxHp))
-            {
-                best = ally;
-                bestDist = dist;
-            }
-        }
-        return best;
+        var picked = SelectTargets(owner.transform.position, 0f, true, 1);
+        return picked.Count > 0 ? picked[0] : null;
     }
 
     /// <summary>
@@ -86,19 +71,7 @@ public class SkillAidFeint : Skill
     /// <summary>取单位最近的存活敌人（无则返回 null）</summary>
     private Chess NearestEnemy(Chess unit)
     {
-        Chess best = null;
-        var bestDist = float.MaxValue;
-        foreach (var enemy in WorldManager.Instance.GetEnemyInRange(unit.transform.position, 0f, unit.side))
-        {
-            if (enemy == null || enemy.hp <= 0)
-                continue;
-            var dist = WorldManager.Instance.GetRange(unit.transform.position, enemy.transform.position);
-            if (dist < bestDist)
-            {
-                bestDist = dist;
-                best = enemy;
-            }
-        }
-        return best;
+        var picked = SelectTargetsWithRules(unit.transform.position, 0f, false, 1, "enemy", "nearest");
+        return picked.Count > 0 ? picked[0] : null;
     }
 }

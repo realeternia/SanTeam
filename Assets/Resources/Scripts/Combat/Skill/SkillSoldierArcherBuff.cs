@@ -17,7 +17,9 @@ public class SkillSoldierArcherBuff : Skill
         if (!CheckBurst(null))
             return false;
 
-        var target = FindTarget();
+        // 目标：按 SelectOnly / SelectFirst 选（典型 enemy + nearest）
+        var picked = SelectTargets(owner.transform.position, skillCfg.Area, false, 1);
+        var target = picked.Count > 0 ? picked[0] : null;
         if (target == null)
             return false;
 
@@ -39,27 +41,5 @@ public class SkillSoldierArcherBuff : Skill
         WorldManager.Instance.CreateSpellMissile(owner, target, owner.transform.position, id, damage, skillCfg.HitEffect);
 
         return true;
-    }
-
-    // 优先当前索敌目标（敌方且在 Area 内），否则取 Area 内最近的敌方单位
-    private Chess FindTarget()
-    {
-        var cur = owner.targetChess;
-        if (cur != null && cur.hp > 0 && WorldManager.Instance.IsEnemy(cur.side, owner.side)
-            && WorldManager.Instance.CheckInRange(owner, cur, skillCfg.Area))
-            return cur;
-
-        Chess nearest = null;
-        var minDist = float.MaxValue;
-        foreach (var e in WorldManager.Instance.GetEnemyInRange(owner.transform.position, skillCfg.Area, owner.side))
-        {
-            var d = Vector3.Distance(owner.transform.position, e.transform.position);
-            if (d < minDist)
-            {
-                minDist = d;
-                nearest = e;
-            }
-        }
-        return nearest;
     }
 }

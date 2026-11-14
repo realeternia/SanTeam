@@ -21,11 +21,9 @@ public class SkillAidFireWall : Skill
 
     public override bool CheckAidSkill()
     {
-        var target = owner.targetChess;
-        if (target == null || target.hp <= 0)
-            return false;
-        // Range<=0 视为不限射程（与配置表一致）
-        if (skillCfg.Range > 0f && !WorldManager.Instance.CheckInRange(owner, target, skillCfg.Range))
+        // 单体技能同样走 SelectOnly / SelectFirst（未配 SelectFirst 时沿用当前索敌目标）；Range<=0 视为不限射程
+        var target = SelectSingleTarget(skillCfg.Range);
+        if (target == null)
             return false;
         if (!CheckBurst(target))
             return false;
@@ -80,8 +78,8 @@ public class SkillAidFireWall : Skill
             var unitList = new List<Chess>();
             foreach (var pos in targetPosList)
             {
-                var unitsInRange = WorldManager.Instance.GetEnemyInRange(pos, skillCfg.Area * 1.5f, owner.side);
-                WorldManager.Instance.RandomSelect(unitsInRange, skillCfg.TargetCount);
+                // 每段火焰范围选取：按 SelectOnly / SelectFirst 选（默认敌方，随机取 TargetCount 名）
+                var unitsInRange = SelectTargets(pos, skillCfg.Area * 1.5f, false, skillCfg.TargetCount);
 
                 foreach (var unit in unitsInRange)
                 {

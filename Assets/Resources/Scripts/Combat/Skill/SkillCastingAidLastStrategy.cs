@@ -16,10 +16,9 @@ public class SkillCastingAidLastStrategy : Skill
 
     public override bool CheckAidSkill()
     {
-        var target = owner.targetChess;
-        if (target == null || target.hp <= 0)
-            return false;
-        if (!WorldManager.Instance.CheckInRange(owner, target, skillCfg.Range))
+        // 单体技能同样走 SelectOnly / SelectFirst（未配 SelectFirst 时沿用当前索敌目标）
+        var target = SelectSingleTarget(skillCfg.Range);
+        if (target == null)
             return false;
         if (!CheckBurst(target))
             return false;
@@ -70,10 +69,8 @@ public class SkillCastingAidLastStrategy : Skill
 
             if (beam != null)
             {
-                var hitUnits = beam.GetHitUnits();
-                // 每跳命中数上限：TargetCount>0 时随机保留 N 名（同落雷/火海）；<=0 表示不限，避免 RandomSelect(0) 清空列表
-                if (skillCfg.TargetCount > 0)
-                    WorldManager.Instance.RandomSelect(hitUnits, skillCfg.TargetCount);
+                // 光束命中后按 SelectOnly / SelectFirst 过滤排序（默认敌方，随机保留 TargetCount 名，<=0 不限）
+                var hitUnits = SelectTargets(beam.GetHitUnits(), owner.transform.position, skillCfg.TargetCount);
 
                 foreach (var e in hitUnits)
                 {

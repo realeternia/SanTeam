@@ -152,6 +152,8 @@ public static class ConfigManager
             skillCfg.TriggerCondition = baseCfg.TriggerCondition;
             skillCfg.Range = baseCfg.Range;
             skillCfg.Area = baseCfg.Area;
+            skillCfg.SelectOnly = baseCfg.SelectOnly;
+            skillCfg.SelectFirst = baseCfg.SelectFirst;
             skillCfg.TargetType = baseCfg.TargetType;
             skillCfg.TargetCount = baseCfg.TargetCount;
             skillCfg.DamageStrength = baseCfg.DamageStrength;

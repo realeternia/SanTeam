@@ -76,13 +76,24 @@ namespace SkillBaseTool
                 { "混乱", new KeyValuePair<string, int>("", 0) },
             };
 
-        private static readonly Dictionary<string, string> TargetTypeModules = new Dictionary<string, string>
+        /// <summary>SelectOnly 硬过滤规则 → 组件名（按出现顺序去重）。</summary>
+        private static readonly Dictionary<string, string> SelectOnlyModules = new Dictionary<string, string>
+        {
+            { "hero", "英雄限定" }, { "notSelf", "排除自身" }, { "notFullHp", "满血跳过" },
+        };
+
+        /// <summary>SelectFirst 优先级规则 → 组件名（按出现顺序去重）。</summary>
+        private static readonly Dictionary<string, string> SelectFirstModules = new Dictionary<string, string>
         {
             { "lowestHp", "低血筛选" }, { "highestHp", "最高血量" }, { "highestAp", "最高法强" },
-            { "rangedOnly", "远程优先" }, { "meleeOnly", "近战优先" }, { "excludeSelf", "排除自身" },
-            { "selfAlways", "施法者必含" }, { "fullHpSkip", "满血跳过" }, { "wholeMap", "全图" },
+            { "rangedFirst", "远程优先" }, { "meleeFirst", "近战优先" },
+        };
+
+        /// <summary>TargetType 仅保留脚本私有行为标记（目标筛选已迁到 SelectOnly/SelectFirst）。</summary>
+        private static readonly Dictionary<string, string> TargetTypeModules = new Dictionary<string, string>
+        {
+            { "selfAlways", "施法者必含" }, { "wholeMap", "全图" },
             { "tauntAroundTarget", "嘲讽周围" }, { "noDedupe", "不按首段去重" }, { "splitByRange", "近远分段" },
-            { "heroOnly", "英雄限定" },
         };
 
         private static readonly Dictionary<string, string> TagModules = new Dictionary<string, string>
@@ -167,6 +178,12 @@ namespace SkillBaseTool
                     result.Add(tier);
             }
 
+            foreach (var kv in SelectOnlyModules)
+                if (SplitTokens(a.SelectOnly, ';').Contains(kv.Key) && !result.Contains(kv.Value))
+                    result.Add(kv.Value);
+            foreach (var kv in SelectFirstModules)
+                if (SplitTokens(a.SelectFirst, ';').Contains(kv.Key) && !result.Contains(kv.Value))
+                    result.Add(kv.Value);
             foreach (var kv in TargetTypeModules)
                 if (a.TargetType.Contains(kv.Key) && !result.Contains(kv.Value))
                     result.Add(kv.Value);
@@ -183,6 +200,15 @@ namespace SkillBaseTool
                     result.Add(tier);
             }
             return result;
+        }
+
+        /// <summary>按分隔符拆分规则串（SelectOnly/SelectFirst 用 ';'）。</summary>
+        private static List<string> SplitTokens(string raw, char sep)
+        {
+            if (string.IsNullOrEmpty(raw))
+                return new List<string>();
+            return raw.Split(new[] { sep }, StringSplitOptions.RemoveEmptyEntries)
+                .Select(x => x.Trim()).Where(x => x.Length > 0).ToList();
         }
 
         private static string PickTier(DataStore store, string family, float? handValue)
@@ -357,7 +383,7 @@ namespace SkillBaseTool
         public static readonly string[] EffectColumns =
         {
             "DamageStrength", "HealStrength", "CD", "MpCost", "Range", "Area", "TargetCount",
-            "Rate", "BuffTime", "TargetType", "TriggerCondition", "Strength2", "Buff",
+            "Rate", "BuffTime", "TargetType", "SelectOnly", "SelectFirst", "TriggerCondition", "Strength2", "Buff",
             "SummonCount", "SummonTime", "SummonHitInterval", "SummonSpeed", "SummonTag",
         };
 
@@ -365,12 +391,13 @@ namespace SkillBaseTool
         public static readonly int[] AppliedColumns =
         {
             Col.Rate, Col.CD, Col.MpCost, Col.TriggerCondition, Col.Range, Col.Area,
+            Col.SelectOnly, Col.SelectFirst,
             Col.TargetType, Col.TargetCount, Col.DamageStrength, Col.HealStrength,
             Col.Strength2, Col.StrengthBuff1, Col.BuffId, Col.BuffTime,
             Col.SummonTag, Col.SummonCount, Col.SummonTime, Col.SummonHitInterval, Col.SummonSpeed,
         };
 
-        /// <summary>展开写入器：把模板/组件的 k-v 绑定落到 41 列与各字符串槽位。</summary>
+        /// <summary>展开写入器：把模板/组件的 k-v 绑定落到 43 列与各字符串槽位。</summary>
         private sealed class BaseWriter
         {
             public readonly string[] B;
@@ -380,11 +407,15 @@ namespace SkillBaseTool
             private readonly List<string> buffIds;
             private readonly List<string> buffSegs;
             private readonly List<string> tags;
+            private readonly List<string> selectOnly;
+            private readonly List<string> selectFirst;
             private readonly List<string> triggers;
             private readonly List<string> s2;
             private readonly HashSet<string> handBuffKeys;
             private readonly HashSet<string> handS2Keys;
             private bool tagsChanged;
+            private bool selectOnlyChanged;
+            private bool selectFirstChanged;
             private bool triggersChanged;
             private bool s2Changed;
 
@@ -394,6 +425,8 @@ namespace SkillBaseTool
                 buffIds = SplitList(B[Col.BuffId], ',');
                 buffSegs = SplitList(B[Col.StrengthBuff1], ',');
                 tags = SplitList(B[Col.TargetType], ',');
+                selectOnly = SplitList(B[Col.SelectOnly], ';');
+                selectFirst = SplitList(B[Col.SelectFirst], ';');
                 triggers = SplitList(B[Col.TriggerCondition], ';');
                 s2 = SplitList(B[Col.Strength2], ',');
                 handBuffKeys = new HashSet<string>(KeyOf(buffSegs));
@@ -427,6 +460,14 @@ namespace SkillBaseTool
                         case "TargetType":
                             if (AddUnique(tags, b.Sub))
                                 tagsChanged = true;
+                            break;
+                        case "SelectOnly":
+                            if (AddUnique(selectOnly, b.Sub))
+                                selectOnlyChanged = true;
+                            break;
+                        case "SelectFirst":
+                            if (AddUnique(selectFirst, b.Sub))
+                                selectFirstChanged = true;
                             break;
                         case "TriggerCondition":
                             if (AddUnique(triggers, b.Sub + NumText(v)))
@@ -490,6 +531,10 @@ namespace SkillBaseTool
                 B[Col.StrengthBuff1] = CfgUtil.Quote(string.Join(",", buffSegs));
                 if (tagsChanged)
                     B[Col.TargetType] = CfgUtil.Quote(string.Join(",", tags));
+                if (selectOnlyChanged)
+                    B[Col.SelectOnly] = CfgUtil.Quote(string.Join(";", selectOnly));
+                if (selectFirstChanged)
+                    B[Col.SelectFirst] = CfgUtil.Quote(string.Join(";", selectFirst));
                 if (triggersChanged)
                     B[Col.TriggerCondition] = CfgUtil.Quote(string.Join(";", triggers));
                 if (s2Changed)
@@ -611,7 +656,9 @@ namespace SkillBaseTool
                 case Col.StrengthBuff1: return "Buff值";
                 case Col.BuffTime: return "Buff时长";
                 case Col.Strength2: return "数值槽";
-                case Col.TargetType: return "选取点";
+                case Col.TargetType: return "行为标记";
+                case Col.SelectOnly: return "目标硬过滤";
+                case Col.SelectFirst: return "目标优先级";
                 case Col.AuroAttrs: return "光环效果";
                 case Col.StartMpRate: return "开局MP";
                 case Col.DamageType: return "伤害类型";

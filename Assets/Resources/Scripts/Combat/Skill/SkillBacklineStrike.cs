@@ -4,15 +4,14 @@ using CommonConfig;
 using UnityEngine;
 
 /// <summary>
-/// 优先打后排的单体射击（ScriptName = "SkillBacklineStrike"）：在搜索范围内锁定敌方后排目标，
-/// 通过飞弹 CreateSpellMissile 结算 GetSkillDamage() 技能伤害。
+/// 优先打后排的单体射击（ScriptName = "SkillBacklineStrike"）：在搜索范围内按 SelectOnly / SelectFirst
+/// 锁定目标（典型 SelectOnly="enemy"、SelectFirst="farthest"），通过飞弹 CreateSpellMissile 结算 GetSkillDamage() 技能伤害。
 /// 搜索半径：Area &gt; 0 时用 Area，否则用 max(attackRange, Range)。
 ///
-/// TargetType 标记：
+/// TargetType 仅保留脚本私有行为标记：
 /// · smart = 三层距离带降级选人（远段 70%~100% → 中段 50%~70% → 全局），每层取对应抗性最低者，
 ///           且优先只在英雄中选、无英雄才选全部单位（郭图·强击）
 /// · extra = 伤害追加 键 extraDamageRate 比例，即 基础伤害 × (1 + extraDamageRate)（文鸯·单骑）
-/// 缺省（无 smart）= 直接取搜索范围内距离最远的敌人（文鸯·单骑）。
 /// </summary>
 public class SkillBacklineStrike : Skill
 {
@@ -23,11 +22,19 @@ public class SkillBacklineStrike : Skill
     public override bool CheckAidSkill()
     {
         var searchRange = skillCfg.Area > 0f ? skillCfg.Area : Math.Max(owner.attackRange, skillCfg.Range);
-        var enemies = WorldManager.Instance.GetEnemyInRange(owner.transform.position, searchRange, owner.side);
-        if (enemies == null || enemies.Count == 0)
-            return false;
-
-        var target = HasSkillFlag("smart") ? SelectSmart(enemies, searchRange) : SelectFarthest(enemies);
+        Chess target;
+        if (HasSkillFlag("smart"))
+        {
+            var enemies = WorldManager.Instance.GetEnemyInRange(owner.transform.position, searchRange, owner.side);
+            if (enemies == null || enemies.Count == 0)
+                return false;
+            target = SelectSmart(enemies, searchRange);
+        }
+        else
+        {
+            var picked = SelectTargets(owner.transform.position, searchRange, false, 1);
+            target = picked.Count > 0 ? picked[0] : null;
+        }
         if (target == null || target.hp <= 0)
             return false;
         if (!CheckBurst(target))
@@ -42,25 +49,6 @@ public class SkillBacklineStrike : Skill
 
         WorldManager.Instance.CreateSpellMissile(owner, target, owner.transform.position, id, damage, skillCfg.HitEffect);
         return true;
-    }
-
-    /// <summary>默认选人：搜索范围内距离自身最远的敌人</summary>
-    private Chess SelectFarthest(List<Chess> enemies)
-    {
-        Chess farthest = null;
-        var maxDistance = -1f;
-        foreach (var enemy in enemies)
-        {
-            if (enemy == null || enemy.hp <= 0)
-                continue;
-            var distance = Vector3.Distance(owner.transform.position, enemy.transform.position);
-            if (distance > maxDistance)
-            {
-                maxDistance = distance;
-                farthest = enemy;
-            }
-        }
-        return farthest;
     }
 
     /// <summary>smart 选人：先只在英雄中选，范围内无英雄再对全部单位按同样规则选</summary>

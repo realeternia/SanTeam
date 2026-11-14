@@ -30,26 +30,11 @@ public class SkillAidBuffLowHp : Skill
             return false;
         }
 
-        var units = WorldManager.Instance.GetMySideInRange(owner.transform.position, skillCfg.Area, owner.side)
-            .FindAll(x => x != owner && x.isHero && x.IsInFight());
-
-        if (units.Count == 0)
-            return false;
-
-        // 找生命比例最低的我方英雄；纯护盾类跳过满血目标（全满血不施放），带治疗的守护允许满血目标吃护甲等增益
-        Chess target = null;
-        float lowest = float.MaxValue;
-        foreach (var u in units)
-        {
-            if (heal <= 0 && u.hp >= u.maxHp)
-                continue;
-            var rate = u.hp / (float)u.maxHp;
-            if (rate < lowest)
-            {
-                lowest = rate;
-                target = u;
-            }
-        }
+        // 选人规则见 SelectOnly / SelectFirst（典型 ally;hero;notSelf;inFight + lowestHp）；
+        // 纯护盾类跳过满血目标（全满血不施放），带治疗的守护允许满血目标吃护甲等增益
+        var picked = SelectTargets(owner.transform.position, skillCfg.Area, true, 1, null,
+            heal <= 0 ? (Func<Chess, bool>)(x => x.hp < x.maxHp) : null);
+        var target = picked.Count > 0 ? picked[0] : null;
         if (target == null)
             return false;
 

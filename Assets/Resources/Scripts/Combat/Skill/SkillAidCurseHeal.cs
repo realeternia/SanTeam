@@ -15,22 +15,13 @@ public class SkillAidCurseHeal : Skill
 
     public override bool CheckAidSkill()
     {
-        // 找 Area 内生命比例最低的友方英雄（可含自身）
-        Chess lowest = null;
-        var lowestRate = float.MaxValue;
-        foreach (var a in WorldManager.Instance.GetMySideInRange(owner.transform.position, skillCfg.Area, owner.side))
-        {
-            if (a == null || a.hp <= 0 || !a.isHero || a.hp >= a.maxHp)
-                continue;
-            if (a.HpRate < lowestRate)
-            {
-                lowestRate = a.HpRate;
-                lowest = a;
-            }
-        }
+        // 治疗目标：按 SelectOnly / SelectFirst 选出（典型 ally;hero;notFullHp + lowestHp）
+        var picked = SelectTargets(owner.transform.position, skillCfg.Area, true, 1);
+        var lowest = picked.Count > 0 ? picked[0] : null;
 
-        // Area 内敌人（含士兵），用于挂"败"
-        var enemies = WorldManager.Instance.GetEnemyInRange(owner.transform.position, skillCfg.Area, owner.side);
+        // 敌人（含士兵）挂"败"：次要场景固定"敌方 + 随机限数"，共用一行配置会与治疗目标规则冲突
+        var enemies = SelectTargetsWithRules(owner.transform.position, skillCfg.Area, false,
+            skillCfg.TargetCount, "enemy", "");
 
         // 既无可治疗的友军、又无敌人可挂"败"时不施放，避免空耗 MP
         if (lowest == null && enemies.Count == 0)
@@ -52,7 +43,6 @@ public class SkillAidCurseHeal : Skill
 
         // 给范围内最多 TargetCount 名敌人挂"败"（每秒法术伤害，由 BuffTimeDamage 结算）
         var buffId = BuffConfig.GetConfigByNameS(skillCfg.BuffId).Id;
-        WorldManager.Instance.RandomSelect(enemies, skillCfg.TargetCount);
         foreach (var e in enemies)
         {
             BuffManager.AddBuff(e, owner, id, buffId, skillCfg.BuffTime);

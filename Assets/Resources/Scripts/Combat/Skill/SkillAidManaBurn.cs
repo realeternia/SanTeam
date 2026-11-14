@@ -18,24 +18,11 @@ public class SkillAidManaBurn : Skill
         if (!CheckBurst(null))
             return false;
 
-        var enemies = WorldManager.Instance.GetEnemyInRange(owner.transform.position, skillCfg.Area, owner.side)
-            .FindAll(x => x != null && x.IsInFight());
-        if (enemies.Count == 0)
-            return false;
-
-        // 范围内当前法力值最高的敌人（各 MpCost>0 技能的当前 MP 之和）
-        Chess target = null;
-        var highest = 0;
-        foreach (var e in enemies)
-        {
-            var mp = GetCurrentMp(e);
-            if (mp > highest)
-            {
-                highest = mp;
-                target = e;
-            }
-        }
-        if (target == null)
+        // 目标：按 SelectOnly / SelectFirst 选（典型 enemy;inFight + highestMp，最高 = 各蓝耗技能当前法力之和最大）
+        var picked = SelectTargets(owner.transform.position, skillCfg.Area, false, 1);
+        var target = picked.Count > 0 ? picked[0] : null;
+        // 无可燃烧法力时不发动，避免空耗 MP
+        if (target == null || GetCurrentMp(target) <= 0)
             return false;
 
         owner.PlayerAnim(skillCfg.Action);
@@ -51,9 +38,11 @@ public class SkillAidManaBurn : Skill
         if (share <= 0)
             return true;
 
-        var receiver = FindNearestAlly();
-        if (receiver == null)
-            receiver = owner;
+        // 法力转移对象：次要场景固定 "ally;notSelf;inFight + nearest"，范围内无友军则给自己
+        var searchRange = skillCfg.Range > 0f ? skillCfg.Range : skillCfg.Area;
+        var receiverPick = SelectTargetsWithRules(owner.transform.position, searchRange, true, 1,
+            "ally;notSelf;inFight", "nearest");
+        var receiver = receiverPick.Count > 0 ? receiverPick[0] : owner;
         foreach (var skill in receiver.skills)
         {
             if (skill.skillCfg.MpCost > 0 && !skill.IsMpFull())
@@ -74,26 +63,5 @@ public class SkillAidManaBurn : Skill
                 total += (int)skill.mp;
         }
         return total;
-    }
-
-    /// <summary>取 skillCfg.Range（未配置时退回 Area）半径内距离最近的友方单位（不含自身）</summary>
-    private Chess FindNearestAlly()
-    {
-        var searchRange = skillCfg.Range > 0f ? skillCfg.Range : skillCfg.Area;
-        var allies = WorldManager.Instance.GetMySideInRange(owner.transform.position, searchRange, owner.side)
-            .FindAll(x => x != null && x != owner && x.IsInFight());
-
-        Chess nearest = null;
-        var minDist = float.MaxValue;
-        foreach (var a in allies)
-        {
-            var d = Vector3.Distance(owner.transform.position, a.transform.position);
-            if (d < minDist)
-            {
-                minDist = d;
-                nearest = a;
-            }
-        }
-        return nearest;
     }
 }

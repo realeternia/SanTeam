@@ -39,10 +39,9 @@ public class SkillSingleDamage : Skill
 
     public override bool CheckAidSkill()
     {
-        var target = owner.targetChess;
+        // 选人规则见 SelectOnly / SelectFirst：当前索敌目标仍满足规则时沿用，否则挑最合适的一个
+        var target = SelectSingleTarget(skillCfg.Range);
         if (target == null || target.hp <= 0)
-            return false;
-        if (skillCfg.Range > 0f && !WorldManager.Instance.CheckInRange(owner, target, skillCfg.Range))
             return false;
         if (!CheckBurst(target))
             return false;

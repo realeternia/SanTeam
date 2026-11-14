@@ -36,7 +36,8 @@ public class SkillAidFlashStrike : Skill
         return true;
     }
 
-    // 首段目标：当前索敌目标是射程内的英雄就用它，否则取射程内最远的英雄（未被本技能打过优先）
+    // 首段目标：当前索敌目标是射程内的英雄就用它，否则按 SelectOnly / SelectFirst 取射程内的英雄
+    // （典型 enemy;hero + heroFirst;farthest；首段只打英雄，故用 extraFilter 强制 isHero）
     private Chess PickFirstTarget()
     {
         var cur = owner.targetChess;
@@ -44,8 +45,8 @@ public class SkillAidFlashStrike : Skill
             && WorldManager.Instance.CheckInRange(owner, cur, skillCfg.Range))
             return cur;
 
-        var heroes = WorldManager.Instance.GetEnemyInRange(owner.transform.position, skillCfg.Range, owner.side);
-        return PickBest(heroes, null, true);
+        var heroes = SelectTargets(owner.transform.position, skillCfg.Range, false, 1, null, x => x.isHero);
+        return heroes.Count > 0 ? heroes[0] : null;
     }
 
     // 快闪连击：首段闪到目标身前、之后各段闪到身后造成伤害 → 间隔 0.5s → 闪击下一个
@@ -84,8 +85,8 @@ public class SkillAidFlashStrike : Skill
             if (i >= count - 1)
                 break;
 
-            // 下一段：Area 内英雄优先，范围内没有英雄才允许跳小兵
-            current = PickBest(WorldManager.Instance.GetEnemyInRange(owner.transform.position, skillCfg.Area, owner.side), hitTargets, false);
+            // 下一段：按 SelectOnly / SelectFirst 在 Area 内重选（优先未被本技能打过的单位）
+            current = PickNextTarget(hitTargets);
             if (current == null)
                 break; // 英雄和小兵都没有 → 停止连击
 
@@ -123,41 +124,12 @@ public class SkillAidFlashStrike : Skill
         return pos;
     }
 
-    // 从候选里挑最优目标：英雄优先于小兵（heroOnly 时仅考虑英雄），其次未被本技能打过，再次距离更远
-    private Chess PickBest(List<Chess> candidates, List<Chess> hitTargets, bool heroOnly)
+    // 下一段目标：按 SelectOnly / SelectFirst 优先选未被本技能打过的单位；全都打过则退化为重新选一次
+    private Chess PickNextTarget(List<Chess> hitTargets)
     {
-        Chess best = null;
-        bool bestWasHit = true;
-        float bestDist = 0f;
-
-        foreach (var enemy in candidates)
-        {
-            if (enemy == null || enemy.hp <= 0)
-                continue;
-            if (heroOnly && !enemy.isHero)
-                continue;
-
-            bool wasHit = hitTargets != null && hitTargets.Contains(enemy);
-            float dist = WorldManager.Instance.GetRange(owner.transform.position, enemy.transform.position);
-
-            bool better;
-            if (best == null)
-                better = true;
-            else if (enemy.isHero != best.isHero)
-                better = enemy.isHero;          // 英雄优先，无英雄时才跳小兵
-            else if (wasHit != bestWasHit)
-                better = !wasHit;                // 未被本技能打过的优先
-            else
-                better = dist > bestDist;        // 同档取更远
-
-            if (better)
-            {
-                best = enemy;
-                bestWasHit = wasHit;
-                bestDist = dist;
-            }
-        }
-
-        return best;
+        var picked = SelectTargets(owner.transform.position, skillCfg.Area, false, 1, null, x => !hitTargets.Contains(x));
+        if (picked.Count == 0)
+            picked = SelectTargets(owner.transform.position, skillCfg.Area, false, 1);
+        return picked.Count > 0 ? picked[0] : null;
     }
 }

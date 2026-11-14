@@ -28,10 +28,9 @@ public class SkillCastingAidDrain : Skill
     {
         if (owner.isJumping)
             return false;
-        var target = owner.targetChess;
-        if (target == null || target.hp <= 0)
-            return false;
-        if (!WorldManager.Instance.CheckInRange(owner, target, skillCfg.Range))
+        // 单体技能同样走 SelectOnly / SelectFirst（未配 SelectFirst 时沿用当前索敌目标）
+        var target = SelectSingleTarget(skillCfg.Range);
+        if (target == null)
             return false;
         if (!CheckBurst(target))
             return false;

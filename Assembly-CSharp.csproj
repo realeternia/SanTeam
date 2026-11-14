@@ -264,6 +264,7 @@
     <Compile Include="Assets\Resources\Scripts\UIs\LoopScrollRect.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\BattleStatManager.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\Skill.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\TargetSelector.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffCritRate.cs" />
     <Compile Include="Assets\Resources\Scripts\Tools\SysRandom.cs" />
     <Compile Include="Assets\Resources\Scripts\Effect\EffectTintColor.cs" />

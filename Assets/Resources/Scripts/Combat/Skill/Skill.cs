@@ -147,6 +147,58 @@ public class Skill
     }
 
     /// <summary>
+    /// 按 SkillConfig.SelectOnly（硬过滤）/ SelectFirst（优先级链）选取技能目标，单体/群体共用。
+    /// defaultAlly=true 表示 SelectOnly 未指定阵营时默认选友方；limit&lt;=0 表示不限制数量。
+    /// </summary>
+    protected List<Chess> SelectTargets(Vector3 center, float range, bool defaultAlly, int limit,
+        Chess exclude = null, Func<Chess, bool> extraFilter = null)
+    {
+        return TargetSelector.Select(owner, center, range, defaultAlly, skillCfg.SelectOnly, skillCfg.SelectFirst,
+            limit, exclude, extraFilter);
+    }
+
+    /// <summary>对已有候选（几何命中、逐跳等）按本技能的 SelectOnly/SelectFirst 过滤、排序、截断</summary>
+    protected List<Chess> SelectTargets(List<Chess> candidates, Vector3 center, int limit,
+        Chess exclude = null, Func<Chess, bool> extraFilter = null)
+    {
+        return TargetSelector.Filter(owner, center, candidates, skillCfg.SelectOnly, skillCfg.SelectFirst,
+            limit, exclude, extraFilter);
+    }
+
+    /// <summary>
+    /// 次要场景显式规则选人：同一技能行存在两套选取规则时使用（如主目标按配置、附带目标按固定规则）。
+    /// </summary>
+    protected List<Chess> SelectTargetsWithRules(Vector3 center, float range, bool defaultAlly, int limit,
+        string selectOnly, string selectFirst, Chess exclude = null, Func<Chess, bool> extraFilter = null)
+    {
+        return TargetSelector.Select(owner, center, range, defaultAlly, selectOnly, selectFirst,
+            limit, exclude, extraFilter);
+    }
+
+    /// <summary>
+    /// 单体技能选目标：未配 SelectFirst 时沿用当前索敌目标（Range&gt;0 时做射程校验）；
+    /// 配了 SelectFirst 时按优先级链挑最合适的一个，候选为空再回退当前目标。
+    /// </summary>
+    protected Chess SelectSingleTarget(float range)
+    {
+        var current = owner.targetChess;
+
+        if (string.IsNullOrEmpty(skillCfg.SelectFirst))
+        {
+            if (current == null || current.hp <= 0)
+                return null;
+            if (range > 0f && !WorldManager.Instance.CheckInRange(owner, current, range))
+                return null;
+            return current;
+        }
+
+        var candidates = SelectTargets(owner.transform.position, range, false, 1);
+        if (candidates.Count == 0)
+            return current != null && current.hp > 0 ? current : null;
+        return candidates[0];
+    }
+
+    /// <summary>
     /// 判断 SkillConfig.TargetType 是否包含指定行为标记。
     /// TargetType 原本是“选取点”单选字段，现向后兼容地扩展为标记列表：
     /// 多项以英文/中文逗号、分号或竖线分隔（如 "self,missile"），逐项精确匹配。

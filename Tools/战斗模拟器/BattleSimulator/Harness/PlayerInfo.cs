@@ -13,6 +13,7 @@ public class PlayerInfo
     public int playerId;      // PlayerConfig.Id
     public PlayerConfig playerConfig;
     public bool isAI;
+    public bool isEliminated;
 
     public Dictionary<int, int> cards = new Dictionary<int, int>();   // 英雄卡 id → exp
     public List<SerializableItemSlot> items = new List<SerializableItemSlot>();

@@ -15,10 +15,9 @@ public class SkillAidDominion : Skill
 
     public override bool CheckAidSkill()
     {
-        var target = owner.targetChess;
-        if (target == null || target.hp <= 0)
-            return false;
-        if (!WorldManager.Instance.CheckInRange(owner, target, skillCfg.Range))
+        // 单体技能同样走 SelectOnly / SelectFirst（未配 SelectFirst 时沿用当前索敌目标）
+        var target = SelectSingleTarget(skillCfg.Range);
+        if (target == null)
             return false;
         if (!CheckBurst(target))
             return false;
@@ -31,13 +30,11 @@ public class SkillAidDominion : Skill
         PlaySelfEffect();
         PlayAreaEffect(center);
 
-        // 以自身为圆心的 AOE 伤害
+        // 以自身为圆心的 AOE 伤害：按 SelectOnly / SelectFirst 选（limit<=0 = 范围内全打）
         var damage = GetSkillDamage();
-        var enemies = WorldManager.Instance.GetEnemyInRange(center, skillCfg.Area, owner.side);
+        var enemies = SelectTargets(center, skillCfg.Area, false, 0);
         foreach (var enemy in enemies)
         {
-            if (enemy == null || enemy.hp <= 0)
-                continue;
             if (damage > 0)
                 enemy.OnSkillDamaged(owner, id, damage);
             if (!string.IsNullOrEmpty(skillCfg.HitEffect))

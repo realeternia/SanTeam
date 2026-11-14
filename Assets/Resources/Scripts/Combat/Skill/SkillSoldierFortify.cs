@@ -17,7 +17,9 @@ public class SkillSoldierFortify : Skill
         if (!CheckBurst(null))
             return false;
 
-        var target = FindEnemyHero();
+        // 目标：按 SelectOnly / SelectFirst 选（典型 enemy;hero + nearest）
+        var picked = SelectTargets(owner.transform.position, skillCfg.Area, false, 1);
+        var target = picked.Count > 0 ? picked[0] : null;
         if (target == null)
             return false;
 
@@ -44,29 +46,5 @@ public class SkillSoldierFortify : Skill
             EffectManager.PlaySkillEffect(target, skillCfg.HitEffect);
         GameLog.Info($"筑垒：{owner.name} 将敌方英雄拖回我方出生点并造成伤害 技能id={id}");
         return true;
-    }
-
-    // 优先当前索敌目标（敌方英雄且在 Area 内），否则取 Area 内最近的敌方英雄
-    private Chess FindEnemyHero()
-    {
-        var cur = owner.targetChess;
-        if (cur != null && cur.hp > 0 && cur.isHero && WorldManager.Instance.IsEnemy(cur.side, owner.side)
-            && WorldManager.Instance.CheckInRange(owner, cur, skillCfg.Area))
-            return cur;
-
-        Chess nearest = null;
-        var minDist = float.MaxValue;
-        foreach (var e in WorldManager.Instance.GetEnemyInRange(owner.transform.position, skillCfg.Area, owner.side))
-        {
-            if (!e.isHero || e.hp <= 0)
-                continue;
-            var d = Vector3.Distance(owner.transform.position, e.transform.position);
-            if (d < minDist)
-            {
-                minDist = d;
-                nearest = e;
-            }
-        }
-        return nearest;
     }
 }

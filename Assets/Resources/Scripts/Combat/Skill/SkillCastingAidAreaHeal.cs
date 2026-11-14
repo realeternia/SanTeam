@@ -47,14 +47,10 @@ public class SkillCastingAidAreaHeal : Skill
             // 引导期间每跳持续播放施法动作
             owner.PlayerAnim(skillCfg.Action);
 
-            // 领域内友方单位（英雄与小兵，含自身；排除领域召唤物本身），按生命缺口从大到小排序
-            var units = WorldManager.Instance.GetMySideInRange(center, skillCfg.Area, owner.side)
-                .FindAll(x => x.hp < x.maxHp && x.SummonTag != skillCfg.SummonTag);
-            units.Sort((a, b) => (b.maxHp - b.hp).CompareTo(a.maxHp - a.hp));
-
-            // 目标数上限：只回复生命缺口最大的前 TargetCount 个（0/负数表示不限）
-            if (skillCfg.TargetCount > 0 && units.Count > skillCfg.TargetCount)
-                units.RemoveRange(skillCfg.TargetCount, units.Count - skillCfg.TargetCount);
+            // 领域内友方单位（按 SelectOnly / SelectFirst 选，典型 ally;notFullHp + biggestHpGap），
+            // 排除领域召唤物本身；TargetCount 上限由 SelectTargets 截断
+            var units = SelectTargets(center, skillCfg.Area, true, skillCfg.TargetCount, null,
+                x => x.SummonTag != skillCfg.SummonTag);
 
             var heal = GetSkillHeal();
             foreach (var unit in units)

@@ -25,8 +25,9 @@ public class SkillAidJumpReturn : Skill
         if (owner.hp <= 0 || owner.isJumping)
             return false;
 
-        // 目标：Range 内最远的敌方单位（优先英雄，无英雄时取最远的小兵）
-        var target = FindFarthestEnemy();
+        // 目标：按 SelectOnly / SelectFirst 选（典型 enemy + heroFirst;farthest，无英雄时退化为最远的小兵）
+        var picked = SelectTargets(owner.transform.position, skillCfg.Range, false, 1);
+        var target = picked.Count > 0 ? picked[0] : null;
         if (target == null)
             return false;
         if (!CheckBurst(target))
@@ -37,32 +38,6 @@ public class SkillAidJumpReturn : Skill
         owner.LockTarget(target);
         owner.StartCoroutine(JumpSequence(target));
         return true;
-    }
-
-    // Range 内最远的存活敌方单位：优先英雄，其次任意敌人
-    private Chess FindFarthestEnemy()
-    {
-        Chess farthestHero = null;
-        Chess farthestAny = null;
-        var bestHero = -1f;
-        var bestAny = -1f;
-        foreach (var u in WorldManager.Instance.GetEnemyInRange(owner.transform.position, skillCfg.Range, owner.side))
-        {
-            if (u == null || u.hp <= 0)
-                continue;
-            var d = WorldManager.Instance.GetRange(owner.transform.position, u.transform.position);
-            if (d > bestAny)
-            {
-                bestAny = d;
-                farthestAny = u;
-            }
-            if (u.isHero && d > bestHero)
-            {
-                bestHero = d;
-                farthestHero = u;
-            }
-        }
-        return farthestHero != null ? farthestHero : farthestAny;
     }
 
     IEnumerator JumpSequence(Chess target)

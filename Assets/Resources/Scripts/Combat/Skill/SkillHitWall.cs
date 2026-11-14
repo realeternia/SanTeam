@@ -63,8 +63,8 @@ public class SkillHitWall : Skill
             var unitList = new List<Chess>();
             foreach (var pos in targetPosList)
             {
-                var unitsInRange = WorldManager.Instance.GetEnemyInRange(pos, skillCfg.Area * 1.5f, owner.side);
-                WorldManager.Instance.RandomSelect(unitsInRange, skillCfg.TargetCount);
+                // 每段墙范围选取：按 SelectOnly / SelectFirst 选（默认敌方，随机取 TargetCount 名）
+                var unitsInRange = SelectTargets(pos, skillCfg.Area * 1.5f, false, skillCfg.TargetCount);
 
                 foreach (var unit in unitsInRange)
                 {

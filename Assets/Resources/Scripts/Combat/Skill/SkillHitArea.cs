@@ -20,11 +20,10 @@ public class SkillHitArea : Skill
             //创建一个hitEffect
             EffectManager.PlaySkillEffect(defender, skillCfg.HitEffect);
 
-            var unitsInRange = WorldManager.Instance.GetEnemyInRange(targetPos, skillCfg.Area, owner.side);
-            unitsInRange.Remove(defender);
+            // 溅射范围：按 SelectOnly / SelectFirst 选（默认敌方的溅射目标，排除被普攻命中的单位）
+            var unitsInRange = SelectTargets(targetPos, skillCfg.Area, false, skillCfg.TargetCount, defender);
             if (unitsInRange.Count > 0)
             {
-                WorldManager.Instance.RandomSelect(unitsInRange, skillCfg.TargetCount);
                 var damage2 = (int)(damage * GetStr2("splashRate"));
                 foreach (var unit in unitsInRange)
                     if (damage2 > 0)

@@ -6,7 +6,7 @@ using System.Text.RegularExpressions;
 
 namespace SkillBaseTool
 {
-    /// <summary>SkillConfig / SkillBaseConfig 的 41 列索引。</summary>
+    /// <summary>SkillConfig / SkillBaseConfig 的 43 列索引。</summary>
     public static class Col
     {
         public const int Id = 0;
@@ -15,42 +15,44 @@ namespace SkillBaseTool
         public const int Version = 3;
         public const int Descript = 4;
         public const int Type = 5;
-        public const int Template = 6;
-        public const int Modules = 7;
-        public const int Lv = 8;
-        public const int Rate = 9;
-        public const int CD = 10;
-        public const int MpCost = 11;
-        public const int StartMpRate = 12;
-        public const int TriggerCondition = 13;
-        public const int DamageType = 14;
-        public const int HurtTag = 15;
-        public const int Range = 16;
-        public const int Area = 17;
-        public const int TargetType = 18;
-        public const int TargetCount = 19;
-        public const int DamageStrength = 20;
-        public const int HealStrength = 21;
-        public const int Strength2 = 22;
-        public const int StrengthBuff1 = 23;
-        public const int BuffId = 24;
-        public const int BuffTime = 25;
-        public const int SummonTag = 26;
-        public const int SummonCount = 27;
-        public const int SummonTime = 28;
-        public const int SummonHitInterval = 29;
-        public const int SummonSpeed = 30;
-        public const int ItemId = 31;
-        public const int ScriptName = 32;
-        public const int Action = 33;
-        public const int SelfEffect = 34;
-        public const int HitEffect = 35;
-        public const int AreaEffect = 36;
-        public const int Icon = 37;
-        public const int LinkSelf = 38;
-        public const int LinkTeam = 39;
-        public const int AuroAttrs = 40;
-        public const int Count = 41;
+        public const int SelectOnly = 6;
+        public const int SelectFirst = 7;
+        public const int Template = 8;
+        public const int Modules = 9;
+        public const int Lv = 10;
+        public const int Rate = 11;
+        public const int CD = 12;
+        public const int MpCost = 13;
+        public const int StartMpRate = 14;
+        public const int TriggerCondition = 15;
+        public const int DamageType = 16;
+        public const int HurtTag = 17;
+        public const int Range = 18;
+        public const int Area = 19;
+        public const int TargetType = 20;
+        public const int TargetCount = 21;
+        public const int DamageStrength = 22;
+        public const int HealStrength = 23;
+        public const int Strength2 = 24;
+        public const int StrengthBuff1 = 25;
+        public const int BuffId = 26;
+        public const int BuffTime = 27;
+        public const int SummonTag = 28;
+        public const int SummonCount = 29;
+        public const int SummonTime = 30;
+        public const int SummonHitInterval = 31;
+        public const int SummonSpeed = 32;
+        public const int ItemId = 33;
+        public const int ScriptName = 34;
+        public const int Action = 35;
+        public const int SelfEffect = 36;
+        public const int HitEffect = 37;
+        public const int AreaEffect = 38;
+        public const int Icon = 39;
+        public const int LinkSelf = 40;
+        public const int LinkTeam = 41;
+        public const int AuroAttrs = 42;
+        public const int Count = 43;
     }
 
     /// <summary>配置行字符串工具：解析/格式化 C# 源码里的构造参数。</summary>
@@ -137,7 +139,7 @@ namespace SkillBaseTool
         }
     }
 
-    /// <summary>SkillConfig_s.cs 的一行（保留 41 列原始参数以便写回）。</summary>
+    /// <summary>SkillConfig_s.cs 的一行（保留 43 列原始参数以便写回）。</summary>
     public sealed class SkillRow
     {
         public int Id;
@@ -156,6 +158,8 @@ namespace SkillBaseTool
         public string Sname { get { return CfgUtil.Unquote(Args[Col.Sname]); } }
         public string Type { get { return CfgUtil.Unquote(Args[Col.Type]); } }
         public string ScriptName { get { return CfgUtil.Unquote(Args[Col.ScriptName]); } }
+        public string SelectOnly { get { return CfgUtil.Unquote(Args[Col.SelectOnly]); } }
+        public string SelectFirst { get { return CfgUtil.Unquote(Args[Col.SelectFirst]); } }
         public string TargetType { get { return CfgUtil.Unquote(Args[Col.TargetType]); } }
         public string BuffId { get { return CfgUtil.Unquote(Args[Col.BuffId]); } }
         public string StrengthBuff1 { get { return CfgUtil.Unquote(Args[Col.StrengthBuff1]); } }
@@ -247,7 +251,7 @@ namespace SkillBaseTool
         /// <summary>BuffConfig 里已存在的 Buff 短名（校验 Effect 用）。</summary>
         public HashSet<string> BuffTokens = new HashSet<string>();
 
-        /// <summary>当前 SkillBaseConfig_s.cs 里已有的行（Id → 41 列参数）。</summary>
+        /// <summary>当前 SkillBaseConfig_s.cs 里已有的行（Id → 43 列参数）。</summary>
         public Dictionary<int, string[]> BaseRows = new Dictionary<int, string[]>();
 
         public int GetQuality(string sname)

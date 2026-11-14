@@ -44,7 +44,7 @@ namespace CommonConfig
             {"Name", new FieldMetaInfo("组件名", "string", 0, "", true)},
             {"Category", new FieldMetaInfo("类别(数值、射程、目标数、范围档、状态效果、持续、目标筛选、特殊机制、施放节奏)", "string", 0)},
             {"Templates", new FieldMetaInfo("适用模板名列表(空=通用)", "string[]", 0)},
-            {"Effect", new FieldMetaInfo("效果k-v(分号多绑定: 列[:子键]=Lv1~5数值；如 Area=30、Buff:缓:slow=0.1,0.12,0.15,0.2,0.25;BuffTime=3、TargetType:lowestHp、None)", "string", 289)},
+            {"Effect", new FieldMetaInfo("效果k-v(分号多绑定: 列[:子键]=Lv1~5数值；如 Area=30、Buff:缓:slow=0.1,0.12,0.15,0.2,0.25;BuffTime=3、TargetType:missile、SelectOnly:hero、SelectFirst:lowestHp、None)", "string", 289)},
             {"Quality", new FieldMetaInfo("品质(1~4)", "int", 60, "qs,1:#666666,2:#33CC33,3:#3333FF,4:#FFD700")},
             {"Score", new FieldMetaInfo("评分(分,标准态=10分)", "float", 90)},
             {"Des", new FieldMetaInfo("说明", "string", 300)},
@@ -214,17 +214,17 @@ namespace CommonConfig
             config[2120] = new SkillTemplateComponentConfig(2120, "暴击大", "状态效果", new string[]{"自身强化","单体友方增益","群体友方增益"}, "Buff:暴:critRate=0.08,0.12,0.18,0.27,0.39;BuffTime=5", 3, 3f, "提升暴击率（暴）（强度大）", "按期望输出增量估值", false);
             config[2121] = new SkillTemplateComponentConfig(2121, "暴击中", "状态效果", new string[]{"自身强化","单体友方增益","群体友方增益"}, "Buff:暴:critRate=0.05,0.08,0.12,0.18,0.26;BuffTime=5", 2, 2f, "提升暴击率（暴）（强度中）", "按期望输出增量估值", false);
             config[2122] = new SkillTemplateComponentConfig(2122, "暴击小", "状态效果", new string[]{"自身强化","单体友方增益","群体友方增益"}, "Buff:暴:critRate=0.03,0.05,0.07,0.11,0.16;BuffTime=5", 1, 1f, "提升暴击率（暴）（强度小）", "按期望输出增量估值", false);
-            config[3000] = new SkillTemplateComponentConfig(3000, "低血筛选", "目标筛选", new string[]{"单体治疗","范围治疗","单体友方增益","群体友方增益"}, "TargetType:lowestHp", 1, 1f, "优先选择最低血量目标", "选择性越强未必更贵；看是否提高击杀或救援效率", false);
-            config[3010] = new SkillTemplateComponentConfig(3010, "后排筛选", "目标筛选", new string[]{"单体治疗","范围治疗","单体友方增益","群体友方增益"}, "None", 1, 0.5f, "优先选择后排目标", "选择性越强未必更贵；看是否提高击杀或救援效率", false);
-            config[3020] = new SkillTemplateComponentConfig(3020, "英雄限定", "目标筛选", new string[]{"单体伤害大","单体伤害中","单体伤害小","群体伤害近距离","群体伤害自身中心"}, "TargetType:heroOnly", 2, 1.5f, "仅对英雄/特定单位生效", "需看筛选是否提高击杀或覆盖效果", false);
-            config[3030] = new SkillTemplateComponentConfig(3030, "友军筛选", "目标筛选", new string[]{"单体治疗","范围治疗","单体友方增益","群体友方增益"}, "None", 1, 0.5f, "仅对特定类型友军生效", "需看筛选是否提高救援或覆盖效果", false);
-            config[3040] = new SkillTemplateComponentConfig(3040, "最高血量", "目标筛选", new string[]{"单体友方增益","群体友方增益"}, "TargetType:highestHp", 2, 1f, "优先选择生命百分比最高的目标", "选择性越强未必更贵；看是否提高救援或承伤效率", false);
-            config[3050] = new SkillTemplateComponentConfig(3050, "最高法强", "目标筛选", new string[]{"单体友方增益","群体友方增益"}, "TargetType:highestAp", 2, 1f, "优先选择法术强度最高的目标", "选择性越强未必更贵；看是否提高增益收益", false);
-            config[3060] = new SkillTemplateComponentConfig(3060, "远程优先", "目标筛选", new string[]{"单体友方增益","群体友方增益"}, "TargetType:rangedOnly", 1, 0.5f, "优先选择远程单位，无匹配时回退其余单位", "选择性本身不增值，看是否契合阵容", false);
-            config[3070] = new SkillTemplateComponentConfig(3070, "近战优先", "目标筛选", new string[]{"单体友方增益","群体友方增益"}, "TargetType:meleeOnly", 1, 0.5f, "优先选择近战单位，无匹配时回退其余单位", "选择性本身不增值，看是否契合阵容", false);
-            config[3080] = new SkillTemplateComponentConfig(3080, "排除自身", "目标筛选", new string[]{"单体友方增益","群体友方增益"}, "TargetType:excludeSelf", 1, 0.5f, "选人时排除施法者自身", "结构性开关，本身不增值", false);
+            config[3000] = new SkillTemplateComponentConfig(3000, "低血筛选", "目标筛选", new string[]{"单体治疗","范围治疗","单体友方增益","群体友方增益"}, "SelectFirst:lowestHp", 1, 1f, "优先选择最低血量目标", "选择性越强未必更贵；看是否提高击杀或救援效率", false);
+            config[3010] = new SkillTemplateComponentConfig(3010, "后排筛选", "目标筛选", new string[]{"单体治疗","范围治疗","单体友方增益","群体友方增益"}, "SelectFirst:farthest", 1, 0.5f, "优先选择后排（最远）目标", "选择性越强未必更贵；看是否提高击杀或救援效率", false);
+            config[3020] = new SkillTemplateComponentConfig(3020, "英雄限定", "目标筛选", new string[]{"单体伤害大","单体伤害中","单体伤害小","群体伤害近距离","群体伤害自身中心"}, "SelectOnly:hero", 2, 1.5f, "仅对英雄/特定单位生效", "需看筛选是否提高击杀或覆盖效果", false);
+            config[3030] = new SkillTemplateComponentConfig(3030, "友军筛选", "目标筛选", new string[]{"单体治疗","范围治疗","单体友方增益","群体友方增益"}, "SelectOnly:ally", 1, 0.5f, "仅对特定类型友军生效", "需看筛选是否提高救援或覆盖效果", false);
+            config[3040] = new SkillTemplateComponentConfig(3040, "最高血量", "目标筛选", new string[]{"单体友方增益","群体友方增益"}, "SelectFirst:highestHp", 2, 1f, "优先选择生命百分比最高的目标", "选择性越强未必更贵；看是否提高救援或承伤效率", false);
+            config[3050] = new SkillTemplateComponentConfig(3050, "最高法强", "目标筛选", new string[]{"单体友方增益","群体友方增益"}, "SelectFirst:highestAp", 2, 1f, "优先选择法术强度最高的目标", "选择性越强未必更贵；看是否提高增益收益", false);
+            config[3060] = new SkillTemplateComponentConfig(3060, "远程优先", "目标筛选", new string[]{"单体友方增益","群体友方增益"}, "SelectFirst:rangedFirst", 1, 0.5f, "优先选择远程单位，无匹配时回退其余单位", "选择性本身不增值，看是否契合阵容", false);
+            config[3070] = new SkillTemplateComponentConfig(3070, "近战优先", "目标筛选", new string[]{"单体友方增益","群体友方增益"}, "SelectFirst:meleeFirst", 1, 0.5f, "优先选择近战单位，无匹配时回退其余单位", "选择性本身不增值，看是否契合阵容", false);
+            config[3080] = new SkillTemplateComponentConfig(3080, "排除自身", "目标筛选", new string[]{"单体友方增益","群体友方增益"}, "SelectOnly:notSelf", 1, 0.5f, "选人时排除施法者自身", "结构性开关，本身不增值", false);
             config[3090] = new SkillTemplateComponentConfig(3090, "施法者必含", "目标筛选", new string[]{"单体友方增益","群体友方增益"}, "TargetType:selfAlways", 1, 0.5f, "选人时施法者必然包含在内", "结构性开关，本身不增值", false);
-            config[3100] = new SkillTemplateComponentConfig(3100, "满血跳过", "目标筛选", new string[]{"单体友方增益","群体友方增益"}, "TargetType:fullHpSkip", 1, 0.5f, "跳过满血目标，避免溢出浪费", "结构性开关，本身不增值", false);
+            config[3100] = new SkillTemplateComponentConfig(3100, "满血跳过", "目标筛选", new string[]{"单体友方增益","群体友方增益"}, "SelectOnly:notFullHp", 1, 0.5f, "跳过满血目标，避免溢出浪费", "结构性开关，本身不增值", false);
             config[3110] = new SkillTemplateComponentConfig(3110, "全图", "目标筛选", new string[]{"单体友方增益","群体友方增益"}, "TargetType:wholeMap", 2, 1.5f, "全图选人，不受射程限制", "大幅扩大可触达范围，按覆盖提升估值", false);
             config[3120] = new SkillTemplateComponentConfig(3120, "嘲讽周围", "目标筛选", new string[]{"单体友方增益","群体友方增益"}, "TargetType:tauntAroundTarget", 2, 1.5f, "对目标周围敌人附加嘲讽", "与嘲讽组件配合，按控制覆盖量估值", false);
             config[3130] = new SkillTemplateComponentConfig(3130, "不按首段去重", "目标筛选", new string[]{"单体友方增益","群体友方增益"}, "TargetType:noDedupe", 1, 0.5f, "多次结算时不按首段效果去重", "结构性开关，本身不增值", false);

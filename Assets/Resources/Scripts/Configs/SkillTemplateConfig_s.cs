@@ -137,18 +137,18 @@ namespace CommonConfig
         public static void Load()
         {
             config.Clear();
-            config[10] = new SkillTemplateConfig(10, "单体伤害大", "对一个敌方单位结算一次高额伤害，标准输出基准。", "施法射程,MP中增加,CD中增加", "DamageStrength=100,150,250,400,600", 3, 10f, 0f, 0f, 7, 2f);
-            config[11] = new SkillTemplateConfig(11, "单体伤害中", "对一个敌方单位结算一次中等伤害，数值降档，评分按同比例下调。", "施法射程,MP中增加,CD中增加", "DamageStrength=80,120,200,320,480", 2, 8f, 0f, 0f, 6, 2f);
-            config[12] = new SkillTemplateConfig(12, "单体伤害小", "对一个敌方单位结算一次低额伤害，适合高频或附带其他效果的单体技能。", "施法射程,MP中增加,CD中增加", "DamageStrength=60,90,150,240,360", 1, 6f, 0f, 0f, 5, 1.5f);
-            config[20] = new SkillTemplateConfig(20, "群体伤害近距离", "在近距离目标点（Range=40）对默认小范围（Area=20）敌人结算伤害，标准群体输出基准。", "最大目标数,施法射程,MP中增加,CD中增加", "DamageStrength=70,105,175,280,420", 3, 10f, 40f, 20f, 7, 2f);
-            config[21] = new SkillTemplateConfig(21, "群体伤害自身中心", "以施法者自身为中心（Range=0）对默认小范围（Area=20）敌人结算伤害，省射程但需贴身。", "最大目标数,MP中增加,CD中增加", "DamageStrength=70,105,175,280,420", 3, 10f, 0f, 20f, 7, 2f);
-            config[30] = new SkillTemplateConfig(30, "单体治疗", "选择一个友方单位进行治疗，数值口径与单体伤害对称。", "属性增益中,施法射程,MP中增加,CD中增加", "HealStrength=100,150,250,400,600", 3, 10f, 0f, 0f, 7, 2f);
-            config[31] = new SkillTemplateConfig(31, "范围治疗", "对默认小范围（Area=20）内友方单位施加治疗，覆盖人数与溢出效果共同影响价值。", "最大目标数,施法射程,MP中增加,CD中增加", "HealStrength=70,105,175,280,420", 4, 11f, 0f, 20f, 9, 3f);
+            config[10] = new SkillTemplateConfig(10, "单体伤害大", "对一个敌方单位结算一次高额伤害，标准输出基准。", "施法射程,MP中增加,CD中增加", "SelectOnly:enemy;DamageStrength=100,150,250,400,600", 3, 10f, 0f, 0f, 7, 2f);
+            config[11] = new SkillTemplateConfig(11, "单体伤害中", "对一个敌方单位结算一次中等伤害，数值降档，评分按同比例下调。", "施法射程,MP中增加,CD中增加", "SelectOnly:enemy;DamageStrength=80,120,200,320,480", 2, 8f, 0f, 0f, 6, 2f);
+            config[12] = new SkillTemplateConfig(12, "单体伤害小", "对一个敌方单位结算一次低额伤害，适合高频或附带其他效果的单体技能。", "施法射程,MP中增加,CD中增加", "SelectOnly:enemy;DamageStrength=60,90,150,240,360", 1, 6f, 0f, 0f, 5, 1.5f);
+            config[20] = new SkillTemplateConfig(20, "群体伤害近距离", "在近距离目标点（Range=40）对默认小范围（Area=20）敌人结算伤害，标准群体输出基准。", "最大目标数,施法射程,MP中增加,CD中增加", "SelectOnly:enemy;DamageStrength=70,105,175,280,420", 3, 10f, 40f, 20f, 7, 2f);
+            config[21] = new SkillTemplateConfig(21, "群体伤害自身中心", "以施法者自身为中心（Range=0）对默认小范围（Area=20）敌人结算伤害，省射程但需贴身。", "最大目标数,MP中增加,CD中增加", "SelectOnly:enemy;DamageStrength=70,105,175,280,420", 3, 10f, 0f, 20f, 7, 2f);
+            config[30] = new SkillTemplateConfig(30, "单体治疗", "选择一个友方单位进行治疗，数值口径与单体伤害对称。", "属性增益中,施法射程,MP中增加,CD中增加", "SelectOnly:ally;HealStrength=100,150,250,400,600", 3, 10f, 0f, 0f, 7, 2f);
+            config[31] = new SkillTemplateConfig(31, "范围治疗", "对默认小范围（Area=20）内友方单位施加治疗，覆盖人数与溢出效果共同影响价值。", "最大目标数,施法射程,MP中增加,CD中增加", "SelectOnly:ally;HealStrength=70,105,175,280,420", 4, 11f, 0f, 20f, 9, 3f);
             config[50] = new SkillTemplateConfig(50, "自身强化", "对施法者自身施加短时属性增益/护盾，主要看持续时间和成长性。", "属性增益中,护盾中,永久成长", "None", 2, 8f, 0f, 0f, 6, 3f);
             config[60] = new SkillTemplateConfig(60, "光环", "对我方单位持续或全局生效的属性光环，按覆盖人数和持续时间估值；光环需主动释放（CD/MP）来叠加自身成长或刷新效果。", "属性增益中", "None", 9, 0f, 0f, 0f, 12, 3f);
-            config[70] = new SkillTemplateConfig(70, "单体友方增益", "对一个友方单位施加属性增益或护盾，价值由强度、持续时间与目标选择共同决定。", "属性增益中,护盾中,低血筛选,施法射程,MP中增加,CD中增加", "None", 3, 9f, 50f, 0f, 6, 3f);
-            config[80] = new SkillTemplateConfig(80, "群体友方增益", "对范围内多名友方施加属性增益或护盾，按覆盖人数与溢出价值估值。", "属性增益中,护盾中,最大目标数,低血筛选,施法射程,MP中增加,CD中增加", "None", 4, 11f, 0f, 20f, 8, 4f);
-            config[90] = new SkillTemplateConfig(90, "兵种增益", "对己方士兵施加属性增益，数值按士兵基础属性折算。", "加攻中,加护甲中,加魔抗中,最大目标数,MP中增加,CD中增加", "None", 3, 9f, 0f, 20f, 7, 4f);
+            config[70] = new SkillTemplateConfig(70, "单体友方增益", "对一个友方单位施加属性增益或护盾，价值由强度、持续时间与目标选择共同决定。", "属性增益中,护盾中,低血筛选,施法射程,MP中增加,CD中增加", "SelectOnly:ally", 3, 9f, 50f, 0f, 6, 3f);
+            config[80] = new SkillTemplateConfig(80, "群体友方增益", "对范围内多名友方施加属性增益或护盾，按覆盖人数与溢出价值估值。", "属性增益中,护盾中,最大目标数,低血筛选,施法射程,MP中增加,CD中增加", "SelectOnly:ally", 4, 11f, 0f, 20f, 8, 4f);
+            config[90] = new SkillTemplateConfig(90, "兵种增益", "对己方士兵施加属性增益，数值按士兵基础属性折算。", "加攻中,加护甲中,加魔抗中,最大目标数,MP中增加,CD中增加", "SelectOnly:ally", 3, 9f, 0f, 20f, 7, 4f);
             config[110] = new SkillTemplateConfig(110, "跳跃弹射", "在多个目标之间跳跃结算伤害或治疗，每跳递减，价值由跳数、单跳数值与搜索半径决定。", "伤害倍率,最大目标数,施法射程,MP中增加,CD中增加", "DamageStrength=60,90,150,240,360", 4, 12f, 30f, 60f, 8, 3f);
             config[100] = new SkillTemplateConfig(100, "召唤技能场", "在落点投放持续存在的伤害技能场，数字为场持续与结算间隔；召唤物标签、范围与单次伤害仍由技能行配置。", "最大目标数,施法射程", "SummonTime=5.2;SummonHitInterval=1", 3, 9f, 0f, 0f, 9, 2.5f);
             config[101] = new SkillTemplateConfig(101, "召唤治疗场", "在落点投放持续存在的治疗技能场，数字为场持续与结算间隔；治疗量与范围仍由技能行配置。", "最大目标数,施法射程", "SummonTime=5;SummonHitInterval=1", 3, 9f, 0f, 0f, 14, 2.5f);

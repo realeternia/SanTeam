@@ -14,9 +14,9 @@ public class BuffMultiShot : Buff
         int extra = (int)GetStrBuff("extraArrows");
         if (extra > 0)
         {
-            var enemies = WorldManager.Instance.GetEnemyInRange(defender.transform.position, skillCfg.Area, owner.side);
-            enemies.Remove(defender);
-            WorldManager.Instance.RandomSelect(enemies, extra);
+            // 额外箭矢目标：按父技能 SelectOnly / SelectFirst 选（默认敌方，随机取 extra 名，排除普攻目标）
+            var enemies = TargetSelector.Select(owner, defender.transform.position, skillCfg.Area, false,
+                skillCfg.SelectOnly, skillCfg.SelectFirst, extra, defender);
             foreach (var u in enemies)
             {
                 WorldManager.Instance.CreateSpellMissile(owner, u, owner.transform.position, skillCfg.Id, damage, owner.hitEffect);
