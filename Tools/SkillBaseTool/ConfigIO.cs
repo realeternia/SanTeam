@@ -60,6 +60,7 @@ namespace SkillBaseTool
                 if (a.Length < 7)
                     continue;
                 string name = CfgUtil.Unquote(a[1]);
+                string job = CfgUtil.Unquote(a[3]);
                 var qs = new List<int>();
                 for (int i = 4; i <= 6; i++)
                 {
@@ -69,6 +70,8 @@ namespace SkillBaseTool
                 }
                 if (qs.Count > 0)
                     store.HeroQuality[name] = qs.Min();
+                if (job.Length > 0)
+                    store.HeroJob[name] = job;
             }
         }
 
@@ -141,7 +144,11 @@ namespace SkillBaseTool
             {
                 if (kv.Value.Length != Col.Count)
                     continue;
-                var row = new SkillRow(kv.Key, kv.Value) { Quality = store.GetQuality(CfgUtil.Unquote(kv.Value[Col.Sname])) };
+                var row = new SkillRow(kv.Key, kv.Value)
+                {
+                    Quality = store.GetQuality(CfgUtil.Unquote(kv.Value[Col.Sname])),
+                    Job = store.GetJob(CfgUtil.Unquote(kv.Value[Col.Sname])),
+                };
                 store.Skills.Add(row);
                 store.SkillById[row.Id] = row;
             }

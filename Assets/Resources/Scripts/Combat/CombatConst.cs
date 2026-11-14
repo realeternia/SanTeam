@@ -45,6 +45,12 @@ public static class CombatConst
         return hurtTag == LockChainHurtTag || hurtTag == AntiShieldHurtTag;
     }
 
+    // ---- 跳跃链(SkillJumpChain) ----
+    /// <summary>跳跃链每跳衰减系数默认值（Strength2 未配 jumpDecay 时使用）</summary>
+    public const float JumpChainDecay = 0.85f;
+    /// <summary>跳跃链衰减系数在 Strength2 中的键名（模板默认写 0.85，组件可覆盖为 1/0.7/0.5）</summary>
+    public const string JumpChainDecayKey = "jumpDecay";
+
     // ---- 伤害类型(SkillConfig.DamageType) ----
     /// <summary>0=法术：ap 成长，受魔抗减免</summary>
     public const int DamageTypeMagic = 0;

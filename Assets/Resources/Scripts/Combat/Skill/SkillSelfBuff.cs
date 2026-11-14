@@ -12,7 +12,8 @@ using UnityEngine;
 ///
 /// TargetType 标记：
 /// · noStack   = 自身已带任一 BuffId 时不重复施放（曹仁·天人守城）
-/// · permanent = 不挂 Buff，直接把 键 selfAtkSpeed 永久加到自身攻速（马岱·连射）
+/// · permanent = 不挂 Buff，把 Strength2 里的成长键（selfAtkSpeed/selfAtk/selfAp/selfArmor/selfMagicRes/selfHp/selfMoveSpeed/selfRange）
+///               永久叠到自身对应属性，每次施放成长一次（马岱·连射）
 /// </summary>
 public class SkillSelfBuff : Skill
 {
@@ -26,7 +27,7 @@ public class SkillSelfBuff : Skill
         if (!owner.IsInFight())
             return false;
 
-        // permanent：不挂 Buff，直接把 键 selfAtkSpeed 永久叠到自身攻速
+        // permanent：不挂 Buff；成长键由 SkillManager 在施放成功后统一叠加（见 Skill.ApplyPermanentGrowth）
         if (HasSkillFlag("permanent"))
         {
             if (!CheckBurst(null))
@@ -34,7 +35,6 @@ public class SkillSelfBuff : Skill
 
             owner.PlayerAnim(skillCfg.Action);
             PlaySelfEffect();
-            owner.attackSpeedRate += GetStr2("selfAtkSpeed");
             return true;
         }
 

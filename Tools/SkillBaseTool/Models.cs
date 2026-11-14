@@ -145,6 +145,8 @@ namespace SkillBaseTool
         public string[] Args;
         /// <summary>英雄品质（Sname 对应 HeroConfig，非英雄技能为 0）。</summary>
         public int Quality;
+        /// <summary>英雄职业（Sname 对应 HeroConfig.Job，非英雄技能为空）。</summary>
+        public string Job;
 
         public SkillRow(int id, string[] args)
         {
@@ -244,6 +246,8 @@ namespace SkillBaseTool
         public Dictionary<int, SkillRow> SkillById = new Dictionary<int, SkillRow>();
         /// <summary>英雄名 → 剧本中最低品质。</summary>
         public Dictionary<string, int> HeroQuality = new Dictionary<string, int>();
+        /// <summary>英雄名 → 职业（HeroConfig.Job）。</summary>
+        public Dictionary<string, string> HeroJob = new Dictionary<string, string>();
 
         public List<TemplateRow> Templates = new List<TemplateRow>();
         public Dictionary<string, TemplateRow> TemplateByName = new Dictionary<string, TemplateRow>();
@@ -259,6 +263,13 @@ namespace SkillBaseTool
         {
             int q;
             return !string.IsNullOrEmpty(sname) && HeroQuality.TryGetValue(sname, out q) ? q : 0;
+        }
+
+        /// <summary>按英雄名取职业，非英雄技能返回空串。</summary>
+        public string GetJob(string sname)
+        {
+            string job;
+            return !string.IsNullOrEmpty(sname) && HeroJob.TryGetValue(sname, out job) ? job : "";
         }
 
         public IEnumerable<SkillRow> LevelOneSkills

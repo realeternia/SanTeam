@@ -12,12 +12,15 @@ namespace SkillBaseTool
         private DataStore store;
         private readonly Action reload;
         private Label lblStats;
+        private ComboBox cboJob;
         private DataGridView grid;
         /// <summary>行号 → 技能（Lv1 行），供编辑按钮回查。</summary>
         private readonly List<SkillRow> rowSkills = new List<SkillRow>();
         private int editColumn = -1;
         private int templateColumn = -1;
         private int moduleColumn = -1;
+        /// <summary>重建职业下拉时不触发刷新。</summary>
+        private bool suppressJob;
 
         public GenerateView(Action reload)
         {
@@ -44,6 +47,25 @@ namespace SkillBaseTool
             btnGen.Click += (s, e) => GenerateBase();
             var btnCheck = MakeButton("③ 配置自检", 366, 120);
             btnCheck.Click += (s, e) => ValidateAll();
+            var lblJob = new Label
+            {
+                Text = "职业",
+                Font = Theme.Small,
+                ForeColor = Theme.Muted,
+                AutoSize = true,
+                Location = new Point(500, 51),
+            };
+            cboJob = new ComboBox
+            {
+                DropDownStyle = ComboBoxStyle.DropDownList,
+                FlatStyle = FlatStyle.Flat,
+                BackColor = Theme.Card2,
+                ForeColor = Theme.Text,
+                Font = Theme.Base,
+                Location = new Point(534, 44),
+                Size = new Size(96, 26),
+            };
+            cboJob.SelectedIndexChanged += (s, e) => { if (!suppressJob) RefreshGrid(); };
             var tip = new Label
             {
                 Text = "规则：DamageStrength/HealStrength 取模板 Values，CD/MpCost 取模板（MpCost×10），Range/Area 仅模板>0 时覆盖，Buff 只按技能自己的 Modules 追加（模板默认组件仅估值）",
@@ -53,13 +75,14 @@ namespace SkillBaseTool
                 Location = new Point(500, 18),
             };
 
-            top.Controls.AddRange(new Control[] { lblStats, btnAuto, btnGen, btnCheck, tip });
+            top.Controls.AddRange(new Control[] { lblStats, btnAuto, btnGen, btnCheck, lblJob, cboJob, tip });
 
             grid = new DataGridView { Dock = DockStyle.Fill, Margin = new Padding(0) };
             Theme.StyleGrid(grid);
             // 只读整表会吞掉按钮列的点击，故放开后逐列设为只读
             grid.ReadOnly = false;
             grid.Columns.Add(MakeColumn("技能", 150));
+            grid.Columns.Add(MakeColumn("职业", 44));
             grid.Columns.Add(MakeColumn("品质", 48));
             grid.Columns.Add(MakeColumn("价格", 58));
             grid.Columns.Add(MakeColumn("类型", 55));
@@ -197,7 +220,31 @@ namespace SkillBaseTool
         public void Bind(DataStore data)
         {
             store = data;
+            FillJobFilter();
             RefreshGrid();
+        }
+
+        /// <summary>重建职业下拉（保留当前选中项），按技能数从多到少排列。</summary>
+        private void FillJobFilter()
+        {
+            string current = cboJob.SelectedItem as string;
+            suppressJob = true;
+            cboJob.BeginUpdate();
+            cboJob.Items.Clear();
+            cboJob.Items.Add("全部");
+            if (store != null)
+            {
+                foreach (var g in store.QualityHeroSkills
+                    .Where(s => !string.IsNullOrEmpty(s.Job))
+                    .GroupBy(s => s.Job)
+                    .OrderByDescending(g => g.Count())
+                    .ThenBy(g => g.Key, StringComparer.CurrentCulture))
+                    cboJob.Items.Add(g.Key);
+            }
+            cboJob.EndUpdate();
+            int idx = string.IsNullOrEmpty(current) ? 0 : cboJob.Items.IndexOf(current);
+            cboJob.SelectedIndex = idx < 0 ? 0 : idx;
+            suppressJob = false;
         }
 
         private void RefreshGrid()
@@ -206,7 +253,9 @@ namespace SkillBaseTool
                 return;
             Theme.BeginBulkFill(grid);
             rowSkills.Clear();
+            string job = cboJob.SelectedItem as string ?? "全部";
             var skills = store.QualityHeroSkills
+                .Where(s => job == "全部" || s.Job == job)
                 .OrderBy(s => s.Quality)
                 .ThenBy(s => s.Sname)
                 .ToList();
@@ -226,24 +275,24 @@ namespace SkillBaseTool
                     templated++;
                 }
                 double price = SkillGen.CalcPrice(store, s);
-                int idx = grid.Rows.Add(s.Display, "Q" + s.Quality, price.ToString("0.##"), s.Type, s.ScriptName,
+                int idx = grid.Rows.Add(s.Display, s.Job, "Q" + s.Quality, price.ToString("0.##"), s.Type, s.ScriptName,
                     s.TemplateName, string.Join("、", s.Modules), status, "编辑");
                 rowSkills.Add(s);
 
                 // 品质列按品质染色
-                grid.Rows[idx].Cells[1].Style.ForeColor = Theme.QualityColor(s.Quality);
+                grid.Rows[idx].Cells[2].Style.ForeColor = Theme.QualityColor(s.Quality);
                 // 价格列：>13 红 / >10 黄 / 其余常规
-                grid.Rows[idx].Cells[2].Style.ForeColor = Theme.PriceColor(price);
+                grid.Rows[idx].Cells[3].Style.ForeColor = Theme.PriceColor(price);
 
-                var cell = grid.Rows[idx].Cells[7];
+                var cell = grid.Rows[idx].Cells[8];
                 cell.Style.ForeColor = status == "OK" ? Theme.Ok
                     : (status == "未模板化" ? Theme.Muted : Theme.Danger);
                 if (status != "OK")
                     grid.Rows[idx].DefaultCellStyle.BackColor = Theme.RowWarn;
             }
             Theme.EndBulkFill(grid);
-            lblStats.Text = string.Format("品质 1~4 英雄技能 {0} 个：已模板化 {1}，SkillBase 行 {2}",
-                skills.Count, templated, store.BaseRows.Count);
+            lblStats.Text = string.Format("{0}品质 1~4 英雄技能 {1} 个：已模板化 {2}，SkillBase 行 {3}",
+                job == "全部" ? "" : "职业 " + job + " · ", skills.Count, templated, store.BaseRows.Count);
         }
 
         /// <summary>打开编辑弹窗；确认后已写回 SkillConfig，重新加载刷新列表。</summary>

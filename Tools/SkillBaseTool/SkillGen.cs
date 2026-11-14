@@ -39,10 +39,21 @@ namespace SkillBaseTool
     {
         public static readonly string[] DamageTemplates =
         {
-            "单体伤害大", "单体伤害中", "单体伤害小", "群体伤害近距离", "群体伤害自身中心", "跳跃弹射-伤害", "冲击波伤害"
+            "单体伤害大", "单体伤害中", "单体伤害小",
+            "群体伤害近距离大", "群体伤害近距离中", "群体伤害近距离小",
+            "群体伤害自身中心大", "群体伤害自身中心中", "群体伤害自身中心小",
+            "跳跃弹射-伤害大", "跳跃弹射-伤害中", "跳跃弹射-伤害小",
+            "冲击波伤害大", "冲击波伤害中", "冲击波伤害小",
+            "持续伤害大", "持续伤害中", "持续伤害小"
         };
 
-        public static readonly string[] HealTemplates = { "单体治疗", "范围治疗", "跳跃弹射-治疗" };
+        public static readonly string[] HealTemplates =
+        {
+            "单体治疗大", "单体治疗中", "单体治疗小",
+            "范围治疗大", "范围治疗中", "范围治疗小",
+            "跳跃弹射-治疗大", "跳跃弹射-治疗中", "跳跃弹射-治疗小",
+            "持续治疗大", "持续治疗中", "持续治疗小"
+        };
 
         /// <summary>Buff 短名 → 组件族。</summary>
         private static readonly Dictionary<string, string> TokenFamily = new Dictionary<string, string>
@@ -51,40 +62,41 @@ namespace SkillBaseTool
             { "乱", "眩晕" }, { "停", "定身" }, { "惑", "混乱" }, { "硬", "减伤" }, { "暴", "暴击" },
             { "攻", "加攻" }, { "甲", "加护甲" }, { "术", "加法强" }, { "抗", "加魔抗" },
             { "快", "加攻速" }, { "速", "加移速" }, { "重", "自身增伤" }, { "盾", "护盾" },
-            { "败", "持续伤害" }, { "吸", "吸血" }, { "闪", "闪避" },
+            { "败", "持续伤害" }, { "吸", "吸血" }, { "闪", "闪避" }, { "血", "加生命回复" },
         };
 
         /// <summary>Buff 短名 → 无档位组件名（唯一形态，直接命中组件）。</summary>
         private static readonly Dictionary<string, string> TokenDirectModule = new Dictionary<string, string>
         {
-            { "叛", "叛逃" }, { "链", "生命链接" }, { "锁", "连锁扩散" }, { "守", "受击叠防" },
+            { "叛", "叛逃" }, { "链", "生命链接" }, { "锁", "连锁扩散" }, { "守", "受击叠防" }, { "毒", "中毒" },
+            { "反", "伤害反射" }, { "焰", "焰衣" }, { "震", "威震" }, { "愈", "急救" },
         };
 
-        /// <summary>组件族 → (StrengthBuff1 键, 百分比换算)。空键表示无独立数值。</summary>
-        private static readonly Dictionary<string, KeyValuePair<string, int>> FamilyKey =
-            new Dictionary<string, KeyValuePair<string, int>>
+        /// <summary>组件族 → StrengthBuff1 数值键（空键表示族内无统一数值）。</summary>
+        private static readonly Dictionary<string, string> FamilyKey = new Dictionary<string, string>
             {
-                { "减防", new KeyValuePair<string, int>("armorDown", 1) },
-                { "减攻", new KeyValuePair<string, int>("atkDown", 1) },
-                { "减速", new KeyValuePair<string, int>("slow", 100) },
-                { "减疗", new KeyValuePair<string, int>("healDown", 1) },
-                { "增伤", new KeyValuePair<string, int>("damagedUp", 100) },
-                { "减伤", new KeyValuePair<string, int>("shieldReduce", 100) },
-                { "暴击", new KeyValuePair<string, int>("critRate", 100) },
-                { "加攻", new KeyValuePair<string, int>("atk", 1) },
-                { "加护甲", new KeyValuePair<string, int>("armor", 1) },
-                { "加法强", new KeyValuePair<string, int>("ap", 1) },
-                { "加魔抗", new KeyValuePair<string, int>("magicRes", 1) },
-                { "加攻速", new KeyValuePair<string, int>("atkSpeed", 100) },
-                { "加移速", new KeyValuePair<string, int>("moveSpeed", 100) },
-                { "自身增伤", new KeyValuePair<string, int>("damageUp", 100) },
-                { "护盾", new KeyValuePair<string, int>("shield", 1) },
-                { "持续伤害", new KeyValuePair<string, int>("dot", 1) },
-                { "吸血", new KeyValuePair<string, int>("suck", 100) },
-                { "闪避", new KeyValuePair<string, int>("evade", 100) },
-                { "眩晕", new KeyValuePair<string, int>("", 0) },
-                { "定身", new KeyValuePair<string, int>("", 0) },
-                { "混乱", new KeyValuePair<string, int>("", 0) },
+                { "减防", "armorDown" },
+                { "减攻", "atkDown" },
+                { "减速", "slow" },
+                { "减疗", "healDown" },
+                { "增伤", "damagedUp" },
+                { "减伤", "shieldReduce" },
+                { "暴击", "critRate" },
+                { "加攻", "atk" },
+                { "加护甲", "armor" },
+                { "加法强", "ap" },
+                { "加魔抗", "magicRes" },
+                { "加攻速", "atkSpeed" },
+                { "加移速", "moveSpeed" },
+                { "自身增伤", "damageUp" },
+                { "护盾", "shield" },
+                { "持续伤害", "dot" },
+                { "加生命回复", "hpRegen" },
+                { "吸血", "suck" },
+                { "闪避", "evade" },
+                { "眩晕", "" },
+                { "定身", "" },
+                { "混乱", "" },
             };
 
         /// <summary>SelectOnly 硬过滤规则 → 组件名（按出现顺序去重）。</summary>
@@ -116,6 +128,12 @@ namespace SkillBaseTool
             { "execute", "斩杀" },
         };
 
+        /// <summary>permanent 模式下 Strength2 成长键 → 永久成长组件（可挂任意模板）。</summary>
+        private static readonly Dictionary<string, string> PermanentGrowthModules = new Dictionary<string, string>
+        {
+            { "selfAtkSpeed", "永久成长攻速" },
+        };
+
         public static bool IsDamageTemplate(string t)
         {
             return t != null && DamageTemplates.Contains(t);
@@ -139,27 +157,29 @@ namespace SkillBaseTool
             if (script == "SkillSoldierBless")
                 return "兵种增益";
             if (script == "SkillJumpChain")
-                return (heal > 0 || a.TargetType.Contains("heal")) ? "跳跃弹射-治疗" : "跳跃弹射-伤害";
+                return (heal > 0 || a.TargetType.Contains("heal")) ? "跳跃弹射-治疗大" : "跳跃弹射-伤害大";
             if (script == "SkillSelfBuff")
                 return "自身强化";
+            if (script == "SkillTaunt")
+                return "群体嘲讽";
             if (script == "SkillAidHitRegion")
-                return "持续伤害";
+                return "持续伤害大";
             if (heal > 0)
             {
                 if (script == "SkillCastingAidAreaHeal")
-                    return "持续治疗";
+                    return "持续治疗大";
                 if (script != "SkillAreaHeal")
                     return null;
-                return type == "单疗" ? "单体治疗" : "范围治疗";
+                return type == "单疗" ? "单体治疗大" : "范围治疗大";
             }
             if (script == "SkillAreaBuff")
                 return type == "群增" ? "群体友方增益" : "单体友方增益";
             if (dmg > 0)
             {
                 if (script.StartsWith("SkillAreaDamage", StringComparison.Ordinal))
-                    return a.TargetType.Contains("self") ? "群体伤害自身中心" : "群体伤害近距离";
+                    return a.TargetType.Contains("self") ? "群体伤害自身中心大" : "群体伤害近距离大";
                 if (script == "SkillShockWave")
-                    return "冲击波伤害";
+                    return "冲击波伤害大";
                 if (script == "SkillSingleDamage")
                     return DamageSize(dmg);
             }
@@ -196,14 +216,14 @@ namespace SkillBaseTool
                 if (!TokenFamily.TryGetValue(tok, out family))
                     continue;
                 float? hand = null;
-                var fk = FamilyKey[family];
-                if (!string.IsNullOrEmpty(fk.Key))
+                string numKey;
+                if (FamilyKey.TryGetValue(family, out numKey) && !string.IsNullOrEmpty(numKey))
                 {
-                    var m = Regex.Match(sb, Regex.Escape(fk.Key) + @":(-?\d+\.?\d*)");
+                    var m = Regex.Match(sb, Regex.Escape(numKey) + @":(-?\d+\.?\d*)");
                     if (!m.Success)
-                        m = Regex.Match(a.Strength2, Regex.Escape(fk.Key) + @":(-?\d+\.?\d*)");
+                        m = Regex.Match(a.Strength2, Regex.Escape(numKey) + @":(-?\d+\.?\d*)");
                     if (m.Success)
-                        hand = CfgUtil.ParseFloat(m.Groups[1].Value) * (fk.Value == 100 ? 100f : 1f);
+                        hand = CfgUtil.ParseFloat(m.Groups[1].Value);
                 }
                 string tier = PickTier(store, family, hand);
                 if (tier != null && !result.Contains(tier))
@@ -237,6 +257,14 @@ namespace SkillBaseTool
                 result.Add("持续场移动");
             if ((a.Strength2.Contains("pushMin") || a.Strength2.Contains("pushMax")) && !result.Contains("位移"))
                 result.Add("位移");
+            if (a.TargetType.Contains("permanent"))
+            {
+                foreach (var kv in PermanentGrowthModules)
+                {
+                    if (Regex.IsMatch(a.Strength2, Regex.Escape(kv.Key) + @":") && !result.Contains(kv.Value))
+                        result.Add(kv.Value);
+                }
+            }
             if (a.ScriptName == "SkillTaunt")
             {
                 string tier = PickTier(store, "嘲讽", a.BuffTime);
@@ -527,12 +555,15 @@ namespace SkillBaseTool
 
             private void ApplyStrength2(string key, float v)
             {
-                // 手配优先：同名 key 已手配在任一槽位（Strength2 / StrengthBuff1）时都不覆盖
+                // 手配优先：同名 key 已手配在任一槽位（Strength2 / StrengthBuff1）时都不覆盖；
+                // 非手配时后写覆盖先写（模板默认值可被组件改写，如 jumpDecay）
                 if (string.IsNullOrEmpty(key) || handS2Keys.Contains(key) || handBuffKeys.Contains(key))
                     return;
-                if (s2.Any(x => x.StartsWith(key + ":", StringComparison.Ordinal)))
-                    return;
-                s2.Add(key + ":" + NumText(v));
+                int idx = s2.FindIndex(x => x.StartsWith(key + ":", StringComparison.Ordinal));
+                if (idx >= 0)
+                    s2[idx] = key + ":" + NumText(v);
+                else
+                    s2.Add(key + ":" + NumText(v));
                 s2Changed = true;
             }
 
@@ -540,9 +571,11 @@ namespace SkillBaseTool
             {
                 if (string.IsNullOrEmpty(key) || handS2Keys.Contains(key) || handBuffKeys.Contains(key))
                     return;
-                if (s2.Any(x => x.StartsWith(key + ":", StringComparison.Ordinal)))
-                    return;
-                s2.Add(key + ":" + text);
+                int idx = s2.FindIndex(x => x.StartsWith(key + ":", StringComparison.Ordinal));
+                if (idx >= 0)
+                    s2[idx] = key + ":" + text;
+                else
+                    s2.Add(key + ":" + text);
                 s2Changed = true;
             }
 
