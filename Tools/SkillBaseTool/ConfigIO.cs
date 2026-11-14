@@ -77,7 +77,7 @@ namespace SkillBaseTool
             foreach (var kv in ParseRows(ReadText(store.TemplatePath, out _), "SkillTemplateConfig"))
             {
                 var a = kv.Value;
-                if (a.Length < 11)
+                if (a.Length < 12)
                     continue;
                 var t = new TemplateRow
                 {
@@ -90,8 +90,9 @@ namespace SkillBaseTool
                     Score = CfgUtil.ParseFloat(a[6]),
                     Range = CfgUtil.ParseFloat(a[7]),
                     Area = CfgUtil.ParseFloat(a[8]),
-                    MpCost = CfgUtil.ParseInt(a[9]),
-                    CD = CfgUtil.ParseFloat(a[10]),
+                    TargetCount = CfgUtil.ParseInt(a[9]),
+                    MpCost = CfgUtil.ParseInt(a[10]),
+                    CD = CfgUtil.ParseFloat(a[11]),
                 };
                 store.Templates.Add(t);
                 store.TemplateByName[t.Name] = t;

@@ -15,6 +15,7 @@ using UnityEngine;
 /// · selfAlways         = 施法者必定获得（李典·御阵 / 周仓）
 /// · noDedupe           = 不按首段 Buff 去重（甄宓 / 袁绍 / 周仓 / 李严 / 张梁 / 大乔）
 /// · wholeMap           = 全图选人（李严·护军；Area 只作为嘲讽半径）
+/// · targetCenter       = 以选中的首个友军目标为中心，再在 Area 内扩散给周围友军（缺省以自身为中心）
 /// · tauntAroundTarget  = 给目标挂完 Buff 后，嘲讽其周围 Area 内敌人（李严·护军）
 /// · splitByRange       = 按近战/远程分开发放：近战取 BuffId 第 1 段、远程取第 2 段（司马炎·一统 "甲,攻"）
 /// </summary>
@@ -41,8 +42,20 @@ public class SkillAreaBuff : Skill
         var splitByRange = HasSkillFlag("splitByRange");
         var searchRange = HasSkillFlag("wholeMap") ? 0f : skillCfg.Area;
 
+        // 中心点：缺省以施法者自身为中心；targetCenter 先选中首个友军目标，再以其位置为中心扩散
+        var center = owner.transform.position;
+        if (HasSkillFlag("targetCenter"))
+        {
+            var primary = SelectTargets(owner.transform.position, skillCfg.Range, true, 1,
+                selfAlways ? owner : null,
+                noDedupe ? (Func<Chess, bool>)null : x => !x.HasBuff(buffIds[0]));
+            if (primary.Count == 0)
+                return false;
+            center = primary[0].transform.position;
+        }
+
         // 选人：SelectOnly 硬过滤 + SelectFirst 优先级；去重（非 noDedupe）在截断目标数前生效
-        var units = SelectTargets(owner.transform.position, searchRange, true, skillCfg.TargetCount,
+        var units = SelectTargets(center, searchRange, true, skillCfg.TargetCount,
             selfAlways ? owner : null,
             noDedupe ? (Func<Chess, bool>)null : x => !x.HasBuff(buffIds[0]));
 
@@ -54,7 +67,7 @@ public class SkillAreaBuff : Skill
 
         owner.PlayerAnim(skillCfg.Action);
         PlaySelfEffect();
-        PlayAreaEffect(owner.transform.position);
+        PlayAreaEffect(center);
 
         foreach (var unit in units)
         {

@@ -31,11 +31,14 @@ public class SkillTaunt : Skill
 
         owner.PlayerAnim(skillCfg.Action);
 
-        // 自身 Buff（如减伤盾"硬"）
+        // 自身 Buff（如减伤盾"硬"）；嘲讽由 TauntEnemies 单独挂给敌方单位，
+        // BuffId 中若混入嘲讽（模板组件「嘲讽大」会并入）必须跳过，否则会把自己设为索敌目标
         if (HasSkillFlag("selfBuff"))
         {
             foreach (var buffId in GetSkillBuffIds())
             {
+                if (buffId == CombatConst.TauntBuffId)
+                    continue;
                 BuffManager.AddBuff(owner, owner, id, buffId, skillCfg.BuffTime);
                 var shield = owner.GetBuff(buffId) as BuffShield;
                 if (shield != null)

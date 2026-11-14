@@ -22,6 +22,7 @@ namespace SkillBaseTool
         public bool MainValueDiff;
         public bool RhythmDiff;
         public bool BuffDiff;
+        public bool SelectDiff;
         public bool HasDiff { get { return Diffs.Count > 0; } }
     }
 
@@ -38,10 +39,10 @@ namespace SkillBaseTool
     {
         public static readonly string[] DamageTemplates =
         {
-            "单体伤害大", "单体伤害中", "单体伤害小", "群体伤害近距离", "群体伤害自身中心", "跳跃弹射"
+            "单体伤害大", "单体伤害中", "单体伤害小", "群体伤害近距离", "群体伤害自身中心", "跳跃弹射-伤害", "冲击波伤害"
         };
 
-        public static readonly string[] HealTemplates = { "单体治疗", "范围治疗" };
+        public static readonly string[] HealTemplates = { "单体治疗", "范围治疗", "跳跃弹射-治疗" };
 
         /// <summary>Buff 短名 → 组件族。</summary>
         private static readonly Dictionary<string, string> TokenFamily = new Dictionary<string, string>
@@ -122,12 +123,12 @@ namespace SkillBaseTool
             float heal = a.HealStrength;
 
             if (script == "SkillAura")
-                return "光环";
+                return "光环小";
             if (script == "SkillSoldierGrow" || script == "SkillSoldierArcherBuff" || script == "SkillSoldierBless" || script == "SkillSoldierFortify")
                 return "兵种增益";
             if (script == "SkillJumpChain")
-                return "跳跃弹射";
-            if (script == "SkillSelfBuff" || script == "SkillAttackedShield" || script == "SkillDefFeedback")
+                return (heal > 0 || a.TargetType.Contains("heal")) ? "跳跃弹射-治疗" : "跳跃弹射-伤害";
+            if (script == "SkillSelfBuff" || script == "SkillAttackedShield")
                 return "自身强化";
             if (heal > 0)
             {
@@ -147,7 +148,9 @@ namespace SkillBaseTool
             {
                 if (script.StartsWith("SkillAreaDamage", StringComparison.Ordinal))
                     return a.TargetType.Contains("self") ? "群体伤害自身中心" : "群体伤害近距离";
-                if (script == "SkillShockWave" || script == "SkillAidChargeImpale" || script == "SkillTaunt")
+                if (script == "SkillShockWave")
+                    return "冲击波伤害";
+                if (script == "SkillAidChargeImpale" || script == "SkillTaunt")
                     return "群体伤害近距离";
                 if (script == "SkillSingleDamage" || script == "SkillAidAddBuff" || script == "SkillAidExplode")
                     return dmg >= 90 ? "单体伤害大" : (dmg >= 60 ? "单体伤害中" : "单体伤害小");
@@ -191,7 +194,7 @@ namespace SkillBaseTool
                 if (a.TargetType.Contains(kv.Key) && !result.Contains(kv.Value))
                     result.Add(kv.Value);
 
-            if (a.ScriptName == "SkillDefFeedback" && !result.Contains("伤害反射"))
+            if (a.ScriptName == "SkillSelfBuff" && a.BuffId.Contains("反") && !result.Contains("伤害反射"))
                 result.Add("伤害反射");
             if (a.ScriptName == "SkillTaunt")
             {
@@ -277,15 +280,7 @@ namespace SkillBaseTool
             var writer = new BaseWriter(skill.Args);
             int lv = Math.Max(1, skill.Lv);
 
-            // 模板主数值：按 Effect 的 k-v 写入列；跳跃弹射且原为治疗时改写到 HealStrength（沿用旧规则）
-            bool jumpHeal = tpl.Name == "跳跃弹射" && skill.HealStrength > 0;
             var tplBindings = ParseEffect(tpl.Effect);
-            if (jumpHeal)
-            {
-                foreach (var b in tplBindings)
-                    if (b.Column == "DamageStrength")
-                        b.Column = "HealStrength";
-            }
             writer.Apply(tplBindings, lv, "模板:" + tpl.Name);
             // 主数值互斥：伤害模板清治疗，治疗模板清伤害
             if (tplBindings.Any(x => x.Column == "DamageStrength"))
@@ -298,6 +293,8 @@ namespace SkillBaseTool
                 writer.B[Col.Range] = CfgUtil.NumF(tpl.Range);
             if (tpl.Area > 0)
                 writer.B[Col.Area] = CfgUtil.NumF(tpl.Area);
+            if (tpl.TargetCount > 0)
+                writer.B[Col.TargetCount] = CfgUtil.NumI(tpl.TargetCount);
             writer.B[Col.CD] = CfgUtil.NumF(tpl.CD);
             writer.B[Col.MpCost] = CfgUtil.NumI(tpl.MpCost * 10);
 
@@ -397,7 +394,7 @@ namespace SkillBaseTool
             Col.SummonTag, Col.SummonCount, Col.SummonTime, Col.SummonHitInterval, Col.SummonSpeed,
         };
 
-        /// <summary>展开写入器：把模板/组件的 k-v 绑定落到 43 列与各字符串槽位。</summary>
+        /// <summary>展开写入器：把模板/组件的 k-v 绑定落到 42 列与各字符串槽位。</summary>
         private sealed class BaseWriter
         {
             public readonly string[] B;
@@ -633,6 +630,7 @@ namespace SkillBaseTool
                     if (c == Col.DamageStrength || c == Col.HealStrength) item.MainValueDiff = true;
                     if (c == Col.CD || c == Col.MpCost) item.RhythmDiff = true;
                     if (c == Col.BuffId || c == Col.StrengthBuff1 || c == Col.BuffTime) item.BuffDiff = true;
+                    if (c == Col.SelectOnly || c == Col.SelectFirst) item.SelectDiff = true;
                 }
                 list.Add(item);
             }
@@ -659,7 +657,6 @@ namespace SkillBaseTool
                 case Col.TargetType: return "行为标记";
                 case Col.SelectOnly: return "目标硬过滤";
                 case Col.SelectFirst: return "目标优先级";
-                case Col.AuroAttrs: return "光环效果";
                 case Col.StartMpRate: return "开局MP";
                 case Col.DamageType: return "伤害类型";
                 case Col.HurtTag: return "伤害标签";
@@ -801,8 +798,6 @@ namespace SkillBaseTool
         private static string PrimaryText(TemplateRow tpl, int lv, SkillRow skill)
         {
             float v = PrimaryValue(tpl.Effect, lv);
-            if (IsDamageTemplate(tpl.Name) && tpl.Name == "跳跃弹射" && skill != null && skill.HealStrength > 0)
-                return "治疗 " + v.ToString("0.###");
             if (IsDamageTemplate(tpl.Name))
                 return "伤害 " + v.ToString("0.###");
             if (IsHealTemplate(tpl.Name))

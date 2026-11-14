@@ -6,12 +6,10 @@ using UnityEngine;
 /// 兵种连锁（金铲铲式职业羁绊）：战斗开始时统计本侧同职业英雄数量，
 /// 按 SkillConfig 职业技能行（Sname=JobConfig.NameS）触发羁绊效果。档位：上阵 1/2/3/4/5 人对应职业技能 Lv1~5 行。
 /// 效果分两类：
-/// 1. 属性加成（不走技能系统）：按 LinkSelf/LinkTeam/AuroAttrs 施加被动属性
+/// 1. 属性加成（不走技能系统）：按 LinkSelf/LinkTeam 施加被动属性
 ///    - LinkSelf：连接英雄（该职业每个英雄自身）获得的属性；其中 soldierAtk/soldierHp 例外，按乘法系数施加给本侧全部士兵
 ///      （多职业组系数先累加、每侧结算前复位一次，最后统一按初始基准乘一次，避免多次施加累乘）
 ///    - LinkTeam：我方其他英雄（除该职业英雄外的全体英雄）获得的总量，配置即该档位总量，不再乘人数
-///    - AuroAttrs：光环技能效果（ApplyJobLinks 后由 ApplyAuroAttrs 阶段单独结算），遍历每个英雄携带的光环技能，
-///      各自对本侧全体英雄（含提供者）生效，效果值受光环来源英雄 auroEffectRate 修正
 /// 2. 脚本技能效果：职业技能行 ScriptName 挂真实技能脚本，运行时 SetJobSkillLevel 切到当前档位行，
 ///    通过技能事件生效（如 枪·眩晕/戟·AOE溅射/炮·AOE范围走 HitBuff 系技能；扇·负面buff延长/琴·正面buff延长走 ModifyBuffTime 的 OnAddBuff 事件）
 /// 数值统一由 SkillConfig 表配置，本类不再硬编码。
@@ -35,8 +33,6 @@ public static class JobLinkManager
             if (!handledSides.Add(player.battleSide))
                 continue;
             ApplyJobLinks(player.battleSide);
-            // 光环技能效果：独立于职业属性加成，按每个英雄携带的光环技能对本侧全体英雄生效
-            ApplyAuroAttrs(player.battleSide);
         }
     }
 
@@ -115,40 +111,6 @@ public static class JobLinkManager
             unit.maxHp = targetMaxHp;
             unit.atk = (int)(unit.atk * unit.soldierAtkRate);
             unit.soldierAtkRate = 1f;
-        }
-    }
-
-    // 结算光环技能效果（AuroAttrs）：遍历本侧每个英雄携带的光环技能，各自对本侧全体英雄生效（含提供者）。
-    // 效果值按光环来源英雄自身的 auroEffectRate 修正（鼓·战鼓 LinkSelf 提升该值），
-    // 因此在 ApplyJobLinks 之后调用，保证先完成 LinkSelf 属性加成再取值。
-    private static void ApplyAuroAttrs(int side)
-    {
-        var allMySideUnits = WorldManager.Instance.GetUnitsMySide(side);
-        if (allMySideUnits.Count == 0)
-            return;
-
-        foreach (var provider in allMySideUnits)
-        {
-            if (!provider.isHero || provider.hp <= 0)
-                continue;
-            foreach (var skill in provider.skills)
-            {
-                var cfg = skill != null ? skill.skillCfg : null;
-                if (cfg == null || string.IsNullOrEmpty(cfg.AuroAttrs))
-                    continue;
-                var auraBonuses = ParseBonuses(cfg.AuroAttrs);
-                if (auraBonuses.Count == 0)
-                    continue;
-
-                foreach (var unit in allMySideUnits)
-                {
-                    if (!unit.isHero)
-                        continue;
-                    // 光环数值吃法强（法强按百分比）：配置值 × (100 + 法强) / 100，再乘 auroEffectRate（鼓加成，对自身与队友同样生效）
-                    foreach (var bonus in auraBonuses)
-                        ApplyAttr(unit, bonus.Attr, bonus.Value * (100f + provider.ap) / 100f * provider.auroEffectRate);
-                }
-            }
         }
     }
 
@@ -280,7 +242,7 @@ public static class JobLinkManager
                 unit.healedRate += value;
                 break;
             case "auroEffectRate":
-                // 鼓·光环技能效果：修正 AuroAttrs 光环属性的效果值
+                // 鼓·光环效果系数（历史字段）：新光环改为每 3 秒挂 Buff，Buff 数值直接读配置，此系数已不参与结算
                 unit.auroEffectRate += value;
                 break;
             case "soldierAtk":

@@ -22,7 +22,7 @@ SHOW_FIELDS = ['Id', 'Name', 'Sname', 'Type', 'Lv', 'Rate', 'CD', 'MpCost', 'Sta
                'TriggerCondition', 'DamageType', 'HurtTag', 'Range', 'Area', 'TargetType',
                'TargetCount', 'DamageStrength', 'HealStrength', 'Strength2', 'StrengthBuff1',
                'BuffId', 'BuffTime', 'SummonTag', 'SummonCount', 'SummonTime', 'ItemId',
-               'ScriptName', 'SelfEffect', 'HitEffect', 'AreaEffect', 'LinkSelf', 'LinkTeam', 'AuroAttrs']
+               'ScriptName', 'SelfEffect', 'HitEffect', 'AreaEffect', 'LinkSelf', 'LinkTeam']
 
 
 def read_text(path):

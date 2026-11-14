@@ -17,8 +17,8 @@ namespace SkillBaseTool
         {
             Text = "编辑技能 · " + skill.Display;
             StartPosition = FormStartPosition.CenterParent;
-            Size = new Size(1200, 760);
-            MinimumSize = new Size(980, 600);
+            Size = new Size(1500, 900);
+            MinimumSize = new Size(1200, 720);
             BackColor = Theme.Bg;
             ForeColor = Theme.Text;
             Font = Theme.Base;

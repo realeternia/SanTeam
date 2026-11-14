@@ -414,6 +414,14 @@ public class Skill
     }
 
     /// <summary>
+    /// 每逻辑帧驱动（Chess.LogicUpdate → SkillManager.Tick）：光环等需要持续计时/消耗的技能覆写。
+    /// </summary>
+    public virtual void Tick(float deltaTime)
+    {
+
+    }
+
+    /// <summary>
     /// 开局初始MP：按 SkillConfig.StartMpRate（开局MP比例，默认0）填充，mp = MpCost × StartMpRate（上限 MpCost）。
     /// 由 SkillManager.BattleBegin 在各技能 BattleBegin 之后统一调用；MpCost=0 的技能不受MP限制，无需填充。
     /// </summary>

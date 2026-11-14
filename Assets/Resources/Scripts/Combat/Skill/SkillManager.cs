@@ -72,6 +72,17 @@ public static class SkillManager
         }
     }
 
+    /// <summary>
+    /// 每逻辑帧驱动技能持续逻辑（光环计时/MP 消耗等），由 Chess.LogicUpdate 调用。
+    /// </summary>
+    public static void Tick(Chess chess, float deltaTime)
+    {
+        foreach (var skill in chess.skills)
+        {
+            skill.Tick(deltaTime);
+        }
+    }
+
     public static void AimTarget(Chess attacker, Chess defender)
     {
         foreach (var skill in attacker.skills)

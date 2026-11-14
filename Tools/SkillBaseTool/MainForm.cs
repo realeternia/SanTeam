@@ -11,6 +11,8 @@ namespace SkillBaseTool
         private Label lblStatus;
         private GenerateView generateView;
         private CompareView compareView;
+        private TreemapView templateView;
+        private TreemapView componentView;
 
         public MainForm()
         {
@@ -68,12 +70,18 @@ namespace SkillBaseTool
             var tabs = new TabControl { Dock = DockStyle.Fill, Font = Theme.Bold };
             generateView = new GenerateView(Reload) { Dock = DockStyle.Fill };
             compareView = new CompareView() { Dock = DockStyle.Fill };
+            templateView = new TreemapView(TreemapView.Mode.Template) { Dock = DockStyle.Fill };
+            componentView = new TreemapView(TreemapView.Mode.Component) { Dock = DockStyle.Fill };
 
             var pageGen = new TabPage("① 模板化 / 生成 SkillBase") { BackColor = Theme.Bg };
             var pageCompare = new TabPage("② 技能 vs 模板 对比") { BackColor = Theme.Bg };
+            var pageTemplate = new TabPage("③ 模板视角") { BackColor = Theme.Bg };
+            var pageComponent = new TabPage("④ 组件视角") { BackColor = Theme.Bg };
             pageGen.Controls.Add(generateView);
             pageCompare.Controls.Add(compareView);
-            tabs.TabPages.AddRange(new[] { pageGen, pageCompare });
+            pageTemplate.Controls.Add(templateView);
+            pageComponent.Controls.Add(componentView);
+            tabs.TabPages.AddRange(new[] { pageGen, pageCompare, pageTemplate, pageComponent });
             tabs.SelectedIndexChanged += (s, e) =>
             {
                 if (tabs.SelectedIndex == 1)
@@ -109,6 +117,8 @@ namespace SkillBaseTool
                 lblPath.Text = "工程：" + root;
                 generateView.Bind(store);
                 compareView.Bind(store);
+                templateView.Bind(store);
+                componentView.Bind(store);
                 lblStatus.Text = string.Format("已加载 技能 {0} 行 / 模板 {1} 条 / 组件 {2} 条 / SkillBase {3} 行 / 英雄品质 {4} 条",
                     store.Skills.Count, store.Templates.Count, store.Components.Count, store.BaseRows.Count, store.HeroQuality.Count);
             }

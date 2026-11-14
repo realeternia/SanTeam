@@ -142,7 +142,7 @@ public static class ConfigManager
                 continue;
             }
 
-            // 只覆盖模板/组件能改写的效果列；身份列与表现列（ScriptName/Action/特效/Icon/Link/AuroAttrs/
+            // 只覆盖模板/组件能改写的效果列；身份列与表现列（ScriptName/Action/特效/Icon/Link/
             // DamageType/HurtTag/StartMpRate/ItemId）一律以 SkillConfig 为准，避免 SkillBase 生成后
             // 表现层改动被旧值回写吞掉
             var baseCfg = SkillBaseConfig.GetConfig(skillCfg.Id);
@@ -572,7 +572,6 @@ public static class ConfigManager
             case "buffid": return cfg.BuffId ?? "";
             case "summontag": return cfg.SummonTag ?? "";
             case "summoncount": return cfg.SummonCount.ToString();
-            case "auroattrs": return cfg.AuroAttrs ?? "";
             case "linkself": return cfg.LinkSelf ?? "";
             case "linkteam": return cfg.LinkTeam ?? "";
             default:
@@ -581,9 +580,7 @@ public static class ConfigManager
                     return SlotText(cfg.Strength2, fieldName.Substring("strength2-".Length), pct);
                 if (fieldName.StartsWith("strengthbuff1-", StringComparison.OrdinalIgnoreCase))
                     return SlotText(cfg.StrengthBuff1, fieldName.Substring("strengthbuff1-".Length), pct);
-                // 子字段引用：/字段-属性名（如 /auroattrs-atk、/linkself-armor、/linkteam-mpRegen）展开为其中单个具体属性数值
-                if (fieldName.StartsWith("auroattrs-", StringComparison.OrdinalIgnoreCase))
-                    return GetAttrFieldValue(cfg.AuroAttrs, fieldName.Substring("auroattrs-".Length), pct);
+                // 子字段引用：/字段-属性名（如 /linkself-armor、/linkteam-mpRegen）展开为其中单个具体属性数值
                 if (fieldName.StartsWith("linkself-", StringComparison.OrdinalIgnoreCase))
                     return GetAttrFieldValue(cfg.LinkSelf, fieldName.Substring("linkself-".Length), pct);
                 if (fieldName.StartsWith("linkteam-", StringComparison.OrdinalIgnoreCase))

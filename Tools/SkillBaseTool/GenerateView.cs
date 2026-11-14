@@ -16,6 +16,8 @@ namespace SkillBaseTool
         /// <summary>行号 → 技能（Lv1 行），供编辑按钮回查。</summary>
         private readonly List<SkillRow> rowSkills = new List<SkillRow>();
         private int editColumn = -1;
+        private int templateColumn = -1;
+        private int moduleColumn = -1;
 
         public GenerateView(Action reload)
         {
@@ -63,7 +65,9 @@ namespace SkillBaseTool
             grid.Columns.Add(MakeColumn("类型", 55));
             grid.Columns.Add(MakeColumn("脚本", 165));
             grid.Columns.Add(MakeColumn("模板", 110));
+            templateColumn = grid.Columns.Count - 1;
             grid.Columns.Add(MakeColumn("组件", 240));
+            moduleColumn = grid.Columns.Count - 1;
             grid.Columns.Add(MakeColumn("状态", 90));
 
             var btnCol = new DataGridViewButtonColumn
@@ -93,6 +97,8 @@ namespace SkillBaseTool
                     return;
                 EditSkill(rowSkills[e.RowIndex]);
             };
+            // 模板 / 组件列：单元格内多色文本（名字=品质色，费用=金黄色）
+            grid.CellPainting += OnCellPainting;
 
             Controls.Add(grid);
             Controls.Add(top);
@@ -123,6 +129,69 @@ namespace SkillBaseTool
                 SortMode = DataGridViewColumnSortMode.NotSortable,
                 DefaultCellStyle = { Alignment = DataGridViewContentAlignment.MiddleLeft },
             };
+        }
+
+        /// <summary>模板 / 组件列的富文本绘制：名字按品质染色，括号内费用金黄色。</summary>
+        private void OnCellPainting(object sender, DataGridViewCellPaintingEventArgs e)
+        {
+            if (e.RowIndex < 0 || e.RowIndex >= rowSkills.Count)
+                return;
+            if (e.ColumnIndex != templateColumn && e.ColumnIndex != moduleColumn)
+                return;
+
+            e.PaintBackground(e.ClipBounds, true);
+            var skill = rowSkills[e.RowIndex];
+            var segments = e.ColumnIndex == templateColumn
+                ? TemplateSegments(skill.TemplateName)
+                : ModuleSegments(skill.Modules);
+            var rect = new Rectangle(e.CellBounds.X + 4, e.CellBounds.Y,
+                Math.Max(0, e.CellBounds.Width - 8), e.CellBounds.Height);
+            Theme.DrawSegments(e.Graphics, rect, segments, Theme.Base);
+            e.Handled = true;
+        }
+
+        private List<Theme.TextSegment> TemplateSegments(string name)
+        {
+            var segments = new List<Theme.TextSegment>();
+            if (string.IsNullOrEmpty(name))
+                return segments;
+            TemplateRow tpl;
+            if (!store.TemplateByName.TryGetValue(name, out tpl))
+            {
+                segments.Add(new Theme.TextSegment(name + "（缺失）", Theme.Danger));
+                return segments;
+            }
+            segments.Add(new Theme.TextSegment(name, Theme.QualityColor(tpl.Quality)));
+            segments.Add(new Theme.TextSegment("（" + PriceText(tpl.Score) + "）", Theme.Accent));
+            return segments;
+        }
+
+        private List<Theme.TextSegment> ModuleSegments(string[] modules)
+        {
+            var segments = new List<Theme.TextSegment>();
+            if (modules == null)
+                return segments;
+            foreach (string name in modules)
+            {
+                if (string.IsNullOrEmpty(name))
+                    continue;
+                if (segments.Count > 0)
+                    segments.Add(new Theme.TextSegment("、", Theme.Faint));
+                ComponentRow comp;
+                if (!store.ComponentByName.TryGetValue(name, out comp))
+                {
+                    segments.Add(new Theme.TextSegment(name + "（缺失）", Theme.Danger));
+                    continue;
+                }
+                segments.Add(new Theme.TextSegment(name, Theme.QualityColor(comp.Quality)));
+                segments.Add(new Theme.TextSegment("（" + PriceText(comp.Score) + "）", Theme.Accent));
+            }
+            return segments;
+        }
+
+        private static string PriceText(double score)
+        {
+            return (score >= 0 ? "+" : "") + score.ToString("0.##");
         }
 
         public void Bind(DataStore data)

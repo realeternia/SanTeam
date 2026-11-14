@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Reflection;
@@ -54,6 +55,40 @@ namespace SkillBaseTool
         public static readonly Font Title = new Font("Microsoft YaHei UI", 11f, FontStyle.Bold);
         public static readonly Font TitleBig = new Font("Microsoft YaHei UI", 13f, FontStyle.Bold);
         public static readonly Font Num = new Font("Microsoft YaHei UI", 16f, FontStyle.Bold);
+
+        /// <summary>富文本片段：一段同色文字。</summary>
+        public struct TextSegment
+        {
+            public string Text;
+            public Color Color;
+
+            public TextSegment(string text, Color color)
+            {
+                Text = text;
+                Color = color;
+            }
+        }
+
+        /// <summary>单行按片段依次绘制多色文本（单元格富文本）；超出右边界截断并显示省略号。</summary>
+        public static void DrawSegments(Graphics g, Rectangle rect, IList<TextSegment> segments, Font font)
+        {
+            if (g == null || segments == null || rect.Width <= 0 || rect.Height <= 0)
+                return;
+            const TextFormatFlags flags = TextFormatFlags.Left | TextFormatFlags.VerticalCenter
+                | TextFormatFlags.SingleLine | TextFormatFlags.NoPadding;
+            int x = rect.X;
+            foreach (var seg in segments)
+            {
+                if (string.IsNullOrEmpty(seg.Text) || x >= rect.Right)
+                    break;
+                int remain = rect.Right - x;
+                Size size = TextRenderer.MeasureText(g, seg.Text, font, new Size(int.MaxValue, rect.Height), flags);
+                var target = new Rectangle(x, rect.Y, Math.Min(size.Width, remain), rect.Height);
+                TextRenderer.DrawText(g, seg.Text, font, target, seg.Color,
+                    size.Width > remain ? flags | TextFormatFlags.EndEllipsis : flags);
+                x += size.Width;
+            }
+        }
 
         public static GraphicsPath RoundRect(Rectangle rect, int radius)
         {

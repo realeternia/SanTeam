@@ -6,7 +6,7 @@ using System.Text.RegularExpressions;
 
 namespace SkillBaseTool
 {
-    /// <summary>SkillConfig / SkillBaseConfig 的 43 列索引。</summary>
+    /// <summary>SkillConfig / SkillBaseConfig 的 42 列索引。</summary>
     public static class Col
     {
         public const int Id = 0;
@@ -51,8 +51,7 @@ namespace SkillBaseTool
         public const int Icon = 39;
         public const int LinkSelf = 40;
         public const int LinkTeam = 41;
-        public const int AuroAttrs = 42;
-        public const int Count = 43;
+        public const int Count = 42;
     }
 
     /// <summary>配置行字符串工具：解析/格式化 C# 源码里的构造参数。</summary>
@@ -139,7 +138,7 @@ namespace SkillBaseTool
         }
     }
 
-    /// <summary>SkillConfig_s.cs 的一行（保留 43 列原始参数以便写回）。</summary>
+    /// <summary>SkillConfig_s.cs 的一行（保留 42 列原始参数以便写回）。</summary>
     public sealed class SkillRow
     {
         public int Id;
@@ -203,6 +202,8 @@ namespace SkillBaseTool
         public float Score;
         public float Range;
         public float Area;
+        /// <summary>标准态目标数（群体默认3，单体1）；生成 SkillBase 时写入 TargetCount 列。</summary>
+        public int TargetCount;
         public int MpCost;
         public float CD;
     }
@@ -251,7 +252,7 @@ namespace SkillBaseTool
         /// <summary>BuffConfig 里已存在的 Buff 短名（校验 Effect 用）。</summary>
         public HashSet<string> BuffTokens = new HashSet<string>();
 
-        /// <summary>当前 SkillBaseConfig_s.cs 里已有的行（Id → 43 列参数）。</summary>
+        /// <summary>当前 SkillBaseConfig_s.cs 里已有的行（Id → 42 列参数）。</summary>
         public Dictionary<int, string[]> BaseRows = new Dictionary<int, string[]>();
 
         public int GetQuality(string sname)

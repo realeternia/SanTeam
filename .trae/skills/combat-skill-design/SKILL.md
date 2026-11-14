@@ -72,6 +72,7 @@ description: 《三国卡牌》(金铲铲式) SkillConfig 表的配置方法与�
 | --- | --- | --- |
 | `SkillAreaBuff`（群增） | `selfAlways` | 施法者必定获得（其余成员按 `TargetCount` 选） |
 | | `noDedupe` / `wholeMap` | 不按首段 Buff 去重 / 全图选人（`Area` 仅作嘲讽半径） |
+| | `targetCenter` | 以选中的首个友军目标为中心，再在 `Area` 内扩散；缺省为自身中心 |
 | | `splitByRange` / `tauntAroundTarget` | 近战取第 1 段、远程取第 2 段 Buff / 挂完 Buff 嘲讽 `Area` 内敌人 |
 | `SkillAreaDamageDeBuff`（群伤） | `self` / `missile` / `maxHpBonus` / `mpBurn` | 自身中心（不做射程校验）/ 走导弹 / 附加最大生命伤害 / 燃烧 `Strength2[mpBurn]` 蓝量 |
 | `SkillAreaHeal`（群疗） | `overflowToArmor` | 溢出治疗转护甲 |
@@ -158,9 +159,8 @@ description: 《三国卡牌》(金铲铲式) SkillConfig 表的配置方法与�
 | --- | --- | --- |
 | `LinkSelf` | string | 只给**连接英雄本人**的加成串（`atk+0.2,armor+0.3` 或 `mpRegen+5`，mpRegen 为百分比） |
 | `LinkTeam` | string | 给我方其他英雄（不含本人）的加成，**配置即总量，不乘人数** |
-| `AuroAttrs` | string | 光环技能的持续光环属性串，由光环脚本按帧/秒施加 |
 
-- 子字段可被描述引用：`/linkself-atk`、`/linkteam-mpRegen`、`/auroattrs-atk`。
+- 子字段可被描述引用：`/linkself-atk`、`/linkteam-mpRegen`。
 - 连锁数值改动只改配置，禁止写进 `JobLinkManager` 等代码；机制档位常量放 `CombatConst`。
 
 ### 2.10 技能模板 / 组件（Template / Modules）
@@ -176,41 +176,42 @@ description: 《三国卡牌》(金铲铲式) SkillConfig 表的配置方法与�
 | 伤害档位 / 治疗量 / 护盾量等主数值 | **模板 `Values`** | 模板 `Values` 就是 Lv1~5 主数值，**不要再建“伤害档位/治疗量”组件** |
 | 伤害倍率（按属性成长） | 组件 | 与固定基值分列，避免重复计价 |
 | 控制/减益（减速、减防、减攻、减疗、增伤、眩晕、定身、混乱） | **组件** | 只管效果本身，**不写作用范围**；单控 = 单体伤害模板 + 眩晕/定身/混乱，群控 = 群体模板 + 同批控制组件，**不建“单体控制”模板** |
-| 属性增益（加攻/加护甲/加法强/加魔抗/加攻速/加移速） | **组件** | 每条属性一个组件，可挂 `光环`、`自身强化`、`单体治疗`、`范围治疗`；`光环` 只是模板，不建“光环”组件 |
-| 施法射程 / 施放中心（目标中心、自身中心） | **模板**（或模板 `Range`） | 施放中心是形态，按“目标中心 AOE / 自身中心 AOE”分模板；射程写模板 `Range` |
-| AoE 半径 | **模板 `Area`（默认小范围=20）** | 默认小范围已含在模板里，不建“小范围”组件；扩大范围用 `中范围`(30) / `大范围`(40) 组件 |
+| 属性增益（加攻/加护甲/加法强/加魔抗/加攻速/加移速） | **组件** | 每条属性一个组件，可挂 `光环小`、`自身强化`、`单体治疗`、`范围治疗`；`光环` 只是模板（只保留最小半径档），不建“光环”组件 |
+| 施法射程 / 施放中心（目标中心、自身中心） | **模板 `Range` 默认 40** | 施放中心是形态，按“目标中心 AOE / 自身中心 AOE”分模板；需要更远/更近时用 `射程小`(60) / `射程大`(90) 组件**替换**模板默认射程 |
+| AoE 半径 | **模板 `Area`（默认小范围=20）** | **模板只保留最小半径档**（光环小=25、群体友方增益-自身小/目标小=25）；扩大范围一律用 `中范围`(30) / `大范围`(40) 组件叠加，不再新建“中/大范围”模板 |
 | 连击、目标筛选、特殊机制 | 组件 | — |
 | 持续伤害（毒/败 DOT） | **buff 组件** | 走伤害类 buff（`StrengthBuff1=dot:N`），不建“持续伤害”组件 |
-| 持续施法、持续区域、召唤技能场（引导/落点区域/召唤投放） | 特化类，默认不建模板也不建组件；**已模板化的召唤类（品质1/2）例外**：用 `召唤技能场`/`召唤治疗场` 模板承载 `SummonTime`/`SummonHitInterval`，召唤物标签、范围、单次伤害/治疗仍由技能行配置 | 依赖专用脚本形态；召唤参数放模板比放组件更好维护 |
-| 跳跃弹射（多目标间跳跃结算、每跳递减） | **模板** | 是形态而非插件，不建“弹射”组件 |
+| 持续施法、持续区域、落点持续场（引导/落点区域/召唤投放） | 特化类，默认不建模板也不建组件；**已模板化的持续场例外**：用 `持续伤害`/`持续治疗` 模板承载 `SummonTime`/`SummonHitInterval`，召唤物标签、范围、单次伤害/治疗仍由技能行配置 | 依赖专用脚本形态；持续参数放模板比放组件更好维护 |
+| 跳跃弹射（多目标间跳跃结算、每跳递减） | **模板（伤害/治疗分开）** | 是形态而非插件，不建“弹射”组件；输出端用 `跳跃弹射-伤害`，治疗端用 `跳跃弹射-治疗` |
+| 冲击波（导弹沿路径命中多名敌人） | **模板** | 固定形态，用 `冲击波伤害`；击退/减速等用组件或技能行 `Strength2`/`BuffId` 叠加 |
 | MP消耗、CD、概率、触发条件 | 组件（施放节奏） | 作为频率修正项，不与单次效果成本混为一项 |
 
-**模板集合保持最小（当前 15 条）**：单体伤害大 / 单体伤害中 / 单体伤害小 / 群体伤害近距离（目标中心 AOE）/ 群体伤害自身中心（自身中心 AOE）/ 单体治疗 / 范围治疗 / 自身强化 / 光环 / 单体友方增益 / 群体友方增益 / 兵种增益 / 跳跃弹射 / 召唤技能场（落点持续伤害场）/ 召唤治疗场（落点持续治疗场）。变体一律靠组件叠加，新增模板前先确认“不能由现有模板 + 组件表达”。
+**模板集合保持最小（当前 20 条）**：伤害段——单体伤害大 / 单体伤害中 / 单体伤害小 / 群体伤害近距离（目标中心 AOE）/ 群体伤害自身中心（自身中心 AOE）/ 跳跃弹射-伤害 / 冲击波伤害 / 持续伤害（落点持续伤害场）；治疗段——单体治疗 / 范围治疗 / 跳跃弹射-治疗 / 持续治疗（落点持续治疗场）；强化增益段——自身强化 / 光环小 / 单体友方增益 / 群体友方增益 / 群体友方增益-自身小 / 群体友方增益-目标小 / 全体友军增益 / 兵种增益。变体一律靠组件叠加，新增模板前先确认“不能由现有模板 + 组件表达”。
 
-**模板字段口径**：`Effect`=效果 k-v（单字段承载“写哪列 + 五级数值”）；`Quality`=品质 1~4（紧邻 `Score` 之前，配表按品质染色：1 `#666666`、2 `#33CC33`、3 `#3333FF`、4 `#FFD700`）；`Score`=标准态总分（标准态=10 分，降档按数值比例下调）；`Range`=射程（0=默认攻击距离）；`Area`=范围半径（默认小范围 20，0=非范围技能）；`MpCost`/`CD`=标准态节奏。组件同样带 `Quality`(1~4，置于 `Score` 前)，`Effect`/`Score` 为单项值，与模板分累加时注意不要对同一项重复计价。
+**模板字段口径**：`Effect`=效果 k-v（单字段承载“写哪列 + 五级数值”）；`Quality`=品质 1~4（紧邻 `Score` 之前，配表按品质染色：1 `#666666`、2 `#33CC33`、3 `#3333FF`、4 `#FFD700`）；`Score`=标准态总分（标准态=10 分，降档按数值比例下调）；`Range`=射程（默认 40，0=自身中心/全图等无施法距离形态）；`Area`=范围半径（默认小范围 20，0=非范围技能）；`TargetCount`=标准态目标数（**群体默认 3，单体/自身 = 1**，生成 SkillBase 时写入 `TargetCount` 列）；`MpCost`/`CD`=标准态节奏。组件同样带 `Quality`(1~4，置于 `Score` 前)，`Effect`/`Score` 为单项值，与模板分累加时注意不要对同一项重复计价。
 
 **Effect 单字段 k-v（模板 / 组件同构，紧邻 `Modules`/`Templates` 之后）**：一个字段同时表达“写入目标 + 五级数值 + Buff 时长”，替代原来的 `Values` + `EffectKey` + `ValueScale` + `BuffTime` 四列。
 
 - 语法：分号分隔多条绑定，单条为 `Column[:sub][=v1,v2,v3,v4,v5]`；`None`/空 = 只计分不写列。数值是**写入后的最终值**，不再有换算倍率（百分比直接写小数）。单值绑定（如 `BuffTime=4`）在 Lv2~5 沿用同一值。
 - 例：`DamageStrength=70,105,175,280,420`、`Area=30`、`SelectFirst:lowestHp`、`SelectOnly:hero`、`Buff:缓:slow=0.1,0.12,0.15,0.2,0.25;BuffTime=3`、`BuffTime=0.9,1.1,1.4,1.8,2.4;Buff:乱`、`Buff:疫;Strength2:healDown=0.3,0.35,0.4,0.5,0.6;BuffTime=4`。
-- 支持的 `Column`：`DamageStrength` / `HealStrength` / `CD` / `MpCost` / `Range` / `Area` / `TargetCount` / `Rate` / `BuffTime` / `SummonCount` / `SummonTime` / `SummonHitInterval` / `SummonSpeed` / `SummonTag:标签`（仅当技能行为空时写入，标签本身仍按技能手配）/ `SelectOnly:规则` / `SelectFirst:规则` / `TargetType:标记` / `TriggerCondition:属性<`（数值即阈值，如 `TriggerCondition:hprate<=70,50,30,20,15`）/ `Strength2:键`（`auraRate`、`selfGrow`、`shield`、`healDown`、`splashRate`、`pierceRate`、`missileRate`、`explodeRate`、`reflect`、`moveDist`、`selfHurt`、`mpBurn`、`doubleChance`、`shieldBonusRate`、`vsJob` 等）/ `Buff:短名[:槽键]`（短名取 `BuffConfig.NameS`；只写 `Buff:短名` 表示只加 buff 不给值）。
+- 支持的 `Column`：`DamageStrength` / `HealStrength` / `CD` / `MpCost` / `Range` / `Area` / `TargetCount` / `Rate` / `BuffTime` / `SummonCount` / `SummonTime` / `SummonHitInterval` / `SummonSpeed` / `SummonTag:标签`（仅当技能行为空时写入，标签本身仍按技能手配）/ `SelectOnly:规则` / `SelectFirst:规则` / `TargetType:标记` / `TriggerCondition:属性<`（数值即阈值，如 `TriggerCondition:hprate<=70,50,30,20,15`）/ `Strength2:键`（`shield`、`healDown`、`splashRate`、`pierceRate`、`missileRate`、`explodeRate`、`reflect`、`moveDist`、`selfHurt`、`mpBurn`、`doubleChance`、`shieldBonusRate`、`vsJob` 等）/ `Buff:短名[:槽键]`（短名取 `BuffConfig.NameS`；只写 `Buff:短名` 表示只加 buff 不给值）。
 - 值可以是数字（逐级）也可以是字面串，如 `Strength2:vsJob=盾|士`；字面串绑定不做数值校验，按手配优先写入。
 - 槽位归属看脚本实际读哪一列：绝大多数 Buff 读 `StrengthBuff1`（如 `缓`/`破`/`慑`/`攻`/`快`），**`疫`（减疗）与 `盾`（护盾）读 `Strength2`**（`healDown`/`shield`，比例值或护盾点数），所以「减疗」写成 `Buff:疫;Strength2:healDown=0.3,...`、「护盾」写成 `Buff:盾;Strength2:shield=60,...`，避免同一机制既加 buff 又加数值造成重复生效。
 - `BuffTime` 绑定：组件提供 Buff 时同一条 `Effect` 里写 `BuffTime=秒数`（减益 3~4s、增益/护盾 5s）；控制类写成逐级值（`BuffTime=0.9,1.1,1.4,1.8,2.4`）。同一技能多个来源时长不同时取**最大值**并告警；没有 `BuffTime` 绑定时沿用技能行手配值。
 - 手配优先：`BuffId`/`StrengthBuff1`/`Strength2`/`TargetType` 里已手配的 token、槽键、标记不会被覆盖，只追加缺失项（同名槽键在 `Strength2` 与 `StrengthBuff1` 任一槽位手配都算已配）。
 
-**Id 分段约定**：两张表 Id 以 **10 为步长**分段（10/20/30…），同类集中在一段内、相似项相邻 +1（如 `中范围`=50、`大范围`=51），段内空号留作扩展。模板：10~19 单体伤害（大/中/小=10/11/12）、20~29 群体伤害（目标中心=20、自身中心=21）、30~39 治疗、40~49 预留（持续区域已改特化）、50~59 自身强化、60~69 光环、70~79 单体友方增益、80~89 群体友方增益、90~99 兵种增益、100~109 召唤（技能场=100、治疗场=101）、110~119 跳跃弹射。组件：`10` 伤害倍率、`20` 治疗量、`30` 施法射程、`40` 最大目标数（以上一个概念占一段开头，不合并同类）、`50~59` 范围档（中=50、大=51）、`90` 连击（`91~99` 空，持续伤害改走 buff、持续施法/区域特化）、`100~119` 预留、`120~122` 施放节奏（MP消耗/CD/概率）、**触发条件固定 `4000~4999`**（当前无预设组件，已删除未使用的阈值预设；需要时按条件键新建，key 必须来自 `Chess.GetAttr`：ap/atk/might/hp/hprate）、`130` 光环生效比例、`140` 光环自身成长；**目标筛选固定 `3000~3999`**（按 10 步长排列，3000 低血筛选起）；**负面 buff 固定 `1000~1999`**、**正面 buff 固定 `2000~2999`**，且**每个 buff 拆 强度大/中/小 三档**（同一 buff 占一个 10 段，大=段首 +0、中=+1、小=+2，数值约为中档的 1.5/1/0.6，评分同步 1.5/1/0.6 并取 0.5 整数倍）；模板 `Modules` 默认引用中档（如 `属性增益中`）；**特殊机制固定 `9000~9999`**（9000~9060 各占一段、多目标结算族 9070~9072、补充机制 9080~9087）。
+**Id 分段约定**：模板表按 **1000 段分大类**（1000 伤害、2000 治疗、3000 强化增益、4000 其他预留），段内仍以 **10 为步长**、同类相邻，子项用 +1~+2（如群体增益三变体 3030/3031/3032）。当前模板：**1000 段 伤害**——1000/1001/1002 单体伤害大/中/小、1010 群体伤害近距离（目标中心）、1011 群体伤害自身中心、1020 跳跃弹射-伤害、1030 冲击波伤害、1040 持续伤害；**2000 段 治疗**——2000 单体治疗、2010 范围治疗、2020 跳跃弹射-治疗、2030 持续治疗；**3000 段 强化增益**——3000 自身强化、3010 光环小（半径 25、评分 3）、3020 单体友方增益、3030 群体友方增益、3031 群体友方增益-自身小、3032 群体友方增益-目标小、3033 全体友军增益、3040 兵种增益；**4000 段 其他**预留。组件表维持原分段：`10` 伤害倍率、`20` 治疗量、`30` 射程小（替换为 60）/ `31` 射程大（替换为 90）、`40` 目标增小（替换为 5）/ `41` 目标增大（替换为 8）（以上一个概念占一段开头，不合并同类）、`50~59` 范围档（中=50、大=51）、`90` 连击（`91~99` 空，持续伤害改走 buff、持续施法/区域特化）、`100~119` 预留、`120~122` 施放节奏（MP消耗/CD/概率）、**触发条件固定 `4000~4999`**（当前无预设组件，已删除未使用的阈值预设；需要时按条件键新建，key 必须来自 `Chess.GetAttr`：ap/atk/might/hp/hprate）；**目标筛选固定 `3000~3999`**（按 10 步长排列，3000 低血筛选起）；**负面 buff 固定 `1000~1999`**、**正面 buff 固定 `2000~2999`**，且**每个 buff 拆 强度大/中/小 三档**（同一 buff 占一个 10 段，大=段首 +0、中=+1、小=+2，数值约为中档的 1.5/1/0.6，评分同步 1.5/1/0.6 并取 0.5 整数倍）；模板 `Modules` 默认引用中档（如 `属性增益中`）；**特殊机制固定 `9000~9999`**（9000~9060 各占一段、多目标结算族 9070~9072、补充机制 9080~9087）。
 
 **一致性自检**：模板 `Modules` 里的每个组件名必须存在于组件表；组件 `Templates` 里的每个模板名必须存在于模板表；改模板名要同步改所有组件的 `Templates` 引用（改名会让引用悬空）。
 
 ### 2.11 SkillBaseConfig（模板展开表）
 
-`SkillBaseConfig_s.cs` 与 `SkillConfig` **列结构完全一致（43 列）**，存放「模板 + 组件」展开后的效果列；`ConfigManager.Init()` 依次 `SkillConfig.Load()` / `SkillBaseConfig.Load()`，并在 `PostModify()` 开头调用 `ApplySkillBase()`：
+`SkillBaseConfig_s.cs` 与 `SkillConfig` **列结构完全一致（42 列）**，存放「模板 + 组件」展开后的效果列；`ConfigManager.Init()` 依次 `SkillConfig.Load()` / `SkillBaseConfig.Load()`，并在 `PostModify()` 开头调用 `ApplySkillBase()`：
 
 - **触发条件**：`SkillConfig.Template` 非空即为模板化技能；同 Id 缺失 `SkillBaseConfig` 行时记 `GameLog.Warn` 并沿用原值。
-- **覆盖列（21 列，仅模板/组件能改写的效果列）**：`Rate CD MpCost TriggerCondition Range Area SelectOnly SelectFirst TargetType TargetCount DamageStrength HealStrength Strength2 StrengthBuff1 BuffId BuffTime SummonTag SummonCount SummonTime SummonHitInterval SummonSpeed`。身份列与表现列（`ScriptName Action SelfEffect HitEffect AreaEffect Icon LinkSelf LinkTeam AuroAttrs DamageType HurtTag StartMpRate ItemId`）**不覆盖**，一律以 SkillConfig 为准；需要让某项参与覆盖时，把对应 key 加进工具的 `EffectColumns` 白名单并同步此列表。
+- **覆盖列（21 列，仅模板/组件能改写的效果列）**：`Rate CD MpCost TriggerCondition Range Area SelectOnly SelectFirst TargetType TargetCount DamageStrength HealStrength Strength2 StrengthBuff1 BuffId BuffTime SummonTag SummonCount SummonTime SummonHitInterval SummonSpeed`。身份列与表现列（`ScriptName Action SelfEffect HitEffect AreaEffect Icon LinkSelf LinkTeam DamageType HurtTag StartMpRate ItemId`）**不覆盖**，一律以 SkillConfig 为准；需要让某项参与覆盖时，把对应 key 加进工具的 `EffectColumns` 白名单并同步此列表。
 - **保留列（9 列身份列）**：`Id Name Sname Version Descript Type Template Modules Lv`。
-- **展开规则（k-v 映射）**：模板先按 `Effect` 的绑定把 `Lv` 对应数值写入目标列/槽（伤害模板=`DamageStrength`、治疗模板=`HealStrength`，两者互斥清零）；随后 `Range`/`Area` 仅模板值 >0 时覆盖，`CD` 取模板，`MpCost` = 模板 `MpCost × 10`；再按**技能自己 `Modules`** 顺序展开每个组件的 `Effect`（列写入 / `Buff:短名:槽键` 追加 `BuffId`+`StrengthBuff1` / `TargetType:标记` / `TriggerCondition` / `Strength2:键`）。`BuffId`/`StrengthBuff1`/`Strength2`/`TargetType` 已手配的键不覆盖，只补缺失项。`BuffTime` 取模板与各组件提供值的最大值。模板默认 `Modules` 只参与估值与推荐校验，**不注入任何效果**（如「护盾中」不会给技能额外加盾）。
+- **展开规则（k-v 映射）**：模板先按 `Effect` 的绑定把 `Lv` 对应数值写入目标列/槽（伤害模板=`DamageStrength`、治疗模板=`HealStrength`，两者互斥清零）；随后 `Range`/`Area`/`TargetCount` 仅在模板值 >0 时覆盖（Range 默认 40、Area 默认小范围 20、TargetCount 群体 3/单体 1），`CD` 取模板，`MpCost` = 模板 `MpCost × 10`；再按**技能自己 `Modules`** 顺序展开每个组件的 `Effect`（列写入 / `Buff:短名:槽键` 追加 `BuffId`+`StrengthBuff1` / `TargetType:标记` / `TriggerCondition` / `Strength2:键`）。`BuffId`/`StrengthBuff1`/`Strength2`/`TargetType` 已手配的键不覆盖，只补缺失项。`BuffTime` 取模板与各组件提供值的最大值。模板默认 `Modules` 只参与估值与推荐校验，**不注入任何效果**（如「护盾中」不会给技能额外加盾）。
 - **可被组件写入的列**：`EffectColumns` = `DamageStrength HealStrength CD MpCost Range Area TargetCount Rate BuffTime SelectOnly SelectFirst TargetType TriggerCondition Strength2 Buff SummonCount SummonTime SummonHitInterval SummonSpeed SummonTag`；`伤害倍率`、`属性增益大/中/小` 仍为 `None`（无对应列或标记，只计分）。目标筛选类组件（`3000~3999`）写 `SelectOnly:`/`SelectFirst:`，行为标记才写 `TargetType:`（如 `3090 施法者必含`→`TargetType:selfAlways`、`3110 全图`→`TargetType:wholeMap`）。
 - **现状覆盖**：品质 1/2 英雄技能 80 个中 77 个模板化（385 行），3 个保留特化不模板化：曹叡·压制（SkillAidManaBurn）、高顺·破甲（SkillSingleDamage 按护盾加成）、黄月英·巧工（SkillAidCraftBuff）。品质 3/4 的专属机制不纳入模板体系。
 - **数值口径提醒**：模板 `Values` 是「标准态」主数值，与手配 `DamageStrength`/`HealStrength`（受品质、MP 系数、法术倍率影响）不是同一量级，直接覆盖会显著改变战斗数值；需要标定时应在烘焙阶段按品质/MP 系数缩放模板值，或回调模板 `Values`，不要逐行改 `SkillBaseConfig`（它由脚本重新生成）。
@@ -274,9 +275,9 @@ description: 《三国卡牌》(金铲铲式) SkillConfig 表的配置方法与�
 | --- | --- | --- |
 | `SkillSingleDamage` | 单体伤害（125 行，最常用） | `DamageStrength`/`HealStrength` + `BuffId`（空=纯伤害）；`TargetCount>0` = 对同一目标连打 N 段 |
 | `SkillAreaDamageDeBuff` | 范围伤害 + 减益（60 行） | `SelectOnly=enemy`；`TargetType` 空=目标中心 / `self`=自身中心；`BuffId` 可 0~N 段 |
-| `SkillSelfBuff` | 自身增益（50 行） | `BuffId` 挂 1~N 个 Buff，数值放 `Strength2`/`StrengthBuff1` 由 Buff 读 |
-| `SkillAreaBuff` | 群体增益（45 行） | `SelectOnly=ally;...` + `SelectFirst` 选人（见 2.3）；护盾类按统一护盾公式写 `Strength2[shield]` |
-| `SkillAura` | 光环（30 行） | `AuroAttrs` 配持续光环属性 |
+| `SkillSelfBuff` | 自身增益（60 行） | `BuffId` 挂 1~N 个 Buff，数值放 `Strength2`/`StrengthBuff1` 由 Buff 读。**反伤也走这里**：`BuffId=反`、`StrengthBuff1=reflect:比例`、`BuffTime=持续时间`，由 `BuffReflect` 在 Buff 期间结算；连接授予的常驻反伤（如 `刺`）加 `TargetType=noStack`，避免 CD 0 时每帧重放 |
+| `SkillAreaBuff` | 群体增益（45 行） | `SelectOnly=ally;...` + `SelectFirst` 选人（见 2.3）；护盾类按统一护盾公式写 `Strength2[shield]`。施放中心分三种模板：`群体友方增益`（自身中心，Area 20）、`-自身小`（Area 25）、`-目标小`（`TargetType:targetCenter`，Area 25）、`全体友军增益`（`TargetType:wholeMap`，Area 0）；要更大半径加 `中范围`/`大范围` 组件 |
+| `SkillAura` | 光环（40 行） | 模板只有 `光环小`（半径 25、评分 3），需要更大范围加 `中范围`/`大范围` 组件。每 3 秒对 `Area` 内按 `SelectOnly`/`SelectFirst` 选中的单位（可含敌方）挂 `BuffId`，`BuffTime` 建议 4s 防断档；`MpCost=0` 常开，`MpCost>0` 时 MP 满开启、每秒扣 1 点 MP，扣到 0 关闭并移除 `SelfEffect`，开启期间攻击/受击不回蓝 |
 | `SkillAreaHeal` | 范围治疗（15 行） | `HealStrength` + `Area`，`overflowToArmor` 可转护甲 |
 | `SkillJumpChain` | 弹射（10 行） | `TargetType=heal` 走治疗链，否则伤害链 |
 | `SkillBacklineStrike` | 打后排（15 行） | `smart` 智能选后排 / 默认最远 |
@@ -286,6 +287,7 @@ description: 《三国卡牌》(金铲铲式) SkillConfig 表的配置方法与�
 
 - 远程技能以自身为中心会全程打空（站位远离敌阵），必须目标中心；近战贴脸 AoE 用 `self`。
 - 类名与 `ScriptName` 用英文，不用拼音；表里已有同名类时优先复用，别新建特化类。
+- 英雄没有被动技能：受击/反伤/触发类效果不要写 `OnAttacked` 之类的被动脚本，一律改成「主动给自己挂 Buff + Buff 内实现」，如反伤 = `SkillSelfBuff` + `BuffId=反`（`BuffReflect`）。
 
 ## 九、新建脚本要点
 

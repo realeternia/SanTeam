@@ -43,12 +43,12 @@ description: 配置与校验战斗技能/Buff 特效(HitEffect/AreaEffect/BuffEf
 
 ## 三、定位与改写（SkillConfig 行格式）
 
-行形如 `config[id] = new SkillConfig(...)`，构造器共 18 个字符串参数，按出现顺序：
+行形如 `config[id] = new SkillConfig(...)`，构造器共 17 个字符串参数，按出现顺序：
 
 ```
 Name, Sname, Descript, Type, TriggerCondition, HurtTag, TargetType, BuffId,
 SummonTag, ScriptName, Action, SelfEffect(第12), HitEffect(第13), AreaEffect(第14),
-Icon, LinkSelf, LinkTeam, AuroAttrs
+Icon, LinkSelf, LinkTeam
 ```
 
 用正则抓取该行全部 `"..."`，第 12、13、14 个即施法自身/命中/范围特效。改名时按匹配的字符跨度**原位替换**（从索引大的往小改），避免同名串误伤。

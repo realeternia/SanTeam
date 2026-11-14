@@ -17,5 +17,8 @@
     <Compile Update="SkillEditDialog.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Update="TreemapView.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
   </ItemGroup>
 </Project>

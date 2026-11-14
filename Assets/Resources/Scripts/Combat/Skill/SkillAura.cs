@@ -1,66 +1,120 @@
-using System;
 using System.Collections.Generic;
-using CommonConfig;
 using UnityEngine;
 
 /// <summary>
-/// 光环主动助战（ScriptName = "SkillAura"）：保留 AuroAttrs 开局被动光环，
-/// 施放时对本侧全体英雄（含自身）再永久累加 光环属性值 × (100+法强)/100 × 键 auraRate（即百分比 x%）。
-/// 光环数值（含开局的被动光环）统一按法强百分比成长，且都乘 auroEffectRate（鼓加成），对自身与队友同样生效。
-/// 复用 JobLinkManager.ParseBonuses/ApplyAttr 与光环被动同一套解析/施加逻辑。
-/// 另每次施放为自身永久叠加成长属性（数值取键 selfGrow）：光环主属性为法强(ap) 时叠加自身法强，
-/// 否则叠加自身攻击(atk)，使纯光环辅助在单兵情况下也能逐步成长为可独立作战的单位。
-/// 每次施放还会驱散我方全体英雄身上的负面 Buff（不可驱散的招牌 Buff 除外，见 BuffManager.DispelNegative）。
-/// 由 SkillManager.CheckAidSkill 经 Skill.CheckAidSkill 自动按 CD 周期性施放。
+/// 光环技能（ScriptName = "SkillAura"）：
+/// 开启期间每 3 秒对 Area 范围内的单位施加 BuffId（可指向友方或敌方，
+/// 由 SelectOnly / SelectFirst 选人，TargetCount&lt;=0 表示范围内全部）。
+///
+/// MP 规则：
+/// · MpCost=0：开局常开，不消耗 MP；
+/// · MpCost&gt;0：MP 满时自动开启，开启期间每秒扣 1 点 MP（每点 MP 持续 1 秒），扣到 0 自动关闭；
+///   开启期间攻击/受击回蓝失效（Chess.mpGainLocked），技能回蓝（Skill.AddMp）不受影响；
+///   关闭后 MP 再次充满会自动重新开启。
+///
+/// 开启时挂常驻 SelfEffect，关闭时销毁（光环视觉随之消失）。
 /// </summary>
 public class SkillAura : Skill
 {
+    /// <summary>光环结算间隔(秒)：每 3 秒对范围内单位挂一次 Buff</summary>
+    private const float TickInterval = 3f;
+    /// <summary>BuffTime 未配置时的兜底持续时间(秒)，需大于结算间隔以免断档</summary>
+    private const float BuffDurationFallback = 4f;
+
+    private float tickTimer;
+    private bool auraOn;
+    private GameObject selfEffectObj;
+
     public SkillAura(int id, Chess unit) : base(id, unit)
     {
     }
 
-    /// <summary>
-    /// 开局光环视觉标识：在自身挂一个常驻循环的 SelfEffect，表示光环正在生效（区别于每次施法的瞬时 SelfEffect）。
-    /// 特效挂在单位节点下，单位死亡/战斗结束时随节点销毁，无需额外清理。
-    /// </summary>
     public override void BattleBegin()
     {
-        if (string.IsNullOrEmpty(skillCfg.SelfEffect))
-            return;
-        EffectManager.PlayPersistentEffect(owner, skillCfg.SelfEffect);
+        tickTimer = 0f;
+        // 无 MP 消耗的光环开局常开
+        if (skillCfg.MpCost <= 0)
+            SetAura(true);
     }
 
-    public override bool CheckAidSkill()
+    public override void Tick(float deltaTime)
     {
-        if (!CheckBurst(null))
-            return false;
+        if (owner == null || owner.hp <= 0 || deltaTime <= 0f)
+            return;
 
-        var allMyHeroes = WorldManager.Instance.GetUnitsMySide(owner.side)
-            .FindAll(x => x.isHero);   // 我方全体英雄（含自身）
-
-        var bonuses = JobLinkManager.ParseBonuses(skillCfg.AuroAttrs);
-        var auraRate = GetStr2("auraRate");
-        foreach (var unit in allMyHeroes)
+        if (!auraOn)
         {
-            // 光环数值吃法强（法强按百分比）：配置值 × (100 + 法强) / 100；
-            // 再乘 auraRate（每次施放的累积比例）与 auroEffectRate（鼓加成），自身与队友同样生效
-            foreach (var bonus in bonuses)
-                JobLinkManager.ApplyAttr(unit, bonus.Attr, bonus.Value * (100f + owner.ap) / 100f * auraRate * owner.auroEffectRate);
+            // 有 MP 消耗的光环：MP 满才开启
+            if (skillCfg.MpCost > 0 && mp >= skillCfg.MpCost)
+                SetAura(true);
+            else
+                return;
         }
 
-        // 自身永久成长：光环主属性为法强则叠法强，否则叠攻击（数值取自键 selfGrow，同样按法强百分比成长并受 auroEffectRate 加成）
-        var selfGrow = GetStrBuff("selfGrow");
-        if (selfGrow > 0f)
+        // 每点 MP 持续 1 秒：开启期间持续扣蓝，扣到 0 关闭
+        mp -= deltaTime;
+        if (mp <= 0f)
         {
-            var growAttr = (bonuses.Count > 0 && bonuses[0].Attr == "ap") ? "ap" : "atk";
-            JobLinkManager.ApplyAttr(owner, growAttr, selfGrow * (100f + owner.ap) / 100f * owner.auroEffectRate);
+            mp = 0f;
+            SetAura(false);
+            return;
         }
 
-        // 每次释放驱散我方全体英雄（含自身）身上的负面 Buff（不可驱散的招牌 Buff 除外）
-        foreach (var unit in allMyHeroes)
-            BuffManager.DispelNegative(unit);
+        tickTimer += deltaTime;
+        if (tickTimer < TickInterval)
+            return;
+        tickTimer -= TickInterval;
+        ApplyAuraBuffs();
+    }
 
-        owner.PlayerAnim(skillCfg.Action);
-        return true;
+    public override void OnDeath()
+    {
+        SetAura(false);
+    }
+
+    private void SetAura(bool on)
+    {
+        if (auraOn == on)
+            return;
+        auraOn = on;
+        // 开启期间禁止攻击/受击回蓝；技能回蓝不受影响（无 MP 消耗的常驻光环不占用 MP）
+        owner.mpGainLocked = on && skillCfg.MpCost > 0;
+
+        if (on)
+        {
+            if (!string.IsNullOrEmpty(skillCfg.SelfEffect))
+                selfEffectObj = EffectManager.PlayPersistentEffect(owner, skillCfg.SelfEffect);
+            tickTimer = 0f;
+            // 开启瞬间立即结算一次，避免等满 3 秒
+            ApplyAuraBuffs();
+            return;
+        }
+
+        if (selfEffectObj != null)
+        {
+            Object.Destroy(selfEffectObj);
+            selfEffectObj = null;
+        }
+    }
+
+    private void ApplyAuraBuffs()
+    {
+        var buffIds = GetSkillBuffIds();
+        if (buffIds.Count == 0)
+        {
+            GameLog.Warn($"SkillAura: 未配置Buff短名 技能id={id}");
+            return;
+        }
+
+        // 选人：SelectOnly 硬过滤 + SelectFirst 优先级（未配置阵营默认友方，可配 enemy 给敌方挂 Buff）
+        var units = SelectTargets(owner.transform.position, skillCfg.Area, true, skillCfg.TargetCount);
+        var duration = skillCfg.BuffTime > 0f ? skillCfg.BuffTime : BuffDurationFallback;
+        foreach (var unit in units)
+        {
+            foreach (var buffId in buffIds)
+                BuffManager.AddBuff(unit, owner, id, buffId, duration);
+            if (!string.IsNullOrEmpty(skillCfg.HitEffect))
+                EffectManager.PlaySkillEffect(unit, skillCfg.HitEffect);
+        }
     }
 }

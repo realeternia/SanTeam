@@ -46,7 +46,7 @@ namespace SkillBaseTool
                 Location = new Point(52, 44),
                 Size = new Size(180, 26),
             };
-            cboFilter.Items.AddRange(new object[] { "全部", "仅有差异", "仅主数值差异", "仅节奏差异", "仅 Buff 差异" });
+            cboFilter.Items.AddRange(new object[] { "全部", "仅有差异", "仅主数值差异", "仅节奏差异", "仅选取差异", "仅 Buff 差异" });
             cboFilter.SelectedIndex = 1;
             cboFilter.SelectedIndexChanged += (s, e) => RefreshGrid();
 
@@ -72,6 +72,7 @@ namespace SkillBaseTool
             grid.Columns.Add(MakeColumn("CD", 70));
             grid.Columns.Add(MakeColumn("MpCost", 70));
             grid.Columns.Add(MakeColumn("Range / Area", 130));
+            grid.Columns.Add(MakeColumn("选取", 140));
             grid.Columns.Add(MakeColumn("Buff", 180));
             grid.Columns.Add(MakeColumn("全部差异", 260));
 
@@ -116,6 +117,7 @@ namespace SkillBaseTool
             int noDiff = items.Count(x => !x.HasDiff);
             int main = items.Count(x => x.MainValueDiff);
             int rhythm = items.Count(x => x.RhythmDiff);
+            int select = items.Count(x => x.SelectDiff);
             int buff = items.Count(x => x.BuffDiff);
             double ratio = 0;
             int rc = 0;
@@ -132,8 +134,8 @@ namespace SkillBaseTool
                 }
             }
             lblSummary.Text = string.Format(
-                "模板化技能 {0} 个（Lv1）：完全一致 {1}，主数值差异 {2}，节奏差异 {3}，Buff 差异 {4}；手配/模板主数值平均比 {5}",
-                items.Count, noDiff, main, rhythm, buff, rc > 0 ? (ratio / rc).ToString("0.00") : "-");
+                "模板化技能 {0} 个（Lv1）：完全一致 {1}，主数值差异 {2}，节奏差异 {3}，选取差异 {4}，Buff 差异 {5}；手配/模板主数值平均比 {6}",
+                items.Count, noDiff, main, rhythm, select, buff, rc > 0 ? (ratio / rc).ToString("0.00") : "-");
             RefreshGrid();
         }
 
@@ -146,15 +148,17 @@ namespace SkillBaseTool
                 if (mode == "仅有差异" && !it.HasDiff) continue;
                 if (mode == "仅主数值差异" && !it.MainValueDiff) continue;
                 if (mode == "仅节奏差异" && !it.RhythmDiff) continue;
+                if (mode == "仅选取差异" && !it.SelectDiff) continue;
                 if (mode == "仅 Buff 差异" && !it.BuffDiff) continue;
 
                 string main = Join(it, "伤害", "治疗");
                 string cd = Join(it, "CD ");
                 string mp = Join(it, "MpCost ");
                 string range = Join(it, "Range ", "Area ");
+                string select = Join(it, "目标硬过滤 ", "目标优先级 ");
                 string buff = Join(it, "BuffId ", "Buff值 ");
                 int idx = grid.Rows.Add(it.Skill.Display, it.Skill.Type, it.Template,
-                    main, cd, mp, range, buff, string.Join("；", it.Diffs));
+                    main, cd, mp, range, select, buff, string.Join("；", it.Diffs));
                 var row = grid.Rows[idx];
                 if (!it.HasDiff)
                     row.DefaultCellStyle.BackColor = Theme.RowOk;
@@ -166,7 +170,12 @@ namespace SkillBaseTool
                 }
                 else
                     row.DefaultCellStyle.BackColor = Theme.RowWarn;
-                row.Cells[8].ToolTipText = string.Join(Environment.NewLine, it.Diffs);
+                if (it.SelectDiff)
+                {
+                    row.Cells[7].Style.ForeColor = Theme.Accent;
+                    row.Cells[7].Style.Font = Theme.Bold;
+                }
+                row.Cells[9].ToolTipText = string.Join(Environment.NewLine, it.Diffs);
             }
             Theme.EndBulkFill(grid);
         }
