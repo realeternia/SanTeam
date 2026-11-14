@@ -192,6 +192,67 @@ namespace SkillBaseTool
             return dmg >= 90 ? "单体伤害大" : (dmg >= 60 ? "单体伤害中" : "单体伤害小");
         }
 
+        /// <summary>模板 → (标准 Type, 脚本)，供编辑弹窗切换模板时联动；单/群控制技能保留原「控」后缀。</summary>
+        private static readonly Dictionary<string, KeyValuePair<string, string>> TemplateBindings =
+            new Dictionary<string, KeyValuePair<string, string>>
+            {
+                { "单体伤害大", new KeyValuePair<string, string>("单伤", "SkillSingleDamage") },
+                { "单体伤害中", new KeyValuePair<string, string>("单伤", "SkillSingleDamage") },
+                { "单体伤害小", new KeyValuePair<string, string>("单伤", "SkillSingleDamage") },
+                { "群体伤害近距离大", new KeyValuePair<string, string>("群伤", "SkillAreaDamageDeBuff") },
+                { "群体伤害近距离中", new KeyValuePair<string, string>("群伤", "SkillAreaDamageDeBuff") },
+                { "群体伤害近距离小", new KeyValuePair<string, string>("群伤", "SkillAreaDamageDeBuff") },
+                { "群体伤害自身中心大", new KeyValuePair<string, string>("群伤", "SkillAreaDamageDeBuff") },
+                { "群体伤害自身中心中", new KeyValuePair<string, string>("群伤", "SkillAreaDamageDeBuff") },
+                { "群体伤害自身中心小", new KeyValuePair<string, string>("群伤", "SkillAreaDamageDeBuff") },
+                { "跳跃弹射-伤害大", new KeyValuePair<string, string>("群伤", "SkillJumpChain") },
+                { "跳跃弹射-伤害中", new KeyValuePair<string, string>("群伤", "SkillJumpChain") },
+                { "跳跃弹射-伤害小", new KeyValuePair<string, string>("群伤", "SkillJumpChain") },
+                { "冲击波伤害大", new KeyValuePair<string, string>("群伤", "SkillShockWave") },
+                { "冲击波伤害中", new KeyValuePair<string, string>("群伤", "SkillShockWave") },
+                { "冲击波伤害小", new KeyValuePair<string, string>("群伤", "SkillShockWave") },
+                { "持续伤害大", new KeyValuePair<string, string>("群伤", "SkillAidHitRegion") },
+                { "持续伤害中", new KeyValuePair<string, string>("群伤", "SkillAidHitRegion") },
+                { "持续伤害小", new KeyValuePair<string, string>("群伤", "SkillAidHitRegion") },
+                { "单体治疗大", new KeyValuePair<string, string>("单疗", "SkillAreaHeal") },
+                { "单体治疗中", new KeyValuePair<string, string>("单疗", "SkillAreaHeal") },
+                { "单体治疗小", new KeyValuePair<string, string>("单疗", "SkillAreaHeal") },
+                { "范围治疗大", new KeyValuePair<string, string>("群疗", "SkillAreaHeal") },
+                { "范围治疗中", new KeyValuePair<string, string>("群疗", "SkillAreaHeal") },
+                { "范围治疗小", new KeyValuePair<string, string>("群疗", "SkillAreaHeal") },
+                { "跳跃弹射-治疗大", new KeyValuePair<string, string>("群疗", "SkillJumpChain") },
+                { "跳跃弹射-治疗中", new KeyValuePair<string, string>("群疗", "SkillJumpChain") },
+                { "跳跃弹射-治疗小", new KeyValuePair<string, string>("群疗", "SkillJumpChain") },
+                { "持续治疗大", new KeyValuePair<string, string>("群疗", "SkillCastingAidAreaHeal") },
+                { "持续治疗中", new KeyValuePair<string, string>("群疗", "SkillCastingAidAreaHeal") },
+                { "持续治疗小", new KeyValuePair<string, string>("群疗", "SkillCastingAidAreaHeal") },
+                { "自身强化", new KeyValuePair<string, string>("自增", "SkillSelfBuff") },
+                { "光环中", new KeyValuePair<string, string>("光环", "SkillAura") },
+                { "单体友方增益", new KeyValuePair<string, string>("单增", "SkillAreaBuff") },
+                { "群体友方增益", new KeyValuePair<string, string>("群增", "SkillAreaBuff") },
+                { "群体友方增益-目标小", new KeyValuePair<string, string>("群增", "SkillAreaBuff") },
+                { "全体友军增益", new KeyValuePair<string, string>("群增", "SkillAreaBuff") },
+                { "兵种增益", new KeyValuePair<string, string>("兵增", "SkillSoldierBless") },
+                { "群体嘲讽", new KeyValuePair<string, string>("群控", "SkillTaunt") },
+            };
+
+        /// <summary>取模板对应的 Type / 脚本；单/群控制技能沿用原「单控 / 群控」Type，避免切模板后丢控制标记。</summary>
+        public static bool TryGetTemplateBinding(string template, string currentType, out string type, out string script)
+        {
+            type = null;
+            script = null;
+            KeyValuePair<string, string> binding;
+            if (string.IsNullOrEmpty(template) || !TemplateBindings.TryGetValue(template, out binding))
+                return false;
+            script = binding.Value;
+            type = binding.Key;
+            if (type == "单伤" && currentType == "单控")
+                type = "单控";
+            else if (type == "群伤" && currentType == "群控")
+                type = "群控";
+            return true;
+        }
+
         /// <summary>从手配 BuffId / TargetType / 标签反推组件（按出现顺序去重）。</summary>
         public static List<string> ExtraModules(DataStore store, SkillRow a)
         {

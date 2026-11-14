@@ -29,6 +29,10 @@ namespace SkillBaseTool
         private RichTextBox txtHints;
         /// <summary>已勾选的组件名（ListBox 不支持 owner-draw 勾选状态，勾选状态自行维护）。</summary>
         private readonly HashSet<string> checkedNames = new HashSet<string>();
+        /// <summary>切换模板后待写回的 Type / 脚本（null 表示未切换或该模板无绑定）。</summary>
+        private string pendingType;
+        private string pendingScript;
+        private bool templateChanged;
 
         public ScoreView(DataStore data, SkillRow target)
         {
@@ -76,7 +80,7 @@ namespace SkillBaseTool
                 ItemHeight = 22,
             };
             cboTemplate.DrawItem += DrawTemplateItem;
-            cboTemplate.SelectedIndexChanged += (s, e) => { if (!suppress) Recalc(); };
+            cboTemplate.SelectedIndexChanged += (s, e) => { if (!suppress) OnTemplateChanged(); };
 
             leftTop.Controls.AddRange(new Control[] { lblSkillInfo, lblTpl, cboTemplate });
 
@@ -383,6 +387,32 @@ namespace SkillBaseTool
             return tpl == null ? null : tpl.Name;
         }
 
+        /// <summary>切换模板时联动 Type / 脚本：顶部预览立即更新，确定时随模板一起写回五级。</summary>
+        private void OnTemplateChanged()
+        {
+            templateChanged = true;
+            string type, script;
+            if (SkillGen.TryGetTemplateBinding(SelectedTemplate(), skill.Type, out type, out script))
+            {
+                pendingType = type;
+                pendingScript = script;
+            }
+            else
+            {
+                pendingType = null;
+                pendingScript = null;
+            }
+            UpdateSkillInfo();
+            Recalc();
+        }
+
+        private void UpdateSkillInfo()
+        {
+            string type = string.IsNullOrEmpty(pendingType) ? skill.Type : pendingType;
+            string script = string.IsNullOrEmpty(pendingScript) ? skill.ScriptName : pendingScript;
+            lblSkillInfo.Text = "技能：" + skill.Display + " · " + type + " · " + script;
+        }
+
         private void Recalc()
         {
             var result = SkillGen.Evaluate(store, skill, SelectedTemplate(), CheckedNames());
@@ -412,16 +442,22 @@ namespace SkillBaseTool
             }
         }
 
-        /// <summary>写回当前技能的 Template / Modules（同 Sname 五级一起），返回写入行数。</summary>
+        /// <summary>写回当前技能的 Template / Modules（同 Sname 五级一起）；切换过模板时同步 Type / ScriptName。</summary>
         public int ApplyToSkill()
         {
             string tpl = SelectedTemplate() ?? "";
             var mods = CheckedNames();
+            bool rebind = templateChanged && !string.IsNullOrEmpty(pendingType) && !string.IsNullOrEmpty(pendingScript);
             var rows = store.Skills.Where(s => s.Sname == skill.Sname).ToList();
             foreach (var row in rows)
             {
                 row.TemplateName = tpl;
                 row.Modules = mods.ToArray();
+                if (rebind)
+                {
+                    row.Args[Col.Type] = CfgUtil.Quote(pendingType);
+                    row.Args[Col.ScriptName] = CfgUtil.Quote(pendingScript);
+                }
             }
             ConfigIO.SaveSkillRows(store, rows.Select(r => r.Id));
             return rows.Count;

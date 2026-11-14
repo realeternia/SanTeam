@@ -26,7 +26,7 @@ namespace SkillBaseTool
             bottom = new Panel { Dock = DockStyle.Bottom, Height = 58, BackColor = Theme.Card, Padding = new Padding(16, 12, 16, 12) };
             lblHint = new Label
             {
-                Text = "确定后写回 SkillConfig 的 Template / Modules（同 Sname 五级一起）",
+                Text = "确定后写回 SkillConfig 的 Template / Modules；切换过模板时同步 Type / ScriptName（同 Sname 五级一起）",
                 Font = Theme.Small,
                 ForeColor = Theme.Muted,
                 AutoSize = true,
