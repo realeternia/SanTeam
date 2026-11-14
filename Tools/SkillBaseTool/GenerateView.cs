@@ -135,7 +135,7 @@ namespace SkillBaseTool
         {
             if (store == null)
                 return;
-            grid.Rows.Clear();
+            Theme.BeginBulkFill(grid);
             rowSkills.Clear();
             var skills = store.Quality12HeroSkills
                 .OrderBy(s => s.Quality)
@@ -172,6 +172,7 @@ namespace SkillBaseTool
                 if (status != "OK")
                     grid.Rows[idx].DefaultCellStyle.BackColor = Theme.RowWarn;
             }
+            Theme.EndBulkFill(grid);
             lblStats.Text = string.Format("品质 1/2 英雄技能 {0} 个：已模板化 {1}，SkillBase 行 {2}",
                 skills.Count, templated, store.BaseRows.Count);
         }

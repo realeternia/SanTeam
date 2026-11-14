@@ -1,6 +1,7 @@
 using System;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.Reflection;
 using System.Windows.Forms;
 
 namespace SkillBaseTool
@@ -110,6 +111,24 @@ namespace SkillBaseTool
             grid.DefaultCellStyle.SelectionForeColor = Text;
             grid.DefaultCellStyle.Font = Base;
             grid.RowTemplate.Height = 26;
+
+            // 双缓冲：避免整表刷新时逐行重绘造成的闪烁与卡顿
+            typeof(DataGridView).GetProperty("DoubleBuffered", BindingFlags.Instance | BindingFlags.NonPublic)
+                ?.SetValue(grid, true);
+        }
+
+        /// <summary>整表重填期间关闭自动列宽/挂起布局，填完再恢复，避免逐行触发布局重算。</summary>
+        public static void BeginBulkFill(DataGridView grid)
+        {
+            grid.SuspendLayout();
+            grid.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.None;
+            grid.Rows.Clear();
+        }
+
+        public static void EndBulkFill(DataGridView grid)
+        {
+            grid.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+            grid.ResumeLayout();
         }
     }
 }

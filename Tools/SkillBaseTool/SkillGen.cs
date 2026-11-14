@@ -298,6 +298,8 @@ namespace SkillBaseTool
             public string Column;
             public string Sub;
             public float[] Values = new float[0];
+            /// <summary>非数值绑定（如 vsJob=盾|士）的字面值；为空表示走 Values。</summary>
+            public string Text;
 
             public float ValueAt(int lv)
             {
@@ -329,9 +331,13 @@ namespace SkillBaseTool
                 };
                 if (parts.Length > 1)
                 {
-                    binding.Values = parts[1].Split(',')
-                        .Select(x => float.TryParse(x.Trim(), NumberStyles.Float, CultureInfo.InvariantCulture, out float v) ? v : 0f)
-                        .ToArray();
+                    string rawValue = parts[1].Trim();
+                    string[] pieces = rawValue.Split(',');
+                    float parsed;
+                    if (pieces.All(x => float.TryParse(x.Trim(), NumberStyles.Float, CultureInfo.InvariantCulture, out parsed)))
+                        binding.Values = pieces.Select(x => float.Parse(x.Trim(), CultureInfo.InvariantCulture)).ToArray();
+                    else
+                        binding.Text = rawValue;
                 }
                 list.Add(binding);
             }
@@ -352,6 +358,16 @@ namespace SkillBaseTool
         {
             "DamageStrength", "HealStrength", "CD", "MpCost", "Range", "Area", "TargetCount",
             "Rate", "BuffTime", "TargetType", "TriggerCondition", "Strength2", "Buff",
+            "SummonCount", "SummonTime", "SummonHitInterval", "SummonSpeed", "SummonTag",
+        };
+
+        /// <summary>运行时 ApplySkillBase 覆盖的列（与 ConfigManager 保持一致：只含模板/组件能改写的效果列）。</summary>
+        public static readonly int[] AppliedColumns =
+        {
+            Col.Rate, Col.CD, Col.MpCost, Col.TriggerCondition, Col.Range, Col.Area,
+            Col.TargetType, Col.TargetCount, Col.DamageStrength, Col.HealStrength,
+            Col.Strength2, Col.StrengthBuff1, Col.BuffId, Col.BuffTime,
+            Col.SummonTag, Col.SummonCount, Col.SummonTime, Col.SummonHitInterval, Col.SummonSpeed,
         };
 
         /// <summary>展开写入器：把模板/组件的 k-v 绑定落到 41 列与各字符串槽位。</summary>
@@ -400,6 +416,14 @@ namespace SkillBaseTool
                         case "TargetCount": B[Col.TargetCount] = CfgUtil.NumI((int)Math.Round(v)); break;
                         case "Rate": B[Col.Rate] = CfgUtil.NumF(v); break;
                         case "BuffTime": BuffTimes.Add(v); break;
+                        case "SummonCount": B[Col.SummonCount] = CfgUtil.NumI((int)Math.Round(v)); break;
+                        case "SummonTime": B[Col.SummonTime] = CfgUtil.NumF(v); break;
+                        case "SummonHitInterval": B[Col.SummonHitInterval] = CfgUtil.NumF(v); break;
+                        case "SummonSpeed": B[Col.SummonSpeed] = CfgUtil.NumF(v); break;
+                        case "SummonTag":
+                            if (CfgUtil.Unquote(B[Col.SummonTag]).Length == 0)
+                                B[Col.SummonTag] = CfgUtil.Quote(b.Sub);
+                            break;
                         case "TargetType":
                             if (AddUnique(tags, b.Sub))
                                 tagsChanged = true;
@@ -408,7 +432,12 @@ namespace SkillBaseTool
                             if (AddUnique(triggers, b.Sub + NumText(v)))
                                 triggersChanged = true;
                             break;
-                        case "Strength2": ApplyStrength2(b.Sub, v); break;
+                        case "Strength2":
+                            if (b.Text != null)
+                                ApplyStrength2Text(b.Sub, b.Text);
+                            else
+                                ApplyStrength2(b.Sub, v);
+                            break;
                         case "Buff": ApplyBuff(b.Sub, v); break;
                         default:
                             Warnings.Add(source + "：未知 Effect 列名「" + b.Column + "」，已忽略");
@@ -425,6 +454,16 @@ namespace SkillBaseTool
                 if (s2.Any(x => x.StartsWith(key + ":", StringComparison.Ordinal)))
                     return;
                 s2.Add(key + ":" + NumText(v));
+                s2Changed = true;
+            }
+
+            private void ApplyStrength2Text(string key, string text)
+            {
+                if (string.IsNullOrEmpty(key) || handS2Keys.Contains(key) || handBuffKeys.Contains(key))
+                    return;
+                if (s2.Any(x => x.StartsWith(key + ":", StringComparison.Ordinal)))
+                    return;
+                s2.Add(key + ":" + text);
                 s2Changed = true;
             }
 
@@ -502,6 +541,8 @@ namespace SkillBaseTool
             return string.Join("；", bindings.Select(b =>
             {
                 string target = string.IsNullOrEmpty(b.Sub) ? b.Column : b.Column + ":" + b.Sub;
+                if (b.Text != null)
+                    return target + "=" + b.Text;
                 if (b.Values.Length == 0)
                     return target;
                 return target + "=" + NumText(b.ValueAt(lv));
@@ -539,14 +580,7 @@ namespace SkillBaseTool
                     continue;
                 var item = new CompareItem { Skill = skill, Template = skill.TemplateName, Base = b };
                 var a = skill.Args;
-                int[] cols =
-                {
-                    Col.CD, Col.MpCost, Col.Rate, Col.Range, Col.Area, Col.TargetCount,
-                    Col.DamageStrength, Col.HealStrength, Col.TriggerCondition,
-                    Col.BuffId, Col.StrengthBuff1, Col.BuffTime, Col.Strength2, Col.TargetType,
-                    Col.AuroAttrs
-                };
-                foreach (int c in cols)
+                foreach (int c in AppliedColumns)
                 {
                     if (a[c] == b[c])
                         continue;
@@ -579,6 +613,23 @@ namespace SkillBaseTool
                 case Col.Strength2: return "数值槽";
                 case Col.TargetType: return "选取点";
                 case Col.AuroAttrs: return "光环效果";
+                case Col.StartMpRate: return "开局MP";
+                case Col.DamageType: return "伤害类型";
+                case Col.HurtTag: return "伤害标签";
+                case Col.SummonTag: return "召唤标签";
+                case Col.SummonCount: return "召唤数";
+                case Col.SummonTime: return "召唤持续";
+                case Col.SummonHitInterval: return "召唤间隔";
+                case Col.SummonSpeed: return "召唤速度";
+                case Col.ItemId: return "道具Id";
+                case Col.ScriptName: return "脚本";
+                case Col.Action: return "动作";
+                case Col.SelfEffect: return "自身特效";
+                case Col.HitEffect: return "命中特效";
+                case Col.AreaEffect: return "范围特效";
+                case Col.Icon: return "图标";
+                case Col.LinkSelf: return "连接加成";
+                case Col.LinkTeam: return "队伍加成";
                 default: return "列" + col;
             }
         }
@@ -761,6 +812,22 @@ namespace SkillBaseTool
                 CheckEffectKey(err, "模板 " + t.Name, t.Effect, store);
             foreach (var c in store.Components)
                 CheckEffectKey(err, "组件 " + c.Name, c.Effect, store);
+
+            // 被模板化技能选用、但 Effect=None 的组件：评分计入却不会写任何列（易漏配）
+            var usedModules = new HashSet<string>(StringComparer.Ordinal);
+            foreach (var s in store.Skills)
+            {
+                if (string.IsNullOrEmpty(s.TemplateName))
+                    continue;
+                foreach (string m in s.Modules)
+                    usedModules.Add(m);
+            }
+            foreach (var c in store.Components)
+            {
+                if (!usedModules.Contains(c.Name) || ParseEffect(c.Effect).Count > 0)
+                    continue;
+                err.Add("⚠ 组件 " + c.Name + " 被技能选用但 Effect=None（只计分，不写任何列）");
+            }
             return err;
         }
 
@@ -782,7 +849,7 @@ namespace SkillBaseTool
                     err.Add(owner + " Effect 列名非法：" + b.Column);
                     continue;
                 }
-                bool tokenOnly = b.Column == "TargetType"
+                bool tokenOnly = b.Column == "TargetType" || b.Column == "SummonTag" || b.Text != null
                     || (b.Column == "Buff" && b.Sub.IndexOf(':') < 0);
                 if (!tokenOnly && b.Values.Length == 0)
                     err.Add(owner + " Effect 绑定缺少数值：" + b.Column + (string.IsNullOrEmpty(b.Sub) ? "" : ":" + b.Sub));

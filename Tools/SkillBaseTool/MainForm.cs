@@ -74,6 +74,11 @@ namespace SkillBaseTool
             pageGen.Controls.Add(generateView);
             pageCompare.Controls.Add(compareView);
             tabs.TabPages.AddRange(new[] { pageGen, pageCompare });
+            tabs.SelectedIndexChanged += (s, e) =>
+            {
+                if (tabs.SelectedIndex == 1)
+                    compareView.EnsureBuilt();
+            };
 
             var status = new Panel { Dock = DockStyle.Bottom, Height = 26, BackColor = Theme.Card, Padding = new Padding(16, 4, 16, 0) };
             lblStatus = new Label { Dock = DockStyle.Fill, Text = "", Font = Theme.Small, ForeColor = Theme.Muted };

@@ -142,14 +142,14 @@ public static class ConfigManager
                 continue;
             }
 
+            // 只覆盖模板/组件能改写的效果列；身份列与表现列（ScriptName/Action/特效/Icon/Link/AuroAttrs/
+            // DamageType/HurtTag/StartMpRate/ItemId）一律以 SkillConfig 为准，避免 SkillBase 生成后
+            // 表现层改动被旧值回写吞掉
             var baseCfg = SkillBaseConfig.GetConfig(skillCfg.Id);
             skillCfg.Rate = baseCfg.Rate;
             skillCfg.CD = baseCfg.CD;
             skillCfg.MpCost = baseCfg.MpCost;
-            skillCfg.StartMpRate = baseCfg.StartMpRate;
             skillCfg.TriggerCondition = baseCfg.TriggerCondition;
-            skillCfg.DamageType = baseCfg.DamageType;
-            skillCfg.HurtTag = baseCfg.HurtTag;
             skillCfg.Range = baseCfg.Range;
             skillCfg.Area = baseCfg.Area;
             skillCfg.TargetType = baseCfg.TargetType;
@@ -165,16 +165,6 @@ public static class ConfigManager
             skillCfg.SummonTime = baseCfg.SummonTime;
             skillCfg.SummonHitInterval = baseCfg.SummonHitInterval;
             skillCfg.SummonSpeed = baseCfg.SummonSpeed;
-            skillCfg.ItemId = baseCfg.ItemId;
-            skillCfg.ScriptName = baseCfg.ScriptName;
-            skillCfg.Action = baseCfg.Action;
-            skillCfg.SelfEffect = baseCfg.SelfEffect;
-            skillCfg.HitEffect = baseCfg.HitEffect;
-            skillCfg.AreaEffect = baseCfg.AreaEffect;
-            skillCfg.Icon = baseCfg.Icon;
-            skillCfg.LinkSelf = baseCfg.LinkSelf;
-            skillCfg.LinkTeam = baseCfg.LinkTeam;
-            skillCfg.AuroAttrs = baseCfg.AuroAttrs;
             applied++;
         }
         GameLog.Debug(string.Format("ConfigManager.ApplySkillBase: 模板化技能数据替换 {0} 行", applied));

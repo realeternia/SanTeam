@@ -14,6 +14,8 @@ namespace SkillBaseTool
         private Label lblSummary;
         private ComboBox cboFilter;
         private DataGridView grid;
+        /// <summary>数据是否已变更、需要重新展开对比（切到本页时才计算）。</summary>
+        private bool dirty;
 
         public CompareView()
         {
@@ -90,13 +92,24 @@ namespace SkillBaseTool
         public void Bind(DataStore data)
         {
             store = data;
-            Rebuild();
+            dirty = true;
+            // 未切到本页时先不做展开对比，等 Tab 激活再算，避免每次刷新都白跑一遍
+            if (Visible)
+                Rebuild();
+        }
+
+        /// <summary>Tab 激活时调用：数据有变化才重新对比。</summary>
+        public void EnsureBuilt()
+        {
+            if (dirty)
+                Rebuild();
         }
 
         private void Rebuild()
         {
             if (store == null)
                 return;
+            dirty = false;
             var gen = SkillGen.GenerateBase(store);
             items = SkillGen.Compare(store, gen);
 
@@ -126,7 +139,7 @@ namespace SkillBaseTool
 
         private void RefreshGrid()
         {
-            grid.Rows.Clear();
+            Theme.BeginBulkFill(grid);
             string mode = cboFilter.SelectedItem as string ?? "全部";
             foreach (var it in items)
             {
@@ -155,6 +168,7 @@ namespace SkillBaseTool
                     row.DefaultCellStyle.BackColor = Theme.RowWarn;
                 row.Cells[8].ToolTipText = string.Join(Environment.NewLine, it.Diffs);
             }
+            Theme.EndBulkFill(grid);
         }
 
         private static string Join(CompareItem item, params string[] prefixes)

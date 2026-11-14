@@ -150,6 +150,8 @@ namespace CommonConfig
             config[80] = new SkillTemplateConfig(80, "群体友方增益", "对范围内多名友方施加属性增益或护盾，按覆盖人数与溢出价值估值。", "属性增益中,护盾中,最大目标数,低血筛选,施法射程,MP中增加,CD中增加", "None", 4, 11f, 0f, 20f, 8, 4f);
             config[90] = new SkillTemplateConfig(90, "兵种增益", "对己方士兵施加属性增益，数值按士兵基础属性折算。", "加攻中,加护甲中,加魔抗中,最大目标数,MP中增加,CD中增加", "None", 3, 9f, 0f, 20f, 7, 4f);
             config[110] = new SkillTemplateConfig(110, "跳跃弹射", "在多个目标之间跳跃结算伤害或治疗，每跳递减，价值由跳数、单跳数值与搜索半径决定。", "伤害倍率,最大目标数,施法射程,MP中增加,CD中增加", "DamageStrength=60,90,150,240,360", 4, 12f, 30f, 60f, 8, 3f);
+            config[100] = new SkillTemplateConfig(100, "召唤技能场", "在落点投放持续存在的伤害技能场，数字为场持续与结算间隔；召唤物标签、范围与单次伤害仍由技能行配置。", "最大目标数,施法射程", "SummonTime=5.2;SummonHitInterval=1", 3, 9f, 0f, 0f, 9, 2.5f);
+            config[101] = new SkillTemplateConfig(101, "召唤治疗场", "在落点投放持续存在的治疗技能场，数字为场持续与结算间隔；治疗量与范围仍由技能行配置。", "最大目标数,施法射程", "SummonTime=5;SummonHitInterval=1", 3, 9f, 0f, 0f, 14, 2.5f);
 
             RebuildIndex();
 
