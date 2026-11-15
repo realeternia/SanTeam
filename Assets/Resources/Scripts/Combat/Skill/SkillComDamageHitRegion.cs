@@ -3,16 +3,16 @@ using System.Collections;
 using UnityEngine;
 
 /// <summary>
-/// 雷电阵（张角·落雷 / 张郃·震碎 共用，ScriptName = "SkillComHitRegion"）：
+/// 雷电阵（张角·落雷 / 张郃·震碎 共用，ScriptName = "SkillComDamageHitRegion"）：
 /// 顺发——在目标位置召唤雷电阵（法术场可视化）并播放一次范围特效（特效本身持续时间较长），
 /// 之后每 SummonHitInterval 秒对范围内敌人结算一次法术伤害，持续 SummonTime 秒；
 /// 施法期间自身可自由移动/普攻，施法者死亡则结束。
 /// 张角·落雷原地不动；张郃·震碎在 Strength2 配了 moveDist 时，法阵会在持续期间沿"施法者→落点"方向缓慢前移该总距离（逐跳均分，踩墙则停）。
 /// 仿法正·明断，由 SkillManager.CheckAidSkill 自动循环施放。
 /// </summary>
-public class SkillComHitRegion : Skill
+public class SkillComDamageHitRegion : Skill
 {
-    public SkillComHitRegion(int id, Chess unit) : base(id, unit)
+    public SkillComDamageHitRegion(int id, Chess unit) : base(id, unit)
     {
     }
 

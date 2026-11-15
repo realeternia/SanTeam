@@ -160,7 +160,7 @@ namespace SkillBaseTool
                 return "自身强化";
             if (script == "SkillTaunt")
                 return "群体嘲讽";
-            if (script == "SkillComHitRegion")
+            if (script == "SkillComDamageHitRegion")
                 return "持续伤害大";
             if (heal > 0)
             {
@@ -314,7 +314,7 @@ namespace SkillBaseTool
                 result.Add("二段射击");
             if (a.ScriptName == "SkillCastingAidFrontalFlaming" && !result.Contains("持续施法"))
                 result.Add("持续施法");
-            if (a.ScriptName == "SkillComHitRegion" && a.Strength2.Contains("moveDist") && !result.Contains("持续场移动"))
+            if (a.ScriptName == "SkillComDamageHitRegion" && a.Strength2.Contains("moveDist") && !result.Contains("持续场移动"))
                 result.Add("持续场移动");
             if ((a.Strength2.Contains("pushMin") || a.Strength2.Contains("pushMax")) && !result.Contains("位移"))
                 result.Add("位移");

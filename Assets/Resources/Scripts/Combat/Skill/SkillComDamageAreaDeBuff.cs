@@ -17,9 +17,9 @@ using UnityEngine;
 /// · mpBurn     = 每个命中目标燃烧 键"mpBurn" 点法力（贾诩·乱阵；基类 ApplyMpBurn 统一实现）
 /// 另可复用基类的通用伤害组件（execute/shieldBonus/missingHp/vsJob/soldierDamage）。
 /// </summary>
-public class SkillComAreaDamageDeBuff : Skill
+public class SkillComDamageAreaDeBuff : Skill
 {
-    public SkillComAreaDamageDeBuff(int id, Chess unit) : base(id, unit)
+    public SkillComDamageAreaDeBuff(int id, Chess unit) : base(id, unit)
     {
     }
 

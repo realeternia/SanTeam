@@ -21,9 +21,9 @@ using UnityEngine;
 ///
 /// Buff 施加/护盾写入统一走基类 ApplyBuffToUnit；wholeMap 半径与 tauntAroundTarget 走基类 GetAuraSearchRange / TauntAroundUnit。
 /// </summary>
-public class SkillComAreaBuff : Skill
+public class SkillComBuffArea : Skill
 {
-    public SkillComAreaBuff(int id, Chess unit) : base(id, unit)
+    public SkillComBuffArea(int id, Chess unit) : base(id, unit)
     {
     }
 
@@ -35,7 +35,7 @@ public class SkillComAreaBuff : Skill
         var buffIds = GetSkillBuffIds();
         if (buffIds.Count == 0)
         {
-            GameLog.Error($"SkillComAreaBuff: 未配置Buff短名 技能id={id}");
+            GameLog.Error($"SkillComBuffArea: 未配置Buff短名 技能id={id}");
             return false;
         }
 

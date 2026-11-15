@@ -10,11 +10,11 @@
 
 | 类别 | 识别方式 | 技能数(Sname) | 配置行 | 使用脚本数 |
 | --- | --- | --- | --- | --- |
-| 英雄个人技能 | `Sname` = 英雄名，Type 非职业/连接/道具 | 155 | 775 | 39 |
+| 英雄个人技能 | `Sname` = 英雄名，Type 非职业/连接/道具 | 155 | 775 | 40 |
 | 职业/国家连锁 | Type=职业 | 19 | 95 | 6 |
 | 好友连锁 | Type=连接 | 31 | 155 | 30 |
 | 道具技能 | Type=道具 | 19 | 19 | 9 |
-| **合计** | — | **224** | **1044** | **83** |
+| **合计** | — | **224** | **1044** | **84** |
 
 - 每个英雄技能按 `Sname` 展开为 Lv1~Lv5；道具技能多为单行 Lv1。
 - 技能类型分布：光环 35 行、兵增 20 行、单伤 190 行、单增 55 行、单控 45 行、单疗 30 行、召唤 10 行、群伤 205 行、群增 45 行、群控 20 行、群疗 35 行、职业 95 行、自增 85 行、连接 155 行、道具 19 行。
@@ -26,7 +26,7 @@
 | 前缀 | 适用范围 | 判定方式 |
 | --- | --- | --- |
 | `SkillAidXxx` | 英雄专属技能 | 一个英雄（或少数英雄）一套实现，含专属机制/演出；重写 `Skill.CheckAidSkill` 或挂专属钩子，逻辑无法由配置完全驱动 |
-| `SkillComXxx` | 通用模板技能 | 行为由 `SkillConfig` 字段 + `TargetType` 标记驱动，一份脚本服务多个英雄/多行配置（如 `SkillComSingleDamage` 服务 38 名英雄） |
+| `SkillComXxx` | 通用模板技能 | 行为由 `SkillConfig` 字段 + `TargetType` 标记驱动，一份脚本服务多个英雄/多行配置（如 `SkillComDamageSingle` 服务 38 名英雄） |
 | `SkillSoldierXxx` | 兵种/召唤物专属技能 | 只被 `SoldierConfig.Skill` 引用（如喷火兽的 `SkillSoldierHitWall`） |
 | `SkillBondXxx` | 羁绊/连锁技能 | `SkillConfig.Type` 为 `职业` 或 `连接` 的行 |
 | `SkillEquipXxx` | 道具技能 | `SkillConfig.Type` 为 `道具` 的行 |
@@ -42,12 +42,13 @@
 
 | ScriptName | 行数 | 类型 | 技能示例 |
 | --- | --- | --- | --- |
-| SkillComAreaBuff | 95 | 群增、单增 | 一统 |
-| SkillComAreaDamageDeBuff | 105 | 群伤、群控 | 暴敛 |
-| SkillComAreaHeal | 40 | 单疗、群疗 | 放权 |
+| SkillComBuffArea | 95 | 群增、单增 | 一统 |
+| SkillComDamageAreaDeBuff | 105 | 群伤、群控 | 暴敛 |
+| SkillComHealArea | 25 | 群疗 | 抚军 |
+| SkillComHealSingle | 15 | 单疗 | 放权 |
 | SkillAidBackstepShot | 5 | 单伤 | 纵舞 |
 | SkillAidBuffLowHp | 5 | 单疗 | 机巧疗 |
-| SkillComCastingAreaHeal | 5 | 群疗 | 胡笳 |
+| SkillComHealAreaCasting | 5 | 群疗 | 胡笳 |
 | SkillAidCastingDrain | 5 | 单控 | 魔神 |
 | SkillAidCastingFrontalFlaming | 5 | 群伤 | 绝策 |
 | SkillAidCastingLastStrategy | 5 | 群伤 | 遗计 |
@@ -61,22 +62,23 @@
 | SkillAidFeint | 5 | 召唤 | 制衡 |
 | SkillAidFireWall | 5 | 群伤 | 火墙 |
 | SkillAidFlashStrike | 5 | 群伤 | 龙胆 |
-| SkillComHitRegion | 20 | 群伤 | 屯田 |
-| SkillComJumpChain | 10 | 群伤、群疗 | 明断 |
+| SkillComDamageHitRegion | 20 | 群伤 | 屯田 |
+| SkillComDamageJumpChain | 5 | 群伤 | 明断 |
+| SkillComHealJumpChain | 5 | 群疗 | 妖疗 |
 | SkillAidJumpReturn | 5 | 单控 | 偷渡阴平 |
 | SkillAidLifeLink | 5 | 单疗 | 离间 |
 | SkillAidManaBurn | 5 | 单控 | 压制 |
 | SkillAidManaShare | 5 | 群增 | 仁德 |
 | SkillAidMultiHit | 5 | 单伤 | 奇策 |
 | SkillAidRaidCamp | 5 | 单伤 | 劫营 |
-| SkillComSelfBuff | 90 | 自增 | 破阵 |
+| SkillComBuffSelf | 90 | 自增 | 破阵 |
 | SkillAidShadowSplit | 5 | 召唤 | 分兵 |
-| SkillComShockWave | 25 | 群伤 | 贯穿箭 |
+| SkillComDamageShockWave | 25 | 群伤 | 贯穿箭 |
 | SkillAidShockWaveMulti | 5 | 群伤 | 连珠 |
-| SkillComSingleDamage | 190 | 单伤、单控、兵增 | 蛇毒 |
+| SkillComDamageSingle | 190 | 单伤、单控、兵增 | 蛇毒 |
 | SkillAidSkyFall | 5 | 群伤 | 天降恶来 |
 | SkillAidSoldierFortify | 5 | 兵增 | 筑垒 |
-| SkillComTaunt | 10 | 群控 | 抬棺 |
+| SkillComBuffTaunt | 10 | 群控 | 抬棺 |
 | SkillBondAreaBuff | 5 | 连接 | 奇才 |
 | SkillBondAttackAddDamage | 5 | 职业 | 猛将 |
 | SkillBondAttackArmorPierce | 5 | 连接 | 悍将 |
@@ -113,7 +115,7 @@
 | SkillBondSelfShield | 5 | 连接 | 温良 |
 | SkillBondSneakChangePos | 5 | 连接 | 偷袭 |
 | SkillAidSpinAttack | 5 | 群伤 | 旋风斩 |
-| SkillComAura | 35 | 光环 | 鼓舞 |
+| SkillComBuffAura | 35 | 光环 | 鼓舞 |
 | SkillSoldierHitWall | 5 | 群伤 | 喷火 |
 | SkillEquipAttackArmorPierce | 3 | 道具 | 破甲 |
 | SkillEquipAttackMagicDamage | 3 | 道具 | 会心 |
@@ -127,15 +129,16 @@
 
 ## 三、英雄个人技能 → 脚本归属
 
-152 名英雄各有 1 个个人技能（`HeroConfig.Skill1` = 技能缩写 = 英雄名），共使用 36 个脚本。
+152 名英雄各有 1 个个人技能（`HeroConfig.Skill1` = 技能缩写 = 英雄名），共使用 39 个脚本。
 
 | ScriptName | 英雄数 | 英雄(技能名) |
 | --- | --- | --- |
-| SkillComAreaBuff | 19 | 司马炎(一统)、周仓(忠勇)、李严(护军)、杨仪(调度)、李典(御阵)、甄宓(洛神)、郭太后(垂帘)、嵇康(广陵)、娄圭(筑城)、大乔(国色)、小乔(鼓舞)、陆抗(西陵)、步骘(镇抚)、司马孚(纯臣)、阮籍(长啸)、郭图(强阵)、张梁(黄天)、马良(励军)、荀彧(兵精) |
-| SkillComAreaDamageDeBuff | 21 | 孙皓(暴敛)、徐庶(困敌)、魏延(奇袭)、黄忠(乱射)、庞统(连锁)、祝融(飞刀)、关平(承志)、刘晔(卸甲)、蒋济(伪书)、毌丘俭(征东)、诸葛诞(举兵)、孙策(破阵冲阵)、韩当(双射)、诸葛恪(刚愎)、贾诩(乱阵)、张绣(枪出如龙)、司马昭(篡逆)、钟会(蓄谋)、张华(博物)、司马伦(乱政)、文丑(陷阵怒吼) |
-| SkillComAreaHeal | 8 | 刘璋(守护)、刘禅(放权)、蒋琬(抚军)、羊祜(遗爱)、王元姬(淑德)、华佗(青囊)、左慈(天书)、王浑(楼船) |
+| SkillComBuffArea | 19 | 司马炎(一统)、周仓(忠勇)、李严(护军)、杨仪(调度)、李典(御阵)、甄宓(洛神)、郭太后(垂帘)、嵇康(广陵)、娄圭(筑城)、大乔(国色)、小乔(鼓舞)、陆抗(西陵)、步骘(镇抚)、司马孚(纯臣)、阮籍(长啸)、郭图(强阵)、张梁(黄天)、马良(励军)、荀彧(兵精) |
+| SkillComDamageAreaDeBuff | 21 | 孙皓(暴敛)、徐庶(困敌)、魏延(奇袭)、黄忠(乱射)、庞统(连锁)、祝融(飞刀)、关平(承志)、刘晔(卸甲)、蒋济(伪书)、毌丘俭(征东)、诸葛诞(举兵)、孙策(破阵冲阵)、韩当(双射)、诸葛恪(刚愎)、贾诩(乱阵)、张绣(枪出如龙)、司马昭(篡逆)、钟会(蓄谋)、张华(博物)、司马伦(乱政)、文丑(陷阵怒吼) |
+| SkillComHealArea | 5 | 蒋琬(抚军)、羊祜(遗爱)、王元姬(淑德)、华佗(青囊)、左慈(天书) |
+| SkillComHealSingle | 3 | 刘璋(守护)、刘禅(放权)、王浑(楼船) |
 | SkillAidBackstepShot | 1 | 孙尚香(纵舞) |
-| SkillComCastingAreaHeal | 1 | 蔡文姬(胡笳) |
+| SkillComHealAreaCasting | 1 | 蔡文姬(胡笳) |
 | SkillAidCastingDrain | 1 | 吕布(魔神) |
 | SkillAidCastingFrontalFlaming | 1 | 陈宫(绝策) |
 | SkillAidCastingLastStrategy | 1 | 郭嘉(遗计) |
@@ -149,24 +152,25 @@
 | SkillAidFeint | 1 | 孙权(制衡) |
 | SkillAidFireWall | 1 | 周瑜(火墙) |
 | SkillAidFlashStrike | 1 | 赵云(龙胆) |
-| SkillComHitRegion | 4 | 张郃(震碎)、王昶(屯田)、王基(攻城)、张角(落雷) |
-| SkillComJumpChain | 2 | 法正(明断)、张宝(妖疗) |
+| SkillComDamageHitRegion | 4 | 张郃(震碎)、王昶(屯田)、王基(攻城)、张角(落雷) |
+| SkillComDamageJumpChain | 1 | 法正(明断) |
+| SkillComHealJumpChain | 1 | 张宝(妖疗) |
 | SkillAidJumpReturn | 1 | 邓艾(偷渡阴平) |
 | SkillAidLifeLink | 1 | 貂蝉(离间) |
 | SkillAidManaBurn | 1 | 曹叡(压制) |
 | SkillAidManaShare | 1 | 刘备(仁德) |
 | SkillAidMultiHit | 1 | 荀攸(奇策) |
 | SkillAidRaidCamp | 1 | 甘宁(劫营) |
-| SkillComSelfBuff | 18 | 孙坚(破阵)、马岱(连射)、严颜(固守)、张辽(威震)、徐晃(长驱)、曹仁(天人守城)、郭淮(雍州壁垒)、王凌(淮南举义)、文钦(奋锤)、周泰(不屈)、丁奉(奋威)、凌统(迅射)、徐盛(疑城)、张悌(死守)、朱然(江陵)、华雄(狂暴)、王濬(疾击)、陈群(律令) |
+| SkillComBuffSelf | 18 | 孙坚(破阵)、马岱(连射)、严颜(固守)、张辽(威震)、徐晃(长驱)、曹仁(天人守城)、郭淮(雍州壁垒)、王凌(淮南举义)、文钦(奋锤)、周泰(不屈)、丁奉(奋威)、凌统(迅射)、徐盛(疑城)、张悌(死守)、朱然(江陵)、华雄(狂暴)、王濬(疾击)、陈群(律令) |
 | SkillAidShadowSplit | 1 | 关羽(分兵) |
-| SkillComShockWave | 5 | 诸葛亮(惊雷)、关兴(复仇)、张苞(蛇矛)、许褚(虎啸)、鞠义(贯穿箭) |
+| SkillComDamageShockWave | 5 | 诸葛亮(惊雷)、关兴(复仇)、张苞(蛇矛)、许褚(虎啸)、鞠义(贯穿箭) |
 | SkillAidShockWaveMulti | 1 | 太史慈(连珠) |
-| SkillComSingleDamage | 38 | 董卓(暴虐)、刘表(乱政)、马腾(腾驾)、张松(舌辩)、马谡(守势)、孟获(蛮勇)、夏侯霸(归汉)、廖化(先锋斩)、谯周(劝学)、夏侯惇(歼灭)、夏侯渊(猎鹰)、曹洪(裂盾)、乐进(御斩)、司马懿(隐忍)、程昱(断粮)、文鸯(单骑)、曹真(虎豹)、诸葛绪(断后)、黄盖(苦肉)、蒋钦(江河)、吕蒙(白衣渡江)、朱桓(标记)、潘璋(偷刃)、程普(横扫)、高顺(破甲)、李儒(鸩酒)、陈泰(扬鞭)、杜预(发火)、王双(崩山)、贾充(构陷)、司马攸(清谈)、辛宪英(明鉴)、颜良(斩杀)、许攸(傲言)、高览(御守)、沮授(强弓)、张任(毒箭)、曹彰(突阵) |
+| SkillComDamageSingle | 38 | 董卓(暴虐)、刘表(乱政)、马腾(腾驾)、张松(舌辩)、马谡(守势)、孟获(蛮勇)、夏侯霸(归汉)、廖化(先锋斩)、谯周(劝学)、夏侯惇(歼灭)、夏侯渊(猎鹰)、曹洪(裂盾)、乐进(御斩)、司马懿(隐忍)、程昱(断粮)、文鸯(单骑)、曹真(虎豹)、诸葛绪(断后)、黄盖(苦肉)、蒋钦(江河)、吕蒙(白衣渡江)、朱桓(标记)、潘璋(偷刃)、程普(横扫)、高顺(破甲)、李儒(鸩酒)、陈泰(扬鞭)、杜预(发火)、王双(崩山)、贾充(构陷)、司马攸(清谈)、辛宪英(明鉴)、颜良(斩杀)、许攸(傲言)、高览(御守)、沮授(强弓)、张任(毒箭)、曹彰(突阵) |
 | SkillAidSkyFall | 1 | 典韦(天降恶来) |
 | SkillAidSoldierFortify | 1 | 张昭(筑垒) |
-| SkillComTaunt | 2 | 于禁(铁壁)、庞德(抬棺) |
+| SkillComBuffTaunt | 2 | 于禁(铁壁)、庞德(抬棺) |
 | SkillAidSpinAttack | 1 | 张飞(旋风斩) |
-| SkillComAura | 7 | 孙乾(鼓舞)、费祎(安民)、鲁肃(长者)、诸葛瑾(敦睦)、司马师(果决)、荀顗(礼乐)、田丰(直谏) |
+| SkillComBuffAura | 7 | 孙乾(鼓舞)、费祎(安民)、鲁肃(长者)、诸葛瑾(敦睦)、司马师(果决)、荀顗(礼乐)、田丰(直谏) |
 
 ## 四、Buff 归属规则
 

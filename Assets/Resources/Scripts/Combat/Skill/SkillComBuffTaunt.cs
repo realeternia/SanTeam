@@ -2,7 +2,7 @@
 using UnityEngine;
 
 /// <summary>
-/// 通用"嘲讽 + 可选自身增益/范围伤害"技能（ScriptName = "SkillComTaunt"）：
+/// 通用"嘲讽 + 可选自身增益/范围伤害"技能（ScriptName = "SkillComBuffTaunt"）：
 /// 对自身 Area 范围内敌人施加嘲讽（BuffTime 秒），并可按配置追加自身 Buff 与范围伤害。
 ///
 /// TargetType 标记：
@@ -11,9 +11,9 @@ using UnityEngine;
 /// 伤害：DamageStrength&gt;0（或物理/真实伤害的 atk）时对 Area 内敌人结算 GetSkillDamage()；
 /// DamageStrength=0 且无 BuffId 时为纯嘲讽（庞德·抬棺仅靠伤害，黄盖仅靠光环盾）。
 /// </summary>
-public class SkillComTaunt : Skill
+public class SkillComBuffTaunt : Skill
 {
-    public SkillComTaunt(int id, Chess unit) : base(id, unit)
+    public SkillComBuffTaunt(int id, Chess unit) : base(id, unit)
     {
     }
 

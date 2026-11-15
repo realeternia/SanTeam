@@ -2,7 +2,7 @@
 using UnityEngine;
 
 /// <summary>
-/// 青囊 / 天书（ScriptName = "SkillComAreaHeal"）：辅助技能，先在 Area 内按 SelectOnly / SelectFirst
+/// 青囊 / 天书（ScriptName = "SkillComHealArea"）：辅助技能，先在 Area 内按 SelectOnly / SelectFirst
 /// （典型配置 SelectOnly="ally;hero;notFullHp"、SelectFirst="lowestHp"）选出治疗中心，
 /// 再以该中心为圆心、Area 为半径按同样规则最多治疗 TargetCount 名友方英雄（各 HealTarget 一次，吃医职业治疗加成）。
 /// 治疗量走独立治疗公式 GetSkillHeal()。附近友军全部满血时不施放。
@@ -12,9 +12,9 @@ using UnityEngine;
 /// TargetType 仅保留脚本私有行为标记：
 /// · overflowToArmor = 溢出的治疗量转为等量护甲（BuffId 需配"甲"），且不再附带驱散（刘禅·安乐）
 /// </summary>
-public class SkillComAreaHeal : Skill
+public class SkillComHealArea : Skill
 {
-    public SkillComAreaHeal(int id, Chess unit) : base(id, unit)
+    public SkillComHealArea(int id, Chess unit) : base(id, unit)
     {
     }
 

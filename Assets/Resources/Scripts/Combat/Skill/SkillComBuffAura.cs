@@ -2,7 +2,7 @@
 using UnityEngine;
 
 /// <summary>
-/// 光环技能（ScriptName = "SkillComAura"）：
+/// 光环技能（ScriptName = "SkillComBuffAura"）：
 /// 开启期间每 3 秒对 Area 范围内的单位施加 BuffId（可指向友方或敌方，
 /// 由 SelectOnly / SelectFirst 选人，TargetCount&lt;=0 表示范围内全部）。
 ///
@@ -14,7 +14,7 @@ using UnityEngine;
 ///
 /// 开启时挂常驻 SelfEffect，关闭时销毁（光环视觉随之消失）。
 /// </summary>
-public class SkillComAura : Skill
+public class SkillComBuffAura : Skill
 {
     /// <summary>光环结算间隔(秒)：每 3 秒对范围内单位挂一次 Buff</summary>
     private const float TickInterval = 3f;
@@ -25,7 +25,7 @@ public class SkillComAura : Skill
     private bool auraOn;
     private GameObject selfEffectObj;
 
-    public SkillComAura(int id, Chess unit) : base(id, unit)
+    public SkillComBuffAura(int id, Chess unit) : base(id, unit)
     {
     }
 
@@ -102,7 +102,7 @@ public class SkillComAura : Skill
         var buffIds = GetSkillBuffIds();
         if (buffIds.Count == 0)
         {
-            GameLog.Warn($"SkillComAura: 未配置Buff短名 技能id={id}");
+            GameLog.Warn($"SkillComBuffAura: 未配置Buff短名 技能id={id}");
             return;
         }
 

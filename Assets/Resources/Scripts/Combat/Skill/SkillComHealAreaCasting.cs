@@ -3,15 +3,15 @@ using CommonConfig;
 using UnityEngine;
 
 /// <summary>
-/// 胡笳（ScriptName = "SkillComCastingAreaHeal"）：辅助技能，持续施法，在自身位置展开治疗领域（参考魔兽争霸3 丛林守护者的"宁静"）。
+/// 胡笳（ScriptName = "SkillComHealAreaCasting"）：辅助技能，持续施法，在自身位置展开治疗领域（参考魔兽争霸3 丛林守护者的"宁静"）。
 /// 领域存在 SummonTime 秒，每 SummonHitInterval 秒为领域内友方单位（英雄与小兵）回复一次生命：
 /// 按生命缺口（maxHp-hp）从大到小排序，最多治疗 TargetCount 个（0=不限）。
 /// 治疗量走独立治疗公式 GetSkillHeal()。由 SkillManager.CheckAidSkill 自动循环施放；领域召唤物用 SummonTag 区分。
 /// 用于蔡文姬：胡笳十八拍，闻者忘忧，众军自愈。
 /// </summary>
-public class SkillComCastingAreaHeal : Skill
+public class SkillComHealAreaCasting : Skill
 {
-    public SkillComCastingAreaHeal(int id, Chess unit) : base(id, unit)
+    public SkillComHealAreaCasting(int id, Chess unit) : base(id, unit)
     {
     }
 
