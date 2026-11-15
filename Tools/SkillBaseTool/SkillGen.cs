@@ -139,6 +139,27 @@ namespace SkillBaseTool
             return t != null && DamageTemplates.Contains(t);
         }
 
+        /// <summary>组件 Templates 的三大类取值：伤害。</summary>
+        public const string CategoryDamage = "Damage";
+        /// <summary>组件 Templates 的三大类取值：治疗。</summary>
+        public const string CategoryHeal = "Heal";
+        /// <summary>组件 Templates 的三大类取值：增益（含减益/控制等一切走 Buff 的效果）。</summary>
+        public const string CategoryBuff = "Buff";
+
+        /// <summary>模板所属大类：由其绑定的脚本类名推断（Damage / Heal / Buff）。</summary>
+        public static string TemplateCategory(TemplateRow tpl)
+        {
+            if (tpl == null || string.IsNullOrEmpty(tpl.Script))
+                return null;
+            if (tpl.Script.Contains(CategoryDamage))
+                return CategoryDamage;
+            if (tpl.Script.Contains(CategoryHeal))
+                return CategoryHeal;
+            if (tpl.Script.Contains(CategoryBuff))
+                return CategoryBuff;
+            return null;
+        }
+
         public static bool IsHealTemplate(string t)
         {
             return t != null && HealTemplates.Contains(t);
@@ -920,9 +941,13 @@ namespace SkillBaseTool
                 r.Hints.Add(string.Format("组件 {0}：分值 {1:0.##}，Lv{2} 数值 {3:0.###}，写入 {4}",
                     comp.Name, comp.Score, lv, value, DescribeEffects(comp.Effect, lv)));
 
-                if (comp.Templates.Length > 0 && !comp.Templates.Contains(tpl.Name))
-                    r.Hints.Add("  ⚠ 该组件不在模板「" + tpl.Name + "」的推荐列表（推荐："
-                        + string.Join("、", comp.Templates) + "）");
+                if (comp.Templates.Length > 0)
+                {
+                    string tplCat = TemplateCategory(tpl);
+                    if (tplCat != null && !comp.Templates.Contains(tplCat))
+                        r.Hints.Add("  ⚠ 该组件不适用于「" + tplCat + "」大类模板（适用："
+                            + string.Join("、", comp.Templates) + "）");
+                }
                 if (comp.IsSpecial)
                     r.Hints.Add("  ⚠ 特殊机制组件，需要人工评审（不走通用展开）");
 
@@ -1009,8 +1034,8 @@ namespace SkillBaseTool
                         err.Add("模板 " + t.Name + " 引用未知组件：" + m);
             foreach (var c in store.Components)
                 foreach (string t in c.Templates)
-                    if (!store.TemplateByName.ContainsKey(t))
-                        err.Add("组件 " + c.Name + " 引用未知模板：" + t);
+                    if (t != CategoryDamage && t != CategoryHeal && t != CategoryBuff)
+                        err.Add("组件 " + c.Name + " 的 Templates 只能是 Damage/Heal/Buff：" + t);
             foreach (var t in store.Templates)
                 CheckEffectKey(err, "模板 " + t.Name, t.Effect, store);
             foreach (var c in store.Components)

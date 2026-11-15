@@ -10,7 +10,7 @@ using UnityEngine;
 /// 张角·落雷原地不动；张郃·震碎在 Strength2 配了 moveDist 时，法阵会在持续期间沿"施法者→落点"方向缓慢前移该总距离（逐跳均分，踩墙则停）。
 /// 仿法正·明断，由 SkillManager.CheckAidSkill 自动循环施放。
 /// </summary>
-public class SkillComDamageHitRegion : Skill
+public class SkillComDamageHitRegion : SkillComDamageSingle
 {
     public SkillComDamageHitRegion(int id, Chess unit) : base(id, unit)
     {

@@ -9,7 +9,7 @@ using UnityEngine;
 /// 配置了 Strength2 的 pushMin/pushMax 时，命中后沿"自身→目标"方向把目标随机推开 pushMin~pushMax 距离（如许褚·虎啸）。
 /// 多箭随机散射（太史慈·连珠）见 SkillShockWaveMulti。
 /// </summary>
-public class SkillComDamageShockWave : Skill
+public class SkillComDamageShockWave : SkillComDamageSingle
 {
     public SkillComDamageShockWave(int id, Chess unit) : base(id, unit)
     {

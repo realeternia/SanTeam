@@ -11,7 +11,7 @@ using UnityEngine;
 /// 每跳按 GetSkillHeal() 治疗，治疗量按 Strength2[jumpDecay]（默认 0.85）逐跳递减（张宝·妖疗）。
 /// 伤害弹射见 SkillComDamageJumpChain。
 /// </summary>
-public class SkillComHealJumpChain : Skill
+public class SkillComHealJumpChain : SkillComHealSingle
 {
     /// <summary>治疗跳间隔(秒)</summary>
     private const float HealInterval = 0.2f;
@@ -55,10 +55,8 @@ public class SkillComHealJumpChain : Skill
             if (owner == null || owner.hp <= 0)
                 yield break;
 
-            if (currentHeal > 0)
-                owner.HealTarget(current, skillId, currentHeal, true);
+            HealUnit(current, currentHeal, false);
             PlayAreaEffect(current.transform.position);
-            EffectManager.PlaySkillEffect(current, skillCfg.HitEffect);
             GameLog.Debug($"妖疗 技能id={id} 等级={Level} 第{i + 1}跳 治疗={currentHeal} 目标={current.heroId}");
             healedList.Add(current);
 

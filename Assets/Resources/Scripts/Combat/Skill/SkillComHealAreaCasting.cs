@@ -9,7 +9,7 @@ using UnityEngine;
 /// 治疗量走独立治疗公式 GetSkillHeal()。由 SkillManager.CheckAidSkill 自动循环施放；领域召唤物用 SummonTag 区分。
 /// 用于蔡文姬：胡笳十八拍，闻者忘忧，众军自愈。
 /// </summary>
-public class SkillComHealAreaCasting : Skill
+public class SkillComHealAreaCasting : SkillComHealSingle
 {
     public SkillComHealAreaCasting(int id, Chess unit) : base(id, unit)
     {
@@ -54,11 +54,7 @@ public class SkillComHealAreaCasting : Skill
 
             var heal = GetSkillHeal();
             foreach (var unit in units)
-            {
-                if (heal > 0)
-                    owner.HealTarget(unit, skillId, heal, true);
-                EffectManager.PlaySkillEffect(unit, skillCfg.HitEffect);
-            }
+                HealUnit(unit, heal, false);
 
             GameLog.Debug($"胡笳 技能id={id} 等级={Level} 第{i + 1}跳 每跳治疗={heal} 目标数={units.Count}");
         }

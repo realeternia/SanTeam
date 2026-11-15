@@ -1,49 +1,55 @@
-﻿using CommonConfig;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
 /// 通用"嘲讽 + 可选自身增益/范围伤害"技能（ScriptName = "SkillComBuffTaunt"）：
 /// 对自身 Area 范围内敌人施加嘲讽（BuffTime 秒），并可按配置追加自身 Buff 与范围伤害。
 ///
-/// TargetType 标记：
-/// · requireTarget = 必须有当前目标才施放（于禁·铁壁）
-/// · selfBuff      = BuffId 挂给自身（黄盖·苦肉"硬" / 于禁·铁壁"硬"）
+/// 流程复用基类 SkillComBuffSingle：CanStart（存活即可）→ 选自身 → CanCast（requireTarget / CheckBurst）
+/// → PlayCast（动作 + 自身特效 + 范围特效）→ ApplyBuffs（自身 Buff → 范围伤害 → 嘲讽）。
+/// 组件标记 requireTarget（必须有当前目标，于禁·铁壁）由基类 CanCast 统一处理；
 /// 伤害：DamageStrength&gt;0（或物理/真实伤害的 atk）时对 Area 内敌人结算 GetSkillDamage()；
 /// DamageStrength=0 且无 BuffId 时为纯嘲讽（庞德·抬棺仅靠伤害，黄盖仅靠光环盾）。
 /// </summary>
-public class SkillComBuffTaunt : Skill
+public class SkillComBuffTaunt : SkillComBuffSingle
 {
     public SkillComBuffTaunt(int id, Chess unit) : base(id, unit)
     {
     }
 
-    public override bool CheckAidSkill()
+    /// <summary>允许不配 BuffId：纯嘲讽/纯范围伤害（庞德·抬棺）无需 Buff。</summary>
+    protected override bool RequireBuffId
     {
-        if (owner.hp <= 0)
-            return false;
+        get { return false; }
+    }
 
-        var requireTarget = HasSkillFlag("requireTarget");
-        var target = owner.targetChess;
-        if (requireTarget && (target == null || target.hp <= 0))
-            return false;
-        if (!CheckBurst(requireTarget ? target : null))
-            return false;
+    /// <summary>嘲讽只要求自身存活（不需要已交战）。</summary>
+    protected override bool CanStart()
+    {
+        return owner.hp > 0;
+    }
 
-        owner.PlayerAnim(skillCfg.Action);
+    /// <summary>Buff 只挂自身；嘲讽本身由 TauntEnemies 单独挂给敌方单位。</summary>
+    protected override List<Chess> SelectBuffTargets(List<int> buffIds)
+    {
+        return new List<Chess> { owner };
+    }
 
-        // 自身 Buff（如减伤盾"硬"）；嘲讽由 TauntEnemies 单独挂给敌方单位，
-        // BuffId 中若混入嘲讽（模板组件「嘲讽大」会并入）必须跳过，否则会把自己设为索敌目标
-        if (HasSkillFlag("selfBuff"))
+    protected override void PlayCast(List<Chess> targets)
+    {
+        base.PlayCast(targets);
+        PlayAreaEffect(owner.transform.position);
+    }
+
+    protected override void ApplyBuffs(List<Chess> targets, List<int> buffIds)
+    {
+        // 自身 Buff（如减伤盾"硬"）；模板组件「嘲讽大」会把嘲讽 Buff 并入 BuffId，
+        // 必须跳过，否则会把自己设为索敌目标
+        foreach (var buffId in buffIds)
         {
-            foreach (var buffId in GetSkillBuffIds())
-            {
-                if (buffId == CombatConst.TauntBuffId)
-                    continue;
-                BuffManager.AddBuff(owner, owner, id, buffId, skillCfg.BuffTime);
-                var shield = owner.GetBuff(buffId) as BuffShield;
-                if (shield != null)
-                    shield.AddHp(GetSkillShield());
-            }
+            if (buffId == CombatConst.TauntBuffId)
+                continue;
+            ApplyBuffToUnit(owner, buffId);
         }
 
         // 范围伤害（DamageStrength=0 时 GetSkillDamage 为 0，自动跳过）；选人规则见 SelectOnly / SelectFirst
@@ -63,9 +69,5 @@ public class SkillComBuffTaunt : Skill
 
         // 嘲讽：把范围内敌人的当前目标改到自己身上
         TauntEnemies(skillCfg.Area);
-
-        PlayAreaEffect(owner.transform.position);
-        PlaySelfEffect();
-        return true;
     }
 }

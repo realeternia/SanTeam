@@ -1,90 +1,35 @@
-﻿﻿﻿﻿using System;
-using System.Collections.Generic;
-using CommonConfig;
-using UnityEngine;
+﻿using System.Collections.Generic;
 
 /// <summary>
-/// 通用"群体增益"技能：给范围内友军附加 skillCfg.BuffId 对应的正面 buff。
-/// 支持多段组合（如奇才 "攻,甲,抗"），去重判断只看第一段。
-/// 选人规则由 SkillConfig.SelectOnly / SelectFirst 决定（见 TargetSelector）：
-///   典型配置 SelectOnly="ally;hero;notSelf;notFullHp"、SelectFirst="lowestHp"。
-/// SelectOnly 未配置阵营时默认取友方；TargetCount&lt;=0 时范围内全部。
-/// 护盾类 Buff 自动按统一护盾公式写入护盾量。
+/// 通用"群体增益"技能（ScriptName = "SkillComBuffArea"）：给范围内友军附加 skillCfg.BuffId 对应的正面 Buff。
+/// 支持多段组合（如奇才 "攻,甲,抗"），护盾类 Buff 自动按统一护盾公式写入护盾量。
+/// 选人规则由 SkillConfig.SelectOnly / SelectFirst 决定（典型 SelectOnly="ally;hero;notSelf;notFullHp"、
+/// SelectFirst="lowestHp"），TargetCount&lt;=0 时范围内全部。
 ///
-/// TargetType 仅保留脚本私有行为标记（逗号分隔）：
-/// · selfAlways         = 施法者必定获得（李典·御阵 / 周仓）
-/// · noDedupe           = 不按首段 Buff 去重（甄宓 / 袁绍 / 周仓 / 李严 / 张梁 / 大乔）
-/// · wholeMap           = 全图选人（李严·护军；Area 只作为嘲讽半径）
-/// · targetCenter       = 以选中的首个友军目标为中心，再在 Area 内扩散给周围友军（缺省以自身为中心）
-/// · tauntAroundTarget  = 给目标挂完 Buff 后，嘲讽其周围 Area 内敌人（李严·护军）
-/// · splitByRange       = 按近战/远程分开发放：近战取 BuffId 第 1 段、远程取第 2 段（司马炎·一统 "甲,攻"）
-///
-/// Buff 施加/护盾写入统一走基类 ApplyBuffToUnit；wholeMap 半径与 tauntAroundTarget 走基类 GetAuraSearchRange / TauntAroundUnit。
+/// 本类只声明「群体发放 + 播范围特效」，全部组件语义（selfAlways / noDedupe / wholeMap / targetCenter /
+/// splitByRange / tauntAroundTarget / 护盾写入）由基类 SkillComBuffSingle 统一结算。
 /// </summary>
-public class SkillComBuffArea : Skill
+public class SkillComBuffArea : SkillComBuffSingle
 {
     public SkillComBuffArea(int id, Chess unit) : base(id, unit)
     {
     }
 
-    public override bool CheckAidSkill()
+    /// <summary>群体发放：在 buffCenter 的 Area 内按规则选人。</summary>
+    protected override bool GroupBuff
     {
-        if (!CheckBurst(null))
-            return false;
-
-        var buffIds = GetSkillBuffIds();
-        if (buffIds.Count == 0)
-        {
-            GameLog.Error($"SkillComBuffArea: 未配置Buff短名 技能id={id}");
-            return false;
-        }
-
-        var selfAlways = HasSkillFlag("selfAlways");
-        var noDedupe = HasSkillFlag("noDedupe");
-        var splitByRange = HasSkillFlag("splitByRange");
-        var searchRange = GetAuraSearchRange();
-
-        // 中心点：缺省以施法者自身为中心；targetCenter 先选中首个友军目标，再以其位置为中心扩散
-        var center = owner.transform.position;
-        if (HasSkillFlag("targetCenter"))
-        {
-            var primary = SelectTargets(owner.transform.position, skillCfg.Range, true, 1,
-                selfAlways ? owner : null,
-                noDedupe ? (Func<Chess, bool>)null : x => !x.HasBuff(buffIds[0]));
-            if (primary.Count == 0)
-                return false;
-            center = primary[0].transform.position;
-        }
-
-        // 选人：SelectOnly 硬过滤 + SelectFirst 优先级；去重（非 noDedupe）在截断目标数前生效
-        var units = SelectTargets(center, searchRange, true, skillCfg.TargetCount,
-            selfAlways ? owner : null,
-            noDedupe ? (Func<Chess, bool>)null : x => !x.HasBuff(buffIds[0]));
-
-        if (selfAlways)
-            units.Add(owner);
-
-        if (units.Count == 0)
-            return false;
-
-        owner.PlayerAnim(skillCfg.Action);
-        PlaySelfEffect();
-        PlayAreaEffect(center);
-
-        foreach (var unit in units)
-        {
-            // splitByRange：近战只吃第 1 段、远程只吃第 2 段（如"甲,攻"），其余情况逐段施加
-            if (splitByRange && buffIds.Count >= 2)
-                ApplyBuffToUnit(unit, unit.attackRange < CombatConst.MeleeRange ? buffIds[0] : buffIds[1]);
-            else
-                foreach (var buffId in buffIds)
-                    ApplyBuffToUnit(unit, buffId);
-
-            if (!string.IsNullOrEmpty(skillCfg.HitEffect))
-                EffectManager.PlaySkillEffect(unit, skillCfg.HitEffect);
-            TauntAroundUnit(unit);
-        }
-        return true;
+        get { return true; }
     }
 
+    /// <summary>群体增益不要求已交战（走位中也可以给友军挂增益）。</summary>
+    protected override bool CanStart()
+    {
+        return owner.hp > 0;
+    }
+
+    protected override void PlayCast(List<Chess> targets)
+    {
+        base.PlayCast(targets);
+        PlayAreaEffect(buffCenter);
+    }
 }

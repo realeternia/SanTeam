@@ -11,7 +11,7 @@ using UnityEngine;
 /// 伤害按 Strength2[jumpDecay]（默认 0.85）逐跳递减（法正·明断）。
 /// 治疗弹射见 SkillComHealJumpChain。
 /// </summary>
-public class SkillComDamageJumpChain : Skill
+public class SkillComDamageJumpChain : SkillComDamageSingle
 {
     /// <summary>伤害跳间隔(秒)</summary>
     private const float DamageInterval = 0.3f;

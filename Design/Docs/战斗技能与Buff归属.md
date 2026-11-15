@@ -71,7 +71,7 @@
 | SkillAidManaShare | 5 | 群增 | 仁德 |
 | SkillAidMultiHit | 5 | 单伤 | 奇策 |
 | SkillAidRaidCamp | 5 | 单伤 | 劫营 |
-| SkillComBuffSelf | 90 | 自增 | 破阵 |
+| SkillComBuffSingle | 90 | 自增 | 破阵 |
 | SkillAidShadowSplit | 5 | 召唤 | 分兵 |
 | SkillComDamageShockWave | 25 | 群伤 | 贯穿箭 |
 | SkillAidShockWaveMulti | 5 | 群伤 | 连珠 |
@@ -161,7 +161,7 @@
 | SkillAidManaShare | 1 | 刘备(仁德) |
 | SkillAidMultiHit | 1 | 荀攸(奇策) |
 | SkillAidRaidCamp | 1 | 甘宁(劫营) |
-| SkillComBuffSelf | 18 | 孙坚(破阵)、马岱(连射)、严颜(固守)、张辽(威震)、徐晃(长驱)、曹仁(天人守城)、郭淮(雍州壁垒)、王凌(淮南举义)、文钦(奋锤)、周泰(不屈)、丁奉(奋威)、凌统(迅射)、徐盛(疑城)、张悌(死守)、朱然(江陵)、华雄(狂暴)、王濬(疾击)、陈群(律令) |
+| SkillComBuffSingle | 18 | 孙坚(破阵)、马岱(连射)、严颜(固守)、张辽(威震)、徐晃(长驱)、曹仁(天人守城)、郭淮(雍州壁垒)、王凌(淮南举义)、文钦(奋锤)、周泰(不屈)、丁奉(奋威)、凌统(迅射)、徐盛(疑城)、张悌(死守)、朱然(江陵)、华雄(狂暴)、王濬(疾击)、陈群(律令) |
 | SkillAidShadowSplit | 1 | 关羽(分兵) |
 | SkillComDamageShockWave | 5 | 诸葛亮(惊雷)、关兴(复仇)、张苞(蛇矛)、许褚(虎啸)、鞠义(贯穿箭) |
 | SkillAidShockWaveMulti | 1 | 太史慈(连珠) |

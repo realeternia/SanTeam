@@ -14,7 +14,7 @@ using UnityEngine;
 ///
 /// 开启时挂常驻 SelfEffect，关闭时销毁（光环视觉随之消失）。
 /// </summary>
-public class SkillComBuffAura : Skill
+public class SkillComBuffAura : SkillComBuffSingle
 {
     /// <summary>光环结算间隔(秒)：每 3 秒对范围内单位挂一次 Buff</summary>
     private const float TickInterval = 3f;
@@ -35,6 +35,12 @@ public class SkillComBuffAura : Skill
         // 无 MP 消耗的光环开局常开
         if (skillCfg.MpCost <= 0)
             SetAura(true);
+    }
+
+    /// <summary>光环由 Tick 周期结算，不走基类的主动施放流程。</summary>
+    public override bool CheckAidSkill()
+    {
+        return false;
     }
 
     public override void Tick(float deltaTime)

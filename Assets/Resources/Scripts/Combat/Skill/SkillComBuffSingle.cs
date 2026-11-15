@@ -1,30 +1,54 @@
 ﻿using System;
+using System.Collections.Generic;
 using CommonConfig;
 using UnityEngine;
 
 /// <summary>
-/// 通用"自身增益"技能（ScriptName = "SkillComBuffSelf"）：触发时给施法者自身挂 1~N 个通用 Buff，
-/// Buff 短名由 SkillConfig.BuffId 配置（英文/中文逗号或分号分隔多个，如"快"、"倍"、"重,吸"、"重,伤"），
-/// 各 Buff 的效果数值由其自身读取对应的 Strength2/StrengthBuff1，本类不写死数值；时长取 BuffTime。
-/// 覆盖：丁奉·奋威("倍") / 王濬·疾击、凌统·迅射("快") /
-/// 华雄·狂暴("重,伤") / 徐晃·长驱("重,吸") / 徐盛·疑城、张梁·黄天("硬") / 张辽·威震("震") /
-/// 曹仁·天人守城("守") / 周泰·不屈("盾,甲") / 马岱·连射（permanent，直接永久叠攻速）。
+/// 增益体系基类（ScriptName = "SkillComBuffSingle"，模板「自身强化」）：
+/// 触发时给目标挂 1~N 个通用 Buff。目标由 SkillConfig.SelectOnly / SelectFirst 决定（Area 内最多 TargetCount 名）；
+/// SelectOnly 留空时默认给自己。Buff 短名由 SkillConfig.BuffId 配置（逗号/分号分隔多个），
+/// 各 Buff 的效果数值由其自身读取 Strength2/StrengthBuff1，本类不写死数值；时长取 BuffTime。
 ///
-/// TargetType 标记：
-/// · noStack   = 自身已带任一 BuffId 时不重复施放（曹仁·天人守城）
-/// · permanent = 不挂 Buff，把 Strength2 里的成长键（selfAtkSpeed/selfAtk/selfAp/selfArmor/selfMagicRes/selfHp/selfMoveSpeed/selfRange）
-///               永久叠到自身对应属性，每次施放成长一次（马岱·连射）
+/// CheckAidSkill 固定按「可施放 → 选目标 → 发动判定 → 施法表现 → 施加效果」五步走，派生类只覆写钩子：
+/// · CanStart() / SelectBuffTargets() / CanCast() / PlayCast() / ApplyBuffs()
+///
+/// **所有增益组件（TargetType 标记 / Strength2 键）统一在基类结算**，派生类不要重复判断：
+/// · noStack            = 目标已带任一 BuffId 时不重复施放（曹仁·天人守城）
+/// · permanent          = 不挂 Buff，把 Strength2 的成长键永久叠到自身属性，每次施放成长一次（马岱·连射）
+/// · selfAlways         = 施法者必定获得（李典·御阵 / 周仓）
+/// · noDedupe           = 不按首段 Buff 去重（甄宓 / 袁绍 / 周仓 / 李严 / 张梁 / 大乔）
+/// · wholeMap           = 全图选人（李严·护军；Area 只作为嘲讽半径）
+/// · targetCenter       = 以选中的首个友军目标为中心，再在 Area 内扩散（缺省以自身为中心）
+/// · tauntAroundTarget  = 挂完 Buff 后嘲讽目标周围 Area 内敌人（李严·护军）
+/// · splitByRange       = 近战取 BuffId 第 1 段、远程取第 2 段（司马炎·一统 "甲,攻"）
+/// 护盾类 Buff 统一按护盾公式写入护盾值。
+///
+/// 增益体系派生：SkillComBuffArea（群体增益）、SkillComBuffAura（光环）、SkillComBuffTaunt（嘲讽）。
 /// </summary>
-public class SkillComBuffSelf : Skill
+public class SkillComBuffSingle : Skill
 {
-    public SkillComBuffSelf(int id, Chess unit) : base(id, unit)
+    /// <summary>本次施放的中心点（自身 / targetCenter 选中的目标位置），供派生类播范围特效。</summary>
+    protected Vector3 buffCenter;
+
+    public SkillComBuffSingle(int id, Chess unit) : base(id, unit)
     {
+    }
+
+    /// <summary>是否群体发放：true = 在 buffCenter 的 Area 内按规则选人；false = 默认自身（单体增益）</summary>
+    protected virtual bool GroupBuff
+    {
+        get { return false; }
+    }
+
+    /// <summary>是否必须配置 BuffId：纯伤害/纯机制类派生（如嘲讽）可覆写为 false。</summary>
+    protected virtual bool RequireBuffId
+    {
+        get { return true; }
     }
 
     public override bool CheckAidSkill()
     {
-        // 自己未进入交战（跑位/待机中）不施放，避免移动途中空开浪费 Buff 时长
-        if (!owner.IsInFight())
+        if (!CanStart())
             return false;
 
         // permanent：不挂 Buff；成长键由 SkillManager 在施放成功后统一叠加（见 Skill.ApplyPermanentGrowth）
@@ -33,33 +57,116 @@ public class SkillComBuffSelf : Skill
             if (!CheckBurst(null))
                 return false;
 
-            owner.PlayerAnim(skillCfg.Action);
-            PlaySelfEffect();
+            PlayCast(new List<Chess> { owner });
             return true;
         }
 
         var buffIds = GetSkillBuffIds();
-        if (buffIds.Count == 0)
+        if (buffIds.Count == 0 && RequireBuffId)
         {
-            GameLog.Error($"SkillComBuffSelf: 未配置Buff短名 技能id={id}");
+            GameLog.Error($"{GetType().Name}: 未配置Buff短名 技能id={id}");
             return false;
         }
 
-        // 已有该状态则不重复施放（Buff 的叠层/到期还原由其自身处理）
+        var targets = SelectBuffTargets(buffIds);
+        if (targets.Count == 0)
+            return false;
+        if (!CanCast(targets, buffIds))
+            return false;
+
+        PlayCast(targets);
+        ApplyBuffs(targets, buffIds);
+        return true;
+    }
+
+    /// <summary>是否允许施放：默认要求自身已进入交战（跑位/待机中不施放，避免移动途中空开浪费 Buff 时长）。</summary>
+    protected virtual bool CanStart()
+    {
+        return owner.IsInFight();
+    }
+
+    /// <summary>选目标：单体走自身/筛选；群体走 Area（含 selfAlways / noDedupe / wholeMap / targetCenter 组件）。</summary>
+    protected virtual List<Chess> SelectBuffTargets(List<int> buffIds)
+    {
+        buffCenter = owner.transform.position;
+
+        if (!GroupBuff)
+        {
+            var single = new List<Chess>();
+            if (!string.IsNullOrEmpty(skillCfg.SelectOnly))
+                single = SelectTargets(owner.transform.position, skillCfg.Area, true,
+                    Mathf.Max(1, skillCfg.TargetCount));
+            else
+                single.Add(owner);
+            return single;
+        }
+
+        var selfAlways = HasSkillFlag("selfAlways");
+        var noDedupe = HasSkillFlag("noDedupe");
+        // 去重：非 noDedupe 时排除已带首段 Buff 的单位
+        Func<Chess, bool> dedupeFilter = (noDedupe || buffIds.Count == 0) ? null : x => !x.HasBuff(buffIds[0]);
+        // selfAlways：选人时排除施法者，最后再把他补进结果
+        var exclude = selfAlways ? owner : null;
+
+        // targetCenter：先选首个友军目标作为中心，再以其位置扩散；缺省以自身为中心
+        if (HasSkillFlag("targetCenter"))
+        {
+            var primary = SelectTargets(owner.transform.position, skillCfg.Range, true, 1,
+                exclude, dedupeFilter);
+            if (primary.Count == 0)
+                return new List<Chess>();
+            buffCenter = primary[0].transform.position;
+        }
+
+        var units = SelectTargets(buffCenter, GetAuraSearchRange(), true, skillCfg.TargetCount,
+            exclude, dedupeFilter);
+        if (selfAlways && !units.Contains(owner))
+            units.Add(owner);
+        return units;
+    }
+
+    /// <summary>发动判定：默认处理 requireTarget（必须有当前目标）与 noStack（已带 Buff 不重复），再 CheckBurst。</summary>
+    protected virtual bool CanCast(List<Chess> targets, List<int> buffIds)
+    {
+        // requireTarget：必须有当前索敌目标才施放（于禁·铁壁）
+        var needTarget = HasSkillFlag("requireTarget");
+        if (needTarget && (owner.targetChess == null || owner.targetChess.hp <= 0))
+            return false;
+
         if (HasSkillFlag("noStack"))
         {
-            foreach (var buffId in buffIds)
-                if (owner.GetBuff(buffId) != null)
-                    return false;
+            foreach (var target in targets)
+                foreach (var buffId in buffIds)
+                    if (target.GetBuff(buffId) != null)
+                        return false;
         }
 
-        if (!CheckBurst(null))
-            return false;
+        return CheckBurst(needTarget ? owner.targetChess : null);
+    }
 
+    /// <summary>施法表现：默认施法动作 + 自身特效。</summary>
+    protected virtual void PlayCast(List<Chess> targets)
+    {
         owner.PlayerAnim(skillCfg.Action);
         PlaySelfEffect();
-        foreach (var buffId in buffIds)
-            ApplyBuffToUnit(owner, buffId);
-        return true;
+    }
+
+    /// <summary>施加效果：逐目标挂 Buff（splitByRange 近远分段），并结算命中特效与 tauntAroundTarget。</summary>
+    protected virtual void ApplyBuffs(List<Chess> targets, List<int> buffIds)
+    {
+        var splitByRange = HasSkillFlag("splitByRange");
+        foreach (var unit in targets)
+        {
+            // splitByRange：近战只吃第 1 段、远程只吃第 2 段（如"甲,攻"），其余情况逐段施加
+            if (splitByRange && buffIds.Count >= 2)
+                ApplyBuffToUnit(unit, unit.attackRange < CombatConst.MeleeRange ? buffIds[0] : buffIds[1]);
+            else
+                foreach (var buffId in buffIds)
+                    ApplyBuffToUnit(unit, buffId);
+
+            if (!string.IsNullOrEmpty(skillCfg.HitEffect))
+                EffectManager.PlaySkillEffect(unit, skillCfg.HitEffect);
+            TauntAroundUnit(unit);
+        }
     }
 }

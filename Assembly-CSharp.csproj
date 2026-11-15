@@ -140,7 +140,7 @@
     <Compile Include="Assets\SineVFX\TopDownEffects\Scripts\SineUIControllerTopDownEffects.cs" />
     <Compile Include="Assets\MasterMagicFX\Scripts\Miscs\MUtils.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffFireCloak.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillComBuffSelf.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillComBuffSingle.cs" />
     <Compile Include="Assets\SineVFX\TopDownEffects\Scripts\RampGeneratorTDE.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillComBuffArea.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffCoolDown.cs" />

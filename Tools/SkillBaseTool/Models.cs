@@ -218,6 +218,7 @@ namespace SkillBaseTool
         public int Id;
         public string Name;
         public string Category;
+        /// <summary>适用大类列表（Damage / Heal / Buff，空=通用）。</summary>
         public string[] Templates;
         /// <summary>效果 k-v（分号多绑定，列[:子键]=Lv1~5数值，None=不写列）。</summary>
         public string Effect;
