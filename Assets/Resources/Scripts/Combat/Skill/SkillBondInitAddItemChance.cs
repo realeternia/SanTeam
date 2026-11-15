@@ -5,7 +5,7 @@
 /// 命中则给所属玩家发放 skillCfg.ItemId 指定的道具（0=不发放）。
 /// 上一局战斗失败时，发动概率 ×LoseRateBonus（+50%，越挫越勇）。
 /// 概率可超过 100%：先保底发放 1 个，超出 100% 的部分继续判定，命中可再获得 1 个。
-/// 对应技能：文采（缩写「文」，2010111~2010115，概率40%~72%，道具「文赋」）。
+/// 当前无技能引用（原文采用此脚本，已改为 SkillBondInitAttrChange 的全队加魔抗），保留供后续概率赠道具类羁绊复用。
 /// </summary>
 public class SkillBondInitAddItemChance : Skill
 {

@@ -193,9 +193,10 @@ public static class HeroScenario
 
         foreach (var data in baseSkillStrengths)
         {
-            float factor = CombatConst.QualitySkillFactors[Mathf.Clamp(GetQuality(data.heroId), 1, CombatConst.QualitySkillFactors.Length) - 1] * data.factor;
-            data.cfg.DamageStrength = data.damage * factor;
-            data.cfg.HealStrength = data.heal * factor;
+            // 伤害与治疗分开取品质系数：伤害按 QualitySkillDamageFactors，治疗按回调后的 QualitySkillHealFactors（两者长度一致）
+            int q = Mathf.Clamp(GetQuality(data.heroId), 1, CombatConst.QualitySkillDamageFactors.Length) - 1;
+            data.cfg.DamageStrength = data.damage * CombatConst.QualitySkillDamageFactors[q] * data.factor;
+            data.cfg.HealStrength = data.heal * CombatConst.QualitySkillHealFactors[q] * data.factor;
         }
     }
 

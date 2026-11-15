@@ -103,7 +103,7 @@ public static class ConfigManager
             HeroScenario.RegisterBaseHeroPanel(heroCfg.Id, baseAtk, baseHp);
 
             // 英雄专属技能（HeroConfig.Skill1 指向的技能缩写）的伤害/治疗基值修正：
-            //   ①品质：× CombatConst.QualitySkillFactors[Q-1]（由 HeroScenario 按当前剧本品质应用）
+            //   ①品质：伤害 × CombatConst.QualitySkillDamageFactors[Q-1]、治疗 × CombatConst.QualitySkillHealFactors[Q-1]（由 HeroScenario 按当前剧本品质应用）
             //   ②MP消耗：× MpCost/CombatConst.SkillMpStandard（基准MpCost=100，钳制到[SkillMpFactorMin,SkillMpFactorMax]）
             //   ③法术倍率：× MagicRate（法系技能更强，与英雄攻击÷MagicRate对冲）
             // 这里只缓存原始强度与②③系数，切换剧本时由 HeroScenario 重新烘焙，保证技能数值与当前剧本品质一致。

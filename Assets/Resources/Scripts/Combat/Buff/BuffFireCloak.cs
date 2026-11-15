@@ -3,12 +3,13 @@ using UnityEngine;
 
 /// <summary>
 /// 焰衣（孙坚·破阵）：挂在自身身上的持续伤害光环。存在期间每秒对自身 skillCfg.Area 半径内的所有敌人
-/// 造成 Skill.GetSkillDamage(skillCfg, 施法者) 技能伤害（随施法者法强成长），并弹伤害飘字。
-/// 持续时间由 SkillSelfBuff 的 BuffTime 控制；技能侧配 TargetType=noStack 保证不会重叠多层。
+/// 造成 Skill.GetSkillDamage(skillCfg, 施法者) × StrengthBuff1 key "damageRate"（伤害%，默认 100%）的技能伤害，
+/// 并弹伤害飘字。持续时间由 SkillSelfBuff 的 BuffTime 控制；技能侧配 TargetType=noStack 保证不会重叠多层。
 /// </summary>
 public class BuffFireCloak : Buff
 {
     private Coroutine tickCoroutine;
+    private float damageRate = 1f; // 伤害%：对标技能伤害的倍率，未配置时按 100%
 
     public BuffFireCloak(int id, int skillId, Chess caster, Chess unit, float lastTime)
         : base(id, skillId, caster, unit, lastTime)
@@ -23,6 +24,7 @@ public class BuffFireCloak : Buff
             GameLog.Error("BuffFireCloak: 找不到技能配置 buffId=" + id);
             return;
         }
+        damageRate = GetStrBuff("damageRate", 1f);
         tickCoroutine = chess.StartCoroutine(TickDamage(chess));
     }
 
@@ -45,7 +47,7 @@ public class BuffFireCloak : Buff
                 yield break;
 
             var attrOwner = caster != null ? caster : chess;
-            var dmg = Skill.GetSkillDamage(skillCfg, attrOwner);
+            var dmg = (int)(Skill.GetSkillDamage(skillCfg, attrOwner) * damageRate);
             if (dmg <= 0)
                 continue;
 
