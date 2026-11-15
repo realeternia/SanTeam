@@ -164,6 +164,8 @@ public static class TargetSelector
 
     private static bool MatchJob(Chess unit, string token)
     {
+        if (unit == null || !unit.isHero || unit.heroId <= 0)
+            return false;
         var heroCfg = HeroConfig.GetConfig(unit.heroId);
         if (heroCfg == null || string.IsNullOrEmpty(heroCfg.Job))
             return false;

@@ -2,16 +2,16 @@
 using UnityEngine;
 
 /// <summary>
-/// 通用方向型范围导弹技能流程（诸葛亮·惊雷 / 许褚·虎啸 共用，ScriptName = "SkillAidShockWave"）：
+/// 通用方向型范围导弹技能流程（诸葛亮·惊雷 / 许褚·虎啸 共用，ScriptName = "SkillComShockWave"）：
 /// 朝目标位置发射导弹，伤害由飞行中的导弹逐个命中路径上的敌人结算（最多 TargetCount 名）。
 /// 配置了 BuffId 时额外给命中目标挂该 buff（如惊雷减速，比例取 Buff 短名对应键，如「缓」= slow），
 /// 未配置 BuffId 的技能不挂 buff。
 /// 配置了 Strength2 的 pushMin/pushMax 时，命中后沿"自身→目标"方向把目标随机推开 pushMin~pushMax 距离（如许褚·虎啸）。
 /// 多箭随机散射（太史慈·连珠）见 SkillShockWaveMulti。
 /// </summary>
-public class SkillAidShockWave : Skill
+public class SkillComShockWave : Skill
 {
-    public SkillAidShockWave(int id, Chess unit) : base(id, unit)
+    public SkillComShockWave(int id, Chess unit) : base(id, unit)
     {
     }
 
@@ -32,7 +32,7 @@ public class SkillAidShockWave : Skill
         var damage = GetSkillDamage(); // 固定系数 + 比例系数×关联属性
         WorldManager.Instance.CreateSpellMissile(owner, targetPos, GetSummonTime(), skillCfg.SummonSpeed, skillCfg.Area, skillCfg.Id, damage, skillCfg.HitEffect, null, OnMissileHit);
 
-        GameLog.Debug("SkillAidShockWave id=" + id.ToString() + " damage=" + damage.ToString());
+        GameLog.Debug("SkillComShockWave id=" + id.ToString() + " damage=" + damage.ToString());
 
         return true;
     }
@@ -47,7 +47,7 @@ public class SkillAidShockWave : Skill
         {
             var buffCfg = BuffConfig.GetConfigByNameS(skillCfg.BuffId);
             if (buffCfg == null)
-                GameLog.Error("SkillAidShockWave: 未找到Buff短名：" + skillCfg.BuffId);
+                GameLog.Error("SkillComShockWave: 未找到Buff短名：" + skillCfg.BuffId);
             else
                 BuffManager.AddBuff(target, owner, id, buffCfg.Id, skillCfg.BuffTime);
         }

@@ -3,7 +3,7 @@ using CommonConfig;
 using UnityEngine;
 
 /// <summary>
-/// 通用"单体伤害 + 可选增益/减益"技能（ScriptName = "SkillAidSingleDamage"）：
+/// 通用"单体伤害 + 可选增益/减益"技能（ScriptName = "SkillComSingleDamage"）：
 /// 锁定 skillCfg.Range 射程内的当前目标，造成 GetSkillDamage() 技能伤害，并可选附加 SkillConfig.BuffId
 /// 指定的 Buff（英文/中文逗号或分号分隔多个，空=纯伤害），时长 BuffTime。
 /// 多段连打请使用 SkillMultiHit（荀攸·奇策）。
@@ -27,9 +27,9 @@ using UnityEngine;
 /// 持续伤害（dot）不再由本脚本结算：统一在 BuffId 里挂 DoT Buff（如"败"），
 /// 每秒跳伤由 BuffTimeDamage 读施加技能的 StrengthBuff1 键"dot"（绝对值）结算。
 /// </summary>
-public class SkillAidSingleDamage : Skill
+public class SkillComSingleDamage : Skill
 {
-    public SkillAidSingleDamage(int id, Chess unit) : base(id, unit)
+    public SkillComSingleDamage(int id, Chess unit) : base(id, unit)
     {
     }
 
@@ -163,7 +163,7 @@ public class SkillAidSingleDamage : Skill
     private bool IsTargetJobMatched(Chess target)
     {
         var raw = skillCfg != null ? skillCfg.Strength2 : null;
-        if (string.IsNullOrEmpty(raw) || target == null)
+        if (string.IsNullOrEmpty(raw) || target == null || !target.isHero || target.heroId <= 0)
             return false;
         var heroCfg = HeroConfig.GetConfig(target.heroId);
         if (heroCfg == null || string.IsNullOrEmpty(heroCfg.Job))

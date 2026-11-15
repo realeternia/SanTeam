@@ -4,7 +4,7 @@ using CommonConfig;
 using UnityEngine;
 
 /// <summary>
-/// 通用"跳跃链"技能（ScriptName = "SkillAidJumpChain"）：医疗波 / 连锁闪电式的连续跳跃结算。
+/// 通用"跳跃链"技能（ScriptName = "SkillComJumpChain"）：医疗波 / 连锁闪电式的连续跳跃结算。
 ///
 /// 伤害模式（缺省）：首跳取当前索敌目标（须在 Range 内），随后每跳在 Area 内寻找最近的、尚未命中的敌方单位，
 /// 共 TargetCount 跳；每跳造成 GetSkillDamage() 并附加 BuffId 减益，伤害按 Strength2[jumpDecay]（默认 0.85）逐跳递减（法正·明断）。
@@ -15,14 +15,14 @@ using UnityEngine;
 /// TargetType 标记：
 /// · heal = 治疗型跳跃（友军英雄）；缺省为伤害型（敌方单位）
 /// </summary>
-public class SkillAidJumpChain : Skill
+public class SkillComJumpChain : Skill
 {
     /// <summary>伤害跳间隔(秒)</summary>
     private const float DamageInterval = 0.3f;
     /// <summary>治疗跳间隔(秒)</summary>
     private const float HealInterval = 0.2f;
 
-    public SkillAidJumpChain(int id, Chess unit) : base(id, unit)
+    public SkillComJumpChain(int id, Chess unit) : base(id, unit)
     {
     }
 
@@ -111,7 +111,7 @@ public class SkillAidJumpChain : Skill
             var debuffCfg = BuffConfig.GetConfigByNameS(skillCfg.BuffId);
             if (debuffCfg == null)
             {
-                GameLog.Error($"SkillAidJumpChain: 未找到减益Buff短名：{skillCfg.BuffId} 技能id={id}");
+                GameLog.Error($"SkillComJumpChain: 未找到减益Buff短名：{skillCfg.BuffId} 技能id={id}");
                 return false;
             }
             debuffId = debuffCfg.Id;

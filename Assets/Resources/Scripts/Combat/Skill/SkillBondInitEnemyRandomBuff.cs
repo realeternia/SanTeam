@@ -26,7 +26,7 @@ public class SkillBondInitEnemyRandomBuff : Skill
         // 敌方存活英雄中随机选一名未持有该 Buff 者（优先配对敌人，无配对敌人时取全部敌方英雄）：
         // 近战优先（射程<=20 判为近战，与 JobLinkManager/弩羁绊规则一致），近战全部挂满后才轮到远程
         var unbuffed = WorldManager.Instance.GetAllEnemys(owner.side)
-            .FindAll(x => !x.HasBuff(buffCfg.Id));
+            .FindAll(x => x.isHero && x.heroId > 0 && !x.HasBuff(buffCfg.Id));
         var melee = unbuffed.FindAll(x => HeroSelectionTool.IsMeleeHero(HeroConfig.GetConfig(x.heroId)));
         var candidates = melee.Count > 0
             ? melee

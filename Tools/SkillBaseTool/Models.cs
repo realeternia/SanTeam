@@ -196,6 +196,8 @@ namespace SkillBaseTool
     {
         public int Id;
         public string Name;
+        /// <summary>唯一绑定的技能类名（对应 SkillTemplateConfig.Script）。</summary>
+        public string Script;
         public string Des;
         public string[] Modules;
         /// <summary>效果 k-v（分号多绑定，列[:子键]=Lv1~5数值，None=不写列）。</summary>

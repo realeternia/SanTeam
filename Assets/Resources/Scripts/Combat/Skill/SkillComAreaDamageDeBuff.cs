@@ -16,9 +16,9 @@ using UnityEngine;
 /// · maxHpBonus = 伤害 += 目标最大生命 × 键"maxHpBonusRate"（文丑·陷阵怒吼）
 /// · mpBurn     = 每个命中目标燃烧 键"mpBurn" 点法力（贾诩·乱阵）
 /// </summary>
-public class SkillAidAreaDamageDeBuff : Skill
+public class SkillComAreaDamageDeBuff : Skill
 {
-    public SkillAidAreaDamageDeBuff(int id, Chess unit) : base(id, unit)
+    public SkillComAreaDamageDeBuff(int id, Chess unit) : base(id, unit)
     {
     }
 

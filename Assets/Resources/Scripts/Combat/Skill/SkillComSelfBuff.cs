@@ -3,7 +3,7 @@ using CommonConfig;
 using UnityEngine;
 
 /// <summary>
-/// 通用"自身增益"技能（ScriptName = "SkillAidSelfBuff"）：触发时给施法者自身挂 1~N 个通用 Buff，
+/// 通用"自身增益"技能（ScriptName = "SkillComSelfBuff"）：触发时给施法者自身挂 1~N 个通用 Buff，
 /// Buff 短名由 SkillConfig.BuffId 配置（英文/中文逗号或分号分隔多个，如"快"、"倍"、"重,吸"、"重,伤"），
 /// 各 Buff 的效果数值由其自身读取对应的 Strength2/StrengthBuff1，本类不写死数值；时长取 BuffTime。
 /// 覆盖：丁奉·奋威("倍") / 王濬·疾击、凌统·迅射("快") /
@@ -15,9 +15,9 @@ using UnityEngine;
 /// · permanent = 不挂 Buff，把 Strength2 里的成长键（selfAtkSpeed/selfAtk/selfAp/selfArmor/selfMagicRes/selfHp/selfMoveSpeed/selfRange）
 ///               永久叠到自身对应属性，每次施放成长一次（马岱·连射）
 /// </summary>
-public class SkillAidSelfBuff : Skill
+public class SkillComSelfBuff : Skill
 {
-    public SkillAidSelfBuff(int id, Chess unit) : base(id, unit)
+    public SkillComSelfBuff(int id, Chess unit) : base(id, unit)
     {
     }
 
@@ -41,7 +41,7 @@ public class SkillAidSelfBuff : Skill
         var buffIds = GetSkillBuffIds();
         if (buffIds.Count == 0)
         {
-            GameLog.Error($"SkillAidSelfBuff: 未配置Buff短名 技能id={id}");
+            GameLog.Error($"SkillComSelfBuff: 未配置Buff短名 技能id={id}");
             return false;
         }
 

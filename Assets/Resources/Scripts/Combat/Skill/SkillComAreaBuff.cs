@@ -19,9 +19,9 @@ using UnityEngine;
 /// · tauntAroundTarget  = 给目标挂完 Buff 后，嘲讽其周围 Area 内敌人（李严·护军）
 /// · splitByRange       = 按近战/远程分开发放：近战取 BuffId 第 1 段、远程取第 2 段（司马炎·一统 "甲,攻"）
 /// </summary>
-public class SkillAidAreaBuff : Skill
+public class SkillComAreaBuff : Skill
 {
-    public SkillAidAreaBuff(int id, Chess unit) : base(id, unit)
+    public SkillComAreaBuff(int id, Chess unit) : base(id, unit)
     {
     }
 
@@ -33,7 +33,7 @@ public class SkillAidAreaBuff : Skill
         var buffIds = GetSkillBuffIds();
         if (buffIds.Count == 0)
         {
-            GameLog.Error($"SkillAidAreaBuff: 未配置Buff短名 技能id={id}");
+            GameLog.Error($"SkillComAreaBuff: 未配置Buff短名 技能id={id}");
             return false;
         }
 

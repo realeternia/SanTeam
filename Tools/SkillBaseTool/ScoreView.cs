@@ -433,7 +433,7 @@ namespace SkillBaseTool
         {
             templateChanged = true;
             string type, script;
-            if (SkillGen.TryGetTemplateBinding(SelectedTemplate(), skill.Type, out type, out script))
+            if (SkillGen.TryGetTemplateBinding(store, SelectedTemplate(), skill.Type, out type, out script))
             {
                 pendingType = type;
                 pendingScript = script;

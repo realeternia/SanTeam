@@ -7,9 +7,9 @@ using UnityEngine;
 /// 张飞·旋风斩：普攻时对周围最多 TargetCount 个敌人造成 key "splashRate"% 攻击伤害，
 /// 并对被溅射的敌人附加流血（Buff 短名由 skillCfg.BuffId 配置），每秒伤害 = 本次溅射伤害 × key "dot"，持续 BuffTime 秒。
 /// </summary>
-public class SkillComAttackSpinAttack : Skill
+public class SkillAidSpinAttack : Skill
 {
-    public SkillComAttackSpinAttack(int id, Chess unit) : base(id, unit)
+    public SkillAidSpinAttack(int id, Chess unit) : base(id, unit)
     {
     }
 
@@ -46,7 +46,7 @@ public class SkillComAttackSpinAttack : Skill
         var buffCfg = BuffConfig.GetConfigByNameS(skillCfg.BuffId);
         if (buffCfg == null)
         {
-            GameLog.Error("SkillComAttackSpinAttack: 未找到流血Buff短名：" + skillCfg.BuffId);
+            GameLog.Error("SkillAidSpinAttack: 未找到流血Buff短名：" + skillCfg.BuffId);
             return;
         }
 

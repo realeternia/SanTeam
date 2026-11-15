@@ -154,15 +154,13 @@ namespace SkillBaseTool
 
             if (script == "SkillAura")
                 return "光环中";
-            if (script == "SkillSoldierBless")
-                return "兵种增益";
             if (script == "SkillJumpChain")
                 return (heal > 0 || a.TargetType.Contains("heal")) ? "跳跃弹射-治疗大" : "跳跃弹射-伤害大";
             if (script == "SkillSelfBuff")
                 return "自身强化";
             if (script == "SkillTaunt")
                 return "群体嘲讽";
-            if (script == "SkillAidHitRegion")
+            if (script == "SkillComHitRegion")
                 return "持续伤害大";
             if (heal > 0)
             {
@@ -192,60 +190,62 @@ namespace SkillBaseTool
             return dmg >= 90 ? "单体伤害大" : (dmg >= 60 ? "单体伤害中" : "单体伤害小");
         }
 
-        /// <summary>模板 → (标准 Type, 脚本)，供编辑弹窗切换模板时联动；单/群控制技能保留原「控」后缀。</summary>
-        private static readonly Dictionary<string, KeyValuePair<string, string>> TemplateBindings =
-            new Dictionary<string, KeyValuePair<string, string>>
+        /// <summary>模板 → 标准 Type，供编辑弹窗切换模板时联动；脚本取模板表 Script 列。</summary>
+        private static readonly Dictionary<string, string> TemplateTypes =
+            new Dictionary<string, string>
             {
-                { "单体伤害大", new KeyValuePair<string, string>("单伤", "SkillSingleDamage") },
-                { "单体伤害中", new KeyValuePair<string, string>("单伤", "SkillSingleDamage") },
-                { "单体伤害小", new KeyValuePair<string, string>("单伤", "SkillSingleDamage") },
-                { "群体伤害近距离大", new KeyValuePair<string, string>("群伤", "SkillAreaDamageDeBuff") },
-                { "群体伤害近距离中", new KeyValuePair<string, string>("群伤", "SkillAreaDamageDeBuff") },
-                { "群体伤害近距离小", new KeyValuePair<string, string>("群伤", "SkillAreaDamageDeBuff") },
-                { "群体伤害自身中心大", new KeyValuePair<string, string>("群伤", "SkillAreaDamageDeBuff") },
-                { "群体伤害自身中心中", new KeyValuePair<string, string>("群伤", "SkillAreaDamageDeBuff") },
-                { "群体伤害自身中心小", new KeyValuePair<string, string>("群伤", "SkillAreaDamageDeBuff") },
-                { "跳跃弹射-伤害大", new KeyValuePair<string, string>("群伤", "SkillJumpChain") },
-                { "跳跃弹射-伤害中", new KeyValuePair<string, string>("群伤", "SkillJumpChain") },
-                { "跳跃弹射-伤害小", new KeyValuePair<string, string>("群伤", "SkillJumpChain") },
-                { "冲击波伤害大", new KeyValuePair<string, string>("群伤", "SkillShockWave") },
-                { "冲击波伤害中", new KeyValuePair<string, string>("群伤", "SkillShockWave") },
-                { "冲击波伤害小", new KeyValuePair<string, string>("群伤", "SkillShockWave") },
-                { "持续伤害大", new KeyValuePair<string, string>("群伤", "SkillAidHitRegion") },
-                { "持续伤害中", new KeyValuePair<string, string>("群伤", "SkillAidHitRegion") },
-                { "持续伤害小", new KeyValuePair<string, string>("群伤", "SkillAidHitRegion") },
-                { "单体治疗大", new KeyValuePair<string, string>("单疗", "SkillAreaHeal") },
-                { "单体治疗中", new KeyValuePair<string, string>("单疗", "SkillAreaHeal") },
-                { "单体治疗小", new KeyValuePair<string, string>("单疗", "SkillAreaHeal") },
-                { "范围治疗大", new KeyValuePair<string, string>("群疗", "SkillAreaHeal") },
-                { "范围治疗中", new KeyValuePair<string, string>("群疗", "SkillAreaHeal") },
-                { "范围治疗小", new KeyValuePair<string, string>("群疗", "SkillAreaHeal") },
-                { "跳跃弹射-治疗大", new KeyValuePair<string, string>("群疗", "SkillJumpChain") },
-                { "跳跃弹射-治疗中", new KeyValuePair<string, string>("群疗", "SkillJumpChain") },
-                { "跳跃弹射-治疗小", new KeyValuePair<string, string>("群疗", "SkillJumpChain") },
-                { "持续治疗大", new KeyValuePair<string, string>("群疗", "SkillCastingAidAreaHeal") },
-                { "持续治疗中", new KeyValuePair<string, string>("群疗", "SkillCastingAidAreaHeal") },
-                { "持续治疗小", new KeyValuePair<string, string>("群疗", "SkillCastingAidAreaHeal") },
-                { "自身强化", new KeyValuePair<string, string>("自增", "SkillSelfBuff") },
-                { "光环中", new KeyValuePair<string, string>("光环", "SkillAura") },
-                { "单体友方增益", new KeyValuePair<string, string>("单增", "SkillAreaBuff") },
-                { "群体友方增益", new KeyValuePair<string, string>("群增", "SkillAreaBuff") },
-                { "群体友方增益-目标小", new KeyValuePair<string, string>("群增", "SkillAreaBuff") },
-                { "全体友军增益", new KeyValuePair<string, string>("群增", "SkillAreaBuff") },
-                { "兵种增益", new KeyValuePair<string, string>("兵增", "SkillSoldierBless") },
-                { "群体嘲讽", new KeyValuePair<string, string>("群控", "SkillTaunt") },
+                { "单体伤害大", "单伤" },
+                { "单体伤害中", "单伤" },
+                { "单体伤害小", "单伤" },
+                { "群体伤害近距离大", "群伤" },
+                { "群体伤害近距离中", "群伤" },
+                { "群体伤害近距离小", "群伤" },
+                { "群体伤害自身中心大", "群伤" },
+                { "群体伤害自身中心中", "群伤" },
+                { "群体伤害自身中心小", "群伤" },
+                { "跳跃弹射-伤害大", "群伤" },
+                { "跳跃弹射-伤害中", "群伤" },
+                { "跳跃弹射-伤害小", "群伤" },
+                { "冲击波伤害大", "群伤" },
+                { "冲击波伤害中", "群伤" },
+                { "冲击波伤害小", "群伤" },
+                { "持续伤害大", "群伤" },
+                { "持续伤害中", "群伤" },
+                { "持续伤害小", "群伤" },
+                { "单体治疗大", "单疗" },
+                { "单体治疗中", "单疗" },
+                { "单体治疗小", "单疗" },
+                { "范围治疗大", "群疗" },
+                { "范围治疗中", "群疗" },
+                { "范围治疗小", "群疗" },
+                { "跳跃弹射-治疗大", "群疗" },
+                { "跳跃弹射-治疗中", "群疗" },
+                { "跳跃弹射-治疗小", "群疗" },
+                { "持续治疗大", "群疗" },
+                { "持续治疗中", "群疗" },
+                { "持续治疗小", "群疗" },
+                { "自身强化", "自增" },
+                { "光环中", "光环" },
+                { "单体友方增益", "单增" },
+                { "群体友方增益", "群增" },
+                { "群体友方增益-目标小", "群增" },
+                { "全体友军增益", "群增" },
+                { "群体嘲讽", "群控" },
             };
 
-        /// <summary>取模板对应的 Type / 脚本；单/群控制技能沿用原「单控 / 群控」Type，避免切模板后丢控制标记。</summary>
-        public static bool TryGetTemplateBinding(string template, string currentType, out string type, out string script)
+        /// <summary>取模板对应的 Type / 脚本（脚本来自 SkillTemplateConfig.Script）；单/群控制技能沿用原「单控 / 群控」Type，避免切模板后丢控制标记。</summary>
+        public static bool TryGetTemplateBinding(DataStore store, string template, string currentType, out string type, out string script)
         {
             type = null;
             script = null;
-            KeyValuePair<string, string> binding;
-            if (string.IsNullOrEmpty(template) || !TemplateBindings.TryGetValue(template, out binding))
+            if (store == null || string.IsNullOrEmpty(template))
                 return false;
-            script = binding.Value;
-            type = binding.Key;
+            TemplateRow tpl;
+            if (!store.TemplateByName.TryGetValue(template, out tpl) || string.IsNullOrEmpty(tpl.Script))
+                return false;
+            if (!TemplateTypes.TryGetValue(template, out type))
+                return false;
+            script = tpl.Script;
             if (type == "单伤" && currentType == "单控")
                 type = "单控";
             else if (type == "群伤" && currentType == "群控")
@@ -314,7 +314,7 @@ namespace SkillBaseTool
                 result.Add("二段射击");
             if (a.ScriptName == "SkillCastingAidFrontalFlaming" && !result.Contains("持续施法"))
                 result.Add("持续施法");
-            if (a.ScriptName == "SkillAidHitRegion" && a.Strength2.Contains("moveDist") && !result.Contains("持续场移动"))
+            if (a.ScriptName == "SkillComHitRegion" && a.Strength2.Contains("moveDist") && !result.Contains("持续场移动"))
                 result.Add("持续场移动");
             if ((a.Strength2.Contains("pushMin") || a.Strength2.Contains("pushMax")) && !result.Contains("位移"))
                 result.Add("位移");

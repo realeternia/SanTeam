@@ -75,7 +75,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .trae/skills/combat-effect-u
 
 - buff 特效随 buff 存续：`PlayBuffEffect` 内对子 `ParticleSystem` 置 `main.loop = true` 后再 `Play()`（`GetComponentsInChildren<ParticleSystem>(true)`）。
 - 一次性特效（命中/范围）不加 loop。
-- 导弹类技能（如 `SkillAidShockWave` 系）：`SkillConfig.HitEffect` 填的是**导弹特效名**（`EffectConfig.MissilePath`），命中特效取该 `EffectConfig` 条目的 `EffPath`——即一个条目同时描述"弹道 + 其命中特效"。原从导弹预制体 `MissileComp.hitEffectName` 读取命中特效的机制已移除，要改某技能的命中特效就改对应 `EffectConfig.EffPath`（缩放/染色同样取该条目）。
+- 导弹类技能（如 `SkillComShockWave` 系）：`SkillConfig.HitEffect` 填的是**导弹特效名**（`EffectConfig.MissilePath`），命中特效取该 `EffectConfig` 条目的 `EffPath`——即一个条目同时描述"弹道 + 其命中特效"。原从导弹预制体 `MissileComp.hitEffectName` 读取命中特效的机制已移除，要改某技能的命中特效就改对应 `EffectConfig.EffPath`（缩放/染色同样取该条目）。
 - 世界缩放/偏移由配置决定，不受父节点缩放影响（按父级 `lossyScale` 的 X 轴做标量补偿）。
 - 该补偿只对 **Hierarchy** 缩放模式的粒子成立；根节点上的 **Local** 粒子只吃自身 `localScale`（忽略父级），会被补偿除法缩小一个父级缩放的倍数（单位根缩放 10 → 小 10 倍，如 `Par_PurpleField`）。`MountEffect` 已统一把根节点 Local 粒子改回 Hierarchy，故新增特效预制体若根节点粒子是 Local 也能自动修正；若想从源头规范，可直接把预制体根节点粒子 Scaling Mode 设为 Hierarchy。
 

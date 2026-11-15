@@ -1,14 +1,18 @@
-﻿using System;
+﻿﻿using System;
 using System.Buffers;
 using System.Collections;
 using System.Collections.Generic;
 using CommonConfig;
 using UnityEngine;
 
-public class SkillComHitWall : Skill
+/// <summary>
+/// 喷火兽兵种技能（SoldierConfig.Skill = "喷火"）：普攻命中后按 Rate 概率在目标位置及左右两侧
+/// 生成火焰墙，每隔 SummonHitInterval 秒对范围内敌人结算一次伤害，共持续 SummonTime 秒。
+/// </summary>
+public class SkillSoldierHitWall : Skill
 {
     private List<Vector3> targetPosList;
-    public SkillComHitWall(int id, Chess unit) : base(id, unit)
+    public SkillSoldierHitWall(int id, Chess unit) : base(id, unit)
     {
     }
 
