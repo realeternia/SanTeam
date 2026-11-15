@@ -14,7 +14,8 @@ using UnityEngine;
 /// TargetType 仅保留脚本私有行为标记（可与 self 组合，逗号分隔）：
 /// · missile    = 以飞弹逐个结算，伤害 ×(1+键"missileRate")（黄忠·乱射）
 /// · maxHpBonus = 伤害 += 目标最大生命 × 键"maxHpBonusRate"（文丑·陷阵怒吼）
-/// · mpBurn     = 每个命中目标燃烧 键"mpBurn" 点法力（贾诩·乱阵）
+/// · mpBurn     = 每个命中目标燃烧 键"mpBurn" 点法力（贾诩·乱阵；基类 ApplyMpBurn 统一实现）
+/// 另可复用基类的通用伤害组件（execute/shieldBonus/missingHp/vsJob/soldierDamage）。
 /// </summary>
 public class SkillComAreaDamageDeBuff : Skill
 {
@@ -46,8 +47,6 @@ public class SkillComAreaDamageDeBuff : Skill
         var maxHpBonus = HasSkillFlag("maxHpBonus");
 
         var skillDamage = GetSkillDamage();
-        // 法力燃烧：燃烧量取本技能数值槽键"mpBurn"，每级只解析一次
-        var mpBurn = HasSkillFlag("mpBurn") ? GetStr2("mpBurn") : 0f;
         foreach (var u in units)
         {
             var damage = skillDamage;
@@ -55,6 +54,8 @@ public class SkillComAreaDamageDeBuff : Skill
                 damage = (int)(damage * (1f + GetStr2("missileRate")));
             if (maxHpBonus)
                 damage += (int)(GetStr2("maxHpBonusRate") * u.maxHp);
+            // 通用伤害组件：execute/shieldBonus/missingHp/vsJob/soldierDamage（未配置则无影响）
+            damage = ApplyDamageModifiers(damage, u);
 
             if (damage > 0)
             {
@@ -68,9 +69,9 @@ public class SkillComAreaDamageDeBuff : Skill
                 }
             }
             // 法力燃烧：每个命中目标每次释放只结算一次
-            BurnMpToTarget(u, mpBurn);
+            ApplyMpBurn(u);
             foreach (var debuffId in debuffIds)
-                BuffManager.AddBuff(u, owner, id, debuffId, skillCfg.BuffTime);
+                ApplyBuffToUnit(u, debuffId);
         }
         return true;
     }

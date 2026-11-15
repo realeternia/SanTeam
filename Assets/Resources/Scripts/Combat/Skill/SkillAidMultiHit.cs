@@ -65,15 +65,8 @@ public class SkillAidMultiHit : Skill
         }
 
         if (owner != null && owner.hp > 0 && target != null && target.hp > 0)
-            ApplyBuffs(target);
+            ApplySkillBuffs(target);
 
         running = false;
-    }
-
-    /// <summary>BuffId 指定的 Buff 全部挂到目标（时长取 BuffTime）</summary>
-    private void ApplyBuffs(Chess target)
-    {
-        foreach (var buffId in GetSkillBuffIds())
-            BuffManager.AddBuff(target, owner, id, buffId, skillCfg.BuffTime);
     }
 }

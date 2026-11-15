@@ -52,30 +52,6 @@ public class SkillComShockWave : Skill
                 BuffManager.AddBuff(target, owner, id, buffCfg.Id, skillCfg.BuffTime);
         }
 
-        PushBack(target);
-    }
-
-    // 击退：按 Strength2 的 pushMin/pushMax 随机取推远距离，沿"自身→目标"方向把目标推离自身；未配置则不做处理
-    private void PushBack(Chess target)
-    {
-        var maxDistance = GetStr2("pushMax");
-        if (maxDistance <= 0f)
-            return;
-        var minDistance = Mathf.Min(GetStr2("pushMin"), maxDistance);
-
-        // 跳跃中的目标不受位移打断
-        if (target.isJumping)
-            return;
-
-        var dir = target.transform.position - owner.transform.position;
-        dir.y = 0f;
-        if (dir.sqrMagnitude < 0.0001f)
-            dir = owner.transform.forward;
-
-        var pushPos = target.transform.position + dir.normalized * SysRandom.Range(minDistance, maxDistance);
-        pushPos.y = target.transform.position.y;
-        // 落点踩墙则原地不动，避免被推穿墙体
-        if (!WorldManager.Instance.CheckPositionBlocked(target, pushPos))
-            target.transform.position = pushPos;
+        PushTargetBack(target);
     }
 }

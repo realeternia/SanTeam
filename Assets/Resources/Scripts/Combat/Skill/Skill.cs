@@ -5,7 +5,18 @@ using CommonConfig;
 using UnityEngine;
 
 /// <summary>
-/// 技能类，处理技能相关逻辑
+/// 技能类，处理技能相关逻辑。
+///
+/// 通用组件效果（TargetType 标记 / Strength2 键）统一在基类实现，派生技能直接调用，不要重复实现：
+/// · 伤害修正 ApplyDamageModifiers：execute(execHp/execRate)、shieldBonus、missingHp、vsJob、soldierDamage
+/// · 概率翻倍 TryDoubleDamage：doubleChance/doubleRate
+/// · 破盾追加 ApplyAntiShieldBonus：antiShield/antiShieldRate
+/// · 命中效果 ApplyMpBurn / ApplyDispel：mpBurn、dispel
+/// · 击退 PushTargetBack：pushMin/pushMax
+/// · 苦肉反噬 HurtSelfByDamage：selfHurt
+/// · Buff 归属 ApplySkillBuffs / ApplyBuffToUnit：selfBuff、bothBuff，护盾类自动写护盾值
+/// · 群体辅助 GetAuraSearchRange / TauntAroundUnit：wholeMap、tauntAroundTarget
+/// 各效果均为「标记或键配了才生效」，未配置时是 no-op。
 /// </summary>
 
 public class Skill
@@ -150,21 +161,6 @@ public class Skill
     }
 
     /// <summary>
-    /// 判断本技能配置的组件列表(Modules)是否包含指定组件名（组件见 SkillTemplateComponentConfig）。
-    /// </summary>
-    public bool HasModule(string moduleName)
-    {
-        if (skillCfg == null || skillCfg.Modules == null || string.IsNullOrEmpty(moduleName))
-            return false;
-        foreach (var module in skillCfg.Modules)
-        {
-            if (module == moduleName)
-                return true;
-        }
-        return false;
-    }
-
-    /// <summary>
     /// 我方存活小兵数量（不含英雄、影子与已阵亡单位）。
     /// </summary>
     protected int CountMySoldiers()
@@ -179,13 +175,13 @@ public class Skill
     }
 
     /// <summary>
-    /// 士兵士气组件：施放成功后给我方全体存活小兵各叠加一层「士兵士气」
+    /// 士兵士气：施放成功后给我方全体存活小兵各叠加一层「士兵士气」
     /// （CombatConst.SoldierMoraleBuffId，StackMode=1 共存，每层 +攻击/+护甲）。
-    /// 仅携带「士兵士气」组件的技能生效，作用范围为我方全部小兵（不按距离筛选）。
+    /// TargetType 含 morale 即生效（由技能组件「士兵士气」写入），作用范围为我方全部小兵（不按距离筛选）。
     /// </summary>
     public void ApplySoldierMorale()
     {
-        if (!HasModule(CombatConst.SoldierMoraleModule))
+        if (!HasSkillFlag("morale"))
             return;
 
         var count = 0;
@@ -198,6 +194,193 @@ public class Skill
         }
         if (count > 0)
             GameLog.Debug($"士兵士气：{owner.name} 为我方 {count} 名小兵各叠一层士气 技能id={id}");
+    }
+
+    /// <summary>
+    /// 士兵回蓝：施放成功后按我方存活小兵数量直接回复 MP。
+    /// Strength2.soldierMpRestore 即每名士兵回复量（组件「士兵回蓝」写入），未配/为 0 则不生效；
+    /// 单次最多回复 CombatConst.SoldierMpRestoreMax 点。
+    /// </summary>
+    public void RestoreMpBySoldier()
+    {
+        if (skillCfg == null || skillCfg.MpCost <= 0f)
+            return;
+
+        var perSoldier = GetStr2("soldierMpRestore");
+        if (perSoldier <= 0f)
+            return;
+
+        var count = CountMySoldiers();
+        if (count <= 0)
+            return;
+
+        var restore = Mathf.Min(count * perSoldier, CombatConst.SoldierMpRestoreMax);
+        AddMp(restore);
+        GameLog.Debug($"士兵回蓝：{owner.name} 按 {count} 名小兵回复 MP {restore:0.##} 技能id={id}");
+    }
+
+    // ---- 通用组件效果（TargetType 标记 / Strength2 键，所有通用技能共享） ----
+
+    /// <summary>
+    /// 伤害类组件修正：execute(execHp/execRate)、shieldBonus、missingHp、vsJob、soldierDamage。
+    /// 未配置的标记与键均为 no-op，可在任意单体/范围伤害结算前直接调用。
+    /// </summary>
+    protected int ApplyDamageModifiers(int dmg, Chess target)
+    {
+        if (target == null)
+            return dmg;
+        if (HasSkillFlag("execute") && target.HpRate < GetStr2("execHp"))
+            dmg = (int)(dmg * GetStr2("execRate", 1f));
+        if (HasSkillFlag("shieldBonus") && target.GetBuff(CombatConst.ShieldBuffId) is BuffShield)
+            dmg = Math.Max(1, (int)(dmg * GetStr2("shieldBonusRate", 1f)));
+        if (HasSkillFlag("missingHp"))
+            dmg += (int)(dmg * GetStr2("missingHpRate") * (1f - owner.HpRate));
+        if (HasSkillFlag("vsJob") && IsTargetJobMatched(target))
+            dmg = Math.Max(1, (int)(dmg * GetStr2("vsJobRate", 2f)));
+        var soldierRate = GetStr2("soldierDamage");
+        if (soldierRate > 0f)
+        {
+            var soldierCount = CountMySoldiers();
+            if (soldierCount > 0)
+                dmg = Math.Max(1, (int)(dmg * (1f + soldierCount * soldierRate)));
+        }
+        return dmg;
+    }
+
+    /// <summary>目标职业是否命中 Strength2 的 vsJob 列表（竖线分隔职业短名，如"盾|士"）。</summary>
+    protected bool IsTargetJobMatched(Chess target)
+    {
+        var raw = skillCfg != null ? skillCfg.Strength2 : null;
+        if (string.IsNullOrEmpty(raw) || target == null || !target.isHero || target.heroId <= 0)
+            return false;
+        var heroCfg = HeroConfig.GetConfig(target.heroId);
+        if (heroCfg == null || string.IsNullOrEmpty(heroCfg.Job))
+            return false;
+        foreach (var seg in raw.Split(','))
+        {
+            var idx = seg.IndexOf(':');
+            if (idx <= 0 || seg.Substring(0, idx).Trim() != "vsJob")
+                continue;
+            foreach (var job in seg.Substring(idx + 1).Split('|'))
+            {
+                if (job.Trim() == heroCfg.Job)
+                    return true;
+            }
+        }
+        return false;
+    }
+
+    /// <summary>概率翻倍（doubleChance/doubleRate）：触发时把 dmg 翻倍并返回 true。</summary>
+    protected bool TryDoubleDamage(ref int dmg)
+    {
+        if (!HasSkillFlag("doubleChance") || SysRandom.Value >= GetStr2("doubleChance"))
+            return false;
+        dmg = Math.Max(1, (int)(dmg * GetStr2("doubleRate", 2f)));
+        return true;
+    }
+
+    /// <summary>破盾追加：目标带吸收盾时按 antiShieldRate × 基础伤害追加一次 AntiShield 标签伤害。</summary>
+    protected void ApplyAntiShieldBonus(Chess target, int baseDamage)
+    {
+        if (target == null || !HasSkillFlag("antiShield"))
+            return;
+        if (!(target.GetBuff(CombatConst.ShieldBuffId) is BuffShield))
+            return;
+        var extra = Math.Max(1, (int)(baseDamage * GetStr2("antiShieldRate", 1f)));
+        target.OnSkillDamaged(owner, id, extra, false, CombatConst.AntiShieldHurtTag);
+    }
+
+    /// <summary>命中燃蓝：配置 mpBurn 键时燃烧目标法力，每次结算一次。</summary>
+    protected void ApplyMpBurn(Chess target)
+    {
+        if (HasSkillFlag("mpBurn"))
+            BurnMpToTarget(target, GetStr2("mpBurn"));
+    }
+
+    /// <summary>命中驱散：dispel 标记时驱散目标正面 Buff。</summary>
+    protected void ApplyDispel(Chess target)
+    {
+        if (HasSkillFlag("dispel"))
+            BuffManager.DispelPositive(target);
+    }
+
+    /// <summary>击退：配置 pushMax 时沿"自身→目标"方向推开 pushMin~pushMax，踩墙则原地不动。</summary>
+    protected void PushTargetBack(Chess target)
+    {
+        if (target == null)
+            return;
+        var maxDistance = GetStr2("pushMax");
+        if (maxDistance <= 0f || target.isJumping)
+            return;
+        var minDistance = Mathf.Min(GetStr2("pushMin"), maxDistance);
+        var dir = target.transform.position - owner.transform.position;
+        dir.y = 0f;
+        if (dir.sqrMagnitude < 0.0001f)
+            dir = owner.transform.forward;
+        var pushPos = target.transform.position + dir.normalized * SysRandom.Range(minDistance, maxDistance);
+        pushPos.y = target.transform.position.y;
+        if (!WorldManager.Instance.CheckPositionBlocked(target, pushPos))
+            target.transform.position = pushPos;
+    }
+
+    /// <summary>苦肉反噬：selfHurt 标记时按本次伤害比例扣自身生命，濒死不致死（最少留 1 点）。</summary>
+    protected void HurtSelfByDamage(int dmg)
+    {
+        if (!HasSkillFlag("selfHurt"))
+            return;
+        var selfDmg = (int)(dmg * GetStr2("selfHurt", 0.2f));
+        if (selfDmg <= 0 || owner.hp <= 1)
+            return;
+        var actual = Mathf.Min(selfDmg, owner.hp - 1);
+        owner.hp -= actual;
+        WorldManager.Instance.AddBattleText("-" + actual, owner.transform.position,
+            new Vector2(0, 60), SysColor.BattleText.RealDamage, 3);
+        owner.OnHpChanged();
+    }
+
+    /// <summary>Buff 归属：selfBuff=全部挂自身；bothBuff=首段挂目标、其余自身；缺省全部挂目标。</summary>
+    protected void ApplySkillBuffs(Chess target)
+    {
+        var buffIds = GetSkillBuffIds();
+        if (buffIds.Count == 0)
+            return;
+        if (HasSkillFlag("selfBuff"))
+        {
+            foreach (var buffId in buffIds)
+                ApplyBuffToUnit(owner, buffId);
+            return;
+        }
+        if (HasSkillFlag("bothBuff"))
+        {
+            ApplyBuffToUnit(target, buffIds[0]);
+            for (var i = 1; i < buffIds.Count; i++)
+                ApplyBuffToUnit(owner, buffIds[i]);
+            return;
+        }
+        foreach (var buffId in buffIds)
+            ApplyBuffToUnit(target, buffId);
+    }
+
+    /// <summary>给单位施加一段 Buff；护盾类 Buff 按统一护盾公式写入护盾值。</summary>
+    protected void ApplyBuffToUnit(Chess unit, int buffId)
+    {
+        BuffManager.AddBuff(unit, owner, id, buffId, skillCfg.BuffTime);
+        var shield = unit.GetBuff(buffId) as BuffShield;
+        if (shield != null)
+            shield.AddHp(GetSkillShield());
+    }
+
+    /// <summary>群体选人半径：wholeMap 标记时 0（全图），否则取 Area。</summary>
+    protected float GetAuraSearchRange()
+    {
+        return HasSkillFlag("wholeMap") ? 0f : skillCfg.Area;
+    }
+
+    /// <summary>以指定单位为中心嘲讽周围 Area 内敌人（tauntAroundTarget 标记）。</summary>
+    protected void TauntAroundUnit(Chess unit)
+    {
+        if (HasSkillFlag("tauntAroundTarget"))
+            TauntEnemies(owner, unit.transform.position, skillCfg.Area);
     }
 
     /// <summary>
@@ -392,6 +575,7 @@ public class Skill
             UpdateCD();
             mpBeforeBurst = mp; // 记录发动前累积量，供"转移全部法力"类技能读取
             mp = 0; // 发动技能后清空MP
+            RestoreMpBySoldier(); // 士兵回蓝组件：发动后按存活小兵数直接回复MP
         }
         return isBurst;
     }

@@ -40,7 +40,7 @@ public class SkillBondAreaBuff : Skill
         var selfAlways = HasSkillFlag("selfAlways");
         var noDedupe = HasSkillFlag("noDedupe");
         var splitByRange = HasSkillFlag("splitByRange");
-        var searchRange = HasSkillFlag("wholeMap") ? 0f : skillCfg.Area;
+        var searchRange = GetAuraSearchRange();
 
         // 中心点：缺省以施法者自身为中心；targetCenter 先选中首个友军目标，再以其位置为中心扩散
         var center = owner.transform.position;
@@ -73,25 +73,15 @@ public class SkillBondAreaBuff : Skill
         {
             // splitByRange：近战只吃第 1 段、远程只吃第 2 段（如"甲,攻"），其余情况逐段施加
             if (splitByRange && buffIds.Count >= 2)
-                ApplyBuff(unit, unit.attackRange < CombatConst.MeleeRange ? buffIds[0] : buffIds[1]);
+                ApplyBuffToUnit(unit, unit.attackRange < CombatConst.MeleeRange ? buffIds[0] : buffIds[1]);
             else
                 foreach (var buffId in buffIds)
-                    ApplyBuff(unit, buffId);
+                    ApplyBuffToUnit(unit, buffId);
 
             if (!string.IsNullOrEmpty(skillCfg.HitEffect))
                 EffectManager.PlaySkillEffect(unit, skillCfg.HitEffect);
-            if (HasSkillFlag("tauntAroundTarget"))
-                TauntEnemies(owner, unit.transform.position, skillCfg.Area);
+            TauntAroundUnit(unit);
         }
         return true;
-    }
-
-    /// <summary>给单个单位施加一段 Buff；护盾类 Buff 按统一护盾公式写入护盾值（李严·护军的"盾"）</summary>
-    private void ApplyBuff(Chess unit, int buffId)
-    {
-        BuffManager.AddBuff(unit, owner, id, buffId, skillCfg.BuffTime);
-        var shield = unit.GetBuff(buffId) as BuffShield;
-        if (shield != null)
-            shield.AddHp(GetSkillShield());
     }
 }

@@ -39,12 +39,8 @@ public static class CombatConst
     public const int SoldierMoraleArmor = 5;
     /// <summary>士兵士气持续时间(秒)：战斗内近似永久</summary>
     public const float SoldierMoraleTime = 999f;
-    /// <summary>技能组件标记名（SkillConfig.Modules 含该名时，施放成功给全体小兵叠一层士气）</summary>
-    public const string SoldierMoraleModule = "士兵士气";
-    /// <summary>技能组件标记名：单体技能按我方存活士兵数提升伤害（组件「士兵增伤」）</summary>
-    public const string SoldierDamageModule = "士兵增伤";
-    /// <summary>士兵增伤每名士兵的默认伤害比例（Strength2 未配 soldierDamage 时使用）</summary>
-    public const float SoldierDamageDefaultRate = 0.03f;
+    /// <summary>士兵回蓝单次回复上限（点）：组件只写 Strength2.soldierMpRestore，上限由运行时常量约束</summary>
+    public const float SoldierMpRestoreMax = 3f;
 
     // ---- 伤害标签(SkillConfig.HurtTag) ----
     /// <summary>AntiShield：绕过护盾直接打血（破盾类技能，BuffShield 判定该标签不吸收）</summary>

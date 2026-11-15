@@ -453,6 +453,10 @@ namespace SkillBaseTool
             public float[] Values = new float[0];
             /// <summary>非数值绑定（如 vsJob=盾|士）的字面值；为空表示走 Values。</summary>
             public string Text;
+            /// <summary>差值符号：0=绝对写入（=），1=叠加（+=），-1=扣减（-=）。</summary>
+            public int DeltaSign;
+
+            public bool IsDelta { get { return DeltaSign != 0; } }
 
             public float ValueAt(int lv)
             {
@@ -476,11 +480,23 @@ namespace SkillBaseTool
                     continue;
                 var parts = s.Split('=');
                 string head = parts[0].Trim();
+                int deltaSign = 0;
+                if (head.EndsWith("+", StringComparison.Ordinal))
+                {
+                    deltaSign = 1;
+                    head = head.Substring(0, head.Length - 1).Trim();
+                }
+                else if (head.EndsWith("-", StringComparison.Ordinal))
+                {
+                    deltaSign = -1;
+                    head = head.Substring(0, head.Length - 1).Trim();
+                }
                 int idx = head.IndexOf(':');
                 var binding = new EffectBinding
                 {
                     Column = idx < 0 ? head : head.Substring(0, idx).Trim(),
                     Sub = idx < 0 ? "" : head.Substring(idx + 1).Trim(),
+                    DeltaSign = deltaSign,
                 };
                 if (parts.Length > 1)
                 {
@@ -567,14 +583,14 @@ namespace SkillBaseTool
                     float v = b.ValueAt(lv);
                     switch (b.Column)
                     {
-                        case "DamageStrength": B[Col.DamageStrength] = CfgUtil.NumF(v); break;
-                        case "HealStrength": B[Col.HealStrength] = CfgUtil.NumF(v); break;
-                        case "CD": B[Col.CD] = CfgUtil.NumF(v); break;
-                        case "MpCost": B[Col.MpCost] = CfgUtil.NumI((int)Math.Round(v)); break;
-                        case "Range": B[Col.Range] = CfgUtil.NumF(v); break;
-                        case "Area": B[Col.Area] = CfgUtil.NumF(v); break;
-                        case "TargetCount": B[Col.TargetCount] = CfgUtil.NumI((int)Math.Round(v)); break;
-                        case "Rate": B[Col.Rate] = CfgUtil.NumF(v); break;
+                        case "DamageStrength": B[Col.DamageStrength] = CfgUtil.NumF(Num(b, Col.DamageStrength, v)); break;
+                        case "HealStrength": B[Col.HealStrength] = CfgUtil.NumF(Num(b, Col.HealStrength, v)); break;
+                        case "CD": B[Col.CD] = CfgUtil.NumF(Num(b, Col.CD, v)); break;
+                        case "MpCost": B[Col.MpCost] = CfgUtil.NumI((int)Math.Round(Num(b, Col.MpCost, v, 10f))); break;
+                        case "Range": B[Col.Range] = CfgUtil.NumF(Num(b, Col.Range, v)); break;
+                        case "Area": B[Col.Area] = CfgUtil.NumF(Num(b, Col.Area, v)); break;
+                        case "TargetCount": B[Col.TargetCount] = CfgUtil.NumI((int)Math.Round(Num(b, Col.TargetCount, v))); break;
+                        case "Rate": B[Col.Rate] = CfgUtil.NumF(Num(b, Col.Rate, v)); break;
                         case "BuffTime": BuffTimes.Add(v); break;
                         case "SummonCount": B[Col.SummonCount] = CfgUtil.NumI((int)Math.Round(v)); break;
                         case "SummonTime": B[Col.SummonTime] = CfgUtil.NumF(v); break;
@@ -612,6 +628,15 @@ namespace SkillBaseTool
                             break;
                     }
                 }
+            }
+
+            /// <summary>绝对值直接写入；差值（+= / -=）在当前列值上叠加，MpCost 按表内单位×10。</summary>
+            private float Num(EffectBinding b, int col, float v, float scale = 1f)
+            {
+                if (!b.IsDelta)
+                    return v;
+                float cur = CfgUtil.ParseFloat(B[col]);
+                return cur + v * b.DeltaSign * scale;
             }
 
             private void ApplyStrength2(string key, float v)
@@ -722,7 +747,8 @@ namespace SkillBaseTool
                     return target + "=" + b.Text;
                 if (b.Values.Length == 0)
                     return target;
-                return target + "=" + NumText(b.ValueAt(lv));
+                string op = b.IsDelta ? (b.DeltaSign > 0 ? "+=" : "-=") : "=";
+                return target + op + NumText(b.ValueAt(lv));
             }));
         }
 
