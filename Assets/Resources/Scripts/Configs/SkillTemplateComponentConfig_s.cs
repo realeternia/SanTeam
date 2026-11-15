@@ -1,4 +1,4 @@
-﻿using System;
+﻿﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -273,6 +273,8 @@ namespace CommonConfig
             config[9240] = new SkillTemplateComponentConfig(9240, "焰衣", "特殊机制", new string[]{"自身强化"}, "Buff:焰;BuffTime=6", 2, 2.5f, "获得焰衣：每秒对自身周围 Area 内敌人造成技能伤害（焰）", "按每秒伤害×持续时间×覆盖人数估值", true);
             config[9250] = new SkillTemplateComponentConfig(9250, "威震", "特殊机制", new string[]{"自身强化"}, "Buff:震;Strength2:stunChance=0.4,0.45,0.5,0.55,0.6", 3, 2.5f, "普攻按概率眩晕目标并转为真实伤害（震）", "按攻速与眩晕时长折算期望收益", true);
             config[9260] = new SkillTemplateComponentConfig(9260, "急救", "状态效果", new string[]{"自身强化","单体治疗大","单体治疗中","单体治疗小","范围治疗大","范围治疗中","范围治疗小"}, "Buff:愈:heal=25,38,52,70,90;BuffTime=5", 2, 1.5f, "每秒固定回复生命（愈）", "按持续时间折算总回复量估值", false);
+            config[9270] = new SkillTemplateComponentConfig(9270, "士兵士气", "特殊机制", null, "TargetType:morale;BuffTime=999", 2, 1.5f, "施放后为我方全体小兵各叠一层士兵士气（每层+5攻击、+5护甲，战斗内近似永久）", "特殊机制，人工评审", true);
+            config[9280] = new SkillTemplateComponentConfig(9280, "士兵增伤", "特殊机制", null, "Strength2:soldierDamage=0.02,0.025,0.03,0.035,0.04", 2, 2f, "单体技能伤害随我方存活士兵数提升：伤害 × (1 + 士兵数 × soldierDamage)", "特殊机制，人工评审", true);
 
             RebuildIndex();
 

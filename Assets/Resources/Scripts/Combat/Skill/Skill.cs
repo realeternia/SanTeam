@@ -1,0 +1,752 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using CommonConfig;
+using UnityEngine;
+
+/// <summary>
+/// 技能类，处理技能相关逻辑
+/// </summary>
+
+public class Skill
+{
+    public int id;
+    public Chess owner;
+    public SkillConfig skillCfg;
+    private float lastUpdateTime; // 上次更新CD的时间
+    public bool isBurst;
+
+    /// <summary>
+    /// 有效技能等级：默认取配置等级(skillCfg.Lv=5)，由连锁机制(兵种连锁/好友连锁·特殊)修正
+    /// </summary>
+    public int Level;
+
+    public int skillId{ get{ return skillCfg.Id; } }
+
+    public float mp; // 当前技能MP，开局按 SkillConfig.StartMpRate 填充（默认0），之后由普攻/受击获取法力，满值=MpCost
+    /// <summary>本次发动前的MP累积量（CheckBurst 清零 mp 前记录，供"清空/转移全部法力"类技能读取）</summary>
+    public float mpBeforeBurst;
+
+    /// <summary>
+    /// 统一技能伤害公式：DamageType=0 法术 = DamageStrength × (100 + ap) / 100（ap 为百分比加成，ap=0 时伤害=DamageStrength）；
+    /// DamageType=1/2 物理/真实 = DamageStrength + atk。魔抗/护甲减免在 OnSkillDamaged 内处理（真实伤害无视抗性与护盾）
+    /// </summary>
+    public int GetSkillDamage()
+    {
+        return GetSkillDamage(skillCfg, owner);
+    }
+
+    /// <summary>
+    /// 统一技能伤害公式（静态重载，供 Buff 等无 Skill 实例处复用，按传入配置与属性主体计算）：
+    /// DamageType=0 法术 = DamageStrength × (100 + ap) / 100；DamageType=1/2 物理/真实 = DamageStrength + atk。
+    /// 配置或属性主体为空时返回 0。
+    /// </summary>
+    public static int GetSkillDamage(SkillConfig cfg, Chess attrOwner)
+    {
+        if (cfg == null || attrOwner == null)
+            return 0;
+        if (cfg.DamageType == CombatConst.DamageTypeMagic)
+            return (int)(cfg.DamageStrength * (100 + attrOwner.GetAttr("ap")) / 100);
+        else
+            return (int)(cfg.DamageStrength + attrOwner.GetAttr("atk"));
+    }
+
+    /// <summary>
+    /// 统一技能治疗公式（独立于伤害公式）：治疗量 = HealStrength × (100 + ap) / 100，ap=0 时治疗量=HealStrength。
+    /// 治疗永远是法术向（ap 成长），不套用物理/真实伤害的 atk 计算，禁止用 GetSkillDamage 充当治疗。
+    /// </summary>
+    public int GetSkillHeal()
+    {
+        return GetSkillHeal(skillCfg, owner);
+    }
+
+    /// <summary>
+    /// 统一技能治疗公式（静态重载，供 Buff 等无 Skill 实例处复用）：治疗量 = HealStrength × (100 + ap) / 100。
+    /// 配置或属性主体为空时返回 0。
+    /// </summary>
+    public static int GetSkillHeal(SkillConfig cfg, Chess attrOwner)
+    {
+        if (cfg == null || attrOwner == null)
+            return 0;
+        return (int)(cfg.HealStrength * (100 + attrOwner.GetAttr("ap")) / 100);
+    }
+
+    /// <summary>
+    /// 统一护盾公式（除国家护盾外，所有套盾技能统一走此公式，随法强成长）：
+    /// 护盾量 = Strength2[key] × (100 + ap) / 100，ap=0 时护盾量 = Strength2[key]（配置中直接写基础值）。
+    /// 默认键为 "shield"；未配置该键返回 0，不回退到最大生命或攻击比例。
+    /// </summary>
+    public int GetSkillShield(string key = "shield")
+    {
+        var v = GetStr2(key);
+        if (v <= 0f)
+            return 0;
+        return Mathf.Max(1, (int)(v * (100 + owner.GetAttr("ap")) / 100f));
+    }
+
+    /// <summary>
+    /// 解析 SkillConfig.BuffId：支持英文/中文逗号、分号分隔的多个 Buff 短名（如 "盾,甲"），
+    /// 返回对应的 BuffId 列表（未配置时返回空列表）。单个短名沿用 BuffConfig.GetConfigByNameS。
+    /// </summary>
+    protected List<int> GetSkillBuffIds()
+    {
+        return GetSkillBuffIds(skillCfg);
+    }
+
+    /// <summary>
+    /// 静态重载：解析 SkillConfig.BuffId（英文/中文逗号、分号分隔），供 Buff 等无 Skill 实例处复用。
+    /// 未配置返回空列表；短名找不到对应 BuffConfig 时跳过并记录日志。
+    /// </summary>
+    public static List<int> GetSkillBuffIds(SkillConfig cfg)
+    {
+        var ids = new List<int>();
+        if (cfg == null || string.IsNullOrEmpty(cfg.BuffId))
+            return ids;
+
+        foreach (var seg in cfg.BuffId.Split(new[] { ',', '，', ';', '；' }, StringSplitOptions.RemoveEmptyEntries))
+        {
+            var name = seg.Trim();
+            if (name.Length == 0)
+                continue;
+            var buffCfg = BuffConfig.GetConfigByNameS(name);
+            if (buffCfg == null)
+            {
+                GameLog.Error($"GetSkillBuffIds: 未找到Buff短名：{name} 技能id={cfg.Id}");
+                continue;
+            }
+            ids.Add(buffCfg.Id);
+        }
+        return ids;
+    }
+
+    /// <summary>
+    /// 按 key 读取 Strength2 数值槽（key 为 "k:v,k:v" 串中的键名），未配置 / key 不存在时返回 def。
+    /// 通用模板通过它读取伤害倍率/护盾量等参数，避免各技能脚本按下标硬编码。
+    /// </summary>
+    protected float GetStr2(string key, float def = 0f)
+    {
+        return ConfigManager.GetSlotValue(skillCfg == null ? null : skillCfg.Strength2, key, def);
+    }
+
+    /// <summary>
+    /// 按 key 读取 StrengthBuff1 数值槽（key 为 "k:v,k:v" 串中的键名），未配置 / key 不存在时返回 def。
+    /// </summary>
+    protected float GetStrBuff(string key, float def = 0f)
+    {
+        return ConfigManager.GetSlotValue(skillCfg == null ? null : skillCfg.StrengthBuff1, key, def);
+    }
+
+    /// <summary>
+    /// permanent 型自身成长技能（TargetType 含 permanent）：施放成功后由 SkillManager 统一调用，
+    /// 读取 Strength2 的 selfAtkSpeed 永久叠加到施法者攻速（当前仅马岱·连射引用该键）。
+    /// </summary>
+    public void ApplyPermanentGrowth()
+    {
+        if (!HasSkillFlag("permanent"))
+            return;
+        var atkSpeed = GetStr2("selfAtkSpeed");
+        if (atkSpeed != 0f)
+            owner.attackSpeedRate += atkSpeed;
+    }
+
+    /// <summary>
+    /// 判断本技能配置的组件列表(Modules)是否包含指定组件名（组件见 SkillTemplateComponentConfig）。
+    /// </summary>
+    public bool HasModule(string moduleName)
+    {
+        if (skillCfg == null || skillCfg.Modules == null || string.IsNullOrEmpty(moduleName))
+            return false;
+        foreach (var module in skillCfg.Modules)
+        {
+            if (module == moduleName)
+                return true;
+        }
+        return false;
+    }
+
+    /// <summary>
+    /// 我方存活小兵数量（不含英雄、影子与已阵亡单位）。
+    /// </summary>
+    protected int CountMySoldiers()
+    {
+        var count = 0;
+        foreach (var unit in WorldManager.Instance.GetUnitsMySide(owner.side))
+        {
+            if (unit != null && !unit.isHero && unit.hp > 0)
+                count++;
+        }
+        return count;
+    }
+
+    /// <summary>
+    /// 士兵士气组件：施放成功后给我方全体存活小兵各叠加一层「士兵士气」
+    /// （CombatConst.SoldierMoraleBuffId，StackMode=1 共存，每层 +攻击/+护甲）。
+    /// 仅携带「士兵士气」组件的技能生效，作用范围为我方全部小兵（不按距离筛选）。
+    /// </summary>
+    public void ApplySoldierMorale()
+    {
+        if (!HasModule(CombatConst.SoldierMoraleModule))
+            return;
+
+        var count = 0;
+        foreach (var unit in WorldManager.Instance.GetUnitsMySide(owner.side))
+        {
+            if (unit == null || unit.isHero || unit.hp <= 0)
+                continue;
+            BuffManager.AddBuff(unit, owner, id, CombatConst.SoldierMoraleBuffId, CombatConst.SoldierMoraleTime);
+            count++;
+        }
+        if (count > 0)
+            GameLog.Debug($"士兵士气：{owner.name} 为我方 {count} 名小兵各叠一层士气 技能id={id}");
+    }
+
+    /// <summary>
+    /// 对目标燃烧指定量法力（燃烧量由上层技能按自身配置约定选取字段后传入，0/负数不生效），返回实际燃烧量。
+    /// </summary>
+    protected int BurnMpToTarget(Chess target, float amount)
+    {
+        if (target == null || target.hp <= 0 || amount <= 0f)
+            return 0;
+        return target.BurnMp(amount);
+    }
+
+    /// <summary>
+    /// 按 SkillConfig.SelectOnly（硬过滤）/ SelectFirst（优先级链）选取技能目标，单体/群体共用。
+    /// defaultAlly=true 表示 SelectOnly 未指定阵营时默认选友方；limit&lt;=0 表示不限制数量。
+    /// </summary>
+    protected List<Chess> SelectTargets(Vector3 center, float range, bool defaultAlly, int limit,
+        Chess exclude = null, Func<Chess, bool> extraFilter = null)
+    {
+        return TargetSelector.Select(owner, center, range, defaultAlly, skillCfg.SelectOnly, skillCfg.SelectFirst,
+            limit, exclude, extraFilter);
+    }
+
+    /// <summary>对已有候选（几何命中、逐跳等）按本技能的 SelectOnly/SelectFirst 过滤、排序、截断</summary>
+    protected List<Chess> SelectTargets(List<Chess> candidates, Vector3 center, int limit,
+        Chess exclude = null, Func<Chess, bool> extraFilter = null)
+    {
+        return TargetSelector.Filter(owner, center, candidates, skillCfg.SelectOnly, skillCfg.SelectFirst,
+            limit, exclude, extraFilter);
+    }
+
+    /// <summary>
+    /// 次要场景显式规则选人：同一技能行存在两套选取规则时使用（如主目标按配置、附带目标按固定规则）。
+    /// </summary>
+    protected List<Chess> SelectTargetsWithRules(Vector3 center, float range, bool defaultAlly, int limit,
+        string selectOnly, string selectFirst, Chess exclude = null, Func<Chess, bool> extraFilter = null)
+    {
+        return TargetSelector.Select(owner, center, range, defaultAlly, selectOnly, selectFirst,
+            limit, exclude, extraFilter);
+    }
+
+    /// <summary>
+    /// 单体技能选目标：未配 SelectFirst 时沿用当前索敌目标（Range&gt;0 时做射程校验）；
+    /// 配了 SelectFirst 时按优先级链挑最合适的一个，候选为空再回退当前目标。
+    /// </summary>
+    protected Chess SelectSingleTarget(float range)
+    {
+        var current = owner.targetChess;
+
+        if (string.IsNullOrEmpty(skillCfg.SelectFirst))
+        {
+            if (current == null || current.hp <= 0)
+                return null;
+            if (range > 0f && !WorldManager.Instance.CheckInRange(owner, current, range))
+                return null;
+            return current;
+        }
+
+        var candidates = SelectTargets(owner.transform.position, range, false, 1);
+        if (candidates.Count == 0)
+            return current != null && current.hp > 0 ? current : null;
+        return candidates[0];
+    }
+
+    /// <summary>
+    /// 判断 SkillConfig.TargetType 是否包含指定行为标记。
+    /// TargetType 原本是“选取点”单选字段，现向后兼容地扩展为标记列表：
+    /// 多项以英文/中文逗号、分号或竖线分隔（如 "self,missile"），逐项精确匹配。
+    /// </summary>
+    protected bool HasSkillFlag(string flag)
+    {
+        if (skillCfg == null || string.IsNullOrEmpty(skillCfg.TargetType) || string.IsNullOrEmpty(flag))
+            return false;
+        foreach (var seg in skillCfg.TargetType.Split(new[] { ',', '，', ';', '；', '|' }, StringSplitOptions.RemoveEmptyEntries))
+        {
+            if (seg.Trim() == flag)
+                return true;
+        }
+        return false;
+    }
+
+    public Skill(int id, Chess unit)
+    {
+        this.id = id;
+        this.owner = unit;
+
+        skillCfg = SkillConfig.GetConfig(id);
+        Level = skillCfg.Lv;
+    }
+
+    /// <summary>
+    /// 设置技能等级（连锁机制：兵种连锁/好友连锁·特殊）
+    /// 实际起效的配置 = 同一Sname组内 level 匹配的那一行；
+    /// 等级超出该组已配置的最高等级行时（个人技能按卡片等级可超过5级）按最高等级行生效，等级不足1时按1级行生效
+    /// </summary>
+    public void SetLevel(int lv)
+    {
+        Level = lv;
+        var targetLv = Mathf.Max(1, lv);
+        var newCfg = ConfigManager.GetSkillConfig(skillCfg.Sname, targetLv);
+        if (newCfg == null)
+        {
+            foreach (var cfg in SkillConfig.ConfigList)
+            {
+                if (cfg.Sname != skillCfg.Sname)
+                    continue;
+                if (newCfg == null || cfg.Lv > newCfg.Lv)
+                    newCfg = cfg;
+            }
+        }
+        if (newCfg != null)
+            skillCfg = newCfg;
+    }
+
+    /// <summary>
+    /// 更新技能CD时间
+    /// </summary>
+    public void UpdateCD()
+    {
+        if (skillCfg.CD > 0)
+        {
+            if (IsInCD())
+            {
+                return;
+            }
+
+            lastUpdateTime = Time.time;
+        }
+    }
+
+    /// <summary>
+    /// 检查技能是否在CD中
+    /// </summary>
+    /// <returns>如果在CD中返回true，否则返回false</returns>
+    public bool IsInCD()
+    {
+        if(skillCfg.CD <= 0)
+            return false;
+
+        return Time.time < lastUpdateTime + skillCfg.CD;
+    }
+
+    // 为技能增加法力（普攻/受击获取、法力分享等共用），结果裁剪到 [0, MpCost]
+    public void AddMp(float add)
+    {
+        if (skillCfg.MpCost <= 0)
+            return;
+        mp = Mathf.Clamp(mp + add, 0f, skillCfg.MpCost);
+    }
+
+    // 法力燃烧：直接扣减当前技能MP（仅对设置了MpCost的技能生效），返回实际燃烧量
+    public int BurnMp(float amount)
+    {
+        if (skillCfg.MpCost <= 0 || amount <= 0f || mp <= 0f)
+            return 0;
+        var before = mp;
+        mp = Mathf.Clamp(mp - amount, 0f, skillCfg.MpCost);
+        return (int)(before - mp);
+    }
+
+    // MP是否已满（未设置MpCost的技能不受MP限制）
+    public bool IsMpFull()
+    {
+        return skillCfg.MpCost <= 0 || mp >= skillCfg.MpCost;
+    }
+
+    public bool CheckBurst(Chess target)
+    {
+        // 设置了MpCost的技能：MP未满时无法发动
+        if (!IsMpFull())
+        {
+            isBurst = false;
+            return false;
+        }
+
+        var rate = skillCfg.Rate;
+        if (rate > 0 && rate < 1 && target != null && target != owner)
+        {
+            // 不再按双方属性差值放大/缩小发动概率，仅保留其他技能/机制对概率的修正(如百出)
+            SkillManager.OnCheckBurst(owner, skillCfg, ref rate);
+        }
+
+        isBurst = !IsInCD() && (skillCfg.Rate <= 0 || SysRandom.Value < rate);
+
+        // 触发条件不满足（如 hprate<50=自身生命低于50%）则本次不触发技能
+        if (isBurst && !MeetTriggerCondition())
+            isBurst = false;
+
+        GameLog.Debug("CheckBurst isBurst=" + isBurst.ToString() + " skillId=" + id.ToString());
+        if(isBurst)
+        {
+            UpdateCD();
+            mpBeforeBurst = mp; // 记录发动前累积量，供"转移全部法力"类技能读取
+            mp = 0; // 发动技能后清空MP
+        }
+        return isBurst;
+    }
+
+    // 技能触发条件是否满足（TriggerCondition为空表示无条件触发）
+    // 支持格式：键+比较符+数值，如 hprate<50=自身生命低于50%；多条件用;分隔，全部满足才可触发
+    private bool MeetTriggerCondition()
+    {
+        var condStr = skillCfg.TriggerCondition;
+        if (string.IsNullOrEmpty(condStr))
+            return true;
+
+        foreach (var seg in condStr.Split(';'))
+        {
+            var s = seg.Trim();
+            if (s.Length == 0)
+                continue;
+
+            // 拆分比较符（先匹配多字符 <= >= == !=，再匹配单字符 < >）
+            var op = "";
+            var opIdx = -1;
+            for (var i = 0; i < s.Length; i++)
+            {
+                var two = i + 1 < s.Length ? s.Substring(i, 2) : "";
+                if (two == "<=" || two == ">=" || two == "==" || two == "!=")
+                {
+                    op = two;
+                    opIdx = i;
+                    break;
+                }
+                var one = s[i].ToString();
+                if (one == "<" || one == ">")
+                {
+                    op = one;
+                    opIdx = i;
+                    break;
+                }
+            }
+            if (op == "" || opIdx <= 0)
+            {
+                GameLog.Warn("无法解析技能触发条件：" + s + "，技能id=" + skillCfg.Id);
+                return false; // 配置异常时不触发，避免条件形同虚设
+            }
+
+            float val;
+            if (!float.TryParse(s.Substring(opIdx + op.Length).Trim(), out val))
+            {
+                GameLog.Warn("技能触发条件数值无效：" + s + "，技能id=" + skillCfg.Id);
+                return false;
+            }
+
+            var key = s.Substring(0, opIdx).Trim();
+            // 条件键取值统一走 Chess.GetAttr（hprate=自身生命百分比0~100），不在技能侧重复维护属性映射
+            int cur;
+            try
+            {
+                cur = owner.GetAttr(key);
+            }
+            catch (Exception)
+            {
+                GameLog.Warn("未知的技能触发条件键：" + key + "，技能id=" + skillCfg.Id);
+                return false; // 配置异常时不触发，避免条件形同虚设
+            }
+
+            var satisfied = false;
+            switch (op)
+            {
+                case "<": satisfied = cur < val; break;
+                case "<=": satisfied = cur <= val; break;
+                case ">": satisfied = cur > val; break;
+                case ">=": satisfied = cur >= val; break;
+                case "==": satisfied = Mathf.Approximately(cur, val); break;
+                case "!=": satisfied = !Mathf.Approximately(cur, val); break;
+            }
+            if (!satisfied)
+                return false;
+        }
+        return true;
+    }
+
+    public virtual void BattleBegin()
+    {
+
+    }
+
+    /// <summary>
+    /// 每逻辑帧驱动（Chess.LogicUpdate → SkillManager.Tick）：光环等需要持续计时/消耗的技能覆写。
+    /// </summary>
+    public virtual void Tick(float deltaTime)
+    {
+
+    }
+
+    /// <summary>
+    /// 开局初始MP：按 SkillConfig.StartMpRate（开局MP比例，默认0）填充，mp = MpCost × StartMpRate（上限 MpCost）。
+    /// 由 SkillManager.BattleBegin 在各技能 BattleBegin 之后统一调用；MpCost=0 的技能不受MP限制，无需填充。
+    /// </summary>
+    public void InitStartMp()
+    {
+        if (skillCfg == null || skillCfg.MpCost <= 0 || skillCfg.StartMpRate <= 0f)
+            return;
+        mp = Mathf.Clamp(skillCfg.MpCost * skillCfg.StartMpRate, 0f, skillCfg.MpCost);
+    }
+
+    // 死亡时触发（Chess.Ondying 调用）
+    public virtual void OnDeath()
+    {
+
+    }
+
+    public virtual void AimTarget(Chess target)
+    {
+
+    }
+
+    public virtual void OnAttack(Chess defender, int damage)
+    {
+    }
+
+    public virtual void OnAttacked(Chess attacker, int damage)
+    {
+    }
+
+    // buff 移除事件：本单位任一 buff 被移除时由 Chess.OnBuffRemoved 派发（如天人守城护盾破爆炸）
+    public virtual void OnBuffRemoved(Chess chess, Buff buff)
+    {
+    }
+
+    // 伤害计算阶段·攻击方：调整伤害基数与倍率（普攻与技能伤害统一进入；castSkillCfg 为当前施放的技能，null=普攻）
+    public virtual void BeforeCalDamage(Chess target, SkillConfig castSkillCfg, ref int damageBase, ref float damageMulti, ref string effect, string hurtTag, bool isFeedback)
+    {
+    }
+
+    // 伤害计算阶段·受击方：调整受伤基数与倍率（普攻与技能伤害统一进入）
+    public virtual void BeforeCalDamaged(Chess caster, SkillConfig castSkillCfg, ref int damageBase, ref float damageMulti, ref string effect, string hurtTag, bool isFeedback)
+    {
+    }
+
+    public virtual bool CheckAidSkill()
+    {
+        return false;
+    }
+
+    public virtual void OnCheckBurst(SkillConfig checkSkillCfg, ref float rate)
+    {
+        
+    }
+
+    public virtual void OnAddBuff(Chess target, ref int buffId, int skillId, ref float time)
+    {
+        
+    }
+
+    public virtual void OnBeAddBuff(Chess caster, ref int buffId, int checkSkillId, ref float time)
+    {
+        
+    }
+
+    /// <summary>
+    /// 护甲修正增量：物理伤害结算时，对受击方护甲的倍率增量（最终倍率 = 1 + Σ各技能增量；0=不改变护甲）。
+    /// 多个技能按加法叠加：破甲类(攻击方, isAttackerSide=true)返回负值（如 -0.3 → 护甲×0.7，完全无视=返回-1）；
+    /// 加甲类(受击方, isAttackerSide=false)返回正值（如 0.2 → 护甲×1.2）。
+    /// 注意：不能把"DamageStrength 即生效"做进默认实现，否则扇(ModifyBuffTime)/速射(ModifyShootSpeed)等
+    /// 无关技能因 DamageStrength>0 会让持有者凭空获得护甲加成，必须显式覆写。
+    /// </summary>
+    public virtual float GetArmorDelta(bool isAttackerSide)
+    {
+        return 0f;
+    }
+
+    public virtual void OnHealTarget(Chess target, int checkSkillId, ref int addon)
+    {
+        
+    }
+
+    /// <summary>
+    /// 召唤技能单位（法术场/分身等）：在指定位置创建单位，并将技能配置的 SummonTag 标记到召唤物上
+    /// </summary>
+    protected Chess SummonUnit(Vector3 pos, int soldierId, string imgPath = "")
+    {
+        var unit = WorldManager.Instance.SpawnUnitsForRegion(owner.GetPlayerInfo(), soldierId, -1, pos, owner.side, imgPath);
+        if (!string.IsNullOrEmpty(skillCfg.SummonTag))
+            unit.SummonTag = skillCfg.SummonTag;
+        return unit;
+    }
+
+    /// <summary>
+    /// 召唤技能法术场(501001)：创建并标记 SummonTag、设置存在时长，返回召唤物与存在时长（时长同时用于技能特效生命周期）
+    /// </summary>
+    protected Chess SummonMagicField(Vector3 pos, out float summonTime)
+    {
+        var magicStub = SummonUnit(pos, CombatConst.SoldierMagicField);
+        summonTime = GetSummonTime();
+        magicStub.SetLifeTime(summonTime);
+        return magicStub;
+    }
+
+    /// <summary>
+    /// 播放范围特效（范围技能统一入口）：在 pos 处播 skillCfg.AreaEffect，缩放按 skillCfg.Area 相对基准半径放大。
+    /// 特效挂在战场场景容器上而非施法者节点，落点固定，不随施法者移动/转向漂移。
+    /// rotation 非空时按该朝向摆放（矩形/扇形范围需要与施法方向对齐）。
+    /// AreaEffect 未配置时静默跳过（范围施法可以没有视觉表现）。
+    /// </summary>
+    protected GameObject PlayAreaEffect(Vector3 pos, float time = 1.3f, Quaternion? rotation = null)
+    {
+        if (string.IsNullOrEmpty(skillCfg.AreaEffect))
+            return null;
+        if (time <= 0f)
+            time = skillCfg.SummonTime > 0f ? skillCfg.SummonTime : 1.3f;
+        return EffectManager.PlayPosSkillEffect(pos, skillCfg.Area, skillCfg.AreaEffect, time, rotation);
+    }
+
+    /// <summary>
+    /// 播放施法自身特效（施法/触发瞬间在施法者自身身上播 skillCfg.SelfEffect，取"增益/目标"类特效）。
+    /// SelfEffect 未配置时静默跳过。
+    /// </summary>
+    protected GameObject PlaySelfEffect(float time = 1.3f)
+    {
+        if (string.IsNullOrEmpty(skillCfg.SelfEffect))
+            return null;
+        return EffectManager.PlaySkillEffect(owner, skillCfg.SelfEffect, time);
+    }
+
+    public float GetSummonTime()
+    {
+        return skillCfg.SummonTime;
+    }
+
+    /// <summary>
+    /// 嘲讽（统一入口，供各嘲讽类技能复用）：给 pos 周围 area 半径内所有存活敌方单位挂上嘲讽 Buff(CombatConst.TauntBuffId)，
+    /// 时长取本技能配置的 BuffTime。嘲讽的索敌效果由 Chess.FindTarget 判断该 Buff 是否存在来决定——
+    /// 挂着嘲讽的单位会强制把嘲讽者(BuffTaunt.caster)作为目标，直到 Buff 到期/被驱散或嘲讽者阵亡。
+    /// 挂完 Buff 后立即重算一次索敌，保证释放瞬间目标就转向嘲讽者。area&lt;=0 表示全地图。返回被嘲讽的敌人数量。
+    /// </summary>
+    protected int TauntEnemies(Chess taunter, Vector3 pos, float area)
+    {
+        if (taunter == null || taunter.hp <= 0)
+            return 0;
+
+        var enemies = WorldManager.Instance.GetEnemyInRange(pos, area, taunter.side);
+        int count = 0;
+        foreach (var e in enemies)
+        {
+            if (e == null || e.hp <= 0)
+                continue;
+            BuffManager.AddBuff(e, taunter, skillCfg.Id, CombatConst.TauntBuffId, skillCfg.BuffTime);
+            // 嘲讽改为 Buff 驱动后立即重算索敌，避免等到下一次常规索敌周期(最长3秒)才生效
+            e.FindTarget();
+            count++;
+        }
+        return count;
+    }
+
+    // 嘲讽自身周围 area 半径内的敌人（最常用形态）
+    protected int TauntEnemies(float area)
+    {
+        return TauntEnemies(owner, owner.transform.position, area);
+    }
+
+    // ---- 空中位移（跳跃/飞行/俯冲）通用封装 ----
+
+    /// <summary>空中位移采样步长（秒），与战斗逻辑时钟 0.05s 对齐，保证模拟器与真机时长一致</summary>
+    protected const float AirMoveStepTime = 0.05f;
+
+    /// <summary>
+    /// 进入空中位移状态：标记 owner.isJumping（跳跃期间外部位移技能 MoveTo 会被忽略）并锁住寻路，
+    /// 保证跳跃/俯冲等空中动作不会被击退、换位、拖拽类技能打断，必然完整播完；仅单位死亡（销毁）会终止。
+    /// 须与 EndAirMove 成对调用。
+    /// </summary>
+    protected void BeginAirMove()
+    {
+        if (owner == null)
+            return;
+        owner.isJumping = true;
+        owner.noMoveCount++;
+    }
+
+    /// <summary>结束空中位移状态：清除跳跃标记并解锁寻路</summary>
+    protected void EndAirMove()
+    {
+        if (owner == null)
+            return;
+        owner.isJumping = false;
+        owner.noMoveCount--;
+    }
+
+    /// <summary>
+    /// 空中位移通用实现：duration 秒内按 curve(t)（t=0~1）计算每步位置并直接写入 owner 位置，结束时落到 curve(1)。
+    /// 注意：须在技能顶层协程里手动逐段推进（var e = AirMove(...); while (e.MoveNext()) yield return e.Current;），
+    /// 不能直接 yield return 本枚举器——模拟器桩协程不展开嵌套 IEnumerator。
+    /// 位移状态由调用方用 BeginAirMove/EndAirMove 管理。
+    /// </summary>
+    protected IEnumerator AirMove(float duration, Func<float, Vector3> curve, Action onComplete = null)
+    {
+        var total = Mathf.Max(0.05f, duration);
+        var elapsed = 0f;
+        while (elapsed < total)
+        {
+            if (owner == null || owner.hp <= 0)
+                yield break;
+            owner.transform.position = curve(Mathf.Clamp01(elapsed / total));
+            elapsed += AirMoveStepTime;
+            yield return new WaitForSeconds(AirMoveStepTime);
+        }
+        if (owner == null)
+            yield break;
+        owner.transform.position = curve(1f);
+        onComplete?.Invoke();
+    }
+
+    /// <summary>
+    /// 抛物线跳跃到 dest：水平方向直线插值，垂直方向叠加 4h·t(1-t) 抛物线（t=0.5 时最高 height）。
+    /// 全程处于空中位移状态（外部位移被忽略、寻路锁定），动作必播完；仅死亡中断。
+    /// 调用方须手动逐段推进：var e = JumpTo(...); while (e.MoveNext()) yield return e.Current;
+    /// </summary>
+    protected IEnumerator JumpTo(Vector3 dest, float height, float duration, Action onComplete = null)
+    {
+        if (owner == null || owner.hp <= 0)
+            yield break;
+        if (owner.isJumping)
+        {
+            GameLog.Warn("跳跃失败：单位已在空中位移中 id=" + id);
+            yield break;
+        }
+
+        BeginAirMove();
+
+        var groundY = owner.baseY + owner.heightOffset;
+        var start = owner.transform.position;
+        start.y = groundY;
+        dest.y = groundY;
+
+        var total = Mathf.Max(0.05f, duration);
+        var elapsed = 0f;
+        var alive = true;
+        while (elapsed < total)
+        {
+            if (owner == null || owner.hp <= 0)
+            {
+                alive = false;
+                break;
+            }
+            var t = Mathf.Clamp01(elapsed / total);
+            var pos = Vector3.Lerp(start, dest, t);
+            pos.y = groundY + 4f * height * t * (1f - t); // 抛物线：中点最高
+            owner.transform.position = pos;
+            elapsed += AirMoveStepTime;
+            yield return new WaitForSeconds(AirMoveStepTime);
+        }
+
+        EndAirMove();
+        if (!alive || owner == null)
+            yield break;
+        owner.transform.position = dest;
+        onComplete?.Invoke();
+    }
+
+}

@@ -3,7 +3,7 @@ using CommonConfig;
 
 /// <summary>
 /// 国家护盾机制：战斗开始时统计同阵营英雄数量，达到档位(2/3/4/5/6)后给该阵营英雄授予对应等级的国家护盾技能
-/// （技能等级=档位 Lv1~5，效果由 SkillFactionShield 走技能/Buff 系统：护盾=最大生命×档位比例）。
+/// （技能等级=档位 Lv1~5，效果由 SkillBondFactionShield 走技能/Buff 系统：护盾=最大生命×档位比例）。
 /// 主公(王)加成由技能内结算（同阵营护盾额外+10%×王数，与旧默认护盾机制一致）。
 /// </summary>
 public static class FactionShieldManager

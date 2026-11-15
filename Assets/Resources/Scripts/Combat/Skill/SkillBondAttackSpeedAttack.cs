@@ -1,0 +1,22 @@
+﻿using System.Collections;
+using System.Collections.Generic;
+using CommonConfig;
+using UnityEngine;
+
+public class SkillBondAttackSpeedAttack : Skill
+{
+    public SkillBondAttackSpeedAttack(int id, Chess unit) : base(id, unit)
+    {
+    }
+
+    public override void OnAttack(Chess defender, int damage)
+    {
+        if (CheckBurst(defender))
+        {
+            owner.PlayerAnim(skillCfg.Action);
+
+            // Cooldown 参数为冷却百分比（key "cooldown"，1=完全冷却），最大不超过1
+            owner.Cooldown(GetStr2("cooldown"));
+        }
+    }
+}

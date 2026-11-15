@@ -1,0 +1,91 @@
+﻿using System;
+using System.Buffers;
+using System.Collections;
+using System.Collections.Generic;
+using CommonConfig;
+using UnityEngine;
+
+public class SkillComHitWall : Skill
+{
+    private List<Vector3> targetPosList;
+    public SkillComHitWall(int id, Chess unit) : base(id, unit)
+    {
+    }
+
+    public override void OnAttack(Chess defender, int damage)
+    {
+        if (CheckBurst(defender))
+        {
+            owner.PlayerAnim(skillCfg.Action);
+            PlaySelfEffect();
+            // 在目标位置，以及owner和defender方向90度两侧，各创建一个effect
+            var targetPos = defender.transform.position;
+
+            SummonMagicField(targetPos, out var summonTime);
+            
+            // 计算owner到defender的方向
+            Vector3 direction = (defender.transform.position - owner.transform.position).normalized;
+            
+            // 计算90度和-90度旋转的方向
+            Vector3 rightDirection = Quaternion.Euler(0, 90, 0) * direction;
+            Vector3 leftDirection = Quaternion.Euler(0, -90, 0) * direction;
+
+            targetPosList = new List<Vector3>();
+            
+            targetPosList.Add(targetPos);
+            if (skillCfg.SummonCount > 1)
+            {
+                targetPosList.Add(targetPos + leftDirection * 10);
+                targetPosList.Add(targetPos + rightDirection * 10);
+            }
+            if (skillCfg.SummonCount > 3)
+            {
+                targetPosList.Add(targetPos + rightDirection * 20);
+                targetPosList.Add(targetPos + leftDirection * 20);
+            }
+            
+            foreach(var pos in targetPosList)
+            {
+                PlayAreaEffect(pos, summonTime);
+            }
+            owner.StartCoroutine(DelayDamage(summonTime));
+        }
+    }
+
+    IEnumerator DelayDamage(float summonTime)
+    {
+        var term = (int)Math.Floor(summonTime / skillCfg.SummonHitInterval);
+        for (int i = 0; i < term; i++)
+        {
+            if (owner == null || owner.hp <= 0)
+                yield break;
+
+            var unitList = new List<Chess>();
+            foreach (var pos in targetPosList)
+            {
+                // 每段墙范围选取：按 SelectOnly / SelectFirst 选（默认敌方，随机取 TargetCount 名）
+                var unitsInRange = SelectTargets(pos, skillCfg.Area * 1.5f, false, skillCfg.TargetCount);
+
+                foreach (var unit in unitsInRange)
+                {
+                    if (unitList.Contains(unit))
+                        continue;
+                    unitList.Add(unit);
+                }
+            }
+            var damage = GetSkillDamage(); // 固定系数 + 比例系数×关联属性
+            foreach (var unit in unitList)
+            {
+                if (damage > 0)
+                {
+                    unit.OnSkillDamaged(owner, skillId, damage);
+                    if (!string.IsNullOrEmpty(skillCfg.HitEffect))
+                        EffectManager.PlaySkillEffect(unit, skillCfg.HitEffect);
+                }
+            }
+
+            yield return new WaitForSeconds(skillCfg.SummonHitInterval);
+        }
+    }
+
+}

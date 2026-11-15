@@ -1,4 +1,4 @@
-# 技能范围字段与范围特效改造（已完成）
+﻿# 技能范围字段与范围特效改造（已完成）
 
 > 整理日期：2026-10-27
 > 状态：已实施并收尾（`Range`/`Area` 语义分离 + `EffectSize` → `AreaEffect`）
@@ -24,7 +24,7 @@
 - **缩放公式**：`最终缩放 = EffectConfig.Scale × (Area / CombatConst.AreaEffectBaseRadius)`，基准半径 `10`。
 - 特效挂在战场场景容器（`WorldManager.Units`）而非施法者节点，落点固定、不随施法者移动/转向。
 - `AreaEffect` 为空或资源加载失败：`GameLog.Warn` 后返回 null（不再 NRE）。
-- 普攻溅射类 [SkillHitArea.cs](../../Assets/Resources/Scripts/Combat/Skill/SkillHitArea.cs)、[SkillHitAround.cs](../../Assets/Resources/Scripts/Combat/Skill/SkillHitAround.cs) 不播范围特效，保留主目标 `HitEffect`。
+- 普攻溅射类 [SkillBondHitArea.cs](../../Assets/Resources/Scripts/Combat/Skill/SkillBondHitArea.cs)、[SkillHitAround.cs](../../Assets/Resources/Scripts/Combat/Skill/SkillHitAround.cs) 不播范围特效，保留主目标 `HitEffect`。
 
 ## 三、已完成的历史变更
 

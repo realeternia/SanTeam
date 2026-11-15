@@ -1,0 +1,36 @@
+﻿using System.Collections;
+using System.Collections.Generic;
+using CommonConfig;
+using UnityEngine;
+
+public class SkillBondHitRepeat : Skill
+{
+    public SkillBondHitRepeat(int id, Chess unit) : base(id, unit)
+    {
+    }
+
+    public override void OnAttack(Chess defender, int damage)
+    {
+        if(CheckBurst(defender))
+        {
+            WorldManager.Instance.AddBattleText(damage.ToString() + "!", defender.transform.position, new UnityEngine.Vector2(0, 60), Color.red, 3);
+            owner.PlayerAnim(skillCfg.Action);
+            owner.StartCoroutine(DelayAttack(defender, damage));
+        }
+    }
+
+    IEnumerator DelayAttack(Chess defender, int damage)
+    {
+        for (int i = 0; i < (int)GetStr2("hitCount"); i++)
+        {
+            yield return new WaitForSeconds(0.3f);
+            if (defender != null && defender.hp > 0)
+            {
+                var d = (int)(damage * GetStr2("hitRate"));
+                defender.OnSkillDamaged(owner, skillId, d);
+                EffectManager.PlaySkillEffect(defender, skillCfg.HitEffect);
+                WorldManager.Instance.AddBattleText(d.ToString() + "!", defender.transform.position, new UnityEngine.Vector2(0, 60), Color.red, 3);
+            }
+        }
+    }
+}

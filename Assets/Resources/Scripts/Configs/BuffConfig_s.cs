@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿﻿﻿﻿using System;
+﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -172,6 +172,7 @@ namespace CommonConfig
             config[300019] = new BuffConfig(300019, "暴击提升", "暴", "提升暴击率", true, true, false, 1, "BuffCritRate", "", "", "", "", "");
             config[300025] = new BuffConfig(300025, "反伤", "反", "受到伤害时将其中一部分返还给攻击者", true, true, false, 1, "BuffReflect", "", "", "", "", "");
             config[300030] = new BuffConfig(300030, "隐匿", "隐", "敌方索敌与单体技能无法锁定自身，单位呈半透明", true, true, false, 4, "BuffStealth", "", "", "", "BuffStealth", "");
+            config[300031] = new BuffConfig(300031, "士兵士气", "气", "每层提升小兵5点攻击与5点护甲，可无限叠加", true, false, false, 1, "BuffMorale", "", "", "", "", "");
             config[300101] = new BuffConfig(300101, "据守", "守", "获得临时双防，期间每次受击再叠一层双防，状态结束后临时双防消失", true, false, false, 4, "BuffDefStack", "", "", "", "", "");
             config[300102] = new BuffConfig(300102, "复活", "复", "死亡后3秒原地复活(仅一次)", true, false, false, 4, "BuffRevive", "", "", "", "", "");
             config[300104] = new BuffConfig(300104, "多重箭", "箭", "攻击时额外射出多支箭", true, true, false, 4, "BuffMultiShot", "", "", "", "", "");

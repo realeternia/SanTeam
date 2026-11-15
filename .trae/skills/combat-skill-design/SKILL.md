@@ -1,4 +1,4 @@
----
+﻿---
 name: combat-skill-design
 description: 《三国卡牌》(金铲铲式) SkillConfig 表的配置方法与战斗技能设计规范。当需要新增/修改一条技能配置（SkillConfig_s.cs 的 43 列）、分配技能 Id 段、按 Lv1~5 展开、写 Descript 动态引用、配伤害/治疗/护盾/MP/Buff/特效/召唤/连线字段、维护技能模板表与模板组件表（SkillTemplateConfig / SkillTemplateComponentConfig，Template + Modules 组合），或排查配置不生效时使用。纯 Buff/BuffConfig、羁绊、物品掉落配置请另用对应技能。
 ---
@@ -17,6 +17,19 @@ description: 《三国卡牌》(金铲铲式) SkillConfig 表的配置方法与�
 6. **写 Descript**：只在 Lv1 写模板，其余 4 行留空。
 7. **注册**：新建 `.cs` 必须在 `Assembly-CSharp.csproj` 加 `<Compile Include>`（Editor 脚本加 `Assembly-CSharp-Editor.csproj`）。
 8. **自检**：跑 `scripts/dump_skill.py <Sname>`（见第十节），确认 5 行齐全、Id 连号、脚本/Buff/特效存在。
+### 脚本命名规范（强制）
+
+| 前缀 | 用途 | 判定方式 |
+| --- | --- | --- |
+| `SkillAidXxx` | 英雄主动技能 | 重写 `Skill.CheckAidSkill` |
+| `SkillComXxx` | 英雄被动 / 通用行为 / 共用基类 | 不重写 `CheckAidSkill` |
+| `SkillBondXxx` | 羁绊/连锁技能 | `SkillConfig.Type` 为 `职业` 或 `连接` |
+| `SkillEquipXxx` | 道具技能 | `SkillConfig.Type` 为 `道具` |
+
+- `ScriptName`、类名、文件名三者必须一致；新增脚本先按上表选前缀，禁止 `SkillTaunt` 这类无分类名。
+- 同一行为被多类技能共用时拆成两个完整脚本：英雄侧保留 `SkillAidXxx` / `SkillComXxx` 实现，羁绊侧完整复制 `SkillBondXxx`、道具侧完整复制 `SkillEquipXxx`；羁绊+道具共用时 Bond 侧保留实现，Equip 侧完整复制。
+- 复制脚本必须完整保留原实现的业务逻辑，不得只写空壳或通过继承复用；`SkillDumb` 为特殊占位脚本，保持原名 `SkillDumb`，不加 `SkillBond` 前缀。
+- 新增/改名脚本必须同步 `Assembly-CSharp.csproj`，并全量更新 `SkillConfig` 与 `SkillBaseConfig` 的 `ScriptName`。
 
 > 构造函数**无默认参数**：新增列必须插到 `SkillConfig` 构造签名对应位置，并同步为**全部数据行**补值，否则编译即失败。
 
@@ -70,17 +83,17 @@ description: 《三国卡牌》(金铲铲式) SkillConfig 表的配置方法与�
 
 | 脚本 | 标记 | 含义 |
 | --- | --- | --- |
-| `SkillAreaBuff`（群增） | `selfAlways` | 施法者必定获得（其余成员按 `TargetCount` 选） |
+| `SkillAidAreaBuff`（群增） | `selfAlways` | 施法者必定获得（其余成员按 `TargetCount` 选） |
 | | `noDedupe` / `wholeMap` | 不按首段 Buff 去重 / 全图选人（`Area` 仅作嘲讽半径） |
 | | `targetCenter` | 以选中的首个友军目标为中心，再在 `Area` 内扩散；缺省为自身中心 |
 | | `splitByRange` / `tauntAroundTarget` | 近战取第 1 段、远程取第 2 段 Buff / 挂完 Buff 嘲讽 `Area` 内敌人 |
-| `SkillAreaDamageDeBuff`（群伤） | `self` / `missile` / `maxHpBonus` / `mpBurn` | 自身中心（不做射程校验）/ 走导弹 / 附加最大生命伤害 / 燃烧 `Strength2[mpBurn]` 蓝量 |
-| `SkillAreaHeal`（群疗） | `overflowToArmor` | 溢出治疗转护甲 |
-| `SkillSelfBuff`（自增） | `permanent` / `noStack` | 永久 / 不叠加 |
-| `SkillBacklineStrike` | `smart` / `extra` | 智能选后排 / 额外效果 |
-| `SkillJumpChain` | `heal` | 治疗弹射模式 |
-| `SkillSingleDamage` | `execute` / `antiShield` 等 | 见脚本头部注释 |
-| `SkillAttackedShield` | `ignoreWeakHit` | 忽略 ≤10 的低伤害 |
+| `SkillAidAreaDamageDeBuff`（群伤） | `self` / `missile` / `maxHpBonus` / `mpBurn` | 自身中心（不做射程校验）/ 走导弹 / 附加最大生命伤害 / 燃烧 `Strength2[mpBurn]` 蓝量 |
+| `SkillAidAreaHeal`（群疗） | `overflowToArmor` | 溢出治疗转护甲 |
+| `SkillAidSelfBuff`（自增） | `permanent` / `noStack` | 永久 / 不叠加 |
+| `SkillBondBacklineStrike` | `smart` / `extra` | 智能选后排 / 额外效果 |
+| `SkillAidJumpChain` | `heal` | 治疗弹射模式 |
+| `SkillAidSingleDamage` | `execute` / `antiShield` 等 | 见脚本头部注释 |
+| `SkillBondAttackedShield` | `ignoreWeakHit` | 忽略 ≤10 的低伤害 |
 
 **选人类技能推荐配置**
 
@@ -96,8 +109,8 @@ description: 《三国卡牌》(金铲铲式) SkillConfig 表的配置方法与�
 | 群体治疗（按缺口） | `ally;notFullHp` | `biggestHpGap` |
 | 单体伤害 | `enemy` | 空（沿用当前索敌目标） |
 
-- 单体类脚本（`SkillSingleDamage`、`SkillShockWave*`、`SkillMultiHit`、`SkillAidDualLaser` 等）统一走基类 `SelectSingleTarget(Range)`：未配 `SelectFirst` 时行为与原来一致（沿用 `owner.targetChess` 并校验射程）。
-- 不走筛选的类型：冲刺/直线路径扫掠（`SkillAidCavalryStrike`、`SkillAttackRunCrossPlus`）、全员光环/全体友军加成（`SkillAura`、`SkillFactionShield`、`SkillAidManaShare`、`SkillSoldier*` 的小兵加成）、嘲讽强制、导弹逐帧探测。这些不是"选目标"，`SelectOnly`/`SelectFirst` 不参与逻辑。
+- 单体类脚本（`SkillAidSingleDamage`、`SkillAidShockWave*`、`SkillAidMultiHit`、`SkillAidDualLaser` 等）统一走基类 `SelectSingleTarget(Range)`：未配 `SelectFirst` 时行为与原来一致（沿用 `owner.targetChess` 并校验射程）。
+- 不走筛选的类型：冲刺/直线路径扫掠（`SkillAidCavalryStrike`、`SkillComAttackRunCrossPlus`）、全员光环/全体友军加成（`SkillComAura`、`SkillBondFactionShield`、`SkillAidManaShare`、`SkillAidSoldier*` / `SkillBondInitSoldierBuff` 的小兵加成）、嘲讽强制、导弹逐帧探测。这些不是"选目标"，`SelectOnly`/`SelectFirst` 不参与逻辑。
 - 远程技能以自身为中心会全程打空（站位远离敌阵）→ 用目标中心；近战贴脸 AoE 用 `self`。
 - 已废弃词不要复用：同一标记在不同脚本里含义必须一致，新增标记前先全局 `Grep HasSkillFlag`。
 
@@ -122,7 +135,7 @@ description: 《三国卡牌》(金铲铲式) SkillConfig 表的配置方法与�
 | 列 | 类型 | 配置方法 |
 | --- | --- | --- |
 | `BuffId` | string | 填 `BuffConfig.NameS` **短名**（不是 Id）；空 = 无 Buff；多个用 `,`/`，`/`;`/`；` 分隔 |
-| `BuffTime` | float | Buff 持续秒数；常规 1~10 秒。**永久类效果不要靠超大 BuffTime 模拟**，用脚本直接改属性（`SkillKillGain` / `SkillAidCraftBuff` / `SkillSelfBuff.permanent`） |
+| `BuffTime` | float | Buff 持续秒数；常规 1~10 秒。**永久类效果不要靠超大 BuffTime 模拟**，用脚本直接改属性（`SkillBondKillGain` / `SkillAidCraftBuff` / `SkillAidSelfBuff.permanent`） |
 
 - 一槽只能装一种语义：既要主动命中给目标上效果、又要开局给友军挂被动 Buff 时，冲突需拆（被动 Buff 配 `BuffId`，命中效果在脚本里用常量短名另引）。
 - **BuffId 号段**：`300xxx` 正面通用、`3001xx` 正面特化、`301xxx` 负面通用、`3011xx` 负面特化。新增 Buff 先判正负面与是否特化，再在对应段顺延。
@@ -173,18 +186,18 @@ description: 《三国卡牌》(金铲铲式) SkillConfig 表的配置方法与�
 
 | 模板 | 唯一脚本 |
 | --- | --- |
-| 单体伤害大 / 中 / 小 | `SkillSingleDamage` |
-| 群体伤害近距离大 / 中 / 小、群体伤害自身中心大 / 中 / 小 | `SkillAreaDamageDeBuff` |
-| 单体友方增益 / 群体友方增益 | `SkillAreaBuff` |
-| 自身强化 | `SkillSelfBuff` |
-| 单体治疗大 / 中 / 小、范围治疗大 / 中 / 小 | `SkillAreaHeal` |
-| 持续治疗大 / 中 / 小 | `SkillCastingAidAreaHeal` |
+| 单体伤害大 / 中 / 小 | `SkillAidSingleDamage` |
+| 群体伤害近距离大 / 中 / 小、群体伤害自身中心大 / 中 / 小 | `SkillAidAreaDamageDeBuff` |
+| 单体友方增益 / 群体友方增益 | `SkillAidAreaBuff` |
+| 自身强化 | `SkillAidSelfBuff` |
+| 单体治疗大 / 中 / 小、范围治疗大 / 中 / 小 | `SkillAidAreaHeal` |
+| 持续治疗大 / 中 / 小 | `SkillAidCastingAreaHeal` |
 | 持续伤害大 / 中 / 小 | `SkillAidHitRegion` |
-| 光环中 | `SkillAura` |
-| 冲击波伤害大 / 中 / 小 | `SkillShockWave` |
-| 跳跃弹射-伤害大 / 中 / 小、跳跃弹射-治疗大 / 中 / 小 | `SkillJumpChain` |
-| 兵种增益 | `SkillSoldierBless` |
-| 群体嘲讽 | `SkillTaunt` |
+| 光环中 | `SkillComAura` |
+| 冲击波伤害大 / 中 / 小 | `SkillAidShockWave` |
+| 跳跃弹射-伤害大 / 中 / 小、跳跃弹射-治疗大 / 中 / 小 | `SkillAidJumpChain` |
+| 兵种增益 | `SkillAidSoldierBless` |
+| 群体嘲讽 | `SkillAidTaunt` |
 
 **归模板 vs 归组件（判定顺序）**
 
@@ -232,7 +245,7 @@ description: 《三国卡牌》(金铲铲式) SkillConfig 表的配置方法与�
 - **保留列（9 列身份列）**：`Id Name Sname Version Descript Type Template Modules Lv`。
 - **展开规则（k-v 映射）**：模板先按 `Effect` 的绑定把 `Lv` 对应数值写入目标列/槽（伤害模板=`DamageStrength`、治疗模板=`HealStrength`，两者互斥清零）；随后 `Range`/`Area`/`TargetCount` 仅在模板值 >0 时覆盖（Range 默认 40、Area 默认小范围 20、TargetCount 群体 3/单体 1），`CD` 取模板，`MpCost` = 模板 `MpCost × 10`；再按**技能自己 `Modules`** 顺序展开每个组件的 `Effect`（列写入 / `Buff:短名:槽键` 追加 `BuffId`+`StrengthBuff1` / `TargetType:标记` / `TriggerCondition` / `Strength2:键`）。`BuffId`/`StrengthBuff1`/`Strength2`/`TargetType` 已手配的键不覆盖，只补缺失项。`BuffTime` 取模板与各组件提供值的最大值。模板默认 `Modules` 只参与估值与推荐校验，**不注入任何效果**（如「护盾中」不会给技能额外加盾）。
 - **可被组件写入的列**：`EffectColumns` = `DamageStrength HealStrength CD MpCost Range Area TargetCount Rate BuffTime SelectOnly SelectFirst TargetType TriggerCondition Strength2 Buff SummonCount SummonTime SummonHitInterval SummonSpeed SummonTag`；`伤害倍率` 仍为 `None`（无对应列或标记，只计分）。目标筛选类组件（`3000~3999`）写 `SelectOnly:`/`SelectFirst:`，行为标记才写 `TargetType:`（如 `3090 施法者必含`→`TargetType:selfAlways`、`3110 全图`→`TargetType:wholeMap`）。
-- **现状覆盖**：品质 1~4 英雄技能 152 个（Q1 26 / Q2 54 / Q3 47 / Q4 25），模板化 123 个（615 行 SkillBase），29 个特化不模板化。Q4 共 14 个专属脚本：曹操·SkillAidDominion、赵云·SkillAidFlashStrike、张飞·SkillAttackSpinAttack、马超·SkillAidCavalryStrike、关羽·SkillAidShadowSplit、姜维·SkillAidDualLaser、郭嘉·SkillCastingAidLastStrategy、典韦·SkillAidSkyFall、甘宁·SkillAidRaidCamp、太史慈·SkillShockWaveMulti、周瑜·SkillAidFireWall、陆逊·SkillCastingAidScorchedEarth、吕布·SkillCastingAidDrain、邓艾·SkillAidJumpReturn。Q1~3 共 15 个：孙权·SkillAidFeint、曹彰·SkillAttackRunCrossPlus、张昭·SkillSoldierFortify、曹叡·SkillAidManaBurn、袁绍·SkillAidExplode、刘备·SkillAidManaShare、黄月英/裴秀·SkillAidCraftBuff、孙尚香·SkillAidBackstepShot、荀攸·SkillMultiHit、陈宫·SkillCastingAidFrontalFlaming、张春华/于吉·SkillAidCurseHeal、貂蝉·SkillAidLifeLink、沮授·SkillSoldierArcherBuff。
+- **现状覆盖**：品质 1~4 英雄技能 152 个（Q1 26 / Q2 54 / Q3 47 / Q4 25），模板化 123 个（615 行 SkillBase），29 个特化不模板化。Q4 共 14 个专属脚本：曹操·SkillAidDominion、赵云·SkillAidFlashStrike、张飞·SkillComAttackSpinAttack、马超·SkillAidCavalryStrike、关羽·SkillAidShadowSplit、姜维·SkillAidDualLaser、郭嘉·SkillAidCastingLastStrategy、典韦·SkillAidSkyFall、甘宁·SkillAidRaidCamp、太史慈·SkillAidShockWaveMulti、周瑜·SkillAidFireWall、陆逊·SkillAidCastingScorchedEarth、吕布·SkillAidCastingDrain、邓艾·SkillAidJumpReturn。Q1~3 共 15 个：孙权·SkillAidFeint、曹彰·SkillComAttackRunCrossPlus、张昭·SkillAidSoldierFortify、曹叡·SkillAidManaBurn、袁绍·SkillAidExplode、刘备·SkillAidManaShare、黄月英/裴秀·SkillAidCraftBuff、孙尚香·SkillAidBackstepShot、荀攸·SkillAidMultiHit、陈宫·SkillAidCastingFrontalFlaming、张春华/于吉·SkillAidCurseHeal、貂蝉·SkillAidLifeLink、沮授·SkillAidSingleDamage。
 - **数值口径提醒**：模板 `Values` 是「标准态」主数值，与手配 `DamageStrength`/`HealStrength`（受品质、MP 系数、法术倍率影响）不是同一量级，直接覆盖会显著改变战斗数值；需要标定时应在烘焙阶段按品质/MP 系数缩放模板值，或回调模板 `Values`，不要逐行改 `SkillBaseConfig`（它由脚本重新生成）。
 
 ## 三、Id 段（当前实际占用）
@@ -286,26 +299,26 @@ description: 《三国卡牌》(金铲铲式) SkillConfig 表的配置方法与�
 
 - BuffId 填短名；组合按段位顺序读 `StrengthBuff1`（小键盘如 `攻,甲,抗` ↔ `atk,armor,magicRes`）。
 - 特效名必须是 `EffectConfig.Name` 中存在的名字（见 `combat-effect-usage` 技能）。
-- 范围技能的 `AreaEffect` 随 `Area` 缩放；普攻溅射类（`SkillHitArea`）只播主目标 `HitEffect`。
+- 范围技能的 `AreaEffect` 随 `Area` 缩放；普攻溅射类（`SkillBondHitArea`）只播主目标 `HitEffect`。
 
 ## 八、优先复用通用脚本
 
 | 脚本 | 形态（配置行数） | 配置要点 |
 | --- | --- | --- |
-| `SkillSingleDamage` | 单体伤害（125 行，最常用） | `DamageStrength`/`HealStrength` + `BuffId`（空=纯伤害）；`TargetCount>0` = 对同一目标连打 N 段 |
-| `SkillAreaDamageDeBuff` | 范围伤害 + 减益（60 行） | `SelectOnly=enemy`；`TargetType` 空=目标中心 / `self`=自身中心；`BuffId` 可 0~N 段 |
-| `SkillSelfBuff` | 自身增益（60 行） | `BuffId` 挂 1~N 个 Buff，数值放 `Strength2`/`StrengthBuff1` 由 Buff 读。**反伤也走这里**：`BuffId=反`、`StrengthBuff1=reflect:比例`、`BuffTime=持续时间`，由 `BuffReflect` 在 Buff 期间结算；连接授予的常驻反伤（如 `刺`）加 `TargetType=noStack`，避免 CD 0 时每帧重放 |
-| `SkillAreaBuff` | 群体增益（45 行） | `SelectOnly=ally;...` + `SelectFirst` 选人（见 2.3）；护盾类按统一护盾公式写 `Strength2[shield]`。施放中心分三种模板：`群体友方增益`（自身中心，Area 20）、`-目标小`（`TargetType:targetCenter`，Area 25）、`全体友军增益`（`TargetType:wholeMap`，Area 0）；要更大半径加 `中范围`/`大范围` 组件 |
-| `SkillAura` | 光环（40 行） | 模板只有 `光环中`（半径 40、`TargetCount=0` 不限人数、评分 2），需要更大范围加 `中范围`/`大范围` 组件。每 3 秒对 `Area` 内按 `SelectOnly`/`SelectFirst` 选中的单位（可含敌方）挂 `BuffId`，`BuffTime` 建议 4s 防断档；`MpCost=0` 常开，`MpCost>0` 时 MP 满开启、每秒扣 1 点 MP，扣到 0 关闭并移除 `SelfEffect`，开启期间攻击/受击不回蓝 |
-| `SkillAreaHeal` | 范围治疗（15 行） | `HealStrength` + `Area`，`overflowToArmor` 可转护甲 |
-| `SkillJumpChain` | 弹射（10 行） | `TargetType=heal` 走治疗链，否则伤害链；每跳衰减读 `Strength2[jumpDecay]`（模板默认 0.85，组件可改 1/0.7/0.5） |
-| `SkillBacklineStrike` | 打后排（15 行） | `smart` 智能选后排 / 默认最远 |
-| `SkillAidBuffLowHp` / `SkillDefReduceDamageRate` | 低血触发（5 行各） | `TriggerCondition=hprate<50` + `Strength2[reduceRate]` |
+| `SkillAidSingleDamage` | 单体伤害（125 行，最常用） | `DamageStrength`/`HealStrength` + `BuffId`（空=纯伤害）；`TargetCount>0` = 对同一目标连打 N 段 |
+| `SkillAidAreaDamageDeBuff` | 范围伤害 + 减益（60 行） | `SelectOnly=enemy`；`TargetType` 空=目标中心 / `self`=自身中心；`BuffId` 可 0~N 段 |
+| `SkillAidSelfBuff` | 自身增益（60 行） | `BuffId` 挂 1~N 个 Buff，数值放 `Strength2`/`StrengthBuff1` 由 Buff 读。**反伤也走这里**：`BuffId=反`、`StrengthBuff1=reflect:比例`、`BuffTime=持续时间`，由 `BuffReflect` 在 Buff 期间结算；连接授予的常驻反伤（如 `刺`）加 `TargetType=noStack`，避免 CD 0 时每帧重放 |
+| `SkillAidAreaBuff` | 群体增益（45 行） | `SelectOnly=ally;...` + `SelectFirst` 选人（见 2.3）；护盾类按统一护盾公式写 `Strength2[shield]`。施放中心分三种模板：`群体友方增益`（自身中心，Area 20）、`-目标小`（`TargetType:targetCenter`，Area 25）、`全体友军增益`（`TargetType:wholeMap`，Area 0）；要更大半径加 `中范围`/`大范围` 组件 |
+| `SkillComAura` | 光环（40 行） | 模板只有 `光环中`（半径 40、`TargetCount=0` 不限人数、评分 2），需要更大范围加 `中范围`/`大范围` 组件。每 3 秒对 `Area` 内按 `SelectOnly`/`SelectFirst` 选中的单位（可含敌方）挂 `BuffId`，`BuffTime` 建议 4s 防断档；`MpCost=0` 常开，`MpCost>0` 时 MP 满开启、每秒扣 1 点 MP，扣到 0 关闭并移除 `SelfEffect`，开启期间攻击/受击不回蓝 |
+| `SkillAidAreaHeal` | 范围治疗（15 行） | `HealStrength` + `Area`，`overflowToArmor` 可转护甲 |
+| `SkillAidJumpChain` | 弹射（10 行） | `TargetType=heal` 走治疗链，否则伤害链；每跳衰减读 `Strength2[jumpDecay]`（模板默认 0.85，组件可改 1/0.7/0.5） |
+| `SkillBondBacklineStrike` | 打后排（15 行） | `smart` 智能选后排 / 默认最远 |
+| `SkillAidBuffLowHp` / `SkillBondDefReduceDamageRate` | 低血触发（5 行各） | `TriggerCondition=hprate<50` + `Strength2[reduceRate]` |
 | `SkillDumb` | 占位（65 行） | 无战斗行为，仅用于职业/道具等纯展示行；**不要给它配伤害字段** |
 
 - 远程技能以自身为中心会全程打空（站位远离敌阵），必须目标中心；近战贴脸 AoE 用 `self`。
 - 类名与 `ScriptName` 用英文，不用拼音；表里已有同名类时优先复用，别新建特化类。
-- 英雄没有被动技能：受击/反伤/触发类效果不要写 `OnAttacked` 之类的被动脚本，一律改成「主动给自己挂 Buff + Buff 内实现」，如反伤 = `SkillSelfBuff` + `BuffId=反`（`BuffReflect`）。
+- 英雄没有被动技能：受击/反伤/触发类效果不要写 `OnAttacked` 之类的被动脚本，一律改成「主动给自己挂 Buff + Buff 内实现」，如反伤 = `SkillAidSelfBuff` + `BuffId=反`（`BuffReflect`）。
 
 ## 九、新建脚本要点
 

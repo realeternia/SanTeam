@@ -1,4 +1,4 @@
-# MP（法力）系统说明
+﻿# MP（法力）系统说明
 
 > 日期：2026-11-04（按当前配置与代码校对）
 > 状态：已实施（金铲铲式：普攻/受击获取法力，mpRegen 为百分比加成）
@@ -98,9 +98,9 @@
 | 4 | **140%** | +70 | 5s | 100 | 3.5s |
 | 5 | **160%** | +100 | 5s | 100 | 3.5s |
 
-> 每名友军会把“每人”份额加到其所有未满的蓝耗技能上（逐技能充能），因此队伍技能越多，实际总灌注量越大。刘备自身现在也要先靠**普攻/受击**攒满 100 点蓝才能发动。“仁德”好友组技能缩写是 `仁`（`SkillInitAddItem`，开局概率获得万民书），与刘备个人技能“刘备”（仁德）不是同一个技能。
+> 每名友军会把“每人”份额加到其所有未满的蓝耗技能上（逐技能充能），因此队伍技能越多，实际总灌注量越大。刘备自身现在也要先靠**普攻/受击**攒满 100 点蓝才能发动。“仁德”好友组技能缩写是 `仁`（`SkillBondInitAddItem`，开局概率获得万民书），与刘备个人技能“刘备”（仁德）不是同一个技能。
 
-### 3.5 攻击额外回蓝（`SkillAttackMpGain`，独立机制，非 mpRegen）
+### 3.5 攻击额外回蓝（`SkillBondAttackMpGain`，独立机制，非 mpRegen）
 
 普攻命中时按 `Rate` 概率，额外获得 `Strength2[mpGain] × CombatConst.MpPerAttack` 点法力（即普攻基础法力 10 的倍率），再经 `mpRegen` 百分比加成后加到自身所有 `MpCost > 0` 技能。
 
@@ -188,7 +188,7 @@
 | 英雄修正（加法叠加） | `HeroConfig_s.cs`（`MpRegen`） + `ConfigManager.cs`（`PostModify`） |
 | 装备叠加 | `Chess.cs`（装备循环 `mpRegen += equipAttr.MpRegen`） |
 | 羁绊施加 | `JobLinkManager.cs`（`case "mpRegen"`） |
-| 攻击额外回蓝 | `SkillAttackMpGain.cs` |
+| 攻击额外回蓝 | `SkillBondAttackMpGain.cs` |
 | 刘备·仁德法力分享 | `SkillAidManaShare.cs` |
 | 英雄专属技能数值修正 | `ConfigManager.cs`（`PostModify`） |
 | 技能伤害/治疗计算 | `Skill.cs`（`GetSkillDamage()` / `GetSkillHeal()`） |

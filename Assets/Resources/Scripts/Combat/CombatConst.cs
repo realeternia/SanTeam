@@ -15,6 +15,8 @@ public static class CombatConst
     /// <summary>隐匿(BuffStealth，正面效果，短名"隐")：嘲讽的反效果，敌方索敌(Chess.FindTarget)与单体技能锁定不到；
     /// 甘宁·百骑劫营每次释放给自己挂 5 秒，并切半透明材质</summary>
     public const int StealthBuffId = 300030;
+    /// <summary>士兵士气(BuffMorale，正面效果，短名"气")：仅对我方小兵生效，每层提升攻击/护甲，可叠加</summary>
+    public const int SoldierMoraleBuffId = 300031;
 
     // ---- Buff 叠加模式(BuffConfig.StackMode) ----
     /// <summary>1 共存：同 Id 允许多个实例并存，数值各自生效（如减甲、减攻）</summary>
@@ -29,6 +31,20 @@ public static class CombatConst
     public const float BuffStackExtendDecayStep = 0.1f;
     /// <summary>时间延长模式：单次延长的最低系数</summary>
     public const float BuffStackExtendMinFactor = 0.1f;
+
+    // ---- 士兵士气(相职业·技能组件) ----
+    /// <summary>士兵士气每层提供的攻击力</summary>
+    public const int SoldierMoraleAtk = 5;
+    /// <summary>士兵士气每层提供的护甲</summary>
+    public const int SoldierMoraleArmor = 5;
+    /// <summary>士兵士气持续时间(秒)：战斗内近似永久</summary>
+    public const float SoldierMoraleTime = 999f;
+    /// <summary>技能组件标记名（SkillConfig.Modules 含该名时，施放成功给全体小兵叠一层士气）</summary>
+    public const string SoldierMoraleModule = "士兵士气";
+    /// <summary>技能组件标记名：单体技能按我方存活士兵数提升伤害（组件「士兵增伤」）</summary>
+    public const string SoldierDamageModule = "士兵增伤";
+    /// <summary>士兵增伤每名士兵的默认伤害比例（Strength2 未配 soldierDamage 时使用）</summary>
+    public const float SoldierDamageDefaultRate = 0.03f;
 
     // ---- 伤害标签(SkillConfig.HurtTag) ----
     /// <summary>AntiShield：绕过护盾直接打血（破盾类技能，BuffShield 判定该标签不吸收）</summary>
@@ -45,7 +61,7 @@ public static class CombatConst
         return hurtTag == LockChainHurtTag || hurtTag == AntiShieldHurtTag;
     }
 
-    // ---- 跳跃链(SkillJumpChain) ----
+    // ---- 跳跃链(SkillAidJumpChain) ----
     /// <summary>跳跃链每跳衰减系数默认值（Strength2 未配 jumpDecay 时使用）</summary>
     public const float JumpChainDecay = 0.85f;
     /// <summary>跳跃链衰减系数在 Strength2 中的键名（模板默认写 0.85，组件可覆盖为 1/0.7/0.5）</summary>
