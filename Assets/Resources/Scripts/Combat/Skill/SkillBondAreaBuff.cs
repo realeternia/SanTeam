@@ -13,11 +13,8 @@ using UnityEngine;
 ///
 /// TargetType 仅保留脚本私有行为标记（逗号分隔）：
 /// · selfAlways         = 施法者必定获得（李典·御阵 / 周仓）
-/// · noDedupe           = 不按首段 Buff 去重（甄宓 / 袁绍 / 周仓 / 李严 / 张梁 / 大乔）
-/// · wholeMap           = 全图选人（李严·护军；Area 只作为嘲讽半径）
+/// · noDedupe           = 不按首段 Buff 去重（司马炎 / 陆抗 / 张梁 / 周仓 / 娄圭 / 步骘 / 阮籍 / 甄宓）
 /// · targetCenter       = 以选中的首个友军目标为中心，再在 Area 内扩散给周围友军（缺省以自身为中心）
-/// · tauntAroundTarget  = 给目标挂完 Buff 后，嘲讽其周围 Area 内敌人（李严·护军）
-/// · splitByRange       = 按近战/远程分开发放：近战取 BuffId 第 1 段、远程取第 2 段（司马炎·一统 "甲,攻"）
 /// </summary>
 public class SkillBondAreaBuff : Skill
 {
@@ -39,8 +36,7 @@ public class SkillBondAreaBuff : Skill
 
         var selfAlways = HasSkillFlag("selfAlways");
         var noDedupe = HasSkillFlag("noDedupe");
-        var splitByRange = HasSkillFlag("splitByRange");
-        var searchRange = GetAuraSearchRange();
+        var searchRange = skillCfg.Area;
 
         // 中心点：缺省以施法者自身为中心；targetCenter 先选中首个友军目标，再以其位置为中心扩散
         var center = owner.transform.position;
@@ -71,16 +67,11 @@ public class SkillBondAreaBuff : Skill
 
         foreach (var unit in units)
         {
-            // splitByRange：近战只吃第 1 段、远程只吃第 2 段（如"甲,攻"），其余情况逐段施加
-            if (splitByRange && buffIds.Count >= 2)
-                ApplyBuffToUnit(unit, unit.attackRange < CombatConst.MeleeRange ? buffIds[0] : buffIds[1]);
-            else
-                foreach (var buffId in buffIds)
-                    ApplyBuffToUnit(unit, buffId);
+            foreach (var buffId in buffIds)
+                ApplyBuffToUnit(unit, buffId);
 
             if (!string.IsNullOrEmpty(skillCfg.HitEffect))
                 EffectManager.PlaySkillEffect(unit, skillCfg.HitEffect);
-            TauntAroundUnit(unit);
         }
         return true;
     }

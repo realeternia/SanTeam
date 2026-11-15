@@ -184,7 +184,6 @@ namespace CommonConfig
             config[3020] = new SkillTemplateConfig(3020, "单体友方增益", "SkillComBuffArea", "对一个友方单位施加属性增益或护盾；模板只计形态分，价值由强度、持续时间与所挂 Buff 决定。", "护盾中,低血筛选,MP中增加", "SelectOnly:ally", 1, 2f, 40f, 0f, 1, 6, 3f);
             config[3030] = new SkillTemplateConfig(3030, "群体友方增益", "SkillComBuffArea", "以自身为中心，对 Area 内多名友方施加属性增益或护盾；模板只计形态分，价值由覆盖人数与所挂 Buff 决定。", "护盾中,低血筛选,MP中增加", "SelectOnly:ally", 2, 4f, 40f, 20f, 3, 8, 4f);
             config[3032] = new SkillTemplateConfig(3032, "群体友方增益-目标小", "SkillComBuffArea", "以选中的首个友军目标为中心，半径25内的友方获得属性增益或护盾；模板只计形态分，价值由所挂 Buff 决定。", "护盾中,低血筛选,MP中增加", "SelectOnly:ally;TargetType:targetCenter", 3, 4f, 40f, 25f, 3, 8, 4f);
-            config[3033] = new SkillTemplateConfig(3033, "全体友军增益", "SkillComBuffArea", "全图范围内所有友方获得属性增益或护盾，不受距离限制；模板只计形态分，价值由所挂 Buff 决定。", "护盾中,MP中增加", "SelectOnly:ally;TargetType:wholeMap", 4, 5f, 0f, 0f, 3, 8, 4f);
             config[3050] = new SkillTemplateConfig(3050, "群体嘲讽", "SkillComBuffTaunt", "以施法者自身为中心，对 Area 内敌人施加嘲讽（BuffTime 秒）并造成伤害；可选自身减伤盾（BuffId=硬）。", "嘲讽中", "SelectOnly:enemy;DamageStrength=40,60,90,150,240", 3, 5f, 0f, 20f, 3, 8, 2f);
 
             RebuildIndex();

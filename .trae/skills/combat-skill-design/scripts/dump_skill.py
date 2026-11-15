@@ -231,14 +231,13 @@ def main():
     range_scripts = ('SkillAreaDamageDeBuff', 'SkillAreaHeal', 'SkillCastingAidScorchedEarth')
     for r in rows:
         av = to_float(r['Area'])
-        if (av or 0) == 0 and r['ScriptName'] in range_scripts and 'wholeMap' not in r['TargetType']:
+        if (av or 0) == 0 and r['ScriptName'] in range_scripts:
             warnings.append('范围技能 Area=0（全图），若非全图设计需修正（技能 %s Lv%s）' % (r['Sname'], r['Lv']))
 
     # 8.1) TargetType 标记合法性（仅校验已知脚本）
     known_flags = {
         'SkillAreaBuff': {'heroOnly', 'excludeSelf', 'selfAlways', 'lowestHp', 'highestHp', 'highestArmor',
-                          'rangedOnly', 'meleeOnly', 'fullHpSkip', 'noDedupe', 'wholeMap', 'splitByRange',
-                          'tauntAroundTarget', 'crossSideFallback'},
+                          'rangedOnly', 'meleeOnly', 'fullHpSkip', 'noDedupe', 'crossSideFallback'},
         'SkillAreaDamageDeBuff': {'self', 'missile', 'maxHpBonus', 'mpBurn'},
         'SkillAreaHeal': {'overflowToArmor'},
         'SkillSelfBuff': {'permanent', 'noStack'},

@@ -6,8 +6,8 @@
 /// 选人规则由 SkillConfig.SelectOnly / SelectFirst 决定（典型 SelectOnly="ally;hero;notSelf;notFullHp"、
 /// SelectFirst="lowestHp"），TargetCount&lt;=0 时范围内全部。
 ///
-/// 本类只声明「群体发放 + 播范围特效」，全部组件语义（selfAlways / noDedupe / wholeMap / targetCenter /
-/// splitByRange / tauntAroundTarget / 护盾写入）由基类 SkillComBuffSingle 统一结算。
+/// 本类只声明「群体发放 + 播范围特效」，全部组件语义（selfAlways / noDedupe / targetCenter /
+/// 护盾写入）由基类 SkillComBuffSingle 统一结算。
 /// </summary>
 public class SkillComBuffArea : SkillComBuffSingle
 {

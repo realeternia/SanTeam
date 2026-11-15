@@ -14,8 +14,7 @@ using UnityEngine;
 /// · 命中效果 ApplyMpBurn / ApplyDispel：mpBurn、dispel
 /// · 击退 PushTargetBack：pushMin/pushMax
 /// · 苦肉反噬 HurtSelfByDamage：selfHurt
-/// · Buff 归属 ApplySkillBuffs / ApplyBuffToUnit：selfBuff、bothBuff，护盾类自动写护盾值
-/// · 群体辅助 GetAuraSearchRange / TauntAroundUnit：wholeMap、tauntAroundTarget
+/// · Buff 归属 ApplySkillBuffs / ApplyBuffToUnit：selfBuff，护盾类自动写护盾值（特化技能可覆写归属）
 /// 各效果均为「标记或键配了才生效」，未配置时是 no-op。
 /// </summary>
 
@@ -338,8 +337,8 @@ public class Skill
         owner.OnHpChanged();
     }
 
-    /// <summary>Buff 归属：selfBuff=全部挂自身；bothBuff=首段挂目标、其余自身；缺省全部挂目标。</summary>
-    protected void ApplySkillBuffs(Chess target)
+    /// <summary>Buff 归属：selfBuff=全部挂自身；缺省全部挂目标。特化技能可覆写自定义归属（如白衣渡江首段挂目标、其余挂自身）。</summary>
+    protected virtual void ApplySkillBuffs(Chess target)
     {
         var buffIds = GetSkillBuffIds();
         if (buffIds.Count == 0)
@@ -348,13 +347,6 @@ public class Skill
         {
             foreach (var buffId in buffIds)
                 ApplyBuffToUnit(owner, buffId);
-            return;
-        }
-        if (HasSkillFlag("bothBuff"))
-        {
-            ApplyBuffToUnit(target, buffIds[0]);
-            for (var i = 1; i < buffIds.Count; i++)
-                ApplyBuffToUnit(owner, buffIds[i]);
             return;
         }
         foreach (var buffId in buffIds)
@@ -368,19 +360,6 @@ public class Skill
         var shield = unit.GetBuff(buffId) as BuffShield;
         if (shield != null)
             shield.AddHp(GetSkillShield());
-    }
-
-    /// <summary>群体选人半径：wholeMap 标记时 0（全图），否则取 Area。</summary>
-    protected float GetAuraSearchRange()
-    {
-        return HasSkillFlag("wholeMap") ? 0f : skillCfg.Area;
-    }
-
-    /// <summary>以指定单位为中心嘲讽周围 Area 内敌人（tauntAroundTarget 标记）。</summary>
-    protected void TauntAroundUnit(Chess unit)
-    {
-        if (HasSkillFlag("tauntAroundTarget"))
-            TauntEnemies(owner, unit.transform.position, skillCfg.Area);
     }
 
     /// <summary>

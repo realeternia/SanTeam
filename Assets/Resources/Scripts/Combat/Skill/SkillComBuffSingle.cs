@@ -16,11 +16,8 @@ using UnityEngine;
 /// · noStack            = 目标已带任一 BuffId 时不重复施放（曹仁·天人守城）
 /// · permanent          = 不挂 Buff，把 Strength2 的成长键永久叠到自身属性，每次施放成长一次（马岱·连射）
 /// · selfAlways         = 施法者必定获得（李典·御阵 / 周仓）
-/// · noDedupe           = 不按首段 Buff 去重（甄宓 / 袁绍 / 周仓 / 李严 / 张梁 / 大乔）
-/// · wholeMap           = 全图选人（李严·护军；Area 只作为嘲讽半径）
+/// · noDedupe           = 不按首段 Buff 去重（司马炎 / 陆抗 / 张梁 / 周仓 / 娄圭 / 步骘 / 阮籍 / 甄宓）
 /// · targetCenter       = 以选中的首个友军目标为中心，再在 Area 内扩散（缺省以自身为中心）
-/// · tauntAroundTarget  = 挂完 Buff 后嘲讽目标周围 Area 内敌人（李严·护军）
-/// · splitByRange       = 近战取 BuffId 第 1 段、远程取第 2 段（司马炎·一统 "甲,攻"）
 /// 护盾类 Buff 统一按护盾公式写入护盾值。
 ///
 /// 增益体系派生：SkillComBuffArea（群体增益）、SkillComBuffAura（光环）、SkillComBuffTaunt（嘲讽）。
@@ -85,7 +82,7 @@ public class SkillComBuffSingle : Skill
         return owner.IsInFight();
     }
 
-    /// <summary>选目标：单体走自身/筛选；群体走 Area（含 selfAlways / noDedupe / wholeMap / targetCenter 组件）。</summary>
+    /// <summary>选目标：单体走自身/筛选；群体走 Area（含 selfAlways / noDedupe / targetCenter 组件）。</summary>
     protected virtual List<Chess> SelectBuffTargets(List<int> buffIds)
     {
         buffCenter = owner.transform.position;
@@ -118,7 +115,7 @@ public class SkillComBuffSingle : Skill
             buffCenter = primary[0].transform.position;
         }
 
-        var units = SelectTargets(buffCenter, GetAuraSearchRange(), true, skillCfg.TargetCount,
+        var units = SelectTargets(buffCenter, skillCfg.Area, true, skillCfg.TargetCount,
             exclude, dedupeFilter);
         if (selfAlways && !units.Contains(owner))
             units.Add(owner);
@@ -151,22 +148,16 @@ public class SkillComBuffSingle : Skill
         PlaySelfEffect();
     }
 
-    /// <summary>施加效果：逐目标挂 Buff（splitByRange 近远分段），并结算命中特效与 tauntAroundTarget。</summary>
+    /// <summary>施加效果：逐目标挂 Buff，并结算命中特效。</summary>
     protected virtual void ApplyBuffs(List<Chess> targets, List<int> buffIds)
     {
-        var splitByRange = HasSkillFlag("splitByRange");
         foreach (var unit in targets)
         {
-            // splitByRange：近战只吃第 1 段、远程只吃第 2 段（如"甲,攻"），其余情况逐段施加
-            if (splitByRange && buffIds.Count >= 2)
-                ApplyBuffToUnit(unit, unit.attackRange < CombatConst.MeleeRange ? buffIds[0] : buffIds[1]);
-            else
-                foreach (var buffId in buffIds)
-                    ApplyBuffToUnit(unit, buffId);
+            foreach (var buffId in buffIds)
+                ApplyBuffToUnit(unit, buffId);
 
             if (!string.IsNullOrEmpty(skillCfg.HitEffect))
                 EffectManager.PlaySkillEffect(unit, skillCfg.HitEffect);
-            TauntAroundUnit(unit);
         }
     }
 }

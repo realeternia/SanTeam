@@ -160,7 +160,6 @@ namespace CommonConfig
             config[1052] = new SkillTemplateComponentConfig(1052, "眩晕", "状态效果", new string[]{"Damage"}, "BuffTime=0.4,0.5,1,0.8,1;Buff:乱", 2, 2f, "无法行动（乱）", "控制按覆盖量计价：强度、时长、命中数、施放频率", false);
             config[1062] = new SkillTemplateComponentConfig(1062, "定身", "状态效果", new string[]{"Damage"}, "BuffTime=1,0.8,1,1,1.5;Buff:停", 1, 1f, "无法移动（停）", "控制按覆盖量计价：强度、时长、命中数、施放频率", false);
             config[1072] = new SkillTemplateComponentConfig(1072, "混乱", "状态效果", new string[]{"Damage"}, "BuffTime=0.5,1,0.7,0.9,1.1;Buff:惑", 2, 1.5f, "不受控制，攻击最近的友方单位（惑）", "控制按覆盖量计价：强度、时长、命中数、施放频率", false);
-            config[1082] = new SkillTemplateComponentConfig(1082, "嘲讽", "状态效果", new string[]{"Damage"}, "BuffTime=1,0.8,1,1,1.5;Buff:嘲", 2, 1.5f, "强制目标攻击施法者（嘲）", "控制按覆盖量计价：强度、时长、命中数、施放频率", false);
             config[1090] = new SkillTemplateComponentConfig(1090, "自身易伤", "状态效果", new string[]{"Buff"}, "Buff:伤:damagedUp=0.2;BuffTime=5;BuffEffect:damagedUp", 2, -1.5f, "自身受到的伤害提升（伤），属于代价项", "负向项，抵减技能总价值", false);
             config[1100] = new SkillTemplateComponentConfig(1100, "中毒", "状态效果", new string[]{"Damage"}, "Buff:毒:dot=12,16,22,30,40;BuffTime=4;BuffEffect:dot", 1, 0.5f, "每秒造成固定跳伤（毒），不随属性成长", "跳伤按持续时间折算总量估值", false);
             config[1110] = new SkillTemplateComponentConfig(1110, "叛逃", "状态效果", new string[]{"Damage"}, "Buff:叛;BuffTime=2", 4, 4f, "命中后目标短时脱离战斗（叛）", "按控制覆盖量计价：时长、命中数、施放频率", true);
@@ -186,6 +185,7 @@ namespace CommonConfig
             config[2190] = new SkillTemplateComponentConfig(2190, "受击叠防", "状态效果", new string[]{"Buff"}, "Buff:守:armor=15,25,35,45,55;Buff:守:perStack=0.15,0.18,0.2,0.22,0.25;BuffEffect:armor;Strength2:maxStack=4,4,5,5,6;BuffTime=5", 3, 3f, "状态期间每次受击叠加双防（armor 初始双防、perStack 每层比例、maxStack 上限）", "按承受伤害次数与叠层上限折算等效减伤", true);
             config[2200] = new SkillTemplateComponentConfig(2200, "焰衣", "状态效果", new string[]{"Buff"}, "Buff:焰:damageRate=1;BuffEffect:damageRate;BuffTime=5", 2, 2.5f, "获得焰衣：每秒对自身周围 Area 内敌人造成技能伤害的 damageRate（伤害%，默认 100%，焰）", "按技能每秒伤害×伤害%×持续时间×覆盖人数估值", true);
             config[2210] = new SkillTemplateComponentConfig(2210, "威震", "状态效果", new string[]{"Buff"}, "Buff:震;BuffEffect:stunChance;Strength2:stunChance=0.4,0.45,0.5,0.55,0.6", 3, 2.5f, "普攻按概率眩晕目标并转为真实伤害（震）", "按攻速与眩晕时长折算期望收益", true);
+            config[2230] = new SkillTemplateComponentConfig(2230, "周围友军加盾", "状态效果", new string[]{"Buff"}, "TargetType:allyShield", 2, 2f, "施放时把本技能的护盾等 Buff 同时挂给自身 Area 内其他友军（施法者已单独获得）", "按覆盖友军数与护盾量估值", false);
             config[2300] = new SkillTemplateComponentConfig(2300, "时长延长小", "状态效果", null, "BuffTimeRate=1.3", 1, 1.5f, "Buff 持续时间延长 30%", "按持续时间等比放大所属状态效果的价值", false);
             config[2301] = new SkillTemplateComponentConfig(2301, "时长延长中", "状态效果", null, "BuffTimeRate=1.5", 2, 2.5f, "Buff 持续时间延长 50%", "按持续时间等比放大所属状态效果的价值", false);
             config[2310] = new SkillTemplateComponentConfig(2310, "效果提升50", "状态效果", null, "BuffEffectRate=1.5", 2, 2f, "该技能所有状态组件的 Buff 效果数值提升 50%", "乘性放大，按被提升状态的基准价值折算", true);
@@ -201,11 +201,7 @@ namespace CommonConfig
             config[3080] = new SkillTemplateComponentConfig(3080, "排除自身", "目标筛选", new string[]{"Heal","Buff"}, "SelectOnly:notSelf", 1, 0.5f, "选人时排除施法者自身", "结构性开关，本身不增值", false);
             config[3090] = new SkillTemplateComponentConfig(3090, "施法者必含", "目标筛选", null, "TargetType:selfAlways", 1, 0.5f, "选人时施法者必然包含在内", "结构性开关，本身不增值", false);
             config[3100] = new SkillTemplateComponentConfig(3100, "满血跳过", "目标筛选", null, "SelectOnly:notFullHp", 1, 0.5f, "跳过满血目标，避免溢出浪费", "结构性开关，本身不增值", false);
-            config[3110] = new SkillTemplateComponentConfig(3110, "全图", "目标筛选", null, "TargetType:wholeMap", 2, 1.5f, "全图选人，不受射程限制", "大幅扩大可触达范围，按覆盖提升估值", false);
-            config[3120] = new SkillTemplateComponentConfig(3120, "嘲讽周围", "目标筛选", null, "TargetType:tauntAroundTarget", 2, 1.5f, "对目标周围敌人附加嘲讽", "与嘲讽组件配合，按控制覆盖量估值", false);
-            config[3150] = new SkillTemplateComponentConfig(3150, "目标兼自身", "目标筛选", null, "TargetType:bothBuff", 2, 1f, "BuffId[0]挂目标、其余挂自身（bothBuff）", "自身增益与目标减益混合，按复合效果估值", false);
             config[3130] = new SkillTemplateComponentConfig(3130, "不按首段去重", "目标筛选", null, "TargetType:noDedupe", 1, 0.5f, "多次结算时不按首段效果去重", "结构性开关，本身不增值", false);
-            config[3140] = new SkillTemplateComponentConfig(3140, "近远分段", "目标筛选", null, "TargetType:splitByRange", 1, 0.5f, "按近战/远程分段施加不同效果", "结构性开关，本身不增值", false);
             config[9000] = new SkillTemplateComponentConfig(9000, "斩杀", "特殊机制", new string[]{"Damage"}, "TargetType:execute;Strength2:execRate=2;Strength2:execHp=0.3", 4, 5f, "按血量阈值直接击杀或额外倍率", "特殊机制，人工评审，不套用普通伤害价格表", true);
             config[9010] = new SkillTemplateComponentConfig(9010, "驱散", "特殊机制", new string[]{"Damage","Heal"}, "TargetType:dispel", 3, 3f, "移除目标增益/减益", "特殊机制，人工评审", true);
             config[9020] = new SkillTemplateComponentConfig(9020, "破盾", "特殊机制", new string[]{"Damage"}, "TargetType:antiShield;TargetType:armorIgnore;Strength2:antiShieldRate=0.5,0.7,0.9,1.2,1.5", 2, 2f, "绕过或击破护盾", "特殊机制，人工评审", true);

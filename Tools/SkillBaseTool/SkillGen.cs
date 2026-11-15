@@ -115,8 +115,7 @@ namespace SkillBaseTool
         /// <summary>TargetType 仅保留脚本私有行为标记（目标筛选已迁到 SelectOnly/SelectFirst）。</summary>
         private static readonly Dictionary<string, string> TargetTypeModules = new Dictionary<string, string>
         {
-            { "selfAlways", "施法者必含" }, { "wholeMap", "全图" },
-            { "tauntAroundTarget", "嘲讽周围" }, { "noDedupe", "不按首段去重" }, { "splitByRange", "近远分段" },
+            { "selfAlways", "施法者必含" }, { "noDedupe", "不按首段去重" },
         };
 
         private static readonly Dictionary<string, string> TagModules = new Dictionary<string, string>
@@ -250,7 +249,6 @@ namespace SkillBaseTool
                 { "单体友方增益", "单增" },
                 { "群体友方增益", "群增" },
                 { "群体友方增益-目标小", "群增" },
-                { "全体友军增益", "群增" },
                 { "群体嘲讽", "群控" },
             };
 
@@ -547,7 +545,7 @@ namespace SkillBaseTool
         public static readonly string[] EffectColumns =
         {
             "DamageStrength", "HealStrength", "CD", "MpCost", "Range", "Area", "TargetCount",
-            "Rate", "BuffTime", "TargetType", "SelectOnly", "SelectFirst", "TriggerCondition", "Strength2", "Buff",
+            "Rate", "BuffTime", "BuffTimeRate", "BuffEffect", "BuffEffectRate", "TargetType", "SelectOnly", "SelectFirst", "TriggerCondition", "Strength2", "Buff",
             "SummonCount", "SummonTime", "SummonHitInterval", "SummonSpeed", "SummonTag",
         };
 
@@ -597,6 +595,11 @@ namespace SkillBaseTool
                 handS2Keys = new HashSet<string>(KeyOf(s2));
             }
 
+            /// <summary>BuffEffect 声明“Buff 效果字段”，供 BuffEffectRate 乘算；BuffTimeRate 为时长乘性修饰项。</summary>
+            private readonly List<string> buffEffectKeys = new List<string>();
+            private readonly List<float> buffTimeRates = new List<float>();
+            private readonly List<float> buffEffectRates = new List<float>();
+
             public void Apply(List<EffectBinding> bindings, int lv, string source)
             {
                 foreach (var b in bindings)
@@ -613,6 +616,9 @@ namespace SkillBaseTool
                         case "TargetCount": B[Col.TargetCount] = CfgUtil.NumI((int)Math.Round(Num(b, Col.TargetCount, v))); break;
                         case "Rate": B[Col.Rate] = CfgUtil.NumF(Num(b, Col.Rate, v)); break;
                         case "BuffTime": BuffTimes.Add(v); break;
+                        case "BuffTimeRate": buffTimeRates.Add(v); break;
+                        case "BuffEffectRate": buffEffectRates.Add(v); break;
+                        case "BuffEffect": AddUnique(buffEffectKeys, b.Sub.Trim()); break;
                         case "SummonCount": B[Col.SummonCount] = CfgUtil.NumI((int)Math.Round(v)); break;
                         case "SummonTime": B[Col.SummonTime] = CfgUtil.NumF(v); break;
                         case "SummonHitInterval": B[Col.SummonHitInterval] = CfgUtil.NumF(v); break;
@@ -705,6 +711,7 @@ namespace SkillBaseTool
 
             public void Flush()
             {
+                ApplyBuffEffectRate();
                 B[Col.BuffId] = CfgUtil.Quote(string.Join(",", buffIds));
                 B[Col.StrengthBuff1] = CfgUtil.Quote(string.Join(",", buffSegs));
                 if (tagsChanged)
@@ -722,8 +729,61 @@ namespace SkillBaseTool
                     float max = BuffTimes.Max();
                     if (BuffTimes.Distinct().Count() > 1)
                         Warnings.Add("多个来源提供了不同的 Buff 时长（" + string.Join("/", BuffTimes.Select(x => x.ToString("0.##"))) + "），取最大值 " + max.ToString("0.##"));
+                    if (buffTimeRates.Count > 0)
+                    {
+                        float rate = buffTimeRates.Max();
+                        if (buffTimeRates.Distinct().Count() > 1)
+                            Warnings.Add("多个时长延长组件同时存在（" + string.Join("/", buffTimeRates.Select(x => x.ToString("0.##"))) + "），取最大值 " + rate.ToString("0.##"));
+                        max *= rate;
+                    }
                     B[Col.BuffTime] = CfgUtil.NumF(max);
                 }
+            }
+
+            /// <summary>
+            /// 把 BuffEffectRate（效果提升%）乘到各状态组件用 BuffEffect 声明的 Buff 效果字段上。
+            /// 只作用于组件写入的数值，手配优先（手配同名 key 不参与乘算）。
+            /// </summary>
+            private void ApplyBuffEffectRate()
+            {
+                if (buffEffectRates.Count == 0)
+                    return;
+                if (buffEffectKeys.Count == 0)
+                {
+                    Warnings.Add("配置了效果提升（BuffEffectRate），但没有任何状态组件声明 BuffEffect，已忽略");
+                    return;
+                }
+                float rate = buffEffectRates.Max();
+                if (buffEffectRates.Distinct().Count() > 1)
+                    Warnings.Add("多个效果提升组件同时存在（" + string.Join("/", buffEffectRates.Select(x => x.ToString("0.##"))) + "），取最大值 " + rate.ToString("0.##"));
+                foreach (string key in buffEffectKeys)
+                {
+                    if (handBuffKeys.Contains(key) || handS2Keys.Contains(key))
+                        continue;
+                    int i = buffSegs.FindIndex(x => x.StartsWith(key + ":", StringComparison.Ordinal));
+                    if (i >= 0)
+                        buffSegs[i] = ScaleSegValue(buffSegs[i], key, rate);
+                    i = s2.FindIndex(x => x.StartsWith(key + ":", StringComparison.Ordinal));
+                    if (i >= 0)
+                    {
+                        s2[i] = ScaleSegValue(s2[i], key, rate);
+                        s2Changed = true;
+                    }
+                }
+            }
+
+            /// <summary>把 "key:1,2,3" 中每个数值乘以 rate，保持多值结构。</summary>
+            private static string ScaleSegValue(string seg, string key, float rate)
+            {
+                string raw = seg.Substring(key.Length + 1);
+                string[] parts = raw.Split(',');
+                for (int i = 0; i < parts.Length; i++)
+                {
+                    float x;
+                    if (float.TryParse(parts[i].Trim(), NumberStyles.Float, CultureInfo.InvariantCulture, out x))
+                        parts[i] = NumText(x * rate);
+                }
+                return key + ":" + string.Join(",", parts);
             }
 
             private static List<string> SplitList(string raw, char sep)
@@ -1077,10 +1137,12 @@ namespace SkillBaseTool
                     err.Add(owner + " Effect 列名非法：" + b.Column);
                     continue;
                 }
-                bool tokenOnly = b.Column == "TargetType" || b.Column == "SummonTag" || b.Text != null
+                bool tokenOnly = b.Column == "TargetType" || b.Column == "SummonTag" || b.Column == "BuffEffect" || b.Text != null
                     || (b.Column == "Buff" && b.Sub.IndexOf(':') < 0);
                 if (!tokenOnly && b.Values.Length == 0)
                     err.Add(owner + " Effect 绑定缺少数值：" + b.Column + (string.IsNullOrEmpty(b.Sub) ? "" : ":" + b.Sub));
+                if (b.Column == "BuffEffect" && string.IsNullOrEmpty(b.Sub))
+                    err.Add(owner + " BuffEffect 缺少字段名（应为 BuffEffect:键名）");
                 if (b.Column == "Buff")
                 {
                     hasBuff = true;

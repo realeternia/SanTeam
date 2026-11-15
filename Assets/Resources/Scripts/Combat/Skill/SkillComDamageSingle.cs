@@ -22,7 +22,7 @@ using UnityEngine;
 /// · missile     = 以飞弹逐个结算，伤害 ×(1+键 missileRate)（CalcDamage / ApplyDamage）
 /// · maxHpBonus  = 伤害 += 目标最大生命 × 键 maxHpBonusRate（CalcDamage）
 /// · execute / shieldBonus / missingHp / vsJob / soldierDamage（CalcDamage）
-/// · antiShield / mpBurn / 击退 pushMin~pushMax / selfHurt / selfBuff / bothBuff / dispel（AfterDamage）
+/// · antiShield / mpBurn / 击退 pushMin~pushMax / selfHurt / selfBuff / dispel（AfterDamage）
 /// 伤害体系派生（各自覆写 CheckAidSkill，自动继承上述全部组件能力）：
 /// · SkillComDamageAreaDeBuff  范围伤害 + 减益（目标中心 / self 自身中心）
 /// · SkillComDamageShockWave   冲击波（导弹沿路径命中）
