@@ -248,7 +248,7 @@
     <Compile Include="Assets\Resources\Scripts\Configs\HeroAttrConfig_s.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillComHealArea.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffReflect.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillComDamageAreaDeBuff.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillComDamageArea.cs" />
     <Compile Include="Assets\Resources\Scripts\Configs\PlayerLevelConfig_s.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillBondAttackSpeedAttack.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidBackstepShot.cs" />

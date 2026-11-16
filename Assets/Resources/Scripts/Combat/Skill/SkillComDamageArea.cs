@@ -1,8 +1,7 @@
 ﻿/// <summary>
-/// 通用"范围伤害 + 减益"技能（ScriptName = "SkillComDamageAreaDeBuff"）：
+/// 通用"范围伤害 + 可选 Buff"技能（ScriptName = "SkillComDamageArea"）：
 /// 取中心点 skillCfg.Area 半径内的敌人（选人规则见 SelectOnly / SelectFirst，TargetCount&lt;=0 时范围内全部）
-/// 造成技能伤害，并给每个目标附加 SkillConfig.BuffId 指定的减益 Buff
-/// （英文/中文逗号或分号分隔可配多个，未配置则纯伤害），时长 BuffTime。
+/// 造成技能伤害；每个目标再按 SkillConfig.BuffId 挂 Buff（英文/中文逗号或分号分隔可配多个，未配置则纯伤害），时长 BuffTime。
 /// 范围特效播在中心点、命中特效播在每个受击目标身上。
 ///
 /// 中心点由基类 SelectTarget 决定：配 TargetType:self 时以自身为中心（近战贴脸 AoE，不做射程校验，
@@ -11,9 +10,9 @@
 /// 每个目标的伤害计算与落地全部走基类 CalcDamage / ApplyDamage，因此弹道(missile)、最大生命追加(maxHpBonus)、
 /// execute / shieldBonus / missingHp / vsJob / soldierDamage 等组件自动生效；燃蓝由基类 ApplyMpBurn 统一结算。
 /// </summary>
-public class SkillComDamageAreaDeBuff : SkillComDamageSingle
+public class SkillComDamageArea : SkillComDamageSingle
 {
-    public SkillComDamageAreaDeBuff(int id, Chess unit) : base(id, unit)
+    public SkillComDamageArea(int id, Chess unit) : base(id, unit)
     {
     }
 
@@ -34,14 +33,13 @@ public class SkillComDamageAreaDeBuff : SkillComDamageSingle
 
         var units = SelectTargets(center, skillCfg.Area, false, skillCfg.TargetCount);
 
-        // 减益 Buff 由 SkillConfig.BuffId 短名指定（如"缓"=减速、"叛"=叛逃），支持多个（如"慑,疫"）
-        var debuffIds = GetSkillBuffIds();
+        // Buff 由 SkillConfig.BuffId 短名指定（如"缓"=减速、"叛"=叛逃），支持多个（如"慑,疫"）
+        var buffIds = GetSkillBuffIds();
         foreach (var u in units)
         {
-            ApplyDamage(u, CalcDamage(u));
-            ApplyMpBurn(u);
-            foreach (var debuffId in debuffIds)
-                ApplyBuffToUnit(u, debuffId);
+            ResolveDamage(u, GetSkillDamage());
+            foreach (var buffId in buffIds)
+                ApplyBuffToUnit(u, buffId);
         }
         return true;
     }

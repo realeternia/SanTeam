@@ -9,6 +9,7 @@ using UnityEngine;
 /// 首跳取当前索敌目标（须在 Range 内），随后每跳在 Area 内寻找最近的、尚未命中的敌方单位，
 /// 共 TargetCount 跳；每跳造成 GetSkillDamage() 并附加 BuffId 减益，
 /// 伤害按 Strength2[jumpDecay]（默认 0.85）逐跳递减（法正·明断）。
+/// 每跳伤害走基类统一伤害路径（CalcDamage），斩杀/护盾加成/残血增伤/兵种克制/最大生命追加/燃蓝/驱散等组件同样生效。
 /// 治疗弹射见 SkillComHealJumpChain。
 /// </summary>
 public class SkillComDamageJumpChain : SkillComDamageSingle
@@ -74,14 +75,13 @@ public class SkillComDamageJumpChain : SkillComDamageSingle
             // 先取位置：目标可能在本次伤害后阵亡，下一跳仍以其原位置为中心
             var pos = current.transform.position;
 
+            // 统一伤害路径：本跳衰减后的基础值经 CalcDamage 修正（斩杀/护盾加成/残血增伤/兵种克制/最大生命追加等）
+            // → 双击 / 直伤/弹道 + 命中特效 → 破盾 / 燃蓝 / 击退 / 驱散
             if (currentDamage > 0)
-                current.OnSkillDamaged(owner, skillId, currentDamage);
+                ResolveDamage(current, currentDamage);
             // debuffId=0 表示本技能未配置减益，跳过挂载
             if (debuffId > 0)
                 BuffManager.AddBuff(current, owner, id, debuffId, skillCfg.BuffTime);
-
-            if (!string.IsNullOrEmpty(skillCfg.HitEffect))
-                EffectManager.PlaySkillEffect(current, skillCfg.HitEffect);
             GameLog.Debug($"明断 技能id={id} 等级={Level} 第{i + 1}跳 伤害={currentDamage} 目标={current.heroId}");
             hitList.Add(current);
 

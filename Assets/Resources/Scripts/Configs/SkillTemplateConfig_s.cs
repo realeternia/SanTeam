@@ -152,12 +152,12 @@ namespace CommonConfig
             config[1000] = new SkillTemplateConfig(1000, "单体伤害大", "SkillComDamageSingle", "对一个敌方单位结算一次高额伤害，标准输出基准。", "MP中增加", "SelectOnly:enemy;DamageStrength=100,150,250,400,600", 3, 10f, 40f, 0f, 1, 7, 2f);
             config[1001] = new SkillTemplateConfig(1001, "单体伤害中", "SkillComDamageSingle", "对一个敌方单位结算一次中等伤害，数值降档，评分按同比例下调。", "MP中增加", "SelectOnly:enemy;DamageStrength=80,120,200,320,480", 2, 8f, 40f, 0f, 1, 7, 2f);
             config[1002] = new SkillTemplateConfig(1002, "单体伤害小", "SkillComDamageSingle", "对一个敌方单位结算一次低额伤害，适合高频或附带其他效果的单体技能。", "MP中增加", "SelectOnly:enemy;DamageStrength=60,90,150,240,360", 1, 6f, 40f, 0f, 1, 7, 1.5f);
-            config[1010] = new SkillTemplateConfig(1010, "群体伤害近距离大", "SkillComDamageAreaDeBuff", "在近距离目标点（Range=40）对默认小范围（Area=20）敌人结算伤害，群体输出大档基准。", "MP中增加", "SelectOnly:enemy;DamageStrength=70,105,175,280,420", 3, 10f, 40f, 20f, 3, 10, 2f);
-            config[1011] = new SkillTemplateConfig(1011, "群体伤害近距离中", "SkillComDamageAreaDeBuff", "同近距离群体伤害，数值为大档的80%，标准群体输出中档。", "MP中增加", "SelectOnly:enemy;DamageStrength=56,84,140,224,336", 2, 8f, 40f, 20f, 3, 10, 2f);
-            config[1012] = new SkillTemplateConfig(1012, "群体伤害近距离小", "SkillComDamageAreaDeBuff", "同近距离群体伤害，数值为大档的60%，适合高频或附带其他效果。", "MP中增加", "SelectOnly:enemy;DamageStrength=42,63,105,168,252", 1, 6f, 40f, 20f, 3, 10, 2f);
-            config[1020] = new SkillTemplateConfig(1020, "群体伤害自身中心大", "SkillComDamageAreaDeBuff", "以施法者自身为中心（Range=0）对默认小范围（Area=20）敌人结算伤害，省射程但需贴身，大档基准。", "MP中增加", "SelectOnly:enemy;DamageStrength=70,105,175,280,420", 3, 10f, 0f, 20f, 3, 10, 2f);
-            config[1021] = new SkillTemplateConfig(1021, "群体伤害自身中心中", "SkillComDamageAreaDeBuff", "同自身中心群体伤害，数值为大档的80%。", "MP中增加", "SelectOnly:enemy;DamageStrength=56,84,140,224,336", 2, 8f, 0f, 20f, 3, 10, 2f);
-            config[1022] = new SkillTemplateConfig(1022, "群体伤害自身中心小", "SkillComDamageAreaDeBuff", "同自身中心群体伤害，数值为大档的60%。", "MP中增加", "SelectOnly:enemy;DamageStrength=42,63,105,168,252", 1, 6f, 0f, 20f, 3, 10, 2f);
+            config[1010] = new SkillTemplateConfig(1010, "群体伤害近距离大", "SkillComDamageArea", "在近距离目标点（Range=40）对默认小范围（Area=20）敌人结算伤害，群体输出大档基准。", "MP中增加", "SelectOnly:enemy;DamageStrength=70,105,175,280,420", 3, 10f, 40f, 20f, 3, 10, 2f);
+            config[1011] = new SkillTemplateConfig(1011, "群体伤害近距离中", "SkillComDamageArea", "同近距离群体伤害，数值为大档的80%，标准群体输出中档。", "MP中增加", "SelectOnly:enemy;DamageStrength=56,84,140,224,336", 2, 8f, 40f, 20f, 3, 10, 2f);
+            config[1012] = new SkillTemplateConfig(1012, "群体伤害近距离小", "SkillComDamageArea", "同近距离群体伤害，数值为大档的60%，适合高频或附带其他效果。", "MP中增加", "SelectOnly:enemy;DamageStrength=42,63,105,168,252", 1, 6f, 40f, 20f, 3, 10, 2f);
+            config[1020] = new SkillTemplateConfig(1020, "群体伤害自身中心大", "SkillComDamageArea", "以施法者自身为中心（Range=0）对默认小范围（Area=20）敌人结算伤害，省射程但需贴身，大档基准。", "MP中增加", "SelectOnly:enemy;DamageStrength=70,105,175,280,420", 3, 10f, 0f, 20f, 3, 10, 2f);
+            config[1021] = new SkillTemplateConfig(1021, "群体伤害自身中心中", "SkillComDamageArea", "同自身中心群体伤害，数值为大档的80%。", "MP中增加", "SelectOnly:enemy;DamageStrength=56,84,140,224,336", 2, 8f, 0f, 20f, 3, 10, 2f);
+            config[1022] = new SkillTemplateConfig(1022, "群体伤害自身中心小", "SkillComDamageArea", "同自身中心群体伤害，数值为大档的60%。", "MP中增加", "SelectOnly:enemy;DamageStrength=42,63,105,168,252", 1, 6f, 0f, 20f, 3, 10, 2f);
             config[1030] = new SkillTemplateConfig(1030, "跳跃弹射-伤害大", "SkillComDamageJumpChain", "在多个敌人之间跳跃结算伤害，主数值为常规群体伤害的1.1倍，每跳按 Strength2[jumpDecay]=0.85 递减；价值由跳数、单跳数值与搜索半径决定，大档基准。", "MP中增加", "SelectOnly:enemy;DamageStrength=77,116,193,308,462;Strength2:jumpDecay=0.85", 4, 10f, 30f, 40f, 3, 10, 3f);
             config[1031] = new SkillTemplateConfig(1031, "跳跃弹射-伤害中", "SkillComDamageJumpChain", "同跳跃弹射伤害，数值为大档的80%，每跳衰减 0.85。", "MP中增加", "SelectOnly:enemy;DamageStrength=62,92,154,246,370;Strength2:jumpDecay=0.85", 3, 8f, 30f, 40f, 3, 10, 3f);
             config[1032] = new SkillTemplateConfig(1032, "跳跃弹射-伤害小", "SkillComDamageJumpChain", "同跳跃弹射伤害，数值为大档的60%，每跳衰减 0.85。", "MP中增加", "SelectOnly:enemy;DamageStrength=46,69,116,185,277;Strength2:jumpDecay=0.85", 2, 6f, 30f, 40f, 3, 10, 3f);
@@ -184,6 +184,8 @@ namespace CommonConfig
             config[3020] = new SkillTemplateConfig(3020, "单体友方增益", "SkillComBuffArea", "对一个友方单位施加属性增益或护盾；模板只计形态分，价值由强度、持续时间与所挂 Buff 决定。", "护盾中,低血筛选,MP中增加", "SelectOnly:ally", 1, 2f, 40f, 0f, 1, 6, 3f);
             config[3030] = new SkillTemplateConfig(3030, "群体友方增益", "SkillComBuffArea", "以自身为中心，对 Area 内多名友方施加属性增益或护盾；模板只计形态分，价值由覆盖人数与所挂 Buff 决定。", "护盾中,低血筛选,MP中增加", "SelectOnly:ally", 2, 4f, 40f, 20f, 3, 8, 4f);
             config[3032] = new SkillTemplateConfig(3032, "群体友方增益-目标小", "SkillComBuffArea", "以选中的首个友军目标为中心，半径25内的友方获得属性增益或护盾；模板只计形态分，价值由所挂 Buff 决定。", "护盾中,低血筛选,MP中增加", "SelectOnly:ally;TargetType:targetCenter", 3, 4f, 40f, 25f, 3, 8, 4f);
+            config[3040] = new SkillTemplateConfig(3040, "单体减益", "SkillComBuffArea", "对一名敌人施加减益/控制类 Buff（不造成伤害）；模板只计形态分，价值由所挂 Buff 决定。", "", "SelectOnly:enemy", 1, 2f, 40f, 0f, 1, 6, 3f);
+            config[3041] = new SkillTemplateConfig(3041, "群体减益", "SkillComBuffArea", "以自身为中心，对 Area 内多名敌人施加减益/控制类 Buff（不造成伤害）；模板只计形态分，价值由覆盖人数与所挂 Buff 决定。", "", "SelectOnly:enemy", 2, 4f, 40f, 20f, 3, 8, 4f);
             config[3050] = new SkillTemplateConfig(3050, "群体嘲讽", "SkillComBuffTaunt", "以施法者自身为中心，对 Area 内敌人施加嘲讽（BuffTime 秒）并造成伤害；可选自身减伤盾（BuffId=硬）。", "嘲讽中", "SelectOnly:enemy;DamageStrength=40,60,90,150,240", 3, 5f, 0f, 20f, 3, 8, 2f);
 
             RebuildIndex();

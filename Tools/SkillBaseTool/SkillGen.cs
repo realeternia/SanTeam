@@ -249,6 +249,8 @@ namespace SkillBaseTool
                 { "单体友方增益", "单增" },
                 { "群体友方增益", "群增" },
                 { "群体友方增益-目标小", "群增" },
+                { "单体减益", "单控" },
+                { "群体减益", "群控" },
                 { "群体嘲讽", "群控" },
             };
 
@@ -325,14 +327,6 @@ namespace SkillBaseTool
 
             if (a.ScriptName == "SkillSelfBuff" && a.BuffId.Contains("反") && !result.Contains("伤害反射"))
                 result.Add("伤害反射");
-            if (a.ScriptName == "SkillAidManaShare" && !result.Contains("法力共享"))
-                result.Add("法力共享");
-            if (a.ScriptName == "SkillAidCraftBuff" && !result.Contains("永久属性"))
-                result.Add("永久属性");
-            if (a.ScriptName == "SkillAidBackstepShot" && !result.Contains("二段射击"))
-                result.Add("二段射击");
-            if (a.ScriptName == "SkillCastingAidFrontalFlaming" && !result.Contains("持续施法"))
-                result.Add("持续施法");
             if (a.ScriptName == "SkillComDamageHitRegion" && a.Strength2.Contains("moveDist") && !result.Contains("持续场移动"))
                 result.Add("持续场移动");
             if ((a.Strength2.Contains("pushMin") || a.Strength2.Contains("pushMax")) && !result.Contains("位移"))
@@ -344,12 +338,6 @@ namespace SkillBaseTool
                     if (Regex.IsMatch(a.Strength2, Regex.Escape(kv.Key) + @":") && !result.Contains(kv.Value))
                         result.Add(kv.Value);
                 }
-            }
-            if (a.ScriptName == "SkillTaunt")
-            {
-                string tier = PickTier(store, "嘲讽", a.BuffTime);
-                if (tier != null && !result.Contains(tier))
-                    result.Add(tier);
             }
             return result;
         }
@@ -1003,10 +991,17 @@ namespace SkillBaseTool
 
                 if (comp.Templates.Length > 0)
                 {
-                    string tplCat = TemplateCategory(tpl);
-                    if (tplCat != null && !comp.Templates.Contains(tplCat))
-                        r.Hints.Add("  ⚠ 该组件不适用于「" + tplCat + "」大类模板（适用："
-                            + string.Join("、", comp.Templates) + "）");
+                    if (comp.Templates.Any(t => t == CategoryDamage || t == CategoryHeal || t == CategoryBuff))
+                    {
+                        string tplCat = TemplateCategory(tpl);
+                        if (tplCat != null && !comp.Templates.Contains(tplCat))
+                            r.Hints.Add("  ⚠ 该组件不适用于「" + tplCat + "」大类模板（适用："
+                                + string.Join("、", comp.Templates) + "）");
+                    }
+                    else if (tpl != null && !comp.Templates.Contains(tpl.Name))
+                    {
+                        r.Hints.Add("  ⚠ 该组件只适用于指定形态模板（" + string.Join("、", comp.Templates) + "）");
+                    }
                 }
                 if (comp.IsSpecial)
                     r.Hints.Add("  ⚠ 特殊机制组件，需要人工评审（不走通用展开）");
@@ -1094,8 +1089,9 @@ namespace SkillBaseTool
                         err.Add("模板 " + t.Name + " 引用未知组件：" + m);
             foreach (var c in store.Components)
                 foreach (string t in c.Templates)
-                    if (t != CategoryDamage && t != CategoryHeal && t != CategoryBuff)
-                        err.Add("组件 " + c.Name + " 的 Templates 只能是 Damage/Heal/Buff：" + t);
+                    if (t != CategoryDamage && t != CategoryHeal && t != CategoryBuff
+                        && !store.TemplateByName.ContainsKey(t))
+                        err.Add("组件 " + c.Name + " 的 Templates 只能是 Damage/Heal/Buff 或模板名：" + t);
             foreach (var t in store.Templates)
                 CheckEffectKey(err, "模板 " + t.Name, t.Effect, store);
             foreach (var c in store.Components)

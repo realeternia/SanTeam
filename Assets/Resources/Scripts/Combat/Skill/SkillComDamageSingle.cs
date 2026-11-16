@@ -12,10 +12,11 @@ using UnityEngine;
 /// · CanCast(target) 发动判定（默认 CheckBurst，可覆写追加"正在结算中"等阻止条件）
 /// · PlayCast(target) 施法表现（默认动作 + SelfEffect，可覆写追加位移/自身 Buff 等）
 /// · CalcDamage(target) 伤害计算（默认 ApplyDamageModifiers，含 execute/shieldBonus/missingHp/vsJob/soldierDamage）
-/// · ResolveHit(target) 伤害结算（默认 CalcDamage → TryDoubleDamage → ApplyDamage → AfterDamage，
-///   导弹/多段/两段射击等可整段覆写，但仍可复用 CalcDamage / ApplyDamage / AfterDamage）
+/// · ResolveDamage(target, baseDamage) 统一伤害路径（修正 → 双击 → 直伤/弹道 → 破盾/燃蓝/击退/驱散），
+///   单体 / 群体 / 跳跃链 / 持续伤害场全部共用；冲击波在导弹命中回调里补同一组命中后效果
+/// · ResolveHit(target) 伤害结算（默认 ResolveDamage + AfterDamage，导弹/多段等可整段覆写，仍可复用 CalcDamage / ApplyDamage）
 /// · ApplyDamage(target, dmg) 伤害落地（默认直伤 / missile 标记走飞弹，并播命中特效）
-/// · AfterDamage(target, dmg) 命中后处理（默认破盾追加 + 燃蓝 + 击退 + 苦肉 + Buff 归属 + 驱散）
+/// · AfterDamage(target, dmg) 命中后的形态补充处理（默认苦肉 + Buff 归属；破盾/燃蓝/击退/驱散已在 ResolveDamage）
 ///
 /// 通用组件效果全部由基类统一实现（TargetType 标记 / Strength2 键），派生类不要重复判断：
 /// · self        = 自身中心（近战贴脸 AoE），沿用当前索敌目标、不做射程校验（SelectTarget）
@@ -24,7 +25,7 @@ using UnityEngine;
 /// · execute / shieldBonus / missingHp / vsJob / soldierDamage（CalcDamage）
 /// · antiShield / mpBurn / 击退 pushMin~pushMax / selfHurt / selfBuff / dispel（AfterDamage）
 /// 伤害体系派生（各自覆写 CheckAidSkill，自动继承上述全部组件能力）：
-/// · SkillComDamageAreaDeBuff  范围伤害 + 减益（目标中心 / self 自身中心）
+/// · SkillComDamageArea        范围伤害 + 可选 Buff（目标中心 / self 自身中心）
 /// · SkillComDamageShockWave   冲击波（导弹沿路径命中）
 /// · SkillComDamageJumpChain   跳跃弹射（逐跳衰减）
 /// · SkillComDamageHitRegion   落点持续伤害场
@@ -84,7 +85,13 @@ public class SkillComDamageSingle : Skill
     /// <summary>伤害计算：基础伤害 → 弹道/最大生命追加 → 全部通用伤害修正组件。</summary>
     protected virtual int CalcDamage(Chess target)
     {
-        var dmg = GetSkillDamage();
+        return CalcDamage(target, GetSkillDamage());
+    }
+
+    /// <summary>按指定基础值计算伤害（跳跃链逐跳衰减、弹道逐目标修正等复用）。</summary>
+    protected virtual int CalcDamage(Chess target, int baseDamage)
+    {
+        var dmg = baseDamage;
         if (HasSkillFlag("missile"))
             dmg = (int)(dmg * (1f + GetStr2("missileRate")));
         if (HasSkillFlag("maxHpBonus"))
@@ -92,15 +99,32 @@ public class SkillComDamageSingle : Skill
         return ApplyDamageModifiers(dmg, target);
     }
 
-    /// <summary>伤害结算主流程：计算 → 概率翻倍 → 落地 → 命中后处理。</summary>
-    protected virtual void ResolveHit(Chess target)
+    /// <summary>
+    /// 统一伤害结算（单体 / 群体 / 跳跃链 / 持续伤害场共用）：
+    /// 基础值 → CalcDamage 修正 → 概率双击 → 落地（直伤或弹道，命中特效随之播放）
+    /// → 破盾追加 / 燃烧法力 / 击退 / 驱散。
+    /// 冲击波由导弹自身按 CalcDamage 倍率结算，命中回调里补同一组“命中后”效果；
+    /// 每施放一次的自伤（苦肉）与 Buff 挂载由调用方处理（单体在 AfterDamage，跳跃链逐跳挂 Buff）。
+    /// </summary>
+    protected int ResolveDamage(Chess target, int baseDamage)
     {
-        var dmg = CalcDamage(target);
+        var dmg = CalcDamage(target, baseDamage);
         var isDouble = TryDoubleDamage(ref dmg);
         ApplyDamage(target, dmg);
         if (isDouble)
             WorldManager.Instance.AddBattleText("暴击", target.transform.position,
                 new Vector2(0, 80), SysColor.BattleText.SkillName, 3);
+        ApplyAntiShieldBonus(target, baseDamage);
+        ApplyMpBurn(target);
+        PushTargetBack(target);
+        ApplyDispel(target);
+        return dmg;
+    }
+
+    /// <summary>伤害结算主流程：统一伤害路径 + 命中后的自伤与 Buff 归属。</summary>
+    protected virtual void ResolveHit(Chess target)
+    {
+        var dmg = ResolveDamage(target, GetSkillDamage());
         AfterDamage(target, dmg);
     }
 
@@ -121,17 +145,12 @@ public class SkillComDamageSingle : Skill
     }
 
     /// <summary>
-    /// 命中后处理：破盾追加、燃烧法力、击退、苦肉反噬、Buff 归属、驱散。
-    /// 派生类覆写后如需保留通用效果，请先调用 base.AfterDamage。
+    /// 命中后的形态补充处理：苦肉反噬 + Buff 归属。
+    /// 破盾 / 燃烧法力 / 击退 / 驱散已收敛到 ResolveDamage，所有伤害形态共用。
     /// </summary>
     protected virtual void AfterDamage(Chess target, int dmg)
     {
-        // 破盾追加伤害：以技能基础伤害为基数，携带 AntiShield 标签绕过护盾直接打血
-        ApplyAntiShieldBonus(target, GetSkillDamage());
-        ApplyMpBurn(target);
-        PushTargetBack(target);
         HurtSelfByDamage(dmg);
         ApplySkillBuffs(target);
-        ApplyDispel(target);
     }
 }

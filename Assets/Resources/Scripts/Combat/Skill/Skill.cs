@@ -278,6 +278,21 @@ public class Skill
         return true;
     }
 
+    /// <summary>
+    /// 概率双击的差额追加：伤害已由外部（如导弹）结算时使用，按 doubleRate 追加差额部分并播暴击文本。
+    /// </summary>
+    protected void ApplyDoubleDamageBonus(Chess target, int dealtDamage)
+    {
+        if (target == null || dealtDamage <= 0)
+            return;
+        if (!HasSkillFlag("doubleChance") || SysRandom.Value >= GetStr2("doubleChance"))
+            return;
+        var extra = Math.Max(1, (int)(dealtDamage * (GetStr2("doubleRate", 2f) - 1f)));
+        target.OnSkillDamaged(owner, id, extra);
+        WorldManager.Instance.AddBattleText("暴击", target.transform.position,
+            new Vector2(0, 80), SysColor.BattleText.SkillName, 3);
+    }
+
     /// <summary>破盾追加：目标带吸收盾时按 antiShieldRate × 基础伤害追加一次 AntiShield 标签伤害。</summary>
     protected void ApplyAntiShieldBonus(Chess target, int baseDamage)
     {
