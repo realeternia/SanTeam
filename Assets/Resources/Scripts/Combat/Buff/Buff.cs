@@ -42,19 +42,39 @@ public class Buff
     /// <summary>
     /// 按 key 读取施加本 Buff 的技能配置的 StrengthBuff1 数值槽（key 为 "k:v,k:v" 串中的键名），
     /// 未配置 / key 不存在时返回 def。每个 Buff 读自己固定的语义 key，不再按数组下标/组合位置猜槽位。
+    /// buffCfg.IsQualityBonus=true 时读取结果再乘施法者英雄品质系数（CombatConst.QualityBuffFactors）。
     /// </summary>
     protected float GetStrBuff(string key, float def = 0f)
     {
-        return ConfigManager.GetSlotValue(skillCfg == null ? null : skillCfg.StrengthBuff1, key, def);
+        float raw = ConfigManager.GetSlotValue(skillCfg == null ? null : skillCfg.StrengthBuff1, key, float.NaN);
+        if (float.IsNaN(raw)) return def;
+        return raw * GetQualityFactor();
     }
 
     /// <summary>
     /// 按 key 读取施加本 Buff 的技能配置的 Strength2 数值槽（key 为 "k:v,k:v" 串中的键名），
     /// 未配置 / key 不存在时返回 def。
+    /// buffCfg.IsQualityBonus=true 时读取结果再乘施法者英雄品质系数（CombatConst.QualityBuffFactors）。
     /// </summary>
     protected float GetStr2(string key, float def = 0f)
     {
-        return ConfigManager.GetSlotValue(skillCfg == null ? null : skillCfg.Strength2, key, def);
+        float raw = ConfigManager.GetSlotValue(skillCfg == null ? null : skillCfg.Strength2, key, float.NaN);
+        if (float.IsNaN(raw)) return def;
+        return raw * GetQualityFactor();
+    }
+
+    /// <summary>
+    /// Buff 数值品质系数：BuffConfig.IsQualityBonus=true 时按施法者英雄品质取 CombatConst.QualityBuffFactors（Q1~Q4），
+    /// 否则为 1；无施法者时退回 Buff 携带者，品质越界按边界处理。
+    /// </summary>
+    protected float GetQualityFactor()
+    {
+        if (buffCfg == null || !buffCfg.IsQualityBonus) return 1f;
+        Chess source = caster != null ? caster : owner;
+        int quality = HeroScenario.GetQuality(source == null ? 0 : source.heroId);
+        if (quality < 1) quality = 1;
+        if (quality > CombatConst.QualityBuffFactors.Length) quality = CombatConst.QualityBuffFactors.Length;
+        return CombatConst.QualityBuffFactors[quality - 1];
     }
 
     public virtual void OnAdd(Chess chess, Chess caster)

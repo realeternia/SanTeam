@@ -158,6 +158,8 @@ public static class CombatConst
     public static readonly float[] QualitySkillDamageFactors = { 1.5f, 2.4f, 3.3f, 4.5f };
     /// <summary>技能治疗品质系数表（按品质 Q1~Q4 直接取总值，非复利）：作用于英雄专属技能 HealStrength，为伤害系数回调 15%（×0.85），Q1=×1.275、Q2=×2.04、Q3=×2.805、Q4=×3.825，避免治疗量随技能伤害一起膨胀</summary>
     public static readonly float[] QualitySkillHealFactors = { 1.275f, 2.04f, 2.805f, 3.825f };
+    /// <summary>Buff 数值品质系数表（按品质 Q1~Q4 直接取总值，非复利）：作用于 BuffConfig.IsQualityBonus=true 的 Buff 数值槽，按施法者英雄品质取，Q1=×1、Q2=×1.25、Q3=×1.5、Q4=×2</summary>
+    public static readonly float[] QualityBuffFactors = { 1f, 1.25f, 1.5f, 2f };
     /// <summary>技能MP消耗修正基准：MpCost=本值时系数=1.0，伤害/治疗按 MpCost/本值 等比例放大或缩小（MP消耗越高、释放越慢，单次数值越高）</summary>
     public const float SkillMpStandard = 100f;
     /// <summary>技能MP消耗修正系数下限（MpCost很低时的最小倍率）</summary>

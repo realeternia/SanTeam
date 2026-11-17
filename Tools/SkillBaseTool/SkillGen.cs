@@ -414,7 +414,7 @@ namespace SkillBaseTool
 
         private static string[] BuildBaseRow(DataStore store, SkillRow skill, TemplateRow tpl, GenerateResult result)
         {
-            var writer = new BaseWriter(skill.Args);
+            var writer = new BaseWriter(skill.Args, store);
             int lv = Math.Max(1, skill.Lv);
 
             var tplBindings = ParseEffect(tpl.Effect);
@@ -533,7 +533,7 @@ namespace SkillBaseTool
         public static readonly string[] EffectColumns =
         {
             "DamageStrength", "HealStrength", "CD", "MpCost", "Range", "Area", "TargetCount",
-            "Rate", "BuffTime", "BuffTimeRate", "BuffEffect", "BuffEffectRate", "TargetType", "SelectOnly", "SelectFirst", "TriggerCondition", "Strength2", "Buff",
+            "Rate", "BuffTime", "BuffTimeRate", "BuffEffectRate", "TargetType", "SelectOnly", "SelectFirst", "TriggerCondition", "Strength2", "Buff",
             "SummonCount", "SummonTime", "SummonHitInterval", "SummonSpeed", "SummonTag",
         };
 
@@ -554,6 +554,7 @@ namespace SkillBaseTool
             public readonly List<float> BuffTimes = new List<float>();
             public readonly List<string> Warnings = new List<string>();
 
+            private readonly DataStore store;
             private readonly List<string> buffIds;
             private readonly List<string> buffSegs;
             private readonly List<string> tags;
@@ -569,9 +570,10 @@ namespace SkillBaseTool
             private bool triggersChanged;
             private bool s2Changed;
 
-            public BaseWriter(string[] source)
+            public BaseWriter(string[] source, DataStore dataStore)
             {
                 B = (string[])source.Clone();
+                store = dataStore;
                 buffIds = SplitList(B[Col.BuffId], ',');
                 buffSegs = SplitList(B[Col.StrengthBuff1], ',');
                 tags = SplitList(B[Col.TargetType], ',');
@@ -583,8 +585,8 @@ namespace SkillBaseTool
                 handS2Keys = new HashSet<string>(KeyOf(s2));
             }
 
-            /// <summary>BuffEffect 声明“Buff 效果字段”，供 BuffEffectRate 乘算；BuffTimeRate 为时长乘性修饰项。</summary>
-            private readonly List<string> buffEffectKeys = new List<string>();
+            /// <summary>BuffAttrName 声明“Buff 效果字段”，供 BuffEffectRate 乘算；BuffTimeRate 为时长乘性修饰项。</summary>
+            private readonly List<string> buffAttrNames = new List<string>();
             private readonly List<float> buffTimeRates = new List<float>();
             private readonly List<float> buffEffectRates = new List<float>();
 
@@ -606,7 +608,6 @@ namespace SkillBaseTool
                         case "BuffTime": BuffTimes.Add(v); break;
                         case "BuffTimeRate": buffTimeRates.Add(v); break;
                         case "BuffEffectRate": buffEffectRates.Add(v); break;
-                        case "BuffEffect": AddUnique(buffEffectKeys, b.Sub.Trim()); break;
                         case "SummonCount": B[Col.SummonCount] = CfgUtil.NumI((int)Math.Round(v)); break;
                         case "SummonTime": B[Col.SummonTime] = CfgUtil.NumF(v); break;
                         case "SummonHitInterval": B[Col.SummonHitInterval] = CfgUtil.NumF(v); break;
@@ -688,6 +689,13 @@ namespace SkillBaseTool
                     return;
                 if (!buffIds.Contains(token))
                     buffIds.Add(token);
+                // Buff 效果字段以 BuffConfig.BuffAttrName 为准：组件只需给 Buff 短名与数值，不再手写 BuffAttrName
+                string[] attrNames;
+                if (store != null && store.BuffAttrNames.TryGetValue(token, out attrNames))
+                {
+                    foreach (string attr in attrNames)
+                        AddUnique(buffAttrNames, attr);
+                }
                 if (parts.Length < 2 || parts[1].Trim().Length == 0)
                     return;
                 string key = parts[1].Trim();
@@ -729,22 +737,22 @@ namespace SkillBaseTool
             }
 
             /// <summary>
-            /// 把 BuffEffectRate（效果提升%）乘到各状态组件用 BuffEffect 声明的 Buff 效果字段上。
+            /// 把 BuffEffectRate（效果提升%）乘到各状态组件用 BuffAttrName 声明的 Buff 效果字段上。
             /// 只作用于组件写入的数值，手配优先（手配同名 key 不参与乘算）。
             /// </summary>
             private void ApplyBuffEffectRate()
             {
                 if (buffEffectRates.Count == 0)
                     return;
-                if (buffEffectKeys.Count == 0)
+                if (buffAttrNames.Count == 0)
                 {
-                    Warnings.Add("配置了效果提升（BuffEffectRate），但没有任何状态组件声明 BuffEffect，已忽略");
+                    Warnings.Add("配置了效果提升（BuffEffectRate），但该技能没有提供任何 Buff（BuffConfig.BuffAttrName 为空），已忽略");
                     return;
                 }
                 float rate = buffEffectRates.Max();
                 if (buffEffectRates.Distinct().Count() > 1)
                     Warnings.Add("多个效果提升组件同时存在（" + string.Join("/", buffEffectRates.Select(x => x.ToString("0.##"))) + "），取最大值 " + rate.ToString("0.##"));
-                foreach (string key in buffEffectKeys)
+                foreach (string key in buffAttrNames)
                 {
                     if (handBuffKeys.Contains(key) || handS2Keys.Contains(key))
                         continue;
@@ -1065,10 +1073,13 @@ namespace SkillBaseTool
         public static List<string> Validate(DataStore store)
         {
             var err = new List<string>();
+            var reportedAttr = new HashSet<string>(StringComparer.Ordinal);
             foreach (var s in store.Skills)
             {
                 if (s.Args.Length != Col.Count)
                     err.Add("SkillConfig " + s.Id + " 列数=" + s.Args.Length);
+                else
+                    CheckBuffAttrNames(err, store, s, reportedAttr);
                 string t = s.TemplateName;
                 if (string.IsNullOrEmpty(t))
                     continue;
@@ -1115,6 +1126,61 @@ namespace SkillBaseTool
             return err;
         }
 
+        /// <summary>
+        /// 校验 SkillConfig 引用 Buff 时，BuffConfig.BuffAttrName 声明的数值槽键是否都已赋值。
+        /// 模板化技能按运行时实际生效的 SkillBaseConfig 行校验，其余按 SkillConfig 行校验；
+        /// 同一 Sname 只报一次，避免 5 行等级重复刷屏。
+        /// </summary>
+        private static void CheckBuffAttrNames(List<string> err, DataStore store, SkillRow skill, HashSet<string> reported)
+        {
+            string[] args = skill.Args;
+            string template = CfgUtil.Unquote(args[Col.Template]);
+            if (!string.IsNullOrEmpty(template))
+            {
+                string[] baseArgs;
+                if (store.BaseRows.TryGetValue(skill.Id, out baseArgs) && baseArgs.Length == Col.Count)
+                    args = baseArgs;
+            }
+
+            string buffId = CfgUtil.Unquote(args[Col.BuffId]);
+            if (string.IsNullOrEmpty(buffId))
+                return;
+            string sb1 = CfgUtil.Unquote(args[Col.StrengthBuff1]);
+            string s2 = CfgUtil.Unquote(args[Col.Strength2]);
+
+            foreach (string raw in buffId.Split(new[] { ',', '，', ';', '；' }, StringSplitOptions.RemoveEmptyEntries))
+            {
+                string token = raw.Trim();
+                string[] attrNames;
+                if (token.Length == 0 || !store.BuffAttrNames.TryGetValue(token, out attrNames))
+                    continue;
+                foreach (string attr in attrNames)
+                {
+                    if (attr.Length == 0 || HasSlotKey(sb1, attr) || HasSlotKey(s2, attr))
+                        continue;
+                    string key = (string.IsNullOrEmpty(skill.Sname) ? "#" + skill.Id : skill.Sname) + "|" + token + "|" + attr;
+                    if (!reported.Add(key))
+                        continue;
+                    err.Add("SkillConfig " + skill.Id + "（" + skill.Display + "）引用 Buff「" + token
+                        + "」缺少 BuffAttrName 数值键：" + attr + "（StrengthBuff1/Strength2 均未赋值）");
+                }
+            }
+        }
+
+        /// <summary>槽位串 "k:v,k:v" 中是否存在指定键。</summary>
+        private static bool HasSlotKey(string slots, string key)
+        {
+            if (string.IsNullOrEmpty(slots))
+                return false;
+            foreach (string seg in slots.Split(new[] { ',', '，' }, StringSplitOptions.RemoveEmptyEntries))
+            {
+                int idx = seg.IndexOf(':');
+                if (idx > 0 && seg.Substring(0, idx).Trim() == key)
+                    return true;
+            }
+            return false;
+        }
+
         /// <summary>校验 Effect：列名合法、数值齐全、Buff 短名存在、提供 Buff 时是否有时长。</summary>
         private static void CheckEffectKey(List<string> err, string owner, string effect, DataStore store)
         {
@@ -1133,12 +1199,10 @@ namespace SkillBaseTool
                     err.Add(owner + " Effect 列名非法：" + b.Column);
                     continue;
                 }
-                bool tokenOnly = b.Column == "TargetType" || b.Column == "SummonTag" || b.Column == "BuffEffect" || b.Text != null
+                bool tokenOnly = b.Column == "TargetType" || b.Column == "SummonTag" || b.Text != null
                     || (b.Column == "Buff" && b.Sub.IndexOf(':') < 0);
                 if (!tokenOnly && b.Values.Length == 0)
                     err.Add(owner + " Effect 绑定缺少数值：" + b.Column + (string.IsNullOrEmpty(b.Sub) ? "" : ":" + b.Sub));
-                if (b.Column == "BuffEffect" && string.IsNullOrEmpty(b.Sub))
-                    err.Add(owner + " BuffEffect 缺少字段名（应为 BuffEffect:键名）");
                 if (b.Column == "Buff")
                 {
                     hasBuff = true;

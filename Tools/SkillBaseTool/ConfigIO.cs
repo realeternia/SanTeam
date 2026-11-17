@@ -128,7 +128,7 @@ namespace SkillBaseTool
             }
         }
 
-        /// <summary>收集 BuffConfig 的短名（第 3 列），用于校验 EffectKey 的 Buff: 绑定。</summary>
+        /// <summary>收集 BuffConfig 的短名（第 3 列）与 BuffAttrName（第 10 列），用于校验 EffectKey 的 Buff: 绑定。</summary>
         private static void LoadBuffTokens(DataStore store)
         {
             foreach (var kv in ParseRows(ReadText(store.BuffPath, out _), "BuffConfig"))
@@ -136,6 +136,8 @@ namespace SkillBaseTool
                 var a = kv.Value;
                 if (a.Length >= 3)
                     store.BuffTokens.Add(CfgUtil.Unquote(a[2]));
+                if (a.Length >= 10)
+                    store.BuffAttrNames[CfgUtil.Unquote(a[2])] = CfgUtil.ParseNames(CfgUtil.Unquote(a[9]));
             }
         }
 
