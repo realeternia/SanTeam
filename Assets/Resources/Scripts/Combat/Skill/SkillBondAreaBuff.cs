@@ -1,5 +1,4 @@
-﻿﻿﻿﻿using System;
-using System.Collections.Generic;
+﻿﻿﻿﻿using System.Collections.Generic;
 using CommonConfig;
 using UnityEngine;
 
@@ -11,10 +10,7 @@ using UnityEngine;
 /// SelectOnly 未配置阵营时默认取友方；TargetCount&lt;=0 时范围内全部。
 /// 护盾类 Buff 自动按统一护盾公式写入护盾量。
 ///
-/// TargetType 仅保留脚本私有行为标记（逗号分隔）：
-/// · selfAlways         = 施法者必定获得（李典·御阵 / 周仓）
-/// · noDedupe           = 不按首段 Buff 去重（司马炎 / 陆抗 / 张梁 / 周仓 / 娄圭 / 步骘 / 阮籍 / 甄宓）
-/// · targetCenter       = 以选中的首个友军目标为中心，再在 Area 内扩散给周围友军（缺省以自身为中心）
+/// 当前使用者：奇才（2010141~2010145）。
 /// </summary>
 public class SkillBondAreaBuff : Skill
 {
@@ -34,36 +30,18 @@ public class SkillBondAreaBuff : Skill
             return false;
         }
 
-        var selfAlways = HasSkillFlag("selfAlways");
-        var noDedupe = HasSkillFlag("noDedupe");
         var searchRange = skillCfg.Area;
 
-        // 中心点：缺省以施法者自身为中心；targetCenter 先选中首个友军目标，再以其位置为中心扩散
-        var center = owner.transform.position;
-        if (HasSkillFlag("targetCenter"))
-        {
-            var primary = SelectTargets(owner.transform.position, skillCfg.Range, true, 1,
-                selfAlways ? owner : null,
-                noDedupe ? (Func<Chess, bool>)null : x => !x.HasBuff(buffIds[0]));
-            if (primary.Count == 0)
-                return false;
-            center = primary[0].transform.position;
-        }
-
-        // 选人：SelectOnly 硬过滤 + SelectFirst 优先级；去重（非 noDedupe）在截断目标数前生效
-        var units = SelectTargets(center, searchRange, true, skillCfg.TargetCount,
-            selfAlways ? owner : null,
-            noDedupe ? (Func<Chess, bool>)null : x => !x.HasBuff(buffIds[0]));
-
-        if (selfAlways)
-            units.Add(owner);
+        // 选人：SelectOnly 硬过滤 + SelectFirst 优先级；去重（已带首段 Buff 的跳过）在截断目标数前生效
+        var units = SelectTargets(owner.transform.position, searchRange, true, skillCfg.TargetCount,
+            null, x => !x.HasBuff(buffIds[0]));
 
         if (units.Count == 0)
             return false;
 
         owner.PlayerAnim(skillCfg.Action);
         PlaySelfEffect();
-        PlayAreaEffect(center);
+        PlayAreaEffect(owner.transform.position);
 
         foreach (var unit in units)
         {

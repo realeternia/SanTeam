@@ -5,14 +5,12 @@ using CommonConfig;
 /// 受击加护盾 / 回血（ScriptName = "SkillBondAttackedShield"）：受到攻击时为自己施加吸收盾或减伤盾，
 /// 是否可触发由 Skill.CheckBurst 统一判定（CD、发动概率、MpCost、TriggerCondition 条件如 "hprate&lt;30"）。
 /// Buff 短名由 SkillConfig.BuffId 配置：第 1 个为主 Buff——
-///   吸收盾「盾」：容量 = key "shield" × (100+法强)/100（随法强成长，如严颜·老当益壮 / 邓艾·偷渡阴平）；
+///   吸收盾「盾」：容量 = key "shield" × (100+法强)/100（随法强成长，当前无技能使用）；
 ///   减伤盾「硬」：减伤率由 硬 Buff（BuffShieldValue）读 key "shieldReduce"（如益壮）。
 /// 回血 Buff「愈」为可选第 2 段，持续秒数：
 ///   · 配置了 key "healTime" 时取该值（固定值模式，如益壮「硬,愈」=[shieldReduce, heal, healTime]）；
-///   · 否则取 BuffTime（成长模式，如邓艾，每秒回血由 BuffTimeHeal 回退到 Skill.GetSkillHeal）。
-/// TargetType 标记：
-///   · ignoreWeakHit = 不忽略 10 点以下的弱伤害（邓艾·偷渡阴平）；缺省时 damage&lt;=10 不触发。
-/// 使用示例：益壮（2010106~2010110）、老当益壮（2020716~2020720）、偷渡阴平（2020726~2020730）。
+///   · 否则取 BuffTime（成长模式，每秒回血由 BuffTimeHeal 回退到 Skill.GetSkillHeal，当前无技能使用）。
+/// 使用示例：好友连锁·益壮（2010106~2010110）。
 /// </summary>
 public class SkillBondAttackedShield : Skill
 {
@@ -22,8 +20,8 @@ public class SkillBondAttackedShield : Skill
 
     public override void OnAttacked(Chess attacker, int damage)
     {
-        // 默认忽略 10 点以下的弱伤害，避免被小兵普攻骗出 CD；ignoreWeakHit 时不做该过滤（邓艾·偷渡阴平）
-        if (!HasSkillFlag("ignoreWeakHit") && damage <= 10)
+        // 忽略 10 点以下的弱伤害，避免被小兵普攻骗出 CD
+        if (damage <= 10)
             return;
         if (!CheckBurst(attacker))
             return;
@@ -46,7 +44,7 @@ public class SkillBondAttackedShield : Skill
         if (shield != null)
             shield.AddHp(shieldHp);
 
-        // 触发后在限时内持续回血；固定值（益壮）与随法强成长（邓艾）由 BuffTimeHeal 自行区分
+        // 触发后在限时内持续回血；固定值（益壮）与随法强成长两种模式由 BuffTimeHeal 自行区分
         var healTime = GetHealTime(buffIds.Count);
         if (healTime > 0f)
         {
@@ -60,7 +58,7 @@ public class SkillBondAttackedShield : Skill
         GameLog.Debug($"受击加护盾 技能id={id} 等级={Level} 生命={owner.hp}/{owner.maxHp} 护盾={shieldHp} 持续回血={GetHealPerTick(buffIds.Count)}/秒×{healTime}秒");
     }
 
-    // 回血持续秒数：读 key "healTime"（固定值模式，如益壮）；未配置时有第 2 个回血 Buff 时取 BuffTime（邓艾）
+    // 回血持续秒数：读 key "healTime"（固定值模式，如益壮）；未配置时有第 2 个回血 Buff 时取 BuffTime
     private float GetHealTime(int buffCount)
     {
         var healTime = GetStrBuff("healTime");

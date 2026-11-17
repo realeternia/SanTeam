@@ -3,7 +3,7 @@ using System;
 /// <summary>
 /// 望族（名门望族·门阀，短名"望"）：开局双防强化，随时间衰减。OnAdd 增加 StrengthBuff1 语义 key "armor" 点护甲、"magicRes" 点魔抗；
 /// DecayOnce() 每跳减去初始加成 1/5（共5跳，15秒归零）；OnRemove 还原剩余加成。
-/// 衰减节奏由施放技能 SkillInitDecayDef 的协程驱动。
+/// 衰减节奏由施放技能 SkillBondInitDecayDef 的协程驱动。
 /// </summary>
 public class BuffDecayDef : Buff
 {

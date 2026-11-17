@@ -4,8 +4,8 @@ using CommonConfig;
 using UnityEngine;
 
 /// <summary>
-/// 谋略：攻击时按概率(Rate)眩晕目标(BuffId=眩晕buff"乱"，时长BuffTime)，且攻击已被眩晕的目标时额外造成
-/// key "stunDamage"(=0.5，50%)伤害。两个效果复用枪·眩晕(SkillHitBuff)与增伤(SkillAttackAddDamage)机制。
+/// 深谋（好友连锁·谋）：攻击时按概率(Rate)眩晕目标(BuffId=眩晕buff"乱"，时长BuffTime)，且攻击已被眩晕的目标时额外造成
+/// key "stunDamage"(=0.5，50%)伤害。两个效果分别复用 SkillBondHitBuff（概率挂 Buff）与 SkillBondAttackAddDamage（攻击增伤）机制。
 /// </summary>
 public class SkillBondAttackStunDamage : Skill
 {

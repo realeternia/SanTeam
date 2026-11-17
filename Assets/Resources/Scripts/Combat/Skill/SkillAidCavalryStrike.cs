@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// 马超·西凉铁骑（主）两段冲锋：先沿朝目标方向突进 Range 距离（突过去），再原路撤回起点（突回来），
+/// 马超·铁骑冲（主）两段冲锋：先沿朝目标方向突进 Range 距离（突过去），再原路撤回起点（突回来），
 /// 形似 RunCross 穿越两次。每段对冲撞路径上的敌人各结算一次 GetSkillDamage，并施加 skillCfg.BuffId 配置的减防 Buff（"破"），
 /// 每段最多命中 TargetCount 名敌人、同一段内同一敌人只命中一次（跨段可被再冲一次），单人最多吃到两次伤害。
 /// 路径命中半径取 skillCfg.Area（Area=0 在全图语义下会命中全场，配置须非 0）。

@@ -1,10 +1,10 @@
 ﻿using CommonConfig;
 
 /// <summary>
-/// 疑城·开场减伤盾（ScriptName = "SkillEquipInitShieldValue"）：
+/// 开场减伤盾（ScriptName = "SkillEquipInitShieldValue"）：
 /// 战斗开始时给自己施加减伤盾（BuffId="硬"=BuffShieldValue 300002），
 /// 持续 BuffTime 秒，减伤比例 = 技能 StrengthBuff1 的 键 shieldReduce（如 0.3 = 减免30%伤害）。
-/// 用于徐盛：开场15秒百分比减伤盾。
+/// 使用者为道具技能：玄盾（玉玺）/ 文润（诗经）/ 玄武（凤凰羽衣）。
 /// </summary>
 public class SkillEquipInitShieldValue : Skill
 {

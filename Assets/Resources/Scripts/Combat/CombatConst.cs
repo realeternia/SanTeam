@@ -13,7 +13,7 @@ public static class CombatConst
     /// <summary>陷阵(BuffNoMove，负面效果，短名"停")：无法移动；张昭·筑垒把敌方英雄拖回我方出生点后用它定身数秒</summary>
     public const int BuffNoMoveId = 301005;
     /// <summary>隐匿(BuffStealth，正面效果，短名"隐")：嘲讽的反效果，敌方索敌(Chess.FindTarget)与单体技能锁定不到；
-    /// 甘宁·百骑劫营每次释放给自己挂 5 秒，并切半透明材质</summary>
+    /// 甘宁·劫营每次释放给自己挂 5 秒，并切半透明材质</summary>
     public const int StealthBuffId = 300030;
     /// <summary>士兵士气(BuffMorale，正面效果，短名"气")：仅对我方小兵生效，每层提升攻击/护甲，可叠加</summary>
     public const int SoldierMoraleBuffId = 300031;

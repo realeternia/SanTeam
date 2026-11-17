@@ -7,7 +7,7 @@ using UnityEngine;
 /// 锁定射程内的当前目标，按 TargetCount 段数对同一目标连续造成 GetSkillDamage() 技能伤害，
 /// 每段独立播放命中特效 skillCfg.HitEffect，段间间隔 SegmentInterval(0.2s)；
 /// 目标中途死亡则提前结束（"最多 N 段"），全部段数结算完后统一附加 SkillConfig.BuffId 指定的 Buff。
-/// 与 SkillSingleDamage 的区别：伤害随时间分段推进（可被打断/目标死亡截断），不是同一帧内连算。
+/// 与 SkillComDamageSingle 的区别：伤害随时间分段推进（可被打断/目标死亡截断），不是同一帧内连算。
 /// </summary>
 public class SkillAidMultiHit : Skill
 {

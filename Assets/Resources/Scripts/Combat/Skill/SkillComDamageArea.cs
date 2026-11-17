@@ -5,10 +5,10 @@
 /// 范围特效播在中心点、命中特效播在每个受击目标身上。
 ///
 /// 中心点由基类 SelectTarget 决定：配 TargetType:self 时以自身为中心（近战贴脸 AoE，不做射程校验，
-/// 如张绣·枪出如龙 / 孙坚·破阵 / 刘晔·卸甲）；缺省以锁定目标为中心（远程需在 Range 射程内，
-/// 如张郃·震碎 / 司马昭·篡逆 / 钟会·蓄谋）。
+/// 如张绣·枪出如龙 / 魏延·奇袭 / 刘晔·卸甲）；缺省以锁定目标为中心（远程需在 Range 射程内，
+/// 如司马昭·篡逆 / 钟会·蓄谋）。
 /// 每个目标的伤害计算与落地全部走基类 CalcDamage / ApplyDamage，因此弹道(missile)、最大生命追加(maxHpBonus)、
-/// execute / shieldBonus / missingHp / vsJob / soldierDamage 等组件自动生效；燃蓝由基类 ApplyMpBurn 统一结算。
+/// execute / shieldBonus / missingHp / vsJob / soldierDamage / critRateBonus 等组件自动生效；燃蓝由基类 ApplyMpBurn 统一结算。
 /// </summary>
 public class SkillComDamageArea : SkillComDamageSingle
 {

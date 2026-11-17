@@ -8,7 +8,7 @@ using UnityEngine;
 /// 技能类，处理技能相关逻辑。
 ///
 /// 通用组件效果（TargetType 标记 / Strength2 键）统一在基类实现，派生技能直接调用，不要重复实现：
-/// · 伤害修正 ApplyDamageModifiers：execute(execHp/execRate)、shieldBonus、missingHp、vsJob、soldierDamage
+/// · 伤害修正 ApplyDamageModifiers：execute(execHp/execRate)、shieldBonus、missingHp、vsJob、soldierDamage、critRateBonus
 /// · 概率翻倍 TryDoubleDamage：doubleChance/doubleRate
 /// · 破盾追加 ApplyAntiShieldBonus：antiShield/antiShieldRate
 /// · 命中效果 ApplyMpBurn / ApplyDispel：mpBurn、dispel
@@ -221,7 +221,7 @@ public class Skill
     // ---- 通用组件效果（TargetType 标记 / Strength2 键，所有通用技能共享） ----
 
     /// <summary>
-    /// 伤害类组件修正：execute(execHp/execRate)、shieldBonus、missingHp、vsJob、soldierDamage。
+    /// 伤害类组件修正：execute(execHp/execRate)、shieldBonus、missingHp、vsJob、soldierDamage、critRateBonus。
     /// 未配置的标记与键均为 no-op，可在任意单体/范围伤害结算前直接调用。
     /// </summary>
     protected int ApplyDamageModifiers(int dmg, Chess target)
@@ -242,6 +242,13 @@ public class Skill
             var soldierCount = CountMySoldiers();
             if (soldierCount > 0)
                 dmg = Math.Max(1, (int)(dmg * (1f + soldierCount * soldierRate)));
+        }
+        // 暴击率加成：技能伤害按「施法者暴击率 + critRateBonus」判定暴击，不依赖弹道形态
+        var critRateBonus = GetStr2("critRateBonus");
+        if (critRateBonus > 0f && SysRandom.Value < owner.critRate + critRateBonus)
+        {
+            dmg = Math.Max(1, (int)(dmg * (1f + owner.critDamageMulti)));
+            WorldManager.Instance.AddBattleText("暴!", target.transform.position, new Vector2(0, 40), Color.red, 3);
         }
         return dmg;
     }

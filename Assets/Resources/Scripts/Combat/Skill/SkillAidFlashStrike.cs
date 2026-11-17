@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// 赵云·快闪：发动射程(Range)内瞬闪连击。首段只打英雄（射程内没有英雄则本次不发动），
+/// 赵云·龙胆：发动射程(Range)内瞬闪连击。首段只打英雄（射程内没有英雄则本次不发动），
 /// 从第二段起在 Area 内重选目标：英雄优先，范围内没有英雄时才允许跳小兵；没有任何可打目标即停止。
 /// 首次闪到目标身前（沿起手方向后退 BlinkBack，避免与目标叠住），之后各次闪到目标身后（沿起手方向穿过目标再走 BlinkBack），
 /// 最多闪击配置 TargetCount 次，

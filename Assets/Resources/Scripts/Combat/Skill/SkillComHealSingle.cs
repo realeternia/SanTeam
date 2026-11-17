@@ -14,7 +14,7 @@ using UnityEngine;
 /// · CleanseOnHeal 是否在治疗时驱散目标负面 Buff（默认 true）
 ///
 /// **所有治疗组件（TargetType 标记 / Strength2 键）统一在基类 HealUnit 结算**，派生类不要重复判断：
-/// · overflowToArmor = 溢出治疗量转等量护甲（与 BuffId 的护甲 Buff 配合，此时不再驱散，刘禅·安乐）
+/// · overflowToArmor = 溢出治疗量转等量护甲（与 BuffId 的护甲 Buff 配合，此时不再驱散；当前无技能使用）
 /// · 护盾类 Buff 按统一护盾公式写入护盾值
 /// 治疗体系派生：SkillComHealArea（范围治疗）、SkillComHealAreaCasting（持续治疗领域）、SkillComHealJumpChain（跳跃治疗链）。
 /// </summary>

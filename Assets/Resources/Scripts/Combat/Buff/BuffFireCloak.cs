@@ -4,7 +4,7 @@ using UnityEngine;
 /// <summary>
 /// 焰衣（孙坚·破阵）：挂在自身身上的持续伤害光环。存在期间每秒对自身 skillCfg.Area 半径内的所有敌人
 /// 造成 Skill.GetSkillDamage(skillCfg, 施法者) × StrengthBuff1 key "damageRate"（伤害%，默认 100%）的技能伤害，
-/// 并弹伤害飘字。持续时间由 SkillSelfBuff 的 BuffTime 控制；技能侧配 TargetType=noStack 保证不会重叠多层。
+/// 并弹伤害飘字。持续时间由 SkillComBuffSingle 施放时的 BuffTime 控制；技能侧配 TargetType=noStack 保证不会重叠多层。
 /// </summary>
 public class BuffFireCloak : Buff
 {

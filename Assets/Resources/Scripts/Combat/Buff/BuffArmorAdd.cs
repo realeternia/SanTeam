@@ -25,7 +25,7 @@ public class BuffArmorAdd : Buff
     }
 
     /// <summary>
-    /// 动态设置本 Buff 提供的护甲值（如刘禅·安乐把溢出治疗量转为护甲）：先扣回旧值再加新值，Buff 结束仍按最终值扣回。
+    /// 动态设置本 Buff 提供的护甲值（如 overflowToArmor 的溢出治疗转护甲）：先扣回旧值再加新值，Buff 结束仍按最终值扣回。
     /// </summary>
     public void SetArmor(int value)
     {

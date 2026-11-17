@@ -4,7 +4,7 @@ using UnityEngine;
 
 /// <summary>
 /// 安民（济世安民）：战斗开始全组士兵最大生命提升 maxHp × 键 maxHpRate、每秒生命回复提升 键 hpRegen 点。
-/// 士兵血量成长机制参照兵种类增益技能（SkillSoldierBless）；士兵为 Chess，自带 maxHp/hpRegen。
+/// 士兵为 Chess，自带 maxHp/hpRegen，这里直接按比例改写两项属性。
 /// </summary>
 public class SkillBondInitSoldierBuff : Skill
 {
