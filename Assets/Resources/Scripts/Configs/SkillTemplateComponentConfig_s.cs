@@ -42,7 +42,7 @@ namespace CommonConfig
         {
             {"Id", new FieldMetaInfo("序列", "int", 94)},
             {"Name", new FieldMetaInfo("组件名", "string", 0, "", true)},
-            {"Category", new FieldMetaInfo("类别(数值、射程、目标数、范围档、状态效果、持续、目标筛选、特殊机制、施放节奏)", "string", 0)},
+            {"Category", new FieldMetaInfo("类别(数值、射程、目标数、范围档、状态效果、持续、目标筛选、特殊机制、施放节奏)", "string", 0, "数值:#555B60,射程:#355F8F,目标数:#4678A8,范围档:#4C9C95,状态效果:#2F7D4E,持续:#3F9B62,目标筛选:#6B4A8F,特殊机制:#A06428,施放节奏:#8C7A2F")},
             {"Templates", new FieldMetaInfo("适用大类列表(Damage伤害/Heal治疗/Buff增益；空=通用)", "string[]", 0)},
             {"Effect", new FieldMetaInfo("效果k-v(分号多绑定: 列[:子键]=数值；Buff属性只填一级(取Lv3)，如 Area=30、Buff:缓:slow=0.18;Buff:缓:atkSpeed=0.18;BuffTime=3、TargetType:missile、SelectOnly:hero、SelectFirst:lowestHp、None)", "string", 511)},
             {"Quality", new FieldMetaInfo("品质(1~4)", "int", 60, "qs,1:#666666,2:#33CC33,3:#3333FF,4:#FFD700")},
@@ -187,8 +187,8 @@ namespace CommonConfig
             config[2300] = new SkillTemplateComponentConfig(2300, "时长延长小", "状态效果", null, "BuffTimeRate=1.3", 1, 1.5f, "Buff 持续时间延长 30%", "按持续时间等比放大所属状态效果的价值", false);
             config[2301] = new SkillTemplateComponentConfig(2301, "时长延长中", "状态效果", null, "BuffTimeRate=1.5", 2, 2.5f, "Buff 持续时间延长 50%", "按持续时间等比放大所属状态效果的价值", false);
             config[2305] = new SkillTemplateComponentConfig(2305, "时长逐级延长20", "状态效果", null, "BuffTimeRate=1.2,1.4,1.6,1.8,2", 3, 3f, "Buff 持续时间随等级逐级延长 20%（Lv1 +20% … Lv5 +100%）", "按持续时间等比放大所属状态效果的价值", true);
-            config[2310] = new SkillTemplateComponentConfig(2310, "效果提升50", "状态效果", null, "BuffEffectRate=1.5", 2, 2f, "该技能所有状态组件的 Buff 效果数值提升 50%", "乘性放大，按被提升状态的基准价值折算", true);
-            config[2311] = new SkillTemplateComponentConfig(2311, "效果提升100", "状态效果", null, "BuffEffectRate=2", 3, 3.5f, "该技能所有状态组件的 Buff 效果数值提升 100%", "乘性放大，按被提升状态的基准价值折算", true);
+            config[2310] = new SkillTemplateComponentConfig(2310, "效果提升30", "状态效果", null, "BuffEffectRate=1.3", 2, 2f, "该技能所有状态组件的 Buff 效果数值提升 30%", "乘性放大，按被提升状态的基准价值折算", true);
+            config[2311] = new SkillTemplateComponentConfig(2311, "效果提升50", "状态效果", null, "BuffEffectRate=1.5", 3, 3.5f, "该技能所有状态组件的 Buff 效果数值提升 50%", "乘性放大，按被提升状态的基准价值折算", true);
             config[2910] = new SkillTemplateComponentConfig(2910, "效果逐级提升20", "状态效果", null, "BuffEffectRate=1.2,1.4,1.6,1.8,2", 3, 3f, "该技能所有状态组件的 Buff 效果数值随等级逐级提升 20%（Lv1 +20% … Lv5 +100%）", "乘性放大，按被提升状态的基准价值折算", true);
             config[3000] = new SkillTemplateComponentConfig(3000, "低血筛选", "目标筛选", new string[]{"Heal","Buff"}, "SelectFirst:lowestHp", 1, 1f, "优先选择最低血量目标", "选择性越强未必更贵；看是否提高击杀或救援效率", false);
             config[3010] = new SkillTemplateComponentConfig(3010, "后排筛选", "目标筛选", null, "SelectFirst:farthest", 1, 0.5f, "优先选择后排（最远）目标", "选择性越强未必更贵；看是否提高击杀或救援效率", false);

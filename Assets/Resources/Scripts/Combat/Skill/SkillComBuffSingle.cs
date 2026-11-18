@@ -20,7 +20,7 @@ using UnityEngine;
 /// · targetCenter       = 以选中的首个友军目标为中心，再在 Area 内扩散（缺省以自身为中心）
 /// 护盾类 Buff 统一按护盾公式写入护盾值。
 ///
-/// 增益体系派生：SkillComBuffArea（群体增益）、SkillComBuffAura（光环）、SkillComBuffTaunt（嘲讽）。
+/// 增益体系派生：SkillComBuffArea（群体增益）、SkillComBuffAura（光环）、SkillComDamageTaunt（嘲讽）。
 /// </summary>
 public class SkillComBuffSingle : Skill
 {

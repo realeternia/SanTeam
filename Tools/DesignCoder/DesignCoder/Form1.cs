@@ -2224,7 +2224,8 @@ namespace DesignCoder
                 bool isNumberType = fieldType == "int" || fieldType == "float";
                 string enumLabel = null;
                 Color? enumColor = null;
-                if (isNumberType && fieldIdx >= 0 && fieldIdx < currentConfig.Fields.Count)
+                // 枚举配色同时支持数值列与字符串列（如 SkillConfig.Type、组件表 Category）
+                if (fieldIdx >= 0 && fieldIdx < currentConfig.Fields.Count)
                 {
                     TryGetEnumInfo(currentConfig.Fields[fieldIdx].FieldRule, cellValue, out enumLabel, out enumColor);
                 }
@@ -2233,7 +2234,7 @@ namespace DesignCoder
                 bool isHighlighted = isRowHighlighted || isColHighlighted;
                 bool isFirstColHighlight = (e.ColumnIndex == firstDataColIdx && e.RowIndex == selectedRowIndex);
 
-                if (colorValue.HasValue || isBoolTrue || isBoolFalse || isNumberType || isHighlighted)
+                if (colorValue.HasValue || isBoolTrue || isBoolFalse || isNumberType || enumColor.HasValue || isHighlighted)
                 {
                     Color bgColor = e.CellStyle.BackColor;
                     Color fgColor = e.CellStyle.ForeColor;
@@ -2251,18 +2252,17 @@ namespace DesignCoder
                             bgColor = Color.FromArgb(80, 130, 200);
                         }
 
-                        if (isNumberType)
+                        if (isNumberType || enumColor.HasValue)
                         {
-                            fgColor = Color.FromArgb(100, 220, 130);
-                            if (fieldIdx >= 0 && fieldIdx < currentConfig.Fields.Count)
+                            if (isNumberType)
+                                fgColor = Color.FromArgb(100, 220, 130);
+                            Color? ruleColor = enumColor;
+                            if (!ruleColor.HasValue && fieldIdx >= 0 && fieldIdx < currentConfig.Fields.Count)
+                                ruleColor = GetRuleColor(currentConfig.Fields[fieldIdx].FieldRule, cellValue);
+                            if (ruleColor.HasValue)
                             {
-                                var fieldDef = currentConfig.Fields[fieldIdx];
-                                Color? ruleColor = enumColor ?? GetRuleColor(fieldDef.FieldRule, cellValue);
-                                if (ruleColor.HasValue)
-                                {
-                                    bgColor = ruleColor.Value;
-                                    fgColor = e.CellStyle.ForeColor;
-                                }
+                                bgColor = ruleColor.Value;
+                                fgColor = e.CellStyle.ForeColor;
                             }
                         }
                     }

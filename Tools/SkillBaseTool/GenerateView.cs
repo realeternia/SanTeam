@@ -12,15 +12,18 @@ namespace SkillBaseTool
         private DataStore store;
         private readonly Action reload;
         private Label lblStats;
-        private ComboBox cboJob;
         private DataGridView grid;
         /// <summary>行号 → 技能（Lv1 行），供编辑按钮回查。</summary>
         private readonly List<SkillRow> rowSkills = new List<SkillRow>();
         private int editColumn = -1;
         private int templateColumn = -1;
         private int moduleColumn = -1;
-        /// <summary>重建职业下拉时不触发刷新。</summary>
-        private bool suppressJob;
+        /// <summary>列索引 → 允许显示的单元格文本；不存在表示该列不过滤。</summary>
+        private readonly Dictionary<int, HashSet<string>> columnFilters = new Dictionary<int, HashSet<string>>();
+        /// <summary>各列原始表头（不含筛选标记），用于恢复。</summary>
+        private string[] baseHeaders;
+        /// <summary>当前打开的列筛选下拉。</summary>
+        private ToolStripDropDown filterDropDown;
 
         public GenerateView(Action reload)
         {
@@ -47,35 +50,16 @@ namespace SkillBaseTool
             btnGen.Click += (s, e) => GenerateBase();
             var btnCheck = MakeButton("③ 配置自检", 366, 120);
             btnCheck.Click += (s, e) => ValidateAll();
-            var lblJob = new Label
-            {
-                Text = "职业",
-                Font = Theme.Small,
-                ForeColor = Theme.Muted,
-                AutoSize = true,
-                Location = new Point(500, 51),
-            };
-            cboJob = new ComboBox
-            {
-                DropDownStyle = ComboBoxStyle.DropDownList,
-                FlatStyle = FlatStyle.Flat,
-                BackColor = Theme.Card2,
-                ForeColor = Theme.Text,
-                Font = Theme.Base,
-                Location = new Point(534, 44),
-                Size = new Size(96, 26),
-            };
-            cboJob.SelectedIndexChanged += (s, e) => { if (!suppressJob) RefreshGrid(); };
             var tip = new Label
             {
-                Text = "规则：DamageStrength/HealStrength 取模板 Values，CD/MpCost 取模板（MpCost×10），Range/Area 仅模板>0 时覆盖，Buff 只按技能自己的 Modules 追加（模板默认组件仅估值）",
+                Text = "规则：DamageStrength/HealStrength 取模板 Values，CD/MpCost 取模板（MpCost×10），Range/Area 仅模板>0 时覆盖，Buff 只按技能自己的 Modules 追加（模板默认组件仅估值）\n点击任意列头可按该列值筛选，再次点击可修改或清除",
                 Font = Theme.Small,
                 ForeColor = Theme.Faint,
                 AutoSize = true,
-                Location = new Point(500, 18),
+                Location = new Point(500, 12),
             };
 
-            top.Controls.AddRange(new Control[] { lblStats, btnAuto, btnGen, btnCheck, lblJob, cboJob, tip });
+            top.Controls.AddRange(new Control[] { lblStats, btnAuto, btnGen, btnCheck, tip });
 
             grid = new DataGridView { Dock = DockStyle.Fill, Margin = new Padding(0) };
             Theme.StyleGrid(grid);
@@ -113,6 +97,8 @@ namespace SkillBaseTool
             };
             grid.Columns.Add(btnCol);
             editColumn = grid.Columns.Count - 1;
+            baseHeaders = grid.Columns.Cast<DataGridViewColumn>().Select(c => c.HeaderText).ToArray();
+            grid.ColumnHeaderMouseClick += OnHeaderMouseClick;
 
             grid.CellContentClick += (s, e) =>
             {
@@ -220,31 +206,9 @@ namespace SkillBaseTool
         public void Bind(DataStore data)
         {
             store = data;
-            FillJobFilter();
+            columnFilters.Clear();
+            ResetHeaders();
             RefreshGrid();
-        }
-
-        /// <summary>重建职业下拉（保留当前选中项），按技能数从多到少排列。</summary>
-        private void FillJobFilter()
-        {
-            string current = cboJob.SelectedItem as string;
-            suppressJob = true;
-            cboJob.BeginUpdate();
-            cboJob.Items.Clear();
-            cboJob.Items.Add("全部");
-            if (store != null)
-            {
-                foreach (var g in store.QualityHeroSkills
-                    .Where(s => !string.IsNullOrEmpty(s.Job))
-                    .GroupBy(s => s.Job)
-                    .OrderByDescending(g => g.Count())
-                    .ThenBy(g => g.Key, StringComparer.CurrentCulture))
-                    cboJob.Items.Add(g.Key);
-            }
-            cboJob.EndUpdate();
-            int idx = string.IsNullOrEmpty(current) ? 0 : cboJob.Items.IndexOf(current);
-            cboJob.SelectedIndex = idx < 0 ? 0 : idx;
-            suppressJob = false;
         }
 
         private void RefreshGrid()
@@ -253,31 +217,29 @@ namespace SkillBaseTool
                 return;
             Theme.BeginBulkFill(grid);
             rowSkills.Clear();
-            string job = cboJob.SelectedItem as string ?? "全部";
             var skills = store.QualityHeroSkills
-                .Where(s => job == "全部" || s.Job == job)
                 .OrderBy(s => s.Quality)
                 .ThenBy(s => s.Sname)
                 .ToList();
             int templated = 0;
+            int shown = 0;
             foreach (var s in skills)
             {
-                string status;
-                if (string.IsNullOrEmpty(s.TemplateName))
-                    status = "未模板化";
-                else if (!store.TemplateByName.ContainsKey(s.TemplateName))
-                    status = "模板缺失";
-                else if (!store.BaseRows.ContainsKey(s.Id))
-                    status = "缺 SkillBase";
-                else
-                {
-                    status = "OK";
+                string status = StatusOf(s);
+                if (status == "OK")
                     templated++;
-                }
                 double price = SkillGen.CalcPrice(store, s);
-                int idx = grid.Rows.Add(s.Display, s.Job, "Q" + s.Quality, price.ToString("0.##"), s.Type, s.ScriptName,
-                    s.TemplateName, string.Join("、", s.Modules), status, "编辑");
+                string[] cells =
+                {
+                    s.Display, s.Job, "Q" + s.Quality, price.ToString("0.##"), s.Type, s.ScriptName,
+                    s.TemplateName, string.Join("、", s.Modules), status,
+                };
+                if (!PassFilters(cells))
+                    continue;
+                int idx = grid.Rows.Add(cells[0], cells[1], cells[2], cells[3], cells[4], cells[5],
+                    cells[6], cells[7], cells[8], "编辑");
                 rowSkills.Add(s);
+                shown++;
 
                 // 品质列按品质染色
                 grid.Rows[idx].Cells[2].Style.ForeColor = Theme.QualityColor(s.Quality);
@@ -291,8 +253,196 @@ namespace SkillBaseTool
                     grid.Rows[idx].DefaultCellStyle.BackColor = Theme.RowWarn;
             }
             Theme.EndBulkFill(grid);
-            lblStats.Text = string.Format("{0}品质 1~4 英雄技能 {1} 个：已模板化 {2}，SkillBase 行 {3}",
-                job == "全部" ? "" : "职业 " + job + " · ", skills.Count, templated, store.BaseRows.Count);
+            lblStats.Text = string.Format("品质 1~4 英雄技能 {0} 个{1}：已模板化 {2}，SkillBase 行 {3}",
+                skills.Count, columnFilters.Count > 0 ? "（筛选显示 " + shown + "）" : "", templated, store.BaseRows.Count);
+        }
+
+        private string StatusOf(SkillRow s)
+        {
+            if (string.IsNullOrEmpty(s.TemplateName))
+                return "未模板化";
+            if (!store.TemplateByName.ContainsKey(s.TemplateName))
+                return "模板缺失";
+            if (!store.BaseRows.ContainsKey(s.Id))
+                return "缺 SkillBase";
+            return "OK";
+        }
+
+        /// <summary>按列索引取出该行的显示文本，供列筛选使用。</summary>
+        private string ColumnValue(SkillRow s, int col)
+        {
+            switch (col)
+            {
+                case 0: return s.Display;
+                case 1: return s.Job;
+                case 2: return "Q" + s.Quality;
+                case 3: return SkillGen.CalcPrice(store, s).ToString("0.##");
+                case 4: return s.Type;
+                case 5: return s.ScriptName;
+                case 6: return s.TemplateName;
+                case 7: return string.Join("、", s.Modules);
+                case 8: return StatusOf(s);
+                default: return null;
+            }
+        }
+
+        private bool PassFilters(string[] cells)
+        {
+            foreach (var kv in columnFilters)
+            {
+                if (kv.Key < 0 || kv.Key >= cells.Length)
+                    continue;
+                if (!kv.Value.Contains(cells[kv.Key] ?? ""))
+                    return false;
+            }
+            return true;
+        }
+
+        private void ResetHeaders()
+        {
+            if (baseHeaders == null)
+                return;
+            for (int i = 0; i < baseHeaders.Length && i < grid.Columns.Count; i++)
+                grid.Columns[i].HeaderText = baseHeaders[i];
+        }
+
+        private void OnHeaderMouseClick(object sender, DataGridViewCellMouseEventArgs e)
+        {
+            if (e.Button != MouseButtons.Left || e.ColumnIndex < 0 || e.ColumnIndex == editColumn)
+                return;
+            ShowFilterPanel(e.ColumnIndex);
+        }
+
+        /// <summary>列头点击：弹出该列的枚举值过滤面板（勾选=保留）。</summary>
+        private void ShowFilterPanel(int col)
+        {
+            if (store == null)
+                return;
+            if (filterDropDown != null)
+                filterDropDown.Close();
+
+            var values = new SortedSet<string>(StringComparer.CurrentCulture);
+            foreach (var s in store.QualityHeroSkills)
+            {
+                string v = ColumnValue(s, col);
+                if (!string.IsNullOrEmpty(v))
+                    values.Add(v);
+            }
+            if (values.Count == 0)
+                return;
+
+            HashSet<string> active;
+            columnFilters.TryGetValue(col, out active);
+
+            var list = new CheckedListBox
+            {
+                CheckOnClick = true,
+                BorderStyle = BorderStyle.None,
+                BackColor = Theme.Card2,
+                ForeColor = Theme.Text,
+                Font = Theme.Base,
+                IntegralHeight = false,
+                Width = 220,
+                Height = Math.Min(300, Math.Max(24, values.Count * 20 + 4)),
+            };
+            foreach (string v in values)
+                list.Items.Add(v, active == null || active.Contains(v));
+
+            var panel = new Panel
+            {
+                BackColor = Theme.Card,
+                Padding = new Padding(8),
+                Size = new Size(236, list.Height + 52),
+            };
+            list.Location = new Point(8, 8);
+
+            var btnAll = MakeSmallButton("全选", 8, list.Height + 16, 62);
+            btnAll.Click += (s2, e2) =>
+            {
+                bool allChecked = true;
+                for (int i = 0; i < list.Items.Count; i++)
+                {
+                    if (!list.GetItemChecked(i))
+                    {
+                        allChecked = false;
+                        break;
+                    }
+                }
+                for (int i = 0; i < list.Items.Count; i++)
+                    list.SetItemChecked(i, !allChecked);
+                btnAll.Text = allChecked ? "全选" : "全不选";
+            };
+            var btnClear = MakeSmallButton("清除筛选", 74, list.Height + 16, 82);
+            var btnApply = MakeSmallButton("应用", 160, list.Height + 16, 62);
+
+            panel.Controls.Add(list);
+            panel.Controls.Add(btnAll);
+            panel.Controls.Add(btnClear);
+            panel.Controls.Add(btnApply);
+
+            var dd = new ToolStripDropDown
+            {
+                Padding = Padding.Empty,
+                AutoClose = true,
+                DropShadowEnabled = true,
+                BackColor = Theme.Card,
+            };
+            dd.Items.Add(new ToolStripControlHost(panel) { Margin = Padding.Empty, Padding = Padding.Empty, AutoSize = false, Size = panel.Size });
+            filterDropDown = dd;
+            dd.Closed += (s2, e2) =>
+            {
+                if (ReferenceEquals(filterDropDown, dd))
+                    filterDropDown = null;
+                // ToolStripManager 关闭后还会访问该下拉，立即 Dispose 会抛 ObjectDisposedException，延后一帧回收
+                if (!IsDisposed && IsHandleCreated)
+                    BeginInvoke(new Action(() => dd.Dispose()));
+                else
+                    dd.Dispose();
+            };
+
+            btnApply.Click += (s2, e2) =>
+            {
+                var set = new HashSet<string>(StringComparer.CurrentCulture);
+                foreach (object item in list.CheckedItems)
+                    set.Add(item.ToString());
+                if (set.Count == values.Count)
+                    columnFilters.Remove(col);
+                else
+                    columnFilters[col] = set;
+                grid.Columns[col].HeaderText = baseHeaders[col] + (columnFilters.ContainsKey(col) ? " ▼" : "");
+                RefreshGrid();
+                dd.Close();
+            };
+            btnClear.Click += (s2, e2) =>
+            {
+                columnFilters.Remove(col);
+                grid.Columns[col].HeaderText = baseHeaders[col];
+                RefreshGrid();
+                dd.Close();
+            };
+
+            // 贴在列头下沿弹出（GetColumnDisplayRectangle 的数据区顶部在表头下方，直接用表头单元格底边）
+            Rectangle header = grid.GetCellDisplayRectangle(col, -1, true);
+            if (header.IsEmpty)
+                header = grid.GetColumnDisplayRectangle(col, true);
+            Point pt = grid.PointToScreen(new Point(header.Left, header.Bottom));
+            dd.Show(pt);
+        }
+
+        private static Button MakeSmallButton(string text, int x, int y, int width)
+        {
+            var b = new Button
+            {
+                Text = text,
+                FlatStyle = FlatStyle.Flat,
+                BackColor = Theme.Card2,
+                ForeColor = Theme.Text,
+                Font = Theme.Small,
+                Size = new Size(width, 26),
+                Location = new Point(x, y),
+            };
+            b.FlatAppearance.BorderColor = Theme.Line;
+            return b;
         }
 
         /// <summary>打开编辑弹窗；确认后已写回 SkillConfig，重新加载刷新列表。</summary>

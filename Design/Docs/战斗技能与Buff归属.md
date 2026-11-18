@@ -78,7 +78,7 @@
 | SkillComDamageSingle | 190 | 单伤、单控、兵增 | 蛇毒 |
 | SkillAidSkyFall | 5 | 群伤 | 天降恶来 |
 | SkillAidSoldierFortify | 5 | 兵增 | 筑垒 |
-| SkillComBuffTaunt | 10 | 群控 | 抬棺 |
+| SkillComDamageTaunt | 10 | 群控 | 抬棺 |
 | SkillBondAreaBuff | 5 | 连接 | 奇才 |
 | SkillBondAttackAddDamage | 5 | 职业 | 猛将 |
 | SkillBondAttackArmorPierce | 5 | 连接 | 悍将 |
@@ -170,7 +170,7 @@
 | SkillAidSoldierFortify | 1 | 张昭(筑垒) |
 | SkillAidRangeSplit | 2 | 司马炎(一统)、陆抗(西陵) |
 | SkillAidWhiteRobe | 1 | 吕蒙(白衣渡江) |
-| SkillComBuffTaunt | 2 | 于禁(铁壁)、庞德(抬棺) |
+| SkillComDamageTaunt | 2 | 于禁(铁壁)、庞德(抬棺) |
 | SkillAidSpinAttack | 1 | 张飞(旋风斩) |
 | SkillComBuffAura | 7 | 孙乾(鼓舞)、费祎(安民)、鲁肃(长者)、诸葛瑾(敦睦)、司马师(果决)、荀顗(礼乐)、田丰(直谏) |
 
