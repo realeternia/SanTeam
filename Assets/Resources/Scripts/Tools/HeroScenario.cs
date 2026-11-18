@@ -164,11 +164,21 @@ public static class HeroScenario
         baseHeroPanels[heroId] = panel;
     }
 
+    /// <summary>英雄专属技能缩写集合（HeroConfig.Skill1），用于区分职业/连接/道具技能</summary>
+    private static readonly HashSet<string> heroExclusiveSkillSnames = new HashSet<string>();
+
+    /// <summary>是否为英雄专属技能（Sname 等于任一 HeroConfig.Skill1）；职业/连接/道具技能不参与英雄品质修正</summary>
+    public static bool IsHeroExclusiveSkill(string sname)
+    {
+        return !string.IsNullOrEmpty(sname) && heroExclusiveSkillSnames.Contains(sname);
+    }
+
     /// <summary>登记品质无关的专属技能强度（PostModify 中调用）</summary>
     public static void RegisterBaseSkillStrength(int heroId, SkillConfig cfg, float damage, float heal, float factor)
     {
         if (cfg == null)
             return;
+        heroExclusiveSkillSnames.Add(cfg.Sname);
         var data = new BaseSkillStrength();
         data.heroId = heroId;
         data.cfg = cfg;

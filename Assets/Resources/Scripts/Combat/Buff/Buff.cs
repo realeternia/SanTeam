@@ -64,12 +64,14 @@ public class Buff
     }
 
     /// <summary>
-    /// Buff 数值品质系数：BuffConfig.IsQualityBonus=true 时按施法者英雄品质取 CombatConst.QualityBuffFactors（Q1~Q4），
-    /// 否则为 1；无施法者时退回 Buff 携带者，品质越界按边界处理。
+    /// Buff 数值品质系数：仅当 BuffConfig.IsQualityBonus=true 且由英雄专属技能（HeroConfig.Skill1）施加时，
+    /// 按施法者英雄品质取 CombatConst.QualityBuffFactors（Q1~Q4），否则为 1；
+    /// 职业/连接/道具技能施加的 Buff 不参与英雄品质修正。无施法者时退回 Buff 携带者，品质越界按边界处理。
     /// </summary>
     protected float GetQualityFactor()
     {
         if (buffCfg == null || !buffCfg.IsQualityBonus) return 1f;
+        if (skillCfg == null || !HeroScenario.IsHeroExclusiveSkill(skillCfg.Sname)) return 1f;
         Chess source = caster != null ? caster : owner;
         int quality = HeroScenario.GetQuality(source == null ? 0 : source.heroId);
         if (quality < 1) quality = 1;
