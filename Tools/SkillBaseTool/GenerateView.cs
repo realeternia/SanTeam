@@ -508,7 +508,7 @@ namespace SkillBaseTool
             var err = SkillGen.Validate(store);
             if (err.Count == 0)
             {
-                MessageBox.Show(this, "校验通过：列数、模板/组件引用、BuffId 重复、BuffAttrName 赋值、SkillBase 覆盖均正常。", "自检",
+                MessageBox.Show(this, "校验通过：列数、模板/组件引用、BuffId 重复、BuffAttrDynamic/BuffAttrConst 赋值、SkillBase 覆盖均正常。", "自检",
                     MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }

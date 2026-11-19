@@ -128,7 +128,7 @@ namespace SkillBaseTool
             }
         }
 
-        /// <summary>收集 BuffConfig 的短名（第 3 列）与 BuffAttrName（第 11 列），用于校验 EffectKey 的 Buff: 绑定。</summary>
+        /// <summary>收集 BuffConfig 的短名（第 3 列）与属性键：BuffAttrDynamic（第 11 列）、BuffAttrConst（第 12 列）。</summary>
         private static void LoadBuffTokens(DataStore store)
         {
             foreach (var kv in ParseRows(ReadText(store.BuffPath, out _), "BuffConfig"))
@@ -136,8 +136,19 @@ namespace SkillBaseTool
                 var a = kv.Value;
                 if (a.Length >= 3)
                     store.BuffTokens.Add(CfgUtil.Unquote(a[2]));
-                if (a.Length >= 11)
-                    store.BuffAttrNames[CfgUtil.Unquote(a[2])] = CfgUtil.ParseNames(CfgUtil.Unquote(a[10]));
+                if (a.Length >= 12)
+                {
+                    string name = CfgUtil.Unquote(a[2]);
+                    string[] dyn = CfgUtil.ParseNames(CfgUtil.Unquote(a[10]));
+                    string[] cst = CfgUtil.ParseNames(CfgUtil.Unquote(a[11]));
+                    store.BuffAttrDynamics[name] = dyn;
+                    store.BuffAttrConsts[name] = cst;
+                    var all = new System.Collections.Generic.List<string>(dyn);
+                    foreach (string k in cst)
+                        if (!all.Contains(k))
+                            all.Add(k);
+                    store.BuffAttrNames[name] = all.ToArray();
+                }
             }
         }
 

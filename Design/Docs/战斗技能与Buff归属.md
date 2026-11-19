@@ -185,7 +185,10 @@
 
 - **施加入口**：`BuffManager.AddBuff(target, caster, skillId, buffId, time)`，target 获得 buff、caster 记归属；按 `BuffConfig.ScriptName` 反射创建 `BuffXxx`。
 - **配置归属**：`SkillConfig.BuffId` 填 `BuffConfig.NameS`（短名），空串=无 buff；支持 `,` `，` `;` `；` 多段，解析走 `Skill.GetSkillBuffIds()`；多段语义由各技能脚本约定（通用组合如 `攻,甲,抗` 按位置取 `StrengthBuff1`）。
-- **数值槽声明**：`BuffConfig.BuffAttrName` 列出该 Buff 生效所需的数值槽键（多个用 `,` 分隔，如 `缓`=`slow,atkSpeed`，槽键可落在 `StrengthBuff1` 或 `Strength2`）；`SkillConfig.BuffId` 引用该 Buff 时这些键必须都已赋值，`SkillBaseTool` 自检会校验（模板化技能按实际生效的 `SkillBaseConfig` 行检查）。组件表不再手写 `BuffAttrName`，`BuffEffectRate` 直接读取 `BuffConfig.BuffAttrName` 乘算；组件里 Buff 属性数值只填一级（取 Lv3）。
+- **数值槽声明**：`BuffConfig` 用两个字段声明该 Buff 生效所需的数值槽键（多个用 `,` 分隔，槽键可落在 `StrengthBuff1` 或 `Strength2`）：
+  - `BuffAttrDynamic`：受品质/等级影响的动态键，如 `缓`=`slow,atkSpeed`、`守`=`armor`；运行时品质系数只乘这些键，`2910 效果逐级提升20` 也只乘这些键；
+  - `BuffAttrConst`：不受品质/等级影响的常量键，如 `守`=`perStack,maxStack`、`焰`=`damageRate`、`箭`=`extraArrows`、`锁`=`chain`。
+  `SkillConfig.BuffId` 引用该 Buff 时，两个字段里声明的键必须都已赋值，`SkillBaseTool` 自检会校验（模板化技能按实际生效的 `SkillBaseConfig` 行检查）；每个使用中的槽键必须且只能落在其中一个字段。组件表不再手写属性键，`BuffEffectRate` 直接读取 `BuffAttrDynamic` 乘算；组件里 Buff 属性数值只填一级（取 Lv3）。
 - **正负面与驱散**：`IsPositive` 定正负；`CanDispel=false` 为招牌/兵种 buff 不可驱散；`DispelNegative` 只清负面可驱散、`DispelPositive` 只清正面可驱散。
 - **存在性驱动**：嘲讽 `BuffTaunt(301010)` 由 `Chess.FindTarget` 判断；连锁 `BuffLock(301102)`、生命链接 `BuffLifeLink(300106)` 也以"身上有没有该 buff"驱动，索敌优先级：混乱 > 嘲讽 > 常规打分。
 - **表现归属**：`BuffEffect`、`ColorStart/ColorEnd`、`Material` 均作用在 owner 上，与 caster 无关。

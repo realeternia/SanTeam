@@ -258,7 +258,11 @@ namespace SkillBaseTool
         public Dictionary<string, ComponentRow> ComponentByName = new Dictionary<string, ComponentRow>();
         /// <summary>BuffConfig 里已存在的 Buff 短名（校验 Effect 用）。</summary>
         public HashSet<string> BuffTokens = new HashSet<string>();
-        /// <summary>Buff 短名 → BuffConfig.BuffAttrName 列表（校验 SkillConfig 引用 Buff 时数值槽是否齐全）。</summary>
+        /// <summary>Buff 短名 → BuffConfig.BuffAttrDynamic 列表（受品质/等级影响，参与 BuffEffectRate 乘算）。</summary>
+        public Dictionary<string, string[]> BuffAttrDynamics = new Dictionary<string, string[]>();
+        /// <summary>Buff 短名 → BuffConfig.BuffAttrConst 列表（不受品质/等级影响）。</summary>
+        public Dictionary<string, string[]> BuffAttrConsts = new Dictionary<string, string[]>();
+        /// <summary>Buff 短名 → Dynamic+Const 并集（校验 SkillConfig 引用 Buff 时数值槽是否齐全）。</summary>
         public Dictionary<string, string[]> BuffAttrNames = new Dictionary<string, string[]>();
 
         /// <summary>当前 SkillBaseConfig_s.cs 里已有的行（Id → 42 列参数）。</summary>

@@ -139,7 +139,7 @@ MonoBehaviour:
   isFakeHero: 0
   dodgeRate: 0
   critRate: 0
-  critDamageMulti: 0.5
+  critDamageMulti: 0.8
   lastDamagedPlayerId: -1
   hp: 50
   attackDamage: 30

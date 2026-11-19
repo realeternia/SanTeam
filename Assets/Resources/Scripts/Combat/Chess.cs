@@ -37,7 +37,7 @@ public class Chess : MonoBehaviour
     public bool isFakeHero;
     public float dodgeRate; //闪避
     public float critRate; //暴击
-    public float critDamageMulti = 0.5f; //暴击伤害倍率
+    public float critDamageMulti = 0.8f; //暴击伤害倍率
     public float healRate; //治疗强化系数（0.1=治疗效果+10%）
     public float healedRate; //受治疗系数（可为负，-0.1=受到的治疗-10%，减疗）
     public float auroEffectRate = 1f; //光环效果加成系数（1=无加成，鼓等光环效果值乘算）

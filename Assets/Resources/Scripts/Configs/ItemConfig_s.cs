@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -42,7 +42,7 @@ namespace CommonConfig
         {
             {"Id", new FieldMetaInfo("序列", "int", 60)},
             {"Name", new FieldMetaInfo("名字", "string", 0)},
-            {"Des", new FieldMetaInfo("效果说明", "string", 220)},
+            {"Des", new FieldMetaInfo("效果说明", "string", 317)},
             {"Quality", new FieldMetaInfo("品质", "int", 60)},
             {"Effect", new FieldMetaInfo("效果", "string", 0)},
             {"Attrs", new FieldMetaInfo("属性加成", "string", 210)},

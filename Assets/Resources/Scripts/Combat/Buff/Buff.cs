@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using CommonConfig;
 using UnityEngine;
 
@@ -16,6 +17,9 @@ public class Buff
     public float endTime;
     public GameObject effect;
 
+    /// <summary>BuffConfig.BuffAttrDynamic 声明的数值槽键集合（只有这些键参与品质乘算）</summary>
+    private readonly HashSet<string> dynamicAttrs = new HashSet<string>();
+
     /// <summary>
     /// 叠加模式为"时间延长"(StackMode=3)时，本实例存续期间被延长的次数：
     /// 第1次延长×0.9、第2次×0.8…用于控制类 Buff 的衰减，实例被顶掉/过期后重新计数
@@ -32,6 +36,11 @@ public class Buff
         skillCfg = SkillConfig.GetConfig(skillId);
         endTime = Time.time + lastTime;
 
+        if (buffCfg != null && !string.IsNullOrEmpty(buffCfg.BuffAttrDynamic))
+        {
+            foreach (string key in buffCfg.BuffAttrDynamic.Split(new[] { ',', '，' }, StringSplitOptions.RemoveEmptyEntries))
+                dynamicAttrs.Add(key.Trim());
+        }
     }
 
     public void SetTime(float time)
@@ -42,35 +51,37 @@ public class Buff
     /// <summary>
     /// 按 key 读取施加本 Buff 的技能配置的 StrengthBuff1 数值槽（key 为 "k:v,k:v" 串中的键名），
     /// 未配置 / key 不存在时返回 def。每个 Buff 读自己固定的语义 key，不再按数组下标/组合位置猜槽位。
-    /// buffCfg.IsQualityBonus=true 时读取结果再乘施法者英雄品质系数（CombatConst.QualityBuffFactors）。
+    /// 仅当 key 属于 BuffConfig.BuffAttrDynamic 且 IsQualityBonus=true 时，再乘施法者英雄品质系数。
     /// </summary>
     protected float GetStrBuff(string key, float def = 0f)
     {
         float raw = ConfigManager.GetSlotValue(skillCfg == null ? null : skillCfg.StrengthBuff1, key, float.NaN);
         if (float.IsNaN(raw)) return def;
-        return raw * GetQualityFactor();
+        return raw * GetQualityFactor(key);
     }
 
     /// <summary>
     /// 按 key 读取施加本 Buff 的技能配置的 Strength2 数值槽（key 为 "k:v,k:v" 串中的键名），
     /// 未配置 / key 不存在时返回 def。
-    /// buffCfg.IsQualityBonus=true 时读取结果再乘施法者英雄品质系数（CombatConst.QualityBuffFactors）。
+    /// 仅当 key 属于 BuffConfig.BuffAttrDynamic 且 IsQualityBonus=true 时，再乘施法者英雄品质系数。
     /// </summary>
     protected float GetStr2(string key, float def = 0f)
     {
         float raw = ConfigManager.GetSlotValue(skillCfg == null ? null : skillCfg.Strength2, key, float.NaN);
         if (float.IsNaN(raw)) return def;
-        return raw * GetQualityFactor();
+        return raw * GetQualityFactor(key);
     }
 
     /// <summary>
-    /// Buff 数值品质系数：仅当 BuffConfig.IsQualityBonus=true 且由英雄专属技能（HeroConfig.Skill1）施加时，
-    /// 按施法者英雄品质取 CombatConst.QualityBuffFactors（Q1~Q4），否则为 1；
-    /// 职业/连接/道具技能施加的 Buff 不参与英雄品质修正。无施法者时退回 Buff 携带者，品质越界按边界处理。
+    /// Buff 数值品质系数：仅当 key 属于 BuffConfig.BuffAttrDynamic（受品质影响）、BuffConfig.IsQualityBonus=true，
+    /// 且由英雄专属技能（HeroConfig.Skill1）施加时，按施法者英雄品质取 CombatConst.QualityBuffFactors（Q1~Q4），否则为 1；
+    /// BuffAttrConst 声明的常量键永远不参与品质乘算。职业/连接/道具技能施加的 Buff 不参与英雄品质修正。
+    /// 无施法者时退回 Buff 携带者，品质越界按边界处理。
     /// </summary>
-    protected float GetQualityFactor()
+    protected float GetQualityFactor(string key)
     {
         if (buffCfg == null || !buffCfg.IsQualityBonus) return 1f;
+        if (!dynamicAttrs.Contains(key)) return 1f;
         if (skillCfg == null || !HeroScenario.IsHeroExclusiveSkill(skillCfg.Sname)) return 1f;
         Chess source = caster != null ? caster : owner;
         int quality = HeroScenario.GetQuality(source == null ? 0 : source.heroId);

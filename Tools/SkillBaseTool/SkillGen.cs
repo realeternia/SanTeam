@@ -585,7 +585,7 @@ namespace SkillBaseTool
                 handS2Keys = new HashSet<string>(KeyOf(s2));
             }
 
-            /// <summary>BuffAttrName 声明“Buff 效果字段”，供 BuffEffectRate 乘算；BuffTimeRate 为时长乘性修饰项。</summary>
+            /// <summary>BuffAttrDynamic 声明“受品质/等级影响的 Buff 效果字段”，供 BuffEffectRate 乘算；BuffTimeRate 为时长乘性修饰项。</summary>
             private readonly List<string> buffAttrNames = new List<string>();
             private readonly List<float> buffTimeRates = new List<float>();
             private readonly List<float> buffEffectRates = new List<float>();
@@ -689,9 +689,9 @@ namespace SkillBaseTool
                     return;
                 if (!buffIds.Contains(token))
                     buffIds.Add(token);
-                // Buff 效果字段以 BuffConfig.BuffAttrName 为准：组件只需给 Buff 短名与数值，不再手写 BuffAttrName
+                // Buff 效果字段以 BuffConfig.BuffAttrDynamic 为准：组件只需给 Buff 短名与数值，不再手写属性键
                 string[] attrNames;
-                if (store != null && store.BuffAttrNames.TryGetValue(token, out attrNames))
+                if (store != null && store.BuffAttrDynamics.TryGetValue(token, out attrNames))
                 {
                     foreach (string attr in attrNames)
                         AddUnique(buffAttrNames, attr);
@@ -737,7 +737,7 @@ namespace SkillBaseTool
             }
 
             /// <summary>
-            /// 把 BuffEffectRate（效果提升%）乘到各状态组件用 BuffAttrName 声明的 Buff 效果字段上。
+            /// 把 BuffEffectRate（效果提升%）乘到各状态组件用 BuffAttrDynamic 声明的动态 Buff 效果字段上。
             /// 只作用于组件写入的数值，手配优先（手配同名 key 不参与乘算）。
             /// </summary>
             private void ApplyBuffEffectRate()
@@ -746,7 +746,7 @@ namespace SkillBaseTool
                     return;
                 if (buffAttrNames.Count == 0)
                 {
-                    Warnings.Add("配置了效果提升（BuffEffectRate），但该技能没有提供任何 Buff（BuffConfig.BuffAttrName 为空），已忽略");
+                    Warnings.Add("配置了效果提升（BuffEffectRate），但该技能没有提供任何动态 Buff 属性（BuffConfig.BuffAttrDynamic 为空），已忽略");
                     return;
                 }
                 float rate = buffEffectRates.Max();
@@ -1127,7 +1127,7 @@ namespace SkillBaseTool
         }
 
         /// <summary>
-        /// 校验 SkillConfig 引用 Buff 时，BuffConfig.BuffAttrName 声明的数值槽键是否都已赋值。
+        /// 校验 SkillConfig 引用 Buff 时，BuffConfig.BuffAttrDynamic/BuffAttrConst 声明的数值槽键是否都已赋值。
         /// 模板化技能按运行时实际生效的 SkillBaseConfig 行校验，其余按 SkillConfig 行校验；
         /// 同一 Sname 只报一次，避免 5 行等级重复刷屏。
         /// </summary>
@@ -1162,7 +1162,7 @@ namespace SkillBaseTool
                     if (!reported.Add(key))
                         continue;
                     err.Add("SkillConfig " + skill.Id + "（" + skill.Display + "）引用 Buff「" + token
-                        + "」缺少 BuffAttrName 数值键：" + attr + "（StrengthBuff1/Strength2 均未赋值）");
+                        + "」缺少 BuffAttrDynamic/BuffAttrConst 数值键：" + attr + "（StrengthBuff1/Strength2 均未赋值）");
                 }
             }
         }
