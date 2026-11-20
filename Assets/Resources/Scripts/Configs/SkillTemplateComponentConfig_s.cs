@@ -166,7 +166,7 @@ namespace CommonConfig
             config[1022] = new SkillTemplateComponentConfig(1022, "减攻", "状态效果", new string[]{"Damage","Buff"}, "Buff:慑:atkDown=15;BuffTime=4", 1, 1.5f, "降低目标攻击（慑）", "按效果强度、持续时间、命中对象数综合估值", false);
             config[1032] = new SkillTemplateComponentConfig(1032, "减疗", "状态效果", new string[]{"Damage","Buff"}, "Buff:疫;Strength2:healDown=0.3;BuffTime=4", 1, 1f, "降低目标受到的治疗（疫）", "按效果强度、持续时间、命中对象数综合估值", false);
             config[1042] = new SkillTemplateComponentConfig(1042, "增伤", "状态效果", new string[]{"Damage","Buff"}, "Buff:伤:damagedUp=0.15;BuffTime=4", 2, 1.8f, "使目标受到的伤害提升（伤）", "按效果强度、持续时间、命中对象数综合估值", false);
-            config[1052] = new SkillTemplateComponentConfig(1052, "眩晕", "状态效果", new string[]{"Damage","Buff"}, "BuffTime=1.5;Buff:乱", 3, 3f, "无法行动（乱）", "控制按覆盖量计价：强度、时长、命中数、施放频率", false);
+            config[1052] = new SkillTemplateComponentConfig(1052, "眩晕", "状态效果", new string[]{"Damage","Buff"}, "BuffTime=1.5;Buff:乱", 2, 3f, "无法行动（乱）", "控制按覆盖量计价：强度、时长、命中数、施放频率", false);
             config[1062] = new SkillTemplateComponentConfig(1062, "定身", "状态效果", new string[]{"Damage","Buff"}, "BuffTime=1.5;Buff:停", 1, 1f, "无法移动（停）", "控制按覆盖量计价：强度、时长、命中数、施放频率", false);
             config[1072] = new SkillTemplateComponentConfig(1072, "混乱", "状态效果", new string[]{"Damage","Buff"}, "BuffTime=1.5;Buff:惑", 3, 3.5f, "不受控制，攻击最近的友方单位（惑）", "控制按覆盖量计价：强度、时长、命中数、施放频率", false);
             config[1080] = new SkillTemplateComponentConfig(1080, "叛逃", "状态效果", new string[]{"Damage","Buff"}, "Buff:叛;BuffTime=2", 4, 3.5f, "命中后目标短时脱离战斗（叛）", "按控制覆盖量计价：时长、命中数、施放频率", true);
