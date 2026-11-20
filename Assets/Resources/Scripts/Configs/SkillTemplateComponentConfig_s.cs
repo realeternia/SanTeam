@@ -159,6 +159,8 @@ namespace CommonConfig
             config[153] = new SkillTemplateComponentConfig(153, "光环耗蓝3x", "施放节奏", new string[]{"光环中"}, "AuraMpRate=3", 1, -3f, "光环开启期间每秒消耗 3 点 MP", "负向项：耗蓝更快，光环持续时间更短", false);
             config[154] = new SkillTemplateComponentConfig(154, "光环耗蓝4x", "施放节奏", new string[]{"光环中"}, "AuraMpRate=4", 1, -4.5f, "光环开启期间每秒消耗 4 点 MP", "负向项：耗蓝更快，光环持续时间更短", false);
             config[160] = new SkillTemplateComponentConfig(160, "生命值低于50%", "施放节奏", null, "TriggerCondition:hprate<50", 2, .5f, "仅当自身生命值低于 50% 时才可触发该技能（通用组件）", "触发条件限制越严价值越高，按触发覆盖率折算", false);
+            config[161] = new SkillTemplateComponentConfig(161, "MP叠3层", "施放节奏", null, "MpLimit=3", 3, 3f, "MP 最多累积到 3×MpCost，每次发动扣 1×MpCost（通用组件）", "正向项：按可持续连续施放次数提升估值", false);
+            config[162] = new SkillTemplateComponentConfig(162, "MP叠5层", "施放节奏", null, "MpLimit=5", 4, 5f, "MP 最多累积到 5×MpCost，每次发动扣 1×MpCost（通用组件）", "正向项：按可持续连续施放次数提升估值", false);
             config[1002] = new SkillTemplateComponentConfig(1002, "减速", "状态效果", new string[]{"Damage","Buff"}, "Buff:缓:slow=0.1;Buff:缓:atkSpeed=0.15;BuffTime=4", 2, 2.2f, "降低目标移动与攻速（缓）", "缓同时降低移速与攻速，按复合效果核算", false);
             config[1012] = new SkillTemplateComponentConfig(1012, "减防", "状态效果", new string[]{"Damage","Buff"}, "Buff:破:armorDown=25;BuffTime=4", 1, 1.5f, "降低目标护甲（破）", "按效果强度、持续时间、命中对象数综合估值", false);
             config[1022] = new SkillTemplateComponentConfig(1022, "减攻", "状态效果", new string[]{"Damage","Buff"}, "Buff:慑:atkDown=15;BuffTime=4", 1, 1.5f, "降低目标攻击（慑）", "按效果强度、持续时间、命中对象数综合估值", false);

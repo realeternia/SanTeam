@@ -26,6 +26,8 @@ public class ChessHUD : MonoBehaviour
     private RectTransform tickRoot; // 刻度线容器
     private readonly List<RectTransform> tickLines = new List<RectTransform>();
     private float lastTickMaxHp = -1f; // 上次绘制刻度时的最大生命值
+    private RectTransform manaTickRoot; // 法力条分层刻度线容器
+    private readonly List<RectTransform> manaTickLines = new List<RectTransform>();
 
     void Start()
     {
@@ -252,6 +254,81 @@ public class ChessHUD : MonoBehaviour
         if (!manaImg.gameObject.activeSelf)
             manaImg.gameObject.SetActive(true);
         var wid = chessUnit.isHero ? HeroBarWidth : SoldierBarWidth;
-        manaImg.rectTransform.sizeDelta = new Vector2(mpSkill.mp * wid / mpSkill.skillCfg.MpCost, manaImg.rectTransform.sizeDelta.y);
+        // MpLimit>1 时整条法力条表示 MpLimit 层，满层填满；否则仍是单层进度条
+        var layers = Mathf.Max(1, mpSkill.skillCfg.MpLimit);
+        RefreshManaTicks(layers, wid);
+        var cap = mpSkill.MpCap;
+        var ratio = cap > 0f ? Mathf.Clamp01(mpSkill.mp / cap) : 0f;
+        manaImg.rectTransform.sizeDelta = new Vector2(ratio * wid, manaImg.rectTransform.sizeDelta.y);
+    }
+
+    /// <summary>
+    /// 法力条分层刻度：MpLimit>1 时把整条法力条按层数平分，层与层之间画竖线（与血条刻度一致）；
+    /// MpLimit<=1 时不画线，保持原有单层进度条。
+    /// </summary>
+    private void RefreshManaTicks(int layers, float barWidth)
+    {
+        if (manaImg == null)
+            return;
+
+        int lineCount = Mathf.Max(0, layers - 1);
+        if (lineCount == 0)
+        {
+            foreach (var line in manaTickLines)
+            {
+                if (line.gameObject.activeSelf)
+                    line.gameObject.SetActive(false);
+            }
+            return;
+        }
+
+        if (manaTickRoot == null)
+        {
+            // 与血条刻度一致：以法力填充的左边缘为起点，刻度容器挂在填充的父节点上
+            var parentRect = manaImg.transform.parent as RectTransform;
+            if (parentRect == null)
+            {
+                GameLog.Error("法力条节点不是 RectTransform，无法绘制法力刻度");
+                return;
+            }
+
+            var rootGo = new GameObject("MpTicks", typeof(RectTransform));
+            manaTickRoot = rootGo.GetComponent<RectTransform>();
+            manaTickRoot.SetParent(parentRect, false);
+            manaTickRoot.anchorMin = new Vector2(0f, 0f);
+            manaTickRoot.anchorMax = new Vector2(0f, 1f);
+            manaTickRoot.pivot = new Vector2(0f, 0.5f);
+            manaTickRoot.sizeDelta = Vector2.zero;
+            manaTickRoot.anchoredPosition = Vector2.zero;
+            manaTickRoot.SetAsLastSibling(); // 压在法力填充之上
+        }
+
+        float cellWidth = barWidth / layers;
+        while (manaTickLines.Count < lineCount)
+        {
+            var lineGo = new GameObject("ManaTick", typeof(RectTransform), typeof(Image));
+            var lineRect = lineGo.GetComponent<RectTransform>();
+            lineRect.SetParent(manaTickRoot, false);
+            lineRect.anchorMin = new Vector2(0f, 0f);
+            lineRect.anchorMax = new Vector2(0f, 1f);
+            lineRect.pivot = new Vector2(0.5f, 0.5f);
+            lineRect.sizeDelta = new Vector2(1f, 0f);
+
+            var lineImage = lineGo.GetComponent<Image>();
+            lineImage.color = SysColor.Battle.ManaTickColor;
+            lineImage.raycastTarget = false;
+            manaTickLines.Add(lineRect);
+        }
+
+        for (int i = 0; i < manaTickLines.Count; i++)
+        {
+            var lineRect = manaTickLines[i];
+            bool visible = i < lineCount;
+            if (lineRect.gameObject.activeSelf != visible)
+                lineRect.gameObject.SetActive(visible);
+            if (!visible)
+                continue;
+            lineRect.anchoredPosition = new Vector2(cellWidth * (i + 1), 0f);
+        }
     }
 }

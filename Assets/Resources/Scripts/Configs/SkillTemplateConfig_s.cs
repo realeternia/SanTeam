@@ -194,7 +194,7 @@ namespace CommonConfig
             config[3041] = new SkillTemplateConfig(3041, "群体减益", "buff", "SkillComBuffArea", "以自身为中心，对 Area 内多名敌人施加减益/控制类 Buff（不造成伤害）；模板只计形态分，价值由覆盖人数与所挂 Buff 决定。", "", "SelectOnly:enemy", 2, 4f, 40f, 20f, 3, 8, 4f);
             config[3050] = new SkillTemplateConfig(3050, "群体嘲讽", "buff", "SkillComDamageTaunt", "以施法者自身为中心，对 Area 内敌人施加嘲讽（BuffTime 秒）并造成伤害；可选自身减伤盾（BuffId=硬）。", "", "SelectOnly:enemy;DamageStrength=40,60,90,150,240", 3, 5f, 0f, 20f, 3, 8, 2f);
             config[4000] = new SkillTemplateConfig(4000, "防御", "防御", "SkillComDefendBefore", "受伤前统一处理减伤与反弹：Strength2 reduce 减免本次伤害、reflect 按比例反弹给攻击者；可用组件 onlyPhys/onlyMagic 限定受击伤害类型（不配=物理+魔法都算）。被动触发，每次触发扣 MP 并受 CD/概率/触发条件约束；强度由组件调节，也可挂状态组件（护盾/减伤/受击叠防/焰衣）在触发时套 Buff。参考塔姆·厚皮、荆棘之甲。", "", "Strength2:reduce=0.25", 1, 1f, 0f, 0f, 0, 10, 2f);
-            config[4010] = new SkillTemplateConfig(4010, "免死一次", "防御", "SkillComDefendCheatDeath", "本次伤害致命时压到只留 1 点生命，每场战斗一次；被动触发扣 MP，可用 TriggerCondition 限定触发血线，也可挂状态组件补盾/回血。参考复活甲、塔里克·宇宙之辉。", "", "", 3, 2.5f, 0f, 0f, 0, 12, 20f);
+            config[4010] = new SkillTemplateConfig(4010, "免死一次", "防御", "SkillComDefendCheatDeath", "本次伤害致命时压到只留 1 点生命，触发频率由 CD 控制（配表拉长 CD 即每场一次）；被动触发扣 MP，可用 TriggerCondition 限定触发血线，也可挂状态组件补盾/回血。参考复活甲、塔里克·宇宙之辉。", "", "", 3, 2.5f, 0f, 0f, 0, 12, 20f);
 
             RebuildIndex();
 

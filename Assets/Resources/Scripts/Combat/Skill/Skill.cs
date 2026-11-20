@@ -33,7 +33,7 @@ public class Skill
 
     public int skillId{ get{ return skillCfg.Id; } }
 
-    public float mp; // 当前技能MP，开局按 SkillConfig.StartMpRate 填充（默认0），之后由普攻/受击获取法力，满值=MpCost
+    public float mp; // 当前技能MP，开局按 SkillConfig.StartMpRate 填充（默认0），之后由普攻/受击获取法力，满值=MpCost（MpLimit>0 时最多累积到 MpLimit×MpCost）
     /// <summary>本次发动前的MP累积量（CheckBurst 清零 mp 前记录，供"清空/转移全部法力"类技能读取）</summary>
     public float mpBeforeBurst;
 
@@ -623,13 +623,16 @@ public class Skill
         return Time.time < lastUpdateTime + skillCfg.CD;
     }
 
-    // 为技能增加法力（普攻/受击获取、法力分享等共用），结果裁剪到 [0, MpCost]
+    // 为技能增加法力（普攻/受击获取、法力分享等共用），结果裁剪到 [0, MpCap]
     public void AddMp(float add)
     {
         if (skillCfg.MpCost <= 0)
             return;
-        mp = Mathf.Clamp(mp + add, 0f, skillCfg.MpCost);
+        mp = Mathf.Clamp(mp + add, 0f, MpCap);
     }
+
+    /// <summary>MP累积上限：MpLimit>0 时为 MpLimit × MpCost，否则为 1 × MpCost</summary>
+    public float MpCap => skillCfg.MpCost <= 0 ? 0f : skillCfg.MpCost * (skillCfg.MpLimit > 0 ? skillCfg.MpLimit : 1);
 
     // 法力燃烧：直接扣减当前技能MP（仅对设置了MpCost的技能生效），返回实际燃烧量
     public int BurnMp(float amount)
@@ -637,7 +640,7 @@ public class Skill
         if (skillCfg.MpCost <= 0 || amount <= 0f || mp <= 0f)
             return 0;
         var before = mp;
-        mp = Mathf.Clamp(mp - amount, 0f, skillCfg.MpCost);
+        mp = Mathf.Clamp(mp - amount, 0f, MpCap);
         return (int)(before - mp);
     }
 
@@ -674,7 +677,7 @@ public class Skill
         {
             UpdateCD();
             mpBeforeBurst = mp; // 记录发动前累积量，供"转移全部法力"类技能读取
-            mp = 0; // 发动技能后清空MP
+            mp = Mathf.Max(0f, mp - skillCfg.MpCost); // 每次发动扣除 1×MpCost，剩余MP可留到下一次（MpLimit>0 时）
             RestoreMpBySoldier(); // 士兵回蓝组件：发动后按存活小兵数直接回复MP
         }
         return isBurst;
@@ -777,7 +780,7 @@ public class Skill
     {
         if (skillCfg == null || skillCfg.MpCost <= 0 || skillCfg.StartMpRate <= 0f)
             return;
-        mp = Mathf.Clamp(skillCfg.MpCost * skillCfg.StartMpRate, 0f, skillCfg.MpCost);
+        mp = Mathf.Clamp(skillCfg.MpCost * skillCfg.StartMpRate, 0f, MpCap);
     }
 
     // 死亡时触发（Chess.Ondying 调用）

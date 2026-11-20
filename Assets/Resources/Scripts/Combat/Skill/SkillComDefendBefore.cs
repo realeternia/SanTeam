@@ -110,6 +110,6 @@ public class SkillComDefendBefore : Skill
         if (!string.IsNullOrEmpty(skillCfg.Action))
             owner.PlayerAnim(skillCfg.Action);
         PlaySelfEffect();
-        GameLog.Debug($"受伤前防御 技能id={id} 等级={Level} 类型={damageType} 减伤={reduce} 反弹={reflect} Buff数={buffIds.Count} 生命={owner.hp}/{owner.maxHp}");
+        GameLog.Debug($"受伤前防御 技能id={id} 等级={Level} 类型={damageType} 减伤={reduce} 反弹={reflect} Buff数={buffIds.Count} 剩余MP={mp} 生命={owner.hp}/{owner.maxHp}");
     }
 }

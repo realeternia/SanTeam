@@ -6,7 +6,7 @@ using System.Text.RegularExpressions;
 
 namespace SkillBaseTool
 {
-    /// <summary>SkillConfig / SkillBaseConfig 的 43 列索引。</summary>
+    /// <summary>SkillConfig / SkillBaseConfig 的 44 列索引。</summary>
     public static class Col
     {
         public const int Id = 0;
@@ -24,35 +24,36 @@ namespace SkillBaseTool
         public const int CD = 12;
         public const int MpCost = 13;
         public const int StartMpRate = 14;
-        public const int TriggerCondition = 15;
-        public const int DamageType = 16;
-        public const int HurtTag = 17;
-        public const int Range = 18;
-        public const int Area = 19;
-        public const int TargetType = 20;
-        public const int TargetCount = 21;
-        public const int DamageStrength = 22;
-        public const int HealStrength = 23;
-        public const int Strength2 = 24;
-        public const int StrengthBuff1 = 25;
-        public const int BuffId = 26;
-        public const int BuffTime = 27;
-        public const int SummonTag = 28;
-        public const int SummonCount = 29;
-        public const int SummonTime = 30;
-        public const int SummonHitInterval = 31;
-        public const int SummonSpeed = 32;
-        public const int ItemId = 33;
-        public const int ScriptName = 34;
-        public const int Action = 35;
-        public const int SelfEffect = 36;
-        public const int HitEffect = 37;
-        public const int AreaEffect = 38;
-        public const int Icon = 39;
-        public const int LinkSelf = 40;
-        public const int LinkTeam = 41;
-        public const int AuraMpRate = 42;
-        public const int Count = 43;
+        public const int MpLimit = 15;
+        public const int TriggerCondition = 16;
+        public const int DamageType = 17;
+        public const int HurtTag = 18;
+        public const int Range = 19;
+        public const int Area = 20;
+        public const int TargetType = 21;
+        public const int TargetCount = 22;
+        public const int DamageStrength = 23;
+        public const int HealStrength = 24;
+        public const int Strength2 = 25;
+        public const int StrengthBuff1 = 26;
+        public const int BuffId = 27;
+        public const int BuffTime = 28;
+        public const int SummonTag = 29;
+        public const int SummonCount = 30;
+        public const int SummonTime = 31;
+        public const int SummonHitInterval = 32;
+        public const int SummonSpeed = 33;
+        public const int ItemId = 34;
+        public const int ScriptName = 35;
+        public const int Action = 36;
+        public const int SelfEffect = 37;
+        public const int HitEffect = 38;
+        public const int AreaEffect = 39;
+        public const int Icon = 40;
+        public const int LinkSelf = 41;
+        public const int LinkTeam = 42;
+        public const int AuraMpRate = 43;
+        public const int Count = 44;
     }
 
     /// <summary>配置行字符串工具：解析/格式化 C# 源码里的构造参数。</summary>
@@ -139,7 +140,7 @@ namespace SkillBaseTool
         }
     }
 
-    /// <summary>SkillConfig_s.cs 的一行（保留 43 列原始参数以便写回）。</summary>
+    /// <summary>SkillConfig_s.cs 的一行（保留 44 列原始参数以便写回）。</summary>
     public sealed class SkillRow
     {
         public int Id;
@@ -197,6 +198,8 @@ namespace SkillBaseTool
     {
         public int Id;
         public string Name;
+        /// <summary>模板分类（伤害 / heal / buff / 防御 等），用于工具里按类别筛选。</summary>
+        public string Type;
         /// <summary>唯一绑定的技能类名（对应 SkillTemplateConfig.Script）。</summary>
         public string Script;
         public string Des;

@@ -534,7 +534,7 @@ namespace SkillBaseTool
         /// <summary>EffectKey 支持的列名（校验用）。</summary>
         public static readonly string[] EffectColumns =
         {
-            "DamageStrength", "HealStrength", "CD", "MpCost", "StartMpRate", "AuraMpRate", "Range", "Area", "TargetCount",
+            "DamageStrength", "HealStrength", "CD", "MpCost", "StartMpRate", "MpLimit", "AuraMpRate", "Range", "Area", "TargetCount",
             "Rate", "BuffTime", "BuffTimeRate", "BuffEffectRate", "TargetType", "SelectOnly", "SelectFirst", "TriggerCondition", "Strength2", "Buff",
             "SummonCount", "SummonTime", "SummonHitInterval", "SummonSpeed", "SummonTag",
         };
@@ -542,14 +542,14 @@ namespace SkillBaseTool
         /// <summary>运行时 ApplySkillBase 覆盖的列（与 ConfigManager 保持一致：只含模板/组件能改写的效果列）。</summary>
         public static readonly int[] AppliedColumns =
         {
-            Col.Rate, Col.CD, Col.MpCost, Col.StartMpRate, Col.AuraMpRate, Col.TriggerCondition, Col.Range, Col.Area,
+            Col.Rate, Col.CD, Col.MpCost, Col.StartMpRate, Col.MpLimit, Col.AuraMpRate, Col.TriggerCondition, Col.Range, Col.Area,
             Col.SelectOnly, Col.SelectFirst,
             Col.TargetType, Col.TargetCount, Col.DamageStrength, Col.HealStrength,
             Col.Strength2, Col.StrengthBuff1, Col.BuffId, Col.BuffTime,
             Col.SummonTag, Col.SummonCount, Col.SummonTime, Col.SummonHitInterval, Col.SummonSpeed,
         };
 
-        /// <summary>展开写入器：把模板/组件的 k-v 绑定落到 43 列与各字符串槽位。</summary>
+        /// <summary>展开写入器：把模板/组件的 k-v 绑定落到 44 列与各字符串槽位。</summary>
         private sealed class BaseWriter
         {
             public readonly string[] B;
@@ -604,6 +604,7 @@ namespace SkillBaseTool
                         case "CD": B[Col.CD] = CfgUtil.NumF(Num(b, Col.CD, v)); break;
                         case "MpCost": B[Col.MpCost] = CfgUtil.NumI((int)Math.Round(Num(b, Col.MpCost, v, 10f))); break;
                         case "StartMpRate": B[Col.StartMpRate] = CfgUtil.NumF(Num(b, Col.StartMpRate, v)); break;
+                        case "MpLimit": B[Col.MpLimit] = CfgUtil.NumI((int)Math.Round(v)); break;
                         case "AuraMpRate": B[Col.AuraMpRate] = CfgUtil.NumF(Num(b, Col.AuraMpRate, v)); break;
                         case "Range": B[Col.Range] = CfgUtil.NumF(Num(b, Col.Range, v)); break;
                         case "Area": B[Col.Area] = CfgUtil.NumF(Num(b, Col.Area, v)); break;
@@ -900,6 +901,7 @@ namespace SkillBaseTool
                 case Col.SelectOnly: return "目标硬过滤";
                 case Col.SelectFirst: return "目标优先级";
                 case Col.StartMpRate: return "开局MP";
+                case Col.MpLimit: return "MP上限层数";
                 case Col.DamageType: return "伤害类型";
                 case Col.HurtTag: return "伤害标签";
                 case Col.SummonTag: return "召唤标签";

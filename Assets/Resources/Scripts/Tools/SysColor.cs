@@ -172,6 +172,7 @@ public static class SysColor
         public static readonly Color HealthSideEvenColor = new Color(1f, 0.7f, 0.8f, 1f);  // 1v1地图其他玩家-浅粉（偶数号位）
         public static readonly Color HealthSideOddColor = new Color(1f, 0.95f, 0.6f, 1f);  // 1v1地图其他玩家-浅黄（奇数号位）
         public static readonly Color HealthTickColor = Color.black;                      // 血条刻度线-黑
+        public static readonly Color ManaTickColor = Color.black;                        // 法力条分层刻度线-黑
         public static readonly Color AttackSuccessColor = Color.red;
         public static readonly Color AttackFailColor = Color.green;
         public static readonly Color CapturedOutlineColor = Color.red;
