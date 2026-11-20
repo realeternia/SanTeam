@@ -29,6 +29,8 @@ namespace DesignCoder
         // 字段规则里带该标记的列按“品质:阵营短名”分两半上色（Scenario1~3）
         private const string QualitySideFieldRule = "qs";
         private const int HeaderRowCount = 3;
+        // 特效字段识别时沿继承链查找基类的最大深度（SkillCom* 中间基类通常 1~2 层）
+        private const int SkillInheritMaxDepth = 4;
         // 数据区左侧冻结的列数（与顶部 3 行表头一起固定，横向滚动时保持可见）
         private const int FrozenDataColumnCount = 4;
 
@@ -1002,6 +1004,9 @@ namespace DesignCoder
 
         // 技能脚本里是否引用了该特效字段：脚本中直接出现字段名即视为引用
         // （如 skillCfg.HitEffect、skillCfg.SelfEffect、PlaySelfEffect()、PlayAreaEffect()）
+        // 组件化脚本经常把特效播放放在基类（如 SkillComDamageArea 继承 SkillComDamageSingle，
+        // SelfEffect/HitEffect 均由基类播放），因此沿中间基类向上查找；
+        // 只到框架根类 Skill 为止——根类里的 PlaySelfEffect/PlayAreaEffect 工具方法不代表具体技能会播。
         private bool IsEffectReferencedByScript(int rowIdx, string fieldName)
         {
             string scriptName = GetRowCellText(rowIdx, "ScriptName");
@@ -1011,12 +1016,60 @@ namespace DesignCoder
             bool cached;
             if (effectRefCache.TryGetValue(cacheKey, out cached)) return cached;
 
-            string script = GetSkillScriptText(scriptName);
-            bool referenced = !string.IsNullOrEmpty(script) &&
-                script.IndexOf(fieldName, StringComparison.Ordinal) >= 0;
+            bool referenced = ScriptChainReferences(scriptName, fieldName, 0);
 
             effectRefCache[cacheKey] = referenced;
             return referenced;
+        }
+
+        // 递归检查脚本自身及其中间基类是否出现字段名（深度受 SkillInheritMaxDepth 限制）
+        private bool ScriptChainReferences(string scriptName, string fieldName, int depth)
+        {
+            if (string.IsNullOrEmpty(scriptName) || depth > SkillInheritMaxDepth) return false;
+
+            string script = GetSkillScriptText(scriptName);
+            if (!string.IsNullOrEmpty(script) && script.IndexOf(fieldName, StringComparison.Ordinal) >= 0)
+                return true;
+
+            string baseName = GetBaseClassName(script, scriptName);
+            if (string.IsNullOrEmpty(baseName) || string.Equals(baseName, "Skill", StringComparison.OrdinalIgnoreCase))
+                return false;
+            return ScriptChainReferences(baseName, fieldName, depth + 1);
+        }
+
+        // 从脚本源码解析继承基类名：定位 `class X : Base`，优先匹配文件名同名类
+        private static string GetBaseClassName(string script, string scriptName)
+        {
+            if (string.IsNullOrEmpty(script)) return null;
+
+            string fallback = null;
+            int idx = 0;
+            while ((idx = script.IndexOf("class ", idx, StringComparison.Ordinal)) >= 0)
+            {
+                int nameStart = idx + 6;
+                int pos = nameStart;
+                while (pos < script.Length && (char.IsLetterOrDigit(script[pos]) || script[pos] == '_')) pos++;
+                string name = script.Substring(nameStart, pos - nameStart);
+
+                int colon = pos;
+                while (colon < script.Length && char.IsWhiteSpace(script[colon])) colon++;
+                idx = pos;
+                if (colon >= script.Length || script[colon] != ':') continue;
+
+                int baseStart = colon + 1;
+                while (baseStart < script.Length && char.IsWhiteSpace(script[baseStart])) baseStart++;
+                int baseEnd = baseStart;
+                while (baseEnd < script.Length &&
+                    (char.IsLetterOrDigit(script[baseEnd]) || script[baseEnd] == '_' || script[baseEnd] == '.'))
+                    baseEnd++;
+                if (baseEnd <= baseStart) continue;
+
+                string baseName = script.Substring(baseStart, baseEnd - baseStart);
+                if (string.Equals(name, scriptName, StringComparison.OrdinalIgnoreCase))
+                    return baseName;
+                if (fallback == null) fallback = baseName;
+            }
+            return fallback;
         }
 
         // 读取技能脚本源码（按 ScriptName 匹配 Combat/Skill 下的同名脚本文件），首次读取后缓存
