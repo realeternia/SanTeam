@@ -1,4 +1,4 @@
-﻿﻿﻿﻿using System;
+﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -187,7 +187,7 @@ namespace CommonConfig
             config[2032] = new SkillTemplateConfig(2032, "持续治疗小", "heal", "SkillComHealAreaCasting", "同持续治疗场，单次治疗量为同档范围治疗的30%（取整）。", "", "SummonTime=5;SummonHitInterval=1;HealStrength=16,24,39,63,95", 1, 5.5f, 40f, 0f, 3, 10, 2.5f);
             config[3000] = new SkillTemplateConfig(3000, "自身强化", "buff", "SkillComBuffSingle", "对施法者自身施加短时属性增益/护盾；模板只计形态分，实际价值由所挂 Buff 决定。", "", "None", 2, 1f, 0f, 0f, 1, 6, 3f);
             config[3010] = new SkillTemplateConfig(3010, "光环中", "buff", "SkillComBuffAura", "开启后每1.4秒对半径40内按 SelectOnly/SelectFirst 选中的单位挂1.5秒Buff（可指向敌方），不限制目标数；无MP消耗常开，有MP消耗则施法开启，开启期间每秒消耗MP=1×AuraMpRate（默认2x，组件150~154可调1.5/2/2.5/3/4）、攻击/受击回蓝照常累计，MP<=0自动关闭；模板只计形态分，价值由 Buff 决定。", "", "SelectOnly:ally", 2, 5f, 0f, 40f, 0, 10, 2.5f);
-            config[3020] = new SkillTemplateConfig(3020, "单体友方增益", "buff", "SkillComBuffSingle", "对一个友方单位施加属性增益或护盾；模板只计形态分，价值由强度、持续时间与所挂 Buff 决定。", "", "SelectOnly:ally", 1, 2f, 40f, 0f, 1, 6, 3f);
+            config[3020] = new SkillTemplateConfig(3020, "单体友方增益", "buff", "SkillComBuffArea", "对一个友方单位施加属性增益或护盾；模板只计形态分，价值由强度、持续时间与所挂 Buff 决定。", "", "SelectOnly:ally", 1, 2f, 40f, 0f, 1, 6, 3f);
             config[3030] = new SkillTemplateConfig(3030, "群体友方增益", "buff", "SkillComBuffArea", "以自身为中心，对 Area 内多名友方施加属性增益或护盾；模板只计形态分，价值由覆盖人数与所挂 Buff 决定。", "", "SelectOnly:ally", 2, 4f, 40f, 20f, 3, 8, 4f);
             config[3032] = new SkillTemplateConfig(3032, "群体友方增益-目标小", "buff", "SkillComBuffArea", "以选中的首个友军目标为中心，半径25内的友方获得属性增益或护盾；模板只计形态分，价值由所挂 Buff 决定。", "", "SelectOnly:ally;TargetType:targetCenter", 3, 4f, 40f, 20f, 3, 8, 4f);
             config[3040] = new SkillTemplateConfig(3040, "单体减益", "buff", "SkillComBuffArea", "对一名敌人施加减益/控制类 Buff（不造成伤害）；模板只计形态分，价值由所挂 Buff 决定。", "", "SelectOnly:enemy", 1, 2f, 40f, 0f, 1, 6, 3f);
