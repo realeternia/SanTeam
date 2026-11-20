@@ -148,13 +148,29 @@ public class SkillComBuffSingle : Skill
         PlaySelfEffect();
     }
 
+    /// <summary>单体友方增益：SelectOnly 非空表示选友军（否则自身强化给自己）。</summary>
+    protected bool SingleAllyBuff
+    {
+        get { return !GroupBuff && !string.IsNullOrEmpty(skillCfg.SelectOnly); }
+    }
+
     /// <summary>施加效果：逐目标挂 Buff，并结算命中特效。</summary>
     protected virtual void ApplyBuffs(List<Chess> targets, List<int> buffIds)
     {
         foreach (var unit in targets)
         {
             foreach (var buffId in buffIds)
+            {
+                // 单体友方增益：目标已带同一 Buff 时只刷新时长，避免共存类 Buff 叠层
+                // （群体增益仍走 AddBuff + 首段去重，保持原有群刷语义）
+                var exist = SingleAllyBuff ? unit.GetBuff(buffId) : null;
+                if (exist != null)
+                {
+                    exist.SetTime(skillCfg.BuffTime);
+                    continue;
+                }
                 ApplyBuffToUnit(unit, buffId);
+            }
 
             if (!string.IsNullOrEmpty(skillCfg.HitEffect))
                 EffectManager.PlaySkillEffect(unit, skillCfg.HitEffect);

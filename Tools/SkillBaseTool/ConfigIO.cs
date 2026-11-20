@@ -72,6 +72,26 @@ namespace SkillBaseTool
                     store.HeroQuality[name] = qs.Min();
                 if (job.Length > 0)
                     store.HeroJob[name] = job;
+
+                // HeroConfig 倒数第二列是挂载的技能名：Sname 不是英雄名的技能（如「才干」）靠它反查品质/职业
+                string skillName = a.Length >= 2 ? CfgUtil.Unquote(a[a.Length - 2]) : "";
+                if (skillName.Length == 0)
+                    continue;
+                if (qs.Count > 0)
+                {
+                    int q = qs.Min();
+                    int old;
+                    if (!store.SkillQuality.TryGetValue(skillName, out old) || q < old)
+                        store.SkillQuality[skillName] = q;
+                }
+                if (job.Length > 0)
+                {
+                    string oldJob;
+                    if (!store.SkillJob.TryGetValue(skillName, out oldJob))
+                        store.SkillJob[skillName] = job;
+                    else if (oldJob != job)
+                        store.SkillJob[skillName] = "多";   // 多职业共用的通用技能
+                }
             }
         }
 
@@ -159,10 +179,17 @@ namespace SkillBaseTool
             {
                 if (kv.Value.Length != Col.Count)
                     continue;
+                string sname = CfgUtil.Unquote(kv.Value[Col.Sname]);
+                int quality = store.GetQuality(sname);
+                if (quality == 0)
+                    quality = store.GetSkillQuality(sname);
+                string job = store.GetJob(sname);
+                if (job.Length == 0)
+                    job = store.GetSkillJob(sname);
                 var row = new SkillRow(kv.Key, kv.Value)
                 {
-                    Quality = store.GetQuality(CfgUtil.Unquote(kv.Value[Col.Sname])),
-                    Job = store.GetJob(CfgUtil.Unquote(kv.Value[Col.Sname])),
+                    Quality = quality,
+                    Job = job,
                 };
                 store.Skills.Add(row);
                 store.SkillById[row.Id] = row;

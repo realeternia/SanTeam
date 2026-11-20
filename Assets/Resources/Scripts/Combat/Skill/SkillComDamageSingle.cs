@@ -22,7 +22,7 @@ using UnityEngine;
 /// · self        = 自身中心（近战贴脸 AoE），沿用当前索敌目标、不做射程校验（SelectTarget）
 /// · missile     = 以飞弹逐个结算（ApplyDamage）；飞弹特效取 HitEffect，飞行速度取 SummonSpeed（0 时用单位导弹速度）
 /// · execute / shieldBonus / missingHp / highHp / vsJob / soldierDamage / critRateBonus（ApplyDamageModifiers）
-/// · antiShield / mpBurn / 击退 pushMin~pushMax / selfHurt / selfBuff / dispel（AfterDamage）
+/// · antiShield / mpBurn / 击退 pushMin~pushMax / 拖回出生点 pullToSpawn / selfHurt / selfBuff / dispel（AfterDamage）
 /// 伤害体系派生（各自覆写 CheckAidSkill，自动继承上述全部组件能力）：
 /// · SkillComDamageArea        范围伤害 + 可选 Buff（目标中心 / self 自身中心）
 /// · SkillComDamageShockWave   冲击波（导弹沿路径命中）
@@ -105,6 +105,8 @@ public class SkillComDamageSingle : Skill
     {
         var dmg = CalcDamage(target, baseDamage);
         var isDouble = TryDoubleDamage(ref dmg);
+        // 拖回出生点：先位移再结算伤害，保证目标被拖走（死亡也落在出生点）
+        PullTargetToSpawn(target);
         ApplyDamage(target, dmg);
         if (isDouble)
             WorldManager.Instance.AddBattleText("暴击", target.transform.position,

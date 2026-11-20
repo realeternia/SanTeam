@@ -24,6 +24,8 @@ namespace SkillBaseTool
         private string[] baseHeaders;
         /// <summary>当前打开的列筛选下拉。</summary>
         private ToolStripDropDown filterDropDown;
+        /// <summary>刷新后需要重新选中的技能 Id（编辑保存后保持当前行，0 表示不指定）。</summary>
+        private int pendingSelectId;
 
         public GenerateView(Action reload)
         {
@@ -104,6 +106,8 @@ namespace SkillBaseTool
             {
                 if (e.ColumnIndex != editColumn || e.RowIndex < 0 || e.RowIndex >= rowSkills.Count)
                     return;
+                if (SkillGen.IsLockedForEdit(store, rowSkills[e.RowIndex]))
+                    return;
                 EditSkill(rowSkills[e.RowIndex]);
             };
             // 模板 / 组件列：单元格内多色文本（名字=品质色，费用=金黄色）
@@ -152,7 +156,7 @@ namespace SkillBaseTool
             var skill = rowSkills[e.RowIndex];
             var segments = e.ColumnIndex == templateColumn
                 ? TemplateSegments(skill.TemplateName)
-                : ModuleSegments(skill.Modules);
+                : ModuleSegments(skill.TemplateName, skill.Modules);
             var rect = new Rectangle(e.CellBounds.X + 4, e.CellBounds.Y,
                 Math.Max(0, e.CellBounds.Width - 8), e.CellBounds.Height);
             Theme.DrawSegments(e.Graphics, rect, segments, Theme.Base);
@@ -175,11 +179,14 @@ namespace SkillBaseTool
             return segments;
         }
 
-        private List<Theme.TextSegment> ModuleSegments(string[] modules)
+        private List<Theme.TextSegment> ModuleSegments(string templateName, string[] modules)
         {
             var segments = new List<Theme.TextSegment>();
             if (modules == null)
                 return segments;
+            TemplateRow tpl;
+            if (string.IsNullOrEmpty(templateName) || !store.TemplateByName.TryGetValue(templateName, out tpl))
+                tpl = null;
             foreach (string name in modules)
             {
                 if (string.IsNullOrEmpty(name))
@@ -193,7 +200,7 @@ namespace SkillBaseTool
                     continue;
                 }
                 segments.Add(new Theme.TextSegment(name, Theme.QualityColor(comp.Quality)));
-                segments.Add(new Theme.TextSegment("（" + PriceText(comp.Score) + "）", Theme.Accent));
+                segments.Add(new Theme.TextSegment("（" + PriceText(SkillGen.ComponentScore(tpl, comp)) + "）", Theme.Accent));
             }
             return segments;
         }
@@ -206,8 +213,8 @@ namespace SkillBaseTool
         public void Bind(DataStore data)
         {
             store = data;
-            columnFilters.Clear();
-            ResetHeaders();
+            // 重新加载（编辑保存 / 自动分配 / 生成 SkillBase）后保留已有列筛选，只恢复表头标记
+            ApplyFilterHeaders();
             RefreshGrid();
         }
 
@@ -215,6 +222,11 @@ namespace SkillBaseTool
         {
             if (store == null)
                 return;
+            // 刷新前记录当前选中行，重建后恢复（否则编辑保存后会自动跳回第一行）
+            int keepId = pendingSelectId;
+            pendingSelectId = 0;
+            if (keepId == 0 && grid.CurrentRow != null && grid.CurrentRow.Index < rowSkills.Count)
+                keepId = rowSkills[grid.CurrentRow.Index].Id;
             Theme.BeginBulkFill(grid);
             rowSkills.Clear();
             var skills = store.QualityHeroSkills
@@ -251,10 +263,37 @@ namespace SkillBaseTool
                     : (status == "未模板化" ? Theme.Muted : Theme.Danger);
                 if (status != "OK")
                     grid.Rows[idx].DefaultCellStyle.BackColor = Theme.RowWarn;
+
+                // 锁定技能（初始属性：无 MP/CD、不支持组件）只展示，不允许编辑
+                if (SkillGen.IsLockedForEdit(store, s))
+                {
+                    var editBtn = grid.Rows[idx].Cells[editColumn];
+                    editBtn.Value = "锁定";
+                    editBtn.ReadOnly = true;
+                    editBtn.Style.ForeColor = Theme.Faint;
+                    editBtn.Style.SelectionForeColor = Theme.Faint;
+                }
             }
             Theme.EndBulkFill(grid);
+            if (keepId != 0)
+                SelectSkill(keepId);
             lblStats.Text = string.Format("品质 1~4 英雄技能 {0} 个{1}：已模板化 {2}，SkillBase 行 {3}",
                 skills.Count, columnFilters.Count > 0 ? "（筛选显示 " + shown + "）" : "", templated, store.BaseRows.Count);
+        }
+
+        /// <summary>按技能 Id 选中对应行并滚动到可见位置；未找到（例如被筛选隐藏）时保持默认。</summary>
+        private void SelectSkill(int id)
+        {
+            for (int i = 0; i < rowSkills.Count; i++)
+            {
+                if (rowSkills[i].Id != id)
+                    continue;
+                grid.ClearSelection();
+                grid.CurrentCell = grid.Rows[i].Cells[0];
+                grid.Rows[i].Selected = true;
+                grid.FirstDisplayedScrollingRowIndex = i;
+                return;
+            }
         }
 
         private string StatusOf(SkillRow s)
@@ -298,12 +337,13 @@ namespace SkillBaseTool
             return true;
         }
 
-        private void ResetHeaders()
+        /// <summary>按当前筛选状态恢复各列表头（保留筛选，只在表头追加 ▼）。</summary>
+        private void ApplyFilterHeaders()
         {
             if (baseHeaders == null)
                 return;
             for (int i = 0; i < baseHeaders.Length && i < grid.Columns.Count; i++)
-                grid.Columns[i].HeaderText = baseHeaders[i];
+                grid.Columns[i].HeaderText = baseHeaders[i] + (columnFilters.ContainsKey(i) ? " ▼" : "");
         }
 
         private void OnHeaderMouseClick(object sender, DataGridViewCellMouseEventArgs e)
@@ -445,13 +485,15 @@ namespace SkillBaseTool
             return b;
         }
 
-        /// <summary>打开编辑弹窗；确认后已写回 SkillConfig，重新加载刷新列表。</summary>
+        /// <summary>打开编辑弹窗；确认后已写回 SkillConfig，重新加载刷新列表并保持选中当前技能。</summary>
         private void EditSkill(SkillRow skill)
         {
             using (var dlg = new SkillEditDialog(store, skill))
             {
-                if (dlg.ShowDialog(FindForm()) == DialogResult.OK)
-                    reload();
+                if (dlg.ShowDialog(FindForm()) != DialogResult.OK)
+                    return;
+                pendingSelectId = skill.Id;
+                reload();
             }
         }
 

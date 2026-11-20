@@ -187,7 +187,7 @@ namespace CommonConfig
             config[2032] = new SkillTemplateConfig(2032, "持续治疗小", "heal", "SkillComHealAreaCasting", "同持续治疗场，单次治疗量为同档范围治疗的30%（取整）。", "", "SummonTime=5;SummonHitInterval=1;HealStrength=16,24,39,63,95", 1, 5.5f, 40f, 0f, 3, 10, 2.5f);
             config[3000] = new SkillTemplateConfig(3000, "自身强化", "buff", "SkillComBuffSingle", "对施法者自身施加短时属性增益/护盾；模板只计形态分，实际价值由所挂 Buff 决定。", "", "None", 2, 1f, 0f, 0f, 1, 6, 3f);
             config[3010] = new SkillTemplateConfig(3010, "光环中", "buff", "SkillComBuffAura", "开启后每1.4秒对半径40内按 SelectOnly/SelectFirst 选中的单位挂1.5秒Buff（可指向敌方），不限制目标数；无MP消耗常开，有MP消耗则施法开启，开启期间每秒消耗MP=1×AuraMpRate（默认2x，组件150~154可调1.5/2/2.5/3/4）、攻击/受击回蓝照常累计，MP<=0自动关闭；模板只计形态分，价值由 Buff 决定。", "", "SelectOnly:ally", 2, 5f, 0f, 40f, 0, 10, 2.5f);
-            config[3020] = new SkillTemplateConfig(3020, "单体友方增益", "buff", "SkillComBuffArea", "对一个友方单位施加属性增益或护盾；模板只计形态分，价值由强度、持续时间与所挂 Buff 决定。", "", "SelectOnly:ally", 1, 2f, 40f, 0f, 1, 6, 3f);
+            config[3020] = new SkillTemplateConfig(3020, "单体友方增益", "buff", "SkillComBuffSingle", "对一个友方单位施加属性增益或护盾；模板只计形态分，价值由强度、持续时间与所挂 Buff 决定。", "", "SelectOnly:ally", 1, 2f, 40f, 0f, 1, 6, 3f);
             config[3030] = new SkillTemplateConfig(3030, "群体友方增益", "buff", "SkillComBuffArea", "以自身为中心，对 Area 内多名友方施加属性增益或护盾；模板只计形态分，价值由覆盖人数与所挂 Buff 决定。", "", "SelectOnly:ally", 2, 4f, 40f, 20f, 3, 8, 4f);
             config[3032] = new SkillTemplateConfig(3032, "群体友方增益-目标小", "buff", "SkillComBuffArea", "以选中的首个友军目标为中心，半径25内的友方获得属性增益或护盾；模板只计形态分，价值由所挂 Buff 决定。", "", "SelectOnly:ally;TargetType:targetCenter", 3, 4f, 40f, 20f, 3, 8, 4f);
             config[3040] = new SkillTemplateConfig(3040, "单体减益", "buff", "SkillComBuffArea", "对一名敌人施加减益/控制类 Buff（不造成伤害）；模板只计形态分，价值由所挂 Buff 决定。", "", "SelectOnly:enemy", 1, 2f, 40f, 0f, 1, 6, 3f);
@@ -195,7 +195,7 @@ namespace CommonConfig
             config[3050] = new SkillTemplateConfig(3050, "群体嘲讽", "buff", "SkillComDamageTaunt", "以施法者自身为中心，对 Area 内敌人施加嘲讽（BuffTime 秒）并造成伤害；可选自身减伤盾（BuffId=硬）。", "", "SelectOnly:enemy;DamageStrength=40,60,90,150,240", 3, 5f, 0f, 20f, 3, 8, 2f);
             config[4000] = new SkillTemplateConfig(4000, "防御", "防御", "SkillComDefendBefore", "受伤前统一处理减伤与反弹：Strength2 reduce 减免本次伤害、reflect 按比例反弹给攻击者；可用组件 onlyPhys/onlyMagic 限定受击伤害类型（不配=物理+魔法都算）。被动触发，每次触发扣 MP 并受 CD/概率/触发条件约束；强度由组件调节，也可挂状态组件（护盾/减伤/受击叠防/焰衣）在触发时套 Buff。参考塔姆·厚皮、荆棘之甲。", "", "Strength2:reduce=0.25", 1, 1f, 0f, 0f, 0, 10, 2f);
             config[4010] = new SkillTemplateConfig(4010, "免死一次", "防御", "SkillComDefendCheatDeath", "本次伤害致命时压到只留 1 点生命，触发频率由 CD 控制（配表拉长 CD 即每场一次）；被动触发扣 MP，可用 TriggerCondition 限定触发血线，也可挂状态组件补盾/回血。参考复活甲、塔里克·宇宙之辉。", "", "", 3, 2.5f, 0f, 0f, 0, 12, 20f);
-            config[5000] = new SkillTemplateConfig(5000, "初始属性", "自增", "SkillComInitAttr", "开局即生效、无 MP、无 CD、不触发任何事件：按 Strength2 给自身固定初始 攻击/护甲/法防/生命，数值约为品质1职业基准的20%（Lv1），每级按1~5倍递增、5级封顶。该类技能不支持任何组件（无触发时机，组件无意义），Strength2 直接写在技能行。", "", "Strength2:atk=10,20,30,40,50;Strength2:armor=5,10,15,20,25;Strength2:magicRes=5,10,15,20,25;Strength2:hp=120,240,360,480,600", 1, 5f, 0f, 0f, 0, 0, 0f);
+            config[5000] = new SkillTemplateConfig(5000, "初始属性", "自增", "SkillComInitAttr", "开局即生效、无 MP、无 CD、不触发任何事件：按 Strength2 给自身固定初始 攻击/护甲/法防/生命，数值约为品质1职业基准的20%（Lv1），每级按1~5倍递增、5级封顶。该类技能不支持任何组件（无触发时机，组件无意义），Strength2 直接写在技能行。", "", "Strength2:atk=10,20,30,40,50;Strength2:armor=5,10,15,20,25;Strength2:magicRes=5,10,15,20,25;Strength2:hp=120,240,360,480,600", 1, 10f, 0f, 0f, 0, 0, 0f);
 
             RebuildIndex();
 

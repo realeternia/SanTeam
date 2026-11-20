@@ -120,7 +120,6 @@
     <Compile Include="Assets\Resources\Scripts\UIs\BagControl.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidMultiHit.cs" />
     <Compile Include="Assets\Resources\Scripts\CardShopManager.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidSoldierFortify.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidJumpReturn.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\TooltipItem.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidCastingLastStrategy.cs" />

@@ -146,6 +146,8 @@ namespace SkillBaseTool
         public const string CategoryHeal = "Heal";
         /// <summary>组件 Templates 的三大类取值：增益（含减益/控制等一切走 Buff 的效果）。</summary>
         public const string CategoryBuff = "Buff";
+        /// <summary>模板分类列的防御取值（受击触发的防御模板）。</summary>
+        public const string TemplateTypeDefend = "防御";
 
         /// <summary>模板所属大类：由其绑定的脚本类名推断（Damage / Heal / Buff）。</summary>
         public static string TemplateCategory(TemplateRow tpl)
@@ -164,6 +166,15 @@ namespace SkillBaseTool
         public static bool IsHealTemplate(string t)
         {
             return t != null && HealTemplates.Contains(t);
+        }
+
+        /// <summary>禁止在工具里改模板/组件的技能：开局固定加属性、无触发时机（如「初始属性」模板）。</summary>
+        public static bool IsLockedForEdit(DataStore store, SkillRow skill)
+        {
+            if (skill == null || string.IsNullOrEmpty(skill.TemplateName))
+                return false;
+            TemplateRow tpl;
+            return store.TemplateByName.TryGetValue(skill.TemplateName, out tpl) && tpl.Script == "SkillComInitAttr";
         }
 
         /// <summary>按技能脚本/类型推断模板；返回 null 表示不走模板（特化技能）。</summary>
@@ -374,6 +385,9 @@ namespace SkillBaseTool
             {
                 var lv1 = group.FirstOrDefault(s => s.Lv == 1) ?? group.First();
                 if (lv1.Quality < 1 || lv1.Quality > 4)
+                    continue;
+                // 已是锁定技能（如「才干」的初始属性）保持原样，不参与自动分配
+                if (IsLockedForEdit(store, lv1))
                     continue;
                 string t = PickTemplate(lv1);
                 if (string.IsNullOrEmpty(t) || !store.TemplateByName.ContainsKey(t))
@@ -948,22 +962,41 @@ namespace SkillBaseTool
                     ComponentRow comp;
                     if (!store.ComponentByName.TryGetValue(name, out comp))
                         continue;
+                    double score = ComponentScore(tpl, comp);
                     string family = TierFamily(store, comp.Name);
                     if (family != null)
                     {
                         ComponentRow prev;
                         if (families.TryGetValue(family, out prev))
                         {
-                            if (prev.Score >= comp.Score)
+                            if (ComponentScore(tpl, prev) >= score)
                                 continue;
-                            total -= prev.Score;
+                            total -= ComponentScore(tpl, prev);
                         }
                         families[family] = comp;
                     }
-                    total += comp.Score;
+                    total += score;
                 }
             }
             return total;
+        }
+
+        /// <summary>概率类组件：防御模板下不产生收益，估值一律记 0。</summary>
+        private static readonly HashSet<string> ProbabilityComponents = new HashSet<string>
+        {
+            "大概率", "中概率", "小概率",     // 施放节奏（Rate）
+            "暴击", "法术暴击", "暴击率加成", // 暴击概率
+            "概率双击", "闪避", "威震",       // 概率触发/概率免伤
+        };
+
+        /// <summary>组件在指定模板下的有效分值：防御模板里的概率类组件记 0。</summary>
+        public static double ComponentScore(TemplateRow tpl, ComponentRow comp)
+        {
+            if (comp == null)
+                return 0;
+            if (tpl != null && tpl.Type == TemplateTypeDefend && ProbabilityComponents.Contains(comp.Name))
+                return 0;
+            return comp.Score;
         }
 
         /// <summary>单技能试算：模板分 + 勾选组件分，并给出提示。</summary>
@@ -1001,8 +1034,11 @@ namespace SkillBaseTool
                     continue;
 
                 float value = PrimaryValue(comp.Effect, lv);
+                double score = ComponentScore(tpl, comp);
                 r.Hints.Add(string.Format("组件 {0}：分值 {1:0.##}，Lv{2} 数值 {3:0.###}，写入 {4}",
-                    comp.Name, comp.Score, lv, value, DescribeEffects(comp.Effect, lv)));
+                    comp.Name, score, lv, value, DescribeEffects(comp.Effect, lv)));
+                if (score != comp.Score)
+                    r.Hints.Add("  ⚠ 防御模板：概率类组件不产生收益，记 0 分");
 
                 if (comp.Templates.Length > 0)
                 {
@@ -1027,17 +1063,17 @@ namespace SkillBaseTool
                     ComponentRow prev;
                     if (families.TryGetValue(family, out prev))
                     {
-                        if (prev.Score >= comp.Score)
+                        if (ComponentScore(tpl, prev) >= score)
                         {
                             r.Hints.Add("  ⚠ 同族已选 " + prev.Name + "，本条不计分");
                             continue;
                         }
-                        r.ComponentScore -= prev.Score;
+                        r.ComponentScore -= ComponentScore(tpl, prev);
                         r.Hints.Add("  ⚠ 同族已选 " + prev.Name + "，改用本条计分");
                     }
                     families[family] = comp;
                 }
-                r.ComponentScore += comp.Score;
+                r.ComponentScore += score;
             }
 
             r.Hints.Add(string.Format("合计：模板 {0:0.##} + 组件 {1:0.##} = {2:0.##}", r.TemplateScore, r.ComponentScore, r.Total));

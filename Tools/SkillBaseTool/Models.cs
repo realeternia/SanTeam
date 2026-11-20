@@ -188,7 +188,8 @@ namespace SkillBaseTool
             get
             {
                 string q = Quality > 0 ? " · Q" + Quality : "";
-                return Sname + " · " + Name + q;
+                string body = Name == Sname ? Name : Sname + " · " + Name;
+                return body + q;
             }
         }
     }
@@ -255,6 +256,10 @@ namespace SkillBaseTool
         public Dictionary<string, int> HeroQuality = new Dictionary<string, int>();
         /// <summary>英雄名 → 职业（HeroConfig.Job）。</summary>
         public Dictionary<string, string> HeroJob = new Dictionary<string, string>();
+        /// <summary>技能名（HeroConfig 指向的技能）→ 持有它的英雄最低品质；用于 Sname 不是英雄名的技能（如「才干」）。</summary>
+        public Dictionary<string, int> SkillQuality = new Dictionary<string, int>();
+        /// <summary>技能名 → 持有它的英雄职业。</summary>
+        public Dictionary<string, string> SkillJob = new Dictionary<string, string>();
 
         public List<TemplateRow> Templates = new List<TemplateRow>();
         public Dictionary<string, TemplateRow> TemplateByName = new Dictionary<string, TemplateRow>();
@@ -283,6 +288,20 @@ namespace SkillBaseTool
         {
             string job;
             return !string.IsNullOrEmpty(sname) && HeroJob.TryGetValue(sname, out job) ? job : "";
+        }
+
+        /// <summary>按技能名取持有英雄的最低品质（Sname 不是英雄名时使用），取不到返回 0。</summary>
+        public int GetSkillQuality(string name)
+        {
+            int q;
+            return !string.IsNullOrEmpty(name) && SkillQuality.TryGetValue(name, out q) ? q : 0;
+        }
+
+        /// <summary>按技能名取持有英雄的职业，取不到返回空串。</summary>
+        public string GetSkillJob(string name)
+        {
+            string job;
+            return !string.IsNullOrEmpty(name) && SkillJob.TryGetValue(name, out job) ? job : "";
         }
 
         public IEnumerable<SkillRow> LevelOneSkills

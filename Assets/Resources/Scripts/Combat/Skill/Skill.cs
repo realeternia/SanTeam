@@ -443,6 +443,17 @@ public class Skill
             target.transform.position = pushPos;
     }
 
+    /// <summary>拖回出生点：配置 pullToSpawn 键时把目标强制拉到我方出生点（owner.spawnPosition），无视阻挡。</summary>
+    protected void PullTargetToSpawn(Chess target)
+    {
+        if (target == null || target.isJumping)
+            return;
+        if (GetStr2("pullToSpawn") <= 0f)
+            return;
+        target.MoveTo(owner.spawnPosition, true);
+        GameLog.Debug($"拖回出生点：{target.name} 被拉到我方出生点 技能id={id}");
+    }
+
     /// <summary>苦肉反噬：selfHurt 标记时按本次伤害比例扣自身生命，濒死不致死（最少留 1 点）。</summary>
     protected void HurtSelfByDamage(int dmg)
     {
