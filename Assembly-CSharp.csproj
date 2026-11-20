@@ -328,6 +328,7 @@
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillBondDefReduceDamageRate.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillComDefendBefore.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillComDefendCheatDeath.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillComInitAttr.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\TextMesh Pro\Shaders\TMPro.cginc" />

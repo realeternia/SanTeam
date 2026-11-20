@@ -42,7 +42,7 @@ namespace CommonConfig
         {
             {"Id", new FieldMetaInfo("序列", "int", 94)},
             {"Name", new FieldMetaInfo("模板名", "string", 165, "", true)},
-            {"Type", new FieldMetaInfo("分类(伤害/heal/buff/防御)", "string", 60, "伤害:#B84A40,heal:#3F9B62,buff:#4678A8,防御:#5F7F8C")},
+            {"Type", new FieldMetaInfo("分类(伤害/heal/buff/防御/自增)", "string", 60, "伤害:#B84A40,heal:#3F9B62,buff:#4678A8,防御:#5F7F8C,自增:#2F7F78")},
             {"Script", new FieldMetaInfo("脚本名(唯一绑定的技能类名)", "string", 153)},
             {"Des", new FieldMetaInfo("说明", "string", 341)},
             {"Modules", new FieldMetaInfo("默认组件名列表(逗号分隔)", "string", 111)},
@@ -195,6 +195,7 @@ namespace CommonConfig
             config[3050] = new SkillTemplateConfig(3050, "群体嘲讽", "buff", "SkillComDamageTaunt", "以施法者自身为中心，对 Area 内敌人施加嘲讽（BuffTime 秒）并造成伤害；可选自身减伤盾（BuffId=硬）。", "", "SelectOnly:enemy;DamageStrength=40,60,90,150,240", 3, 5f, 0f, 20f, 3, 8, 2f);
             config[4000] = new SkillTemplateConfig(4000, "防御", "防御", "SkillComDefendBefore", "受伤前统一处理减伤与反弹：Strength2 reduce 减免本次伤害、reflect 按比例反弹给攻击者；可用组件 onlyPhys/onlyMagic 限定受击伤害类型（不配=物理+魔法都算）。被动触发，每次触发扣 MP 并受 CD/概率/触发条件约束；强度由组件调节，也可挂状态组件（护盾/减伤/受击叠防/焰衣）在触发时套 Buff。参考塔姆·厚皮、荆棘之甲。", "", "Strength2:reduce=0.25", 1, 1f, 0f, 0f, 0, 10, 2f);
             config[4010] = new SkillTemplateConfig(4010, "免死一次", "防御", "SkillComDefendCheatDeath", "本次伤害致命时压到只留 1 点生命，触发频率由 CD 控制（配表拉长 CD 即每场一次）；被动触发扣 MP，可用 TriggerCondition 限定触发血线，也可挂状态组件补盾/回血。参考复活甲、塔里克·宇宙之辉。", "", "", 3, 2.5f, 0f, 0f, 0, 12, 20f);
+            config[5000] = new SkillTemplateConfig(5000, "初始属性", "自增", "SkillComInitAttr", "开局即生效、无 MP、无 CD、不触发任何事件：按 Strength2 给自身固定初始 攻击/护甲/法防/生命，数值约为品质1职业基准的20%（Lv1），每级按1~5倍递增、5级封顶。该类技能不支持任何组件（无触发时机，组件无意义），Strength2 直接写在技能行。", "", "Strength2:atk=10,20,30,40,50;Strength2:armor=5,10,15,20,25;Strength2:magicRes=5,10,15,20,25;Strength2:hp=120,240,360,480,600", 1, 5f, 0f, 0f, 0, 0, 0f);
 
             RebuildIndex();
 
