@@ -6,6 +6,8 @@ public static class CombatConst
     // ---- BuffId ----
     /// <summary>护盾(BuffShield)</summary>
     public const int ShieldBuffId = 300001;
+    /// <summary>法术暴击(BuffMagicCrit)：法术技能伤害按概率翻倍</summary>
+    public const int MagicCritBuffId = 300020;
     /// <summary>嘲讽(BuffTaunt，负面效果)：被挂者强制把嘲讽者(BuffTaunt.caster)作为索敌目标，索敌判定见 Chess.FindTarget</summary>
     public const int TauntBuffId = 301010;
     /// <summary>眩晕(BuffNoAction，负面效果，短名"乱")：无法行动；威震(BuffVengefulStance)普攻触发眩晕时使用</summary>

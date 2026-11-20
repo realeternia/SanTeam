@@ -21,8 +21,7 @@ using UnityEngine;
 /// 通用组件效果全部由基类统一实现（TargetType 标记 / Strength2 键），派生类不要重复判断：
 /// · self        = 自身中心（近战贴脸 AoE），沿用当前索敌目标、不做射程校验（SelectTarget）
 /// · missile     = 以飞弹逐个结算（ApplyDamage）；飞弹特效取 HitEffect，飞行速度取 SummonSpeed（0 时用单位导弹速度）
-/// · maxHpBonus  = 伤害 += 目标最大生命 × 键 maxHpBonusRate（CalcDamage）
-/// · execute / shieldBonus / missingHp / vsJob / soldierDamage / critRateBonus（ApplyDamageModifiers）
+/// · execute / shieldBonus / missingHp / highHp / vsJob / soldierDamage / critRateBonus（ApplyDamageModifiers）
 /// · antiShield / mpBurn / 击退 pushMin~pushMax / selfHurt / selfBuff / dispel（AfterDamage）
 /// 伤害体系派生（各自覆写 CheckAidSkill，自动继承上述全部组件能力）：
 /// · SkillComDamageArea        范围伤害 + 可选 Buff（目标中心 / self 自身中心）
@@ -92,8 +91,6 @@ public class SkillComDamageSingle : Skill
     protected virtual int CalcDamage(Chess target, int baseDamage)
     {
         var dmg = baseDamage;
-        if (HasSkillFlag("maxHpBonus"))
-            dmg += (int)(GetStr2("maxHpBonusRate") * target.maxHp);
         return ApplyDamageModifiers(dmg, target);
     }
 

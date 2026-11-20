@@ -143,12 +143,14 @@ public static class ConfigManager
             }
 
             // 只覆盖模板/组件能改写的效果列；身份列与表现列（ScriptName/Action/特效/Icon/Link/
-            // DamageType/HurtTag/StartMpRate/ItemId）一律以 SkillConfig 为准，避免 SkillBase 生成后
-            // 表现层改动被旧值回写吞掉
+            // DamageType/HurtTag/ItemId）一律以 SkillConfig 为准，避免 SkillBase 生成后
+            // 表现层改动被旧值回写吞掉。StartMpRate 仅在组件显式配置（>0）时覆盖，保留手配值。
             var baseCfg = SkillBaseConfig.GetConfig(skillCfg.Id);
             skillCfg.Rate = baseCfg.Rate;
             skillCfg.CD = baseCfg.CD;
             skillCfg.MpCost = baseCfg.MpCost;
+            if (baseCfg.StartMpRate > 0f)
+                skillCfg.StartMpRate = baseCfg.StartMpRate;
             skillCfg.TriggerCondition = baseCfg.TriggerCondition;
             skillCfg.Range = baseCfg.Range;
             skillCfg.Area = baseCfg.Area;

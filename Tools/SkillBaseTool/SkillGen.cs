@@ -69,7 +69,7 @@ namespace SkillBaseTool
         private static readonly Dictionary<string, string> TokenDirectModule = new Dictionary<string, string>
         {
             { "叛", "叛逃" }, { "链", "生命链接" }, { "锁", "连锁扩散" }, { "守", "受击叠防" }, { "毒", "中毒" },
-            { "反", "伤害反射" }, { "焰", "焰衣" }, { "震", "威震" }, { "愈", "急救" },
+            { "反", "伤害反射" }, { "焰", "焰衣" }, { "震", "威震" }, { "愈", "急救" }, { "法暴", "法术暴击" },
         };
 
         /// <summary>组件族 → StrengthBuff1 数值键（空键表示族内无统一数值）。</summary>
@@ -123,7 +123,9 @@ namespace SkillBaseTool
             { "antiShield", "破盾" }, { "armorIgnore", "破盾" }, { "dispel", "驱散" },
             { "doubleChance", "概率双击" }, { "selfHurt", "自损" }, { "mpBurn", "燃烧法力" },
             { "shieldBonus", "按护盾加成伤害" }, { "vsJob", "兵种克制" },
-            { "missile", "弹道" }, { "maxHpBonus", "最大生命伤害" }, { "missingHp", "残血增伤" },
+            { "missile", "弹道" }, { "highHp", "高血增伤" }, { "missingHp", "残血增伤" },
+            { "randomAmp", "随机增伤" }, { "isolatedAmp", "孤立增伤" }, { "shieldedAmp", "有盾增伤" },
+            { "fullHp", "满血增伤" }, { "castStack", "逐次施法增伤" },
             { "execute", "斩杀" },
         };
 
@@ -532,7 +534,7 @@ namespace SkillBaseTool
         /// <summary>EffectKey 支持的列名（校验用）。</summary>
         public static readonly string[] EffectColumns =
         {
-            "DamageStrength", "HealStrength", "CD", "MpCost", "Range", "Area", "TargetCount",
+            "DamageStrength", "HealStrength", "CD", "MpCost", "StartMpRate", "Range", "Area", "TargetCount",
             "Rate", "BuffTime", "BuffTimeRate", "BuffEffectRate", "TargetType", "SelectOnly", "SelectFirst", "TriggerCondition", "Strength2", "Buff",
             "SummonCount", "SummonTime", "SummonHitInterval", "SummonSpeed", "SummonTag",
         };
@@ -540,7 +542,7 @@ namespace SkillBaseTool
         /// <summary>运行时 ApplySkillBase 覆盖的列（与 ConfigManager 保持一致：只含模板/组件能改写的效果列）。</summary>
         public static readonly int[] AppliedColumns =
         {
-            Col.Rate, Col.CD, Col.MpCost, Col.TriggerCondition, Col.Range, Col.Area,
+            Col.Rate, Col.CD, Col.MpCost, Col.StartMpRate, Col.TriggerCondition, Col.Range, Col.Area,
             Col.SelectOnly, Col.SelectFirst,
             Col.TargetType, Col.TargetCount, Col.DamageStrength, Col.HealStrength,
             Col.Strength2, Col.StrengthBuff1, Col.BuffId, Col.BuffTime,
@@ -601,6 +603,7 @@ namespace SkillBaseTool
                         case "HealStrength": B[Col.HealStrength] = CfgUtil.NumF(Num(b, Col.HealStrength, v)); break;
                         case "CD": B[Col.CD] = CfgUtil.NumF(Num(b, Col.CD, v)); break;
                         case "MpCost": B[Col.MpCost] = CfgUtil.NumI((int)Math.Round(Num(b, Col.MpCost, v, 10f))); break;
+                        case "StartMpRate": B[Col.StartMpRate] = CfgUtil.NumF(Num(b, Col.StartMpRate, v)); break;
                         case "Range": B[Col.Range] = CfgUtil.NumF(Num(b, Col.Range, v)); break;
                         case "Area": B[Col.Area] = CfgUtil.NumF(Num(b, Col.Area, v)); break;
                         case "TargetCount": B[Col.TargetCount] = CfgUtil.NumI((int)Math.Round(Num(b, Col.TargetCount, v))); break;

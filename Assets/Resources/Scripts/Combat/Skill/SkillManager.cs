@@ -178,6 +178,8 @@ public static class SkillManager
                 skill.ApplyPermanentGrowth();
                 // 携带「士兵士气」组件的技能施放成功后，给我方全体小兵叠一层士气
                 skill.ApplySoldierMorale();
+                // 累计本技能施法次数（逐次施法增伤读取）
+                skill.OnCastSuccess();
                 return true;
             }
         }

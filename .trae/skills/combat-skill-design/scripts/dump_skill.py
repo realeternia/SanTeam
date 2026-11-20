@@ -238,7 +238,7 @@ def main():
     known_flags = {
         'SkillAreaBuff': {'heroOnly', 'excludeSelf', 'selfAlways', 'lowestHp', 'highestHp', 'highestArmor',
                           'rangedOnly', 'meleeOnly', 'fullHpSkip', 'noDedupe', 'crossSideFallback'},
-        'SkillAreaDamageDeBuff': {'self', 'missile', 'maxHpBonus', 'mpBurn'},
+        'SkillAreaDamageDeBuff': {'self', 'missile', 'highHp', 'mpBurn'},
         'SkillAreaHeal': {'overflowToArmor'},
         'SkillSelfBuff': {'permanent', 'noStack'},
         'SkillBacklineStrike': {'smart', 'extra'},

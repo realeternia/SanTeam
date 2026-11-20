@@ -262,6 +262,7 @@ public static class SysColor
         public static readonly Color SkillName = new Color(1f, 0.9f, 0.1f);  // 技能触发-金黄
         public static readonly Color Zhiheng = new Color(1f, 0.3f, 0.3f);    // 制衡-红
         public static readonly Color ItemGain = new Color(1f, 0.75f, 0.1f);   // 获得道具-金
+        public static readonly Color AmpUp = new Color(1f, 0.35f, 0.25f);      // 随机增伤>100%-红
     }
 
     // 玩家状态

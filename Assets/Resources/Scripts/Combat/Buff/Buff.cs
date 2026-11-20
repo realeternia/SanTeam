@@ -20,6 +20,9 @@ public class Buff
     /// <summary>BuffConfig.BuffAttrDynamic 声明的数值槽键集合（只有这些键参与品质乘算）</summary>
     private readonly HashSet<string> dynamicAttrs = new HashSet<string>();
 
+    /// <summary>法强加成黑名单：这些键不随施法者法强放大（ap 自循环、evade/critRate 概率溢出）</summary>
+    private static readonly HashSet<string> ApScaleBlacklist = new HashSet<string> { "ap", "evade", "critRate" };
+
     /// <summary>
     /// 叠加模式为"时间延长"(StackMode=3)时，本实例存续期间被延长的次数：
     /// 第1次延长×0.9、第2次×0.8…用于控制类 Buff 的衰减，实例被顶掉/过期后重新计数
@@ -51,25 +54,44 @@ public class Buff
     /// <summary>
     /// 按 key 读取施加本 Buff 的技能配置的 StrengthBuff1 数值槽（key 为 "k:v,k:v" 串中的键名），
     /// 未配置 / key 不存在时返回 def。每个 Buff 读自己固定的语义 key，不再按数组下标/组合位置猜槽位。
-    /// 仅当 key 属于 BuffConfig.BuffAttrDynamic 且 IsQualityBonus=true 时，再乘施法者英雄品质系数。
+    /// 仅当 key 属于 BuffConfig.BuffAttrDynamic 时，再乘品质系数（IsQualityBonus）与法强系数（IsApBonus）。
     /// </summary>
     protected float GetStrBuff(string key, float def = 0f)
     {
         float raw = ConfigManager.GetSlotValue(skillCfg == null ? null : skillCfg.StrengthBuff1, key, float.NaN);
         if (float.IsNaN(raw)) return def;
-        return raw * GetQualityFactor(key);
+        return raw * GetValueFactor(key);
     }
 
     /// <summary>
     /// 按 key 读取施加本 Buff 的技能配置的 Strength2 数值槽（key 为 "k:v,k:v" 串中的键名），
     /// 未配置 / key 不存在时返回 def。
-    /// 仅当 key 属于 BuffConfig.BuffAttrDynamic 且 IsQualityBonus=true 时，再乘施法者英雄品质系数。
+    /// 仅当 key 属于 BuffConfig.BuffAttrDynamic 时，再乘品质系数（IsQualityBonus）与法强系数（IsApBonus）。
     /// </summary>
     protected float GetStr2(string key, float def = 0f)
     {
         float raw = ConfigManager.GetSlotValue(skillCfg == null ? null : skillCfg.Strength2, key, float.NaN);
         if (float.IsNaN(raw)) return def;
-        return raw * GetQualityFactor(key);
+        return raw * GetValueFactor(key);
+    }
+
+    /// <summary>
+    /// Buff 数值倍率 = 品质系数 × 法强系数。
+    /// 品质：IsQualityBonus=true 时按施法者英雄品质乘 CombatConst.QualityBuffFactors；
+    /// 法强：IsApBonus=true 时再乘 (100+施法者ap)/100（仅 BuffAttrDynamic 键、英雄专属技能，ap/evade/critRate 除外）。
+    /// </summary>
+    private float GetValueFactor(string key)
+    {
+        var factor = GetQualityFactor(key);
+        if (buffCfg == null || !buffCfg.IsApBonus || ApScaleBlacklist.Contains(key))
+            return factor;
+        if (!dynamicAttrs.Contains(key))
+            return factor;
+        if (skillCfg == null || !HeroScenario.IsHeroExclusiveSkill(skillCfg.Sname))
+            return factor;
+        Chess source = caster != null ? caster : owner;
+        var ap = source == null ? 0 : source.GetAttr("ap");
+        return factor * (100f + ap) / 100f;
     }
 
     /// <summary>

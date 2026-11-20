@@ -119,7 +119,7 @@ namespace SkillBaseTool
             panes.RowStyles.Add(new RowStyle(SizeType.Percent, 100f));
             panes.Controls.Add(BuildPane("目标选取", "目标筛选组件（勾选后写入 Modules；×N=已被 N 个技能引用）",
                 out clbSelect, out txtSearchSelect), 0, 0);
-            panes.Controls.Add(BuildPane("特殊效果", "状态 / 特殊机制 / 数值与节奏组件（×N=已被 N 个技能引用）",
+            panes.Controls.Add(BuildPane("特殊效果", "状态 / 增伤 / 士兵 / 特殊机制 / 数值与节奏组件（×N=已被 N 个技能引用）",
                 out clbEffect, out txtSearchEffect), 1, 0);
 
             var leftBottom = new Panel { Dock = DockStyle.Bottom, Height = 70, BackColor = Theme.Card };

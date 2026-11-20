@@ -146,6 +146,15 @@ public class Skill
         return ConfigManager.GetSlotValue(skillCfg == null ? null : skillCfg.StrengthBuff1, key, def);
     }
 
+    /// <summary>战斗内成功施法次数（由 SkillManager 在施放成功后累计，供逐次施法增伤读取）。</summary>
+    protected int castTimes;
+
+    /// <summary>施放成功后由 SkillManager 统一调用，累计本技能的施法次数。</summary>
+    public void OnCastSuccess()
+    {
+        castTimes++;
+    }
+
     /// <summary>
     /// permanent 型自身成长技能（TargetType 含 permanent）：施放成功后由 SkillManager 统一调用，
     /// 读取 Strength2 的 selfAtkSpeed 永久叠加到施法者攻速（当前仅马岱·连射引用该键）。
@@ -221,7 +230,8 @@ public class Skill
     // ---- 通用组件效果（TargetType 标记 / Strength2 键，所有通用技能共享） ----
 
     /// <summary>
-    /// 伤害类组件修正：execute(execHp/execRate)、shieldBonus、missingHp、vsJob、soldierDamage、critRateBonus。
+    /// 伤害类组件修正：execute(execHp/execRate)、shieldBonus、missingHp、highHp、vsJob、soldierDamage、critRateBonus、
+    /// randomAmp、isolatedAmp、shieldedAmp、fullHp、castStack。
     /// 未配置的标记与键均为 no-op，可在任意单体/范围伤害结算前直接调用。
     /// </summary>
     protected int ApplyDamageModifiers(int dmg, Chess target)
@@ -234,6 +244,9 @@ public class Skill
             dmg = Math.Max(1, (int)(dmg * GetStr2("shieldBonusRate", 1f)));
         if (HasSkillFlag("missingHp"))
             dmg += (int)(dmg * GetStr2("missingHpRate") * (1f - owner.HpRate));
+        // 高血增伤：目标生命比例高于阈值时按比例提升本次伤害
+        if (HasSkillFlag("highHp") && target.HpRate > GetStr2("highHpThreshold", 0.5f))
+            dmg = (int)(dmg * (1f + GetStr2("highHpRate")));
         if (HasSkillFlag("vsJob") && IsTargetJobMatched(target))
             dmg = Math.Max(1, (int)(dmg * GetStr2("vsJobRate", 2f)));
         var soldierRate = GetStr2("soldierDamage");
@@ -249,6 +262,49 @@ public class Skill
         {
             dmg = Math.Max(1, (int)(dmg * (1f + owner.critDamageMulti)));
             WorldManager.Instance.AddBattleText("暴!", target.transform.position, new Vector2(0, 40), Color.red, 3);
+        }
+        // 法术暴击：携带法暴 Buff 时，法术技能伤害按概率翻倍
+        if (skillCfg != null && skillCfg.DamageType == CombatConst.DamageTypeMagic
+            && owner.GetBuff(CombatConst.MagicCritBuffId) is BuffMagicCrit magicCrit
+            && SysRandom.Value < magicCrit.Chance)
+        {
+            dmg = Math.Max(1, (int)(dmg * magicCrit.Rate));
+            WorldManager.Instance.AddBattleText("法暴!", target.transform.position, new Vector2(0, 40), SysColor.BattleText.AmpUp, 3);
+        }
+        // 随机增伤：每次结算在 randomAmpMin~randomAmpMax 倍之间随机，>100% 时飘红字
+        if (HasSkillFlag("randomAmp"))
+        {
+            var min = GetStr2("randomAmpMin", 0.8f);
+            var max = GetStr2("randomAmpMax", 1.5f);
+            var amp = SysRandom.Range(min, max);
+            dmg = Math.Max(1, (int)(dmg * amp));
+            if (amp > 1f)
+                WorldManager.Instance.AddBattleText($"增伤{Mathf.RoundToInt(amp * 100f)}%", target.transform.position, new Vector2(0, 40), SysColor.BattleText.AmpUp, 3);
+        }
+        // 孤立增伤：目标周围 isolatedRange 格内没有其他敌方英雄
+        if (HasSkillFlag("isolatedAmp"))
+        {
+            var aroundHeroes = 0;
+            foreach (var unit in WorldManager.Instance.GetEnemyInRange(target.transform.position, GetStr2("isolatedRange", 1f), owner.side))
+            {
+                if (unit.isHero)
+                    aroundHeroes++;
+            }
+            if (aroundHeroes <= 1)
+                dmg = Math.Max(1, (int)(dmg * (1f + GetStr2("isolatedAmpRate", 0.4f))));
+        }
+        // 有盾增伤：施法者自身带护盾时提升伤害
+        if (HasSkillFlag("shieldedAmp") && owner.GetBuff(CombatConst.ShieldBuffId) is BuffShield)
+            dmg = Math.Max(1, (int)(dmg * (1f + GetStr2("shieldedAmpRate", 0.3f))));
+        // 满血增伤：施法者处于满血时提升伤害
+        if (HasSkillFlag("fullHp") && owner.HpRate >= 1f)
+            dmg = Math.Max(1, (int)(dmg * (1f + GetStr2("fullHpRate", 0.25f))));
+        // 逐次施法增伤：本场第 2 次施放起每多施放一次叠一层（首次不计），上限 castStackMax 层
+        if (HasSkillFlag("castStack"))
+        {
+            var stack = Mathf.Min(castTimes, (int)GetStr2("castStackMax", 5f));
+            if (stack > 0)
+                dmg = Math.Max(1, (int)(dmg * (1f + stack * GetStr2("castStackRate", 0.1f))));
         }
         return dmg;
     }

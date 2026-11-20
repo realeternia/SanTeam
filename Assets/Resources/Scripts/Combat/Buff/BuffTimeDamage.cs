@@ -3,7 +3,7 @@ using UnityEngine;
 
 /// <summary>
 /// 持续伤害 Buff（如"败"溃败，短名"败"）：每 1 秒对携带者结算一次技能伤害。
-/// 默认跳伤取施加技能的 StrengthBuff1 语义 key "dot"（绝对值，不走伤害公式、不随属性成长）；
+/// 默认跳伤取施加技能的 StrengthBuff1 语义 key "dot"（绝对值，不走伤害公式；品质/法强加成按 BuffConfig 勾选乘算）；
 /// 需要按实时数值结算的技能（如旋风斩流血）在首次 tick 前用 SetDamage 覆写。
 /// </summary>
 public class BuffTimeDamage : Buff
@@ -29,7 +29,7 @@ public class BuffTimeDamage : Buff
     public override void OnAdd(Chess chess, Chess caster)
     {
         base.OnAdd(chess, caster);
-        // 默认跳伤取施加技能的 StrengthBuff1 语义 key "dot"（绝对值，不走伤害公式、不随属性成长；需要实时数值的技能用 SetDamage 覆写）
+        // 默认跳伤取施加技能的 StrengthBuff1 语义 key "dot"（绝对值，不走伤害公式；品质/法强加成按 BuffConfig 勾选乘算；需要实时数值的技能用 SetDamage 覆写）
         damage = GetStrBuff("dot");
 
         // 启动伤害协程
