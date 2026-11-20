@@ -146,6 +146,27 @@ public class Skill
         return ConfigManager.GetSlotValue(skillCfg == null ? null : skillCfg.StrengthBuff1, key, def);
     }
 
+    /// <summary>
+    /// 按 key 读取 Strength2 字符串槽（key 为 "k:v,k:v" 串中的键名），未配置 / key 不存在时返回 null。
+    /// </summary>
+    protected string GetStrKey(string key)
+    {
+        var raw = skillCfg == null ? null : skillCfg.Strength2;
+        if (string.IsNullOrEmpty(raw) || string.IsNullOrEmpty(key))
+            return null;
+        foreach (var seg in raw.Split(new[] { ',', '，', ';', '；' }, StringSplitOptions.RemoveEmptyEntries))
+        {
+            var s = seg.Trim();
+            var i = s.IndexOf(':');
+            if (i <= 0)
+                continue;
+            if (!string.Equals(s.Substring(0, i).Trim(), key, StringComparison.OrdinalIgnoreCase))
+                continue;
+            return s.Substring(i + 1).Trim();
+        }
+        return null;
+    }
+
     /// <summary>战斗内成功施法次数（由 SkillManager 在施放成功后累计，供逐次施法增伤读取）。</summary>
     protected int castTimes;
 
@@ -328,6 +349,28 @@ public class Skill
                 if (job.Trim() == heroCfg.Job)
                     return true;
             }
+        }
+        return false;
+    }
+
+    /// <summary>
+    /// 受击来源是否命中 Strength2 的 DamageSource 限定：any/all/未配置 = 都算；
+    /// hero = 仅英雄，soldier = 仅小兵，多个用竖线分隔（如 "hero|soldier"）。供所有受击类技能复用。
+    /// </summary>
+    protected bool IsDamageSourceMatched(Chess source)
+    {
+        var raw = GetStrKey("DamageSource");
+        if (string.IsNullOrEmpty(raw) || raw == "any" || raw == "all")
+            return true;
+        if (source == null)
+            return false;
+        foreach (var seg in raw.Split('|', ','))
+        {
+            var v = seg.Trim();
+            if (v == "hero" && source.isHero)
+                return true;
+            if (v == "soldier" && !source.isHero)
+                return true;
         }
         return false;
     }

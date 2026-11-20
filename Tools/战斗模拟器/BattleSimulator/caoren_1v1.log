@@ -1,0 +1,104 @@
+﻿[Debug] [2026-11-20 15:32:14.322][DEBUG] ConfigManager.ApplySkillBase: 模板化技能数据替换 610 行
+[Debug] [2026-11-20 15:32:14.326][DEBUG] HeroScenario 当前剧本: 老存档(剧本1+2)
+[Debug] [2026-11-20 15:32:14.326][DEBUG] ConfigManager Init fin
+=== 战斗模拟器 CLI（输入 help 查看命令，quit 退出） ===
+> seed=7
+> 测试模式速测=开启(技能MP拉满+生命×5)
+> 甲阵容已设置: 102012
+> 乙阵容已设置: 102001
+> [Debug] [2026-11-20 15:32:14.346][DEBUG] Init Hero102012
+[Debug] [2026-11-20 15:32:14.347][DEBUG] Init Hero done 102012
+[Debug] [2026-11-20 15:32:14.348][DEBUG] Init Hero102001
+[Debug] [2026-11-20 15:32:14.348][DEBUG] Init Hero done 102001
+速测诊断 甲=英雄1/士兵0 乙=英雄1/士兵0
+测试模式：英雄初始技能MP拉满 + 生命×5
+seed=7 每侧小兵=0 阵容A=102012 阵容B=102001
+[Debug] [2026-11-20 15:32:14.374][DEBUG] CheckBurst isBurst=True skillId=2021011
+[Debug] [2026-11-20 15:32:14.374][DEBUG] PlaySkillEffect: MagicChargePink
+[Warn] [2026-11-20 15:32:14.375][WARN] EffectManager 变色配置无效: MagicChargePink TintColor=#FF00EA
+[Debug] [2026-11-20 15:32:14.375][DEBUG] PlaySkillEffect: FanExplosion
+[Debug] [2026-11-20 15:32:14.375][DEBUG] StartCasting 开始引导 skillId=2021011 id=101
+[Debug] [2026-11-20 15:32:14.378][DEBUG] CheckBurst isBurst=True skillId=2020716
+[Debug] [2026-11-20 15:32:14.378][DEBUG] AddBuff buffId=300101 skillId=2020716 time=5
+[Debug] [2026-11-20 15:32:14.379][DEBUG] Buff OnAdd 300101 2020716 Chess Chess
+[Debug] [2026-11-20 15:32:14.380][DEBUG] PlaySkillEffect: MagicChargePink
+[Warn] [2026-11-20 15:32:14.380][WARN] EffectManager 变色配置无效: MagicChargePink TintColor=#FF00EA
+[Debug] [2026-11-20 15:32:14.380][DEBUG] 免死/防御触发 技能id=2020716 等级=1 类型=0 已免死=False 生命=6612/6660
+[Debug] [2026-11-20 15:32:14.380][DEBUG] PlaySkillEffect: FanExplosion
+[Warn] [2026-11-20 15:32:14.380][WARN] EffectManager 变色配置无效: SwordHitYellowCritical TintColor=#FFFF00
+[Debug] [2026-11-20 15:32:14.380][DEBUG] PlaySkillEffect: FanExplosion
+[Debug] [2026-11-20 15:32:14.380][DEBUG] PlaySkillEffect: FanExplosion
+[Warn] [2026-11-20 15:32:14.380][WARN] EffectManager 变色配置无效: SwordHitYellowCritical TintColor=#FFFF00
+[Debug] [2026-11-20 15:32:14.380][DEBUG] PlaySkillEffect: FanExplosion
+[Debug] [2026-11-20 15:32:14.380][DEBUG] PlaySkillEffect: FanExplosion
+[Warn] [2026-11-20 15:32:14.380][WARN] EffectManager 变色配置无效: SwordHitYellowCritical TintColor=#FFFF00
+[Debug] [2026-11-20 15:32:14.381][DEBUG] Buff OnRemove 300101 2020716 Chess Chess
+[Debug] [2026-11-20 15:32:14.381][DEBUG] CheckBurst isBurst=True skillId=2020716
+[Debug] [2026-11-20 15:32:14.381][DEBUG] AddBuff buffId=300101 skillId=2020716 time=5
+[Debug] [2026-11-20 15:32:14.381][DEBUG] Buff OnAdd 300101 2020716 Chess Chess
+[Debug] [2026-11-20 15:32:14.381][DEBUG] PlaySkillEffect: MagicChargePink
+[Warn] [2026-11-20 15:32:14.381][WARN] EffectManager 变色配置无效: MagicChargePink TintColor=#FF00EA
+[Debug] [2026-11-20 15:32:14.381][DEBUG] 免死/防御触发 技能id=2020716 等级=1 类型=0 已免死=False 生命=5212/6660
+[Debug] [2026-11-20 15:32:14.381][DEBUG] PlaySkillEffect: FanExplosion
+[Debug] [2026-11-20 15:32:14.381][DEBUG] PlaySkillEffect: FanExplosion
+[Warn] [2026-11-20 15:32:14.381][WARN] EffectManager 变色配置无效: SwordHitYellowCritical TintColor=#FFFF00
+[Debug] [2026-11-20 15:32:14.381][DEBUG] PlaySkillEffect: FanExplosion
+[Warn] [2026-11-20 15:32:14.381][WARN] EffectManager 变色配置无效: SwordHitYellowCritical TintColor=#FFFF00
+[Debug] [2026-11-20 15:32:14.382][DEBUG] Buff OnRemove 300101 2020716 Chess Chess
+[Warn] [2026-11-20 15:32:14.382][WARN] EffectManager 变色配置无效: SwordHitYellowCritical TintColor=#FFFF00
+[Warn] [2026-11-20 15:32:14.382][WARN] EffectManager 变色配置无效: SwordHitYellowCritical TintColor=#FFFF00
+[Warn] [2026-11-20 15:32:14.382][WARN] EffectManager 变色配置无效: SwordHitYellowCritical TintColor=#FFFF00
+[Warn] [2026-11-20 15:32:14.382][WARN] EffectManager 变色配置无效: SwordHitYellowCritical TintColor=#FFFF00
+[Warn] [2026-11-20 15:32:14.382][WARN] EffectManager 变色配置无效: SwordHitYellowCritical TintColor=#FFFF00
+[Warn] [2026-11-20 15:32:14.382][WARN] EffectManager 变色配置无效: SwordHitYellowCritical TintColor=#FFFF00
+[Warn] [2026-11-20 15:32:14.382][WARN] EffectManager 变色配置无效: SwordHitYellowCritical TintColor=#FFFF00
+[Debug] [2026-11-20 15:32:14.383][DEBUG] CheckBurst isBurst=True skillId=2021011
+[Debug] [2026-11-20 15:32:14.383][DEBUG] PlaySkillEffect: MagicChargePink
+[Warn] [2026-11-20 15:32:14.383][WARN] EffectManager 变色配置无效: MagicChargePink TintColor=#FF00EA
+[Debug] [2026-11-20 15:32:14.383][DEBUG] PlaySkillEffect: FanExplosion
+[Debug] [2026-11-20 15:32:14.383][DEBUG] StartCasting 开始引导 skillId=2021011 id=101
+[Debug] [2026-11-20 15:32:14.383][DEBUG] CheckBurst isBurst=True skillId=2020716
+[Debug] [2026-11-20 15:32:14.383][DEBUG] AddBuff buffId=300101 skillId=2020716 time=5
+[Debug] [2026-11-20 15:32:14.383][DEBUG] Buff OnAdd 300101 2020716 Chess Chess
+[Debug] [2026-11-20 15:32:14.383][DEBUG] PlaySkillEffect: MagicChargePink
+[Warn] [2026-11-20 15:32:14.383][WARN] EffectManager 变色配置无效: MagicChargePink TintColor=#FF00EA
+[Debug] [2026-11-20 15:32:14.383][DEBUG] 免死/防御触发 技能id=2020716 等级=1 类型=0 已免死=False 生命=3882/6660
+[Debug] [2026-11-20 15:32:14.383][DEBUG] PlaySkillEffect: FanExplosion
+[Warn] [2026-11-20 15:32:14.383][WARN] EffectManager 变色配置无效: SwordHitYellowCritical TintColor=#FFFF00
+[Debug] [2026-11-20 15:32:14.383][DEBUG] PlaySkillEffect: FanExplosion
+[Debug] [2026-11-20 15:32:14.383][DEBUG] PlaySkillEffect: FanExplosion
+[Warn] [2026-11-20 15:32:14.383][WARN] EffectManager 变色配置无效: SwordHitYellowCritical TintColor=#FFFF00
+[Debug] [2026-11-20 15:32:14.383][DEBUG] PlaySkillEffect: FanExplosion
+[Debug] [2026-11-20 15:32:14.383][DEBUG] PlaySkillEffect: FanExplosion
+[Warn] [2026-11-20 15:32:14.383][WARN] EffectManager 变色配置无效: SwordHitYellowCritical TintColor=#FFFF00
+[Debug] [2026-11-20 15:32:14.383][DEBUG] Buff OnRemove 300101 2020716 Chess Chess
+[Debug] [2026-11-20 15:32:14.384][DEBUG] CheckBurst isBurst=True skillId=2020716
+[Debug] [2026-11-20 15:32:14.384][DEBUG] AddBuff buffId=300101 skillId=2020716 time=5
+[Debug] [2026-11-20 15:32:14.384][DEBUG] Buff OnAdd 300101 2020716 Chess Chess
+[Debug] [2026-11-20 15:32:14.384][DEBUG] PlaySkillEffect: MagicChargePink
+[Warn] [2026-11-20 15:32:14.384][WARN] EffectManager 变色配置无效: MagicChargePink TintColor=#FF00EA
+[Debug] [2026-11-20 15:32:14.384][DEBUG] 免死/防御触发 技能id=2020716 等级=1 类型=0 已免死=False 生命=2384/6660
+[Debug] [2026-11-20 15:32:14.384][DEBUG] PlaySkillEffect: FanExplosion
+[Debug] [2026-11-20 15:32:14.384][DEBUG] PlaySkillEffect: FanExplosion
+[Warn] [2026-11-20 15:32:14.384][WARN] EffectManager 变色配置无效: SwordHitYellowCritical TintColor=#FFFF00
+[Debug] [2026-11-20 15:32:14.384][DEBUG] PlaySkillEffect: FanExplosion
+[Warn] [2026-11-20 15:32:14.384][WARN] EffectManager 变色配置无效: SwordHitYellowCritical TintColor=#FFFF00
+[Debug] [2026-11-20 15:32:14.384][DEBUG] Buff OnRemove 300101 2020716 Chess Chess
+[Warn] [2026-11-20 15:32:14.384][WARN] EffectManager 变色配置无效: SwordHitYellowCritical TintColor=#FFFF00
+[Warn] [2026-11-20 15:32:14.384][WARN] EffectManager 变色配置无效: SwordHitYellowCritical TintColor=#FFFF00
+[Warn] [2026-11-20 15:32:14.384][WARN] EffectManager 变色配置无效: SwordHitYellowCritical TintColor=#FFFF00
+[Warn] [2026-11-20 15:32:14.384][WARN] EffectManager 变色配置无效: SwordHitYellowCritical TintColor=#FFFF00
+[Warn] [2026-11-20 15:32:14.385][WARN] EffectManager 变色配置无效: SwordHitYellowCritical TintColor=#FFFF00
+[Warn] [2026-11-20 15:32:14.385][WARN] EffectManager 变色配置无效: SwordHitYellowCritical TintColor=#FFFF00
+[Debug] [2026-11-20 15:32:14.386][DEBUG] id:100 dieUnit.side:1 存活阵营数:1
+结果: 乙胜 | 墙钟 0.0s 步数 1006
+=== 战斗结果 ===
+战斗时长: 50.3s
+胜负: 乙（side2）胜
+存活: 甲 0 / 乙 1
+=== 伤害统计 Top10 ===
+1. P1 郭嘉 总伤:5556 攻击:22次 技能:4512 对英雄:5556
+2. P0 曹仁 总伤:1426 攻击:23次 技能:0 对英雄:1426
+
+> bye
+

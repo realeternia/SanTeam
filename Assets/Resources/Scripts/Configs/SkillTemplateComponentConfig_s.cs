@@ -209,7 +209,7 @@ namespace CommonConfig
             config[3090] = new SkillTemplateComponentConfig(3090, "施法者必含", "目标筛选", null, "TargetType:selfAlways", 1, .5f, "选人时施法者必然包含在内", "结构性开关，本身不增值", false);
             config[3100] = new SkillTemplateComponentConfig(3100, "满血跳过", "目标筛选", null, "SelectOnly:notFullHp", 1, .3f, "跳过满血目标，避免溢出浪费", "结构性开关，本身不增值", false);
             config[3130] = new SkillTemplateComponentConfig(3130, "不按首段去重", "目标筛选", null, "TargetType:noDedupe", 1, 0f, "多次结算时不按首段效果去重", "结构性开关，本身不增值", false);
-            config[3140] = new SkillTemplateComponentConfig(3140, "受击·伤害源为英雄", "目标筛选", new string[]{"Defend"}, "Strength2:srcHero=1", 2, -1f, "仅当本次伤害来源为英雄时触发防御（小兵/召唤物造成的伤害不触发）", "限制触发来源，按覆盖率折价", false);
+            config[3140] = new SkillTemplateComponentConfig(3140, "受击·伤害源为英雄", "目标筛选", new string[]{"Defend"}, "Strength2:DamageSource=hero", 2, -1f, "仅当本次伤害来源为英雄时触发防御（小兵/召唤物造成的伤害不触发）", "限制触发来源，按覆盖率折价", false);
             config[3150] = new SkillTemplateComponentConfig(3150, "受击·伤害>自身生命3%", "施放节奏", new string[]{"Defend"}, "Strength2:minHpRate=0.03", 2, -1f, "仅当本次伤害超过自身最大生命的 3% 时触发防御，过滤小额伤害", "限制触发频率，按覆盖率折价", false);
             config[4000] = new SkillTemplateComponentConfig(4000, "斩杀", "增伤", null, "TargetType:execute;Strength2:execRate=3;Strength2:execHp=0.3", 3, 3f, "按血量阈值直接击杀或额外倍率", "按目标低于阈值时的覆盖比例折算额外倍率", false);
             config[4010] = new SkillTemplateComponentConfig(4010, "残血增伤", "增伤", null, "TargetType:missingHp;Strength2:missingHpRate=0.7", 2, 2f, "按施法者已损失生命追加伤害（missingHpRate）", "按施法者残血阶段的平均损失生命折算增伤", false);

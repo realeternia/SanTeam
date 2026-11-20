@@ -581,13 +581,13 @@ public class WorldManager : MonoBehaviour
         missile.MoveToTarget(targetChess, sourceChess.missileSpeed, sourceChess.missileHight);
     }
 
-    public void CreateSpellMissile(Chess sourceChess, Chess targetChess, Vector3 startPos, int skillId, int damage, string effectName)
+    public void CreateSpellMissile(Chess sourceChess, Chess targetChess, Vector3 startPos, int skillId, int damage, string effectName, float speed = 0f)
     {
         Missile missilePrefab = Resources.Load<Missile>("Prefabs/MissileCom");
         var missile = UnityEngine.Object.Instantiate<Missile>(missilePrefab, startPos, Quaternion.identity, Units.transform);
         missile.Init(sourceChess, 1, effectName);
         missile.SetSkillInfo(skillId, damage);
-        missile.MoveToTarget(targetChess, Mathf.Max(sourceChess.missileSpeed, 14), sourceChess.missileHight);
+        missile.MoveToTarget(targetChess, speed > 0f ? speed : Mathf.Max(sourceChess.missileSpeed, 14), sourceChess.missileHight);
     }
 
     public void CreateSpellMissile(Chess sourceChess, Vector3 targetPos, float time, float speed, float size, int skillId, int damage, string effectName, Func<Chess, float> perTargetDamageMulti = null, Action<Chess> perTargetOnHit = null)
