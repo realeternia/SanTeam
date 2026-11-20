@@ -4,8 +4,9 @@ using CommonConfig;
 using UnityEngine;
 
 /// <summary>
-/// 张飞·旋风斩：普攻时对周围最多 TargetCount 个敌人造成 key "splashRate"% 攻击伤害，
-/// 并对被溅射的敌人附加流血（Buff 短名由 skillCfg.BuffId 配置），每秒伤害 = 本次溅射伤害 × key "dot"，持续 BuffTime 秒。
+/// 张飞·旋风斩（主动）：锁定射程内一名敌人后施放，对自身周围最多 TargetCount 个敌人造成
+/// key "splashRate" × 自身攻击的伤害，并对被命中的敌人附加流血
+/// （Buff 短名由 skillCfg.BuffId 配置），每秒伤害 = 本次伤害 × key "dot"，持续 BuffTime 秒。
 /// </summary>
 public class SkillAidSpinAttack : Skill
 {
@@ -13,24 +14,28 @@ public class SkillAidSpinAttack : Skill
     {
     }
 
-    public override void OnAttack(Chess defender, int damage)
+    public override bool CheckAidSkill()
     {
-        if(CheckBurst(defender))
-        {
-            owner.PlayerAnim(skillCfg.Action);
-            // 旋风范围：按 SelectOnly / SelectFirst 选（默认敌方，排除被普攻命中的单位）
-            var unitsInRange = SelectTargets(owner.transform.position, skillCfg.Area, false, skillCfg.TargetCount, defender);
-            foreach (var unit in unitsInRange)
-            {
-                var spinDamage = (int)(damage * GetStr2("splashRate"));
-                unit.OnSkillDamaged(owner, skillId, spinDamage);
-                if (!string.IsNullOrEmpty(skillCfg.HitEffect))
-                    EffectManager.PlaySkillEffect(unit, skillCfg.HitEffect);
-                ApplyBleed(unit, spinDamage);
-            }
+        // 主动施放：射程内需有敌人锁定目标，再按 MP/CD/概率闸门判定
+        var target = SelectSingleTarget(skillCfg.Range);
+        if (target == null || !CheckBurst(target))
+            return false;
 
-            PlayAreaEffect(owner.transform.position);
+        owner.PlayerAnim(skillCfg.Action);
+        PlaySelfEffect();
+        PlayAreaEffect(owner.transform.position);
+
+        // 旋风范围：按 SelectOnly / SelectFirst 选（默认敌方）
+        var unitsInRange = SelectTargets(owner.transform.position, skillCfg.Area, false, skillCfg.TargetCount);
+        foreach (var unit in unitsInRange)
+        {
+            var spinDamage = ApplyDamageModifiers((int)(owner.atk * GetStr2("splashRate")), unit);
+            unit.OnSkillDamaged(owner, skillId, spinDamage);
+            if (!string.IsNullOrEmpty(skillCfg.HitEffect))
+                EffectManager.PlaySkillEffect(unit, skillCfg.HitEffect);
+            ApplyBleed(unit, spinDamage);
         }
+        return true;
     }
 
     // 对目标附加流血：每秒伤害 = 本次溅射伤害 × key "dot"

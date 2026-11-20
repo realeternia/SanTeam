@@ -82,26 +82,32 @@ namespace SkillBaseTool
             var skills = store.QualityHeroSkills.ToList();
             if (mode == Mode.Template)
             {
+                int unused = 0;
                 foreach (var tpl in store.Templates)
                 {
                     var used = skills.Where(s => s.TemplateName == tpl.Name).ToList();
-                    if (used.Count > 0)
-                        blocks.Add(MakeBlock(tpl.Name, tpl.Quality, tpl.Score, used, true));
+                    if (used.Count == 0)
+                        unused++;
+                    // 无人引用的模板也要画出来，内部显示“无”
+                    blocks.Add(MakeBlock(tpl.Name, tpl.Quality, tpl.Score, used, true));
                 }
                 int unassigned = skills.Count(s => string.IsNullOrEmpty(s.TemplateName));
-                lblSummary.Text = string.Format("模板视角：{0} 个模板 / {1} 个 Q1–Q4 英雄技能（未模板化 {2}）",
-                    blocks.Count, skills.Count, unassigned);
+                lblSummary.Text = string.Format("模板视角：{0} 个模板（无人引用 {1}）/ {2} 个 Q1–Q4 英雄技能（未模板化 {3}）",
+                    blocks.Count, unused, skills.Count, unassigned);
             }
             else
             {
+                int unused = 0;
                 foreach (var comp in store.Components)
                 {
                     var used = skills.Where(s => s.Modules.Contains(comp.Name)).ToList();
-                    if (used.Count > 0)
-                        blocks.Add(MakeBlock(comp.Name, comp.Quality, comp.Score, used, false));
+                    if (used.Count == 0)
+                        unused++;
+                    // 无人引用的组件也要画出来，内部显示“无”
+                    blocks.Add(MakeBlock(comp.Name, comp.Quality, comp.Score, used, false));
                 }
-                lblSummary.Text = string.Format("组件视角：{0} 个组件 / {1} 个 Q1–Q4 英雄技能（一个技能可同时出现在多个组件方块中）",
-                    blocks.Count, skills.Count);
+                lblSummary.Text = string.Format("组件视角：{0} 个组件（无人引用 {1}）/ {2} 个 Q1–Q4 英雄技能（一个技能可同时出现在多个组件方块中）",
+                    blocks.Count, unused, skills.Count);
             }
             // treemap 要求按面积（技能数）降序
             blocks = blocks.OrderByDescending(b => b.Count).ThenByDescending(b => b.Score).ToList();
@@ -117,6 +123,13 @@ namespace SkillBaseTool
                 .ThenByDescending(i => i.Price)
                 .ToList();
             block.Count = block.Items.Count;
+            if (block.Count == 0)
+            {
+                block.Meta = isTemplate
+                    ? string.Format("×0 · 模板分 {0} · 无引用", PriceText(score))
+                    : string.Format("×0 · 单价 {0} · 无引用", PriceText(score));
+                return block;
+            }
             double average = block.Items.Average(i => i.Price);
             block.Meta = isTemplate
                 ? string.Format("×{0} · 模板分 {1} · 均价 {2}", block.Count, PriceText(score), PriceText(average))
@@ -357,6 +370,17 @@ namespace SkillBaseTool
             {
                 using (var pen = new Pen(Theme.Line))
                     g.DrawLine(pen, rect.X + 6, rect.Y + 24, rect.Right - 7, rect.Y + 24);
+            }
+
+            if (block.Items.Count == 0)
+            {
+                // 无人引用：没有小方块可画，直接在内部显示“无”
+                var noneRect = new Rectangle(rect.X + 8, rect.Y + 26, Math.Max(0, rect.Width - 16),
+                    Math.Max(0, rect.Height - 30));
+                TextRenderer.DrawText(g, "无", Theme.Base, noneRect, Theme.Faint,
+                    TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter
+                    | TextFormatFlags.WordBreak | TextFormatFlags.NoPadding);
+                return;
             }
 
             foreach (var item in block.Items)
