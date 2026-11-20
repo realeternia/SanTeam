@@ -21,7 +21,7 @@
 ## 二、范围特效实现
 
 - 统一入口 `Skill.PlayAreaEffect(pos, time)`（[Skill.cs](../../Assets/Resources/Scripts/Combat/Skill/Skill.cs)），内部调用 `EffectManager.PlayPosSkillEffect`。
-- **缩放公式**：`最终缩放 = EffectConfig.Scale × (Area / CombatConst.AreaEffectBaseRadius)`，基准半径 `10`。
+- **缩放公式**：`最终缩放 = EffectConfig.Scale × (Area / EffectManager.AreaEffectBaseRadius)`，基准半径 `15`。
 - 特效挂在战场场景容器（`WorldManager.Units`）而非施法者节点，落点固定、不随施法者移动/转向。
 - `AreaEffect` 为空或资源加载失败：`GameLog.Warn` 后返回 null（不再 NRE）。
 - 普攻溅射类 [SkillBondHitArea.cs](../../Assets/Resources/Scripts/Combat/Skill/SkillBondHitArea.cs)、[SkillHitAround.cs](../../Assets/Resources/Scripts/Combat/Skill/SkillHitAround.cs) 不播范围特效，保留主目标 `HitEffect`。
@@ -45,6 +45,6 @@
 | --- | --- |
 | 范围特效入口 | [Skill.cs](../../Assets/Resources/Scripts/Combat/Skill/Skill.cs) `PlayAreaEffect` |
 | 特效播放与缩放 | [EffectManager.cs](../../Assets/Resources/Scripts/Combat/EffectManager.cs) `PlayPosSkillEffect` |
-| 缩放基准半径 | [CombatConst.cs](../../Assets/Resources/Scripts/Combat/CombatConst.cs) `AreaEffectBaseRadius` |
+| 缩放基准半径 | [EffectManager.cs](../../Assets/Resources/Scripts/Combat/EffectManager.cs) `AreaEffectBaseRadius` |
 | 特效配置 | [EffectConfig_s.cs](../../Assets/Resources/Scripts/Configs/EffectConfig_s.cs) |
 | 技能字段 | [SkillConfig_s.cs](../../Assets/Resources/Scripts/Configs/SkillConfig_s.cs) `Range` / `Area` / `AreaEffect` / `HitEffect` |

@@ -153,6 +153,11 @@ namespace CommonConfig
             config[140] = new SkillTemplateComponentConfig(140, "大概率", "施放节奏", null, "Rate=0.6", 1, -1f, "每次行动发动概率较高（Rate），百分比", "负向项：节奏成本，按实际发动频率抵减技能总价值", false);
             config[141] = new SkillTemplateComponentConfig(141, "中概率", "施放节奏", null, "Rate=0.4", 1, -2.5f, "每次行动发动概率中等（Rate），百分比", "负向项：节奏成本，按实际发动频率抵减技能总价值", false);
             config[142] = new SkillTemplateComponentConfig(142, "小概率", "施放节奏", null, "Rate=0.2", 1, -4f, "每次行动发动概率较低（Rate），百分比", "负向项：节奏成本，按实际发动频率抵减技能总价值", false);
+            config[150] = new SkillTemplateComponentConfig(150, "光环耗蓝1.5x", "施放节奏", new string[]{"光环中"}, "AuraMpRate=1.5", 1, 1.5f, "光环开启期间每秒消耗 1.5 点 MP（默认 2x）", "正向项：耗蓝更慢，光环持续时间更长", false);
+            config[151] = new SkillTemplateComponentConfig(151, "光环耗蓝2x", "施放节奏", new string[]{"光环中"}, "AuraMpRate=2", 1, 0f, "光环开启期间每秒消耗 2 点 MP（默认）", "基准档，不额外计价", false);
+            config[152] = new SkillTemplateComponentConfig(152, "光环耗蓝2.5x", "施放节奏", new string[]{"光环中"}, "AuraMpRate=2.5", 1, -1.5f, "光环开启期间每秒消耗 2.5 点 MP", "负向项：耗蓝更快，光环持续时间更短", false);
+            config[153] = new SkillTemplateComponentConfig(153, "光环耗蓝3x", "施放节奏", new string[]{"光环中"}, "AuraMpRate=3", 1, -3f, "光环开启期间每秒消耗 3 点 MP", "负向项：耗蓝更快，光环持续时间更短", false);
+            config[154] = new SkillTemplateComponentConfig(154, "光环耗蓝4x", "施放节奏", new string[]{"光环中"}, "AuraMpRate=4", 1, -4.5f, "光环开启期间每秒消耗 4 点 MP", "负向项：耗蓝更快，光环持续时间更短", false);
             config[1002] = new SkillTemplateComponentConfig(1002, "减速", "状态效果", new string[]{"Damage","Buff"}, "Buff:缓:slow=0.1;Buff:缓:atkSpeed=0.15;BuffTime=4", 2, 2.2f, "降低目标移动与攻速（缓）", "缓同时降低移速与攻速，按复合效果核算", false);
             config[1012] = new SkillTemplateComponentConfig(1012, "减防", "状态效果", new string[]{"Damage","Buff"}, "Buff:破:armorDown=25;BuffTime=4", 1, 1.5f, "降低目标护甲（破）", "按效果强度、持续时间、命中对象数综合估值", false);
             config[1022] = new SkillTemplateComponentConfig(1022, "减攻", "状态效果", new string[]{"Damage","Buff"}, "Buff:慑:atkDown=15;BuffTime=4", 1, 1.5f, "降低目标攻击（慑）", "按效果强度、持续时间、命中对象数综合估值", false);

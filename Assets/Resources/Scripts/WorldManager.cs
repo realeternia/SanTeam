@@ -44,6 +44,10 @@ public class WorldManager : MonoBehaviour
     private List<Tuple<GameObject, PlayerInfo, int>> bagDrops = new List<Tuple<GameObject, PlayerInfo, int>>(); // 怪物掉落包（BagDrop模型，获得玩家，首个掉落物id用于显示图标）
 
     // 调试阵容·开局Buff：记录"调试单位 → 配置条目"，在 BattleBegin 全部技能结算后统一施加（见 ApplyDebugBuffs）
+    /// <summary>调试阵容给武将挂Buff时使用的临时技能配置Id：Buff 的效果数值统一取自 SkillConfig，该配置行数值全为0，仅保证 Buff 能正常构造</summary>
+    public const int DebugBuffSkillId = 999999;
+    /// <summary>调试阵容挂Buff的默认时长(秒)：条目未填时长时使用</summary>
+    public const float DebugBuffDefaultTime = 10f;
     private List<Tuple<Chess, GameManager.DebugHeroEntry>> debugBuffTargets = new List<Tuple<Chess, GameManager.DebugHeroEntry>>();
    
     public HeroInfoGroup heroInfoGroup;
@@ -234,7 +238,7 @@ public class WorldManager : MonoBehaviour
     }
 
     // 调试阵容·开局Buff：给窗口里配了Buff的调试武将按条目挂载Buff（时长取条目配置，默认10秒）。
-    // Buff 的效果数值统一读 SkillConfig，这里用零值调试配置行（CombatConst.DebugBuffSkillId），
+    // Buff 的效果数值统一读 SkillConfig，这里用零值调试配置行（DebugBuffSkillId），
     // 只用于验证Buff的挂载/表现/时长，不产生数值影响。
     private void ApplyDebugBuffs()
     {
@@ -242,9 +246,9 @@ public class WorldManager : MonoBehaviour
             return;
 
         // 零值调试技能配置行：数值槽走 key-value 串，留空即可（各 Buff 脚本按固定 key 读取，缺 key 得 0）
-        SkillConfig.Assign(CombatConst.DebugBuffSkillId, new SkillConfig
+        SkillConfig.Assign(DebugBuffSkillId, new SkillConfig
         {
-            Id = CombatConst.DebugBuffSkillId,
+            Id = DebugBuffSkillId,
             Name = "调试Buff",
             Sname = "调试Buff",
             Strength2 = "",
@@ -262,9 +266,9 @@ public class WorldManager : MonoBehaviour
                 GameLog.Error($"调试阵容：Buff配置不存在 id={hero.buffId}");
                 continue;
             }
-            float time = hero.buffTime > 0f ? hero.buffTime : CombatConst.DebugBuffDefaultTime;
+            float time = hero.buffTime > 0f ? hero.buffTime : DebugBuffDefaultTime;
             GameLog.Info($"调试阵容：给 {chess.chessName}(id{chess.id}) 挂载Buff {hero.buffId}，时长{time}秒");
-            BuffManager.AddBuff(chess, chess, CombatConst.DebugBuffSkillId, hero.buffId, time);
+            BuffManager.AddBuff(chess, chess, DebugBuffSkillId, hero.buffId, time);
         }
         debugBuffTargets.Clear();
     }

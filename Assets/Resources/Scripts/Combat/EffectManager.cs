@@ -5,6 +5,10 @@ using CommonConfig;
 
 public static class EffectManager
 {
+    /// <summary>范围特效缩放基准半径：EffectConfig.Scale 对应的半径，实际缩放 = Scale × Area / 本值</summary>
+    public const float AreaEffectBaseRadius = 15f;
+    /// <summary>挂在单位身上的特效（命中/技能/施法/buff）额外抬升高度：在 EffectConfig.OffsetY 基础上统一再上抬的世界高度；地面范围特效(PlayPosSkillEffect)不适用，保持贴地</summary>
+    public const float UnitEffectExtraOffsetY = 4f;
 
     // 通过 EffectConfig 解析特效资源路径（相对 Resources）：配置存省略 Prefabs/ 前缀的路径（如 Effect/xxx），
     // 这里统一补全；缺失时回退到 Prefabs/Effect 目录。外部引用仍传特效名（HitEffect 值），由这里统一解析。
@@ -118,7 +122,7 @@ public static class EffectManager
         var hitPrefab = Resources.Load<GameObject>(ResolveEffectPath(effectName));
         var cfg = EffectConfig.GetConfigByName(effectName);
         float scale = GetScale(effectName, cfg, hitPrefab != null ? hitPrefab.transform.localScale.x : 1f);
-        float offsetY = GetOffsetY(effectName, cfg) + CombatConst.UnitEffectExtraOffsetY;
+        float offsetY = GetOffsetY(effectName, cfg) + UnitEffectExtraOffsetY;
         GameObject hitEffect = UnityEngine.Object.Instantiate(hitPrefab, targetChess.transform.position, Quaternion.identity);
         MountEffect(hitEffect, targetChess.transform, new Vector3(scale, scale, scale), offsetY);
         ApplyTint(hitEffect, cfg);
@@ -143,7 +147,7 @@ public static class EffectManager
 
         var cfg = EffectConfig.GetConfigByName(effect);
         float scale = GetScale(effect, cfg, hitPrefab.transform.localScale.x);
-        float offsetY = GetOffsetY(effect, cfg) + CombatConst.UnitEffectExtraOffsetY;
+        float offsetY = GetOffsetY(effect, cfg) + UnitEffectExtraOffsetY;
         GameObject hitEffect = UnityEngine.Object.Instantiate(hitPrefab, sourceChess.transform.position, hitPrefab.transform.rotation);
         MountEffect(hitEffect, sourceChess.transform, new Vector3(scale, scale, scale), offsetY);
         ApplyTint(hitEffect, cfg);
@@ -175,7 +179,7 @@ public static class EffectManager
 
         var cfg = EffectConfig.GetConfigByName(effect);
         float baseScale = GetScale(effect, cfg, hitPrefab.transform.localScale.x);
-        float extra = (area > 0f && CombatConst.AreaEffectBaseRadius > 0f) ? area / CombatConst.AreaEffectBaseRadius : 1f;
+        float extra = (area > 0f && AreaEffectBaseRadius > 0f) ? area / AreaEffectBaseRadius : 1f;
         float scale = baseScale * extra;
         float offsetY = GetOffsetY(effect, cfg);
         GameObject hitEffect = UnityEngine.Object.Instantiate(hitPrefab, sourcePos, hitPrefab.transform.rotation);
@@ -196,7 +200,7 @@ public static class EffectManager
 
         var cfg = EffectConfig.GetConfigByName(effect);
         float scale = GetScale(effect, cfg, hitPrefab != null ? hitPrefab.transform.localScale.x : 1f);
-        float offsetY = GetOffsetY(effect, cfg) + CombatConst.UnitEffectExtraOffsetY;
+        float offsetY = GetOffsetY(effect, cfg) + UnitEffectExtraOffsetY;
         GameObject hitEffect = UnityEngine.Object.Instantiate(hitPrefab, sourceChess.transform.position, hitPrefab.transform.rotation);
         MountEffect(hitEffect, sourceChess.transform, new Vector3(scale, scale, scale), offsetY);
         ApplyTint(hitEffect, cfg);

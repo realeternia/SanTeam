@@ -38,15 +38,17 @@ Unity (C#) | JsonUtility | UGUI | TextMeshPro
 
 统一使用 `SysRandom`（Range/Value/Next/InsideUnitCircle，支持 Seed）。禁止 `UnityEngine.Random`，也不要散落 `new System.Random()`。
 
-### 常量归类（CombatConst / AIConst / GameConst）
+### 常量归类（通用规则）
 
-三个常量类职责严格分离，新增数值先判定归属再落文件，禁止在调用方硬编码：
+新增数值先判定归属再落文件，禁止在调用方硬编码；**能归属到某个类的，不要往常量类里塞**：
 
-- `Combat/CombatConst.cs` → `CombatConst`：**只在战斗中生效**的内容——技能/Buff Id、伤害类型/标签、Buff 叠加模式、抗性/移动避障/单位间距、召唤物 Id、范围特效、星级/品质成长、技能 MP 修正、疲劳机制等
+- `Combat/CombatConst.cs` → `CombatConst`：只放**跨类共享的战斗值**——技能/Buff Id、伤害类型/标签、Buff 叠加模式、抗性公式、移动避障/单位间距、召唤物 Id、星级/品质成长、技能 MP 修正
+- **单类/单机制专用** → 放实现类的 `private const`（例：`SkillComBuffAura.TickInterval`、`FatigueManager.Interval`、`EffectManager.AreaEffectBaseRadius`）
+- **成套且被多个类共用** → 新建独立静态常量类（如 `XxxConst`），不要堆进 `CombatConst`
 - `Tools/AIConst.cs` → `AIConst`：**AI 决策策略**相关数值——许愿品质偏好、评分倍率、买卖卡意向、淘汰清仓、商店刷新、锁卡、聚焦、羁绊信任倍率
 - `Tools/GameConst.cs` → `GameConst`：**非战斗的通用玩法规则**——许愿槽位/解锁回合/出卡权重、好友每回合金币、5x5 布阵图（格数/行列/英雄格）、玩家等级/经验/生命/卡上限、买经验、士兵等级
 
-约定：单个数值用 `public const`，数组/二维数组用 `public static readonly`，全部加中文 `/// <summary>` 说明；常量类只放数值，不放业务方法（需要逻辑时放调用方或独立静态类）。
+约定：单个数值用 `const`，数组/二维数组用 `static readonly`，全部加中文 `/// <summary>` 说明；常量类/常量区块只放数值，不放业务方法（需要逻辑时放调用方或独立静态类）。
 
 ## 核心架构
 
@@ -60,26 +62,11 @@ Unity (C#) | JsonUtility | UGUI | TextMeshPro
 - 配置后处理（字段补默认值/联动修正）统一放 `ConfigManager.PostModify()`，如 HeroConfig 数值为 0 时取职业基准值
 - 禁止在配置类（如 `SoldierConfig`）中添加掉落解析/加权随机等业务实现
 - 禁止在配置类构造器中使用默认参数：新增列必须插入到对应字段/构造参数的位置（保持表列顺序，如 CD 后加触发条件 TriggerCondition），并同步为全部数据行补值，不允许让旧行缺参
-- 战斗中用到的技能/Buff Id 常量放 `CombatConst`（`Combat/CombatConst.cs`），不要在战斗代码里硬编码 Id
+- 战斗中用到的**跨类共享**技能/Buff Id 常量放 `CombatConst`（`Combat/CombatConst.cs`），单类专用的放实现类 `private const`，不要在战斗代码里硬编码 Id
 
-### 技能系统
+### 战斗层专项规范
 
-- 基类 `Skill`（`Combat/Skill/Skill.cs`），派生类 `SkillXxx` 放 `Combat/Skill/`，一技能一文件
-- 技能等级机制：同一技能在 SkillConfig 表按 Sname 展开为 Lv1~5 多行，`SetLevel(lv)` 会切换到对应配置行；连锁机制（兵种/好友特殊）通过修改 `Level` 生效
-- 技能伤害统一公式：`Strength + 关联属性 × SkillDamageAttrRate`（Attr：ap=法强 / might=无双 / atk=武力）
-
-### Buff 系统
-
-- 基类 `Buff`（`Combat/Buff/Buff.cs`），派生类 `BuffXxx` 放 `Combat/Buff/`，由 `BuffManager` 统一管理
-- **BuffId 号段**：`300xxx` 正面通用、`3001xx` 正面特化、`301xxx` 负面通用、`3011xx` 负面特化
-  - 通用 = 可复用、语义单一（加攻/加防/加速/护盾/回复/减攻/减速等）；特化 = 专属机制/需要独立脚本状态（复活、据守、嘲讽、混乱等）
-  - 新增 Buff 先判断正负面与是否特化，再在对应段内顺延取号；短名（`NameS`）不变，改动 Id 时需同步 `CombatConst` 与代码注释
-- 复杂 Buff 优先拆成多个通用 Buff 组合（`SkillConfig.BuffId` 用 `,` 分隔多段），各段按组合位置读取 `StrengthBuff1`（如 `快,速`=[攻速,移速]、`攻,甲,抗`=[攻击,护甲,魔抗]）
-
-### 连锁/羁绊机制
-
-- 兵种连锁 `JobLinkManager`（静态类）：上阵同职业 1/2/3/4/5 人对应职业技能 Lv1~5 档位，LinkSelf=连接英雄自身加成，LinkTeam=全队总量加成（配置即总量，不乘人数），数值全部走 SkillConfig，不硬编码
-- 数值档位数组常量按归属放置：阵营护盾 `FactionShieldCounts` 在 `CombatConst`（战斗内生效），好友连线档位 `FriendLineCounts` 在 `AIConst`（AI 评分用）；具体技能数值全部走 SkillConfig，不硬编码
+技能 / Buff / 连锁羁绊 / 战斗常量的详细规范已拆分到 `.trae/skills/combat-rules/SKILL.md`；涉及 `Combat/` 下代码（Skill、Buff、Chess、各战斗 Manager）时必须先加载该 skill。此处只保留一条铁律：**战斗中禁止硬编码技能/Buff Id 与机制数值**（归属见上方「常量归类」）。
 
 ### 纯数据对象 - PO
 
@@ -132,7 +119,7 @@ UI 图标统一走 `IconLoader` 组件（Inspector 配 sourceType：Path / HeroA
 - 禁止配置类使用属性，用公共字段
 - 禁止在配置类（`XxxConfig_s.cs`）中添加模板之外的任何方法（业务/工具/静态便捷/重载），配表由工具模板生成，重新生成会覆盖丢失
 - 禁止硬编码颜色，用 `SysColor`（含嵌套类）
-- 禁止在战斗中硬编码技能/Buff Id 和机制数值：战斗相关提取到 `CombatConst`，AI 策略数值提取到 `AIConst`，非战斗玩法数值提取到 `GameConst`
+- 禁止在战斗中硬编码技能/Buff Id 和机制数值：跨类共享值放 `CombatConst`，单类/单机制专用值放实现类 `private const`（或独立 `XxxConst`），AI 策略数值放 `AIConst`，非战斗玩法数值放 `GameConst`
 - 新增 `.cs` 文件必须在 `Assembly-CSharp.csproj` 添加 `<Compile Include>`（Editor 脚本加到 `Assembly-CSharp-Editor.csproj`）
 - 新增配置类必须在 `ConfigManager.Init()` 中注册 Load
 - 禁止静默 null check return，必须记录日志

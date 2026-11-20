@@ -41,8 +41,7 @@ public class Chess : MonoBehaviour
     public float healRate; //治疗强化系数（0.1=治疗效果+10%）
     public float healedRate; //受治疗系数（可为负，-0.1=受到的治疗-10%，减疗）
     public float auroEffectRate = 1f; //光环效果加成系数（1=无加成，鼓等光环效果值乘算）
-    /// <summary>MP 获取锁定（光环开启期间为 true）：屏蔽攻击/受击回蓝，技能回蓝不受影响</summary>
-    public bool mpGainLocked;
+
 
     public int lastDamagedPlayerId = -1;
     /// <summary>最近一次实际受到伤害的时间(Time.time，无受伤为负无穷)，供"最近受伤"判定</summary>
@@ -396,8 +395,7 @@ public class Chess : MonoBehaviour
     /// </summary>
     public void GainMp(float baseGain)
     {
-        // 光环开启期间：攻击/受击无法回蓝（技能回蓝走 Skill.AddMp，不受此限制）
-        if (mpGainLocked || baseGain <= 0f)
+        if (baseGain <= 0f)
             return;
         var gain = baseGain * MpGainMultiplier;
         if (gain <= 0f)

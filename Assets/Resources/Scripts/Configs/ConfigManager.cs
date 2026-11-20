@@ -151,6 +151,7 @@ public static class ConfigManager
             skillCfg.MpCost = baseCfg.MpCost;
             if (baseCfg.StartMpRate > 0f)
                 skillCfg.StartMpRate = baseCfg.StartMpRate;
+            skillCfg.AuraMpRate = baseCfg.AuraMpRate;
             skillCfg.TriggerCondition = baseCfg.TriggerCondition;
             skillCfg.Range = baseCfg.Range;
             skillCfg.Area = baseCfg.Area;

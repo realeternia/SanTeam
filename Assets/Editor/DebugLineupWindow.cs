@@ -393,7 +393,7 @@ public class DebugLineupWindow : EditorWindow
                 elem.FindPropertyRelative("level").intValue = 1;
                 // 插入的元素会复制上一个元素（含其Buff设置），这里重置为不挂Buff
                 elem.FindPropertyRelative("buffId").intValue = 0;
-                elem.FindPropertyRelative("buffTime").floatValue = CombatConst.DebugBuffDefaultTime;
+                elem.FindPropertyRelative("buffTime").floatValue = WorldManager.DebugBuffDefaultTime;
                 so.ApplyModifiedProperties();
                 MarkSceneDirty();
             });
@@ -539,7 +539,7 @@ public class DebugLineupWindow : EditorWindow
             elem.FindPropertyRelative("heroId").intValue = picks[i].Id;
             elem.FindPropertyRelative("level").intValue = 1;
             elem.FindPropertyRelative("buffId").intValue = 0;
-            elem.FindPropertyRelative("buffTime").floatValue = CombatConst.DebugBuffDefaultTime;
+            elem.FindPropertyRelative("buffTime").floatValue = WorldManager.DebugBuffDefaultTime;
         }
     }
 

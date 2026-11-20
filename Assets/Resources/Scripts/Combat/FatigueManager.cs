@@ -1,7 +1,7 @@
 // ============================================================
 // 战斗 · 疲劳机制 —— FatigueManager
-// 战斗超时加压：开战后 FatigueStartTime 秒起，每 FatigueInterval 秒对全体英雄结算一次疲劳伤害，
-// 数值按 FatigueBaseDamage 线性递增(100/200/300…)。真实伤害：直接扣血，无视抗性/护盾/减伤/闪避等一切结算；不致死，最多扣到 1 血。
+// 战斗超时加压：开战后 StartTime 秒起，每 Interval 秒对全体英雄结算一次疲劳伤害，
+// 数值按 BaseDamage 线性递增(100/200/300…)。真实伤害：直接扣血，无视抗性/护盾/减伤/闪避等一切结算；不致死，最多扣到 1 血。
 // 由战斗主循环驱动（真机 WorldManager.GameUpdate / 模拟器 BattleSim.Step 每 tick 调 Tick），开战前 Reset。
 // ============================================================
 using System.Collections.Generic;
@@ -9,6 +9,15 @@ using System.Collections.Generic;
 /// <summary>战斗疲劳：超时后按固定间隔对全体英雄施加递增的真实伤害（拖时间会被逐渐耗死）</summary>
 public static class FatigueManager
 {
+    /// <summary>疲劳开始时间(秒)：开战后经过该时长开始结算疲劳</summary>
+    private const float StartTime = 30f;
+    /// <summary>疲劳结算间隔(秒)</summary>
+    private const float Interval = 5f;
+    /// <summary>首次疲劳伤害</summary>
+    private const int BaseDamage = 100;
+    /// <summary>每次疲劳伤害的线性增量(100/200/300…)</summary>
+    private const int DamageGrowth = 100;
+
     private static float elapsed;   // 本场已进行的战斗时长(秒)
     private static float nextTime;  // 下一次疲劳结算的时间点(秒)
     private static int count;       // 本场已结算次数(决定伤害 100/200/300…)
@@ -18,18 +27,18 @@ public static class FatigueManager
     {
         elapsed = 0f;
         count = 0;
-        nextTime = CombatConst.FatigueStartTime;
+        nextTime = StartTime;
     }
 
     /// <summary>每个战斗 tick 调用一次（dt=战斗步长），内部按秒累计并在到点后结算</summary>
     public static void Tick(float dt)
     {
         elapsed += dt;
-        // FatigueInterval<=0 视为不启用疲劳（并入循环条件，避免常量折叠产生不可达代码，同时防止 nextTime 不推进导致死循环）
-        while (CombatConst.FatigueInterval > 0f && elapsed >= nextTime)
+        // Interval<=0 视为不启用疲劳（并入循环条件，避免常量折叠产生不可达代码，同时防止 nextTime 不推进导致死循环）
+        while (Interval > 0f && elapsed >= nextTime)
         {
             ApplyFatigue();
-            nextTime += CombatConst.FatigueInterval;
+            nextTime += Interval;
         }
     }
 
@@ -37,7 +46,7 @@ public static class FatigueManager
     private static void ApplyFatigue()
     {
         count++;
-        int damage = CombatConst.FatigueBaseDamage + (count - 1) * CombatConst.FatigueDamageGrowth;
+        int damage = BaseDamage + (count - 1) * DamageGrowth;
 
         var game = GameManager.Instance;
         var world = WorldManager.Instance;

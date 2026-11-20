@@ -1,5 +1,6 @@
 /// <summary>
-/// 战斗常量：战斗相关的技能/Buff Id 与机制数值统一在此维护
+/// 战斗层跨类共享常量：技能/Buff Id、伤害类型/标签、叠加模式、抗性与通用机制数值。
+/// 只被单个类/单个机制使用的常量不要放这里：放实现类的 private const（光环间隔、疲劳参数、调试Id 等）。
 /// </summary>
 public static class CombatConst
 {
@@ -85,15 +86,6 @@ public static class CombatConst
     /// <summary>单次受击最多获得的法力（防止一次高伤害直接回满）</summary>
     public const float MpPerDamageCap = 20f;
 
-    // ---- 调试阵容·开局Buff ----
-    /// <summary>
-    /// 调试阵容给武将挂Buff时使用的临时技能配置Id：Buff 的效果数值统一取自 SkillConfig，
-    /// 该配置行数值全为0（见 WorldManager.ApplyDebugBuffs），仅保证 Buff 能正常构造，不产生数值影响
-    /// </summary>
-    public const int DebugBuffSkillId = 999999;
-    /// <summary>调试阵容挂Buff的默认时长(秒)：条目未填时长时使用</summary>
-    public const float DebugBuffDefaultTime = 10f;
-
     // ---- 国家护盾机制(同阵营连线，数值参考金铲铲神盾使羁绊) ----
     /// <summary>同阵营英雄数量档位(2/3/4/5/6，对应国家护盾技能 Lv1~5)</summary>
     public static readonly int[] FactionShieldCounts = { 2, 3, 4, 5, 6 };
@@ -142,13 +134,6 @@ public static class CombatConst
     /// <summary>影子(501002)：分兵/影技能召唤的分身</summary>
     public const int SoldierShadow = 501002;
 
-    // ---- 范围特效 ----
-    /// <summary>范围特效缩放基准半径：EffectConfig.Scale 对应的半径，实际缩放 = Scale × Area / 本值</summary>
-    public const float AreaEffectBaseRadius = 15f;
-    /// <summary>挂在单位身上的特效（命中/技能/施法/buff）额外抬升高度：在 EffectConfig.OffsetY 基础上统一再上抬的世界高度；
-    /// 地面范围特效(PlayPosSkillEffect)不适用，保持贴地</summary>
-    public const float UnitEffectExtraOffsetY = 4f;
-
     // ---- 卡牌属性成长 ----
     /// <summary>星级成长倍率：每升1星 ×本值（乘方式，Lv1=×1.0、Lv2=×1.55、Lv3=×1.55²…），作用于 Atk/Ap/Hp</summary>
     public const float StarGrowthPerStar = 1.55f;
@@ -178,14 +163,4 @@ public static class CombatConst
     public const int FriendSpecialBaseLevel = 0;
     /// <summary>代友道具的 ItemConfig.Effect 标记：装备后视为指代羁绊组在场1人，参与人数计算、连线与关联技能授予</summary>
     public const string FriendProxyItemEffect = "friendrep";
-
-    // ---- 疲劳机制(战斗超时加压：拖时间会被逐渐磨到残血，但不致死，最低扣到 1 血) ----
-    /// <summary>疲劳开始时间(秒)：开战后经过该时长开始结算疲劳</summary>
-    public const float FatigueStartTime = 30f;
-    /// <summary>疲劳结算间隔(秒)</summary>
-    public const float FatigueInterval = 5f;
-    /// <summary>首次疲劳伤害</summary>
-    public const int FatigueBaseDamage = 100;
-    /// <summary>每次疲劳伤害的线性增量(100/200/300…)</summary>
-    public const int FatigueDamageGrowth = 100;
 }
