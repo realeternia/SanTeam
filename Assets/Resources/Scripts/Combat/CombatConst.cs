@@ -50,14 +50,16 @@ public static class CombatConst
     public const string AntiShieldHurtTag = "AntiShield";
     /// <summary>LockChain：连锁(BuffLock)传递的伤害标签，避免锁链伤害二次扩散成循环放大</summary>
     public const string LockChainHurtTag = "LockChain";
+    /// <summary>Reflect：反伤(物理/魔法反弹)产生的伤害标签，避免双方反伤互相递归</summary>
+    public const string ReflectHurtTag = "Reflect";
 
     /// <summary>
-    /// 是否派生伤害：连锁(LockChain)/破盾(AntiShield)这类由其他伤害二次派生的伤害。
-    /// 派生伤害不得再生出派生伤害（连锁/生命链接/破盾），否则两种机制会互相触发形成无限递归
+    /// 是否派生伤害：连锁(LockChain)/破盾(AntiShield)/反伤(Reflect)这类由其他伤害二次派生的伤害。
+    /// 派生伤害不得再生出派生伤害（连锁/生命链接/破盾/反伤），否则机制会互相触发形成无限递归
     /// </summary>
     public static bool IsDerivedHurtTag(string hurtTag)
     {
-        return hurtTag == LockChainHurtTag || hurtTag == AntiShieldHurtTag;
+        return hurtTag == LockChainHurtTag || hurtTag == AntiShieldHurtTag || hurtTag == ReflectHurtTag;
     }
 
     // ---- 跳跃链(SkillComDamageJumpChain) ----

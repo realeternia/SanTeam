@@ -326,6 +326,8 @@
     <Compile Include="Assets\Resources\Scripts\Profile.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\TooltipHeroAttr.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillBondDefReduceDamageRate.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillComDefendBefore.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillComDefendCheatDeath.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\TextMesh Pro\Shaders\TMPro.cginc" />
