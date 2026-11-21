@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 4318146845555901146}
   - component: {fileID: 1976830715694858661}
   m_Layer: 0
-  m_Name: ArmorCirclingJia
+  m_Name: RisingArrowGreen
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -188,8 +188,8 @@ ParticleSystem:
     startColor:
       serializedVersion: 2
       minMaxState: 0
-      minColor: {r: 1, g: 0.95, b: 0.72, a: 1}
-      maxColor: {r: 1, g: 0.78, b: 0.28, a: 0.4117647}
+      minColor: {r: 0.6, g: 1, b: 0.7, a: 1}
+      maxColor: {r: 0.2, g: 0.9, b: 0.4, a: 0.4117647}
       maxGradient:
         serializedVersion: 2
         key0: {r: 1, g: 1, b: 1, a: 1}
@@ -4851,7 +4851,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7faa64a828219b44cb0eb5bfbfa83524, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rotateVector: {x: 0, y: 0, z: 90}
+  rotateVector: {x: 0, y: 0, z: 0}
   rotateSpace: 0
 --- !u!1 &4373109043655909727
 GameObject:
@@ -4866,7 +4866,7 @@ GameObject:
   - component: {fileID: 561919879176693066}
   - component: {fileID: 2863364948727461202}
   m_Layer: 0
-  m_Name: ArmorJia
+  m_Name: Arrow
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4970,8 +4970,8 @@ ParticleSystem:
     startLifetime:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 1.5
-      minScalar: 5
+      scalar: 1.2
+      minScalar: 1.2
       maxCurve:
         serializedVersion: 2
         m_Curve:
@@ -5040,8 +5040,8 @@ ParticleSystem:
     startColor:
       serializedVersion: 2
       minMaxState: 0
-      minColor: {r: 1, g: 0.95, b: 0.65, a: 1}
-      maxColor: {r: 1, g: 0.72, b: 0.12, a: 1}
+      minColor: {r: 0.6, g: 1, b: 0.65, a: 1}
+      maxColor: {r: 0.2, g: 0.85, b: 0.35, a: 1}
       maxGradient:
         serializedVersion: 2
         key0: {r: 1, g: 1, b: 1, a: 1}
@@ -5105,8 +5105,8 @@ ParticleSystem:
     startSize:
       serializedVersion: 2
       minMaxState: 3
-      scalar: 3
-      minScalar: 2
+      scalar: 2.4
+      minScalar: 2.4
       maxCurve:
         serializedVersion: 2
         m_Curve:
@@ -5245,8 +5245,8 @@ ParticleSystem:
         m_RotationOrder: 4
     startRotationX:
       serializedVersion: 2
-      minMaxState: 3
-      scalar: 1
+      minMaxState: 0
+      scalar: 0
       minScalar: 0
       maxCurve:
         serializedVersion: 2
@@ -5298,8 +5298,8 @@ ParticleSystem:
         m_RotationOrder: 4
     startRotationY:
       serializedVersion: 2
-      minMaxState: 3
-      scalar: 1
+      minMaxState: 0
+      scalar: 0
       minScalar: 0
       maxCurve:
         serializedVersion: 2
@@ -5351,7 +5351,7 @@ ParticleSystem:
         m_RotationOrder: 4
     startRotation:
       serializedVersion: 2
-      minMaxState: 3
+      minMaxState: 0
       scalar: 0
       minScalar: 0
       maxCurve:
@@ -5447,7 +5447,7 @@ ParticleSystem:
     serializedVersion: 6
     enabled: 1
     type: 10
-    angle: 61.353016
+    angle: 360
     length: 5
     boxThickness: {x: 0, y: 0, z: 0}
     radiusThickness: 0
@@ -5533,7 +5533,7 @@ ParticleSystem:
     sphericalDirectionAmount: 0
     randomPositionAmount: 0
     radius:
-      value: 1
+      value: 1.5
       mode: 0
       spread: 0
       speed:
@@ -5652,8 +5652,8 @@ ParticleSystem:
     rateOverTime:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 3
-      minScalar: 10
+      scalar: 5
+      minScalar: 5
       maxCurve:
         serializedVersion: 2
         m_Curve:
@@ -5758,7 +5758,7 @@ ParticleSystem:
     m_BurstCount: 0
     m_Bursts: []
   SizeModule:
-    enabled: 1
+    enabled: 0
     curve:
       serializedVersion: 2
       minMaxState: 1
@@ -6285,7 +6285,7 @@ ParticleSystem:
     enabled: 1
     x:
       serializedVersion: 2
-      minMaxState: 1
+      minMaxState: 0
       scalar: 0
       minScalar: 0
       maxCurve:
@@ -6338,7 +6338,7 @@ ParticleSystem:
         m_RotationOrder: 4
     y:
       serializedVersion: 2
-      minMaxState: 1
+      minMaxState: 0
       scalar: 0
       minScalar: 0
       maxCurve:
@@ -6391,9 +6391,9 @@ ParticleSystem:
         m_RotationOrder: 4
     z:
       serializedVersion: 2
-      minMaxState: 1
-      scalar: 0.5
-      minScalar: 0
+      minMaxState: 0
+      scalar: 2
+      minScalar: 2
       maxCurve:
         serializedVersion: 2
         m_Curve:
@@ -9589,7 +9589,7 @@ ParticleSystemRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 952f0ce2bf04399419bd28d2bc214c00, type: 2}
+  - {fileID: 2100000, guid: cff774d3a56b70449bded5faf3ab944f, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -9654,5 +9654,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7faa64a828219b44cb0eb5bfbfa83524, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rotateVector: {x: 0, y: 0, z: 125}
+  rotateVector: {x: 0, y: 0, z: 0}
   rotateSpace: 0

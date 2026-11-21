@@ -198,11 +198,11 @@ namespace CommonConfig
             config[300025] = new BuffConfig(300025, "反伤", "反", "受到伤害时将其中一部分返还给攻击者", true, true, false, true, true, 1, "BuffReflect", "reflect", "", "", "", "CirclingReflectCi", "", "");
             config[300030] = new BuffConfig(300030, "隐匿", "隐", "敌方索敌与单体技能无法锁定自身，单位呈半透明", true, true, false, false, false, 4, "BuffStealth", "", "", "", "", "", "BuffStealth", "");
             config[300031] = new BuffConfig(300031, "士兵士气", "气", "每层提升小兵5点攻击与5点护甲，可无限叠加", true, false, false, false, false, 1, "BuffMorale", "", "", "", "", "", "", "");
-            config[300101] = new BuffConfig(300101, "据守", "守", "获得临时双防，期间每次受击再叠一层双防，状态结束后临时双防消失", true, false, false, false, false, 4, "BuffDefStack", "armor", "perStack,maxStack", "", "", "", "", "");
+            config[300101] = new BuffConfig(300101, "据守", "守", "获得临时双防，期间每次受击再叠一层双防，状态结束后临时双防消失", true, false, false, false, false, 4, "BuffDefStack", "armor", "perStack,maxStack", "", "", "RisingArrowGreen", "", "");
             config[300106] = new BuffConfig(300106, "生命链接", "链", "与链接方共享伤害与回复", true, false, false, false, false, 4, "BuffLifeLink", "", "damageShare", "", "", "HeartStream", "", "");
-            config[300107] = new BuffConfig(300107, "望族", "望", "提升/strength点护甲、/strength2点魔抗，每3秒衰减1/5，15秒后归零", true, true, false, true, true, 4, "BuffDecayDef", "armor,magicRes", "", "", "", "", "", "");
-            config[300108] = new BuffConfig(300108, "兼资", "兼", "攻击叠层：每层提升/strength攻击、/strength2法术强度，持续攻击刷新，停手后层数清零", true, true, false, true, true, 4, "BuffStackBuf", "atk,ap", "", "", "", "", "", "");
-            config[300109] = new BuffConfig(300109, "威震", "震", "携带者普攻按概率眩晕目标，且普攻转为真实伤害", true, false, false, false, false, 4, "BuffVengefulStance", "", "stunChance", "#0000CC", "#660099", "", "", "");
+            config[300107] = new BuffConfig(300107, "望族", "望", "提升/strength点护甲、/strength2点魔抗，每3秒衰减1/5，15秒后归零", true, true, false, true, true, 4, "BuffDecayDef", "armor,magicRes", "", "", "", "RisingArrowGreen", "", "");
+            config[300108] = new BuffConfig(300108, "兼资", "兼", "攻击叠层：每层提升/strength攻击、/strength2法术强度，持续攻击刷新，停手后层数清零", true, true, false, true, true, 4, "BuffStackBuf", "atk,ap", "", "", "", "RisingArrowGreen", "", "");
+            config[300109] = new BuffConfig(300109, "威震", "震", "携带者普攻按概率眩晕目标，且普攻转为真实伤害", true, false, false, false, false, 4, "BuffVengefulStance", "", "stunChance", "", "", "RisingArrowGreen", "", "");
             config[300110] = new BuffConfig(300110, "焰衣", "焰", "每秒对周围敌人造成伤害", true, true, false, false, false, 4, "BuffFireCloak", "", "damageRate", "", "", "Par_FireFieldRed", "", "");
             config[301001] = new BuffConfig(301001, "眩晕", "乱", "眩晕，无法行动", false, true, true, false, false, 3, "BuffNoAction", "", "", "", "", "StunnedCirclingStarsSimple", "", "");
             config[301003] = new BuffConfig(301003, "增伤", "伤", "受到的伤害按比例增加", false, true, false, true, true, 1, "BuffDamagedAddRate", "damagedUp", "", "", "", "StunnedDamageUp", "", "");

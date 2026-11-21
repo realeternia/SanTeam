@@ -706,6 +706,20 @@ MonoBehaviour:
   spacingZ: 20
   swingAmplitude: 4
   swingSpeed: 1.5
+  autoScreenshot: 1
+  screenshotDir: EffectScreenshots
+  captureStartDelay: 2
+  captureSampleWindow: 1.2
+  captureSampleInterval: 0.05
+  captureWarmupDistance: 8
+  captureWarmupSeconds: 0.4
+  captureWidth: 256
+  captureHeight: 256
+  captureViewDirection: {x: 0, y: 0.35, z: -1}
+  captureBackground: {r: 0.08, g: 0.08, b: 0.1, a: 1}
+  captureZoom: 1.5
+  captureAltBackground: {r: 0.7, g: 0.7, b: 0.72, a: 1}
+  captureLayer: 31
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
