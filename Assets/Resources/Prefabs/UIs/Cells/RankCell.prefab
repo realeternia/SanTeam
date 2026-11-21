@@ -104,15 +104,15 @@ MonoBehaviour:
   - {fileID: 2778914275693842788}
   - {fileID: 6094987756589393924}
   heroName: {fileID: 4939478911074581863}
-  heroStr: {fileID: 1555415514819213229}
-  heroInte: {fileID: 1415345999452329535}
-  heroLeadShip: {fileID: 2721485446357246574}
+  heroAtk: {fileID: 2721485446357246574}
+  heroArmor: {fileID: 1415345999452329535}
+  heroMagicRes: {fileID: 1555415514819213229}
   heroHp: {fileID: 7728140091595030493}
   heroPrice: {fileID: 6007908790999696257}
   heroId: 0
-  str: 0
-  inte: 0
-  leadShip: 0
+  atk: 0
+  armor: 0
+  magicRes: 0
   hp: 0
   price: 0
 --- !u!1 &1250212870423333234

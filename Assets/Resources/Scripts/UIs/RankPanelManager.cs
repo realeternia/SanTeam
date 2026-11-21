@@ -12,44 +12,56 @@ public class RankPanelManager : MonoBehaviour
     public GameObject rankParent;
     public GameObject rankCellPrefab; // RankCell预制体引用
 
-    public Button btnLeadShip;
-    public Button btnStr;
-    public Button btnInte;
+    public Button btnAtk;
+    public Button btnArmor;
+    public Button btnMagicRes;
     public Button btnHp;
     public Button btnPrice;
 
     public Button closeBtn;
 
     private LoopScrollRect loopScroll; // 循环列表，只实例化可见单元格，避免一次性创建全部条目导致卡顿
+    private int loadedScenarioId = int.MinValue; // 当前数据源对应的剧本，切换剧本后需重建
+    private bool inited; // ShowRank 会先激活面板再调 OnShow（早于 Start），用该标记保证只初始化一次
 
 
     // Start is called before the first frame update
     void Start()
     {
+        EnsureInitialized();
+    }
+
+    // 面板初始化：首次显示（可能在 Start 之前）时创建循环列表、加载数据并绑定排序按钮
+    private void EnsureInitialized()
+    {
+        if (inited)
+            return;
+        inited = true;
+
         ConfigManager.Init();
 
         loopScroll = new LoopScrollRect(scrollRect);
 
-        // 加载所有英雄配置
+        // 加载当前剧本英雄排行
         LoadHeroRankings();
 
-        btnLeadShip.onClick.AddListener(() =>
+        btnAtk.onClick.AddListener(() =>
         {
             GameManager.Instance.PlaySound("Sounds/click");
-            GameLog.Debug("点击了btnLeadShip，开始按领导力排序");
-            SortItems("LeadShip");
+            GameLog.Debug("点击了btnAtk，开始按攻击排序");
+            SortItems("Atk");
         });
-        btnStr.onClick.AddListener(() =>
+        btnArmor.onClick.AddListener(() =>
         {
             GameManager.Instance.PlaySound("Sounds/click");
-            GameLog.Debug("点击了btnStr，开始按力量排序");
-            SortItems("Str");
+            GameLog.Debug("点击了btnArmor，开始按护甲排序");
+            SortItems("Armor");
         });
-        btnInte.onClick.AddListener(() =>
+        btnMagicRes.onClick.AddListener(() =>
         {
             GameManager.Instance.PlaySound("Sounds/click");
-            GameLog.Debug("点击了btnInte，开始按智力排序");
-            SortItems("Inte");
+            GameLog.Debug("点击了btnMagicRes，开始按魔抗排序");
+            SortItems("MagicRes");
         });
         btnHp.onClick.AddListener(() =>
         {
@@ -90,12 +102,12 @@ public class RankPanelManager : MonoBehaviour
 
         cellInfos.Sort((a, b) =>
         {
-            if(rankType == "LeadShip")
-                return b.leadShip.CompareTo(a.leadShip);
-            else if(rankType == "Str")
-                return b.str.CompareTo(a.str);
-            else if(rankType == "Inte")
-                return b.inte.CompareTo(a.inte);
+            if(rankType == "Atk")
+                return b.atk.CompareTo(a.atk);
+            else if(rankType == "Armor")
+                return b.armor.CompareTo(a.armor);
+            else if(rankType == "MagicRes")
+                return b.magicRes.CompareTo(a.magicRes);
             else if(rankType == "Hp")
                 return b.hp.CompareTo(a.hp);
             else if(rankType == "Price")
@@ -113,13 +125,12 @@ public class RankPanelManager : MonoBehaviour
     private int GetHeroVal(HeroConfig h, string rankType)
     {
         if (h == null) return 0;
-        // 排序与展示同口径：HeroConfig 数值经 PostModify 写回为 1星带品质面板
+        // 排序与展示同口径：HeroConfig 数值经 PostModify/HeroScenario 写回为 1 星面板
         switch (rankType)
         {
-            case "LeadShip": return h.Atk;
-            // 无双强度已并入攻击：Str 列不再单独展示，排序复用合并后的攻击(Atk)数值
-            case "Str": return h.Atk;
-            case "Inte": return h.Ap;
+            case "Atk": return h.Atk;
+            case "Armor": return h.Armor;
+            case "MagicRes": return h.MagicRes;
             case "Hp": return h.Hp;
             case "Price": return HeroSelectionTool.GetPrice(h);
             default: return 0;
@@ -129,20 +140,25 @@ public class RankPanelManager : MonoBehaviour
     // 加载英雄排名
     private void LoadHeroRankings()
     {
-        // 清除现有的子物体
-        foreach (Transform child in rankParent.transform)
-        {
-            Destroy(child.gameObject);
-        }
-
-        // 切换前清理循环列表（若已启用）
+        // 先清理循环列表（持有单元格引用），再清空可能残留的子物体
         if (loopScroll != null && loopScroll.IsInitialized)
         {
             loopScroll.Clear();
         }
 
-        // 获取当前剧本全部可用英雄配置
-        var heroConfigs = HeroConfig.ConfigList.Where(cfg => HeroScenario.IsAvailable(cfg.Id)).ToList();
+        foreach (Transform child in rankParent.transform)
+        {
+            Destroy(child.gameObject);
+        }
+
+        // 只取当前剧本出场的英雄；默认按国家（阵营）分组，同国家内按品质从高到低
+        var heroConfigs = HeroConfig.ConfigList
+            .Where(cfg => HeroScenario.IsAvailable(cfg.Id))
+            .OrderBy(cfg => HeroScenario.GetSide(cfg))
+            .ThenByDescending(cfg => HeroScenario.GetQuality(cfg))
+            .ThenBy(cfg => cfg.Id)
+            .ToList();
+        loadedScenarioId = HeroScenario.CurrentId;
         float cellHeight = rankCellPrefab.GetComponent<RectTransform>().sizeDelta.y;
 
         // 使用循环列表加载：只实例化视口内可见的单元格
@@ -158,6 +174,16 @@ public class RankPanelManager : MonoBehaviour
 
     public void OnShow()
     {
+        // 首次 ShowRank 时 OnShow 会早于 Start 执行，这里保证循环列表已初始化
+        EnsureInitialized();
+
+        // 剧本切换后按新剧本重建数据源，保证只显示本剧本英雄
+        if (loadedScenarioId != HeroScenario.CurrentId)
+        {
+            LoadHeroRankings();
+            return;
+        }
+
         // 重新显示时刷新可见单元格（卡池、收藏状态可能已变化）
         if (loopScroll != null && loopScroll.IsInitialized)
         {
@@ -167,6 +193,8 @@ public class RankPanelManager : MonoBehaviour
 
     public void OnHide()
     {
+        // 面板关闭时隐藏按住显示的英雄 Tips，避免残留在界面上
+        PanelManager.Instance.GetTooltip<BaseTooltip>()?.HideTooltip();
     }
 
 

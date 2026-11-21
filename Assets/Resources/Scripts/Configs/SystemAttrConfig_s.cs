@@ -97,6 +97,9 @@ namespace CommonConfig
             config.Clear();
             config[1] = new SystemAttrConfig(1, "gold", "金币", "othcoin");
             config[2] = new SystemAttrConfig(2, "time", "时间", "othtime");
+            config[3] = new SystemAttrConfig(3, "pvpwin", "PvP胜场", "pvpwin");
+            config[4] = new SystemAttrConfig(4, "pvplose", "PvP负场", "pvplose");
+            config[5] = new SystemAttrConfig(5, "pvpwinrate", "PvP胜率", "pvpwinrate");
 
             RebuildIndex();
 

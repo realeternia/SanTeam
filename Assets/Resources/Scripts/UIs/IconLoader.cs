@@ -1,4 +1,5 @@
 using CommonConfig;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -16,6 +17,34 @@ public class IconLoader : MonoBehaviour
     public string iconPath;
     public int configId;
     public Image image;
+
+    private static readonly Dictionary<string, Sprite> spriteCache = new Dictionary<string, Sprite>();
+
+    // 静态加载：优先按 Sprite 读取；若图片按默认 Texture 导入则用 Texture2D 运行时生成 Sprite
+    public static Sprite LoadSprite(string iconName)
+    {
+        if (string.IsNullOrEmpty(iconName))
+            return null;
+
+        Sprite cached;
+        if (spriteCache.TryGetValue(iconName, out cached) && cached != null)
+            return cached;
+
+        string path = "Textures/Icons/" + iconName;
+        Sprite sprite = Resources.Load<Sprite>(path);
+        if (sprite == null)
+        {
+            Texture2D texture = Resources.Load<Texture2D>(path);
+            if (texture == null)
+            {
+                GameLog.Error(string.Format("IconLoader 图标不存在：{0}", path));
+                return null;
+            }
+            sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f));
+        }
+        spriteCache[iconName] = sprite;
+        return sprite;
+    }
 
     void Start()
     {

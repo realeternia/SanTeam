@@ -94,11 +94,11 @@ MonoBehaviour:
   scrollRect: {fileID: 8819840824855862603}
   rankParent: {fileID: 3956215661144406138}
   rankCellPrefab: {fileID: 76827737818314668, guid: 2a5271cbdce1427fb65961e6b2067477, type: 3}
-  btnSdAtk: {fileID: 32415566430558379}
-  btnSdHp: {fileID: 4521301151821724518}
-  btnGold: {fileID: 8829091396492015563}
-  btnPower: {fileID: 7859346394848818225}
-  btnMark: {fileID: 1005035728176103574}
+  btnGold: {fileID: 32415566430558379}
+  btnPower: {fileID: 4521301151821724518}
+  btnMark: {fileID: 49345620602186097}
+  winRateHeaderIcon: {fileID: 5565468990209696506}
+  recentHeaderIcon: {fileID: 8036491046779917158}
   closeBtn: {fileID: 4663127087866884016}
 --- !u!1 &1219565735220692230
 GameObject:
@@ -238,7 +238,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &2370899324458720270
 RectTransform:
   m_ObjectHideFlags: 0
@@ -497,7 +497,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 58ea5ffbecd7b1e4caa937a11e309665, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 90a9bb13b54e1a54f96b0b0c32373684, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -719,7 +719,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 704d0055ac1c27748af5a6fb82260b1b, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 0dc93646d802487428763772c0a117b4, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -1174,7 +1174,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: dcc342ea06df4dc190c73c9e71ade4ce, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 31a88b3ba1f50b7438077fea67c1f4e2, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1

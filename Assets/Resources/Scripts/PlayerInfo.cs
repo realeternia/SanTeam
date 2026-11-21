@@ -35,6 +35,14 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     public int winCount;
     [CustomSerializeField]
     public int loseCount;
+    // PvP 战绩：仅统计玩家对玩家的战斗（PVE 怪物回合不计入），用于玩家排行
+    [CustomSerializeField]
+    public int pvpWinCount;
+    [CustomSerializeField]
+    public int pvpLoseCount;
+    // 最近 PvP 战绩：下标0为最近一场，1=胜 0=负 -1=无记录
+    [CustomSerializeField]
+    public int[] recentBattleResults = new int[GameConst.PvpRecentCount];
     // 上一局是否失败（战斗开始类技能判定用，如「文」的获得道具概率加成；首局默认false=无加成）
     [CustomSerializeField]
     public bool lastBattleLose;
@@ -115,6 +123,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         gold = 0;
         mark = GameConst.PlayerInitLife;
         isEliminated = false;
+        ResetPvpHistory();
         ApplyEliminatedState();
 
         SetPlayerData();
@@ -134,6 +143,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         isEliminated = false;
         winCount = 0;
         loseCount = 0;
+        ResetPvpHistory();
         lastBattleLose = false;
 
         cards.Clear();
@@ -1242,7 +1252,7 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         return newResult;
     }
 
-    public void onBattleResult(bool isWin, int add, int damageOverride = -1)
+    public void onBattleResult(bool isWin, int add, int damageOverride = -1, bool isPvp = true)
     {
         if (isEliminated)
             return;
@@ -1253,6 +1263,16 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
             winCount++;
         else
             loseCount++;
+
+        // 玩家排行只统计 PvP 战绩，PVE 怪物回合不计入最近战绩
+        if (isPvp)
+        {
+            if (isWin)
+                pvpWinCount++;
+            else
+                pvpLoseCount++;
+            PushPvpResult(isWin);
+        }
         lastBattleLose = !isWin;
 
         // 每轮战斗失败扣除本回合配置的生命值（混战地图按名次传 damageOverride）；生命≤0 淘汰并移出游戏
@@ -1280,6 +1300,34 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         resultText.text = mark.ToString();
         // 玩家等级体系：战斗获胜/失败获得经验（参考金铲铲，节奏放慢一倍：胜利+2，失败+1）
         AddExp(isWin ? GameConst.BattleWinExp : GameConst.BattleLoseExp);
+    }
+
+    /// <summary>PvP 胜率（0~100 整数百分比），无战绩时为 0</summary>
+    public int GetPvpWinRatePercent()
+    {
+        int total = pvpWinCount + pvpLoseCount;
+        return total > 0 ? Mathf.RoundToInt(pvpWinCount * 100f / total) : 0;
+    }
+
+    // 最近 PvP 战绩左移一位，最新一场放下标0
+    private void PushPvpResult(bool isWin)
+    {
+        if (recentBattleResults == null || recentBattleResults.Length != GameConst.PvpRecentCount)
+            recentBattleResults = new int[GameConst.PvpRecentCount];
+
+        for (int i = recentBattleResults.Length - 1; i > 0; i--)
+            recentBattleResults[i] = recentBattleResults[i - 1];
+        recentBattleResults[0] = isWin ? 1 : 0;
+    }
+
+    // 清空 PvP 战绩（-1 表示该场次还没有记录）
+    private void ResetPvpHistory()
+    {
+        pvpWinCount = 0;
+        pvpLoseCount = 0;
+        recentBattleResults = new int[GameConst.PvpRecentCount];
+        for (int i = 0; i < recentBattleResults.Length; i++)
+            recentBattleResults[i] = -1;
     }
 
     // 生命值耗尽：标记淘汰并隐藏头像（顶部玩家列表不再显示，后续商店/匹配都不再参与）
@@ -1743,6 +1791,8 @@ public class PlayerInfo : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
             isOnTurn = false;
             battleSide = 0;
             castleHUD = null;
+            // 旧存档没有 PvP 战绩字段时使用空记录
+            ResetPvpHistory();
             
             // 获取所有带有[CustomSerializeField]属性的字段
             var fields = GetType().GetFields();

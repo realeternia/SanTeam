@@ -1551,7 +1551,8 @@ public class WorldManager : MonoBehaviour
             if (match[i] < 0)
                 continue;
             bool isWin = sideHasUnits[i * 2];
-            GameManager.Instance.GetPlayer(match[i]).onBattleResult(isWin, 0);
+            // PVE 怪物回合不计入玩家排行的 PvP 战绩
+            GameManager.Instance.GetPlayer(match[i]).onBattleResult(isWin, 0, -1, false);
         }
 
         gameFinish = true;

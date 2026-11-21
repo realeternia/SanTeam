@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using CommonConfig;
-using TMPro;
 
 public class RankPlayerPanelManager : MonoBehaviour
 {
@@ -11,11 +10,12 @@ public class RankPlayerPanelManager : MonoBehaviour
     public GameObject rankParent;
     public GameObject rankCellPrefab; // RankCell预制体引用
 
-    public Button btnSdAtk;
-    public Button btnSdHp;
     public Button btnGold;
     public Button btnPower;
     public Button btnMark;
+
+    public Image winRateHeaderIcon; // 胜率列表头
+    public Image recentHeaderIcon;  // 最近10场战绩列表头
 
     public Button closeBtn;
 
@@ -23,20 +23,6 @@ public class RankPlayerPanelManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-
-
-        btnSdAtk.onClick.AddListener(() =>
-        {
-            GameManager.Instance.PlaySound("Sounds/click");
-            GameLog.Debug("点击了btnSdAtk，开始按攻击力排序");
-            SortItems("sdatk");
-        });
-        btnSdHp.onClick.AddListener(() =>
-        {
-            GameManager.Instance.PlaySound("Sounds/click");
-            GameLog.Debug("点击了btnSdHp，开始按生命值排序");
-            SortItems("sdhp");
-        });
         btnGold.onClick.AddListener(() =>
         {
             GameManager.Instance.PlaySound("Sounds/click");
@@ -52,7 +38,7 @@ public class RankPlayerPanelManager : MonoBehaviour
         btnMark.onClick.AddListener(() =>
         {
             GameManager.Instance.PlaySound("Sounds/click");
-            GameLog.Debug("点击了btnMark，开始按生命值排序");
+            GameLog.Debug("点击了btnMark，开始按玩家生命排序");
             SortItems("mark");
         });
         closeBtn.onClick.AddListener(() =>
@@ -61,6 +47,11 @@ public class RankPlayerPanelManager : MonoBehaviour
             CardShopManager.Instance.OnShow();
         });
 
+        // 新增图标没有预制体资源引用，运行时按 SystemAttrConfig 加载
+        if (winRateHeaderIcon != null)
+            winRateHeaderIcon.sprite = LoadSystemIcon("pvpwinrate");
+        if (recentHeaderIcon != null)
+            recentHeaderIcon.sprite = LoadSystemIcon("pvpwin");
     }
 
     private void SortItems(string rankType)
@@ -73,16 +64,12 @@ public class RankPlayerPanelManager : MonoBehaviour
 
         cellInfos.Sort((a, b) =>
         {
-            if(rankType == "sdatk")
-                return b.soldierAtk.CompareTo(a.soldierAtk);
-            else if(rankType == "sdhp")
-                return b.soldierHp.CompareTo(a.soldierHp);
-            else if(rankType == "gold")
+            if(rankType == "gold")
                 return b.gold.CompareTo(a.gold);
             else if(rankType == "power")
                 return b.power.CompareTo(a.power);
             else if(rankType == "mark")
-                return b.mark.CompareTo(a.mark);
+                return b.life.CompareTo(a.life);
             return 0;
         });
 
@@ -93,7 +80,7 @@ public class RankPlayerPanelManager : MonoBehaviour
         scrollRect.normalizedPosition = new Vector2(0, 1);
     }
 
-    // 加载英雄排名
+    // 加载玩家排名
     private void LoadPlayerRankings()
     {
         // 清除现有的子物体
@@ -139,7 +126,7 @@ public class RankPlayerPanelManager : MonoBehaviour
 
     public void OnShow()
     {
-        // 加载所有英雄配置
+        // 加载所有玩家数据
         LoadPlayerRankings();
     }
 
@@ -147,6 +134,16 @@ public class RankPlayerPanelManager : MonoBehaviour
     {
     }
 
+    private static Sprite LoadSystemIcon(string name)
+    {
+        SystemAttrConfig cfg = SystemAttrConfig.GetConfigByname(name);
+        if (cfg == null || string.IsNullOrEmpty(cfg.Icon))
+        {
+            GameLog.Error("RankPlayerPanelManager LoadSystemIcon: SystemAttrConfig 缺少图标 name=" + name);
+            return null;
+        }
+        return IconLoader.LoadSprite(cfg.Icon);
+    }
 
     // Update is called once per frame
     void Update()

@@ -126,6 +126,8 @@ public class PanelManager : MonoBehaviour
     public void ShowBag()
     {
         GameManager.Instance.PlaySound("Sounds/deck");
+        // 覆盖面板打开前先隐藏商店卡片特效，关闭回到商店时由 CardShopManager.OnShow 恢复
+        CardShopManager.Instance?.HideCardEffects();
         if (bagPanel == null)
             bagPanel = LoadPanel("BagPanel");
         if (bagPanel == null)
@@ -150,6 +152,7 @@ public class PanelManager : MonoBehaviour
     public void ShowRank()
     {
         GameManager.Instance.PlaySound("Sounds/deck");
+        CardShopManager.Instance?.HideCardEffects();
         if (rankPanel == null)
             rankPanel = LoadPanel("RankInfoPanel");
         if (rankPanel == null)
@@ -174,6 +177,7 @@ public class PanelManager : MonoBehaviour
     public void ShowRankPlayer()
     {
         GameManager.Instance.PlaySound("Sounds/deck");
+        CardShopManager.Instance?.HideCardEffects();
         if (rankPlayerPanel == null)
             rankPlayerPanel = LoadPanel("PlayerInfoPanel");
         if (rankPlayerPanel == null)

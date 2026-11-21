@@ -69,6 +69,8 @@ public static class GameConst
     public const int PlayerMaxHeroCards = 15;
     /// <summary>玩家初始生命值：每轮战斗失败按 GameRoundConfig.DamageCount 扣除，生命≤0 淘汰移出游戏</summary>
     public const int PlayerInitLife = 100;
+    /// <summary>玩家排行展示的最近 PvP 战绩场数（1=胜 0=负 -1=无记录）</summary>
+    public const int PvpRecentCount = 10;
 
     // ---- 买经验（预留：金铲铲4金币买4经验，1金币=1经验；UI后续接入） ----
     /// <summary>购买经验所需金币</summary>

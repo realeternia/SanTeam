@@ -124,23 +124,27 @@ public class CardShopManager : MonoBehaviour
         bagBtn.onClick.AddListener(() =>
         {
             PanelManager.Instance.ShowBag();
-            for(int i = 0; i < cardViews.Count; i++)
-                cardViews[i].ShowEffectLayer(false);
         });
         rankBtn.onClick.AddListener(() =>
         {
             PanelManager.Instance.ShowRank();
-            for(int i = 0; i < cardViews.Count; i++)
-                cardViews[i].ShowEffectLayer(false);
         });
         rankPlayerBtn.onClick.AddListener(() =>
         {
             PanelManager.Instance.ShowRankPlayer();
-            for(int i = 0; i < cardViews.Count; i++)
-                cardViews[i].ShowEffectLayer(false);
         });
 
         ShopBegin();
+    }
+
+    /// <summary>
+    /// 隐藏商店卡片的关联特效层（打开背包/英雄排行/玩家排行等覆盖面板时调用），
+    /// 关闭面板回到商店时由 OnShow() 统一按关联状态恢复。
+    /// </summary>
+    public void HideCardEffects()
+    {
+        for (int i = 0; i < cardViews.Count; i++)
+            cardViews[i].ShowEffectLayer(false);
     }
 
     // 每次进入商店时重算顶部玩家列表：同步淘汰显隐 + 按存活人数重新排序/居中摆放
