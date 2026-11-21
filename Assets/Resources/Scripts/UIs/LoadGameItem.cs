@@ -45,7 +45,7 @@ public class LoadGameItem : MonoBehaviour
         if (infoText != null)
         {
             string yearStr = GetYearText(summary.year, summary.scenarioId);
-            string scenarioStr = GetScenarioText(summary.scenarioId);
+            string scenarioStr = SysColor.ColorText(GetScenarioText(summary.scenarioId), GetScenarioColor(summary.scenarioId));
             string markStr = SysColor.ColorText(summary.mark.ToString(), SysColor.UI.SaveMark);
             string goldStr = SysColor.ColorText(summary.gold.ToString(), SysColor.UI.SaveGold);
             string timeStr = SysColor.ColorText(GetTimeAgo(summary.saveTime), SysColor.UI.SaveTime);
@@ -119,6 +119,18 @@ public class LoadGameItem : MonoBehaviour
         if (ScenarioConfig.HasConfig(scenarioId))
             return ScenarioConfig.GetConfig(scenarioId).Name;
         return "旧版";
+    }
+
+    // 剧本名颜色：取 ScenarioConfig.Colorstr；老存档/无配置显示灰色
+    private static Color GetScenarioColor(int scenarioId)
+    {
+        if (!ScenarioConfig.HasConfig(scenarioId))
+            return SysColor.UI.LegacyScenario;
+        var cfg = ScenarioConfig.GetConfig(scenarioId);
+        if (!string.IsNullOrEmpty(cfg.Colorstr) && ColorUtility.TryParseHtmlString(cfg.Colorstr, out Color color))
+            return color;
+        GameLog.Warn("LoadGameItem 剧本[" + scenarioId + "]颜色配置无效: " + cfg.Colorstr + "，改用灰色");
+        return SysColor.UI.LegacyScenario;
     }
 
     // 年份按剧本开始年份动态计算：存档里的 year 是"已完成回合数"（0 基），

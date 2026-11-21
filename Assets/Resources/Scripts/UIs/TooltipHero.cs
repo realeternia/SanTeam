@@ -209,14 +209,15 @@ public class TooltipHero : BaseTooltip
         return baseVal + " + " + SysColor.ColorText(Mathf.RoundToInt(bonusRate * 100) + "%", SysColor.UI.NextLv);
     }
 
-    // 排列技能/好友行：锚定 tooltip 左上角，每行固定高度100，自上而下排列；返回累加后的Y
-    private float LayoutRow(TooltipHeroSkill row, float currentY)
+    // 排列技能/好友行：锚定 tooltip 左上角，每行固定高度100，按行宽水平居中，自上而下排列；返回累加后的Y
+    private float LayoutRow(TooltipHeroSkill row, float currentY, float width)
     {
         var rowRt = (RectTransform)row.transform;
         rowRt.anchorMin = new Vector2(0, 1);
         rowRt.anchorMax = new Vector2(0, 1);
         rowRt.pivot = new Vector2(0.5f, 0.5f);
-        rowRt.anchoredPosition = new Vector2(250, -currentY - SkillRowHeight * 0.5f);
+        rowRt.sizeDelta = new Vector2(width, SkillRowHeight);
+        rowRt.anchoredPosition = new Vector2(width * 0.5f, -currentY - SkillRowHeight * 0.5f);
         return currentY + SkillRowHeight;
     }
 
@@ -320,8 +321,12 @@ public class TooltipHero : BaseTooltip
             return;
         }
 
-        float currentY = 10f + NameRowHeight + 15f + attrRows * AttrRowHeight; // 起始Y位置（名字行 + 属性区下方）
+        float startY = 10f + NameRowHeight + 15f + attrRows * AttrRowHeight; // 起始Y位置（名字行 + 属性区下方）
         float spacing = 5f;   // 控件间距
+
+        // 名字列表单行不换行：先按各行列表量出所需宽度，再统一加宽 tips 并排列
+        var layoutRows = new List<TooltipHeroSkill>();
+        float rowWidth = TooltipHeroSkill.RowMinWidth;
 
         // 先隐藏全部技能行，再按需显示（无技能时不残留上次的行）
         for (int i = 0; i < skillRows.Count; i++)
@@ -390,7 +395,7 @@ public class TooltipHero : BaseTooltip
                     skillText = string.IsNullOrEmpty(effect) ? skillConfig.Name : skillConfig.Name + " " + effect;
                     // 列表行：同职业英雄（按品质倒排；商店全部按品质上色，背包仅上阵的上色）
                     string jobList = BuildHeroNameList(jobHeroIds, player, isShopCard);
-                    row.SetFriendSkill(skillText, skillConfig.Icon, jobList, jobLv);
+                    rowWidth = Mathf.Max(rowWidth, row.SetFriendSkill(skillText, skillConfig.Icon, jobList, jobLv));
                 }
                 else
                 {
@@ -402,8 +407,8 @@ public class TooltipHero : BaseTooltip
                     row.SetSkill(skillText, GetClassIcon(skillConfig.Type) ?? skillConfig.Icon, skillLv);
                 }
 
-                // 每行固定高度100，自上而下排列
-                currentY = LayoutRow(row, currentY);
+                // 每行记录，待最终行宽确定后统一排列（行高固定100）
+                layoutRows.Add(row);
             }
         }
         
@@ -440,14 +445,22 @@ public class TooltipHero : BaseTooltip
                     icon = friendSkillCfg.Icon;
                 }
 
-                // 人员列表（1行，超出截断）：按品质倒排；商店全部按品质上色，背包仅上阵的上色
+                // 人员列表（1行，不换行，过长时加宽 tips）：按品质倒排；商店全部按品质上色，背包仅上阵的上色
                 string listStr = BuildHeroNameList(friendCfg.Heros, player, isShopCard);
 
-                // 图标 + 描述(最多2行) + 列表(1行) 由好友行承载，行高固定与技能行一致
-                row.SetFriendSkill(skillText, icon, listStr, friendLv);
-                currentY = LayoutRow(row, currentY);
+                // 图标 + 描述(最多2行) + 列表(1行带底色) 由好友行承载，行高固定与技能行一致
+                rowWidth = Mathf.Max(rowWidth, row.SetFriendSkill(skillText, icon, listStr, friendLv));
+                layoutRows.Add(row);
                 idx++;
             }
+        }
+
+        // 最终行宽确定后统一排列技能/好友行（行高固定100，按宽水平居中）
+        float currentY = startY;
+        foreach (var row in layoutRows)
+        {
+            row.SetRowWidth(rowWidth);
+            currentY = LayoutRow(row, currentY, rowWidth);
         }
 
         // 装备行（每个装备一个 500x70 行）：显示在技能/好友行之后，图标 + 装备名
@@ -469,14 +482,15 @@ public class TooltipHero : BaseTooltip
                 rowRt.anchorMin = new Vector2(0, 1);
                 rowRt.anchorMax = new Vector2(0, 1);
                 rowRt.pivot = new Vector2(0.5f, 0.5f);
-                rowRt.anchoredPosition = new Vector2(250, -currentY - EquipRowHeight * 0.5f);
+                rowRt.sizeDelta = new Vector2(rowWidth, EquipRowHeight);
+                rowRt.anchoredPosition = new Vector2(rowWidth * 0.5f, -currentY - EquipRowHeight * 0.5f);
                 currentY += EquipRowHeight + spacing;
             }
         }
 
         // 调整背景大小
         float height = Mathf.Max(50f, currentY + 10f);
-        rect.sizeDelta = new Vector2(500, height);
+        rect.sizeDelta = new Vector2(rowWidth, height);
 
         // 内容填充完毕，走基类统一显示/定位逻辑（同一时刻只显示一个、贴边不出屏）
         Show();
@@ -509,7 +523,8 @@ public class TooltipHero : BaseTooltip
         return ConfigManager.GetSkillConfig(friendCfg.SkillId, Mathf.Max(1, level)) ?? ConfigManager.GetSkillConfig(friendCfg.SkillId, 1);
     }
 
-    // 拼英雄名字列表（职业/好友列表共用）：按品质倒排（同品质保持原顺序），名字只保留最后一个字；
+    // 拼英雄名字列表（职业/好友列表共用）：只显示当前剧本出场的英雄（名单与英雄池一致），
+    // 按品质倒排（同品质保持原顺序），显示英雄全名；
     // 商店牌：全部名字按品质上色；背包：只有上阵（battleCards 内）的按品质上色，未上阵的保持默认色
     // internal 供 TooltipFriend（羁绊提示）复用
     internal static string BuildHeroNameList(IEnumerable<int> heroIds, PlayerInfo player, bool isShopCard)
@@ -517,7 +532,7 @@ public class TooltipHero : BaseTooltip
         var valid = new List<int>();
         foreach (var hid in heroIds)
         {
-            if (HeroConfig.GetConfig(hid) != null)
+            if (HeroConfig.GetConfig(hid) != null && HeroScenario.IsAvailable(hid))
                 valid.Add(hid);
         }
 
@@ -525,7 +540,7 @@ public class TooltipHero : BaseTooltip
         foreach (var hid in valid.OrderByDescending(id => HeroScenario.GetQuality(id)))
         {
             var cfg = HeroConfig.GetConfig(hid);
-            string name = cfg.Name.Substring(cfg.Name.Length - 1);
+            string name = cfg.Name;
             if (isShopCard || (player != null && player.battleCards.Contains(hid)))
                 name = "<color=#" + ColorUtility.ToHtmlStringRGB(SysColor.GetQualityColor(HeroScenario.GetQuality(cfg))) + ">" + name + "</color>";
             parts.Add(name);

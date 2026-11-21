@@ -595,8 +595,46 @@ public static class ConfigManager
                     return GetAttrFieldValue(cfg.LinkSelf, fieldName.Substring("linkself-".Length), pct);
                 if (fieldName.StartsWith("linkteam-", StringComparison.OrdinalIgnoreCase))
                     return GetAttrFieldValue(cfg.LinkTeam, fieldName.Substring("linkteam-".Length), pct);
-                return null;
+                // 整数数值字段偏移引用：/targetcount-1（如"对目标及附近 targetcount-1 名敌人"）
+                return GetOffsetIntFieldValue(cfg, fieldName);
         }
+    }
+
+    // 整数数值字段的加减偏移引用：/字段名+整数、/字段名-整数（如 /targetcount-1 = 目标数-1）；
+    // 仅支持简单整数字段，避免与 /strength2-key、/linkself-attr 等子字段语法冲突；不匹配返回 null（占位符原样输出）
+    private static string GetOffsetIntFieldValue(SkillConfig cfg, string fieldName)
+    {
+        int signIdx = -1;
+        for (int i = fieldName.Length - 1; i > 0; i--)
+        {
+            char c = fieldName[i];
+            if (c == '+' || c == '-')
+            {
+                signIdx = i;
+                break;
+            }
+            if (c < '0' || c > '9')
+                break;
+        }
+        if (signIdx <= 0 || signIdx == fieldName.Length - 1)
+            return null;
+
+        int baseVal;
+        switch (fieldName.Substring(0, signIdx).ToLowerInvariant())
+        {
+            case "targetcount": baseVal = cfg.TargetCount; break;
+            case "summoncount": baseVal = cfg.SummonCount; break;
+            case "mpcost": baseVal = cfg.MpCost; break;
+            case "lv": baseVal = cfg.Lv; break;
+            default: return null;
+        }
+
+        int offset;
+        if (!int.TryParse(fieldName.Substring(signIdx + 1), out offset))
+            return null;
+        if (fieldName[signIdx] == '-')
+            offset = -offset;
+        return Mathf.Max(0, baseVal + offset).ToString();
     }
 
     // 从 "属性名+数值,..." 组合串中取指定属性的单个数值；pct=true 时按百分比输出（如 crit+0.03 -> 3%）

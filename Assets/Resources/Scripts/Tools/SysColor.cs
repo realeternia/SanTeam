@@ -148,6 +148,8 @@ public static class SysColor
 
         public static readonly Color NextLv = new Color(0.4f, 1f, 0.4f); // 技能说明下一档差值-淡绿
         public static readonly Color SkillDesc = new Color(0.55f, 1f, 0.35f); // 技能描述-lime
+        public static readonly Color TooltipListBg = new Color(0.24f, 0.22f, 0.2f, 0.9f); // 提示框人员列表底色（比背景略亮，起分隔作用）
+        public static readonly Color LegacyScenario = new Color(0.6f, 0.6f, 0.6f, 1f); // 老存档剧本名（无剧本配置）-灰
 
         public static readonly Color SaveMark = new Color(0.55f, 0.8f, 1f);  // 存档-积分浅蓝
         public static readonly Color SaveGold = new Color(1f, 0.55f, 0.1f);  // 存档-金钱蓝

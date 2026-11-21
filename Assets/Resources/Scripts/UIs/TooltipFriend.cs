@@ -75,14 +75,15 @@ public class TooltipFriend : BaseTooltip
         return effectRow;
     }
 
-    // 排列技能行：锚定 tooltip 左上角，行高固定100
-    private void LayoutRow(TooltipHeroSkill row, float currentY)
+    // 排列技能行：锚定 tooltip 左上角，行高固定100，按行宽水平居中
+    private void LayoutRow(TooltipHeroSkill row, float currentY, float width)
     {
         var rowRt = (RectTransform)row.transform;
         rowRt.anchorMin = new Vector2(0, 1);
         rowRt.anchorMax = new Vector2(0, 1);
         rowRt.pivot = new Vector2(0.5f, 0.5f);
-        rowRt.anchoredPosition = new Vector2(250, -currentY - SkillRowHeight * 0.5f);
+        rowRt.sizeDelta = new Vector2(width, SkillRowHeight);
+        rowRt.anchoredPosition = new Vector2(width * 0.5f, -currentY - SkillRowHeight * 0.5f);
     }
 
     public void ShowTooltip(BondTipData data)
@@ -129,13 +130,15 @@ public class TooltipFriend : BaseTooltip
         if (data.Kind != BondKind.Force && data.HeroIds != null && data.HeroIds.Count > 0)
             listText = TooltipHero.BuildHeroNameList(data.HeroIds, data.Player, false);
 
-        row.SetFriendSkill(skillText, icon, listText, effLv);
+        // 名字列表单行不换行，过长时按列表所需宽度加宽整个 tips
+        float rowWidth = row.SetFriendSkill(skillText, icon, listText, effLv);
+        row.SetRowWidth(rowWidth);
 
         // 内容填充完毕：名字行下方排效果行，调整背景大小后走基类统一显示/定位
         float currentY = 10f + NameRowHeight + 10f;
-        LayoutRow(row, currentY);
+        LayoutRow(row, currentY, rowWidth);
         float height = Mathf.Max(50f, currentY + SkillRowHeight + 10f);
-        rect.sizeDelta = new Vector2(500, height);
+        rect.sizeDelta = new Vector2(rowWidth, height);
         Show();
     }
 }
