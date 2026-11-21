@@ -227,6 +227,16 @@ namespace CommonConfig
             config[11490] = new EffectConfig(11490, "top_down_ice_dot", "攻击命中", "负面", "目标", "Effect/top_down_ice_dot", "", 5f, .5f, 5f, 1f, "");
             config[11500] = new EffectConfig(11500, "top_down_stone_circle", "攻击命中", "负面", "范围", "Effect/top_down_stone_circle", "", 2f, .5f, 5f, 1f, "");
             config[11510] = new EffectConfig(11510, "FlamethrowerSpikyRed", "攻击命中", "负面", "范围", "Effect/FlamethrowerSpikyRed", "", 8.5f, .5f, 5f, 1f, "");
+            config[11520] = new EffectConfig(11520, "CirclingArmorJia", "金色护甲甲字环绕特效", "增益", "Buff", "Effect/ArmorCirclingJia", "", 3f, 1f, 8f, 1f, "#00D5FF");
+            config[11521] = new EffectConfig(11521, "CirclingMagicResKang", "魔抗提升抗字环绕特效", "增益", "Buff", "Effect/CirclingMagicResKang", "", 3f, 1f, 8f, 1f, "#6FA8FF");
+            config[11522] = new EffectConfig(11522, "CirclingAtkGong", "攻击提升攻字环绕特效", "增益", "Buff", "Effect/CirclingAtkGong", "", 3f, 1f, 8f, 1f, "#FF4A3D");
+            config[11523] = new EffectConfig(11523, "CirclingDamageShang", "伤害提升伤字环绕特效", "增益", "Buff", "Effect/CirclingDamageShang", "", 3f, 1f, 8f, 1f, "#FF7A1A");
+            config[11524] = new EffectConfig(11524, "CirclingMoveSpeedYi", "移速提升移字环绕特效", "增益", "Buff", "Effect/CirclingMoveSpeedYi", "", 3f, 1f, 8f, 1f, "#4DFF9E");
+            config[11525] = new EffectConfig(11525, "CirclingAtkSpeedSu", "攻速提升速字环绕特效", "增益", "Buff", "Effect/CirclingAtkSpeedSu", "", 3f, 1f, 8f, 1f, "#FFD84D");
+            config[11526] = new EffectConfig(11526, "CirclingLifestealXi", "吸血吸字环绕特效", "增益", "Buff", "Effect/CirclingLifestealXi", "", 3f, 1f, 8f, 1f, "#D92B4B");
+            config[11527] = new EffectConfig(11527, "CirclingApFa", "法强提升法字环绕特效", "增益", "Buff", "Effect/CirclingApFa", "", 3f, 1f, 8f, 1f, "#B36BFF");
+            config[11528] = new EffectConfig(11528, "CirclingCritBao", "暴击提升暴字环绕特效", "增益", "Buff", "Effect/CirclingCritBao", "", 3f, 1f, 8f, 1f, "#FFB020");
+            config[11529] = new EffectConfig(11529, "CirclingSpellCritJue", "法术暴击绝字环绕特效", "增益", "Buff", "Effect/CirclingSpellCritJue", "", 3f, 1f, 8f, 1f, "#FF4DD2");
 
             RebuildIndex();
 
