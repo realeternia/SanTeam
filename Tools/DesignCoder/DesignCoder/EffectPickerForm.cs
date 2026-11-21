@@ -9,8 +9,8 @@ using System.Windows.Forms;
 namespace DesignCoder
 {
     /// <summary>
-    /// 特效截图选择面板：分“导弹 / 目标型 / 范围型 / Buff”四个页签，按行列显示 EffectScreenshots 目录下的特效截图。
-    /// 导弹看截图文件名 _Missile 后缀，其余按 EffectConfig.Area（目标/范围/Buff）分页签。
+    /// 特效截图选择面板：分“导弹 / 目标型 / 范围型 / 光环 / Buff”五个页签，按行列显示 EffectScreenshots 目录下的特效截图。
+    /// 导弹看截图文件名 _Missile 后缀，其余按 EffectConfig.Area（目标/范围/光环/Buff）分页签。
     /// 负面特效红框、正面（增益）特效绿框，伤害类灰框；缩略图左上显示资源路径，右下显示 EffectConfig 的 Area，
     /// 右上显示该特效在 SkillConfig 中被多少个技能引用（同一技能多等级只算一次，导弹不统计）。
     /// 双击缩略图或点“确定”返回选中的特效名（EffectConfig.Name，即技能配置里存的值）。
@@ -27,8 +27,9 @@ namespace DesignCoder
         private const int TabMissile = 0;
         private const int TabTarget = 1;
         private const int TabArea = 2;
-        private const int TabBuff = 3;
-        private static readonly string[] TabTitles = { "导弹", "目标型", "范围型", "Buff" };
+        private const int TabAura = 3;
+        private const int TabBuff = 4;
+        private static readonly string[] TabTitles = { "导弹", "目标型", "范围型", "光环", "Buff" };
 
         private static readonly Color PanelBg = Color.FromArgb(37, 37, 38);
         private static readonly Color ItemBg = Color.FromArgb(45, 45, 48);
@@ -43,8 +44,8 @@ namespace DesignCoder
         private readonly Dictionary<string, int> usageCounts;
 
         private readonly TabControl tabControl;
-        private readonly TabPage[] tabPages = new TabPage[4];
-        private readonly FlowLayoutPanel[] tabPanels = new FlowLayoutPanel[4];
+        private readonly TabPage[] tabPages = new TabPage[TabTitles.Length];
+        private readonly FlowLayoutPanel[] tabPanels = new FlowLayoutPanel[TabTitles.Length];
         private readonly Label tipLabel;
         private readonly List<EffectItemControl> itemControls = new List<EffectItemControl>();
         private EffectItemControl selected;
@@ -267,10 +268,11 @@ namespace DesignCoder
             return result;
         }
 
-        // 按 EffectConfig.Area 分页签：范围 → 范围型、Buff → Buff、其余归目标型
+        // 按 EffectConfig.Area 分页签：范围 → 范围型、光环 → 光环、Buff → Buff、其余归目标型
         private static int GetAreaTab(string area)
         {
             if (area == "范围") return TabArea;
+            if (area == "光环") return TabAura;
             if (area == "Buff") return TabBuff;
             return TabTarget;
         }

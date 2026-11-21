@@ -1,4 +1,4 @@
-﻿using System;
+﻿﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -44,7 +44,7 @@ namespace CommonConfig
             {"Name", new FieldMetaInfo("特效名（外部引用 key，即 HitEffect 值）", "string", 188, "", true)},
             {"Cname", new FieldMetaInfo("中文名", "string", 171)},
             {"Type", new FieldMetaInfo("类型（增益/负面/伤害）", "string", 80)},
-            {"Area", new FieldMetaInfo("作用范围（目标/范围/Buff）", "string", 80)},
+            {"Area", new FieldMetaInfo("作用范围（目标/范围/Buff/光环）", "string", 80)},
             {"EffPath", new FieldMetaInfo("特效资源路径（省略 Prefabs/ 前缀，如 Effect/xxx，对应 Prefabs/Effect 下资源，无则留空）", "string", 210)},
             {"MissilePath", new FieldMetaInfo("导弹资源路径（省略 Prefabs/ 前缀，如 Missile/xxx，对应 Prefabs/Missile 下资源，无则留空）", "string", 245)},
             {"Scale", new FieldMetaInfo("特效世界缩放（挂载后实际大小，与挂点无关，默认取 prefab 根缩放）", "float", 60)},
@@ -76,7 +76,7 @@ namespace CommonConfig
         /// </summary>
         public string Type;
         /// <summary>
-        ///作用范围（目标/范围/Buff）
+        ///作用范围（目标/范围/Buff/光环）
         /// </summary>
         public string Area;
         /// <summary>
@@ -167,14 +167,14 @@ namespace CommonConfig
             config[10160] = new EffectConfig(10160, "Par_FireShoot_Bullet", "火焰射击", "伤害", "目标", "Effect/Par_FireShoot_Hit", "Missile/Par_FireShoot_Bullet", 1.5f, 1f, 3f, 1f, "");
             config[10170] = new EffectConfig(10170, "SwordWaveBlue", "蓝色冲击波", "伤害", "范围", "Effect/StormExplosion", "Missile/SwordWaveBlue", 5f, 1f, 3.4f, 1f, "");
             config[11000] = new EffectConfig(11000, "AuraSoftPurple", "紫色缓冲特效", "增益", "范围", "Effect/AuraSoftPurple", "", 3f, 1f, 8f, 1f, "");
-            config[11010] = new EffectConfig(11010, "BloodExplosion", "鲜血爆裂特效", "伤害", "目标", "Effect/BloodExplosion", "", 3f, 1f, 8f, 1f, "");
-            config[11020] = new EffectConfig(11020, "HeartStream", "爱心流光特效", "增益", "目标", "Effect/HeartStream", "", 8f, 1f, 8f, 1f, "");
+            config[11010] = new EffectConfig(11010, "BloodExplosion", "鲜血爆裂特效", "伤害", "Buff", "Effect/BloodExplosion", "", 3f, 1f, 8f, 1f, "");
+            config[11020] = new EffectConfig(11020, "HeartStream", "爱心流光特效", "增益", "Buff", "Effect/HeartStream", "", 8f, 1f, 8f, 1f, "");
             config[11030] = new EffectConfig(11030, "LightningExplosionRed", "红色闪电爆裂特效", "伤害", "目标", "Effect/LightningExplosionBlue", "", 3f, 1f, 5f, 1f, "#FF1C00");
             config[11040] = new EffectConfig(11040, "MagicBuffGreen", "绿色增益特效", "增益", "目标", "Effect/MagicBuffGreen", "", 8f, 1f, 8f, 1f, "");
             config[11041] = new EffectConfig(11041, "MagicBuffBlue", "蓝色增益特效", "增益", "目标", "Effect/MagicBuffGreen", "", 8f, 1f, 8f, 1f, "#3333FF");
             config[11050] = new EffectConfig(11050, "MagicFieldGreen", "绿色法阵特效", "增益", "范围", "Effect/MagicFieldGreen", "", 8f, 1f, 8f, 1f, "");
-            config[11060] = new EffectConfig(11060, "ShieldSoftBlue", "蓝色护盾特效", "增益", "目标", "Effect/ShieldSoftBlue", "", 3f, 1f, 8f, 1f, "");
-            config[11061] = new EffectConfig(11061, "ShieldSoftYellow", "黄色护盾特效", "增益", "目标", "Effect/ShieldSoftBlue", "", 3f, 1f, 8f, 1f, "#FFBB09");
+            config[11060] = new EffectConfig(11060, "ShieldSoftBlue", "蓝色护盾特效", "增益", "Buff", "Effect/ShieldSoftBlue", "", 3f, 1f, 8f, 1f, "");
+            config[11061] = new EffectConfig(11061, "ShieldSoftYellow", "黄色护盾特效", "增益", "Buff", "Effect/ShieldSoftBlue", "", 3f, 1f, 8f, 1f, "#FFBB09");
             config[11070] = new EffectConfig(11070, "SlowAuraYellow", "黄色迟缓光环特效", "负面", "范围", "Effect/SlowAuraYellow", "", 3f, 2f, 8f, 1f, "");
             config[11080] = new EffectConfig(11080, "SoftFireBigRed", "红色大火特效", "伤害", "目标", "Effect/SoftFireBigRed", "", 10f, 1f, 8f, 1f, "");
             config[11090] = new EffectConfig(11090, "MagicChargeBlue", "蓝色蓄力特效", "增益", "目标", "Effect/MagicChargeBlue", "", 3f, 1f, 8f, 1f, "");
@@ -209,18 +209,18 @@ namespace CommonConfig
             config[11262] = new EffectConfig(11262, "PoisonExplosionSoftPurple", "紫色迷雾爆裂特效", "伤害", "范围", "Effect/PoisonExplosionSoft", "", 7f, 1f, 5f, 1f, "#550066");
             config[11270] = new EffectConfig(11270, "MagicAuraBlue", "蓝色魔法区域特效", "增益", "范围", "Effect/MagicAuraBlue", "", 4f, 1f, 5f, 1f, "");
             config[11271] = new EffectConfig(11271, "MagicAuraYellow", "黄色魔法区域特效", "增益", "范围", "Effect/MagicAuraBlue", "", 4f, 1f, 5f, 1f, "#fbff00ff");
-            config[11280] = new EffectConfig(11280, "Misses", "红色烟雾效果", "负面", "目标", "Effect/Misses", "", 8f, 1f, 5f, 1f, "");
-            config[11281] = new EffectConfig(11281, "MissesBlue", "蓝色烟雾效果", "负面", "目标", "Effect/Misses", "", 8f, 1f, 5f, 1f, "#3333FF");
-            config[11282] = new EffectConfig(11282, "MissesGreen", "绿色烟雾效果", "负面", "目标", "Effect/Misses", "", 8f, 1f, 5f, 1f, "#00FF1B");
+            config[11280] = new EffectConfig(11280, "Misses", "红色烟雾效果", "负面", "Buff", "Effect/Misses", "", 8f, 1f, 5f, 1f, "");
+            config[11281] = new EffectConfig(11281, "MissesBlue", "蓝色烟雾效果", "负面", "Buff", "Effect/Misses", "", 8f, 1f, 5f, 1f, "#3333FF");
+            config[11282] = new EffectConfig(11282, "MissesGreen", "绿色烟雾效果", "负面", "Buff", "Effect/Misses", "", 8f, 1f, 5f, 1f, "#00FF1B");
             config[11290] = new EffectConfig(11290, "Wet", "蓝色下雨效果", "负面", "目标", "Effect/Wet", "", 6f, 1f, 5f, 1f, "");
             config[11300] = new EffectConfig(11300, "Character_status_sleep", "sleep", "负面", "Buff", "Effect/Character_status_sleep", "", 8f, 1f, 5f, 1f, "#3333FF");
             config[11400] = new EffectConfig(11400, "Character_status_fight", "好战", "负面", "Buff", "Effect/Character_status_fight", "", 8f, 1f, 5f, 1f, "");
             config[11410] = new EffectConfig(11410, "Character_status_taunt", "嘲讽", "负面", "Buff", "Effect/Character_status_taunt", "", 8f, 1f, 5f, 1f, "");
-            config[11420] = new EffectConfig(11420, "Par_LargeMagicCircle", "蓝色光环", "负面", "目标", "Effect/Par_LargeMagicCircle", "", 1.5f, .5f, 5f, 1f, "");
-            config[11421] = new EffectConfig(11421, "Par_LargeMagicCircleGreen", "绿色光环", "负面", "目标", "Effect/Par_LargeMagicCircle", "", 1.5f, .5f, 5f, 1f, "#00FF1B");
-            config[11430] = new EffectConfig(11430, "Par_HolyMagicCircle", "金色光环", "负面", "目标", "Effect/Par_HolyMagicCircle", "", 1.5f, .5f, 5f, 1f, "");
-            config[11440] = new EffectConfig(11440, "Par_PurpleField", "紫色光环", "负面", "目标", "Effect/Par_PurpleField", "", 4f, .5f, 5f, 1f, "");
-            config[11450] = new EffectConfig(11450, "Par_FireField", "红色光环", "负面", "目标", "Effect/Par_FireField", "", 4.5f, .5f, 5f, 1f, "");
+            config[11420] = new EffectConfig(11420, "Par_LargeMagicCircle", "蓝色光环", "负面", "光环", "Effect/Par_LargeMagicCircle", "", 1.5f, .5f, 5f, 1f, "");
+            config[11421] = new EffectConfig(11421, "Par_LargeMagicCircleGreen", "绿色光环", "负面", "光环", "Effect/Par_LargeMagicCircle", "", 1.5f, .5f, 5f, 1f, "#00FF1B");
+            config[11430] = new EffectConfig(11430, "Par_HolyMagicCircle", "金色光环", "负面", "光环", "Effect/Par_HolyMagicCircle", "", 1.5f, .5f, 5f, 1f, "");
+            config[11440] = new EffectConfig(11440, "Par_PurpleField", "紫色光环", "负面", "光环", "Effect/Par_PurpleField", "", 4f, .5f, 5f, 1f, "");
+            config[11450] = new EffectConfig(11450, "Par_FireField", "红色光环", "负面", "光环", "Effect/Par_FireField", "", 4.5f, .5f, 5f, 1f, "");
             config[11460] = new EffectConfig(11460, "StunnedCirclingShadowSimple", "闪避", "负面", "Buff", "Effect/StunnedCirclingShadowSimple", "", 4.5f, .5f, 5f, 1f, "");
             config[11470] = new EffectConfig(11470, "top_down_lightning_dot_blue", "攻击命中", "负面", "目标", "Effect/top_down_lightning_dot_orange", "", 7f, .5f, 5f, 1f, "#00D5FF");
             config[11480] = new EffectConfig(11480, "top_down_starfall_circle_rainbow", "星落效果，aoe", "负面", "范围", "Effect/top_down_starfall_circle_rainbow", "", 2f, .5f, 5f, 1f, "");

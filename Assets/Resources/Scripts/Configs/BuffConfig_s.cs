@@ -55,7 +55,7 @@ namespace CommonConfig
             {"BuffAttrConst", new FieldMetaInfo("常量属性键(不受品质/等级影响，多个用逗号分隔)", "string", 220)},
             {"ColorStart", new FieldMetaInfo("启动色", "string", 0)},
             {"ColorEnd", new FieldMetaInfo("结束色", "string", 0)},
-            {"BuffEffect", new FieldMetaInfo("hit", "string", 220)},
+            {"BuffEffect", new FieldMetaInfo("Buff特效（取 Area=Buff 的特效，挂单位身上随 buff 存续）", "string", 220, "effect")},
             {"Material", new FieldMetaInfo("切材质", "string", 0)},
             {"Icon", new FieldMetaInfo("图标", "string", 0)},
         };
@@ -126,7 +126,7 @@ namespace CommonConfig
         /// </summary>
         public string ColorEnd;
         /// <summary>
-        ///hit
+        ///Buff特效（取 Area=Buff 的特效，挂单位身上随 buff 存续）
         /// </summary>
         public string BuffEffect;
         /// <summary>

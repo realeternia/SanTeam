@@ -2995,8 +2995,16 @@ MonoBehaviour:
   currentSaveSlot: -1
   scenarioId: 1
   pendingNewGameSave: 0
-  debugHeroesSide1: []
-  debugHeroesSide2: []
+  debugHeroesSide1:
+  - heroId: 101016
+    level: 1
+    buffId: 0
+    buffTime: 10
+  debugHeroesSide2:
+  - heroId: 105015
+    level: 1
+    buffId: 0
+    buffTime: 10
   debugFullMp: 1
   debugJobLink: 1
   debugFactionShield: 1
