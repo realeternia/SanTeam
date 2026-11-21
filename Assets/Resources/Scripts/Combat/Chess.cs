@@ -540,6 +540,15 @@ public class Chess : MonoBehaviour
             }
         }
 
+        // 组队模式（两大阵营）：优先锁定与自己号位配对的 1v1 对手（1↔2、3↔4、5↔6、7↔8），
+        // 配对对手全部阵亡/隐匿后再回落到其他号位的敌人
+        if (WorldManager.Instance.MapRule == 1)
+        {
+            var pairedTargets = validTargets.Where(t => (t.chess.side + 1) / 2 == (side + 1) / 2).ToList();
+            if (pairedTargets.Count > 0)
+                validTargets = pairedTargets;
+        }
+
         // 如果没有有效目标，直接返回
         if (validTargets.Count == 0)
         {

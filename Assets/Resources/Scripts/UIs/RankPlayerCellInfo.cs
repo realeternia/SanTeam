@@ -20,8 +20,8 @@ public class RankPlayerCellInfo : MonoBehaviour
 
     // 最近 PvP 战绩图标布局：从名字右侧开始，逐个向右排列
     private const float ResultStartX = 770f;
-    private const float ResultStepX = 28f;
-    private const float ResultIconSize = 24f;
+    private const float ResultStepX = 42f;
+    private const float ResultIconSize = 36f;
     private const float ResultY = -39f;
 
     private static Sprite winIcon;

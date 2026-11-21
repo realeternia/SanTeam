@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -120,15 +120,15 @@ namespace CommonConfig
         {
             config.Clear();
             config[1] = new PlayerLevelConfig(1, 2, 1, 1, 0, 0, 0, 0);
-            config[2] = new PlayerLevelConfig(2, 6, 2, 1, 0, 15, 0, 0);
-            config[3] = new PlayerLevelConfig(3, 10, 3, 2, 0, 25, 10, 0);
-            config[4] = new PlayerLevelConfig(4, 16, 4, 2, 1, 30, 15, 1);
-            config[5] = new PlayerLevelConfig(5, 24, 5, 3, 1, 33, 20, 4);
-            config[6] = new PlayerLevelConfig(6, 36, 6, 3, 2, 35, 25, 7);
-            config[7] = new PlayerLevelConfig(7, 50, 7, 4, 2, 35, 30, 10);
-            config[8] = new PlayerLevelConfig(8, 64, 8, 4, 3, 30, 33, 17);
+            config[2] = new PlayerLevelConfig(2, 6, 2, 1, 0, 10, 0, 0);
+            config[3] = new PlayerLevelConfig(3, 10, 3, 2, 0, 15, 5, 0);
+            config[4] = new PlayerLevelConfig(4, 16, 4, 2, 1, 20, 8, 0);
+            config[5] = new PlayerLevelConfig(5, 24, 5, 3, 1, 25, 12, 2);
+            config[6] = new PlayerLevelConfig(6, 36, 6, 3, 2, 30, 18, 5);
+            config[7] = new PlayerLevelConfig(7, 50, 7, 4, 2, 35, 25, 10);
+            config[8] = new PlayerLevelConfig(8, 64, 8, 4, 3, 30, 30, 17);
             config[9] = new PlayerLevelConfig(9, 88, 9, 5, 3, 25, 35, 25);
-            config[10] = new PlayerLevelConfig(10, 0, 10, 5, 4, 20, 35, 35);
+            config[10] = new PlayerLevelConfig(10, 0, 10, 5, 4, 20, 30, 30);
 
             RebuildIndex();
 
