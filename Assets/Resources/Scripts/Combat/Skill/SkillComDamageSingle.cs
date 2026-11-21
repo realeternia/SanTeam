@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using CommonConfig;
 using UnityEngine;
 
@@ -23,6 +24,7 @@ using UnityEngine;
 /// · missile     = 以飞弹逐个结算（ApplyDamage）；飞弹特效取 HitEffect，飞行速度取 SummonSpeed（0 时用单位导弹速度）
 /// · execute / shieldBonus / missingHp / highHp / vsJob / soldierDamage / critRateBonus（ApplyDamageModifiers）
 /// · antiShield / mpBurn / 击退 pushMin~pushMax / 拖回出生点 pullToSpawn / selfHurt / selfBuff / dispel（AfterDamage）
+/// · hitCount / hitInterval = 多段攻击：第1段立即结算，第2段起每隔 hitInterval 秒追加命中（默认1段、间隔0.3秒）
 /// 伤害体系派生（各自覆写 CheckAidSkill，自动继承上述全部组件能力）：
 /// · SkillComDamageArea        范围伤害 + 可选 Buff（目标中心 / self 自身中心）
 /// · SkillComDamageShockWave   冲击波（导弹沿路径命中）
@@ -32,6 +34,9 @@ using UnityEngine;
 /// </summary>
 public class SkillComDamageSingle : Skill
 {
+    /// <summary>多段攻击未配置 hitInterval 时的默认间隔（秒）</summary>
+    private const float DefaultHitInterval = 0.3f;
+
     public SkillComDamageSingle(int id, Chess unit) : base(id, unit)
     {
     }
@@ -52,7 +57,36 @@ public class SkillComDamageSingle : Skill
 
         PlayCast(target);
         ResolveHit(target);
+
+        // 多段攻击：hitCount>1 时按 hitInterval 秒间隔追加命中（默认1段，保持原有单体技能行为）
+        var hitCount = Mathf.Max(1, (int)GetStr2("hitCount", 1f));
+        if (hitCount > 1)
+            owner.StartCoroutine(ExtraHits(target, hitCount, Mathf.Max(0f, GetStr2("hitInterval", DefaultHitInterval))));
         return true;
+    }
+
+    /// <summary>多段攻击：第2段起每隔 interval 秒再次结算 ResolveHit；目标死亡时重新索敌。</summary>
+    private IEnumerator ExtraHits(Chess target, int hitCount, float interval)
+    {
+        for (var i = 1; i < hitCount; i++)
+        {
+            if (interval > 0f)
+                yield return new WaitForSeconds(interval);
+
+            if (owner == null || owner.hp <= 0)
+                yield break;
+
+            // 延迟期间原目标死亡时重新索敌
+            if (target == null || target.hp <= 0)
+            {
+                owner.FindTarget();
+                target = owner.targetChess;
+            }
+            if (target == null || target.hp <= 0)
+                yield break;
+
+            ResolveHit(target);
+        }
     }
 
     /// <summary>选目标：self 标记沿用当前索敌目标（自身中心 AoE），否则按射程校验（配 SelectFirst 时走优先级链）。</summary>

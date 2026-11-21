@@ -492,6 +492,10 @@ namespace SkillBaseTool
             var rows = store.Skills.Where(s => s.Sname == skill.Sname).ToList();
             foreach (var row in rows)
             {
+                // 取消勾选的组件：同步清掉它写进 Strength2 / TargetType 的残留键与标签
+                if (row.Modules != null && row.Modules.Length > 0)
+                    SkillGen.RemoveComponentEffects(store, row, row.Modules.Where(m => !mods.Contains(m)), mods);
+
                 row.TemplateName = tpl;
                 row.Modules = mods.ToArray();
                 if (rebind)

@@ -336,7 +336,6 @@ namespace CommonConfig
         public static void Load()
         {
             config.Clear();
-
             RebuildIndex();
 
         }

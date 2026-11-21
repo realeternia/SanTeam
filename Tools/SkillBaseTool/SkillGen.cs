@@ -463,9 +463,73 @@ namespace SkillBaseTool
             return changed;
         }
 
+        /// <summary>
+        /// 取消勾选组件时，把该组件贡献的 Strength2 键与 TargetType 标签从技能行移除；
+        /// 若同一键/标签仍被保留组件声明则保留，未在组件里声明的手配键/标签不受影响。
+        /// </summary>
+        public static void RemoveComponentEffects(DataStore store, SkillRow row, IEnumerable<string> removedModules, IEnumerable<string> remainingModules)
+        {
+            var removed = new List<string>(removedModules ?? Enumerable.Empty<string>());
+            if (removed.Count == 0)
+                return;
+
+            var remaining = new HashSet<string>(remainingModules ?? Enumerable.Empty<string>());
+            var keepS2 = new HashSet<string>();
+            var keepTags = new HashSet<string>();
+            foreach (string name in remaining)
+            {
+                ComponentRow comp;
+                if (!store.ComponentByName.TryGetValue(name, out comp))
+                    continue;
+                foreach (var b in ParseEffect(comp.Effect))
+                {
+                    if (b.Column == "Strength2" && !string.IsNullOrEmpty(b.Sub))
+                        keepS2.Add(b.Sub);
+                    else if (b.Column == "TargetType" && !string.IsNullOrEmpty(b.Sub))
+                        keepTags.Add(b.Sub);
+                }
+            }
+
+            var dropS2 = new HashSet<string>();
+            var dropTags = new HashSet<string>();
+            foreach (string name in removed)
+            {
+                ComponentRow comp;
+                if (!store.ComponentByName.TryGetValue(name, out comp))
+                    continue;
+                foreach (var b in ParseEffect(comp.Effect))
+                {
+                    if (b.Column == "Strength2" && !string.IsNullOrEmpty(b.Sub) && !keepS2.Contains(b.Sub))
+                        dropS2.Add(b.Sub);
+                    else if (b.Column == "TargetType" && !string.IsNullOrEmpty(b.Sub) && !keepTags.Contains(b.Sub))
+                        dropTags.Add(b.Sub);
+                }
+            }
+
+            if (dropS2.Count > 0)
+                row.Args[Col.Strength2] = FilterSegments(row.Args[Col.Strength2], ',', dropS2);
+            if (dropTags.Count > 0)
+                row.Args[Col.TargetType] = FilterSegments(row.Args[Col.TargetType], ',', dropTags);
+        }
+
+        /// <summary>去掉以 key: 开头的段（TargetType 标签没有冒号，按整段匹配）。</summary>
+        private static string FilterSegments(string raw, char sep, HashSet<string> dropKeys)
+        {
+            var segs = CfgUtil.Unquote(raw)
+                .Split(new[] { sep }, StringSplitOptions.RemoveEmptyEntries)
+                .Select(x => x.Trim()).Where(x => x.Length > 0).ToList();
+            segs.RemoveAll(s =>
+            {
+                int idx = s.IndexOf(':');
+                string key = idx < 0 ? s : s.Substring(0, idx).Trim();
+                return dropKeys.Contains(key);
+            });
+            return CfgUtil.Quote(string.Join(sep.ToString(), segs));
+        }
+
         private static string[] BuildBaseRow(DataStore store, SkillRow skill, TemplateRow tpl, GenerateResult result)
         {
-            var writer = new BaseWriter(skill.Args, store);
+            var writer = new BaseWriter(skill.Args, store, skill.Modules);
             int lv = Math.Max(1, skill.Lv);
 
             var tplBindings = ParseEffect(tpl.Effect);
@@ -621,7 +685,7 @@ namespace SkillBaseTool
             private bool triggersChanged;
             private bool s2Changed;
 
-            public BaseWriter(string[] source, DataStore dataStore)
+            public BaseWriter(string[] source, DataStore dataStore, string[] selectedModules)
             {
                 B = (string[])source.Clone();
                 store = dataStore;
@@ -634,6 +698,62 @@ namespace SkillBaseTool
                 s2 = SplitList(B[Col.Strength2], ',');
                 handBuffKeys = new HashSet<string>(KeyOf(buffSegs));
                 handS2Keys = new HashSet<string>(KeyOf(s2));
+                RemoveStaleComponentEffects(selectedModules);
+            }
+
+            /// <summary>
+            /// 组件取消勾选后，SkillConfig 里仍可能残留它写入的 Strength2 键 / TargetType 标签。
+            /// 生成前先清掉“没有任何保留组件声明”的组件键与标签，避免移除组件后旧数值继续生效。
+            /// </summary>
+            private void RemoveStaleComponentEffects(string[] selectedModules)
+            {
+                if (store == null)
+                    return;
+
+                var selected = new HashSet<string>(selectedModules ?? new string[0]);
+                var allS2 = new HashSet<string>();
+                var selectedS2 = new HashSet<string>();
+                var allTags = new HashSet<string>();
+                var selectedTags = new HashSet<string>();
+
+                foreach (var kv in store.ComponentByName)
+                {
+                    bool isSelected = selected.Contains(kv.Key);
+                    foreach (var b in ParseEffect(kv.Value.Effect))
+                    {
+                        if (b.Column == "Strength2" && !string.IsNullOrEmpty(b.Sub))
+                        {
+                            allS2.Add(b.Sub);
+                            if (isSelected)
+                                selectedS2.Add(b.Sub);
+                        }
+                        else if (b.Column == "TargetType" && !string.IsNullOrEmpty(b.Sub))
+                        {
+                            allTags.Add(b.Sub);
+                            if (isSelected)
+                                selectedTags.Add(b.Sub);
+                        }
+                    }
+                }
+
+                for (int i = s2.Count - 1; i >= 0; i--)
+                {
+                    int idx = s2[i].IndexOf(':');
+                    string key = idx > 0 ? s2[i].Substring(0, idx).Trim() : s2[i].Trim();
+                    if (!allS2.Contains(key) || selectedS2.Contains(key))
+                        continue;
+                    s2.RemoveAt(i);
+                    handS2Keys.Remove(key);
+                    s2Changed = true;
+                }
+
+                for (int i = tags.Count - 1; i >= 0; i--)
+                {
+                    if (!allTags.Contains(tags[i]) || selectedTags.Contains(tags[i]))
+                        continue;
+                    tags.RemoveAt(i);
+                    tagsChanged = true;
+                }
             }
 
             /// <summary>BuffAttrDynamic 声明“受品质/等级影响的 Buff 效果字段”，供 BuffEffectRate 乘算；BuffTimeRate 为时长乘性修饰项。</summary>

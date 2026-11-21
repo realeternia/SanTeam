@@ -72,6 +72,8 @@ namespace SkillBaseTool
             compareView = new CompareView() { Dock = DockStyle.Fill };
             templateView = new TreemapView(TreemapView.Mode.Template) { Dock = DockStyle.Fill };
             componentView = new TreemapView(TreemapView.Mode.Component) { Dock = DockStyle.Fill };
+            // 对比页「保存所有」直接复用生成页的「应用」逻辑
+            compareView.ApplyAll = generateView.ApplyStaged;
 
             var pageGen = new TabPage("① 模板化 / 待应用") { BackColor = Theme.Bg };
             var pageCompare = new TabPage("② 待应用对比") { BackColor = Theme.Bg };

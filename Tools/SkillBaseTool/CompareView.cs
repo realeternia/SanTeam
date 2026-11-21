@@ -14,6 +14,8 @@ namespace SkillBaseTool
         private Label lblSummary;
         private ComboBox cboFilter;
         private DataGridView grid;
+        /// <summary>保存全部待应用数据（由 MainForm 接到 GenerateView.ApplyStaged）。</summary>
+        public Action ApplyAll;
         /// <summary>数据是否已变更、需要重新展开对比（切到本页时才计算）。</summary>
         private bool dirty;
 
@@ -61,7 +63,26 @@ namespace SkillBaseTool
             };
             btnRefresh.FlatAppearance.BorderColor = Theme.Line;
             btnRefresh.Click += (s, e) => Rebuild();
-            top.Controls.AddRange(new Control[] { lblSummary, lblFilter, cboFilter, btnRefresh });
+
+            var btnApplyAll = new Button
+            {
+                Text = "保存所有",
+                FlatStyle = FlatStyle.Flat,
+                BackColor = Theme.Accent,
+                ForeColor = ColorTranslator.FromHtml("#1A1A1A"),
+                Location = new Point(356, 44),
+                Size = new Size(110, 28),
+            };
+            btnApplyAll.FlatAppearance.BorderColor = Theme.Line;
+            btnApplyAll.Click += (s, e) =>
+            {
+                if (ApplyAll == null)
+                    MessageBox.Show(this, "未接到保存动作。", "保存所有", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                else
+                    ApplyAll();
+            };
+
+            top.Controls.AddRange(new Control[] { lblSummary, lblFilter, cboFilter, btnRefresh, btnApplyAll });
 
             grid = new DataGridView { Dock = DockStyle.Fill };
             Theme.StyleGrid(grid);

@@ -217,9 +217,9 @@ namespace CommonConfig
             config[12] = new PlayerConfig(12, "可霏", "温婉重情 乐善好施", "PlayerPic/kefei", "#0099CC", true, 0, new int[0], 1.5f, 2, "乐师辅助：琴手 + 吴国 + 济世/义胆/安民", new int[]{502}, new int[]{3}, new int[]{7,15,32}, 0.1f, 0.45f, 0.5f, 40, 0.75f, 0.4f, 12, 26);
             config[100] = new PlayerConfig(100, "魔童", "野性难驯小魔头", "PlayerPic/nezha", "#8C0000", false, 0, new int[]{409001}, 1.5f, 3, "战车突击：战车 + 迅捷/悍将/枭雄/陷阵", new int[]{102}, new int[0], new int[]{13,14,31,9}, 0.1f, 0.9f, 0.5f, 50, 0.75f, 0.6f, 11, 24);
             config[101] = new PlayerConfig(101, "钱多", "多金老练出手阔少爷", "PlayerPic/qian", "#FFFFFF", false, 2, new int[]{409002}, 1.5f, 4, "阔少战车+谋士：战车/丞相 + 望族/文采/王佐/奇才", new int[]{102,402}, new int[0], new int[]{17,24,12,20}, 0.1f, 0.7f, 0.4f, 80, 0.8f, 0.9f, 8, 20);
-            config[102] = new PlayerConfig(102, "黄眉", "法力无边目中无人", "PlayerPic/huangmei", "#5555FF", false, 0, new int[]{100002,409004}, 1.5f, 3, "权谋法术：智士 + 袁氏 + 权奸/善守", new int[]{401}, new int[]{6}, new int[]{16,28}, 0.1f, 0.85f, 0.6f, 90, 1.2f, .85f, 8, 20);
-            config[103] = new PlayerConfig(103, "无量", "法力无边和蔼莽撞", "PlayerPic/wuliang", "#FF3333", false, 0, new int[]{100003,409005}, 1.5f, 3, "法力+莽撞和蔼：智士/盾兵 + 仁德/虎狼", new int[]{401,302}, new int[0], new int[]{5,29}, 0.1f, 0.9f, 0.6f, 85, 1.15f, 0.9f, 8, 20);
-            config[104] = new PlayerConfig(104, "大虎", "聪明军师", "PlayerPic/dahu", "#006633", false, 0, new int[]{100001,409003}, 1.5f, 4, "谋略军团+亲卫：丞相/智士/盾兵 + 深谋/智勇", new int[]{302,401,402}, new int[0], new int[]{10,27}, 0.1f, 0.9f, 0.5f, 90, 0.7f, .75f, 8, 20);
+            config[102] = new PlayerConfig(102, "黄眉", "法力无边目中无人", "PlayerPic/huangmei", "#5555FF", false, 0, new int[]{409004}, 1.5f, 3, "权谋法术：智士 + 袁氏 + 权奸/善守", new int[]{401}, new int[]{6}, new int[]{16,28}, 0.1f, 0.85f, 0.6f, 90, 1.2f, .85f, 8, 20);
+            config[103] = new PlayerConfig(103, "无量", "法力无边和蔼莽撞", "PlayerPic/wuliang", "#FF3333", false, 0, new int[]{409005}, 1.5f, 3, "法力+莽撞和蔼：智士/盾兵 + 仁德/虎狼", new int[]{401,302}, new int[0], new int[]{5,29}, 0.1f, 0.9f, 0.6f, 85, 1.15f, 0.9f, 8, 20);
+            config[104] = new PlayerConfig(104, "大虎", "聪明军师", "PlayerPic/dahu", "#006633", false, 0, new int[]{409003}, 1.5f, 4, "谋略军团+亲卫：丞相/智士/盾兵 + 深谋/智勇", new int[]{302,401,402}, new int[0], new int[]{10,27}, 0.1f, 0.9f, 0.5f, 90, 0.7f, .75f, 8, 20);
             config[999] = new PlayerConfig(999, "怪物", "守关无名怪物", "PlayerPic/tower", "#FF0000", false, 0, new int[0], 0f, 0, "无固定卡组偏好（守关怪物）", new int[0], new int[0], new int[0], 0.1f, 0f, 0f, 0, 0f, 0f, 0, 0);
 
             RebuildIndex();

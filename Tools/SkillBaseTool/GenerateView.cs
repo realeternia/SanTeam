@@ -551,7 +551,7 @@ namespace SkillBaseTool
         }
 
         /// <summary>把待应用表写入 SkillConfig（效果列），Version 提到下一批次，然后清空 SkillBaseConfig。</summary>
-        private void ApplyStaged()
+        public void ApplyStaged()
         {
             if (store == null)
                 return;
