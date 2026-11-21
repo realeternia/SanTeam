@@ -125,11 +125,17 @@ public static class ConfigManager
     }
 
     /// <summary>
-    /// 模板化技能的数据替换：SkillConfig 行只保留身份列（Id/Name/Sname/Version/Descript/Type/Template/Modules/Lv），
-    /// 效果列一律从同 Id 的 SkillBaseConfig 行覆盖。SkillBaseConfig 由模板 + 组件展开生成。
+    /// 模板化技能的"待应用"数据替换：SkillConfig 为唯一数据源，效果列平时直接生效；
+    /// 仅当 SkillBaseConfig 里存在待应用行（工具「应用」前的暂存）时，才用同 Id 行覆盖对应效果列。
     /// </summary>
     private static void ApplySkillBase()
     {
+        if (SkillBaseConfig.ConfigList.Count == 0)
+        {
+            GameLog.Debug("ConfigManager.ApplySkillBase: 无待应用数据，跳过");
+            return;
+        }
+
         int applied = 0;
         foreach (var skillCfg in SkillConfig.ConfigList)
         {
@@ -137,8 +143,7 @@ public static class ConfigManager
                 continue;
             if (!SkillBaseConfig.HasConfig(skillCfg.Id))
             {
-                GameLog.Warn(string.Format("ConfigManager.ApplySkillBase: 技能[{0}]({1}) 引用了模板[{2}]，但缺少同 Id 的 SkillBaseConfig，沿用原有数值",
-                    skillCfg.Name, skillCfg.Id, skillCfg.Template));
+                // 无待应用行 = 使用 SkillConfig 自身数值，属正常状态
                 continue;
             }
 

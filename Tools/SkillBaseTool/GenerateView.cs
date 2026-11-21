@@ -48,20 +48,22 @@ namespace SkillBaseTool
 
             var btnAuto = MakeButton("① 自动分配模板", 16, 160);
             btnAuto.Click += (s, e) => AutoAssign();
-            var btnGen = MakeButton("② 生成 SkillBase", 186, 170);
+            var btnGen = MakeButton("② 生成待应用", 186, 130);
             btnGen.Click += (s, e) => GenerateBase();
-            var btnCheck = MakeButton("③ 配置自检", 366, 120);
+            var btnCheck = MakeButton("③ 配置自检", 326, 110);
             btnCheck.Click += (s, e) => ValidateAll();
+            var btnApply = MakeButton("④ 应用", 446, 90);
+            btnApply.Click += (s, e) => ApplyStaged();
             var tip = new Label
             {
-                Text = "规则：DamageStrength/HealStrength 取模板 Values，CD/MpCost 取模板（MpCost×10），Range/Area 仅模板>0 时覆盖，Buff 只按技能自己的 Modules 追加（模板默认组件仅估值）\n点击任意列头可按该列值筛选，再次点击可修改或清除",
+                Text = "生成/编辑只把与 SkillConfig 有差异的行写入 SkillBaseConfig（待应用）；「④ 应用」才把效果列写入 SkillConfig、Version 末位+1，然后清空 SkillBaseConfig\n点击任意列头可按该列值筛选，再次点击可修改或清除",
                 Font = Theme.Small,
                 ForeColor = Theme.Faint,
                 AutoSize = true,
-                Location = new Point(500, 12),
+                Location = new Point(552, 12),
             };
 
-            top.Controls.AddRange(new Control[] { lblStats, btnAuto, btnGen, btnCheck, tip });
+            top.Controls.AddRange(new Control[] { lblStats, btnAuto, btnGen, btnCheck, btnApply, tip });
 
             grid = new DataGridView { Dock = DockStyle.Fill, Margin = new Padding(0) };
             Theme.StyleGrid(grid);
@@ -260,7 +262,7 @@ namespace SkillBaseTool
 
                 var cell = grid.Rows[idx].Cells[8];
                 cell.Style.ForeColor = status == "OK" ? Theme.Ok
-                    : (status == "未模板化" ? Theme.Muted : Theme.Danger);
+                    : (status == "待应用" ? Theme.Accent : (status == "未模板化" ? Theme.Muted : Theme.Danger));
                 if (status != "OK")
                     grid.Rows[idx].DefaultCellStyle.BackColor = Theme.RowWarn;
 
@@ -277,7 +279,7 @@ namespace SkillBaseTool
             Theme.EndBulkFill(grid);
             if (keepId != 0)
                 SelectSkill(keepId);
-            lblStats.Text = string.Format("品质 1~4 英雄技能 {0} 个{1}：已模板化 {2}，SkillBase 行 {3}",
+            lblStats.Text = string.Format("品质 1~4 英雄技能 {0} 个{1}：已模板化 {2}，待应用行 {3}",
                 skills.Count, columnFilters.Count > 0 ? "（筛选显示 " + shown + "）" : "", templated, store.BaseRows.Count);
         }
 
@@ -302,9 +304,7 @@ namespace SkillBaseTool
                 return "未模板化";
             if (!store.TemplateByName.ContainsKey(s.TemplateName))
                 return "模板缺失";
-            if (!store.BaseRows.ContainsKey(s.Id))
-                return "缺 SkillBase";
-            return "OK";
+            return store.BaseRows.ContainsKey(s.Id) ? "待应用" : "OK";
         }
 
         /// <summary>按列索引取出该行的显示文本，供列筛选使用。</summary>
@@ -485,7 +485,7 @@ namespace SkillBaseTool
             return b;
         }
 
-        /// <summary>打开编辑弹窗；确认后已写回 SkillConfig，重新加载刷新列表并保持选中当前技能。</summary>
+        /// <summary>打开编辑弹窗；确认后 Template/Modules 写回 SkillConfig，并把展开结果写入待应用表。</summary>
         private void EditSkill(SkillRow skill)
         {
             using (var dlg = new SkillEditDialog(store, skill))
@@ -493,8 +493,17 @@ namespace SkillBaseTool
                 if (dlg.ShowDialog(FindForm()) != DialogResult.OK)
                     return;
                 pendingSelectId = skill.Id;
+                StageSkillGroup(skill.Sname);
                 reload();
             }
+        }
+
+        /// <summary>把同 Sname 的各级行按模板展开，仅把有差异的行写入待应用表。</summary>
+        private void StageSkillGroup(string sname)
+        {
+            var rows = store.Skills.Where(x => x.Sname == sname).ToList();
+            if (rows.Count > 0)
+                SkillGen.StageSkills(store, rows);
         }
 
         private void AutoAssign()
@@ -513,34 +522,84 @@ namespace SkillBaseTool
                 return;
             }
             ConfigIO.SaveSkillRows(store, ids);
-            string msg = string.Format("已为 {0} 个技能写入模板，共 {1} 行。", groups, ids.Count);
+            var staged = SkillGen.StageSkills(store, ids.Select(id => store.SkillById[id]).Where(x => x != null));
+            string msg = string.Format("已为 {0} 个技能写入模板，共 {1} 行；其中 {2} 行有差异，已写入待应用。", groups, ids.Count, staged);
             if (skipped.Count > 0)
                 msg += "\n未模板化（特化）：" + string.Join("、", skipped);
             MessageBox.Show(this, msg, "完成", MessageBoxButtons.OK, MessageBoxIcon.Information);
             reload();
         }
 
+        /// <summary>按模板重新展开全部技能，只把与 SkillConfig 有差异的行写入待应用表。</summary>
         private void GenerateBase()
         {
             if (store == null)
                 return;
-            var gen = SkillGen.GenerateBase(store);
-            if (gen.Rows.Count == 0)
+            if (store.TemplateByName.Count == 0)
             {
-                MessageBox.Show(this, "没有已填模板的技能，请先执行 ① 自动分配模板。", "提示",
+                MessageBox.Show(this, "没有模板配置，请先维护 SkillTemplateConfig。", "提示",
                     MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
-            if (MessageBox.Show(this, string.Format("将用 {0} 个模板化技能展开 {1} 行，整表覆盖 SkillBaseConfig。继续？",
-                    gen.TemplatedSkills, gen.Rows.Count), "生成 SkillBase", MessageBoxButtons.OKCancel,
+            List<string> warnings;
+            int n = SkillGen.StageSkills(store, store.Skills, out warnings);
+            string msg = string.Format("已展开全部模板化技能：{0} 行有差异，已写入待应用（无差异的行不写）。", n);
+            if (warnings.Count > 0)
+                msg += "\n警告：" + string.Join("\n", warnings.Take(10));
+            MessageBox.Show(this, msg, "生成待应用", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            reload();
+        }
+
+        /// <summary>把待应用表写入 SkillConfig（效果列），Version 提到下一批次，然后清空 SkillBaseConfig。</summary>
+        private void ApplyStaged()
+        {
+            if (store == null)
+                return;
+            if (store.BaseRows.Count == 0)
+            {
+                MessageBox.Show(this, "当前没有待应用的数据（SkillBaseConfig 为空）。", "应用",
+                    MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+            float version = NextVersion();
+            if (MessageBox.Show(this, string.Format(
+                    "将把 {0} 行待应用数据写入 SkillConfig 的效果列（Version → {1}），随后清空 SkillBaseConfig。继续？",
+                    store.BaseRows.Count, CfgUtil.NumF(version)), "应用", MessageBoxButtons.OKCancel,
                     MessageBoxIcon.Question) != DialogResult.OK)
                 return;
-            int n = ConfigIO.WriteBaseRows(store, gen.Rows);
-            string msg = string.Format("已写入 {0} 行 SkillBaseConfig。", n);
-            if (gen.Warnings.Count > 0)
-                msg += "\n警告：" + string.Join("\n", gen.Warnings.Take(10));
-            MessageBox.Show(this, msg, "完成", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+            var ids = new List<int>();
+            foreach (var kv in store.BaseRows)
+            {
+                SkillRow skill;
+                if (!store.SkillById.TryGetValue(kv.Key, out skill) || kv.Value.Length != Col.Count)
+                    continue;
+                foreach (int c in SkillGen.AppliedColumns)
+                {
+                    // 与运行时 ApplySkillBase 一致：开局MP / MP上限层数仅在待应用值 > 0 时覆盖
+                    if ((c == Col.StartMpRate || c == Col.MpLimit) && CfgUtil.ParseFloat(kv.Value[c]) <= 0f)
+                        continue;
+                    skill.Args[c] = kv.Value[c];
+                }
+                skill.Version = version;
+                ids.Add(skill.Id);
+            }
+            ConfigIO.SaveSkillRows(store, ids);
+            store.BaseRows.Clear();
+            ConfigIO.WriteBaseRows(store, store.BaseRows);
+
+            MessageBox.Show(this, string.Format("已应用 {0} 行，Version = {1}，SkillBaseConfig 已清空。",
+                ids.Count, CfgUtil.NumF(version)), "应用完成", MessageBoxButtons.OK, MessageBoxIcon.Information);
             reload();
+        }
+
+        /// <summary>下一批次版本：当前最高 Version 末位 +0.1（如 1.2 → 1.3）。</summary>
+        private float NextVersion()
+        {
+            float max = 0f;
+            foreach (var s in store.Skills)
+                max = Math.Max(max, s.Version);
+            return (float)(Math.Round(max * 10) + 1) / 10f;
         }
 
         private void ValidateAll()
@@ -550,7 +609,7 @@ namespace SkillBaseTool
             var err = SkillGen.Validate(store);
             if (err.Count == 0)
             {
-                MessageBox.Show(this, "校验通过：列数、模板/组件引用、BuffId 重复、BuffAttrDynamic/BuffAttrConst 赋值、SkillBase 覆盖均正常。", "自检",
+                MessageBox.Show(this, "校验通过：列数、模板/组件引用、BuffId 重复、BuffAttrDynamic/BuffAttrConst 赋值均正常。", "自检",
                     MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }

@@ -6,7 +6,7 @@ using System.Windows.Forms;
 
 namespace SkillBaseTool
 {
-    /// <summary>③ 对比现有技能数值与模板展开后的 SkillBase 数值。</summary>
+    /// <summary>② 对比待应用数据（SkillBaseConfig 暂存）与 SkillConfig，仅列出有差异的部分。</summary>
     public sealed class CompareView : UserControl
     {
         private DataStore store;
@@ -111,31 +111,16 @@ namespace SkillBaseTool
             if (store == null)
                 return;
             dirty = false;
-            var gen = SkillGen.GenerateBase(store);
-            items = SkillGen.Compare(store, gen);
+            // 只对比待应用表（SkillBaseConfig 暂存）与 SkillConfig，且只列出有差异的行/列
+            items = SkillGen.ComparePending(store);
 
-            int noDiff = items.Count(x => !x.HasDiff);
             int main = items.Count(x => x.MainValueDiff);
             int rhythm = items.Count(x => x.RhythmDiff);
             int select = items.Count(x => x.SelectDiff);
             int buff = items.Count(x => x.BuffDiff);
-            double ratio = 0;
-            int rc = 0;
-            foreach (var it in items)
-            {
-                float hand = it.Skill.DamageStrength != 0 ? it.Skill.DamageStrength : it.Skill.HealStrength;
-                float tpl = CfgUtil.ParseFloat(it.Base[Col.DamageStrength]) != 0
-                    ? CfgUtil.ParseFloat(it.Base[Col.DamageStrength])
-                    : CfgUtil.ParseFloat(it.Base[Col.HealStrength]);
-                if (tpl > 0 && hand > 0)
-                {
-                    ratio += hand / tpl;
-                    rc++;
-                }
-            }
             lblSummary.Text = string.Format(
-                "模板化技能 {0} 个（Lv1）：完全一致 {1}，主数值差异 {2}，节奏差异 {3}，选取差异 {4}，Buff 差异 {5}；手配/模板主数值平均比 {6}",
-                items.Count, noDiff, main, rhythm, select, buff, rc > 0 ? (ratio / rc).ToString("0.00") : "-");
+                "待应用技能 {0} 个：主数值差异 {1}，节奏差异 {2}，选取差异 {3}，Buff 差异 {4}（无差异的不显示）",
+                items.Count, main, rhythm, select, buff);
             RefreshGrid();
         }
 

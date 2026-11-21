@@ -407,11 +407,11 @@ namespace SkillBaseTool
             return changed;
         }
 
-        /// <summary>按模板 + 组件展开生成 SkillBaseConfig 行。</summary>
-        public static GenerateResult GenerateBase(DataStore store)
+        /// <summary>按模板 + 组件展开指定技能行，生成 SkillBase 行（仅这些行）。</summary>
+        public static GenerateResult GenerateFor(DataStore store, IEnumerable<SkillRow> skills)
         {
             var result = new GenerateResult();
-            foreach (var skill in store.Skills)
+            foreach (var skill in skills)
             {
                 string tname = skill.TemplateName;
                 if (string.IsNullOrEmpty(tname))
@@ -426,6 +426,41 @@ namespace SkillBaseTool
                 result.Rows[skill.Id] = BuildBaseRow(store, skill, tpl, result);
             }
             return result;
+        }
+
+        /// <summary>
+        /// 把指定技能按模板展开后与 SkillConfig 当前值比较：有差异的行写入待应用表（SkillBaseConfig 暂存），
+        /// 已无差异的行从待应用表移除；只写有修改的行。返回待应用行数。
+        /// </summary>
+        public static int StageSkills(DataStore store, IEnumerable<SkillRow> skills)
+        {
+            List<string> warnings;
+            return StageSkills(store, skills, out warnings);
+        }
+
+        public static int StageSkills(DataStore store, IEnumerable<SkillRow> skills, out List<string> warnings)
+        {
+            var gen = GenerateFor(store, skills);
+            warnings = gen.Warnings;
+            int changed = 0;
+            foreach (var kv in gen.Rows)
+            {
+                SkillRow skill;
+                if (!store.SkillById.TryGetValue(kv.Key, out skill))
+                    continue;
+                bool diff = AppliedColumns.Any(c => skill.Args[c] != kv.Value[c]);
+                if (diff)
+                {
+                    store.BaseRows[kv.Key] = kv.Value;
+                    changed++;
+                }
+                else
+                {
+                    store.BaseRows.Remove(kv.Key);
+                }
+            }
+            ConfigIO.WriteBaseRows(store, store.BaseRows);
+            return changed;
         }
 
         private static string[] BuildBaseRow(DataStore store, SkillRow skill, TemplateRow tpl, GenerateResult result)
@@ -866,32 +901,36 @@ namespace SkillBaseTool
             return null;
         }
 
-        /// <summary>对比现有技能行与模板展开结果。</summary>
-        public static List<CompareItem> Compare(DataStore store, GenerateResult gen)
+        /// <summary>对比待应用表（SkillBaseConfig 暂存）与 SkillConfig，只列出有差异的行与列。</summary>
+        public static List<CompareItem> ComparePending(DataStore store)
         {
             var list = new List<CompareItem>();
-            foreach (var skill in store.LevelOneSkills)
+            foreach (var kv in store.BaseRows)
             {
-                if (string.IsNullOrEmpty(skill.TemplateName))
+                SkillRow skill;
+                if (!store.SkillById.TryGetValue(kv.Key, out skill) || skill.Lv != 1 || kv.Value.Length != Col.Count)
                     continue;
-                string[] b;
-                if (!gen.Rows.TryGetValue(skill.Id, out b))
-                    continue;
-                var item = new CompareItem { Skill = skill, Template = skill.TemplateName, Base = b };
-                var a = skill.Args;
-                foreach (int c in AppliedColumns)
-                {
-                    if (a[c] == b[c])
-                        continue;
-                    item.Diffs.Add(ColName(c) + " " + Display(a[c]) + "→" + Display(b[c]));
-                    if (c == Col.DamageStrength || c == Col.HealStrength) item.MainValueDiff = true;
-                    if (c == Col.CD || c == Col.MpCost) item.RhythmDiff = true;
-                    if (c == Col.BuffId || c == Col.StrengthBuff1 || c == Col.BuffTime) item.BuffDiff = true;
-                    if (c == Col.SelectOnly || c == Col.SelectFirst) item.SelectDiff = true;
-                }
-                list.Add(item);
+                var item = new CompareItem { Skill = skill, Template = skill.TemplateName, Base = kv.Value };
+                FillDiffs(item, skill.Args, kv.Value);
+                if (item.HasDiff)
+                    list.Add(item);
             }
             return list;
+        }
+
+        /// <summary>收集一行在生效列上的差异，并标记差异类别。</summary>
+        private static void FillDiffs(CompareItem item, string[] a, string[] b)
+        {
+            foreach (int c in AppliedColumns)
+            {
+                if (a[c] == b[c])
+                    continue;
+                item.Diffs.Add(ColName(c) + " " + Display(a[c]) + "→" + Display(b[c]));
+                if (c == Col.DamageStrength || c == Col.HealStrength) item.MainValueDiff = true;
+                if (c == Col.CD || c == Col.MpCost) item.RhythmDiff = true;
+                if (c == Col.BuffId || c == Col.StrengthBuff1 || c == Col.BuffTime) item.BuffDiff = true;
+                if (c == Col.SelectOnly || c == Col.SelectFirst) item.SelectDiff = true;
+            }
         }
 
         public static string ColName(int col)
@@ -1134,8 +1173,6 @@ namespace SkillBaseTool
                 var tokens = s.BuffId.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
                 if (tokens.Distinct().Count() != tokens.Length)
                     err.Add("SkillConfig " + s.Id + " BuffId 重复：" + s.BuffId);
-                if (!store.BaseRows.ContainsKey(s.Id))
-                    err.Add("SkillConfig " + s.Id + " 缺少同 Id 的 SkillBaseConfig");
             }
             foreach (var t in store.Templates)
                 foreach (string m in t.Modules)

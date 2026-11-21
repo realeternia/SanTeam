@@ -157,6 +157,11 @@ namespace SkillBaseTool
         }
 
         public int Lv { get { return CfgUtil.ParseInt(Args[Col.Lv]); } }
+        public float Version
+        {
+            get { return CfgUtil.ParseFloat(Args[Col.Version]); }
+            set { Args[Col.Version] = CfgUtil.NumF(value); }
+        }
         public string Name { get { return CfgUtil.Unquote(Args[Col.Name]); } }
         public string Sname { get { return CfgUtil.Unquote(Args[Col.Sname]); } }
         public string Type { get { return CfgUtil.Unquote(Args[Col.Type]); } }

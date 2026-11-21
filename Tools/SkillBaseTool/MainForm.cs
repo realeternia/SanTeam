@@ -73,8 +73,8 @@ namespace SkillBaseTool
             templateView = new TreemapView(TreemapView.Mode.Template) { Dock = DockStyle.Fill };
             componentView = new TreemapView(TreemapView.Mode.Component) { Dock = DockStyle.Fill };
 
-            var pageGen = new TabPage("① 模板化 / 生成 SkillBase") { BackColor = Theme.Bg };
-            var pageCompare = new TabPage("② 技能 vs 模板 对比") { BackColor = Theme.Bg };
+            var pageGen = new TabPage("① 模板化 / 待应用") { BackColor = Theme.Bg };
+            var pageCompare = new TabPage("② 待应用对比") { BackColor = Theme.Bg };
             var pageTemplate = new TabPage("③ 模板视角") { BackColor = Theme.Bg };
             var pageComponent = new TabPage("④ 组件视角") { BackColor = Theme.Bg };
             pageGen.Controls.Add(generateView);
@@ -119,7 +119,7 @@ namespace SkillBaseTool
                 compareView.Bind(store);
                 templateView.Bind(store);
                 componentView.Bind(store);
-                lblStatus.Text = string.Format("已加载 技能 {0} 行 / 模板 {1} 条 / 组件 {2} 条 / SkillBase {3} 行 / 英雄品质 {4} 条",
+                lblStatus.Text = string.Format("已加载 技能 {0} 行 / 模板 {1} 条 / 组件 {2} 条 / 待应用 {3} 行 / 英雄品质 {4} 条",
                     store.Skills.Count, store.Templates.Count, store.Components.Count, store.BaseRows.Count, store.HeroQuality.Count);
             }
             catch (Exception ex)
