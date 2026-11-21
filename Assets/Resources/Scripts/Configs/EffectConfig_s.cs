@@ -216,11 +216,12 @@ namespace CommonConfig
             config[11300] = new EffectConfig(11300, "Character_status_sleep", "sleep", "负面", "Buff", "Effect/Character_status_sleep", "", 8f, 1f, 5f, 1f, "#3333FF");
             config[11400] = new EffectConfig(11400, "Character_status_fight", "好战", "负面", "Buff", "Effect/Character_status_fight", "", 8f, 1f, 5f, 1f, "");
             config[11410] = new EffectConfig(11410, "Character_status_taunt", "嘲讽", "负面", "Buff", "Effect/Character_status_taunt", "", 8f, 1f, 5f, 1f, "");
-            config[11420] = new EffectConfig(11420, "Par_LargeMagicCircle", "蓝色光环", "负面", "光环", "Effect/Par_LargeMagicCircle", "", 1.5f, .5f, 5f, 1f, "");
-            config[11421] = new EffectConfig(11421, "Par_LargeMagicCircleGreen", "绿色光环", "负面", "光环", "Effect/Par_LargeMagicCircle", "", 1.5f, .5f, 5f, 1f, "#00FF1B");
-            config[11430] = new EffectConfig(11430, "Par_HolyMagicCircle", "金色光环", "负面", "光环", "Effect/Par_HolyMagicCircle", "", 1.5f, .5f, 5f, 1f, "");
-            config[11440] = new EffectConfig(11440, "Par_PurpleField", "紫色光环", "负面", "光环", "Effect/Par_PurpleField", "", 4f, .5f, 5f, 1f, "");
-            config[11450] = new EffectConfig(11450, "Par_FireField", "红色光环", "负面", "光环", "Effect/Par_FireField", "", 4.5f, .5f, 5f, 1f, "");
+            config[11420] = new EffectConfig(11420, "Par_LargeMagicCircle", "蓝色光环", "正面", "光环", "Effect/Par_LargeMagicCircle", "", 1.5f, .5f, 5f, 1f, "");
+            config[11421] = new EffectConfig(11421, "Par_LargeMagicCircleGreen", "绿色光环", "正面", "光环", "Effect/Par_LargeMagicCircle", "", 1.5f, .5f, 5f, 1f, "#00FF1B");
+            config[11430] = new EffectConfig(11430, "Par_HolyMagicCircle", "金色光环", "正面", "光环", "Effect/Par_HolyMagicCircle", "", 1.5f, .5f, 5f, 1f, "");
+            config[11440] = new EffectConfig(11440, "Par_PurpleField", "紫色光环", "正面", "光环", "Effect/Par_PurpleField", "", 4f, .5f, 5f, 1f, "");
+            config[11450] = new EffectConfig(11450, "Par_FireField", "红色光环", "正面", "光环", "Effect/Par_FireField", "", 4.5f, .5f, 5f, 1f, "");
+            config[11451] = new EffectConfig(11451, "Par_FireFieldRed", "红色光环", "正面", "光环", "Effect/Par_FireField", "", 4.5f, .5f, 5f, 1f, "#FF0000");
             config[11460] = new EffectConfig(11460, "StunnedCirclingShadowSimple", "闪避", "负面", "Buff", "Effect/StunnedCirclingShadowSimple", "", 4.5f, .5f, 5f, 1f, "");
             config[11470] = new EffectConfig(11470, "top_down_lightning_dot_blue", "攻击命中", "负面", "目标", "Effect/top_down_lightning_dot_orange", "", 7f, .5f, 5f, 1f, "#00D5FF");
             config[11480] = new EffectConfig(11480, "top_down_starfall_circle_rainbow", "星落效果，aoe", "负面", "范围", "Effect/top_down_starfall_circle_rainbow", "", 2f, .5f, 5f, 1f, "");
@@ -237,6 +238,7 @@ namespace CommonConfig
             config[11527] = new EffectConfig(11527, "CirclingApFa", "法强提升法字环绕特效", "增益", "Buff", "Effect/CirclingApFa", "", 3f, 1f, 8f, 1f, "#B36BFF");
             config[11528] = new EffectConfig(11528, "CirclingCritBao", "暴击提升暴字环绕特效", "增益", "Buff", "Effect/CirclingCritBao", "", 3f, 1f, 8f, 1f, "#FFB020");
             config[11529] = new EffectConfig(11529, "CirclingSpellCritJue", "法术暴击绝字环绕特效", "增益", "Buff", "Effect/CirclingSpellCritJue", "", 3f, 1f, 8f, 1f, "#FF4DD2");
+            config[11530] = new EffectConfig(11530, "CirclingReflectCi", "反伤六刺环绕特效", "增益", "Buff", "Effect/CirclingReflectCi", "", 3f, 1f, 8f, 1f, "");
 
             RebuildIndex();
 

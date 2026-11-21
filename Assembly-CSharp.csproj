@@ -69,7 +69,6 @@
     <Compile Include="Assets\Resources\Scripts\UIs\TooltipHero.cs" />
     <Compile Include="Assets\Resources\Scripts\Configs\SystemAttrConfig_s.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillBondAttackMpGain.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffRevive.cs" />
     <Compile Include="Assets\MasterMagicFX\Scripts\Miscs\MEffectExample.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffTaunt.cs" />
     <Compile Include="Assets\Resources\Scripts\SystemTip.cs" />
@@ -135,7 +134,6 @@
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillComDamageTaunt.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffVengefulStance.cs" />
     <Compile Include="Assets\Resources\Scripts\Configs\MapConfig_s.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffMultiShot.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillBondFactionShield.cs" />
     <Compile Include="Assets\Lana Studio\Casual RPG VFX\Scripts\UVscroll.cs" />
     <Compile Include="Assets\SineVFX\TopDownEffects\Scripts\SineUIControllerTopDownEffects.cs" />
@@ -300,7 +298,6 @@
     <Compile Include="Assets\Resources\Scripts\Configs\SkillTemplateComponentConfig_s.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\SideHeroControl.cs" />
     <Compile Include="Assets\Resources\Scripts\Configs\PlayerConfig_s.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffHealBoost.cs" />
     <Compile Include="Assets\DOTween\Modules\DOTweenModuleUIToolkit.cs" />
     <Compile Include="Assets\DOTween\Modules\DOTweenModuleUtils.cs" />
     <Compile Include="Assets\MasterMagicFX\Scripts\Miscs\BulletPreviewerShooter.cs" />

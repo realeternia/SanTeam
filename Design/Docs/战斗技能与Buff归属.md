@@ -210,21 +210,18 @@
 | 300009 | 移速提升(速) | 正 | BuffMoveSpeedAdd | 1 | 小乔 |
 | 300012 | 护甲(甲) | 正 | BuffArmorAdd | 11 | 才、俭、刘禅、大乔、周仓、荀彧、高览、周泰… |
 | 300013 | 魔抗提升(抗) | 正 | BuffMagicResAdd | 3 | 才、吕蒙、荀彧 |
-| 300014 | 生命回复(血) | 正 | BuffHpRegenAdd | 0 |  |
+| 300014 | 生命回复(血) | 正 | BuffHpRegenAdd | 1 | 鼓舞 |
 | 300015 | 闪避(闪) | 正 | BuffEvasion | 1 | 左慈 |
 | 300016 | 法强提升(术) | 正 | BuffApAdd | 1 | 曹操 |
 | 300018 | 法力回复(蓝) | 正 | BuffMpRegenAdd | 0 |  |
 | 300019 | 暴击提升(暴) | 正 | BuffCritRate | 2 | 丁奉、董卓 |
-| 300025 | 反伤(反) | 正 | BuffReflect | 0 |  |
+| 300025 | 反伤(反) | 正 | BuffReflect | 2 | 自守、黄天 |
 | 300030 | 隐匿(隐) | 正 | BuffStealth | 1 | 甘宁 |
 | 300101 | 据守(守) | 正 | BuffDefStack | 1 | 曹仁 |
-| 300102 | 复活(复) | 正 | BuffRevive | 0 |  |
-| 300104 | 多重箭(箭) | 正 | BuffMultiShot | 0 |  |
 | 300106 | 生命链接(链) | 正 | BuffLifeLink | 1 | 貂蝉 |
 | 300107 | 望族(望) | 正 | BuffDecayDef | 1 | 族 |
 | 300108 | 兼资(兼) | 正 | BuffStackBuf | 1 | 兼 |
 | 300109 | 威震(震) | 正 | BuffVengefulStance | 1 | 张辽 |
-| 300128 | 护驾(护) | 正 | BuffHealBoost | 0 |  |
 | 301001 | 眩晕(乱) | 负 | BuffNoAction | 4 | 枪、谋、吕布、夏侯惇 |
 | 301003 | 增伤(伤) | 负 | BuffDamagedAddRate | 6 | 冲、奸、朱桓、华雄、许攸、刘晔 |
 | 301004 | 减攻(慑) | 负 | BuffAtkDown | 4 | 徐庶、马腾、陈宫、程昱 |
@@ -242,13 +239,7 @@
 
 | Id | 名称(短名) | 脚本 |
 | --- | --- | --- |
-| 300014 | 生命回复(血) | BuffHpRegenAdd |
 | 300018 | 法力回复(蓝) | BuffMpRegenAdd |
-| 300025 | 反伤(反) | BuffReflect |
-| 300102 | 复活(复) | BuffRevive |
-| 300104 | 多重箭(箭) | BuffMultiShot |
-| 300128 | 护驾(护) | BuffHealBoost |
-| 301010 | 嘲讽(嘲) | BuffTaunt |
 
 ## 六、代码索引
 

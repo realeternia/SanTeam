@@ -53,11 +53,6 @@ public class Chess : MonoBehaviour
     // 最近一次实际受到伤害的伤害类型（CombatConst.DamageTypeMagic/Attack/Real），
     // 在伤害结算处统一记录，供飘字等表现层直接读取，避免各技能重复判断（真实伤害=紫字）
     public int lastDamageType;
-    // ---- 相职业武将专属标记 ----
-    /// <summary>是否已武装"复活"（张昭·筑垒：死亡可原地复活一次；由 BuffRevive 维护）</summary>
-    public bool reviveArmed;
-    /// <summary>复活是否已使用（每名单位至多一次）</summary>
-    public bool reviveUsed;
     // 伤害结算事件：attacker, victim, damage, skillId(0=普攻)。供战斗模拟器精确捕获每次伤害（飘字/日志），避免逐帧血量差分漏记
     public static event System.Action<Chess, Chess, int, int> OnDamageDealt;
     // 治疗结算事件：healer, target, effectiveHeal(不超过目标生命缺口的有效治疗量)。仅真实治疗(isHeal=true)触发，供战斗模拟器统计治疗榜
@@ -1090,18 +1085,6 @@ public class Chess : MonoBehaviour
         // 显式打断持续施法(引导)：死亡时随 GameObject 销毁协程自停，此处清理引导状态并输出日志
         BreakCasting();
 
-        // 复活（张昭·筑垒施加的 BuffRevive）：被标记的士兵死亡后延迟原地复活（满血），每名士兵至多一次
-        if (!isHero && reviveArmed && !reviveUsed)
-        {
-            reviveUsed = true;
-            var pid = playerId;
-            var sId = soldierId;
-            var pos = transform.position;
-            var sd = side;
-            var img = chessName;
-            WorldManager.Instance.StartCoroutine(ReviveSoldierCoroutine(pid, sId, pos, sd, img));
-        }
-
         SkillManager.OnDeath(this);
         buffs.Clear();
         WorldManager.Instance.OnUnitDying(this, lastDamagedPlayerId);
@@ -1156,22 +1139,6 @@ public class Chess : MonoBehaviour
             castingCoroutine = null;
         }
     }
-
-    // 复活协程：延迟 BuffRevive.ReviveDelay 后在原地满血重建士兵（挂在 WorldManager 上，不受施加者存活影响）
-    private System.Collections.IEnumerator ReviveSoldierCoroutine(int pid, int soldierIdOf, UnityEngine.Vector3 pos, int sd, string imgPath)
-    {
-        yield return new WaitForSeconds(BuffRevive.ReviveDelay);
-
-        var player = (pid >= 0 && pid < GameManager.Instance.players.Length) ? GameManager.Instance.GetPlayer(pid) : null;
-        if (player == null)
-        {
-            GameLog.Warn("复活失败：找不到所属玩家 pid=" + pid + "，士兵 soldierId=" + soldierIdOf);
-            yield break;
-        }
-        WorldManager.Instance.SpawnUnitsForRegion(player, soldierIdOf, -1, pos, sd, imgPath);
-        GameLog.Info("复活：士兵 soldierId=" + soldierIdOf + " 原地复活满血");
-    }
-
 
     /// <summary>
     /// 当前普攻的伤害类型：默认物理(CombatConst.DamageTypeAttack)；
