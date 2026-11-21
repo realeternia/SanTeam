@@ -62,6 +62,6 @@ description: 《三国卡牌》战斗层开发规范：Skill/Buff/Chess 与各�
 
 - 伤害管线：`Chess.OnSkillDamaged` → 抗性 `ResistMultiplier` → 护盾吸收 → Buff 钩子（`BeforeCalDamaged`）→ 扣血/回蓝；派生伤害（`LockChain` / `AntiShield`）不得再派生
 - 法术暴击：Buff `300020`「法暴」，法术技能伤害按 `magicCritChance` 概率 ×`magicCritRate`，判定在 `Skill.ApplyDamageModifiers`
-- 光环 `SkillComBuffAura`：每 1.4s 挂 1.5s Buff；MpCost>0 时需施法开启，开启后每秒扣 `1×SkillConfig.AuraMpRate`（默认 2），期间攻击/受击回蓝照常累计，MP<=0 自动关闭
+- 光环 `SkillComBuffAura`：每 1.4s 挂 1.5s Buff；MpCost>0 时需施法开启，开启后每秒扣 `1×SkillConfig.AuraMpRate`（默认 20），期间攻击/受击回蓝照常累计，MP<=0 自动关闭
 - 疲劳 `FatigueManager`：超时后按间隔对全体英雄施加递增真实伤害，不致死（最低 1 血）
 - 索敌/移动：`Chess.FindTarget`、`TargetSelector`，避障与单位间距常量在 `CombatConst`

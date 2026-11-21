@@ -62,7 +62,7 @@ description: 《三国卡牌》(金铲铲式) SkillConfig 表的配置方法与�
 | `CD` | float | 发动冷却（秒），`0` = 无冷却；与 `MpCost` 二选一或叠加，不要在脚本里另写死冷却 |
 | `MpCost` | int | 技能 MP 上限。`0` = 不用蓝随时可发；`>0` 靠普攻命中/受伤获取法力（`mpRegen` 为百分比加成），满才发动，发动后清空。见 [MP法力系统说明](../../Design/Docs/MP法力系统说明.md) |
 | `StartMpRate` | float | 0~1 开局法力比例：`0` 从零充能（默认），`1` 开局满蓝 |
-| `AuraMpRate` | float | 光环耗蓝倍率（仅 `SkillComBuffAura` 生效）：开启期间每秒消耗 MP = 1×该值，默认 2（组件 150~154 可改 1.5/2/2.5/3/4） |
+| `AuraMpRate` | float | 光环耗蓝倍率（仅 `SkillComBuffAura` 生效）：开启期间每秒消耗 MP = 1×该值，默认 20（组件 150~154 可改 15/20/25/30/40） |
 | `TriggerCondition` | string | 满足才触发，空 = 无条件。格式 `key<数值`，多条件 `;` 分隔且需**全部满足**；key 走 `Chess.GetAttr`（如 `hprate<50` = 自身生命低于 50%）。解析失败会 `GameLog.Warn` 并**判定为不触发** |
 | `HurtTag` | string | 伤害标签，`AntiShield` = 绕过护盾直接打血（破盾类）；空 = 无 |
 
@@ -323,7 +323,7 @@ description: 《三国卡牌》(金铲铲式) SkillConfig 表的配置方法与�
 | `SkillComDamageArea` | 范围伤害 + 可选 Buff（60 行） | `SelectOnly=enemy`；`TargetType` 空=目标中心 / `self`=自身中心；`BuffId` 可 0~N 段（未配置即纯伤害） |
 | `SkillComBuffSingle` | 单体增益（90 行，缺省自身） | **单体增益体系基类**：`BuffId` 挂 1~N 个 Buff，数值放 `Strength2`/`StrengthBuff1` 由 Buff 读。目标由 `SelectOnly`/`SelectFirst` 在 `Area` 内选（最多 `TargetCount` 名），**留空则默认给自己**；所以既能当"自身强化"，也能配 `ally;hero` 给友军加 Buff。钩子：`CanStart`/`SelectBuffTargets`/`CanCast`/`PlayCast`/`ApplyBuffs`；体系内派生：`SkillComBuffArea`、`SkillComBuffAura`、`SkillComDamageTaunt`。**反伤也走这里**：`BuffId=反`、`StrengthBuff1=reflect:比例`、`BuffTime=持续时间`，由 `BuffReflect` 在 Buff 期间结算；连接授予的常驻反伤（如 `刺`）加 `TargetType=noStack`，避免 CD 0 时每帧重放 |
 | `SkillComBuffArea` | 群体增益（45 行） | `SelectOnly=ally;...` + `SelectFirst` 选人（见 2.3）；护盾类按统一护盾公式写 `Strength2[shield]`。施放中心分两种模板：`群体友方增益`（自身中心，Area 20）、`-目标小`（`TargetType:targetCenter`，Area 25）；要更大半径加 `中范围`/`大范围` 组件。近远分段（司马炎·一统 / 陆抗·西陵）走专属脚本 `SkillAidRangeSplit`，不再作为通用组件 |
-| `SkillComBuffAura` | 光环（40 行） | 模板只有 `光环中`（半径 40、`TargetCount=0` 不限人数、评分 2），需要更大范围加 `中范围`/`大范围` 组件。每 1.4 秒对 `Area` 内按 `SelectOnly`/`SelectFirst` 选中的单位（可含敌方）挂 1.5 秒 `BuffId`（固定时长，`BuffTime` 列不参与）；`MpCost=0` 常开；`MpCost>0` 时 MP 满且 CD 就绪后通过施法开启（施法不清空 MP，MP 作为光环燃料），开启后每秒扣 `1×AuraMpRate` 点 MP（默认 2x，组件 150~154 可调）、期间攻击/受击回蓝照常累计，MP<=0 自动关闭并移除 `SelfEffect`，再次开启需 MP 充满后重新施法 |
+| `SkillComBuffAura` | 光环（40 行） | 模板只有 `光环中`（半径 40、`TargetCount=0` 不限人数、评分 2），需要更大范围加 `中范围`/`大范围` 组件。每 1.4 秒对 `Area` 内按 `SelectOnly`/`SelectFirst` 选中的单位（可含敌方）挂 1.5 秒 `BuffId`（固定时长，`BuffTime` 列不参与）；`MpCost=0` 常开；`MpCost>0` 时 MP 满且 CD 就绪后通过施法开启（施法不清空 MP，MP 作为光环燃料），开启后每秒扣 `1×AuraMpRate` 点 MP（默认 20，组件 150~154 可调 15/20/25/30/40）、期间攻击/受击回蓝照常累计，MP<=0 自动关闭并移除 `SelfEffect`，再次开启需 MP 充满后重新施法 |
 | `SkillComHealArea` | 范围治疗（25 行） | `HealStrength` + `Area`；单目标结算走基类 `HealUnit`，`overflowToArmor` 等组件自动生效 |
 | `SkillComHealSingle` | 单体治疗（15 行） | **单体治疗体系基类**：只治 1 名友军（`Area` 内按 `SelectFirst`，典型 `lowestHp`），默认净化并挂 `BuffId`（支持多段/护盾），`HitEffect` 打在目标身上；钩子 `SelectTarget`/`CanCast`/`PlayCast`/`ResolveHeal`/`CleanseOnHeal`；体系内派生：`SkillComHealArea`、`SkillComHealAreaCasting`、`SkillComHealJumpChain` |
 | `SkillComDamageJumpChain` | 伤害弹射（5 行） | 敌方跳跃伤害链；每跳衰减读 `Strength2[jumpDecay]`（模板默认 0.85，组件可改 1/0.7/0.5），命中可带 `BuffId` 减益 |

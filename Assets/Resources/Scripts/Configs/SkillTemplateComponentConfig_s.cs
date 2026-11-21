@@ -153,11 +153,11 @@ namespace CommonConfig
             config[140] = new SkillTemplateComponentConfig(140, "大概率", "施放节奏", null, "Rate=0.6", 1, -1f, "每次行动发动概率较高（Rate），百分比", "负向项：节奏成本，按实际发动频率抵减技能总价值", false);
             config[141] = new SkillTemplateComponentConfig(141, "中概率", "施放节奏", null, "Rate=0.4", 1, -2.5f, "每次行动发动概率中等（Rate），百分比", "负向项：节奏成本，按实际发动频率抵减技能总价值", false);
             config[142] = new SkillTemplateComponentConfig(142, "小概率", "施放节奏", null, "Rate=0.2", 1, -4f, "每次行动发动概率较低（Rate），百分比", "负向项：节奏成本，按实际发动频率抵减技能总价值", false);
-            config[150] = new SkillTemplateComponentConfig(150, "光环耗蓝1.5x", "施放节奏", new string[]{"光环中"}, "AuraMpRate=1.5", 1, 1.5f, "光环开启期间每秒消耗 1.5 点 MP（默认 2x）", "正向项：耗蓝更慢，光环持续时间更长", false);
-            config[151] = new SkillTemplateComponentConfig(151, "光环耗蓝2x", "施放节奏", new string[]{"光环中"}, "AuraMpRate=2", 1, 0f, "光环开启期间每秒消耗 2 点 MP（默认）", "基准档，不额外计价", false);
-            config[152] = new SkillTemplateComponentConfig(152, "光环耗蓝2.5x", "施放节奏", new string[]{"光环中"}, "AuraMpRate=2.5", 1, -1.5f, "光环开启期间每秒消耗 2.5 点 MP", "负向项：耗蓝更快，光环持续时间更短", false);
-            config[153] = new SkillTemplateComponentConfig(153, "光环耗蓝3x", "施放节奏", new string[]{"光环中"}, "AuraMpRate=3", 1, -3f, "光环开启期间每秒消耗 3 点 MP", "负向项：耗蓝更快，光环持续时间更短", false);
-            config[154] = new SkillTemplateComponentConfig(154, "光环耗蓝4x", "施放节奏", new string[]{"光环中"}, "AuraMpRate=4", 1, -4.5f, "光环开启期间每秒消耗 4 点 MP", "负向项：耗蓝更快，光环持续时间更短", false);
+            config[150] = new SkillTemplateComponentConfig(150, "光环耗蓝15x", "施放节奏", new string[]{"光环中"}, "AuraMpRate=15", 1, 1.5f, "光环开启期间每秒消耗 15 点 MP（默认 20）", "正向项：耗蓝更慢，光环持续时间更长", false);
+            config[151] = new SkillTemplateComponentConfig(151, "光环耗蓝20x", "施放节奏", new string[]{"光环中"}, "AuraMpRate=20", 1, 0f, "光环开启期间每秒消耗 20 点 MP（默认）", "基准档，不额外计价", false);
+            config[152] = new SkillTemplateComponentConfig(152, "光环耗蓝25x", "施放节奏", new string[]{"光环中"}, "AuraMpRate=25", 1, -1.5f, "光环开启期间每秒消耗 25 点 MP", "负向项：耗蓝更快，光环持续时间更短", false);
+            config[153] = new SkillTemplateComponentConfig(153, "光环耗蓝30x", "施放节奏", new string[]{"光环中"}, "AuraMpRate=30", 1, -3f, "光环开启期间每秒消耗 30 点 MP", "负向项：耗蓝更快，光环持续时间更短", false);
+            config[154] = new SkillTemplateComponentConfig(154, "光环耗蓝40x", "施放节奏", new string[]{"光环中"}, "AuraMpRate=40", 1, -4.5f, "光环开启期间每秒消耗 40 点 MP", "负向项：耗蓝更快，光环持续时间更短", false);
             config[160] = new SkillTemplateComponentConfig(160, "生命值低于50%", "施放节奏", null, "TriggerCondition:hprate<50", 2, .5f, "仅当自身生命值低于 50% 时才可触发该技能（通用组件）", "触发条件限制越严价值越高，按触发覆盖率折算", false);
             config[161] = new SkillTemplateComponentConfig(161, "MP叠3层", "施放节奏", null, "MpLimit=3", 3, 3f, "MP 最多累积到 3×MpCost，每次发动扣 1×MpCost（通用组件）", "正向项：按可持续连续施放次数提升估值", false);
             config[162] = new SkillTemplateComponentConfig(162, "MP叠5层", "施放节奏", null, "MpLimit=5", 4, 5f, "MP 最多累积到 5×MpCost，每次发动扣 1×MpCost（通用组件）", "正向项：按可持续连续施放次数提升估值", false);

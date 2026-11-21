@@ -41,6 +41,8 @@ public class WorldManager : MonoBehaviour
     private int pveFightCount = 1; // PVE仅玩家0参战（1号位打2号位怪物），AI不打怪
     private int oddPlayerSide = 0; // 单数存活玩家时随机选中的玩家号位（0=本场没有）
     private int oddMonsterSide = 0; // 与该玩家对应的野怪号位（rule0为敌方，rule1为友方助战）
+    /// <summary>PVE怪物每回合的攻防成长系数：属性 = 配置值 × (1 + 系数 × (回合-1))，怪物配置本身不带等级成长</summary>
+    private const float MonsterRoundGrowthPerRound = 0.06f;
     private List<Tuple<GameObject, PlayerInfo, int>> bagDrops = new List<Tuple<GameObject, PlayerInfo, int>>(); // 怪物掉落包（BagDrop模型，获得玩家，首个掉落物id用于显示图标）
 
     // 调试阵容·开局Buff：记录"调试单位 → 配置条目"，在 BattleBegin 全部技能结算后统一施加（见 ApplyDebugBuffs）
@@ -936,6 +938,9 @@ public class WorldManager : MonoBehaviour
     private Chess SpawnMonsterForRegion(int soldierId, int posId, UnityEngine.Vector3 spawnPos, int side)
     {
         var soldierConfig = SoldierConfig.GetConfig(soldierId);
+        // 怪物随回合成长：配置表只提供基础值（AtkP/HpP 均为0），按当前回合叠加线性系数
+        int round = Mathf.Max(1, GameManager.Instance.year);
+        float roundScale = 1f + MonsterRoundGrowthPerRound * (round - 1);
         GameObject unitPrefab = Resources.Load<GameObject>("Prefabs/Battles/" + soldierConfig.Model);
 
         GameObject unitInstance = Instantiate(unitPrefab, spawnPos, Quaternion.identity, Units.transform);
@@ -950,10 +955,10 @@ public class WorldManager : MonoBehaviour
             chessComponent.side = side;
             // 怪物模型不显示玩家头像，显示SoldierConfig.Img配置的贴图
             chessComponent.chessName = soldierConfig.Img != null ? soldierConfig.Img : "";
-            chessComponent.maxHp = soldierConfig.Hp;
+            chessComponent.maxHp = (int)(soldierConfig.Hp * roundScale);
             chessComponent.moveSpeed = soldierConfig.MoveSpeed;
             chessComponent.attackRange = soldierConfig.Range;
-            chessComponent.atk = soldierConfig.Atk;
+            chessComponent.atk = (int)(soldierConfig.Atk * roundScale);
             chessComponent.attackSpeed = soldierConfig.AtkSpeed / 30f;
             chessComponent.missileSpeed = soldierConfig.MissileSpeed;
             chessComponent.missileHight = soldierConfig.MissileHight;

@@ -9,7 +9,7 @@ using UnityEngine;
 /// MP 规则：
 /// · MpCost=0：开局常开，不消耗 MP；
 /// · MpCost&gt;0：MP 满且 CD 就绪时通过正常施法开启（施法不清空 MP，MP 作为光环燃料），
-///   开启期间每秒消耗 1 × SkillConfig.AuraMpRate 点 MP（默认 2x）；攻击/受击回蓝照常累计（可延长持续时间）；
+///   开启期间每秒消耗 1 × SkillConfig.AuraMpRate 点 MP（默认 20）；攻击/受击回蓝照常累计（可延长持续时间）；
 ///   当 MP&lt;=0 时自动关闭；关闭后需 MP 再次充满并施法才会重新开启。
 ///
 /// 开启时挂常驻 SelfEffect，关闭时销毁（光环视觉随之消失）。
@@ -21,7 +21,7 @@ public class SkillComBuffAura : SkillComBuffSingle
     /// <summary>光环 Buff 持续时间(秒)：1.5 秒，略大于结算间隔避免断档</summary>
     private const float BuffDuration = 1.5f;
     /// <summary>光环 MP 消耗默认速度倍率：SkillConfig.AuraMpRate 未配置/≤0 时使用</summary>
-    private const float DefaultMpRate = 2f;
+    private const float DefaultMpRate = 20f;
 
     private float tickTimer;
     private bool auraOn;
@@ -61,7 +61,7 @@ public class SkillComBuffAura : SkillComBuffSingle
         if (!auraOn)
             return;
 
-        // 有 MP 消耗：每秒扣 1 × AuraMpRate（默认 2）点，扣到 0 自动关闭（期间攻击/受击回蓝照常累计）
+        // 有 MP 消耗：每秒扣 1 × AuraMpRate（默认 20）点，扣到 0 自动关闭（期间攻击/受击回蓝照常累计）
         if (skillCfg.MpCost > 0)
         {
             var drainRate = skillCfg.AuraMpRate > 0f ? skillCfg.AuraMpRate : DefaultMpRate;

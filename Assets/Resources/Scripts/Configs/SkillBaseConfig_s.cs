@@ -83,7 +83,7 @@ namespace CommonConfig
             {"Icon", new FieldMetaInfo("图标", "string", 173)},
             {"LinkSelf", new FieldMetaInfo("连接英雄加成", "string", 231)},
             {"LinkTeam", new FieldMetaInfo("我方其他英雄加成", "string", 155)},
-            {"AuraMpRate", new FieldMetaInfo("光环耗蓝倍率(仅光环技能：开启期间每秒消耗MP=1×该值，默认2)", "float", 60)},
+            {"AuraMpRate", new FieldMetaInfo("光环耗蓝倍率(仅光环技能：开启期间每秒消耗MP=1×该值，默认20)", "float", 60)},
         };
 
         public static Dictionary<string, FieldMetaInfo> FieldMeta { get { return fieldMeta; } }
@@ -265,9 +265,9 @@ namespace CommonConfig
         /// </summary>
         public string LinkTeam;
         /// <summary>
-        ///光环耗蓝倍率（仅 SkillComBuffAura 生效：开启期间每秒消耗 MP = 1 × AuraMpRate；默认 2，组件 150~154 可改为 1.5/2/2.5/3/4）
+        ///光环耗蓝倍率（仅 SkillComBuffAura 生效：开启期间每秒消耗 MP = 1 × AuraMpRate；默认 20，组件 150~154 可改为 15/20/25/30/40）
         /// </summary>
-        public float AuraMpRate = 2f;
+        public float AuraMpRate = 20f;
 
 
         public SkillBaseConfig(int Id, string Name, string Sname, float Version, string Descript, string Type, string SelectOnly, string SelectFirst, string Template, string[] Modules, int Lv, float Rate, float CD, int MpCost, float StartMpRate, int MpLimit, string TriggerCondition, int DamageType, string HurtTag, float Range, float Area, string TargetType, int TargetCount, float DamageStrength, float HealStrength, string Strength2, string StrengthBuff1, string BuffId, float BuffTime, string SummonTag, int SummonCount, float SummonTime, float SummonHitInterval, float SummonSpeed, int ItemId, string ScriptName, string Action, string SelfEffect, string HitEffect, string AreaEffect, string Icon, string LinkSelf, string LinkTeam, float AuraMpRate)
