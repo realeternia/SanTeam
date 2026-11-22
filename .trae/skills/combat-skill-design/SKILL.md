@@ -111,7 +111,7 @@ description: 《三国卡牌》(金铲铲式) SkillConfig 表的配置方法与�
 | 群体治疗（按缺口） | `ally;notFullHp` | `biggestHpGap` |
 | 单体伤害 | `enemy` | 空（沿用当前索敌目标） |
 
-- 单体类脚本（`SkillComDamageSingle`、`SkillComDamageShockWave*`、`SkillAidMultiHit`、`SkillAidDualLaser` 等）统一走基类 `SelectSingleTarget(Range)`：未配 `SelectFirst` 时行为与原来一致（沿用 `owner.targetChess` 并校验射程）。
+- 单体类脚本（`SkillComDamageSingle`、`SkillComDamageShockWave*`、`SkillAidDualLaser` 等）统一走基类 `SelectSingleTarget(Range)`：未配 `SelectFirst` 时行为与原来一致（沿用 `owner.targetChess` 并校验射程）。
 - 不走筛选的类型：冲刺/直线路径扫掠（`SkillAidCavalryStrike`、`SkillBondAttackRunCrossPlus`）、全员光环/全体友军加成（`SkillComBuffAura`、`SkillBondFactionShield`、`SkillAidManaShare`、`SkillAidSoldier*` / `SkillBondInitSoldierBuff` 的小兵加成）、嘲讽强制、导弹逐帧探测。这些不是"选目标"，`SelectOnly`/`SelectFirst` 不参与逻辑。
 - 远程技能以自身为中心会全程打空（站位远离敌阵）→ 用目标中心；近战贴脸 AoE 用 `self`。
 - 已废弃词不要复用：同一标记在不同脚本里含义必须一致，新增标记前先全局 `Grep HasSkillFlag`。
@@ -138,7 +138,7 @@ description: 《三国卡牌》(金铲铲式) SkillConfig 表的配置方法与�
 | 列 | 类型 | 配置方法 |
 | --- | --- | --- |
 | `BuffId` | string | 填 `BuffConfig.NameS` **短名**（不是 Id）；空 = 无 Buff；多个用 `,`/`，`/`;`/`；` 分隔 |
-| `BuffTime` | float | Buff 持续秒数；常规 1~10 秒。**永久类效果不要靠超大 BuffTime 模拟**，用脚本直接改属性（`SkillBondKillGain` / `SkillAidCraftBuff` / `SkillComBuffSingle.permanent`） |
+| `BuffTime` | float | Buff 持续秒数；常规 1~10 秒。**永久类效果不要靠超大 BuffTime 模拟**，用脚本直接改属性（`SkillBondKillGain` / `SkillComBuffSingle.permanent`） |
 
 - 一槽只能装一种语义：既要主动命中给目标上效果、又要开局给友军挂被动 Buff 时，冲突需拆（被动 Buff 配 `BuffId`，命中效果在脚本里用常量短名另引）。
 - **BuffId 号段**：`300xxx` 正面通用、`3001xx` 正面特化、`301xxx` 负面通用、`3011xx` 负面特化。新增 Buff 先判正负面与是否特化，再在对应段顺延。
@@ -259,7 +259,7 @@ description: 《三国卡牌》(金铲铲式) SkillConfig 表的配置方法与�
 - **保留列（9 列身份列）**：`Id Name Sname Version Descript Type Template Modules Lv`。
 - **展开规则（k-v 映射）**：模板先按 `Effect` 的绑定把 `Lv` 对应数值写入目标列/槽（伤害模板=`DamageStrength`、治疗模板=`HealStrength`，两者互斥清零）；随后 `Range`/`Area`/`TargetCount` 仅在模板值 >0 时覆盖（Range 默认 40、Area 默认小范围 20、TargetCount 群体 3/单体 1），`CD` 取模板，`MpCost` = 模板 `MpCost × 10`；再按**技能自己 `Modules`** 顺序展开每个组件的 `Effect`（列写入 / `Buff:短名:槽键` 追加 `BuffId`+`StrengthBuff1` / `TargetType:标记` / `TriggerCondition` / `Strength2:键`）。`BuffId`/`StrengthBuff1`/`Strength2`/`TargetType` 已手配的键不覆盖，只补缺失项。`BuffTime` 取模板与各组件提供值的最大值，再乘 `BuffTimeRate`（多个取最大值）；`BuffEffectRate` 对 `BuffConfig.BuffAttrDynamic` 的槽键数值乘算（手配键不参与，`BuffAttrConst` 不参与）。模板默认 `Modules` 只参与估值与推荐校验，**不注入任何效果**（当前所有模板 `Modules` 均为空，需要组件请配到技能行，不要放模板）。
 - **可被组件写入的列**：`EffectColumns` = `DamageStrength HealStrength CD MpCost StartMpRate AuraMpRate Range Area TargetCount Rate BuffTime BuffTimeRate BuffEffectRate SelectOnly SelectFirst TargetType TriggerCondition Strength2 Buff SummonCount SummonTime SummonHitInterval SummonSpeed SummonTag`。其中 `BuffTimeRate` 乘最终 `BuffTime`，`BuffEffectRate` 对 `BuffConfig.BuffAttrDynamic` 的键乘算（两者只参与展开，不落到技能表列）。目标筛选类组件（`3000~3999`）写 `SelectOnly:`/`SelectFirst:`，行为标记才写 `TargetType:`（如 `3090 施法者必含`→`TargetType:selfAlways`）。
-- **现状覆盖**：品质 1~4 英雄技能 152 个（Q1 26 / Q2 54 / Q3 47 / Q4 25），模板化 121 个（610 行 SkillBase），31 个特化不模板化。Q4 共 14 个专属脚本：曹操·SkillAidDominion、赵云·SkillAidFlashStrike、张飞·SkillAidSpinAttack、马超·SkillAidCavalryStrike、关羽·SkillAidShadowSplit、姜维·SkillAidDualLaser、郭嘉·SkillAidCastingLastStrategy、典韦·SkillAidSkyFall、甘宁·SkillAidRaidCamp、太史慈·SkillAidShockWaveMulti、周瑜·SkillAidFireWall、陆逊·SkillAidCastingScorchedEarth、吕布·SkillAidCastingDrain、邓艾·SkillAidJumpReturn。Q1~3 共 17 个：孙权·SkillAidFeint、张昭·SkillAidSoldierFortify、曹叡·SkillAidManaBurn、袁绍·SkillAidExplode、刘备·SkillAidManaShare、黄月英/裴秀·SkillAidCraftBuff、孙尚香·SkillAidBackstepShot、荀攸·SkillAidMultiHit、陈宫·SkillAidCastingFrontalFlaming、张春华/于吉·SkillAidCurseHeal、貂蝉·SkillAidLifeLink、蒋琬·SkillComHealArea（手配群疗，Template 留空）、吕蒙·SkillAidWhiteRobe、司马炎/陆抗·SkillAidRangeSplit。
+- **现状覆盖**：品质 1~4 英雄技能 152 个（Q1 26 / Q2 54 / Q3 47 / Q4 25），模板化 128 个（645 行 SkillBase），24 个特化不模板化。Q4 共 14 个专属脚本：曹操·SkillAidDominion、赵云·SkillAidFlashStrike、张飞·SkillAidSpinAttack、马超·SkillAidCavalryStrike、关羽·SkillAidShadowSplit、姜维·SkillAidDualLaser、郭嘉·SkillAidCastingLastStrategy、典韦·SkillAidSkyFall、甘宁·SkillAidRaidCamp、太史慈·SkillAidShockWaveMulti、周瑜·SkillAidFireWall、陆逊·SkillAidCastingScorchedEarth、吕布·SkillAidCastingDrain、邓艾·SkillAidJumpReturn。Q1~3 共 10 个：孙权·SkillAidFeint、张昭·SkillAidSoldierFortify、曹叡·SkillAidManaBurn、刘备·SkillAidManaShare、孙尚香·SkillAidBackstepShot、陈宫·SkillAidCastingFrontalFlaming、蒋琬·SkillComHealArea（手配群疗，Template 留空）、吕蒙·SkillAidWhiteRobe、司马炎/陆抗·SkillAidRangeSplit。
 - **数值口径提醒**：模板 `Values` 是「标准态」主数值，与手配 `DamageStrength`/`HealStrength`（受品质、MP 系数、法术倍率影响）不是同一量级，直接覆盖会显著改变战斗数值；需要标定时应在烘焙阶段按品质/MP 系数缩放模板值，或回调模板 `Values`，不要逐行改 `SkillBaseConfig`（它由脚本重新生成）。
 
 ## 三、Id 段（当前实际占用）

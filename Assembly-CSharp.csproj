@@ -117,7 +117,6 @@
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffLifeLink.cs" />
     <Compile Include="Assets\Resources\Scripts\Tools\SysColor.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\BagControl.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidMultiHit.cs" />
     <Compile Include="Assets\Resources\Scripts\CardShopManager.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidJumpReturn.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\TooltipItem.cs" />
@@ -150,7 +149,6 @@
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillBondInitMpFill.cs" />
     <Compile Include="Assets\DOTween\Modules\DOTweenModulePhysics.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\BagRecycler.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidLifeLink.cs" />
     <Compile Include="Assets\Resources\Scripts\Configs\HeroConfig_s.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\EffectManager.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffNoAction.cs" />
@@ -175,7 +173,6 @@
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillBondAttackShieldPierce.cs" />
     <Compile Include="Assets\MasterMagicFX\Scripts\Miscs\CameraRotater.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\BattleResultHeroCellControl.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidExplode.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillBondInitSoldierBuff.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\LoadGameItem.cs" />
     <Compile Include="Assets\MasterMagicFX\Scripts\Miscs\ParticlePreviewer.cs" />
@@ -185,7 +182,6 @@
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffShield.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\RankPlayerCellInfo.cs" />
     <Compile Include="Assets\MasterMagicFX\Scripts\Miscs\LaserShooter.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidCurseHeal.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidShadowSplit.cs" />
     <Compile Include="Assets\Resources\Scripts\PO\PanelEvent.cs" />
     <Compile Include="Assets\Resources\Scripts\Configs\SoldierLevelConfig_s.cs" />
@@ -281,7 +277,6 @@
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillBondInitAttrChange.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillBondInitEnemyRandomBuff.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillBondSelfShield.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidCraftBuff.cs" />
     <Compile Include="Assets\Resources\Scripts\Shop\SharedShopMode.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidCastingScorchedEarth.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidSkyFall.cs" />

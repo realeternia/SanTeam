@@ -15,6 +15,8 @@ using UnityEngine;
 ///
 /// **所有治疗组件（TargetType 标记 / Strength2 键）统一在基类 HealUnit 结算**，派生类不要重复判断：
 /// · overflowToArmor = 溢出治疗量转等量护甲（与 BuffId 的护甲 Buff 配合，此时不再驱散；当前无技能使用）
+/// · curseNearest     = 治疗时不给被治疗者挂 Buff，改为给其周围 curseRange 内最近的 TargetCount 名敌人挂 BuffId（于吉·妖咒 / 张春华·狠决）
+/// · linkBoth         = 治疗目标后，把 BuffId 同时挂给目标与自身（貂蝉·离间，双方生命链接）
 /// · 护盾类 Buff 按统一护盾公式写入护盾值
 /// 治疗体系派生：SkillComHealArea（范围治疗）、SkillComHealAreaCasting（持续治疗领域）、SkillComHealJumpChain（跳跃治疗链）。
 /// </summary>
@@ -100,11 +102,46 @@ public class SkillComHealSingle : Skill
             if (CleanseOnHeal)
                 BuffManager.DispelNegative(unit);
             if (withBuffs)
-                ApplySkillBuffs(unit);
+            {
+                // 诅咒治疗：Buff 不给被治疗者，改挂到其周围最近的敌人身上
+                if (HasSkillFlag("curseNearest"))
+                    ApplyCurseToNearestEnemies(unit);
+                else
+                {
+                    ApplySkillBuffs(unit);
+                    // 链接双方：Buff 同时挂给施法者自身（生命链接需要双方各持一份）
+                    if (HasSkillFlag("linkBoth") && unit != owner)
+                        ApplySkillBuffs(owner);
+                }
+            }
         }
 
         if (!string.IsNullOrEmpty(skillCfg.HitEffect))
             EffectManager.PlaySkillEffect(unit, skillCfg.HitEffect);
+    }
+
+    /// <summary>
+    /// 诅咒治疗：把 BuffId 挂到被治疗者周围最近的敌人身上。
+    /// 数量取 TargetCount（至少 1），搜索半径取 Strength2 键 "curseRange"（缺省用 Area）。
+    /// </summary>
+    private void ApplyCurseToNearestEnemies(Chess around)
+    {
+        var buffIds = GetSkillBuffIds();
+        if (around == null || buffIds.Count == 0)
+            return;
+
+        var range = GetStr2("curseRange", skillCfg.Area);
+        var count = Mathf.Max(1, skillCfg.TargetCount);
+        var enemies = SelectTargetsWithRules(around.transform.position, range, false, count, "enemy", "nearest");
+        if (enemies == null)
+            return;
+        foreach (var enemy in enemies)
+        {
+            foreach (var buffId in buffIds)
+                ApplyBuffToUnit(enemy, buffId);
+            if (!string.IsNullOrEmpty(skillCfg.HitEffect))
+                EffectManager.PlaySkillEffect(enemy, skillCfg.HitEffect);
+        }
     }
 
     /// <summary>把溢出治疗量写成护甲：挂上 BuffId 指定的 Buff 并以其护甲值设为溢出量。</summary>

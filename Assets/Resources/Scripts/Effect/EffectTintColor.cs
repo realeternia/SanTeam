@@ -3,7 +3,7 @@ using UnityEngine;
 /// <summary>
 /// 粒子染色脚本：用 tintColor 变量把本物体（含子级）所有 ParticleSystem 的颜色改为目标色。
 /// 同时覆盖起始颜色(startColor)与 Color by Lifetime(colorOverLifetime)，保留各颜色关键点的 alpha。
-/// 用于 MagicChargeYellow / MagicChargePink 这类仅换色的特效变体，避免各自维护一套粒子设置。
+/// 用于 MagicChargeRed / SelfArcaneOrbitBlue 这类仅换色的特效变体，避免各自维护一套粒子设置。
 /// tintColor 的 alpha ≤ 0 表示不改色。
 /// </summary>
 public class EffectTintColor : MonoBehaviour

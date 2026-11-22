@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using CommonConfig;
 using UnityEngine;
 
@@ -126,6 +127,26 @@ public class SkillComDamageSingle : Skill
     {
         var dmg = baseDamage;
         return ApplyDamageModifiers(dmg, target);
+    }
+
+    /// <summary>
+    /// 中心双倍：centerDouble 标记下，锁定的主目标基础伤害 × centerRate（缺省 2 倍），其余目标不变。
+    /// 统一在伤害体系基类读取标记，群体 / 冲击波等形态直接复用，子类不再自行判断。
+    /// </summary>
+    protected int ApplyCenterDouble(int baseDamage, bool isCenterTarget)
+    {
+        if (!isCenterTarget || !HasSkillFlag("centerDouble"))
+            return baseDamage;
+        return Mathf.RoundToInt(baseDamage * GetStr2("centerRate", 2f));
+    }
+
+    /// <summary>centerDouble 时确保锁定目标在命中列表内（范围选人可能被 TargetCount 截断）。</summary>
+    protected void EnsureCenterDoubleTarget(List<Chess> units, Chess target)
+    {
+        if (!HasSkillFlag("centerDouble") || target == null || target.hp <= 0)
+            return;
+        if (!units.Contains(target))
+            units.Add(target);
     }
 
     /// <summary>

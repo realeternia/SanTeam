@@ -246,6 +246,9 @@ namespace DesignCoder
 
                 string type = GetConfigValue(cfg, "Type");
                 string area = GetConfigValue(cfg, "Area");
+                // 基础截图（配色变体各有独立 Name）未登记时按同系列 Area 推断，避免自身型特效落到目标型页签
+                if (string.IsNullOrEmpty(area) && !isMissile)
+                    area = InferAreaFromSeries(effects, effectName);
                 string resPath = isMissile ? GetConfigValue(cfg, "MissilePath") : GetConfigValue(cfg, "EffPath");
                 if (string.IsNullOrEmpty(resPath))
                     resPath = fileBase;
@@ -347,6 +350,30 @@ namespace DesignCoder
                 result[name] = row;
             }
             return result;
+        }
+
+        // 未登记的基础截图按名称最长可匹配前缀找同系列已登记行，取一致的 Area（自身/范围/光环/Buff/目标）
+        private static string InferAreaFromSeries(Dictionary<string, Dictionary<string, string>> effects, string effectName)
+        {
+            if (effects == null || string.IsNullOrEmpty(effectName)) return "";
+
+            string prefix = effectName;
+            while (prefix.Length >= 4)
+            {
+                string matched = null;
+                bool conflict = false;
+                foreach (var pair in effects)
+                {
+                    if (!pair.Key.StartsWith(prefix, StringComparison.OrdinalIgnoreCase)) continue;
+                    string area = (GetConfigValue(pair.Value, "Area") ?? "").Trim();
+                    if (area.Length == 0) continue;
+                    if (matched == null) matched = area;
+                    else if (!string.Equals(matched, area, StringComparison.Ordinal)) { conflict = true; break; }
+                }
+                if (matched != null && !conflict) return matched;
+                prefix = prefix.Substring(0, prefix.Length - 1);
+            }
+            return "";
         }
 
         // 按 EffectConfig.Area 分页签：自身 → 自身、范围 → 范围型、光环 → 光环、Buff → Buff、其余归目标型

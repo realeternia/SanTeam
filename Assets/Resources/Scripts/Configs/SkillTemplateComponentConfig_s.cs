@@ -245,6 +245,10 @@ namespace CommonConfig
             config[9082] = new SkillTemplateComponentConfig(9082, "燃烧法力", "特殊机制", null, "TargetType:mpBurn;Strength2:mpBurn=20", 2, 2f, "燃烧目标法力（mpBurn），压制技能循环", "按削弱的法力与技能频率估值", false);
             config[9190] = new SkillTemplateComponentConfig(9190, "持续场移动", "特殊机制", new string[]{"持续伤害大","持续伤害中","持续伤害小"}, "Strength2:moveDist=40", 2, 1.5f, "持续伤害场沿方向移动（moveDist）", "特殊机制，人工评审", true);
 
+            config[163] = new SkillTemplateComponentConfig(163, "多段", "施放节奏", null, "Strength2:hitCount=3,3,4,4,5;Strength2:hitInterval=0.2", 2, 2f, "同一目标分多段结算伤害，每段间隔 hitInterval 秒（hitCount 可逐级配置）", "按总段数与单段数值折算总输出，注意目标死亡会截断剩余段数", false);
+            config[4130] = new SkillTemplateComponentConfig(4130, "中心双倍", "增伤", null, "TargetType:centerDouble;Strength2:centerRate=2", 2, 3f, "范围伤害时，锁定的主目标承受 centerRate 倍伤害，其余目标正常", "按主目标承伤占比与倍率折算额外伤害", false);
+            config[9040] = new SkillTemplateComponentConfig(9040, "治疗诅咒", "特殊机制", new string[]{"Heal"}, "TargetType:curseNearest;Strength2:curseRange=60", 2, 2.5f, "治疗时把 BuffId 挂给被治疗目标周围 curseRange 内最近的 TargetCount 名敌人", "按可覆盖敌人数与 debuff 强度估值，人工评审", true);
+            config[9041] = new SkillTemplateComponentConfig(9041, "链接双方", "特殊机制", new string[]{"Heal"}, "TargetType:linkBoth", 2, 1.5f, "治疗目标后，把 BuffId 同时挂给目标与施法者自身（双方生命链接）", "按链接双方的自损/分摊收益估值，人工评审", true);
             RebuildIndex();
 
         }

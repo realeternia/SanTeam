@@ -177,11 +177,6 @@ namespace CommonConfig
             config[11061] = new EffectConfig(11061, "ShieldSoftYellow", "黄色护盾特效", "增益", "Buff", "Effect/ShieldSoftBlue", "", 3f, 1f, 8f, 1f, "#FFBB09");
             config[11070] = new EffectConfig(11070, "SlowAuraYellow", "黄色迟缓光环特效", "负面", "范围", "Effect/SlowAuraYellow", "", 3f, 2f, 8f, 1f, "");
             config[11080] = new EffectConfig(11080, "SoftFireBigRed", "红色大火特效", "伤害", "范围", "Effect/SoftFireBigRed", "", 10f, 1f, 8f, 1f, "");
-            config[11090] = new EffectConfig(11090, "MagicChargeBlue", "蓝色蓄力特效", "增益", "自身", "Effect/MagicChargeBlue", "", 3f, 1f, 8f, 1f, "");
-            config[11091] = new EffectConfig(11091, "MagicChargeGreen", "绿色蓄力特效", "增益", "自身", "Effect/MagicChargeBlue", "", 3f, 1f, 8f, 1f, "#00FF00");
-            config[11092] = new EffectConfig(11092, "MagicChargePink", "粉色蓄力特效", "增益", "自身", "Effect/MagicChargeBlue", "", 3f, 1f, 8f, 1f, "#FF00EA");
-            config[11093] = new EffectConfig(11093, "MagicChargeYellow", "黄色蓄力特效", "增益", "自身", "Effect/MagicChargeBlue", "", 3f, 1f, 8f, 1f, "#FFBB09");
-            config[11094] = new EffectConfig(11094, "MagicChargeRed", "红色蓄力特效", "增益", "自身", "Effect/MagicChargeBlue", "", 3f, 1f, 8f, 1f, "#FF2222");
             config[11100] = new EffectConfig(11100, "SparkleAreaWhite", "白色闪耀区域特效", "增益", "范围", "Effect/SparkleAreaWhite", "", 10f, 1f, 8f, 1f, "");
             config[11110] = new EffectConfig(11110, "StunnedCirclingStarsSimple", "眩晕环绕星特效", "负面", "Buff", "Effect/StunnedCirclingStarsSimple", "", 3f, 1f, 8f, 1f, "");
             config[11120] = new EffectConfig(11120, "StunnedDamageUp", "眩晕增伤特效", "负面", "Buff", "Effect/StunnedDamageUp", "", 3f, 1f, 8f, 1f, "");
@@ -239,7 +234,19 @@ namespace CommonConfig
             config[11528] = new EffectConfig(11528, "CirclingCritBao", "暴击提升暴字环绕特效", "增益", "Buff", "Effect/CirclingCritBao", "", 3f, 1f, 8f, 1f, "#FFB020");
             config[11529] = new EffectConfig(11529, "CirclingSpellCritJue", "法术暴击绝字环绕特效", "增益", "Buff", "Effect/CirclingSpellCritJue", "", 3f, 1f, 8f, 1f, "#FF4DD2");
             config[11530] = new EffectConfig(11530, "CirclingReflectCi", "反伤六刺环绕特效", "增益", "Buff", "Effect/CirclingReflectCi", "", 3f, 1f, 8f, 1f, "");
-            config[11531] = new EffectConfig(11531, "RisingArrowGreen", "绿色上升箭头特效（属性强化）", "增益", "Buff", "Effect/RisingArrowGreen", "", 3f, 1f, 8f, 1f, "");
+            config[11540] = new EffectConfig(11540, "RisingArrowGreen", "绿色上升箭头特效（属性强化）", "增益", "Buff", "Effect/RisingArrowGreen", "", 3f, 1f, 8f, 1f, "");
+            config[11550] = new EffectConfig(11550, "SelfPrismSnapBlue", "自身特效-棱镜闪·蓝（群体治疗）", "增益", "自身", "Effect/SelfPrismSnap", "", 3f, 1f, 8f, 1f, "#4AA8FF");
+            config[11551] = new EffectConfig(11551, "SelfPrismSnapCyan", "自身特效-棱镜闪·青（单体治疗）", "增益", "自身", "Effect/SelfPrismSnap", "", 3f, 1f, 8f, 1f, "#4DE8E1");
+            config[11552] = new EffectConfig(11552, "SelfPrismSnapPink", "自身特效-棱镜闪·粉（辅助/防御）", "增益", "自身", "Effect/SelfPrismSnap", "", 3f, 1f, 8f, 1f, "#FF7BD5");
+            config[11560] = new EffectConfig(11560, "SelfArcaneOrbitBlue", "自身特效-奥术环·蓝（法术群体伤害）", "增益", "自身", "Effect/SelfArcaneOrbit", "", 3f, 1f, 8f, 1f, "#4AA8FF");
+            config[11561] = new EffectConfig(11561, "SelfArcaneOrbitRed", "自身特效-奥术环·红（法术单体伤害）", "增益", "自身", "Effect/SelfArcaneOrbit", "", 3f, 1f, 8f, 1f, "#FF4444");
+            config[11562] = new EffectConfig(11562, "SelfArcaneOrbitYellow", "自身特效-奥术环·土黄（法术控制）", "增益", "自身", "Effect/SelfArcaneOrbit", "", 3f, 1f, 8f, 1f, "#C9A227");
+            config[11570] = new EffectConfig(11570, "SelfBuffPulseGreen", "自身特效-强化脉冲·绿（群体增益）", "增益", "自身", "Effect/SelfBuffPulse", "", 3f, 1f, 8f, 1f, "#4DFF9E");
+            config[11571] = new EffectConfig(11571, "SelfBuffPulseYellow", "自身特效-强化脉冲·黄（单体增益）", "增益", "自身", "Effect/SelfBuffPulse", "", 3f, 1f, 8f, 1f, "#FFD24D");
+            config[11572] = new EffectConfig(11572, "SelfBuffPulseOrange", "自身特效-强化脉冲·橙（自身/召唤强化）", "增益", "自身", "Effect/SelfBuffPulse", "", 3f, 1f, 8f, 1f, "#FF8A3D");
+            config[11580] = new EffectConfig(11580, "MagicChargeRed", "自身特效-蓄力·红（物理单体伤害）", "增益", "自身", "Effect/MagicChargeBlue", "", 3f, 1f, 8f, 1f, "#FF3B3B");
+            config[11581] = new EffectConfig(11581, "MagicChargeGold", "自身特效-蓄力·金（物理群体伤害）", "增益", "自身", "Effect/MagicChargeBlue", "", 3f, 1f, 8f, 1f, "#FFC93C");
+            config[11582] = new EffectConfig(11582, "MagicChargePurple", "自身特效-蓄力·紫（物理控制）", "增益", "自身", "Effect/MagicChargeBlue", "", 3f, 1f, 8f, 1f, "#A96BFF");
 
             RebuildIndex();
 
