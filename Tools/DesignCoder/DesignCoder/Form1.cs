@@ -18,6 +18,11 @@ namespace DesignCoder
         private static readonly string EffectConfigPath = Path.Combine(ConfigDir, "EffectConfig_s.cs");
         // 技能配置表（选图面板统计特效被多少技能引用）
         private static readonly string SkillConfigPath = Path.Combine(ConfigDir, "SkillConfig_s.cs");
+        // Buff 配置表（Buff 页签的引用计数）
+        private static readonly string BuffConfigPath = Path.Combine(ConfigDir, "BuffConfig_s.cs");
+        // 职业/小兵配置表（HitEffect 命中时显示黄色额外计数）
+        private static readonly string JobConfigPath = Path.Combine(ConfigDir, "JobConfig_s.cs");
+        private static readonly string SoldierConfigPath = Path.Combine(ConfigDir, "SoldierConfig_s.cs");
         // EffectTest 场景自动截图输出目录（项目根目录下）
         private static readonly string EffectScreenshotDir = Path.GetFullPath(
             Path.Combine(ConfigDir, @"..\..\..\..\EffectScreenshots"));
@@ -53,6 +58,8 @@ namespace DesignCoder
         private Font effectButtonFont;
         // 技能脚本源码缓存（key: 脚本名）与“脚本是否引用某特效字段”判定缓存（key: 脚本名|字段名）
         private readonly Dictionary<string, string> scriptTextCache = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        // EffectConfig.Name -> Area（特效字段 Area 校验用，EffectConfig 修改/切换时失效重建）
+        private Dictionary<string, string> effectAreaMap;
         private readonly Dictionary<string, bool> effectRefCache = new Dictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
         // 势力短名/势力名 -> 势力主色（来自 ForceConfig.Names / ForceConfig.Colorstr），懒加载缓存
         private bool forceColorsLoaded = false;
@@ -185,6 +192,7 @@ namespace DesignCoder
             try
             {
                 currentConfigName = configName;
+                effectAreaMap = null;
                 // 切换配置时清空列筛选（筛选条件按表独立，避免串表）
                 columnFilters.Clear();
 
@@ -550,6 +558,7 @@ namespace DesignCoder
             if (configName.EndsWith("_s")) configName = configName.Substring(0, configName.Length - 2);
             
             modifiedConfigs.Add(configName);
+            if (configName == "EffectConfig") effectAreaMap = null;
             UpdateListViewModifiedMarks();
         }
 
@@ -1104,6 +1113,53 @@ namespace DesignCoder
             return value == null ? "" : value.ToString().Trim();
         }
 
+        // 特效 Area 校验：SelfEffect 需为自身（光环技能为光环），HitEffect 需为目标，AreaEffect 需为范围
+        private bool IsEffectAreaMismatch(int rowIdx, string fieldName, string effectName)
+        {
+            if (string.IsNullOrWhiteSpace(effectName)) return false;
+            string expected = GetExpectedEffectArea(rowIdx, fieldName);
+            if (expected == null) return false;
+
+            Dictionary<string, string> areaMap = GetEffectAreaMap();
+            if (areaMap == null || areaMap.Count == 0) return false;
+
+            string area;
+            if (!areaMap.TryGetValue(effectName.Trim(), out area)) return true;   // 未登记的特效也提示
+            return !string.Equals((area ?? "").Trim(), expected, StringComparison.Ordinal);
+        }
+
+        private string GetExpectedEffectArea(int rowIdx, string fieldName)
+        {
+            if (fieldName == "HitEffect") return "目标";
+            if (fieldName == "AreaEffect") return "范围";
+            if (fieldName == "SelfEffect")
+            {
+                string skillType = GetRowCellText(rowIdx, "Type");
+                return skillType == "光环" ? "光环" : "自身";
+            }
+            return null;
+        }
+
+        private Dictionary<string, string> GetEffectAreaMap()
+        {
+            if (effectAreaMap != null) return effectAreaMap;
+
+            var map = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            ConfigData cfg = ResolveConfigForStats("EffectConfig", EffectConfigPath);
+            if (cfg != null)
+            {
+                foreach (var row in cfg.Rows)
+                {
+                    string name, area;
+                    if (!row.TryGetValue("Name", out name) || string.IsNullOrWhiteSpace(name)) continue;
+                    row.TryGetValue("Area", out area);
+                    map[name.Trim()] = (area ?? "").Trim();
+                }
+            }
+            effectAreaMap = map;
+            return map;
+        }
+
         // 特效字段格子：左侧显示特效名字符串，右侧画“选”按钮，点击后打开截图选择面板
         // 脚本引用了该特效字段时（SkillConfig.ScriptName 对应脚本里出现字段名）整格背景标绿
         private void PaintEffectFieldCell(DataGridViewCellPaintingEventArgs e)
@@ -1114,6 +1170,8 @@ namespace DesignCoder
             int fieldIdx = GetFieldIndexFromColumnIndex(e.ColumnIndex);
             string fieldName = fieldIdx >= 0 && fieldIdx < currentConfig.Fields.Count ? currentConfig.Fields[fieldIdx].Name : "";
             string text = e.Value != null ? e.Value.ToString() : "";
+            // Area 与字段/技能类型不匹配 → 淡红色背景提示
+            bool areaMismatch = IsEffectAreaMismatch(e.RowIndex, fieldName, text);
             // 配置了特效、且 ScriptName 对应脚本里引用了该特效字段 → 标绿（空值不标，避免满屏绿）
             bool referenced = text.Trim().Length > 0 && !string.IsNullOrEmpty(fieldName)
                 && IsEffectReferencedByScript(e.RowIndex, fieldName);
@@ -1121,7 +1179,13 @@ namespace DesignCoder
             bool isHighlighted = (e.RowIndex == selectedRowIndex) || (e.ColumnIndex == selectedColumnIndex);
             Color bgColor;
             Color fgColor;
-            if (referenced)
+            if (areaMismatch)
+            {
+                // 淡红色：提示特效分类与字段期望不一致
+                bgColor = Color.FromArgb(255, 190, 190);
+                fgColor = Color.FromArgb(70, 25, 25);
+            }
+            else if (referenced)
             {
                 // 脚本已引用该特效字段：绿色背景 + 浅绿文字
                 bgColor = Color.FromArgb(45, 105, 60);
@@ -1142,7 +1206,7 @@ namespace DesignCoder
             {
                 e.Graphics.FillRectangle(bgBrush, e.CellBounds);
             }
-            if (!referenced && !isHighlighted && (e.State & DataGridViewElementStates.Selected) == DataGridViewElementStates.Selected)
+            if (!areaMismatch && !referenced && !isHighlighted && (e.State & DataGridViewElementStates.Selected) == DataGridViewElementStates.Selected)
             {
                 using (Brush selBrush = new SolidBrush(e.CellStyle.SelectionBackColor))
                 {
@@ -1209,7 +1273,7 @@ namespace DesignCoder
             object cellValue = dataGridView1.Rows[rowIdx].Cells[colIdx].Value;
             string currentValue = cellValue != null ? cellValue.ToString() : "";
 
-            using (var dlg = new EffectPickerForm(EffectConfigPath, EffectScreenshotDir, currentValue, BuildEffectUsageCounts()))
+            using (var dlg = new EffectPickerForm(EffectConfigPath, EffectScreenshotDir, currentValue, BuildEffectUsageStats()))
             {
                 if (dlg.ShowDialog(this) != DialogResult.OK) return;
                 if (string.IsNullOrEmpty(dlg.SelectedEffect)) return;
@@ -1217,65 +1281,103 @@ namespace DesignCoder
             }
         }
 
-        // 统计 SkillConfig 中每个特效被多少个技能引用：同一技能（Sname）多等级只算一次
-        // 优先用工具内已加载的 SkillConfig（含未保存修改），否则读文件
-        private Dictionary<string, int> BuildEffectUsageCounts()
+        // 统计特效引用：
+        // 导弹=SkillConfig.HitEffect（按 Sname 去重）；Buff=BuffConfig.BuffEffect（按行）；
+        // 其余=SkillConfig.SelfEffect/HitEffect/AreaEffect（按 Sname 去重）；
+        // Extra=JobConfig/SoldierConfig.HitEffect（按行，选图面板显示黄色标签）
+        private EffectUsageStats BuildEffectUsageStats()
         {
-            var result = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+            var stats = new EffectUsageStats
+            {
+                SkillCounts = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase),
+                MissileCounts = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase),
+                BuffCounts = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase),
+                ExtraCounts = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase),
+            };
 
-            ConfigData skill;
-            if (currentConfigName == "SkillConfig" && currentConfig != null)
+            ConfigData skill = ResolveConfigForStats("SkillConfig", SkillConfigPath);
+            if (skill != null)
             {
-                skill = currentConfig;
-            }
-            else if (!loadedConfigs.TryGetValue("SkillConfig", out skill))
-            {
-                skill = null;
-            }
-
-            if (skill == null)
-            {
-                if (!File.Exists(SkillConfigPath)) return result;
-                try
+                string[] effectFields = { "SelfEffect", "HitEffect", "AreaEffect" };
+                var effectToSkills = new Dictionary<string, HashSet<string>>(StringComparer.OrdinalIgnoreCase);
+                var hitToSkills = new Dictionary<string, HashSet<string>>(StringComparer.OrdinalIgnoreCase);
+                for (int i = 0; i < skill.Rows.Count; i++)
                 {
-                    skill = ConfigData.Parse(File.ReadAllText(SkillConfigPath, Encoding.UTF8));
+                    Dictionary<string, string> row = skill.Rows[i];
+                    string sname;
+                    if (!row.TryGetValue("Sname", out sname) || string.IsNullOrWhiteSpace(sname))
+                        sname = "#row" + i;   // 没有 Sname 时按行各算一次
+
+                    foreach (string fieldName in effectFields)
+                        AddEffectSkill(row, fieldName, sname, effectToSkills);
+                    AddEffectSkill(row, "HitEffect", sname, hitToSkills);
                 }
-                catch (Exception ex)
-                {
-                    System.Diagnostics.Debug.WriteLine("读取 SkillConfig 统计特效引用失败：" + ex.Message);
-                    return result;
-                }
+
+                foreach (var kv in effectToSkills)
+                    stats.SkillCounts[kv.Key] = kv.Value.Count;
+                foreach (var kv in hitToSkills)
+                    stats.MissileCounts[kv.Key] = kv.Value.Count;
             }
 
-            string[] effectFields = { "SelfEffect", "HitEffect", "AreaEffect" };
-            var effectToSkills = new Dictionary<string, HashSet<string>>(StringComparer.OrdinalIgnoreCase);
-            for (int i = 0; i < skill.Rows.Count; i++)
+            CountEffectRows(ResolveConfigForStats("BuffConfig", BuffConfigPath), "BuffEffect", stats.BuffCounts);
+            CountEffectRows(ResolveConfigForStats("JobConfig", JobConfigPath), "HitEffect", stats.ExtraCounts);
+            CountEffectRows(ResolveConfigForStats("SoldierConfig", SoldierConfigPath), "HitEffect", stats.ExtraCounts);
+            return stats;
+        }
+
+        // 优先用工具内已加载的配置（含未保存修改），否则读文件
+        private ConfigData ResolveConfigForStats(string configName, string path)
+        {
+            if (currentConfigName == configName && currentConfig != null)
+                return currentConfig;
+
+            ConfigData cfg;
+            if (loadedConfigs.TryGetValue(configName, out cfg) && cfg != null)
+                return cfg;
+
+            if (!File.Exists(path)) return null;
+            try
             {
-                Dictionary<string, string> row = skill.Rows[i];
-                string sname;
-                if (!row.TryGetValue("Sname", out sname) || string.IsNullOrWhiteSpace(sname))
-                    sname = "#row" + i;   // 没有 Sname 时按行各算一次
-
-                foreach (string fieldName in effectFields)
-                {
-                    string value;
-                    if (!row.TryGetValue(fieldName, out value)) continue;
-                    value = value == null ? "" : value.Trim();
-                    if (value.Length == 0) continue;
-
-                    HashSet<string> skills;
-                    if (!effectToSkills.TryGetValue(value, out skills))
-                    {
-                        skills = new HashSet<string>();
-                        effectToSkills[value] = skills;
-                    }
-                    skills.Add(sname);
-                }
+                return ConfigData.Parse(File.ReadAllText(path, Encoding.UTF8));
             }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine("读取 " + configName + " 统计特效引用失败：" + ex.Message);
+                return null;
+            }
+        }
 
-            foreach (var kv in effectToSkills)
-                result[kv.Key] = kv.Value.Count;
-            return result;
+        private static void AddEffectSkill(Dictionary<string, string> row, string fieldName, string sname,
+            Dictionary<string, HashSet<string>> effectToSkills)
+        {
+            string value;
+            if (!row.TryGetValue(fieldName, out value)) return;
+            value = value == null ? "" : value.Trim();
+            if (value.Length == 0) return;
+
+            HashSet<string> skills;
+            if (!effectToSkills.TryGetValue(value, out skills))
+            {
+                skills = new HashSet<string>();
+                effectToSkills[value] = skills;
+            }
+            skills.Add(sname);
+        }
+
+        private static void CountEffectRows(ConfigData config, string fieldName, Dictionary<string, int> counts)
+        {
+            if (config == null) return;
+            foreach (var row in config.Rows)
+            {
+                string value;
+                if (!row.TryGetValue(fieldName, out value)) continue;
+                value = value == null ? "" : value.Trim();
+                if (value.Length == 0) continue;
+
+                int count;
+                counts.TryGetValue(value, out count);
+                counts[value] = count + 1;
+            }
         }
 
         // 技能配置按 Sname 展开为多等级行：改特效时把同 Sname 的全部行一起改掉

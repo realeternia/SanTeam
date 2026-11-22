@@ -9,10 +9,22 @@ using System.Windows.Forms;
 namespace DesignCoder
 {
     /// <summary>
-    /// 特效截图选择面板：分“导弹 / 目标型 / 范围型 / 光环 / Buff”五个页签，按行列显示 EffectScreenshots 目录下的特效截图。
-    /// 导弹看截图文件名 _Missile 后缀，其余按 EffectConfig.Area（目标/范围/光环/Buff）分页签。
+    /// 特效引用统计：主计数按类型取自不同表，ExtraCounts 为 JobConfig/SoldierConfig 的额外命中数。
+    /// </summary>
+    public class EffectUsageStats
+    {
+        public Dictionary<string, int> SkillCounts;    // 技能 SelfEffect/HitEffect/AreaEffect 引用技能数（同 Sname 只算一次）
+        public Dictionary<string, int> MissileCounts;  // 技能 HitEffect 引用技能数（导弹页签）
+        public Dictionary<string, int> BuffCounts;     // BuffConfig.BuffEffect 引用行数（Buff 页签）
+        public Dictionary<string, int> ExtraCounts;    // JobConfig/SoldierConfig.HitEffect 引用行数（黄色标签）
+    }
+
+    /// <summary>
+    /// 特效截图选择面板：分“导弹 / 自身 / 目标型 / 范围型 / 光环 / Buff”六个页签，按行列显示 EffectScreenshots 目录下的特效截图。
+    /// 导弹看截图文件名 _Missile 后缀，其余按 EffectConfig.Area（自身/目标/范围/光环/Buff）分页签。
     /// 负面特效红框、正面（增益）特效绿框，伤害类灰框；缩略图左上显示资源路径，右下显示 EffectConfig 的 Area，
-    /// 右上显示该特效在 SkillConfig 中被多少个技能引用（同一技能多等级只算一次，导弹不统计）。
+    /// 右上显示引用计数（导弹取 SkillConfig.HitEffect，Buff 取 BuffConfig.BuffEffect，其余取技能特效字段），
+    /// 左下黄色标签显示 JobConfig/SoldierConfig.HitEffect 的额外命中数。
     /// 双击缩略图或点“确定”返回选中的特效名（EffectConfig.Name，即技能配置里存的值）。
     /// </summary>
     public class EffectPickerForm : Form
@@ -25,11 +37,12 @@ namespace DesignCoder
         private const int BadgeWidth = 34;
 
         private const int TabMissile = 0;
-        private const int TabTarget = 1;
-        private const int TabArea = 2;
-        private const int TabAura = 3;
-        private const int TabBuff = 4;
-        private static readonly string[] TabTitles = { "导弹", "目标型", "范围型", "光环", "Buff" };
+        private const int TabSelf = 1;
+        private const int TabTarget = 2;
+        private const int TabArea = 3;
+        private const int TabAura = 4;
+        private const int TabBuff = 5;
+        private static readonly string[] TabTitles = { "导弹", "自身", "目标型", "范围型", "光环", "Buff" };
 
         private static readonly Color PanelBg = Color.FromArgb(37, 37, 38);
         private static readonly Color ItemBg = Color.FromArgb(45, 45, 48);
@@ -41,7 +54,7 @@ namespace DesignCoder
         private readonly string effectConfigPath;
         private readonly string screenshotDir;
         private readonly string currentValue;
-        private readonly Dictionary<string, int> usageCounts;
+        private readonly EffectUsageStats usageStats;
 
         private readonly TabControl tabControl;
         private readonly TabPage[] tabPages = new TabPage[TabTitles.Length];
@@ -55,14 +68,14 @@ namespace DesignCoder
         /// <summary>选中返回的特效名（EffectConfig.Name），未选择时为 null</summary>
         public string SelectedEffect { get; private set; }
 
-        /// <param name="usageCounts">特效被 SkillConfig 引用的技能数（key 为 EffectConfig.Name），可为 null</param>
+        /// <param name="usageStats">特效引用统计（key 为 EffectConfig.Name），可为 null</param>
         public EffectPickerForm(string effectConfigPath, string screenshotDir, string currentValue,
-            Dictionary<string, int> usageCounts)
+            EffectUsageStats usageStats)
         {
             this.effectConfigPath = effectConfigPath;
             this.screenshotDir = screenshotDir;
             this.currentValue = currentValue ?? "";
-            this.usageCounts = usageCounts;
+            this.usageStats = usageStats;
 
             Text = "选择特效";
             StartPosition = FormStartPosition.CenterParent;
@@ -188,7 +201,8 @@ namespace DesignCoder
                 item.Area = area;
                 item.BorderColor = GetBorderColor(type);
                 item.TabIndex = isMissile ? TabMissile : GetAreaTab(area);
-                item.Usage = isMissile ? -1 : GetUsageCount(item.Value);
+                item.Usage = GetUsageCount(isMissile, area, item.Value);
+                item.ExtraUsage = GetCount(usageStats != null ? usageStats.ExtraCounts : null, item.Value);
                 item.Thumb = LoadThumbnail(file);
 
                 var ctl = new EffectItemControl(item);
@@ -207,17 +221,27 @@ namespace DesignCoder
                 return;
             }
 
-            tipLabel.Text = string.Format("共 {0} 张（红框=负面，绿框=正面，灰框=伤害；“用N”=被N个技能引用，导弹不统计）　　当前值：{1}",
+            tipLabel.Text = string.Format("共 {0} 张（红框=负面，绿框=正面，灰框=伤害；“用N”=导弹取技能HitEffect、Buff取Buff表、其余取技能特效；黄标=职业/小兵HitEffect）　　当前值：{1}",
                 itemControls.Count, string.IsNullOrEmpty(currentValue) ? "（空）" : currentValue);
 
             SelectDefault();
         }
 
-        private int GetUsageCount(string effectName)
+        private int GetUsageCount(bool isMissile, string area, string effectName)
         {
-            if (usageCounts == null || string.IsNullOrEmpty(effectName)) return 0;
+            if (usageStats == null || string.IsNullOrEmpty(effectName)) return 0;
+            if (isMissile)
+                return GetCount(usageStats.MissileCounts, effectName);
+            if (string.Equals((area ?? "").Trim(), "Buff", StringComparison.OrdinalIgnoreCase))
+                return GetCount(usageStats.BuffCounts, effectName);
+            return GetCount(usageStats.SkillCounts, effectName);
+        }
+
+        private static int GetCount(Dictionary<string, int> counts, string effectName)
+        {
+            if (counts == null || string.IsNullOrEmpty(effectName)) return 0;
             int count;
-            return usageCounts.TryGetValue(effectName, out count) ? count : 0;
+            return counts.TryGetValue(effectName, out count) ? count : 0;
         }
 
         // 默认选中当前字符串对应的截图（同名特效优先取本体，其次导弹），并切到它所在的页签
@@ -268,9 +292,10 @@ namespace DesignCoder
             return result;
         }
 
-        // 按 EffectConfig.Area 分页签：范围 → 范围型、光环 → 光环、Buff → Buff、其余归目标型
+        // 按 EffectConfig.Area 分页签：自身 → 自身、范围 → 范围型、光环 → 光环、Buff → Buff、其余归目标型
         private static int GetAreaTab(string area)
         {
+            if (area == "自身") return TabSelf;
             if (area == "范围") return TabArea;
             if (area == "光环") return TabAura;
             if (area == "Buff") return TabBuff;
@@ -371,7 +396,8 @@ namespace DesignCoder
             public Color BorderColor;
             public Bitmap Thumb;
             public int TabIndex;        // 所属页签（导弹/目标型/范围型）
-            public int Usage = -1;      // SkillConfig 引用技能数，-1 表示不统计（导弹）
+            public int Usage = 0;       // 主引用计数（导弹/Buff/技能按类型取不同表）
+            public int ExtraUsage = 0;  // JobConfig/SoldierConfig 额外命中数（黄色标签）
         }
 
         private class EffectItemControl : Control
@@ -424,9 +450,9 @@ namespace DesignCoder
                     }
                 }
 
-                // 左上：资源路径（半透明黑底 + 省略号）；右上：SkillConfig 引用计数
+                // 左上：资源路径（半透明黑底 + 省略号）；右上：引用计数
                 var topRect = new Rectangle(imgRect.X + 1, imgRect.Y + 1, imgRect.Width - 2, 18);
-                if (Item.Usage >= 0 && topRect.Width > BadgeWidth + 10)
+                if (topRect.Width > BadgeWidth + 10)
                 {
                     var badgeRect = new Rectangle(topRect.Right - BadgeWidth, topRect.Y, BadgeWidth, topRect.Height);
                     DrawOverlayText(g, Item.Usage.ToString(), badgeRect, ContentAlignment.MiddleRight, Item.Usage > 0);
@@ -434,9 +460,18 @@ namespace DesignCoder
                 }
                 DrawOverlayText(g, Item.PathName, topRect, ContentAlignment.MiddleLeft, false);
 
-                // 右下：EffectConfig.Area
+                // 底部：左侧黄色额外计数（Job/Soldier 命中），右侧 EffectConfig.Area
+                var bottomRect = new Rectangle(imgRect.X + 1, imgRect.Bottom - 19, imgRect.Width - 2, 18);
+                if (Item.ExtraUsage > 0)
+                {
+                    var extraRect = new Rectangle(bottomRect.X, bottomRect.Y, BadgeWidth, bottomRect.Height);
+                    DrawOverlayText(g, Item.ExtraUsage.ToString(), extraRect, ContentAlignment.MiddleLeft, false,
+                        Color.FromArgb(235, 198, 40), Color.FromArgb(35, 30, 10));
+                    bottomRect.X += BadgeWidth + 1;
+                    bottomRect.Width -= BadgeWidth + 1;
+                }
                 if (!string.IsNullOrEmpty(Item.Area))
-                    DrawOverlayText(g, Item.Area, new Rectangle(imgRect.X + 1, imgRect.Bottom - 19, imgRect.Width - 2, 18), ContentAlignment.MiddleRight, false);
+                    DrawOverlayText(g, Item.Area, bottomRect, ContentAlignment.MiddleRight, false);
 
                 // 底部：截图文件名
                 var nameRect = new Rectangle(2, imgRect.Bottom + 2, Width - 4, NameHeight - 2);
@@ -445,11 +480,12 @@ namespace DesignCoder
                     TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter | TextFormatFlags.EndEllipsis | TextFormatFlags.NoPrefix);
             }
 
-            private void DrawOverlayText(Graphics g, string text, Rectangle rect, ContentAlignment align, bool highlight)
+            private void DrawOverlayText(Graphics g, string text, Rectangle rect, ContentAlignment align, bool highlight,
+                Color? backOverride = null, Color? textOverride = null)
             {
                 if (string.IsNullOrEmpty(text)) return;
 
-                Color backColor = highlight ? Color.FromArgb(190, 60, 130, 70) : Color.FromArgb(175, 0, 0, 0);
+                Color backColor = backOverride ?? (highlight ? Color.FromArgb(190, 60, 130, 70) : Color.FromArgb(175, 0, 0, 0));
                 using (var back = new SolidBrush(backColor))
                 {
                     g.FillRectangle(back, rect);
@@ -459,7 +495,7 @@ namespace DesignCoder
                 flags |= align == ContentAlignment.MiddleRight ? TextFormatFlags.Right : TextFormatFlags.Left;
 
                 var textRect = new Rectangle(rect.X + 3, rect.Y, rect.Width - 6, rect.Height);
-                TextRenderer.DrawText(g, text, overlayFont, textRect, Color.White, flags);
+                TextRenderer.DrawText(g, text, overlayFont, textRect, textOverride ?? Color.White, flags);
             }
         }
     }
