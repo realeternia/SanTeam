@@ -45,7 +45,10 @@ public class SkillComDamageArea : SkillComDamageSingle
         foreach (var u in units)
         {
             // 主目标双倍由伤害基类统一处理（centerDouble / centerRate）
-            ResolveDamage(u, ApplyCenterDouble(baseDamage, u == target));
+            var dmg = ResolveDamage(u, ApplyCenterDouble(baseDamage, u == target));
+            // 导弹型：Buff 归属已延后到飞弹命中回调，施法瞬间不再挂
+            if (IsMissileDeferred(dmg))
+                continue;
             foreach (var buffId in buffIds)
                 ApplyBuffToUnit(u, buffId);
         }

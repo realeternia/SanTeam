@@ -28,6 +28,9 @@ public class WorldManager : MonoBehaviour
     public bool isDraw;   // 同刻双方全灭导致的平局（与打到步数上限的平局区分）
     private bool[] sideBattleOver = new bool[8]; // 各阵营战斗是否已结束（无存活敌方）
 
+    /// <summary>无头模拟无地图：与游戏内"无地图时 -1"一致（不启用配对/阵营目标过滤）</summary>
+    public int MapRule { get { return -1; } }
+
     // 羁绊开关（默认全开，仅批量模拟器按需在开战前关闭；不影响战斗逻辑本身）
     public static bool EnableJobLinks = true;        // 职业连锁
     public static bool EnableFriendLines = true;     // 好友连线（默认连线 + 特殊连锁）
@@ -581,12 +584,13 @@ public class WorldManager : MonoBehaviour
         missile.MoveToTarget(targetChess, sourceChess.missileSpeed, sourceChess.missileHight);
     }
 
-    public void CreateSpellMissile(Chess sourceChess, Chess targetChess, Vector3 startPos, int skillId, int damage, string effectName, float speed = 0f)
+    public void CreateSpellMissile(Chess sourceChess, Chess targetChess, Vector3 startPos, int skillId, int damage, string effectName, float speed = 0f, Action<Chess> perTargetOnHit = null)
     {
         Missile missilePrefab = Resources.Load<Missile>("Prefabs/MissileCom");
         var missile = UnityEngine.Object.Instantiate<Missile>(missilePrefab, startPos, Quaternion.identity, Units.transform);
         missile.Init(sourceChess, 1, effectName);
         missile.SetSkillInfo(skillId, damage);
+        missile.perTargetOnHit = perTargetOnHit;
         missile.MoveToTarget(targetChess, speed > 0f ? speed : Mathf.Max(sourceChess.missileSpeed, 14), sourceChess.missileHight);
     }
 

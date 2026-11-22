@@ -1,4 +1,4 @@
-﻿using System;
+﻿﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -57,7 +57,7 @@ namespace CommonConfig
             {"MoveSpeed", new FieldMetaInfo("移动速度（王/士/盾/锤/枪/戟10 马/车12 弓/炮/扇/相/棋/鼓/琴/医/工8 弩7）", "int", 60)},
             {"MissileSpeed", new FieldMetaInfo("导弹速度", "int", 60)},
             {"MissileHight", new FieldMetaInfo("导弹高度", "float", 60)},
-            {"HitEffect", new FieldMetaInfo("hit", "string", 364)},
+            {"HitEffect", new FieldMetaInfo("hit", "string", 364, "effect")},
         };
 
         public static Dictionary<string, FieldMetaInfo> FieldMeta { get { return fieldMeta; } }

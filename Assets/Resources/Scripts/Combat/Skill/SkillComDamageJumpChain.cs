@@ -77,10 +77,11 @@ public class SkillComDamageJumpChain : SkillComDamageSingle
 
             // 统一伤害路径：本跳衰减后的基础值经 CalcDamage 修正（斩杀/护盾加成/残血增伤/兵种克制/最大生命追加等）
             // → 双击 / 直伤/弹道 + 命中特效 → 破盾 / 燃蓝 / 击退 / 驱散
+            var dmg = 0;
             if (currentDamage > 0)
-                ResolveDamage(current, currentDamage);
-            // debuffId=0 表示本技能未配置减益，跳过挂载
-            if (debuffId > 0)
+                dmg = ResolveDamage(current, currentDamage);
+            // debuffId=0 表示本技能未配置减益，跳过挂载；导弹型由飞弹命中回调统一挂载
+            if (debuffId > 0 && !IsMissileDeferred(dmg))
                 BuffManager.AddBuff(current, owner, id, debuffId, skillCfg.BuffTime);
             GameLog.Debug($"明断 技能id={id} 等级={Level} 第{i + 1}跳 伤害={currentDamage} 目标={current.heroId}");
             hitList.Add(current);

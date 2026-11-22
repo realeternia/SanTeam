@@ -17,12 +17,13 @@ using UnityEngine;
 /// · ResolveDamage(target, baseDamage) 统一伤害路径（修正 → 双击 → 直伤/弹道 → 破盾/燃蓝/击退/驱散），
 ///   单体 / 群体 / 跳跃链 / 持续伤害场全部共用；冲击波在导弹命中回调里补同一组命中后效果
 /// · ResolveHit(target) 伤害结算（默认 ResolveDamage + AfterDamage，导弹/多段等可整段覆写，仍可复用 CalcDamage / ApplyDamage）
-/// · ApplyDamage(target, dmg) 伤害落地（默认直伤 / missile 标记走飞弹，并播命中特效）
+/// · ApplyDamage(target, dmg, baseDamage) 伤害落地（默认直伤 / missile 标记走飞弹，并播命中特效）
 /// · AfterDamage(target, dmg) 命中后的形态补充处理（默认苦肉 + Buff 归属；破盾/燃蓝/击退/驱散已在 ResolveDamage）
 ///
 /// 通用组件效果全部由基类统一实现（TargetType 标记 / Strength2 键），派生类不要重复判断：
 /// · self        = 自身中心（近战贴脸 AoE），沿用当前索敌目标、不做射程校验（SelectTarget）
-/// · missile     = 以飞弹逐个结算（ApplyDamage）；飞弹特效取 HitEffect，飞行速度取 SummonSpeed（0 时用单位导弹速度）
+/// · missile     = 以飞弹逐个结算（ApplyDamage）；飞弹特效取 HitEffect，飞行速度取 SummonSpeed（0 时用单位导弹速度），
+///                 破盾/燃蓝/击退/驱散与 Buff 归属统一延后到飞弹命中回调，避免飞弹未落地就生效
 /// · execute / shieldBonus / missingHp / highHp / vsJob / soldierDamage / critRateBonus（ApplyDamageModifiers）
 /// · antiShield / mpBurn / 击退 pushMin~pushMax / 拖回出生点 pullToSpawn / selfHurt / selfBuff / dispel（AfterDamage）
 /// · hitCount / hitInterval = 多段攻击：第1段立即结算，第2段起每隔 hitInterval 秒追加命中（默认1段、间隔0.3秒）
@@ -162,15 +163,36 @@ public class SkillComDamageSingle : Skill
         var isDouble = TryDoubleDamage(ref dmg);
         // 拖回出生点：先位移再结算伤害，保证目标被拖走（死亡也落在出生点）
         PullTargetToSpawn(target);
-        ApplyDamage(target, dmg);
+        ApplyDamage(target, dmg, baseDamage);
         if (isDouble)
             WorldManager.Instance.AddBattleText("暴击", target.transform.position,
                 new Vector2(0, 80), SysColor.BattleText.SkillName, 3);
+        // 导弹型：命中后效果已随飞弹延后到 ApplyMissileImpact，施法瞬间不再重复结算
+        if (!IsMissileDeferred(dmg))
+            ApplyHitFollowUps(target, baseDamage);
+        return dmg;
+    }
+
+    /// <summary>本次命中是否走飞弹延迟结算（missile 标记 + 有伤害），供派生类判断是否需要立即挂 Buff。</summary>
+    protected bool IsMissileDeferred(int dmg)
+    {
+        return HasSkillFlag("missile") && dmg > 0;
+    }
+
+    /// <summary>命中后效果：破盾追加 / 燃烧法力 / 击退 / 驱散（直伤落地即执行，导弹型在命中回调执行）。</summary>
+    private void ApplyHitFollowUps(Chess target, int baseDamage)
+    {
         ApplyAntiShieldBonus(target, baseDamage);
         ApplyMpBurn(target);
         PushTargetBack(target);
         ApplyDispel(target);
-        return dmg;
+    }
+
+    /// <summary>飞弹命中回调：补做原本施法瞬间执行的命中后结算与 Buff 归属，保证效果与弹道同步。</summary>
+    private void ApplyMissileImpact(Chess target, int baseDamage)
+    {
+        ApplyHitFollowUps(target, baseDamage);
+        ApplySkillBuffs(target);
     }
 
     /// <summary>伤害结算主流程：统一伤害路径 + 命中后的自伤与 Buff 归属。</summary>
@@ -180,13 +202,14 @@ public class SkillComDamageSingle : Skill
         AfterDamage(target, dmg);
     }
 
-    /// <summary>伤害落地：missile 标记走飞弹，否则直接结算；命中特效统一在此播放。</summary>
-    protected virtual void ApplyDamage(Chess target, int dmg)
+    /// <summary>伤害落地：missile 标记走飞弹（命中回调补命中后效果与 Buff），否则直接结算；命中特效统一在此播放。</summary>
+    protected virtual void ApplyDamage(Chess target, int dmg, int baseDamage)
     {
         if (HasSkillFlag("missile"))
         {
             if (dmg > 0)
-                WorldManager.Instance.CreateSpellMissile(owner, target, owner.transform.position, id, dmg, skillCfg.HitEffect, skillCfg.SummonSpeed);
+                WorldManager.Instance.CreateSpellMissile(owner, target, owner.transform.position, id, dmg, skillCfg.HitEffect, skillCfg.SummonSpeed,
+                    hit => ApplyMissileImpact(hit, baseDamage));
             return;
         }
 
@@ -199,10 +222,12 @@ public class SkillComDamageSingle : Skill
     /// <summary>
     /// 命中后的形态补充处理：苦肉反噬 + Buff 归属。
     /// 破盾 / 燃烧法力 / 击退 / 驱散已收敛到 ResolveDamage，所有伤害形态共用。
+    /// 导弹型的 Buff 归属已延后到飞弹命中回调，施法瞬间不再挂载。
     /// </summary>
     protected virtual void AfterDamage(Chess target, int dmg)
     {
         HurtSelfByDamage(dmg);
-        ApplySkillBuffs(target);
+        if (!IsMissileDeferred(dmg))
+            ApplySkillBuffs(target);
     }
 }

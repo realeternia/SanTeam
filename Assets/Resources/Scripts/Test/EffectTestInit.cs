@@ -7,7 +7,7 @@ using UnityEngine;
 /// <summary>
 /// 特效测试场景初始化：按 EffectConfig 遍历，把所有特效与导弹平铺创建出来。
 /// 特效原地静止展示；导弹做左右往复摆动，方便观察拖尾。
-/// 场景启动后自动逐个特效截图，文件名取特效名，保存到项目根目录下的截图目录。
+/// 场景启动后自动逐个特效录制帧动画（特效总时长内采样），保存到项目根目录下的截图目录。
 /// </summary>
 public class EffectTestInit : MonoBehaviour
 {
@@ -34,14 +34,10 @@ public class EffectTestInit : MonoBehaviour
     public string screenshotDir = "EffectScreenshots";
     [Tooltip("全部特效创建完成后等待多少秒再开始截图（留出粒子扩散时间）")]
     public float captureStartDelay = 2f;
-    [Tooltip("重启粒子后采集的时间窗（秒），窗内逐帧采样取最清晰的一帧（覆盖特效完整发展过程，喷火/烟雾类需要时间成型）")]
-    public float captureSampleWindow = 1.2f;
-    [Tooltip("采样间隔（秒）")]
-    public float captureSampleInterval = 0.05f;
-    [Tooltip("按距离发射的拖尾类特效静止时不出粒子，截图前会先平移这段距离（世界单位）")]
+    [Tooltip("每个特效录制的帧数：在特效总时长内均匀采样，拼成循环帧动画（文件名 特效名_00.png、特效名_01.png…）")]
+    public int captureFrameCount = 10;
+    [Tooltip("按距离发射的拖尾类特效静止时不出粒子，录制前会先平移这段距离（世界单位）")]
     public float captureWarmupDistance = 8f;
-    [Tooltip("平移预热耗时（秒）")]
-    public float captureWarmupSeconds = 0.4f;
     [Tooltip("截图宽度")]
     public int captureWidth = 256;
     [Tooltip("截图高度")]
@@ -52,13 +48,50 @@ public class EffectTestInit : MonoBehaviour
     public Color captureBackground = new Color(0.08f, 0.08f, 0.1f, 1f);
     [Tooltip("放大系数：越大特效在画面里越大（1=按包围盒取景，>1 放大）")]
     public float captureZoom = 1.5f;
-    [Tooltip("暗背景下几乎看不到内容时，改用该亮背景补拍一张（暗色半透明烟雾类特效在暗底上看不清）")]
+    [Tooltip("暗背景下几乎看不到内容时，改用该亮背景整段重录（暗色半透明烟雾类特效在暗底上看不清）")]
     public Color captureAltBackground = new Color(0.7f, 0.7f, 0.72f, 1f);
     [Tooltip("截图专用层（临时把待截图特效切到该层，只让截图相机看到它，默认 31）")]
     public int captureLayer = 31;
 
-    // 暗背景下内容像素少于此值时，认为特效在暗底上看不清，改用亮背景补拍
+    // 暗背景下内容像素少于此值时，认为特效在暗底上看不清，改用亮背景重录
     private const int AltBackgroundContentPixels = 30;
+    // 录制窗口最短时长（秒）：时长很短的特效也留出足够时间采满帧数
+    private const float MinCaptureDuration = 0.6f;
+    // 录制元数据：记录源 prefab 与每张截图文件的最后修改时间，未变更时跳过重录
+    // 版本号变更会强制全部重录（v2：取景恢复为与单帧截图一致）
+    private const int RecordMetaVersion = 2;
+    private const string RecordMetaFileName = "_record_meta.json";
+
+    // 录制元数据根节点
+    [System.Serializable]
+    private class RecordMeta
+    {
+        public int version;
+        public int frameCount;
+        public int width;
+        public int height;
+        public List<RecordMetaItem> items = new List<RecordMetaItem>();
+    }
+
+    // 单个特效的录制元数据
+    [System.Serializable]
+    private class RecordMetaItem
+    {
+        public string shotName;
+        public string sourcePath;   // 源 prefab 资源路径（Assets 相对）
+        public long sourceTime;     // 源 prefab 最后修改时间（UTC ticks）
+        public float scale;
+        public string tint;
+        public List<RecordMetaFile> files = new List<RecordMetaFile>();
+    }
+
+    // 单张截图的文件名与最后修改时间
+    [System.Serializable]
+    private class RecordMetaFile
+    {
+        public string name;
+        public long time;           // 截图文件最后修改时间（UTC ticks）
+    }
 
     // 场景内创建的全部特效/导弹条目（含截图用信息）
     private readonly List<EffectItem> createdItems = new List<EffectItem>();
@@ -207,46 +240,71 @@ public class EffectTestInit : MonoBehaviour
             trail.Clear();
     }
 
-    // 单张截图的一次采样结果
-    private class ShotSample
+    // 单帧录制结果
+    private class ShotFrame
     {
         public byte[] png;
         // 与背景明显不同的像素数（内容量）
-        public int content = -1;
-        // 与背景的总对比度（越大越清晰）
-        public long contrast;
-        // 该帧渲染包围盒的半径（越大说明特效越成型）
-        public float radius;
+        public int content;
     }
 
-    // 在时间窗内逐帧渲染采样，收集每帧结果（内容量/对比度/包围盒尺寸），之后统一挑选
-    private IEnumerator SampleEffect(Camera cam, RenderTexture rt, Texture2D tex, EffectItem item, Vector3 originPos, bool move, Color background, List<ShotSample> samples)
+    // 一段帧动画的录制结果（统一取景 + 全部帧）
+    private class SequenceResult
     {
-        cam.backgroundColor = background;
-        float window = Mathf.Max(0.05f, move ? captureWarmupSeconds : captureSampleWindow);
-        float interval = Mathf.Max(0.01f, captureSampleInterval);
+        public bool hasBounds;
+        public Bounds bounds;
+        public readonly List<ShotFrame> frames = new List<ShotFrame>();
+    }
+
+    // 录制总时长：取特效内粒子系统一个循环的时长（多个发射器取最长），并保证最短录制窗口
+    private static float GetCaptureDuration(GameObject go)
+    {
+        float duration = 0f;
+        foreach (var ps in go.GetComponentsInChildren<ParticleSystem>(true))
+            duration = Mathf.Max(duration, ps.main.duration);
+        return Mathf.Max(MinCaptureDuration, duration);
+    }
+
+    // 在总时长内均匀采样：取各帧中点，避免首尾恰好是空帧
+    private static float[] GetSampleTimes(float duration, int frameCount)
+    {
+        int count = Mathf.Max(2, frameCount);
+        var times = new float[count];
+        for (int i = 0; i < count; i++)
+            times[i] = duration * (i + 0.5f) / count;
+        return times;
+    }
+
+    // 探测取景：按总时长走一遍，合并各采样时刻的包围盒，作为整段动画的统一取景
+    private IEnumerator ProbeSequence(EffectItem item, Vector3 originPos, bool move, float duration, int frameCount, SequenceResult result)
+    {
+        result.hasBounds = false;
+        if (item.go == null)
+            yield break;
+
+        float[] times = GetSampleTimes(duration, frameCount);
         float elapsed = 0f;
-        float nextSample = interval;
-        while (elapsed < window && item.go != null)
+        int index = 0;
+        while (index < times.Length && item.go != null)
         {
             elapsed += Time.deltaTime;
             // 平移预热：按距离发射的粒子（拖尾类）只有移动时才出粒子
             if (move)
-                item.go.transform.position = originPos + Vector3.right * (captureWarmupDistance * Mathf.Clamp01(elapsed / window));
+                item.go.transform.position = originPos + Vector3.right * (captureWarmupDistance * Mathf.Clamp01(elapsed / duration));
 
-            if (elapsed >= nextSample)
+            while (index < times.Length && elapsed >= times[index])
             {
-                nextSample += interval;
                 if (TryGetEffectBounds(item.go, out var bounds))
                 {
-                    FrameCaptureCamera(cam, bounds.center, bounds.extents.magnitude, item.scale);
-                    RenderToTexture(cam, rt, tex);
-                    var sample = new ShotSample();
-                    sample.content = MeasureFrame(tex, background, out sample.contrast);
-                    sample.radius = bounds.extents.magnitude;
-                    sample.png = tex.EncodeToPNG();
-                    samples.Add(sample);
+                    if (result.hasBounds)
+                        result.bounds.Encapsulate(bounds);
+                    else
+                    {
+                        result.bounds = bounds;
+                        result.hasBounds = true;
+                    }
                 }
+                index++;
             }
             yield return null;
         }
@@ -254,23 +312,186 @@ public class EffectTestInit : MonoBehaviour
             item.go.transform.position = originPos;
     }
 
-    // 挑选最合适的一帧：只看尺寸接近窗内最大值的帧（特效已成型），再取对比度最高的一帧。
-    // 否则喷火/喷烟这类特效刚出膛时只有一个小点，相机会贴上去放大，反而成为“最清晰”的一帧，与 Unity 里看到的一整串完全不同。
-    private static ShotSample PickBest(List<ShotSample> samples)
+    // 逐帧录制：整段动画共用同一取景，避免逐帧按各自包围盒取景导致画面忽大忽小
+    private IEnumerator CaptureSequence(Camera cam, RenderTexture rt, Texture2D tex, EffectItem item, Vector3 originPos, bool move, float duration, int frameCount, Vector3 center, float radius, Color background, SequenceResult result)
     {
-        const float sizeTolerance = 0.85f;
-        float maxRadius = 0f;
-        foreach (var s in samples)
-            maxRadius = Mathf.Max(maxRadius, s.radius);
-        ShotSample best = null;
-        foreach (var s in samples)
+        cam.backgroundColor = background;
+        result.frames.Clear();
+        if (item.go == null)
+            yield break;
+
+        FrameCaptureCamera(cam, center, radius, item.scale);
+
+        float[] times = GetSampleTimes(duration, frameCount);
+        float elapsed = 0f;
+        int index = 0;
+        while (index < times.Length && item.go != null)
         {
-            if (s.radius < maxRadius * sizeTolerance)
-                continue;
-            if (best == null || s.contrast > best.contrast)
-                best = s;
+            elapsed += Time.deltaTime;
+            if (move)
+                item.go.transform.position = originPos + Vector3.right * (captureWarmupDistance * Mathf.Clamp01(elapsed / duration));
+
+            while (index < times.Length && elapsed >= times[index])
+            {
+                RenderToTexture(cam, rt, tex);
+                var frame = new ShotFrame();
+                frame.content = MeasureFrame(tex, background);
+                frame.png = tex.EncodeToPNG();
+                result.frames.Add(frame);
+                index++;
+            }
+            yield return null;
         }
-        return best;
+        if (move && item.go != null)
+            item.go.transform.position = originPos;
+    }
+
+    // 整段动画的内容量取各帧最大值（任意一帧有内容就不算拍空）
+    private static int GetMaxContent(List<ShotFrame> frames)
+    {
+        int max = 0;
+        foreach (var frame in frames)
+            max = Mathf.Max(max, frame.content);
+        return max;
+    }
+
+    // 写出帧动画：特效名_00.png、特效名_01.png…；返回实际写出的文件路径
+    private static List<string> WriteFrames(string dir, string shotName, List<ShotFrame> frames)
+    {
+        string baseName = SanitizeFileName(shotName);
+        var written = new List<string>();
+        if (frames.Count == 0)
+            return written;
+
+        // 清理该特效上次遗留的帧文件（帧数变少时避免旧帧残留），只删“基名_纯数字.png”
+        foreach (string existing in Directory.GetFiles(dir, baseName + "_*.png"))
+        {
+            string name = Path.GetFileNameWithoutExtension(existing);
+            if (name.Length <= baseName.Length + 1)
+                continue;
+            string suffix = name.Substring(baseName.Length + 1);
+            bool allDigits = suffix.Length >= 2;
+            for (int i = 0; i < suffix.Length && allDigits; i++)
+                allDigits = suffix[i] >= '0' && suffix[i] <= '9';
+            if (!allDigits)
+                continue;
+            try
+            {
+                File.Delete(existing);
+            }
+            catch (System.Exception e)
+            {
+                GameLog.Warn("EffectTestInit 删除旧帧失败: " + existing + " (" + e.Message + ")");
+            }
+        }
+
+        for (int i = 0; i < frames.Count; i++)
+        {
+            if (frames[i].png == null)
+                continue;
+            string path = Path.Combine(dir, baseName + "_" + i.ToString("00") + ".png");
+            try
+            {
+                File.WriteAllBytes(path, frames[i].png);
+                written.Add(path);
+            }
+            catch (System.Exception e)
+            {
+                GameLog.Error("EffectTestInit 截图保存失败: " + path + " (" + e.Message + ")");
+            }
+        }
+        return written;
+    }
+
+    // 源 prefab 的 Assets 相对路径
+    private static string GetPrefabAssetPath(EffectItem item)
+    {
+        return "Assets/Resources/" + item.path + ".prefab";
+    }
+
+    // 源 prefab 的最后修改时间（UTC ticks）；取不到时为 0，表示不跳过
+    private static long GetPrefabTimeUtcTicks(EffectItem item)
+    {
+        string assetPath = Path.Combine(Application.dataPath, "Resources", item.path + ".prefab");
+        return File.Exists(assetPath) ? File.GetLastWriteTimeUtc(assetPath).Ticks : 0;
+    }
+
+    // 源 prefab 与上次截图都没变、缩放/染色也一致时，可以跳过重录
+    private static bool CanSkipItem(RecordMetaItem entry, EffectItem item, string dir, int frameCount)
+    {
+        if (entry == null || string.IsNullOrEmpty(entry.shotName))
+            return false;
+        if (!string.Equals(entry.sourcePath ?? "", GetPrefabAssetPath(item), System.StringComparison.OrdinalIgnoreCase))
+            return false;
+        if (Mathf.Abs(entry.scale - item.scale) > 0.0001f)
+            return false;
+        if (!string.Equals(entry.tint ?? "", item.tint ?? "", System.StringComparison.Ordinal))
+            return false;
+
+        long sourceTime = GetPrefabTimeUtcTicks(item);
+        if (sourceTime == 0 || sourceTime != entry.sourceTime)
+            return false;
+
+        if (entry.files == null || entry.files.Count != frameCount)
+            return false;
+        foreach (var file in entry.files)
+        {
+            if (file == null || string.IsNullOrEmpty(file.name))
+                return false;
+            string path = Path.Combine(dir, file.name);
+            if (!File.Exists(path))
+                return false;
+            if (File.GetLastWriteTimeUtc(path).Ticks != file.time)
+                return false;
+        }
+        return true;
+    }
+
+    // 用刚写出的截图文件生成一条录制元数据（含每个文件的最后修改时间）
+    private static RecordMetaItem BuildMetaItem(EffectItem item, List<string> writtenFiles)
+    {
+        var entry = new RecordMetaItem();
+        entry.shotName = item.shotName;
+        entry.sourcePath = GetPrefabAssetPath(item);
+        entry.sourceTime = GetPrefabTimeUtcTicks(item);
+        entry.scale = item.scale;
+        entry.tint = item.tint ?? "";
+        entry.files = new List<RecordMetaFile>(writtenFiles.Count);
+        foreach (string file in writtenFiles)
+        {
+            var metaFile = new RecordMetaFile();
+            metaFile.name = Path.GetFileName(file);
+            metaFile.time = File.GetLastWriteTimeUtc(file).Ticks;
+            entry.files.Add(metaFile);
+        }
+        return entry;
+    }
+
+    private static RecordMeta LoadRecordMeta(string path)
+    {
+        if (!File.Exists(path))
+            return null;
+        try
+        {
+            return JsonUtility.FromJson<RecordMeta>(File.ReadAllText(path));
+        }
+        catch (System.Exception e)
+        {
+            GameLog.Warn("EffectTestInit 解析录制元数据失败，本次全部重录: " + path + " (" + e.Message + ")");
+            return null;
+        }
+    }
+
+    private static void SaveRecordMeta(string path, RecordMeta meta)
+    {
+        try
+        {
+            File.WriteAllText(path, JsonUtility.ToJson(meta, true));
+        }
+        catch (System.Exception e)
+        {
+            GameLog.Error("EffectTestInit 保存录制元数据失败: " + path + " (" + e.Message + ")");
+        }
     }
 
     // 用截图相机渲染一帧到 RenderTexture，并读回 Texture2D
@@ -285,21 +506,17 @@ public class EffectTestInit : MonoBehaviour
         cam.targetTexture = null;
     }
 
-    // 统计与背景色差异明显的像素数（返回值），并累加整体对比度（contrast）
-    // content 用于判断这一帧是否拍到了内容；contrast 用于挑帧以及比较不同背景下哪种更清晰
-    private static int MeasureFrame(Texture2D tex, Color bg, out long contrast)
+    // 统计与背景色差异明显的像素数（内容量），用于判断这一帧是否拍到了内容
+    private static int MeasureFrame(Texture2D tex, Color bg)
     {
         int bgR = Mathf.RoundToInt(bg.r * 255f);
         int bgG = Mathf.RoundToInt(bg.g * 255f);
         int bgB = Mathf.RoundToInt(bg.b * 255f);
         const int visibleThreshold = 24;
-        // 逐通道差异低于该值视为背景噪声，不计入对比度，避免整幅淡雾被噪声淹没
-        const int noiseFloor = 6;
         var pixels = tex.GetPixels32();
         int w = tex.width;
         int h = tex.height;
         int count = 0;
-        long sum = 0;
         // 隔像素采样即可，无需全图统计
         for (int y = 0; y < h; y += 2)
         {
@@ -308,17 +525,15 @@ public class EffectTestInit : MonoBehaviour
             {
                 var c = pixels[row + x];
                 int d = Mathf.Max(Mathf.Abs(c.r - bgR), Mathf.Max(Mathf.Abs(c.g - bgG), Mathf.Abs(c.b - bgB)));
-                if (d > noiseFloor)
-                    sum += d - noiseFloor;
                 if (d > visibleThreshold)
                     count++;
             }
         }
-        contrast = sum;
         return count;
     }
 
-    // 逐个特效截图：把目标临时切到独立层，用只认该层的截图相机渲染到 RenderTexture，存为 特效名.png
+    // 逐个特效录制：把目标临时切到独立层，用只认该层的截图相机渲染到 RenderTexture，
+    // 在特效总时长内均匀采样录制帧动画，存为 特效名_00.png、特效名_01.png…
     private IEnumerator CaptureAllEffects()
     {
         yield return new WaitForSeconds(captureStartDelay);
@@ -341,6 +556,7 @@ public class EffectTestInit : MonoBehaviour
         int layer = Mathf.Clamp(captureLayer, 0, 31);
         int width = Mathf.Max(16, captureWidth);
         int height = Mathf.Max(16, captureHeight);
+        int frameCount = Mathf.Max(2, captureFrameCount);
         var camGo = new GameObject("EffectCaptureCamera");
         var cam = camGo.AddComponent<Camera>();
         cam.enabled = false;                       // 只手动 Render，不参与屏幕渲染
@@ -357,12 +573,45 @@ public class EffectTestInit : MonoBehaviour
         var tex = new Texture2D(width, height, TextureFormat.RGB24, false);
         var originalLayers = new List<KeyValuePair<GameObject, int>>();
 
+        // 读取上次录制元数据：源 prefab 与截图文件都没变、且录制参数一致时跳过
+        string metaPath = Path.Combine(dir, RecordMetaFileName);
+        var newMeta = new RecordMeta();
+        newMeta.version = RecordMetaVersion;
+        newMeta.frameCount = frameCount;
+        newMeta.width = width;
+        newMeta.height = height;
+        newMeta.items = new List<RecordMetaItem>();
+        var oldEntries = new Dictionary<string, RecordMetaItem>(System.StringComparer.OrdinalIgnoreCase);
+        var oldMeta = LoadRecordMeta(metaPath);
+        bool metaCompatible = oldMeta != null && oldMeta.version == RecordMetaVersion
+            && oldMeta.frameCount == frameCount && oldMeta.width == width && oldMeta.height == height;
+        if (metaCompatible && oldMeta.items != null)
+        {
+            foreach (var entry in oldMeta.items)
+            {
+                if (entry != null && !string.IsNullOrEmpty(entry.shotName))
+                    oldEntries[entry.shotName] = entry;
+            }
+        }
+
         capturing = true;
         int done = 0;
+        int skipped = 0;
+        int totalFrames = 0;
         foreach (var item in createdItems)
         {
             if (item.go == null)
                 continue;
+
+            // 未变更的特效直接跳过，避免重复录制
+            RecordMetaItem oldEntry;
+            oldEntries.TryGetValue(item.shotName, out oldEntry);
+            if (CanSkipItem(oldEntry, item, dir, frameCount))
+            {
+                newMeta.items.Add(oldEntry);
+                skipped++;
+                continue;
+            }
 
             // 记录并临时切换层级，让背景/地面/其他特效不出现在截图里
             originalLayers.Clear();
@@ -372,60 +621,74 @@ public class EffectTestInit : MonoBehaviour
                 t.gameObject.layer = layer;
             }
 
-            // 重启粒子系统，保证截到的是特效的起始爆发阶段；
-            // 否则可能正好落在爆发间隙或淡出末尾，拍出全黑图
             Vector3 originalPos = item.go.transform.position;
+            float duration = GetCaptureDuration(item.go);
+            var result = new SequenceResult();
+
+            // 阶段1：重启粒子后静止探测取景，覆盖特效完整的发展过程
             RestartParticles(item.go);
+            yield return ProbeSequence(item, originalPos, false, duration, frameCount, result);
 
-            // 阶段1：静止采样，覆盖特效完整的发展过程
-            var samples = new List<ShotSample>();
-            yield return SampleEffect(cam, rt, tex, item, originalPos, false, captureBackground, samples);
-
-            // 阶段2：拖尾类特效（按距离发射）静止时不出粒子，平移预热后再采样
-            if (samples.Count == 0)
-                yield return SampleEffect(cam, rt, tex, item, originalPos, true, captureBackground, samples);
-
-            ShotSample best = PickBest(samples);
-
-            // 暗背景上看不清（暗色半透明烟雾类），换亮背景补拍，取更清晰的一张（按对比度比较）
-            if (best == null || best.content < AltBackgroundContentPixels)
+            // 阶段2：拖尾类特效（按距离发射）静止时不出粒子，平移预热后再探测
+            bool move = !result.hasBounds;
+            if (move)
             {
-                var altSamples = new List<ShotSample>();
-                yield return SampleEffect(cam, rt, tex, item, originalPos, false, captureAltBackground, altSamples);
-                if (altSamples.Count == 0)
-                    yield return SampleEffect(cam, rt, tex, item, originalPos, true, captureAltBackground, altSamples);
-                var altBest = PickBest(altSamples);
-                if (altBest != null && (best == null || altBest.contrast > best.contrast))
-                    best = altBest;
+                RestartParticles(item.go);
+                yield return ProbeSequence(item, originalPos, true, duration, frameCount, result);
+            }
+
+            // 没有可用包围盒时按配置缩放给个固定取景兜底
+            Bounds framing = result.hasBounds
+                ? result.bounds
+                : new Bounds(originalPos, Vector3.one * (Mathf.Max(1f, item.scale) * 2f));
+
+            // 暗背景整段录制（统一取景，避免逐帧缩放跳动）
+            RestartParticles(item.go);
+            yield return CaptureSequence(cam, rt, tex, item, originalPos, move, duration, frameCount,
+                framing.center, framing.extents.magnitude, captureBackground, result);
+
+            // 暗背景上看不清（暗色半透明烟雾类），换亮背景整段重录
+            if (GetMaxContent(result.frames) < AltBackgroundContentPixels)
+            {
+                RestartParticles(item.go);
+                yield return CaptureSequence(cam, rt, tex, item, originalPos, move, duration, frameCount,
+                    framing.center, framing.extents.magnitude, captureAltBackground, result);
             }
 
             if (item.go != null)
                 item.go.transform.position = originalPos;
 
-            string path = Path.Combine(dir, SanitizeFileName(item.shotName) + ".png");
-            byte[] png = best != null ? best.png : null;
-            if (png == null)
+            List<string> written = WriteFrames(dir, item.shotName, result.frames);
+            if (written.Count == 0)
             {
                 // 兜底：仍然没有任何可渲染内容，按配置缩放给个固定取景拍一张，便于排查
                 GameLog.Warn("EffectTestInit 未取到渲染包围盒，使用默认取景: " + item.shotName);
                 cam.backgroundColor = captureBackground;
-                FrameCaptureCamera(cam, originalPos, item.scale * 2f, item.scale);
+                FrameCaptureCamera(cam, originalPos, Mathf.Max(1f, item.scale) * 2f, item.scale);
                 RenderToTexture(cam, rt, tex);
-                png = tex.EncodeToPNG();
+                string path = Path.Combine(dir, SanitizeFileName(item.shotName) + "_00.png");
+                try
+                {
+                    File.WriteAllBytes(path, tex.EncodeToPNG());
+                    written.Add(path);
+                }
+                catch (System.Exception e)
+                {
+                    GameLog.Error("EffectTestInit 截图保存失败: " + path + " (" + e.Message + ")");
+                }
             }
-            else if (best.content == 0)
+            else if (GetMaxContent(result.frames) == 0)
             {
                 GameLog.Warn("EffectTestInit 截图内容为空（全背景色）: " + item.shotName);
             }
 
-            try
+            if (written.Count > 0)
             {
-                File.WriteAllBytes(path, png);
                 done++;
-            }
-            catch (System.Exception e)
-            {
-                GameLog.Error("EffectTestInit 截图保存失败: " + path + " (" + e.Message + ")");
+                totalFrames += written.Count;
+                // 记录本次录制的源 prefab 与截图修改时间，并立即落盘（中断也能保住已完成的部分）
+                newMeta.items.Add(BuildMetaItem(item, written));
+                SaveRecordMeta(metaPath, newMeta);
             }
 
             // 还原层级
@@ -442,7 +705,8 @@ public class EffectTestInit : MonoBehaviour
         Object.Destroy(rt);
         Object.Destroy(tex);
         Object.Destroy(camGo);
-        GameLog.Info("EffectTestInit 特效截图完成，共 " + done + " 张，目录: " + dir);
+        SaveRecordMeta(metaPath, newMeta);
+        GameLog.Info("EffectTestInit 特效帧动画录制完成，共 " + done + " 个特效、" + totalFrames + " 帧，跳过 " + skipped + " 个未变更，目录: " + dir);
     }
 
     // 汇总特效实例下所有可见 Renderer 的世界包围盒
@@ -468,7 +732,7 @@ public class EffectTestInit : MonoBehaviour
         return has;
     }
 
-    // 让透视相机从固定方向框住目标球；radius 上限参考配置缩放，避免个别超大的包围盒把特效拍得极小
+    // 让透视相机从固定方向框住目标球；radius 上限参考配置缩放，避免个别超大的包围盒把特效拍得极小（与单帧截图取景一致）
     private void FrameCaptureCamera(Camera cam, Vector3 center, float boundsRadius, float scaleRef)
     {
         float maxRadius = Mathf.Max(1.5f, scaleRef * 2.5f);

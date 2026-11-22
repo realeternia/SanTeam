@@ -42,6 +42,8 @@ namespace DesignCoder
         private const int TabArea = 3;
         private const int TabAura = 4;
         private const int TabBuff = 5;
+        // 帧动画播放间隔（毫秒）：10 帧约 1 秒一轮，循环播放
+        private const int FrameInterval = 100;
         private static readonly string[] TabTitles = { "导弹", "自身", "目标型", "范围型", "光环", "Buff" };
         // 各页签主色（与 EffectConfig.Area 的枚举配色一致）
         private static readonly Color[] TabColors =
@@ -71,6 +73,8 @@ namespace DesignCoder
         private readonly FlowLayoutPanel[] tabPanels = new FlowLayoutPanel[TabTitles.Length];
         private readonly Label tipLabel;
         private readonly List<EffectItemControl> itemControls = new List<EffectItemControl>();
+        // 帧动画定时器：统一驱动所有缩略图切帧，循环播放
+        private readonly Timer frameTimer = new Timer();
         private EffectItemControl selected;
         // 打开时默认选中的缩略图（等窗体显示后再切页签并滚动到可视区域）
         private EffectItemControl pendingDefault;
@@ -162,6 +166,18 @@ namespace DesignCoder
             KeyDown += EffectPickerForm_KeyDown;
 
             LoadItems();
+
+            // 缩略图建好后启动帧动画循环
+            frameTimer.Interval = FrameInterval;
+            frameTimer.Tick += FrameTimer_Tick;
+            frameTimer.Start();
+        }
+
+        // 定时切帧并重绘（单帧截图不重绘）
+        private void FrameTimer_Tick(object sender, EventArgs e)
+        {
+            foreach (var ctl in itemControls)
+                ctl.AdvanceFrame();
         }
 
         // 页签自绘：按 Area 主色区分，选中页签更亮并带底部亮条
@@ -235,11 +251,40 @@ namespace DesignCoder
             string[] files = Directory.GetFiles(screenshotDir, "*.png");
             Array.Sort(files, StringComparer.OrdinalIgnoreCase);
 
+            // 帧动画文件名为 特效名_00.png、特效名_01.png…，按基名分组；有帧文件的优先用帧，忽略旧的同名单张截图
+            var frameFiles = new Dictionary<string, List<KeyValuePair<int, string>>>(StringComparer.OrdinalIgnoreCase);
+            var singleFiles = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
             foreach (string file in files)
             {
                 string fileBase = Path.GetFileNameWithoutExtension(file);
-                bool isMissile = fileBase.EndsWith("_Missile", StringComparison.OrdinalIgnoreCase);
-                string effectName = isMissile ? fileBase.Substring(0, fileBase.Length - "_Missile".Length) : fileBase;
+                int frameIndex;
+                string baseName = SplitFrameFile(fileBase, out frameIndex);
+                if (frameIndex < 0)
+                {
+                    singleFiles[baseName] = file;
+                    continue;
+                }
+                List<KeyValuePair<int, string>> list;
+                if (!frameFiles.TryGetValue(baseName, out list))
+                {
+                    list = new List<KeyValuePair<int, string>>();
+                    frameFiles[baseName] = list;
+                }
+                list.Add(new KeyValuePair<int, string>(frameIndex, file));
+            }
+
+            var baseNames = new List<string>(frameFiles.Keys);
+            foreach (string name in singleFiles.Keys)
+            {
+                if (!frameFiles.ContainsKey(name))
+                    baseNames.Add(name);
+            }
+            baseNames.Sort(StringComparer.OrdinalIgnoreCase);
+
+            foreach (string baseName in baseNames)
+            {
+                bool isMissile = baseName.EndsWith("_Missile", StringComparison.OrdinalIgnoreCase);
+                string effectName = isMissile ? baseName.Substring(0, baseName.Length - "_Missile".Length) : baseName;
 
                 Dictionary<string, string> cfg;
                 effects.TryGetValue(effectName, out cfg);
@@ -251,18 +296,18 @@ namespace DesignCoder
                     area = InferAreaFromSeries(effects, effectName);
                 string resPath = isMissile ? GetConfigValue(cfg, "MissilePath") : GetConfigValue(cfg, "EffPath");
                 if (string.IsNullOrEmpty(resPath))
-                    resPath = fileBase;
+                    resPath = baseName;
 
                 var item = new EffectItem();
                 item.Value = cfg != null ? GetConfigValue(cfg, "Name") : effectName;
-                item.DisplayName = fileBase;
+                item.DisplayName = baseName;
                 item.PathName = resPath;
                 item.Area = area;
                 item.BorderColor = GetBorderColor(type);
                 item.TabIndex = isMissile ? TabMissile : GetAreaTab(area);
                 item.Usage = GetUsageCount(isMissile, area, item.Value);
                 item.ExtraUsage = GetCount(usageStats != null ? usageStats.ExtraCounts : null, item.Value);
-                item.Thumb = LoadThumbnail(file);
+                item.Frames = LoadFrames(GetFramePaths(baseName, frameFiles, singleFiles));
 
                 var ctl = new EffectItemControl(item);
                 ctl.Click += ItemControl_Click;
@@ -281,10 +326,59 @@ namespace DesignCoder
                 return;
             }
 
-            tipLabel.Text = string.Format("共 {0} 张（红框=负面，绿框=正面，灰框=伤害；“用N”=导弹取技能HitEffect、Buff取Buff表、其余取技能特效；黄标=职业/小兵HitEffect）　　当前值：{1}",
+            tipLabel.Text = string.Format("共 {0} 个特效（循环播放帧动画；红框=负面，绿框=正面，灰框=伤害；“用N”=导弹取技能HitEffect、Buff取Buff表、其余取技能特效；黄标=职业/小兵HitEffect）　　当前值：{1}",
                 itemControls.Count, string.IsNullOrEmpty(currentValue) ? "（空）" : currentValue);
 
             SelectDefault();
+        }
+
+        // 拆帧动画文件名：特效名_00.png → (特效名, 0)；不是帧文件时返回原文件名、序号 -1
+        private static string SplitFrameFile(string fileBase, out int frameIndex)
+        {
+            frameIndex = -1;
+            int underscore = fileBase.LastIndexOf('_');
+            // 至少两位纯数字才当作帧序号（帧文件名固定 特效名_00.png 格式）
+            if (underscore <= 0 || fileBase.Length - underscore - 1 < 2)
+                return fileBase;
+
+            string suffix = fileBase.Substring(underscore + 1);
+            for (int i = 0; i < suffix.Length; i++)
+            {
+                if (suffix[i] < '0' || suffix[i] > '9')
+                    return fileBase;
+            }
+            frameIndex = int.Parse(suffix);
+            return fileBase.Substring(0, underscore);
+        }
+
+        // 取一个特效的全部帧文件：有帧文件按序号排；否则退回旧的单张截图
+        private static List<string> GetFramePaths(string baseName,
+            Dictionary<string, List<KeyValuePair<int, string>>> frameFiles,
+            Dictionary<string, string> singleFiles)
+        {
+            List<KeyValuePair<int, string>> numbered;
+            if (frameFiles.TryGetValue(baseName, out numbered) && numbered.Count > 0)
+            {
+                numbered.Sort((a, b) => a.Key.CompareTo(b.Key));
+                var paths = new List<string>(numbered.Count);
+                foreach (var pair in numbered)
+                    paths.Add(pair.Value);
+                return paths;
+            }
+
+            string single;
+            if (singleFiles.TryGetValue(baseName, out single))
+                return new List<string> { single };
+            return new List<string>();
+        }
+
+        // 把帧文件缩放成缩略图，供定时器循环播放
+        private static List<Bitmap> LoadFrames(List<string> files)
+        {
+            var frames = new List<Bitmap>(files.Count);
+            foreach (string file in files)
+                frames.Add(LoadThumbnail(file));
+            return frames;
         }
 
         private int GetUsageCount(bool isMissile, string area, string effectName)
@@ -462,10 +556,14 @@ namespace DesignCoder
         {
             if (disposing)
             {
+                frameTimer.Stop();
+                frameTimer.Dispose();
                 foreach (var ctl in itemControls)
                 {
-                    if (ctl.Item != null && ctl.Item.Thumb != null)
-                        ctl.Item.Thumb.Dispose();
+                    if (ctl.Item == null || ctl.Item.Frames == null)
+                        continue;
+                    foreach (var frame in ctl.Item.Frames)
+                        frame.Dispose();
                 }
             }
             base.Dispose(disposing);
@@ -474,11 +572,12 @@ namespace DesignCoder
         private class EffectItem
         {
             public string Value;        // 写回配置的值（EffectConfig.Name）
-            public string DisplayName;  // 截图文件名
+            public string DisplayName;  // 截图文件名（帧动画为去掉 _00 序号后的基名）
             public string PathName;     // 左上显示的资源路径
             public string Area;         // 右下显示的 Area
             public Color BorderColor;
-            public Bitmap Thumb;
+            public List<Bitmap> Frames; // 帧动画（单张截图只有 1 帧）
+            public int FrameIndex;      // 当前播放到的帧
             public int TabIndex;        // 所属页签（导弹/目标型/范围型）
             public int Usage = 0;       // 主引用计数（导弹/Buff/技能按类型取不同表）
             public int ExtraUsage = 0;  // JobConfig/SoldierConfig 额外命中数（黄色标签）
@@ -512,14 +611,32 @@ namespace DesignCoder
                 base.Dispose(disposing);
             }
 
+            // 当前帧（单张截图恒为第 0 帧）
+            private Bitmap GetCurrentFrame()
+            {
+                if (Item.Frames == null || Item.Frames.Count == 0)
+                    return null;
+                return Item.Frames[Item.FrameIndex % Item.Frames.Count];
+            }
+
+            // 定时器驱动切到下一帧并重绘；单帧截图无需重绘
+            public void AdvanceFrame()
+            {
+                if (Item.Frames == null || Item.Frames.Count <= 1)
+                    return;
+                Item.FrameIndex = (Item.FrameIndex + 1) % Item.Frames.Count;
+                Invalidate();
+            }
+
             protected override void OnPaint(PaintEventArgs e)
             {
                 Graphics g = e.Graphics;
                 g.Clear(IsSelected ? Color.FromArgb(60, 60, 68) : ItemBg);
 
                 var imgRect = new Rectangle(ItemPad + 3, ItemPad, ThumbSize, ThumbSize);
-                if (Item.Thumb != null)
-                    g.DrawImage(Item.Thumb, imgRect);
+                Bitmap frame = GetCurrentFrame();
+                if (frame != null)
+                    g.DrawImage(frame, imgRect);
 
                 using (var pen = new Pen(Item.BorderColor, 3f))
                 {

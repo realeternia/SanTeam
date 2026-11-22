@@ -1217,7 +1217,7 @@ public class WorldManager : MonoBehaviour
         missile.MoveToTarget(targetChess, sourceChess.missileSpeed, sourceChess.missileHight);
     }
 
-    public void CreateSpellMissile(Chess sourceChess, Chess targetChess, Vector3 startPos, int skillId, int damage, string effectName, float speed = 0f)
+    public void CreateSpellMissile(Chess sourceChess, Chess targetChess, Vector3 startPos, int skillId, int damage, string effectName, float speed = 0f, System.Action<Chess> perTargetOnHit = null)
     {
         // 首先加载导弹预制体
         Missile missilePrefab = Resources.Load<Missile>("Prefabs/MissileCom");
@@ -1226,6 +1226,8 @@ public class WorldManager : MonoBehaviour
         var missile = Instantiate<Missile>(missilePrefab, startPos, Quaternion.identity, Units.transform);
         missile.Init(sourceChess, 1, effectName);
         missile.SetSkillInfo(skillId, damage);
+        // 命中回调（如导弹型技能的推离/Buff 延后结算），未配置时命中只结算伤害与特效
+        missile.perTargetOnHit = perTargetOnHit;
         // 技能配置了飞弹速度则优先使用，否则沿用单位导弹速度（不低于14）
         missile.MoveToTarget(targetChess, speed > 0f ? speed : Mathf.Max(sourceChess.missileSpeed, 14), sourceChess.missileHight);
     }    
