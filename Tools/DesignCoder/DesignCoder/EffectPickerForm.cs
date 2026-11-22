@@ -43,6 +43,16 @@ namespace DesignCoder
         private const int TabAura = 4;
         private const int TabBuff = 5;
         private static readonly string[] TabTitles = { "导弹", "自身", "目标型", "范围型", "光环", "Buff" };
+        // 各页签主色（与 EffectConfig.Area 的枚举配色一致）
+        private static readonly Color[] TabColors =
+        {
+            Color.FromArgb(85, 91, 96),    // 导弹：灰
+            Color.FromArgb(47, 125, 78),   // 自身：绿
+            Color.FromArgb(53, 95, 143),   // 目标：蓝
+            Color.FromArgb(160, 100, 40),  // 范围：橙
+            Color.FromArgb(76, 156, 149),  // 光环：青
+            Color.FromArgb(107, 74, 143),  // Buff：紫
+        };
 
         private static readonly Color PanelBg = Color.FromArgb(37, 37, 38);
         private static readonly Color ItemBg = Color.FromArgb(45, 45, 48);
@@ -121,16 +131,22 @@ namespace DesignCoder
             tabControl = new TabControl();
             tabControl.Dock = DockStyle.Fill;
             tabControl.Font = new Font("微软雅黑", 10F);
+            tabControl.BackColor = PanelBg;
+            tabControl.DrawMode = TabDrawMode.OwnerDrawFixed;
+            tabControl.ItemSize = new Size(112, 32);
+            tabControl.SizeMode = TabSizeMode.Fixed;
+            tabControl.DrawItem += TabControl_DrawItem;
             for (int i = 0; i < tabPages.Length; i++)
             {
                 var page = new TabPage(TabTitles[i]);
-                page.BackColor = PanelBg;
+                page.UseVisualStyleBackColor = false;
+                page.BackColor = ScaleColor(TabColors[i], 0.22f);
 
                 var flow = new FlowLayoutPanel();
                 flow.Dock = DockStyle.Fill;
                 flow.AutoScroll = true;
                 flow.WrapContents = true;
-                flow.BackColor = PanelBg;
+                flow.BackColor = ScaleColor(TabColors[i], 0.22f);
                 flow.Padding = new Padding(8);
                 page.Controls.Add(flow);
 
@@ -146,6 +162,46 @@ namespace DesignCoder
             KeyDown += EffectPickerForm_KeyDown;
 
             LoadItems();
+        }
+
+        // 页签自绘：按 Area 主色区分，选中页签更亮并带底部亮条
+        private void TabControl_DrawItem(object sender, DrawItemEventArgs e)
+        {
+            if (e.Index < 0 || e.Index >= tabControl.TabPages.Count) return;
+
+            bool selected = (e.State & DrawItemState.Selected) == DrawItemState.Selected;
+            Color baseColor = TabColors[e.Index % TabColors.Length];
+            Color bgColor = selected ? baseColor : ScaleColor(baseColor, 0.55f);
+
+            var rect = e.Bounds;
+            using (var brush = new SolidBrush(bgColor))
+                e.Graphics.FillRectangle(brush, rect);
+
+            if (selected)
+            {
+                using (var brush = new SolidBrush(ScaleColor(baseColor, 1.25f)))
+                    e.Graphics.FillRectangle(brush, new Rectangle(rect.X, rect.Bottom - 3, rect.Width, 3));
+            }
+
+            using (var pen = new Pen(Color.FromArgb(25, 25, 28)))
+                e.Graphics.DrawRectangle(pen, rect.X, rect.Y, rect.Width - 1, rect.Height - 1);
+
+            var textRect = new Rectangle(rect.X + 4, rect.Y, rect.Width - 8, rect.Height - (selected ? 2 : 0));
+            TextRenderer.DrawText(e.Graphics, tabControl.TabPages[e.Index].Text, tabControl.Font, textRect, Color.White,
+                TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter | TextFormatFlags.NoPrefix | TextFormatFlags.EndEllipsis);
+        }
+
+        private static Color ScaleColor(Color color, float factor)
+        {
+            return Color.FromArgb(
+                ClampColor(color.R * factor),
+                ClampColor(color.G * factor),
+                ClampColor(color.B * factor));
+        }
+
+        private static int ClampColor(float value)
+        {
+            return Math.Max(0, Math.Min(255, (int)value));
         }
 
         private void EffectPickerForm_KeyDown(object sender, KeyEventArgs e)
@@ -214,6 +270,7 @@ namespace DesignCoder
 
             for (int i = 0; i < tabPages.Length; i++)
                 tabPages[i].Text = string.Format("{0} ({1})", TabTitles[i], tabPanels[i].Controls.Count);
+            tabControl.Invalidate();
 
             if (itemControls.Count == 0)
             {
