@@ -58,8 +58,8 @@ public class EffectTestInit : MonoBehaviour
     // 录制窗口最短时长（秒）：时长很短的特效也留出足够时间采满帧数
     private const float MinCaptureDuration = 0.6f;
     // 录制元数据：记录源 prefab 与每张截图文件的最后修改时间，未变更时跳过重录
-    // 版本号变更会强制全部重录（v2：取景恢复为与单帧截图一致）
-    private const int RecordMetaVersion = 2;
+    // 版本号变更会强制全部重录（v2：取景恢复为与单帧截图一致；v3：收缩可见窗口、去全黑帧）
+    private const int RecordMetaVersion = 3;
     private const string RecordMetaFileName = "_record_meta.json";
 
     // 录制元数据根节点
@@ -253,6 +253,8 @@ public class EffectTestInit : MonoBehaviour
     {
         public bool hasBounds;
         public Bounds bounds;
+        // 探测阶段各采样时刻的内容量：用来把录制窗口收缩到特效真正可见的区间
+        public int[] sampleContent;
         public readonly List<ShotFrame> frames = new List<ShotFrame>();
     }
 
@@ -275,13 +277,64 @@ public class EffectTestInit : MonoBehaviour
         return times;
     }
 
-    // 探测取景：按总时长走一遍，合并各采样时刻的包围盒，作为整段动画的统一取景
-    private IEnumerator ProbeSequence(EffectItem item, Vector3 originPos, bool move, float duration, int frameCount, SequenceResult result)
+    // 在 [start, end] 内均匀采样（含首尾），用于录制真正可见的区间
+    private static float[] GetInclusiveSampleTimes(float start, float end, int frameCount)
+    {
+        int count = Mathf.Max(2, frameCount);
+        var times = new float[count];
+        float span = Mathf.Max(0f, end - start);
+        for (int i = 0; i < count; i++)
+            times[i] = start + span * i / (count - 1);
+        return times;
+    }
+
+    // 依据探测到的各采样时刻内容量，把录制窗口收缩到特效真正可见的区间，避免大量全黑帧
+    private static void GetActiveWindow(SequenceResult probe, float duration, int frameCount, out float start, out float end)
+    {
+        start = 0f;
+        end = duration;
+        if (probe.sampleContent == null)
+            return;
+
+        float[] times = GetSampleTimes(duration, frameCount);
+        int count = Mathf.Min(probe.sampleContent.Length, times.Length);
+        int first = -1;
+        int last = -1;
+        for (int i = 0; i < count; i++)
+        {
+            if (probe.sampleContent[i] <= 0)
+                continue;
+            if (first < 0)
+                first = i;
+            last = i;
+        }
+        if (first < 0)
+            return;
+
+        // 两端各留 1/4 采样步长，规避随机种子导致的起止抖动
+        float step = duration / frameCount;
+        start = Mathf.Clamp(times[first] - step * 0.25f, 0f, duration);
+        end = Mathf.Clamp(times[last] + step * 0.25f, 0f, duration);
+
+        // 可见区间太短时真实帧率下采不到足够不同的画面，向两侧扩到最小窗口（多出的空帧会被剔除）
+        float minSpan = Mathf.Min(duration, Mathf.Max(step * 2f, 0.3f));
+        if (end - start < minSpan)
+        {
+            float center = (start + end) * 0.5f;
+            start = Mathf.Clamp(center - minSpan * 0.5f, 0f, Mathf.Max(0f, duration - minSpan));
+            end = start + minSpan;
+        }
+    }
+
+    // 探测取景：按总时长走一遍，合并各采样时刻的包围盒作为统一取景，并记录各时刻的内容量
+    private IEnumerator ProbeSequence(Camera cam, RenderTexture rt, Texture2D tex, EffectItem item, Vector3 originPos, bool move, float duration, int frameCount, Color background, SequenceResult result)
     {
         result.hasBounds = false;
+        result.sampleContent = new int[Mathf.Max(2, frameCount)];
         if (item.go == null)
             yield break;
 
+        cam.backgroundColor = background;
         float[] times = GetSampleTimes(duration, frameCount);
         float elapsed = 0f;
         int index = 0;
@@ -304,6 +357,13 @@ public class EffectTestInit : MonoBehaviour
                         result.hasBounds = true;
                     }
                 }
+                // 用当前并集取景渲染一次，统计该时刻的内容量，供收缩录制窗口使用
+                if (result.hasBounds)
+                {
+                    FrameCaptureCamera(cam, result.bounds.center, result.bounds.extents.magnitude, item.scale);
+                    RenderToTexture(cam, rt, tex);
+                    result.sampleContent[index] = MeasureFrame(tex, background);
+                }
                 index++;
             }
             yield return null;
@@ -313,7 +373,7 @@ public class EffectTestInit : MonoBehaviour
     }
 
     // 逐帧录制：整段动画共用同一取景，避免逐帧按各自包围盒取景导致画面忽大忽小
-    private IEnumerator CaptureSequence(Camera cam, RenderTexture rt, Texture2D tex, EffectItem item, Vector3 originPos, bool move, float duration, int frameCount, Vector3 center, float radius, Color background, SequenceResult result)
+    private IEnumerator CaptureSequence(Camera cam, RenderTexture rt, Texture2D tex, EffectItem item, Vector3 originPos, bool move, float startTime, float endTime, int frameCount, Vector3 center, float radius, Color background, SequenceResult result)
     {
         cam.backgroundColor = background;
         result.frames.Clear();
@@ -322,14 +382,15 @@ public class EffectTestInit : MonoBehaviour
 
         FrameCaptureCamera(cam, center, radius, item.scale);
 
-        float[] times = GetSampleTimes(duration, frameCount);
+        float[] times = GetInclusiveSampleTimes(startTime, endTime, frameCount);
         float elapsed = 0f;
         int index = 0;
         while (index < times.Length && item.go != null)
         {
             elapsed += Time.deltaTime;
+            // 平移预热：在整个窗口内把目标从原点移动到 captureWarmupDistance
             if (move)
-                item.go.transform.position = originPos + Vector3.right * (captureWarmupDistance * Mathf.Clamp01(elapsed / duration));
+                item.go.transform.position = originPos + Vector3.right * (captureWarmupDistance * Mathf.Clamp01((elapsed - startTime) / Mathf.Max(0.01f, endTime - startTime)));
 
             while (index < times.Length && elapsed >= times[index])
             {
@@ -344,6 +405,52 @@ public class EffectTestInit : MonoBehaviour
         }
         if (move && item.go != null)
             item.go.transform.position = originPos;
+    }
+
+    // 去掉全黑帧（纯背景），避免动图里出现多张全黑
+    private static void RemoveEmptyFrames(List<ShotFrame> frames)
+    {
+        frames.RemoveAll(frame => frame.content == 0);
+    }
+
+    // 特效名_00 → 特效名；不是帧文件命名则原样返回
+    private static string StripFrameSuffix(string fileBase)
+    {
+        int underscore = fileBase.LastIndexOf('_');
+        if (underscore <= 0 || fileBase.Length - underscore - 1 < 2)
+            return fileBase;
+        string suffix = fileBase.Substring(underscore + 1);
+        for (int i = 0; i < suffix.Length; i++)
+        {
+            if (suffix[i] < '0' || suffix[i] > '9')
+                return fileBase;
+        }
+        return fileBase.Substring(0, underscore);
+    }
+
+    // 清理目录中不属于当前特效列表的历史 png（旧命名遗留的单张截图或旧帧）
+    private static int CleanStaleScreenshots(string dir, List<EffectItem> items)
+    {
+        var current = new HashSet<string>(System.StringComparer.OrdinalIgnoreCase);
+        foreach (var item in items)
+            current.Add(SanitizeFileName(item.shotName));
+
+        int removed = 0;
+        foreach (string file in Directory.GetFiles(dir, "*.png"))
+        {
+            if (current.Contains(StripFrameSuffix(Path.GetFileNameWithoutExtension(file))))
+                continue;
+            try
+            {
+                File.Delete(file);
+                removed++;
+            }
+            catch (System.Exception e)
+            {
+                GameLog.Warn("EffectTestInit 清理历史截图失败: " + file + " (" + e.Message + ")");
+            }
+        }
+        return removed;
     }
 
     // 整段动画的内容量取各帧最大值（任意一帧有内容就不算拍空）
@@ -416,8 +523,8 @@ public class EffectTestInit : MonoBehaviour
         return File.Exists(assetPath) ? File.GetLastWriteTimeUtc(assetPath).Ticks : 0;
     }
 
-    // 源 prefab 与上次截图都没变、缩放/染色也一致时，可以跳过重录
-    private static bool CanSkipItem(RecordMetaItem entry, EffectItem item, string dir, int frameCount)
+    // 源 prefab 与上次截图都没变、缩放/染色也一致、且已录到有效帧时，可以跳过重录
+    private static bool CanSkipItem(RecordMetaItem entry, EffectItem item, string dir)
     {
         if (entry == null || string.IsNullOrEmpty(entry.shotName))
             return false;
@@ -432,7 +539,8 @@ public class EffectTestInit : MonoBehaviour
         if (sourceTime == 0 || sourceTime != entry.sourceTime)
             return false;
 
-        if (entry.files == null || entry.files.Count != frameCount)
+        // 结果为空（没有帧文件）时必须重录
+        if (entry.files == null || entry.files.Count == 0)
             return false;
         foreach (var file in entry.files)
         {
@@ -606,7 +714,7 @@ public class EffectTestInit : MonoBehaviour
             // 未变更的特效直接跳过，避免重复录制
             RecordMetaItem oldEntry;
             oldEntries.TryGetValue(item.shotName, out oldEntry);
-            if (CanSkipItem(oldEntry, item, dir, frameCount))
+            if (CanSkipItem(oldEntry, item, dir))
             {
                 newMeta.items.Add(oldEntry);
                 skipped++;
@@ -625,16 +733,16 @@ public class EffectTestInit : MonoBehaviour
             float duration = GetCaptureDuration(item.go);
             var result = new SequenceResult();
 
-            // 阶段1：重启粒子后静止探测取景，覆盖特效完整的发展过程
+            // 阶段1：重启粒子后静止探测取景与可见时长，覆盖特效完整的发展过程
             RestartParticles(item.go);
-            yield return ProbeSequence(item, originalPos, false, duration, frameCount, result);
+            yield return ProbeSequence(cam, rt, tex, item, originalPos, false, duration, frameCount, captureBackground, result);
 
             // 阶段2：拖尾类特效（按距离发射）静止时不出粒子，平移预热后再探测
             bool move = !result.hasBounds;
             if (move)
             {
                 RestartParticles(item.go);
-                yield return ProbeSequence(item, originalPos, true, duration, frameCount, result);
+                yield return ProbeSequence(cam, rt, tex, item, originalPos, true, duration, frameCount, captureBackground, result);
             }
 
             // 没有可用包围盒时按配置缩放给个固定取景兜底
@@ -642,21 +750,29 @@ public class EffectTestInit : MonoBehaviour
                 ? result.bounds
                 : new Bounds(originalPos, Vector3.one * (Mathf.Max(1f, item.scale) * 2f));
 
+            // 按探测到的可见区间收缩录制窗口，避免大量全黑帧
+            float startTime;
+            float endTime;
+            GetActiveWindow(result, duration, frameCount, out startTime, out endTime);
+
             // 暗背景整段录制（统一取景，避免逐帧缩放跳动）
             RestartParticles(item.go);
-            yield return CaptureSequence(cam, rt, tex, item, originalPos, move, duration, frameCount,
+            yield return CaptureSequence(cam, rt, tex, item, originalPos, move, startTime, endTime, frameCount,
                 framing.center, framing.extents.magnitude, captureBackground, result);
 
             // 暗背景上看不清（暗色半透明烟雾类），换亮背景整段重录
             if (GetMaxContent(result.frames) < AltBackgroundContentPixels)
             {
                 RestartParticles(item.go);
-                yield return CaptureSequence(cam, rt, tex, item, originalPos, move, duration, frameCount,
+                yield return CaptureSequence(cam, rt, tex, item, originalPos, move, startTime, endTime, frameCount,
                     framing.center, framing.extents.magnitude, captureAltBackground, result);
             }
 
             if (item.go != null)
                 item.go.transform.position = originalPos;
+
+            // 去掉纯背景的全黑帧，保证动图里最多只有一帧全黑（全是空帧时由下方兜底拍一张）
+            RemoveEmptyFrames(result.frames);
 
             List<string> written = WriteFrames(dir, item.shotName, result.frames);
             if (written.Count == 0)
@@ -677,18 +793,18 @@ public class EffectTestInit : MonoBehaviour
                     GameLog.Error("EffectTestInit 截图保存失败: " + path + " (" + e.Message + ")");
                 }
             }
-            else if (GetMaxContent(result.frames) == 0)
-            {
-                GameLog.Warn("EffectTestInit 截图内容为空（全背景色）: " + item.shotName);
-            }
 
             if (written.Count > 0)
             {
                 done++;
                 totalFrames += written.Count;
-                // 记录本次录制的源 prefab 与截图修改时间，并立即落盘（中断也能保住已完成的部分）
-                newMeta.items.Add(BuildMetaItem(item, written));
-                SaveRecordMeta(metaPath, newMeta);
+                // 结果为空（走了兜底单帧）时不写元数据，下次仍会重录
+                if (result.frames.Count > 0)
+                {
+                    // 记录本次录制的源 prefab 与截图修改时间，并立即落盘（中断也能保住已完成的部分）
+                    newMeta.items.Add(BuildMetaItem(item, written));
+                    SaveRecordMeta(metaPath, newMeta);
+                }
             }
 
             // 还原层级
@@ -700,6 +816,14 @@ public class EffectTestInit : MonoBehaviour
             yield return null;
         }
         capturing = false;
+
+        // 清理已不在当前特效列表中的历史截图（旧命名遗留），避免选择面板里出现没有帧动画的条目
+        if (createdItems.Count > 0)
+        {
+            int removed = CleanStaleScreenshots(dir, createdItems);
+            if (removed > 0)
+                GameLog.Info("EffectTestInit 清理历史截图 " + removed + " 张");
+        }
 
         cam.targetTexture = null;
         Object.Destroy(rt);

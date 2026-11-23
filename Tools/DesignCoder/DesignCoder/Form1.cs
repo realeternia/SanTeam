@@ -60,6 +60,8 @@ namespace DesignCoder
         private readonly Dictionary<string, string> scriptTextCache = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         // EffectConfig.Name -> Area（特效字段 Area 校验用，EffectConfig 修改/切换时失效重建）
         private Dictionary<string, string> effectAreaMap;
+        // EffectConfig.Name -> MissilePath（弹道标记与 HitEffect 匹配校验用，EffectConfig 修改/切换时失效重建）
+        private Dictionary<string, string> effectMissileMap;
         private readonly Dictionary<string, bool> effectRefCache = new Dictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
         // 势力短名/势力名 -> 势力主色（来自 ForceConfig.Names / ForceConfig.Colorstr），懒加载缓存
         private bool forceColorsLoaded = false;
@@ -193,6 +195,7 @@ namespace DesignCoder
             {
                 currentConfigName = configName;
                 effectAreaMap = null;
+                effectMissileMap = null;
                 // 切换配置时清空列筛选（筛选条件按表独立，避免串表）
                 columnFilters.Clear();
 
@@ -558,7 +561,7 @@ namespace DesignCoder
             if (configName.EndsWith("_s")) configName = configName.Substring(0, configName.Length - 2);
             
             modifiedConfigs.Add(configName);
-            if (configName == "EffectConfig") effectAreaMap = null;
+            if (configName == "EffectConfig") { effectAreaMap = null; effectMissileMap = null; }
             UpdateListViewModifiedMarks();
         }
 
@@ -1160,6 +1163,81 @@ namespace DesignCoder
             return map;
         }
 
+        private Dictionary<string, string> GetEffectMissileMap()
+        {
+            if (effectMissileMap != null) return effectMissileMap;
+
+            var map = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            ConfigData cfg = ResolveConfigForStats("EffectConfig", EffectConfigPath);
+            if (cfg != null)
+            {
+                foreach (var row in cfg.Rows)
+                {
+                    string name, missile;
+                    if (!row.TryGetValue("Name", out name) || string.IsNullOrWhiteSpace(name)) continue;
+                    row.TryGetValue("MissilePath", out missile);
+                    map[name.Trim()] = (missile ?? "").Trim();
+                }
+            }
+            effectMissileMap = map;
+            return map;
+        }
+
+        // 技能是否带 missile 标记（SkillConfig.TargetType 逗号分隔的多项标记）
+        private bool RowHasMissileFlag(int rowIdx)
+        {
+            string targetType = GetRowCellText(rowIdx, "TargetType");
+            if (string.IsNullOrWhiteSpace(targetType)) return false;
+            foreach (string token in targetType.Split(new[] { ',', '，', ';', '；', '|', ' ' }, StringSplitOptions.RemoveEmptyEntries))
+            {
+                if (string.Equals(token.Trim(), "missile", StringComparison.OrdinalIgnoreCase)) return true;
+            }
+            return false;
+        }
+
+        // 弹道校验：技能带 missile 标记时，HitEffect 对应的 EffectConfig 必须配置 MissilePath（导弹特效类型）
+        private bool IsMissileHitEffectMismatch(int rowIdx, string fieldName, string effectName)
+        {
+            if (fieldName != "HitEffect") return false;
+            if (!RowHasMissileFlag(rowIdx)) return false;
+
+            Dictionary<string, string> missileMap = GetEffectMissileMap();
+            if (missileMap == null || missileMap.Count == 0) return false;   // EffectConfig 未加载时不误报
+
+            string name = (effectName ?? "").Trim();
+            string missilePath;
+            if (name.Length == 0) return true;                                // 弹道技能没配 HitEffect
+            if (!missileMap.TryGetValue(name, out missilePath)) return true;   // 未登记的特效也提示
+            return string.IsNullOrWhiteSpace(missilePath);
+        }
+
+        // 粉色提示的原因说明（鼠标悬停时显示）
+        private string GetEffectAreaMismatchReason(int rowIdx, string fieldName, string effectName)
+        {
+            string expected = GetExpectedEffectArea(rowIdx, fieldName);
+            if (expected == null || string.IsNullOrWhiteSpace(effectName)) return null;
+
+            string area;
+            if (!GetEffectAreaMap().TryGetValue(effectName.Trim(), out area))
+                return "特效「" + effectName + "」未在 EffectConfig 登记，字段 " + fieldName + " 期望「" + expected + "」分类";
+
+            return "特效「" + effectName + "」Area=" + (area ?? "") + "，与字段 " + fieldName + " 期望的「" + expected + "」分类不一致";
+        }
+
+        private string GetMissileHitEffectMismatchReason(int rowIdx, string effectName)
+        {
+            string name = (effectName ?? "").Trim();
+            if (name.Length == 0)
+                return "技能带 missile 标记，但 HitEffect 为空：导弹没有可用的命中特效配置";
+
+            Dictionary<string, string> missileMap = GetEffectMissileMap();
+            if (!missileMap.ContainsKey(name))
+                return "技能带 missile 标记，但特效「" + name + "」未在 EffectConfig 登记";
+
+            return "技能带 missile 标记（TargetType 含 missile），但特效「" + name + "」的 MissilePath 为空："
+                + "导弹飞行物会回退成该命中特效本体。请给 EffectConfig 配置导弹特效，或去掉技能的 missile 标记";
+        }
+
         // 特效字段格子：左侧显示特效名字符串，右侧画“选”按钮，点击后打开截图选择面板
         // 脚本引用了该特效字段时（SkillConfig.ScriptName 对应脚本里出现字段名）整格背景标绿
         private void PaintEffectFieldCell(DataGridViewCellPaintingEventArgs e)
@@ -1172,6 +1250,8 @@ namespace DesignCoder
             string text = e.Value != null ? e.Value.ToString() : "";
             // Area 与字段/技能类型不匹配 → 淡红色背景提示
             bool areaMismatch = IsEffectAreaMismatch(e.RowIndex, fieldName, text);
+            // 技能带 missile 标记但 HitEffect 不是导弹特效类型 → 粉红色背景提示
+            bool missileMismatch = IsMissileHitEffectMismatch(e.RowIndex, fieldName, text);
             // 配置了特效、且 ScriptName 对应脚本里引用了该特效字段 → 标绿（空值不标，避免满屏绿）
             bool referenced = text.Trim().Length > 0 && !string.IsNullOrEmpty(fieldName)
                 && IsEffectReferencedByScript(e.RowIndex, fieldName);
@@ -1179,7 +1259,13 @@ namespace DesignCoder
             bool isHighlighted = (e.RowIndex == selectedRowIndex) || (e.ColumnIndex == selectedColumnIndex);
             Color bgColor;
             Color fgColor;
-            if (areaMismatch)
+            if (missileMismatch)
+            {
+                // 粉红色：弹道技能的 HitEffect 未配置导弹路径（悬停可看原因）
+                bgColor = Color.FromArgb(255, 155, 205);
+                fgColor = Color.FromArgb(85, 20, 60);
+            }
+            else if (areaMismatch)
             {
                 // 淡红色：提示特效分类与字段期望不一致
                 bgColor = Color.FromArgb(255, 190, 190);
@@ -1206,7 +1292,7 @@ namespace DesignCoder
             {
                 e.Graphics.FillRectangle(bgBrush, e.CellBounds);
             }
-            if (!areaMismatch && !referenced && !isHighlighted && (e.State & DataGridViewElementStates.Selected) == DataGridViewElementStates.Selected)
+            if (!missileMismatch && !areaMismatch && !referenced && !isHighlighted && (e.State & DataGridViewElementStates.Selected) == DataGridViewElementStates.Selected)
             {
                 using (Brush selBrush = new SolidBrush(e.CellStyle.SelectionBackColor))
                 {
@@ -2199,7 +2285,30 @@ namespace DesignCoder
             {
                 SyncDataTableToConfig();
                 MarkCurrentConfigModified();
+                // 同一行内存在联动校验（如 TargetType 的 missile 标记影响 HitEffect 提示），整行重绘
+                dataGridView1.InvalidateRow(e.RowIndex);
             }
+        }
+
+        // 粉色/淡红色警告格子的悬停原因说明
+        private void dataGridView1_CellToolTipTextNeeded(object sender, DataGridViewCellToolTipTextNeededEventArgs e)
+        {
+            if (isLoading || e.RowIndex < HeaderRowCount || e.ColumnIndex < 0) return;
+            if (currentConfig == null) return;
+
+            int fieldIdx = GetFieldIndexFromColumnIndex(e.ColumnIndex);
+            if (fieldIdx < 0 || fieldIdx >= currentConfig.Fields.Count) return;
+
+            string fieldName = currentConfig.Fields[fieldIdx].Name;
+            string text = GetRowCellText(e.RowIndex, fieldName);
+            var reasons = new List<string>();
+            if (IsMissileHitEffectMismatch(e.RowIndex, fieldName, text))
+                reasons.Add(GetMissileHitEffectMismatchReason(e.RowIndex, text));
+            if (IsEffectAreaMismatch(e.RowIndex, fieldName, text))
+                reasons.Add(GetEffectAreaMismatchReason(e.RowIndex, fieldName, text));
+            reasons.RemoveAll(r => string.IsNullOrEmpty(r));
+            if (reasons.Count > 0)
+                e.ToolTipText = string.Join("\n", reasons.ToArray());
         }
 
         private void dataGridView1_ColumnWidthChanged(object sender, DataGridViewColumnEventArgs e)
