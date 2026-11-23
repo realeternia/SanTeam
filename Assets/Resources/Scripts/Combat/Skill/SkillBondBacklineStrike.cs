@@ -44,7 +44,7 @@ public class SkillBondBacklineStrike : Skill
 
         var damage = GetSkillDamage();
 
-        WorldManager.Instance.CreateSpellMissile(owner, target, owner.transform.position, id, damage, skillCfg.HitEffect);
+        WorldManager.Instance.CreateSpellMissile(owner, target, owner.transform.position, id, damage, skillCfg.HitEffect, 0f, null, effectTint);
         return true;
     }
 

@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using CommonConfig;
 using UnityEngine;
 
@@ -37,7 +37,7 @@ public class SkillAidBackstepShot : Skill
         // 第一段：对当前目标射出一箭
         var firstDamage = GetSkillDamage();
         if (firstDamage > 0)
-            WorldManager.Instance.CreateSpellMissile(owner, target, owner.transform.position, id, firstDamage, skillCfg.HitEffect);
+            WorldManager.Instance.CreateSpellMissile(owner, target, owner.transform.position, id, firstDamage, skillCfg.HitEffect, 0f, null, effectTint);
 
         owner.StartCoroutine(RetreatAndSecondShot(target, firstDamage));
         return true;
@@ -73,6 +73,6 @@ public class SkillAidBackstepShot : Skill
         // 第二段：无视射程，对后撤前的目标补射，伤害为第一段的 SecondDamageRate
         var secondDamage = (int)(firstDamage * SecondDamageRate);
         if (secondDamage > 0)
-            WorldManager.Instance.CreateSpellMissile(owner, target, owner.transform.position, id, secondDamage, skillCfg.HitEffect);
+            WorldManager.Instance.CreateSpellMissile(owner, target, owner.transform.position, id, secondDamage, skillCfg.HitEffect, 0f, null, effectTint);
     }
 }

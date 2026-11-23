@@ -39,7 +39,7 @@ public class SkillBondSneakChangePos : Skill
         if (damage > 0)
         {
             target.OnSkillDamaged(owner, skillId, damage);
-            EffectManager.PlaySkillEffect(target, skillCfg.HitEffect);
+            PlaySkillEffect(target, skillCfg.HitEffect);
             WorldManager.Instance.AddBattleText(damage + "!", target.transform.position, new Vector2(0, 60), Color.red, 3);
         }
 

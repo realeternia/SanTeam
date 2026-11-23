@@ -1,4 +1,4 @@
-using CommonConfig;
+﻿using CommonConfig;
 using UnityEngine;
 
 /// <summary>
@@ -50,7 +50,7 @@ public class SkillAidManaShare : Skill
                 given = true;
             }
             if (given && ally != owner && !string.IsNullOrEmpty(skillCfg.HitEffect))
-                EffectManager.PlaySkillEffect(ally, skillCfg.HitEffect); // 施法者自身已由 SelfEffect 表现，避免叠播
+                PlaySkillEffect(ally, skillCfg.HitEffect); // 施法者自身已由 SelfEffect 表现，避免叠播
         }
 
         GameLog.Info("仁德：" + GetHeroName(owner) + " 共享 " + (int)mpBeforeBurst + " 点法力（法强加成后 "

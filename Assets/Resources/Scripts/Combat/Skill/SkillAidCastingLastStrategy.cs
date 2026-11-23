@@ -25,7 +25,7 @@ public class SkillAidCastingLastStrategy : Skill
 
         owner.PlayerAnim(skillCfg.Action);
         PlaySelfEffect();
-        EffectManager.PlaySkillEffect(target, skillCfg.HitEffect);
+        PlaySkillEffect(target, skillCfg.HitEffect);
 
         // 引导状态：引导期内 castingSkillId>0，MoveAndFight 提前返回（无法移动/普攻），被晕眩/死亡打断
         owner.StartCasting(id, LaserChannel());
@@ -78,7 +78,7 @@ public class SkillAidCastingLastStrategy : Skill
                         e.OnSkillDamaged(owner, skillId, skillDamage);
                     // 命中特效：每次结算在受击目标处播一次技能命中特效
                     if (!string.IsNullOrEmpty(skillCfg.HitEffect))
-                        EffectManager.PlaySkillEffect(e, skillCfg.HitEffect);
+                        PlaySkillEffect(e, skillCfg.HitEffect);
                     // 命中粒子：每次结算在受击目标处播一次火花
                     beam.PlayImpact(e);
                 }

@@ -231,7 +231,7 @@ public class LaserBeamController : MonoBehaviour
         if (string.IsNullOrEmpty(impactEffect) || hitTarget == null || source == null)
             return;
 
-        EffectManager.PlayHitEffect(source, hitTarget, impactEffect);
+        EffectManager.PlayHitEffect(source, hitTarget, impactEffect, source.heroEffectColor);
     }
 
     /// <summary>

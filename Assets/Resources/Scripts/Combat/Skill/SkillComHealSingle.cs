@@ -117,7 +117,7 @@ public class SkillComHealSingle : Skill
         }
 
         if (!string.IsNullOrEmpty(skillCfg.HitEffect))
-            EffectManager.PlaySkillEffect(unit, skillCfg.HitEffect);
+            PlaySkillEffect(unit, skillCfg.HitEffect);
     }
 
     /// <summary>
@@ -140,7 +140,7 @@ public class SkillComHealSingle : Skill
             foreach (var buffId in buffIds)
                 ApplyBuffToUnit(enemy, buffId);
             if (!string.IsNullOrEmpty(skillCfg.HitEffect))
-                EffectManager.PlaySkillEffect(enemy, skillCfg.HitEffect);
+                PlaySkillEffect(enemy, skillCfg.HitEffect);
         }
     }
 

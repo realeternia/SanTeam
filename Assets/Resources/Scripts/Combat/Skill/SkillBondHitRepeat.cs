@@ -28,7 +28,7 @@ public class SkillBondHitRepeat : Skill
             {
                 var d = (int)(damage * GetStr2("hitRate"));
                 defender.OnSkillDamaged(owner, skillId, d);
-                EffectManager.PlaySkillEffect(defender, skillCfg.HitEffect);
+                PlaySkillEffect(defender, skillCfg.HitEffect);
                 WorldManager.Instance.AddBattleText(d.ToString() + "!", defender.transform.position, new UnityEngine.Vector2(0, 60), Color.red, 3);
             }
         }

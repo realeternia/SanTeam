@@ -1,4 +1,4 @@
-using CommonConfig;
+﻿using CommonConfig;
 using UnityEngine;
 
 /// <summary>
@@ -30,7 +30,7 @@ public class SkillAidManaBurn : Skill
 
         var burned = BurnMpToTarget(target, GetStr2("mpBurn"));
         if (!string.IsNullOrEmpty(skillCfg.HitEffect))
-            EffectManager.PlaySkillEffect(target, skillCfg.HitEffect);
+            PlaySkillEffect(target, skillCfg.HitEffect);
         if (burned <= 0)
             return true;
 

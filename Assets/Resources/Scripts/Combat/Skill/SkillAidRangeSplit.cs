@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 /// <summary>
 /// 司马炎·一统 / 陆抗·西陵（特有技能）：群体增益，近战单位取 BuffId 第 1 段、远程单位取第 2 段（如 "甲,攻"）。
@@ -23,7 +23,7 @@ public class SkillAidRangeSplit : SkillComBuffArea
         {
             ApplyBuffToUnit(unit, unit.attackRange < CombatConst.MeleeRange ? buffIds[0] : buffIds[1]);
             if (!string.IsNullOrEmpty(skillCfg.HitEffect))
-                EffectManager.PlaySkillEffect(unit, skillCfg.HitEffect);
+                PlaySkillEffect(unit, skillCfg.HitEffect);
         }
     }
 }

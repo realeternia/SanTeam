@@ -209,14 +209,14 @@ public class SkillComDamageSingle : Skill
         {
             if (dmg > 0)
                 WorldManager.Instance.CreateSpellMissile(owner, target, owner.transform.position, id, dmg, skillCfg.HitEffect, skillCfg.SummonSpeed,
-                    hit => ApplyMissileImpact(hit, baseDamage));
+                    hit => ApplyMissileImpact(hit, baseDamage), effectTint);
             return;
         }
 
         if (dmg > 0)
             target.OnSkillDamaged(owner, id, dmg);
         if (!string.IsNullOrEmpty(skillCfg.HitEffect))
-            EffectManager.PlaySkillEffect(target, skillCfg.HitEffect);
+            PlaySkillEffect(target, skillCfg.HitEffect);
     }
 
     /// <summary>

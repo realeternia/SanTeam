@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using CommonConfig;
@@ -95,7 +95,7 @@ public class SkillAidFireWall : Skill
                 {
                     unit.OnSkillDamaged(owner, skillId, damage);
                     if (!string.IsNullOrEmpty(skillCfg.HitEffect))
-                        EffectManager.PlaySkillEffect(unit, skillCfg.HitEffect);
+                        PlaySkillEffect(unit, skillCfg.HitEffect);
                 }
             }
 

@@ -81,7 +81,7 @@ public class SkillComDamageTaunt : SkillComBuffSingle
                     continue;
                 e.OnSkillDamaged(owner, id, damage);
                 if (!string.IsNullOrEmpty(skillCfg.HitEffect))
-                    EffectManager.PlaySkillEffect(e, skillCfg.HitEffect);
+                    PlaySkillEffect(e, skillCfg.HitEffect);
             }
         }
 

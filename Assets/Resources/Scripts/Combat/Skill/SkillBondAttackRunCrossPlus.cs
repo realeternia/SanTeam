@@ -91,7 +91,7 @@ public class SkillBondAttackRunCrossPlus : Skill
                 {
                     chess.OnSkillDamaged(owner, skillId, crossDamage);
                     if (!string.IsNullOrEmpty(skillCfg.HitEffect))
-                        EffectManager.PlaySkillEffect(chess, skillCfg.HitEffect);
+                        PlaySkillEffect(chess, skillCfg.HitEffect);
                 }
 
                 pushedList.Add(chess.id);

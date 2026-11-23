@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using CommonConfig;
 using UnityEngine;
 
@@ -33,7 +33,7 @@ public class SkillAidShadowSplit : Skill
 
         owner.PlayerAnim(skillCfg.Action);
         PlaySelfEffect();
-        EffectManager.PlaySkillEffect(target, skillCfg.SelfEffect);
+        PlaySkillEffect(target, skillCfg.SelfEffect);
         return true;
     }
 

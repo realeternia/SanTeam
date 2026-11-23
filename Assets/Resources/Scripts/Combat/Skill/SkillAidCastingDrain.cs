@@ -137,7 +137,7 @@ public class SkillAidCastingDrain : Skill
                 target.OnSkillDamaged(owner, skillId, damage);
                 // 吸取：把造成的伤害转为自身生命（吸血不算治疗，不吃治疗加成）
                 owner.HealTarget(owner, skillId, damage, false);
-                EffectManager.PlaySkillEffect(target, skillCfg.HitEffect);
+                PlaySkillEffect(target, skillCfg.HitEffect);
             }
 
             yield return new WaitForSeconds(1f);

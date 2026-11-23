@@ -10,6 +10,8 @@ public class Missile : MonoBehaviour
 {
     public Chess owner;
     public string effectName;
+    /// <summary>英雄技能专有色（alpha=0 表示不染色）：技能弹道按该色染导弹本体与命中特效</summary>
+    public Color heroTint;
     /// <summary>命中特效名：即导弹特效名（effectName），命中时经 EffectConfig 解析该条目的 EffPath 播放命中特效</summary>
     private string hitEffectName;
 
@@ -23,12 +25,13 @@ public class Missile : MonoBehaviour
     /// <summary>每目标命中回调（可空）：命中单个目标结算伤害后调用，用于给命中目标施加额外效果（如惊雷挂减速）</summary>
     public Action<Chess> perTargetOnHit;
 
-    public void Init(Chess sourceChess, float size, string effectName)
+    public void Init(Chess sourceChess, float size, string effectName, Color heroTint = default(Color))
     {
         this.effectName = effectName;
         hitEffectName = effectName;
         owner = sourceChess;
         this.size = size;
+        this.heroTint = heroTint;
     }
 
     // 通过 EffectConfig 解析导弹资源路径（相对 Resources）：配置存省略 Prefabs/ 前缀的路径，这里统一补全；
@@ -81,7 +84,7 @@ public class Missile : MonoBehaviour
         transform.position += new Vector3(0f, 2f, 0f);
         // 世界缩放统一走 EffectConfig.MissileScale，与挂点无关；父级多为非等比缩放，按 X 轴统一标量补偿，避免粒子拉伸变形；未配置时回退 size × prefab 根缩放
         var cfg = EffectConfig.GetConfigByName(effectName);
-        EffectManager.ApplyTint(missileEffect, cfg);
+        EffectManager.ApplyTint(missileEffect, cfg, heroTint);
         float scale = cfg != null && cfg.MissileScale > 0 ? cfg.MissileScale : size * missilePrefab.transform.localScale.x;
         ApplyVisualScale(missileEffect, scale);
 
@@ -107,7 +110,7 @@ public class Missile : MonoBehaviour
         transform.position += new Vector3(0f, 5f, 0f);
         // 世界缩放统一走 EffectConfig.MissileScale，与挂点无关；父级多为非等比缩放，按 X 轴统一标量补偿，避免粒子拉伸变形；未配置时回退 prefab 根缩放
         var cfg = EffectConfig.GetConfigByName(effectName);
-        EffectManager.ApplyTint(missileEffect, cfg);
+        EffectManager.ApplyTint(missileEffect, cfg, heroTint);
         float scale = cfg != null && cfg.MissileScale > 0 ? cfg.MissileScale : missilePrefab.transform.localScale.x;
         ApplyVisualScale(missileEffect, scale);
 
@@ -249,7 +252,7 @@ public class Missile : MonoBehaviour
                 ? Mathf.Max(1, (int)(skillDamage * perTargetDamageMulti(target)))
                 : skillDamage;
             target.OnSkillDamaged(owner, skillId, damage);
-            EffectManager.PlaySkillEffect(target, hitEffectName);
+            EffectManager.PlaySkillEffect(target, hitEffectName, 1.3f, heroTint);
             // 命中附加效果（如惊雷减速）：目标仍存活时回调
             if (perTargetOnHit != null && target != null && target.hp > 0)
                 perTargetOnHit(target);

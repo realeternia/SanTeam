@@ -1217,14 +1217,14 @@ public class WorldManager : MonoBehaviour
         missile.MoveToTarget(targetChess, sourceChess.missileSpeed, sourceChess.missileHight);
     }
 
-    public void CreateSpellMissile(Chess sourceChess, Chess targetChess, Vector3 startPos, int skillId, int damage, string effectName, float speed = 0f, System.Action<Chess> perTargetOnHit = null)
+    public void CreateSpellMissile(Chess sourceChess, Chess targetChess, Vector3 startPos, int skillId, int damage, string effectName, float speed = 0f, System.Action<Chess> perTargetOnHit = null, Color heroTint = default(Color))
     {
         // 首先加载导弹预制体
         Missile missilePrefab = Resources.Load<Missile>("Prefabs/MissileCom");
         
         // 实例化导弹
         var missile = Instantiate<Missile>(missilePrefab, startPos, Quaternion.identity, Units.transform);
-        missile.Init(sourceChess, 1, effectName);
+        missile.Init(sourceChess, 1, effectName, heroTint);
         missile.SetSkillInfo(skillId, damage);
         // 命中回调（如导弹型技能的推离/Buff 延后结算），未配置时命中只结算伤害与特效
         missile.perTargetOnHit = perTargetOnHit;
@@ -1232,14 +1232,14 @@ public class WorldManager : MonoBehaviour
         missile.MoveToTarget(targetChess, speed > 0f ? speed : Mathf.Max(sourceChess.missileSpeed, 14), sourceChess.missileHight);
     }    
 
-    public void CreateSpellMissile(Chess sourceChess, Vector3 targetPos, float time, float speed, float size, int skillId, int damage, string effectName, System.Func<Chess, float> perTargetDamageMulti = null, System.Action<Chess> perTargetOnHit = null)
+    public void CreateSpellMissile(Chess sourceChess, Vector3 targetPos, float time, float speed, float size, int skillId, int damage, string effectName, System.Func<Chess, float> perTargetDamageMulti = null, System.Action<Chess> perTargetOnHit = null, Color heroTint = default(Color))
     {
         // 首先加载导弹预制体
         Missile missilePrefab = Resources.Load<Missile>("Prefabs/MissileCom");
         
         // 实例化导弹
         var missile = Instantiate<Missile>(missilePrefab, sourceChess.transform.position, Quaternion.identity, Units.transform);
-        missile.Init(sourceChess, size, effectName);
+        missile.Init(sourceChess, size, effectName, heroTint);
         missile.SetSkillInfo(skillId, damage);
         missile.perTargetDamageMulti = perTargetDamageMulti;
         missile.perTargetOnHit = perTargetOnHit;

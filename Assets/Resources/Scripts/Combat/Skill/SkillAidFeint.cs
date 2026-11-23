@@ -1,4 +1,4 @@
-using CommonConfig;
+﻿using CommonConfig;
 using UnityEngine;
 
 /// <summary>
@@ -32,7 +32,7 @@ public class SkillAidFeint : Skill
         shadow.hp = shadow.maxHp;
 
         if (!string.IsNullOrEmpty(skillCfg.HitEffect))
-            EffectManager.PlaySkillEffect(shadow, skillCfg.HitEffect);
+            PlaySkillEffect(shadow, skillCfg.HitEffect);
         GameLog.Info("制衡：" + owner.heroId + " 复制了英雄幻影 heroId=" + copied.heroId);
         return true;
     }

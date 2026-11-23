@@ -1,4 +1,4 @@
-using CommonConfig;
+﻿using CommonConfig;
 using UnityEngine;
 
 /// <summary>
@@ -38,7 +38,7 @@ public class SkillAidDominion : Skill
             if (damage > 0)
                 enemy.OnSkillDamaged(owner, id, damage);
             if (!string.IsNullOrEmpty(skillCfg.HitEffect))
-                EffectManager.PlaySkillEffect(enemy, skillCfg.HitEffect);
+                PlaySkillEffect(enemy, skillCfg.HitEffect);
         }
 
         // 我方全体英雄获得法强等增益（含自身）
@@ -50,7 +50,7 @@ public class SkillAidDominion : Skill
             foreach (var buffId in buffIds)
                 BuffManager.AddBuff(ally, owner, id, buffId, skillCfg.BuffTime);
             if (!string.IsNullOrEmpty(skillCfg.SelfEffect))
-                EffectManager.PlaySkillEffect(ally, skillCfg.SelfEffect);
+                PlaySkillEffect(ally, skillCfg.SelfEffect);
         }
 
         GameLog.Info("护驾：" + owner.heroId + " 对 " + enemies.Count + " 名敌人造成 AOE，并为 " + allies.Count + " 名友军提升法强");

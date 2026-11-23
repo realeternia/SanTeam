@@ -40,7 +40,7 @@ public class SkillAidDualLaser : SkillComDamageShockWave
         for (int i = -1; i <= 1; i++)
         {
             var dir = Quaternion.Euler(0f, i * LaserSpreadAngle, 0f) * forward;
-            WorldManager.Instance.CreateSpellMissile(owner, startPos + dir * skillCfg.Range, GetSummonTime(), skillCfg.SummonSpeed, skillCfg.Area, skillCfg.Id, damage, skillCfg.HitEffect, null, OnMissileHit);
+            WorldManager.Instance.CreateSpellMissile(owner, startPos + dir * skillCfg.Range, GetSummonTime(), skillCfg.SummonSpeed, skillCfg.Area, skillCfg.Id, damage, skillCfg.HitEffect, null, OnMissileHit, effectTint);
         }
 
         GameLog.Debug("SkillAidDualLaser id=" + id.ToString() + " damage=" + damage.ToString());

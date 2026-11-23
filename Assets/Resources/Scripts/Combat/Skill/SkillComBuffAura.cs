@@ -95,7 +95,7 @@ public class SkillComBuffAura : SkillComBuffSingle
         if (on)
         {
             if (!string.IsNullOrEmpty(skillCfg.SelfEffect))
-                selfEffectObj = EffectManager.PlayPersistentEffect(owner, skillCfg.SelfEffect);
+                selfEffectObj = PlayPersistentEffect(owner, skillCfg.SelfEffect);
             tickTimer = 0f;
             // 开启瞬间立即结算一次，避免等满 3 秒
             ApplyAuraBuffs();
@@ -126,7 +126,7 @@ public class SkillComBuffAura : SkillComBuffSingle
             foreach (var buffId in buffIds)
                 BuffManager.AddBuff(unit, owner, id, buffId, duration);
             if (!string.IsNullOrEmpty(skillCfg.HitEffect))
-                EffectManager.PlaySkillEffect(unit, skillCfg.HitEffect);
+                PlaySkillEffect(unit, skillCfg.HitEffect);
         }
     }
 }

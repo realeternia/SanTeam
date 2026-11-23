@@ -101,22 +101,43 @@ public static class EffectManager
     // 配置了变色（TintColor）时，自动挂染色脚本并设置目标颜色
     public static void ApplyTint(GameObject effect, EffectConfig cfg)
     {
-        if (effect == null || cfg == null || string.IsNullOrEmpty(cfg.TintColor))
+        ApplyTint(effect, cfg, default(Color));
+    }
+
+    /// <summary>
+    /// 特效染色：heroTint.alpha&gt;0 且特效允许英雄染色（CanTint）时优先用英雄专有色，
+    /// 否则回退 EffectConfig.TintColor（变体自身配色）；两者都没有则不染色。
+    /// </summary>
+    public static void ApplyTint(GameObject effect, EffectConfig cfg, Color heroTint)
+    {
+        if (effect == null || cfg == null)
             return;
-        if (EffectTintColor.TryParseHex(cfg.TintColor, out var color))
+
+        Color color;
+        if (heroTint.a > 0f && cfg.CanTint)
         {
-            var tint = effect.GetComponent<EffectTintColor>();
-            if (tint == null)
-                tint = effect.AddComponent<EffectTintColor>();
-            tint.SetTint(color);
+            color = heroTint;
+        }
+        else if (!string.IsNullOrEmpty(cfg.TintColor))
+        {
+            if (!EffectTintColor.TryParseHex(cfg.TintColor, out color))
+            {
+                GameLog.Warn("EffectManager 变色配置无效: " + cfg.Name + " TintColor=" + cfg.TintColor);
+                return;
+            }
         }
         else
         {
-            GameLog.Warn("EffectManager 变色配置无效: " + cfg.Name + " TintColor=" + cfg.TintColor);
+            return;
         }
+
+        var tint = effect.GetComponent<EffectTintColor>();
+        if (tint == null)
+            tint = effect.AddComponent<EffectTintColor>();
+        tint.SetTint(color);
     }
 
-    public static void PlayHitEffect(Chess sourceChess, Chess targetChess, string effectName)
+    public static void PlayHitEffect(Chess sourceChess, Chess targetChess, string effectName, Color heroTint = default(Color))
     {
         // 播放粒子特效
         var hitPrefab = Resources.Load<GameObject>(ResolveEffectPath(effectName));
@@ -125,12 +146,12 @@ public static class EffectManager
         float offsetY = GetOffsetY(effectName, cfg) + UnitEffectExtraOffsetY;
         GameObject hitEffect = UnityEngine.Object.Instantiate(hitPrefab, targetChess.transform.position, Quaternion.identity);
         MountEffect(hitEffect, targetChess.transform, new Vector3(scale, scale, scale), offsetY);
-        ApplyTint(hitEffect, cfg);
+        ApplyTint(hitEffect, cfg, heroTint);
         // 可以添加代码设置特效的生命周期，例如几秒钟后自动销毁
         UnityEngine.Object.Destroy(hitEffect, 1.3f);
     }
 
-    public static GameObject PlaySkillEffect(Chess sourceChess, string effect, float time = 1.3f)
+    public static GameObject PlaySkillEffect(Chess sourceChess, string effect, float time = 1.3f, Color heroTint = default(Color))
     {
         if (string.IsNullOrEmpty(effect))
         {
@@ -150,7 +171,7 @@ public static class EffectManager
         float offsetY = GetOffsetY(effect, cfg) + UnitEffectExtraOffsetY;
         GameObject hitEffect = UnityEngine.Object.Instantiate(hitPrefab, sourceChess.transform.position, hitPrefab.transform.rotation);
         MountEffect(hitEffect, sourceChess.transform, new Vector3(scale, scale, scale), offsetY);
-        ApplyTint(hitEffect, cfg);
+        ApplyTint(hitEffect, cfg, heroTint);
         // 可以添加代码设置特效的生命周期，例如几秒钟后自动销毁
         UnityEngine.Object.Destroy(hitEffect, time);
         return hitEffect;
@@ -162,7 +183,7 @@ public static class EffectManager
     /// 特效挂在战场场景容器上（不挂施法者节点），落点固定，不随施法者移动/转向漂移。
     /// rotation 非空时按该朝向摆放特效（如扇形/矩形喷火需要朝向施法方向）。
     /// </summary>
-    public static GameObject PlayPosSkillEffect(Vector3 sourcePos, float area, string effect, float time = 1.3f, Quaternion? rotation = null)
+    public static GameObject PlayPosSkillEffect(Vector3 sourcePos, float area, string effect, float time = 1.3f, Quaternion? rotation = null, Color heroTint = default(Color))
     {
         if (string.IsNullOrEmpty(effect))
         {
@@ -186,7 +207,7 @@ public static class EffectManager
         MountEffectToScene(hitEffect, sourcePos, new Vector3(scale, scale, scale), offsetY);
         if (rotation.HasValue)
             hitEffect.transform.rotation = rotation.Value;
-        ApplyTint(hitEffect, cfg);
+        ApplyTint(hitEffect, cfg, heroTint);
         // 可以添加代码设置特效的生命周期，例如几秒钟后自动销毁
         UnityEngine.Object.Destroy(hitEffect, time);
 
@@ -221,7 +242,7 @@ public static class EffectManager
     /// 持续型自身特效：把特效常驻挂在单位节点下（挂点/缩放规则同 PlayBuffEffect），粒子循环播放且不自动销毁，
     /// 随单位节点销毁（单位死亡/战斗结束）一并清理。用于需要永久存在于自身的视觉标识（如光环技能持有者）。
     /// </summary>
-    public static GameObject PlayPersistentEffect(Chess sourceChess, string effect)
+    public static GameObject PlayPersistentEffect(Chess sourceChess, string effect, Color heroTint = default(Color))
     {
         if (sourceChess == null || string.IsNullOrEmpty(effect))
         {
@@ -241,7 +262,7 @@ public static class EffectManager
         float offsetY = GetOffsetY(effect, cfg);
         GameObject hitEffect = UnityEngine.Object.Instantiate(prefab, sourceChess.transform.position, prefab.transform.rotation);
         MountEffect(hitEffect, sourceChess.transform, new Vector3(scale, scale, scale), offsetY);
-        ApplyTint(hitEffect, cfg);
+        ApplyTint(hitEffect, cfg, heroTint);
 
         // 常驻期间粒子需持续播放，循环避免中途熄灭；不设置销毁时间，交由单位节点销毁时清理
         foreach (var ps in hitEffect.GetComponentsInChildren<ParticleSystem>(true))
@@ -272,7 +293,7 @@ public static class EffectManager
     /// 跟随型导弹特效：把导弹预制体挂到单位身上（作为其子节点），随单位移动持续播放粒子，
     /// 单位瞬移/位移时粒子在移动路径上留下拖尾残影（快闪类技能用）。time&gt;0 时到时自动销毁，否则由调用方销毁。
     /// </summary>
-    public static GameObject PlayFollowMissileEffect(Chess unit, string effect, float time = 0f)
+    public static GameObject PlayFollowMissileEffect(Chess unit, string effect, float time = 0f, Color heroTint = default(Color))
     {
         if (unit == null || string.IsNullOrEmpty(effect))
         {
@@ -293,7 +314,7 @@ public static class EffectManager
         float offsetY = cfg != null ? cfg.MissileOffsetY : 0f;
         GameObject missileEffect = UnityEngine.Object.Instantiate(missilePrefab, unit.transform.position, missilePrefab.transform.rotation);
         MountEffect(missileEffect, unit.transform, new Vector3(scale, scale, scale), offsetY);
-        ApplyTint(missileEffect, cfg);
+        ApplyTint(missileEffect, cfg, heroTint);
 
         // 跟随期间粒子需持续播放（拖尾），循环避免中途熄灭
         foreach (var ps in missileEffect.GetComponentsInChildren<ParticleSystem>(true))

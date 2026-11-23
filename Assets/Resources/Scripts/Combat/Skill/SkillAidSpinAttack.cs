@@ -32,7 +32,7 @@ public class SkillAidSpinAttack : Skill
             var spinDamage = ApplyDamageModifiers((int)(owner.atk * GetStr2("splashRate")), unit);
             unit.OnSkillDamaged(owner, skillId, spinDamage);
             if (!string.IsNullOrEmpty(skillCfg.HitEffect))
-                EffectManager.PlaySkillEffect(unit, skillCfg.HitEffect);
+                PlaySkillEffect(unit, skillCfg.HitEffect);
             ApplyBleed(unit, spinDamage);
         }
         return true;

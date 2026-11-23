@@ -110,7 +110,7 @@ public class SkillAidCastingScorchedEarth : Skill
                 {
                     unit.OnSkillDamaged(owner, skillId, skillDamage);
                     if (!string.IsNullOrEmpty(skillCfg.HitEffect))
-                        EffectManager.PlaySkillEffect(unit, skillCfg.HitEffect);
+                        PlaySkillEffect(unit, skillCfg.HitEffect);
                 }
             }
 

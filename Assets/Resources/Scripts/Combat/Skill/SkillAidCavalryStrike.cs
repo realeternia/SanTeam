@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -86,7 +86,7 @@ public class SkillAidCavalryStrike : Skill
                 {
                     enemy.OnSkillDamaged(owner, id, damage);
                     if (!string.IsNullOrEmpty(skillCfg.HitEffect))
-                        EffectManager.PlaySkillEffect(enemy, skillCfg.HitEffect);
+                        PlaySkillEffect(enemy, skillCfg.HitEffect);
                 }
 
                 foreach (var buffId in buffIds)

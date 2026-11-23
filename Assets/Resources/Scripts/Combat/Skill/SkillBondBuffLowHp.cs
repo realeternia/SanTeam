@@ -55,7 +55,7 @@ public class SkillBondBuffLowHp : Skill
         }
 
         if (!string.IsNullOrEmpty(skillCfg.HitEffect))
-            EffectManager.PlaySkillEffect(target, skillCfg.HitEffect);
+            PlaySkillEffect(target, skillCfg.HitEffect);
         return true;
     }
 

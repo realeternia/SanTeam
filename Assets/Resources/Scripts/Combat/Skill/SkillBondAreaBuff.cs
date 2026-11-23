@@ -49,7 +49,7 @@ public class SkillBondAreaBuff : Skill
                 ApplyBuffToUnit(unit, buffId);
 
             if (!string.IsNullOrEmpty(skillCfg.HitEffect))
-                EffectManager.PlaySkillEffect(unit, skillCfg.HitEffect);
+                PlaySkillEffect(unit, skillCfg.HitEffect);
         }
         return true;
     }

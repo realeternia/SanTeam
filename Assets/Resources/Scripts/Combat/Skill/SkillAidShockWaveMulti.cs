@@ -50,7 +50,7 @@ public class SkillAidShockWaveMulti : Skill
             var angle = i == 0 ? 0f : SysRandom.Range(-SpreadHalfAngle, SpreadHalfAngle);
             var aim = start + Quaternion.Euler(0f, angle, 0f) * dir * distance;
             aim.y = targetPos.y;
-            WorldManager.Instance.CreateSpellMissile(owner, aim, GetSummonTime(), skillCfg.SummonSpeed, skillCfg.Area, skillCfg.Id, damage, skillCfg.HitEffect, null, null);
+            WorldManager.Instance.CreateSpellMissile(owner, aim, GetSummonTime(), skillCfg.SummonSpeed, skillCfg.Area, skillCfg.Id, damage, skillCfg.HitEffect, null, null, effectTint);
         }
 
         GameLog.Info("连珠：" + owner.heroId + " 射出 " + count + " 支箭，单箭伤害 " + damage);

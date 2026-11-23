@@ -93,7 +93,7 @@ public class SkillBondHitFireArea : Skill
                 // 百分比魔法伤害：经 OnSkillDamaged 按 DamageType 受抗性减免
                 unit.OnSkillDamaged(owner, skillId, dmg);
                 if (dmg > 0 && !string.IsNullOrEmpty(skillCfg.HitEffect))
-                    EffectManager.PlaySkillEffect(unit, skillCfg.HitEffect);
+                    PlaySkillEffect(unit, skillCfg.HitEffect);
             }
 
             yield return new WaitForSeconds(skillCfg.SummonHitInterval);

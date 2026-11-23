@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using CommonConfig;
 using UnityEngine;
 
@@ -70,7 +70,7 @@ public class SkillAidJumpReturn : Skill
             foreach (var buffId in buffIds)
                 BuffManager.AddBuff(target, owner, id, buffId, skillCfg.BuffTime);
             if (!string.IsNullOrEmpty(skillCfg.HitEffect))
-                EffectManager.PlaySkillEffect(target, skillCfg.HitEffect);
+                PlaySkillEffect(target, skillCfg.HitEffect);
         }
 
         // 停留 BuffTime 秒（目标被陷阵，自身可继续普攻）

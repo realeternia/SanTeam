@@ -25,6 +25,6 @@ public class SkillEquipAttackMagicDamage : Skill
         defender.OnSkillDamaged(owner, skillId, magicDmg, false, skillCfg.HurtTag);
 
         if (!string.IsNullOrEmpty(skillCfg.HitEffect))
-            EffectManager.PlaySkillEffect(defender, skillCfg.HitEffect);
+            PlaySkillEffect(defender, skillCfg.HitEffect);
     }
 }

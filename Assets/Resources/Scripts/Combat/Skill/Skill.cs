@@ -27,6 +27,12 @@ public class Skill
     public bool isBurst;
 
     /// <summary>
+    /// 英雄技能专有色（HeroConfig.EffectColor；alpha=0 表示不染色）。
+    /// 仅英雄个人技能(Skill1)在 Chess 初始化时赋值，其余技能保持默认值，不受英雄染色影响。
+    /// </summary>
+    public Color effectTint;
+
+    /// <summary>
     /// 有效技能等级：默认取配置等级(skillCfg.Lv=5)，由连锁机制(兵种连锁/好友连锁·特殊)修正
     /// </summary>
     public int Level;
@@ -899,7 +905,7 @@ public class Skill
             return null;
         if (time <= 0f)
             time = skillCfg.SummonTime > 0f ? skillCfg.SummonTime : 1.3f;
-        return EffectManager.PlayPosSkillEffect(pos, skillCfg.Area, skillCfg.AreaEffect, time, rotation);
+        return EffectManager.PlayPosSkillEffect(pos, skillCfg.Area, skillCfg.AreaEffect, time, rotation, effectTint);
     }
 
     /// <summary>
@@ -910,7 +916,25 @@ public class Skill
     {
         if (string.IsNullOrEmpty(skillCfg.SelfEffect))
             return null;
-        return EffectManager.PlaySkillEffect(owner, skillCfg.SelfEffect, time);
+        return EffectManager.PlaySkillEffect(owner, skillCfg.SelfEffect, time, effectTint);
+    }
+
+    /// <summary>播放命中/目标特效并套用英雄专有色（技能内统一走本方法，勿直接调 EffectManager.PlaySkillEffect）</summary>
+    protected GameObject PlaySkillEffect(Chess target, string effect, float time = 1.3f)
+    {
+        return EffectManager.PlaySkillEffect(target, effect, time, effectTint);
+    }
+
+    /// <summary>播放常驻自身特效并套用英雄专有色</summary>
+    protected GameObject PlayPersistentEffect(Chess target, string effect)
+    {
+        return EffectManager.PlayPersistentEffect(target, effect, effectTint);
+    }
+
+    /// <summary>播放跟随型导弹拖尾并套用英雄专有色</summary>
+    protected GameObject PlayFollowMissileEffect(Chess unit, string effect, float time = 0f)
+    {
+        return EffectManager.PlayFollowMissileEffect(unit, effect, time, effectTint);
     }
 
     public float GetSummonTime()

@@ -80,7 +80,7 @@ public class SkillEquipHitWall : Skill
                 {
                     unit.OnSkillDamaged(owner, skillId, damage);
                     if (!string.IsNullOrEmpty(skillCfg.HitEffect))
-                        EffectManager.PlaySkillEffect(unit, skillCfg.HitEffect);
+                        PlaySkillEffect(unit, skillCfg.HitEffect);
                 }
             }
 

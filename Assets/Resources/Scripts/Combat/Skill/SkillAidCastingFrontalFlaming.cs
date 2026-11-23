@@ -81,7 +81,7 @@ public class SkillAidCastingFrontalFlaming : Skill
             {
                 unit.OnSkillDamaged(owner, skillId, perTickDamage);
                 if (!string.IsNullOrEmpty(skillCfg.HitEffect))
-                    EffectManager.PlaySkillEffect(unit, skillCfg.HitEffect);
+                    PlaySkillEffect(unit, skillCfg.HitEffect);
                 // 减益：每跳刷新一次，引导结束后仍按 BuffTime 计时
                 foreach (var buffId in buffIds)
                     BuffManager.AddBuff(unit, owner, id, buffId, skillCfg.BuffTime);

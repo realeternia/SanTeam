@@ -18,7 +18,7 @@ public class SkillBondHitArea : Skill
 
             var targetPos = defender.transform.position;
             //创建一个hitEffect
-            EffectManager.PlaySkillEffect(defender, skillCfg.HitEffect);
+            PlaySkillEffect(defender, skillCfg.HitEffect);
 
             // 溅射范围：按 SelectOnly / SelectFirst 选（默认敌方的溅射目标，排除被普攻命中的单位）
             var unitsInRange = SelectTargets(targetPos, skillCfg.Area, false, skillCfg.TargetCount, defender);

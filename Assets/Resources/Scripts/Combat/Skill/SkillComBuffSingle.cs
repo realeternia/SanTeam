@@ -173,7 +173,7 @@ public class SkillComBuffSingle : Skill
             }
 
             if (!string.IsNullOrEmpty(skillCfg.HitEffect))
-                EffectManager.PlaySkillEffect(unit, skillCfg.HitEffect);
+                PlaySkillEffect(unit, skillCfg.HitEffect);
         }
     }
 }

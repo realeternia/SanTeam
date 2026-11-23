@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -53,7 +53,7 @@ public class SkillAidFlashStrike : Skill
     IEnumerator FlashStrike(Chess firstTarget)
     {
         // 整段过程给自身挂导弹特效：瞬移时粒子在路径上留下拖尾残影
-        var trail = EffectManager.PlayFollowMissileEffect(owner, skillCfg.SelfEffect);
+        var trail = PlayFollowMissileEffect(owner, skillCfg.SelfEffect);
 
         // 起手方向（赵云→首个目标，水平）：区分身前/身后，整段固定，避免每次跳到目标另一侧后方向翻转
         var approach = firstTarget.transform.position - owner.transform.position;
@@ -113,7 +113,7 @@ public class SkillAidFlashStrike : Skill
 
         target.OnSkillDamaged(owner, skillId, damage);
         if (!string.IsNullOrEmpty(skillCfg.HitEffect))
-            EffectManager.PlaySkillEffect(target, skillCfg.HitEffect);
+            PlaySkillEffect(target, skillCfg.HitEffect);
     }
 
     // 闪击落点：身前 = 目标沿「赵云→目标」反方向退 BlinkBack；身后 = 沿该方向穿过目标再走 BlinkBack

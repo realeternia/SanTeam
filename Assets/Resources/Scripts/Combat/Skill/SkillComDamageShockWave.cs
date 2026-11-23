@@ -31,7 +31,7 @@ public class SkillComDamageShockWave : SkillComDamageSingle
         PlaySelfEffect();
         var damage = GetSkillDamage(); // 固定系数 + 比例系数×关联属性
         // 逐目标伤害修正：斩杀/护盾加成/残血增伤/兵种克制/最大生命追加折算成导弹倍率，与其他伤害形态共用同一套组件
-        WorldManager.Instance.CreateSpellMissile(owner, targetPos, GetSummonTime(), skillCfg.SummonSpeed, skillCfg.Area, skillCfg.Id, damage, skillCfg.HitEffect, ShockWaveDamageMulti, OnShockWaveHit);
+        WorldManager.Instance.CreateSpellMissile(owner, targetPos, GetSummonTime(), skillCfg.SummonSpeed, skillCfg.Area, skillCfg.Id, damage, skillCfg.HitEffect, ShockWaveDamageMulti, OnShockWaveHit, effectTint);
 
         GameLog.Debug("SkillComDamageShockWave id=" + id.ToString() + " damage=" + damage.ToString());
 

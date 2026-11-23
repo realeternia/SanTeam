@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using CommonConfig;
 using UnityEngine;
@@ -108,7 +108,7 @@ public class SkillAidSkyFall : Skill
             {
                 u.OnSkillDamaged(owner, id, skillDamage);
                 if (!string.IsNullOrEmpty(skillCfg.HitEffect))
-                    EffectManager.PlaySkillEffect(u, skillCfg.HitEffect);
+                    PlaySkillEffect(u, skillCfg.HitEffect);
             }
         }
 

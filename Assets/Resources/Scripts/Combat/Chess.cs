@@ -18,6 +18,8 @@ public class Chess : MonoBehaviour
     public int side;
     public bool isHero;
     public int heroId;
+    /// <summary>英雄技能专有色（HeroConfig.EffectColor；alpha=0 表示未配置，不染色）</summary>
+    public Color heroEffectColor;
     public string chessName = "0";
     public int pos;
     /// <summary>战斗初始(出生)位置，Init 时记录；"叛逃"后退的参考点</summary>
@@ -212,6 +214,9 @@ public class Chess : MonoBehaviour
             var heroCfg = HeroConfig.GetConfig(heroId);
             var jobCfg = ConfigManager.GetJobConfig(heroCfg.Job);
             var jobSkillSname = jobCfg != null ? jobCfg.NameS : "";
+            // 英雄技能专有色：仅配置了 EffectColor 的英雄（品质4）在释放个人技能时染色
+            if (EffectTintColor.TryParseHex(heroCfg.EffectColor, out var heroColor))
+                heroEffectColor = heroColor;
             var playerInfo = GameManager.Instance.GetPlayer(playerId);
             // 初始化技能：默认取1级行创建，随后按来源修正等级——
             // 个人技能(Skill1)等级 = 卡片等级（即单位等级 level，正常对局与调试阵容同源）；兵种技能为占位技能(Dumb)，职业被动加成由 JobLinkManager 按同职业英雄数直接施加；
@@ -221,6 +226,9 @@ public class Chess : MonoBehaviour
                 var skill = SkillManager.CreateSkill(skillCfg.Id, this);
                 if (skillCfg.Sname != jobSkillSname)
                     skill.SetLevel(level);
+                // 个人技能(Skill1)继承英雄专有色；职业/羁绊/兵种技能不染色
+                if (skillCfg.Sname == heroCfg.Skill1)
+                    skill.effectTint = heroEffectColor;
                 skills.Add(skill);
             }
 
