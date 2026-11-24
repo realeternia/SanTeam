@@ -67,6 +67,7 @@
     <Compile Include="Assets\Editor\EffectPrefabScaleFixer.cs" />
     <Compile Include="Assets\MasterMagicFX\Scripts\Editor\ParticleMappingControllerEditor.cs" />
     <Compile Include="Assets\Editor\IconLoaderEditor.cs" />
+    <Compile Include="Assets\Editor\EffectPrefabContextMenu.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\DOTween\Editor\DOTweenEditor.dll" />

@@ -172,6 +172,10 @@ namespace CommonConfig
             config[10130] = new EffectConfig(10130, "FlashExplosionBlue", "蓝色星爆", "伤害", "目标", true, "Effect/FlashExplosionBlue", "Missile/FlashExplosionBlue", 5f, 1f, 5f, 1f, "");
             config[10131] = new EffectConfig(10131, "LaserMeshMissileBlue", "蓝色星爆", "伤害", "目标", true, "Effect/FlashExplosionBlue", "Missile/LaserMeshMissileBlue", 5f, 1f, 5f, 1f, "");
             config[10140] = new EffectConfig(10140, "Par_FireShoot_Bullet", "火焰射击", "伤害", "目标", true, "Effect/Par_FireShoot_Hit", "Missile/Par_FireShoot_Bullet", 1.5f, 1f, 3f, 1f, "");
+            config[10141] = new EffectConfig(10141, "Par_BlueShoot_Bullet", "火焰射击蓝色", "伤害", "目标", true, "Effect/Par_BlueShoot_Hit", "Missile/Par_BlueShoot_Bullet", 3f, 1f, 5f, 1f, "");
+            config[10142] = new EffectConfig(10142, "Par_PurpleShoot_Bullet", "Par_PurpleShoot_Bullet", "伤害", "目标", true, "Effect/Par_PurpleShoot_Hit", "Missile/Par_PurpleShoot_Bullet", 2.5f, 1f, 4f, 1f, "");
+            config[10143] = new EffectConfig(10143, "Par_LightShoot_Bullet", "Par_LightShoot_Bullet", "伤害", "目标", true, "Effect/Par_LightShoot_Hit", "Missile/Par_LightShoot_Bullet", 2.5f, 1f, 4f, 1f, "");
+            config[10150] = new EffectConfig(10150, "Par_RedSwordBeam", "剑光波", "伤害", "目标", true, "Effect/Par_LightShoot_Hit", "Missile/Par_RedSwordBeam", 1.8f, 1f, 1.8f, 1f, "");
             config[11000] = new EffectConfig(11000, "LightningExplosionRed", "红色闪电爆裂特效", "伤害", "目标", true, "Effect/LightningExplosionBlue", "", 3f, 1f, 5f, 1f, "#FF1C00");
             config[11010] = new EffectConfig(11010, "MagicBuffGreen", "绿色增益特效", "增益", "目标", true, "Effect/MagicBuffGreen", "", 8f, 1f, 8f, 1f, "");
             config[11011] = new EffectConfig(11011, "MagicBuffBlue", "蓝色增益特效", "增益", "目标", true, "Effect/MagicBuffGreen", "", 8f, 1f, 8f, 1f, "#3333FF");

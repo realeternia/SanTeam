@@ -24,7 +24,7 @@ namespace DesignCoder
     /// 导弹看截图文件名 _Missile 后缀，其余按 EffectConfig.Area（自身/目标/范围/光环/Buff）分页签。
     /// 负面特效红框、正面（增益）特效绿框，伤害类灰框；缩略图左上显示资源路径，右下显示 EffectConfig 的 Area，
     /// 右上显示引用计数（导弹取 SkillConfig.HitEffect，Buff 取 BuffConfig.BuffEffect，其余取技能特效字段），
-    /// 左下黄色标签显示 JobConfig/SoldierConfig.HitEffect 的额外命中数。
+    /// 左下黄色标签显示 JobConfig/SoldierConfig.HitEffect 的额外命中数；导弹与目标型页签中带黄标的条目排在最前。
     /// 双击缩略图或点“确定”返回选中的特效名（EffectConfig.Name，即技能配置里存的值）。
     /// </summary>
     public class EffectPickerForm : Form
@@ -281,6 +281,11 @@ namespace DesignCoder
             }
             baseNames.Sort(StringComparer.OrdinalIgnoreCase);
 
+            // 各页签先收集条目，再统一加入面板（导弹/目标型页签需要把带黄标的排到最前）
+            var tabItems = new List<EffectItemControl>[TabTitles.Length];
+            for (int i = 0; i < tabItems.Length; i++)
+                tabItems[i] = new List<EffectItemControl>();
+
             foreach (string baseName in baseNames)
             {
                 bool isMissile = baseName.EndsWith("_Missile", StringComparison.OrdinalIgnoreCase);
@@ -313,11 +318,27 @@ namespace DesignCoder
                 ctl.Click += ItemControl_Click;
                 ctl.DoubleClick += ItemControl_DoubleClick;
                 itemControls.Add(ctl);
-                tabPanels[item.TabIndex].Controls.Add(ctl);
+                tabItems[item.TabIndex].Add(ctl);
             }
 
             for (int i = 0; i < tabPages.Length; i++)
+            {
+                List<EffectItemControl> list = tabItems[i];
+                if (i == TabMissile || i == TabTarget)
+                {
+                    // 黄标（JobConfig/SoldierConfig.HitEffect 引用）优先，组内保持原名称顺序
+                    foreach (EffectItemControl ctl in list)
+                        if (ctl.Item.ExtraUsage > 0) tabPanels[i].Controls.Add(ctl);
+                    foreach (EffectItemControl ctl in list)
+                        if (ctl.Item.ExtraUsage <= 0) tabPanels[i].Controls.Add(ctl);
+                }
+                else
+                {
+                    foreach (EffectItemControl ctl in list)
+                        tabPanels[i].Controls.Add(ctl);
+                }
                 tabPages[i].Text = string.Format("{0} ({1})", TabTitles[i], tabPanels[i].Controls.Count);
+            }
             tabControl.Invalidate();
 
             if (itemControls.Count == 0)
