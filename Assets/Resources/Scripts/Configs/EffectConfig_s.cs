@@ -181,7 +181,9 @@ namespace CommonConfig
             config[10180] = new EffectConfig(10180, "Par_HealBubble", "Par_HealBubble", "伤害", "目标", true, "Effect/Par_LightShoot_Hit", "Missile/Par_HealBubble", 2f, 1f, 5f, 1f, "");
             config[10190] = new EffectConfig(10190, "Par_LoveShoot_Bullet", "Par_LoveShoot_Bullet", "伤害", "目标", true, "Effect/Par_LoveShoot_Hit", "Missile/Par_LoveShoot_Bullet", 2f, 1f, 5f, 1f, "");
             config[10200] = new EffectConfig(10200, "Par_BlueSwordShoot_Bullet", "Par_BlueSwordShoot_Bullet", "伤害", "目标", true, "Effect/Par_BlueSwordShoot_Hit", "Missile/Par_BlueSwordShoot_Bullet", 2f, 1f, 5f, 1f, "");
-            config[10210] = new EffectConfig(10210, "Par_YellowDisc_Bullet", "Par_YellowDisc_Bullet", "伤害", "目标", true, "Effect/Par_YellowDisc_Hit", "Missile/Par_YellowDisc_Bullet", 2f, 1f, 5f, 1f, "");
+            config[10210] = new EffectConfig(10210, "Par_YellowDisc_Bullet", "Par_YellowDisc_Bullet", "伤害", "目标", true, "Effect/Par_YellowDisc_Hit", "Missile/Par_YellowDisc_Bullet", 2f, 1f, 2f, 1f, "");
+            config[10220] = new EffectConfig(10220, "Par_LightningShoot_Bullet", "Par_LightningShoot_Bullet", "伤害", "目标", true, "Par_LightningShoot_Hit", "Missile/Par_LightningShoot_Bullet", 2f, 1f, 4f, 1f, "");
+            config[10230] = new EffectConfig(10230, "Par_WindBullet", "Par_WindBullet", "伤害", "目标", true, "Par_WindBullet_Hit", "Missile/Par_WindBullet", 2f, 1f, 3f, 1f, "");
             config[11000] = new EffectConfig(11000, "LightningExplosionRed", "红色闪电爆裂特效", "伤害", "目标", true, "Effect/LightningExplosionBlue", "", 3f, 1f, 5f, 1f, "#FF1C00");
             config[11010] = new EffectConfig(11010, "MagicBuffGreen", "绿色增益特效", "增益", "目标", true, "Effect/MagicBuffGreen", "", 8f, 1f, 8f, 1f, "");
             config[11011] = new EffectConfig(11011, "MagicBuffBlue", "蓝色增益特效", "增益", "目标", true, "Effect/MagicBuffGreen", "", 8f, 1f, 8f, 1f, "#3333FF");
@@ -222,6 +224,9 @@ namespace CommonConfig
             config[12130] = new EffectConfig(12130, "top_down_stone_circle", "攻击命中", "负面", "范围", true, "Effect/top_down_stone_circle", "", 2f, .5f, 5f, 1f, "");
             config[12140] = new EffectConfig(12140, "FlamethrowerSpikyRed", "攻击命中", "负面", "范围", true, "Effect/FlamethrowerSpikyRed", "", 8.5f, .5f, 5f, 1f, "");
             config[12150] = new EffectConfig(12150, "AuraSoftPurple", "紫色缓冲特效", "增益", "范围", true, "Effect/AuraSoftPurple", "", 3f, 1f, 8f, 1f, "");
+            config[12160] = new EffectConfig(12160, "Par_PoisonFields", "剧毒区域绿色", "伤害", "范围", true, "Effect/Par_PoisonFields", "", 3f, 1f, 5f, 1f, "");
+            config[12170] = new EffectConfig(12170, "Par_PoisonSpring", "Par_PoisonSpring", "伤害", "范围", true, "Effect/Par_PoisonSpring", "", 2f, 1f, 5f, 1f, "");
+            config[12180] = new EffectConfig(12180, "Par_WaterSpring", "Par_WaterSpring", "伤害", "范围", true, "Effect/Par_WaterSpring", "", 2f, 1f, 5f, 1f, "");
             config[13000] = new EffectConfig(13000, "BloodExplosion", "鲜血爆裂特效", "伤害", "Buff", true, "Effect/BloodExplosion", "", 3f, 1f, 8f, 1f, "");
             config[13010] = new EffectConfig(13010, "HeartStream", "爱心流光特效", "增益", "Buff", true, "Effect/HeartStream", "", 8f, 1f, 8f, 1f, "");
             config[13020] = new EffectConfig(13020, "ShieldSoftBlue", "蓝色护盾特效", "增益", "Buff", true, "Effect/ShieldSoftBlue", "", 3f, 1f, 8f, 1f, "");
@@ -248,6 +253,7 @@ namespace CommonConfig
             config[13200] = new EffectConfig(13200, "CirclingSpellCritJue", "法术暴击绝字环绕特效", "增益", "Buff", true, "Effect/CirclingSpellCritJue", "", 3f, 1f, 8f, 1f, "#FF4DD2");
             config[13210] = new EffectConfig(13210, "CirclingReflectCi", "反伤六刺环绕特效", "增益", "Buff", true, "Effect/CirclingReflectCi", "", 3f, 1f, 8f, 1f, "");
             config[13220] = new EffectConfig(13220, "RisingArrowGreen", "绿色上升箭头特效（属性强化）", "增益", "Buff", true, "Effect/RisingArrowGreen", "", 3f, 1f, 8f, 1f, "");
+            config[13230] = new EffectConfig(13230, "Par_LightningBall", "点球保护罩", "伤害", "Buff", true, "Effect/Par_LightningBall", "", 3f, 1f, 1f, 1f, "");
             config[14000] = new EffectConfig(14000, "Par_LargeMagicCircle", "蓝色光环", "正面", "光环", true, "Effect/Par_LargeMagicCircle", "", 1.5f, .5f, 5f, 1f, "");
             config[14001] = new EffectConfig(14001, "Par_LargeMagicCircleGreen", "绿色光环", "正面", "光环", true, "Effect/Par_LargeMagicCircle", "", 1.5f, .5f, 5f, 1f, "#00FF1B");
             config[14010] = new EffectConfig(14010, "Par_HolyMagicCircle", "金色光环", "正面", "光环", true, "Effect/Par_HolyMagicCircle", "", 1.5f, .5f, 5f, 1f, "");
