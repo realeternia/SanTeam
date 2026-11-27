@@ -1116,6 +1116,35 @@ namespace DesignCoder
             return value == null ? "" : value.ToString().Trim();
         }
 
+        // 必有命中特效的技能类型：这些类型的目标/受击单位都要有命中表现，HitEffect 不得为空。
+        // 自增（目标是自身，由 SelfEffect 表现）、光环（每 tick 刷 Buff，逐跳播命中特效会闪烁）
+        // 以及职业/连接/道具类技能不在此列。
+        private static readonly string[] HitEffectRequiredTypes = new string[]
+        {
+            "单伤", "群伤", "召唤", "单控", "群控",
+            "单增", "群增", "兵增", "单疗", "群疗"
+        };
+
+        // HitEffect 漏配校验：技能类型必须有命中特效 + 脚本链确实会读 HitEffect + 当前值为空
+        private bool IsHitEffectMissing(int rowIdx, string fieldName, string effectName)
+        {
+            if (fieldName != "HitEffect") return false;
+            if (!string.IsNullOrWhiteSpace(effectName)) return false;
+
+            string skillType = GetRowCellText(rowIdx, "Type");
+            if (Array.IndexOf(HitEffectRequiredTypes, skillType) < 0) return false;
+
+            // 只对脚本会播命中特效的技能提示；用 SelfEffect 等其他字段表现的脚本不误报
+            return IsEffectReferencedByScript(rowIdx, fieldName);
+        }
+
+        private string GetHitEffectMissingReason(int rowIdx)
+        {
+            string skillType = GetRowCellText(rowIdx, "Type");
+            return "技能类型「" + skillType + "」必须有命中特效，但 HitEffect 为空："
+                + "请按脚本行为补「目标」类特效（伤害类型补伤害/目标、控制补负面/目标、增益/治疗补增益/目标）";
+        }
+
         // 特效 Area 校验：SelfEffect 需为自身（光环技能为光环），HitEffect 需为目标，AreaEffect 需为范围
         private bool IsEffectAreaMismatch(int rowIdx, string fieldName, string effectName)
         {
@@ -1252,6 +1281,8 @@ namespace DesignCoder
             bool areaMismatch = IsEffectAreaMismatch(e.RowIndex, fieldName, text);
             // 技能带 missile 标记但 HitEffect 不是导弹特效类型 → 粉红色背景提示
             bool missileMismatch = IsMissileHitEffectMismatch(e.RowIndex, fieldName, text);
+            // 本该有命中特效的技能 HitEffect 为空 → 红色背景提示（漏配）
+            bool hitMissing = IsHitEffectMissing(e.RowIndex, fieldName, text);
             // 配置了特效、且 ScriptName 对应脚本里引用了该特效字段 → 标绿（空值不标，避免满屏绿）
             bool referenced = text.Trim().Length > 0 && !string.IsNullOrEmpty(fieldName)
                 && IsEffectReferencedByScript(e.RowIndex, fieldName);
@@ -1264,6 +1295,12 @@ namespace DesignCoder
                 // 粉红色：弹道技能的 HitEffect 未配置导弹路径（悬停可看原因）
                 bgColor = Color.FromArgb(255, 155, 205);
                 fgColor = Color.FromArgb(85, 20, 60);
+            }
+            else if (hitMissing)
+            {
+                // 红色：技能会播命中特效但 HitEffect 漏配（悬停可看原因）
+                bgColor = Color.FromArgb(255, 130, 130);
+                fgColor = Color.FromArgb(70, 0, 0);
             }
             else if (areaMismatch)
             {
@@ -1292,7 +1329,7 @@ namespace DesignCoder
             {
                 e.Graphics.FillRectangle(bgBrush, e.CellBounds);
             }
-            if (!missileMismatch && !areaMismatch && !referenced && !isHighlighted && (e.State & DataGridViewElementStates.Selected) == DataGridViewElementStates.Selected)
+            if (!missileMismatch && !hitMissing && !areaMismatch && !referenced && !isHighlighted && (e.State & DataGridViewElementStates.Selected) == DataGridViewElementStates.Selected)
             {
                 using (Brush selBrush = new SolidBrush(e.CellStyle.SelectionBackColor))
                 {
@@ -2306,6 +2343,8 @@ namespace DesignCoder
                 reasons.Add(GetMissileHitEffectMismatchReason(e.RowIndex, text));
             if (IsEffectAreaMismatch(e.RowIndex, fieldName, text))
                 reasons.Add(GetEffectAreaMismatchReason(e.RowIndex, fieldName, text));
+            if (IsHitEffectMissing(e.RowIndex, fieldName, text))
+                reasons.Add(GetHitEffectMissingReason(e.RowIndex));
             reasons.RemoveAll(r => string.IsNullOrEmpty(r));
             if (reasons.Count > 0)
                 e.ToolTipText = string.Join("\n", reasons.ToArray());

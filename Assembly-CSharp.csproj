@@ -197,6 +197,7 @@
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidManaBurn.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffLock.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidFireWall.cs" />
+    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidIceberg.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\RankPanelManager.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffHpRegenAdd.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffDecayDef.cs" />

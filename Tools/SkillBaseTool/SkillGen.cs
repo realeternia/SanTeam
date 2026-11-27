@@ -177,50 +177,40 @@ namespace SkillBaseTool
             return store.TemplateByName.TryGetValue(skill.TemplateName, out tpl) && tpl.Script == "SkillComInitAttr";
         }
 
-        /// <summary>按技能脚本/类型推断模板；返回 null 表示不走模板（特化技能）。</summary>
-        public static string PickTemplate(SkillRow a)
+        /// <summary>
+        /// 按技能脚本从模板表直接取模板：com 技能同名模板有多个档位时固定取「中」档；
+        /// 形态（自身中心/近距离、增减益）由脚本与 Type 确定。返回 null 表示不走模板（特化技能）。
+        /// </summary>
+        public static string PickTemplate(DataStore store, SkillRow lv1)
         {
-            string type = a.Type;
-            string script = a.ScriptName;
-            float dmg = a.DamageStrength;
-            float heal = a.HealStrength;
+            var candidates = store.Templates.Where(t => t.Script == lv1.ScriptName).ToList();
+            if (candidates.Count == 0)
+                return null;
 
-            if (script == "SkillAura")
-                return "光环中";
-            if (script == "SkillJumpChain")
-                return (heal > 0 || a.TargetType.Contains("heal")) ? "跳跃弹射-治疗大" : "跳跃弹射-伤害大";
-            if (script == "SkillSelfBuff")
-                return "自身强化";
-            if (script == "SkillTaunt")
-                return "群体嘲讽";
-            if (script == "SkillComDamageHitRegion")
-                return "持续伤害大";
-            if (heal > 0)
+            if (lv1.ScriptName == "SkillComBuffArea")
             {
-                if (script == "SkillCastingAidAreaHeal")
-                    return "持续治疗大";
-                if (script != "SkillAreaHeal")
+                string want = null;
+                switch (lv1.Type)
+                {
+                    case "群增": want = "群体友方增益"; break;
+                    case "单增": want = "单体友方增益"; break;
+                    case "群控": want = "群体减益"; break;
+                    case "单控": want = "单体减益"; break;
+                }
+                var hit = want == null ? null : candidates.FirstOrDefault(t => t.Name == want);
+                return hit == null ? null : hit.Name;
+            }
+
+            if (lv1.ScriptName == "SkillComDamageArea")
+            {
+                bool selfCenter = lv1.TargetType.Contains("self");
+                candidates = candidates.Where(t => t.Name.Contains("自身中心") == selfCenter).ToList();
+                if (candidates.Count == 0)
                     return null;
-                return type == "单疗" ? "单体治疗大" : "范围治疗大";
             }
-            if (script == "SkillAreaBuff")
-                return type == "群增" ? "群体友方增益" : "单体友方增益";
-            if (dmg > 0)
-            {
-                if (script.StartsWith("SkillAreaDamage", StringComparison.Ordinal))
-                    return a.TargetType.Contains("self") ? "群体伤害自身中心大" : "群体伤害近距离大";
-                if (script == "SkillShockWave")
-                    return "冲击波伤害大";
-                if (script == "SkillSingleDamage")
-                    return DamageSize(dmg);
-            }
-            return null;
-        }
 
-        /// <summary>单体伤害按基值分档：≥90 大、≥60 中、其余小。</summary>
-        private static string DamageSize(float dmg)
-        {
-            return dmg >= 90 ? "单体伤害大" : (dmg >= 60 ? "单体伤害中" : "单体伤害小");
+            var mid = candidates.FirstOrDefault(t => t.Name.Contains("中"));
+            return mid != null ? mid.Name : candidates[0].Name;
         }
 
         /// <summary>模板 → 标准 Type，供编辑弹窗切换模板时联动；脚本取模板表 Script 列。</summary>
@@ -375,7 +365,7 @@ namespace SkillBaseTool
             return tiers.OrderBy(t => Math.Abs(PrimaryValue(store.ComponentByName[t].Effect, 1) - handValue.Value)).First();
         }
 
-        /// <summary>为品质 1~4 英雄技能自动填 Template / Modules，返回被改动的行 Id。</summary>
+        /// <summary>为尚未模板化的品质 1~4 英雄技能自动填 Template / Modules，返回被改动的行 Id。</summary>
         public static HashSet<int> AutoAssign(DataStore store, out int assignedGroups, out List<string> skipped)
         {
             var changed = new HashSet<int>();
@@ -389,7 +379,10 @@ namespace SkillBaseTool
                 // 已是锁定技能（如「才干」的初始属性）保持原样，不参与自动分配
                 if (IsLockedForEdit(store, lv1))
                     continue;
-                string t = PickTemplate(lv1);
+                // 只补空模板：已有模板的组保留现有档位，避免被自动分配覆盖
+                if (group.Any(s => !string.IsNullOrEmpty(s.TemplateName)))
+                    continue;
+                string t = PickTemplate(store, lv1);
                 if (string.IsNullOrEmpty(t) || !store.TemplateByName.ContainsKey(t))
                 {
                     skipped.Add(lv1.Display + "（" + lv1.ScriptName + "）");

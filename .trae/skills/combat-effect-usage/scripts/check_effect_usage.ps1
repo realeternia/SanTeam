@@ -51,7 +51,10 @@ foreach ($line in ($skText -split "`r?`n")) {
   if ($seen.ContainsKey($sn)) { continue }
   $seen[$sn] = 1
   $ct = $heroTypes[$t]
-  $h = $m[11].Groups[1].Value; $a = $m[12].Groups[1].Value
+  # 构造器尾部固定 6 个字符串：SelfEffect, HitEffect, AreaEffect, Icon, LinkSelf, LinkTeam
+  # （前面有 Modules 数组，字符串总数不固定，不能用绝对下标）
+  $cnt = $m.Count
+  $h = $m[$cnt-5].Groups[1].Value; $a = $m[$cnt-4].Groups[1].Value
   $hc = if ($effCat.ContainsKey($h)) { $effCat[$h] } else { '?' }
   $ac = if ($a -eq '') { '' } elseif ($effCat.ContainsKey($a)) { $effCat[$a] } else { '?' }
   if ($h -ne '') { if ($hitCount.ContainsKey($h)) { $hitCount[$h]++ } else { $hitCount[$h] = 1 } }

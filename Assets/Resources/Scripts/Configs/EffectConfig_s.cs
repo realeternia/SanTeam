@@ -200,7 +200,6 @@ namespace CommonConfig
             config[11070] = new EffectConfig(11070, "Wet", "蓝色下雨效果", "负面", "目标", true, "Effect/Wet", "", 6f, 1f, 5f, 1f, "");
             config[11080] = new EffectConfig(11080, "top_down_lightning_dot_blue", "攻击命中", "负面", "目标", true, "Effect/top_down_lightning_dot_orange", "", 7f, .5f, 5f, 1f, "#00D5FF");
             config[11090] = new EffectConfig(11090, "top_down_ice_dot", "攻击命中", "负面", "目标", true, "Effect/top_down_ice_dot", "", 5f, .5f, 5f, 1f, "");
-            config[11100] = new EffectConfig(11100, "Par_IceClusterSingle", "冰山技能", "伤害", "目标", true, "Effect/Par_IceClusterSingle", "", 4f, 1f, 5f, 1f, "");
             config[11110] = new EffectConfig(11110, "Par_FireSector", "扇形攻击火焰", "伤害", "目标", true, "Effect/Par_FireSector", "", 3f, 1f, 5f, 1f, "");
             config[11120] = new EffectConfig(11120, "Par_PurpleSector", "扇形攻击紫色", "伤害", "目标", true, "Effect/Par_PurpleSector", "", 3f, 1f, 5f, 1f, "");
             config[12000] = new EffectConfig(12000, "MagicFieldGreen", "绿色法阵特效", "增益", "范围", true, "Effect/MagicFieldGreen", "", 8f, 1f, 8f, 1f, "");
@@ -227,6 +226,7 @@ namespace CommonConfig
             config[12160] = new EffectConfig(12160, "Par_PoisonFields", "剧毒区域绿色", "伤害", "范围", true, "Effect/Par_PoisonFields", "", 3f, 1f, 5f, 1f, "");
             config[12170] = new EffectConfig(12170, "Par_PoisonSpring", "Par_PoisonSpring", "伤害", "范围", true, "Effect/Par_PoisonSpring", "", 2f, 1f, 5f, 1f, "");
             config[12180] = new EffectConfig(12180, "Par_WaterSpring", "Par_WaterSpring", "伤害", "范围", true, "Effect/Par_WaterSpring", "", 2f, 1f, 5f, 1f, "");
+            config[12190] = new EffectConfig(12190, "Par_IceClusterSingle", "冰山技能", "伤害", "范围", true, "Effect/Par_IceClusterSingle", "", 4f, 1f, 5f, 1f, "");
             config[13000] = new EffectConfig(13000, "BloodExplosion", "鲜血爆裂特效", "伤害", "Buff", true, "Effect/BloodExplosion", "", 3f, 1f, 8f, 1f, "");
             config[13010] = new EffectConfig(13010, "HeartStream", "爱心流光特效", "增益", "Buff", true, "Effect/HeartStream", "", 8f, 1f, 8f, 1f, "");
             config[13020] = new EffectConfig(13020, "ShieldSoftBlue", "蓝色护盾特效", "增益", "Buff", true, "Effect/ShieldSoftBlue", "", 3f, 1f, 8f, 1f, "");

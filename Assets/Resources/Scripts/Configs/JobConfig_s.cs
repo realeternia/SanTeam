@@ -97,10 +97,6 @@ namespace CommonConfig
         ///生命（职业基准值，英雄生命 = 该基准 × (1 + HeroConfig.Hp修正%/100)）
         /// </summary>
         public int Hp;
-        /// <summary>
-        ///射程（近战7 弓35 弩50 炮35 扇/相/棋/鼓/琴/医/工25）；
-        ///命中判距为「射程+双方占位半径」，已按新口径下调10（近战职业）
-        /// </summary>
         public int Range;
         /// <summary>
         ///攻速（20=每秒攻击1次，40=每秒2次）
@@ -192,7 +188,7 @@ namespace CommonConfig
             config[402] = new JobConfig(402, "丞相", "相", new string[]{"ap","magicres","mpRegen"}, 45, 0, 1.5f, 500, 25, 20, 2, 0, 15, 35, 8, 18, 0f, "SharpExplosionGreen");
             config[403] = new JobConfig(403, "棋手", "棋", new string[]{"ap","crit","mpRegen"}, 50, 0, 1.5f, 450, 25, 20, 2, 0, 15, 35, 8, 15, 0f, "LightningExplosionBlue");
             config[501] = new JobConfig(501, "鼓手", "鼓", new string[]{"ap","hp","mpRegen"}, 45, 0, 1.5f, 495, 25, 20, 2, 0, 25, 40, 8, 15, 0f, "SharpExplosionGreen");
-            config[502] = new JobConfig(502, "琴手", "琴", new string[]{"ap","mpRegen","atkspeed"}, 45, 0, 1.5f, 480, 25, 20, 2, 0, 20, 40, 8, 15, 0f, "StormExplosion");
+            config[502] = new JobConfig(502, "琴手", "琴", new string[]{"ap","mpRegen","atkspeed"}, 45, 0, 1.5f, 480, 25, 20, 2, 0, 20, 40, 8, 15, 0f, "FlashExplosionBlue");
             config[503] = new JobConfig(503, "医士", "医", new string[]{"ap","hpRegen","mpRegen"}, 45, 0, 1.5f, 480, 25, 20, 2, 0, 20, 30, 8, 14, 0f, "ShadowExplosionGreen");
             config[601] = new JobConfig(601, "锤兵", "锤", new string[]{"atk","hp","armor"}, 55, 0, 1f, 550, 7, 15, 2, 0, 25, 15, 10, 0, 0f, "SwordHitYellowCritical");
             config[602] = new JobConfig(602, "枪兵", "枪", new string[]{"atk","atkspeed","hp"}, 55, 0, 1f, 550, 7, 20, 2, 0, 25, 25, 10, 0, 0f, "SwordHitYellowCritical");
