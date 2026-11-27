@@ -73,7 +73,7 @@ public class SkillEquipHitWall : Skill
                     unitList.Add(unit);
                 }
             }
-            var damage = GetSkillDamage(); // 固定系数 + 比例系数×关联属性
+            var damage = GetTickDamage(term); // 分时结算：DamageStrength 为整段总伤害，按跳数均分
             foreach (var unit in unitList)
             {
                 if (damage > 0)

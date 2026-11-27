@@ -191,7 +191,7 @@ namespace CommonConfig
             config[2170] = new SkillTemplateComponentConfig(2170, "伤害反射", "状态效果", new string[]{"Buff","Defend"}, "Buff:反:reflect=0.25;BuffTime=5", 3, 2.5f, "给自己挂反伤 buff（reflect）", "按承受伤害与反弹比例折算", false);
             config[2180] = new SkillTemplateComponentConfig(2180, "生命链接", "状态效果", null, "Buff:链:damageShare=0.5;BuffTime=5", 3, 3f, "把目标受到的伤害按比例分摊给链接单位（链）", "按链接单位数与分摊比例折算等效减伤", true);
             config[2190] = new SkillTemplateComponentConfig(2190, "受击叠防", "状态效果", new string[]{"Buff","Defend"}, "Buff:守:armor=20;Buff:守:perStack=0.2;Strength2:maxStack=5;BuffTime=5", 3, 2.5f, "状态期间每次受击叠加双防（armor 初始双防、perStack 每层比例、maxStack 上限）", "按承受伤害次数与叠层上限折算等效减伤", true);
-            config[2200] = new SkillTemplateComponentConfig(2200, "焰衣", "状态效果", new string[]{"Buff","Defend"}, "Buff:焰:damageRate=1;BuffTime=5", 2, 2.5f, "获得焰衣：每秒对自身周围 Area 内敌人造成技能伤害的 damageRate（伤害%，默认 100%，焰）", "按技能每秒伤害×伤害%×持续时间×覆盖人数估值", true);
+            config[2200] = new SkillTemplateComponentConfig(2200, "焰衣", "状态效果", new string[]{"Buff","Defend"}, "Buff:焰:damageShare=0.2;BuffTime=5;TargetCount=3;DamageStrength=150,225,350,550,800", 4, 6f, "获得焰衣：每秒对自身周围 Area 内至多 TargetCount 名敌人造成技能伤害×damageShare（伤害分摊，默认 0.2=5 秒总伤害的 1/5，焰）", "按技能每秒伤害×伤害分摊×持续时间×覆盖人数估值", true);
             config[2210] = new SkillTemplateComponentConfig(2210, "威震", "状态效果", null, "Buff:震;Strength2:stunChance=0.5;BuffTime=5", 4, 4f, "普攻按概率眩晕目标并转为真实伤害（震）", "按攻速与眩晕时长折算期望收益", true);
             config[2300] = new SkillTemplateComponentConfig(2300, "时长延长小", "状态效果", null, "BuffTimeRate=1.3", 1, 1.5f, "Buff 持续时间延长 30%", "按持续时间等比放大所属状态效果的价值", false);
             config[2301] = new SkillTemplateComponentConfig(2301, "时长延长中", "状态效果", null, "BuffTimeRate=1.5", 2, 2.5f, "Buff 持续时间延长 50%", "按持续时间等比放大所属状态效果的价值", false);
@@ -244,11 +244,11 @@ namespace CommonConfig
             config[9081] = new SkillTemplateComponentConfig(9081, "自损", "特殊机制", new string[]{"单体伤害大","单体伤害中","单体伤害小"}, "TargetType:selfHurt;Strength2:selfHurt=0.2", 1, -1.5f, "施放时消耗自身生命（selfHurt），属于代价项", "负向项，抵减技能总价值", false);
             config[9082] = new SkillTemplateComponentConfig(9082, "燃烧法力", "特殊机制", null, "TargetType:mpBurn;Strength2:mpBurn=20", 2, 2f, "燃烧目标法力（mpBurn），压制技能循环", "按削弱的法力与技能频率估值", false);
             config[9190] = new SkillTemplateComponentConfig(9190, "持续场移动", "特殊机制", new string[]{"持续伤害大","持续伤害中","持续伤害小"}, "Strength2:moveDist=40", 2, 1.5f, "持续伤害场沿方向移动（moveDist）", "特殊机制，人工评审", true);
-
             config[163] = new SkillTemplateComponentConfig(163, "多段", "施放节奏", null, "Strength2:hitCount=3,3,4,4,5;Strength2:hitInterval=0.2", 2, 2f, "同一目标分多段结算伤害，每段间隔 hitInterval 秒（hitCount 可逐级配置）", "按总段数与单段数值折算总输出，注意目标死亡会截断剩余段数", false);
             config[4130] = new SkillTemplateComponentConfig(4130, "中心双倍", "增伤", null, "TargetType:centerDouble;Strength2:centerRate=2", 2, 3f, "范围伤害时，锁定的主目标承受 centerRate 倍伤害，其余目标正常", "按主目标承伤占比与倍率折算额外伤害", false);
             config[9040] = new SkillTemplateComponentConfig(9040, "治疗诅咒", "特殊机制", new string[]{"Heal"}, "TargetType:curseNearest;Strength2:curseRange=60", 2, 2.5f, "治疗时把 BuffId 挂给被治疗目标周围 curseRange 内最近的 TargetCount 名敌人", "按可覆盖敌人数与 debuff 强度估值，人工评审", true);
             config[9041] = new SkillTemplateComponentConfig(9041, "链接双方", "特殊机制", new string[]{"Heal"}, "TargetType:linkBoth", 2, 1.5f, "治疗目标后，把 BuffId 同时挂给目标与施法者自身（双方生命链接）", "按链接双方的自损/分摊收益估值，人工评审", true);
+
             RebuildIndex();
 
         }

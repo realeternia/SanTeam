@@ -10,6 +10,7 @@ using UnityEngine;
 /// 张角·落雷原地不动；张郃·震碎在 Strength2 配了 moveDist 时，法阵会在持续期间沿"施法者→落点"方向缓慢前移该总距离（逐跳均分，踩墙则停）。
 /// 仿法正·明断，由 SkillManager.CheckAidSkill 自动循环施放。
 /// 每跳伤害走基类统一伤害路径（CalcDamage），斩杀/护盾加成/残血增伤/兵种克制/最大生命追加/燃蓝/驱散等组件同样生效。
+/// DamageStrength 为整段总伤害，按跳数均分。
 /// </summary>
 public class SkillComDamageHitRegion : SkillComDamageSingle
 {
@@ -63,7 +64,7 @@ public class SkillComDamageHitRegion : SkillComDamageSingle
             var unitsInRange = SelectTargets(curPos, skillCfg.Area, false, skillCfg.TargetCount);
             if (unitsInRange.Count > 0)
             {
-                var baseDamage = GetSkillDamage(); // 固定系数 + 比例系数×关联属性
+                var baseDamage = GetTickDamage(term); // 分时结算：DamageStrength 为整段总伤害，按跳数均分
                 // 统一伤害路径：逐目标经 CalcDamage 修正 → 双击 / 直伤 + 命中特效 → 破盾 / 燃蓝 / 击退 / 驱散
                 foreach (var unit in unitsInRange)
                     ResolveDamage(unit, baseDamage);

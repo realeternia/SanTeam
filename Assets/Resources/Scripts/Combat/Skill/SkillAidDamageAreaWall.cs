@@ -8,7 +8,8 @@ using UnityEngine;
 /// 周瑜·火墙（ScriptName = "SkillAidDamageAreaWall"）：主动辅助技能——
 /// 以当前目标为基准点，在目标位置及 owner→目标方向左右各 90° 处召唤火墙
 /// （数量由 SummonCount 决定：1=仅中心，&gt;1=左右各 10，&gt;3=左右各 20），
-/// 每个火墙每 SummonHitInterval 秒对周围 Area*1.5 内敌人结算一次技能伤害，持续 SummonTime 秒。
+/// 每个火墙每 SummonHitInterval 秒对周围 Area*1.5 内敌人结算一次技能伤害，持续 SummonTime 秒
+/// （DamageStrength 为整段总伤害，按跳数均分）。
 /// 非持续施法：放下火墙后施法者可正常移动/普攻。
 /// </summary>
 public class SkillAidDamageAreaWall : Skill
@@ -88,7 +89,7 @@ public class SkillAidDamageAreaWall : Skill
                     unitList.Add(unit);
                 }
             }
-            var damage = GetSkillDamage(); // 固定系数 + 比例系数×关联属性
+            var damage = GetTickDamage(term); // 分时结算：DamageStrength 为整段总伤害，按跳数均分
             foreach (var unit in unitList)
             {
                 if (damage > 0)

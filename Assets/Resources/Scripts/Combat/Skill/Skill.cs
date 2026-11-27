@@ -68,6 +68,20 @@ public class Skill
     }
 
     /// <summary>
+    /// 分时结算技能的单跳伤害：DamageStrength 视为整段持续时间内的总伤害，按跳数 ticks 均分
+    /// （四舍五入，每跳至少 1；总伤害为 0 时仍为 0）。供火墙/火焰场/雷电阵等周期性跳伤技能使用。
+    /// </summary>
+    protected int GetTickDamage(int ticks)
+    {
+        var total = GetSkillDamage();
+        if (total <= 0)
+            return 0;
+        if (ticks <= 1)
+            return total;
+        return Mathf.Max(1, Mathf.RoundToInt((float)total / ticks));
+    }
+
+    /// <summary>
     /// 统一技能治疗公式（独立于伤害公式）：治疗量 = HealStrength × (100 + ap) / 100，ap=0 时治疗量=HealStrength。
     /// 治疗永远是法术向（ap 成长），不套用物理/真实伤害的 atk 计算，禁止用 GetSkillDamage 充当治疗。
     /// </summary>

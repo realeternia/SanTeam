@@ -2,14 +2,15 @@ using System.Collections;
 using UnityEngine;
 
 /// <summary>
-/// 焰衣（孙坚·破阵）：挂在自身身上的持续伤害光环。存在期间每秒对自身 skillCfg.Area 半径内的所有敌人
-/// 造成 Skill.GetSkillDamage(skillCfg, 施法者) × StrengthBuff1 key "damageRate"（伤害%，默认 100%）的技能伤害，
-/// 并弹伤害飘字。持续时间由 SkillComBuffSingle 施放时的 BuffTime 控制；技能侧配 TargetType=noStack 保证不会重叠多层。
+/// 焰衣（孙坚·破阵）：挂在自身身上的持续伤害光环。存在期间每秒对自身 skillCfg.Area 半径内至多
+/// skillCfg.TargetCount 名敌人造成 Skill.GetSkillDamage(skillCfg, 施法者) × StrengthBuff1 key "damageShare"
+/// （伤害分摊，未配置时按 100%；焰衣按 BuffTime 配置为 1/持续秒数，如 5 秒=0.2），并对命中目标播放 skillCfg.HitEffect。
+/// 持续时间由 SkillComBuffSingle 施放时的 BuffTime 控制；技能侧配 TargetType=noStack 保证不会重叠多层。
 /// </summary>
 public class BuffFireCloak : Buff
 {
     private Coroutine tickCoroutine;
-    private float damageRate = 1f; // 伤害%：对标技能伤害的倍率，未配置时按 100%
+    private float damageShare = 1f; // 伤害分摊：技能伤害按该比例分摊到每跳，未配置时按 100%
 
     public BuffFireCloak(int id, int skillId, Chess caster, Chess unit, float lastTime)
         : base(id, skillId, caster, unit, lastTime)
@@ -24,7 +25,7 @@ public class BuffFireCloak : Buff
             GameLog.Error("BuffFireCloak: 找不到技能配置 buffId=" + id);
             return;
         }
-        damageRate = GetStrBuff("damageRate", 1f);
+        damageShare = GetStrBuff("damageShare", 1f);
         tickCoroutine = chess.StartCoroutine(TickDamage(chess));
     }
 
@@ -47,17 +48,18 @@ public class BuffFireCloak : Buff
                 yield break;
 
             var attrOwner = caster != null ? caster : chess;
-            var dmg = (int)(Skill.GetSkillDamage(skillCfg, attrOwner) * damageRate);
+            var dmg = (int)(Skill.GetSkillDamage(skillCfg, attrOwner) * damageShare);
             if (dmg <= 0)
                 continue;
 
-            var enemies = WorldManager.Instance.GetEnemyInRange(chess.transform.position, skillCfg.Area, chess.side);
+            // 限定最大伤害数（TargetCount，<=0 不限），并沿用技能的 SelectOnly / SelectFirst 选取规则
+            var enemies = TargetSelector.Select(chess, chess.transform.position, skillCfg.Area, false,
+                skillCfg.SelectOnly, skillCfg.SelectFirst, skillCfg.TargetCount);
             foreach (var e in enemies)
             {
-                if (e == null || e.hp <= 0)
-                    continue;
                 e.OnSkillDamaged(attrOwner, skillCfg.Id, dmg);
-                WorldManager.Instance.AddBattleText("-" + dmg, e.transform.position, new Vector2(0, 60), SysColor.Battle.DamageColor, 2);
+                if (!string.IsNullOrEmpty(skillCfg.HitEffect))
+                    EffectManager.PlaySkillEffect(e, skillCfg.HitEffect);
             }
         }
     }

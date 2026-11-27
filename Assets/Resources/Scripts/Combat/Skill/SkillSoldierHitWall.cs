@@ -7,7 +7,8 @@ using UnityEngine;
 
 /// <summary>
 /// 喷火兽兵种技能（SoldierConfig.Skill = "喷火"）：普攻命中后按 Rate 概率在目标位置及左右两侧
-/// 生成火焰墙，每隔 SummonHitInterval 秒对范围内敌人结算一次伤害，共持续 SummonTime 秒。
+/// 生成火焰墙，每隔 SummonHitInterval 秒对范围内敌人结算一次伤害，共持续 SummonTime 秒
+/// （DamageStrength 为整段总伤害，按跳数均分）。
 /// </summary>
 public class SkillSoldierHitWall : Skill
 {
@@ -77,7 +78,7 @@ public class SkillSoldierHitWall : Skill
                     unitList.Add(unit);
                 }
             }
-            var damage = GetSkillDamage(); // 固定系数 + 比例系数×关联属性
+            var damage = GetTickDamage(term); // 分时结算：DamageStrength 为整段总伤害，按跳数均分
             foreach (var unit in unitList)
             {
                 if (damage > 0)

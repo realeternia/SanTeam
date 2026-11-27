@@ -6,7 +6,8 @@ using CommonConfig;
 using UnityEngine;
 
 /// <summary>
-/// 火攻场：类似HitWall，攻击时在目标位置召唤一个火焰场，持续造成百分比魔法伤害；
+/// 火攻场：类似HitWall，攻击时在目标位置召唤一个火焰场，持续造成百分比魔法伤害
+/// （DamageStrength 为整段总伤害，按跳数均分）；
 /// 蔓延：若目标位置周围 Area 内已存在火（SummonTag=火，不区分来源，场景中任意火场都算），则按发动概率(Rate)在 Range 范围内随机敌人位置放火，等级越高概率越高
 /// 非持续施法：放火后施法者可正常移动/普攻，火焰场按 SummonTime 独立持续跳伤（施法者死亡则停止跳伤）
 /// </summary>
@@ -87,7 +88,7 @@ public class SkillBondHitFireArea : Skill
                 }
             }
 
-            var dmg = GetSkillDamage();
+            var dmg = GetTickDamage(term); // 分时结算：DamageStrength 为整段总伤害，按跳数均分
             foreach (var unit in unitList)
             {
                 // 百分比魔法伤害：经 OnSkillDamaged 按 DamageType 受抗性减免

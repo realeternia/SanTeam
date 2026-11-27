@@ -8,7 +8,8 @@ using UnityEngine;
 /// 陆逊·火海（术）：在身前扇形区域生成多片火持续灼烧。
 /// 必定有 1 片火落在目标单位身上；其余 SummonCount-1 片按 Range/SummonCount 等距分布在
 /// 施法者朝目标方向的扇形内（左右各 30° 随机开角）。
-/// 每片火召唤一个火焰场（SummonTag=火）并播放火特效，周期性(skillCfg.SummonHitInterval)对落点周围敌人持续造成伤害。
+/// 每片火召唤一个火焰场（SummonTag=火）并播放火特效，周期性(skillCfg.SummonHitInterval)对落点周围敌人持续造成伤害
+/// （DamageStrength 为整段总伤害，按跳数均分）。
 /// 非持续施法：放火后施法者可正常移动/普攻，火焰场按 SummonTime 独立持续跳伤。
 /// </summary>
 public class SkillAidDamageAreaField : Skill
@@ -103,7 +104,7 @@ public class SkillAidDamageAreaField : Skill
                 }
             }
 
-            var skillDamage = GetSkillDamage();
+            var skillDamage = GetTickDamage(term); // 分时结算：DamageStrength 为整段总伤害，按跳数均分
             foreach (var unit in unitList)
             {
                 if (skillDamage > 0)
