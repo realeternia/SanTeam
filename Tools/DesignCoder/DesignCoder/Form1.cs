@@ -18,6 +18,8 @@ namespace DesignCoder
         private static readonly string EffectConfigPath = Path.Combine(ConfigDir, "EffectConfig_s.cs");
         // 技能配置表（选图面板统计特效被多少技能引用）
         private static readonly string SkillConfigPath = Path.Combine(ConfigDir, "SkillConfig_s.cs");
+        // 技能模板表（校验 SkillConfig 的 Template 与 ScriptName 是否匹配）
+        private static readonly string SkillTemplateConfigPath = Path.Combine(ConfigDir, "SkillTemplateConfig_s.cs");
         // Buff 配置表（Buff 页签的引用计数）
         private static readonly string BuffConfigPath = Path.Combine(ConfigDir, "BuffConfig_s.cs");
         // 职业/小兵配置表（HitEffect 命中时显示黄色额外计数）
@@ -63,6 +65,8 @@ namespace DesignCoder
         // EffectConfig.Name -> MissilePath（弹道标记与 HitEffect 匹配校验用，EffectConfig 修改/切换时失效重建）
         private Dictionary<string, string> effectMissileMap;
         private readonly Dictionary<string, bool> effectRefCache = new Dictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
+        // SkillTemplateConfig.Name -> Script（SkillConfig 表脚本/模板一致性校验用，切换配置表时失效重建）
+        private Dictionary<string, string> skillTemplateScriptMap;
         // 势力短名/势力名 -> 势力主色（来自 ForceConfig.Names / ForceConfig.Colorstr），懒加载缓存
         private bool forceColorsLoaded = false;
         private readonly Dictionary<string, Color> forceColorByName = new Dictionary<string, Color>();
@@ -109,6 +113,8 @@ namespace DesignCoder
             this.KeyPreview = true;
             this.KeyDown += Form1_KeyDown;
             SetupFilterMenuItems();
+            // SkillConfig 表：脚本与模板对不上的行背景标红
+            dataGridView1.CellFormatting += dataGridView1_CellFormatting;
         }
 
         private void Form1_KeyDown(object sender, KeyEventArgs e)
@@ -196,6 +202,8 @@ namespace DesignCoder
                 currentConfigName = configName;
                 effectAreaMap = null;
                 effectMissileMap = null;
+                // 模板表可能刚被编辑过，重建脚本映射
+                skillTemplateScriptMap = null;
                 // 切换配置时清空列筛选（筛选条件按表独立，避免串表）
                 columnFilters.Clear();
 
@@ -1082,6 +1090,72 @@ namespace DesignCoder
                 if (fallback == null) fallback = baseName;
             }
             return fallback;
+        }
+
+        // 读取技能模板表 Name -> Script（懒加载，切换配置表时失效重建）
+        private Dictionary<string, string> GetSkillTemplateScriptMap()
+        {
+            if (skillTemplateScriptMap != null) return skillTemplateScriptMap;
+
+            skillTemplateScriptMap = new Dictionary<string, string>(StringComparer.Ordinal);
+            try
+            {
+                if (File.Exists(SkillTemplateConfigPath))
+                {
+                    var tplData = ConfigData.Parse(File.ReadAllText(SkillTemplateConfigPath, Encoding.UTF8));
+                    foreach (var row in tplData.Rows)
+                    {
+                        string name = row.ContainsKey("Name") ? (row["Name"] ?? "").Trim() : "";
+                        string script = row.ContainsKey("Script") ? (row["Script"] ?? "").Trim() : "";
+                        if (name.Length > 0)
+                            skillTemplateScriptMap[name] = script;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine("读取技能模板表失败[" + SkillTemplateConfigPath + "]：" + ex.Message);
+            }
+            return skillTemplateScriptMap;
+        }
+
+        // SkillConfig 表：Template 对应模板的 Script 与 ScriptName 不一致时返回 true（附原因）
+        private bool TryGetScriptTemplateMismatch(int rowIdx, out string reason)
+        {
+            reason = null;
+            if (currentConfig == null || currentConfig.ClassName != "SkillConfig") return false;
+            if (rowIdx < HeaderRowCount) return false;
+
+            string template = GetRowCellText(rowIdx, "Template").Trim();
+            if (template.Length == 0) return false;
+
+            string expectScript;
+            if (!GetSkillTemplateScriptMap().TryGetValue(template, out expectScript) || expectScript.Length == 0)
+                return false;
+
+            string script = GetRowCellText(rowIdx, "ScriptName").Trim();
+            if (string.Equals(expectScript, script, StringComparison.OrdinalIgnoreCase)) return false;
+
+            reason = "模板「" + template + "」对应脚本 " + expectScript + "，与 ScriptName「" + script + "」不一致";
+            return true;
+        }
+
+        // 脚本与模板对不上的数据行：整行背景标红（模板/脚本列悬停可看原因）
+        private void dataGridView1_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e)
+        {
+            string reason;
+            if (!TryGetScriptTemplateMismatch(e.RowIndex, out reason)) return;
+
+            e.CellStyle.BackColor = Color.FromArgb(120, 40, 40);
+            e.CellStyle.ForeColor = Color.FromArgb(255, 220, 220);
+            e.CellStyle.SelectionBackColor = Color.FromArgb(160, 65, 65);
+
+            if (e.ColumnIndex >= 0 && e.ColumnIndex < dataGridView1.Columns.Count)
+            {
+                string colName = dataGridView1.Columns[e.ColumnIndex].Name;
+                if (colName == "Template" || colName == "ScriptName")
+                    dataGridView1.Rows[e.RowIndex].Cells[e.ColumnIndex].ToolTipText = reason;
+            }
         }
 
         // 读取技能脚本源码（按 ScriptName 匹配 Combat/Skill 下的同名脚本文件），首次读取后缓存

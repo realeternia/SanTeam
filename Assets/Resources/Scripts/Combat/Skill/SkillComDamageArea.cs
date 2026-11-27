@@ -26,18 +26,21 @@ public class SkillComDamageArea : SkillComDamageSingle
         if (target == null)
             return false;
 
-        if (!CanCast(target))
-            return false;
-
         var center = GetCastCenter(target);
-
-        PlayCast(target);
-        PlayAreaEffect(center);
-
         var units = SelectTargets(center, skillCfg.Area, false, skillCfg.TargetCount);
 
         // 中心双倍：锁定目标承受 centerRate 倍伤害；若未被范围选人选中则补进来，保证主目标必中
         EnsureCenterDoubleTarget(units, target);
+
+        // 范围内无可命中目标时不发动：避免空放消耗 MP/CD 并播放无意义特效（自身中心型远程施法尤甚）
+        if (units.Count == 0)
+            return false;
+
+        if (!CanCast(target))
+            return false;
+
+        PlayCast(target);
+        PlayAreaEffect(center);
 
         // Buff 由 SkillConfig.BuffId 短名指定（如"缓"=减速、"叛"=叛逃），支持多个（如"慑,疫"）
         var buffIds = GetSkillBuffIds();
