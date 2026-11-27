@@ -81,7 +81,7 @@
 
 > 扇的连接英雄自身获得“负面 buff 时长 +30%~200%”，不含 mpRegen；`Strength2[mpRegen]` 与 `LinkTeam` 两处数值需保持一致。相（丞相/402）只提供 `LinkSelf` 士兵攻击/生命（20%~120%），不提供 mpRegen。
 
-### 3.4 刘备·仁德（法力分享，`SkillAidManaShare`）
+### 3.4 刘备·仁德（法力分享，`SkillAidManaTeamShare`）
 
 技能 Id 2020001 ~ 2020005，`MpCost=100`、`CD=3.5s`。发动时清空本技能累积法力，按下列公式分给我方全体英雄（含自身）：
 
@@ -189,6 +189,6 @@
 | 装备叠加 | `Chess.cs`（装备循环 `mpRegen += equipAttr.MpRegen`） |
 | 羁绊施加 | `JobLinkManager.cs`（`case "mpRegen"`） |
 | 攻击额外回蓝 | `SkillBondAttackMpGain.cs` |
-| 刘备·仁德法力分享 | `SkillAidManaShare.cs` |
+| 刘备·仁德法力分享 | `SkillAidManaTeamShare.cs` |
 | 英雄专属技能数值修正 | `ConfigManager.cs`（`PostModify`） |
 | 技能伤害/治疗计算 | `Skill.cs`（`GetSkillDamage()` / `GetSkillHeal()`） |

@@ -10,7 +10,7 @@ using UnityEngine;
 /// 每跳最多对 TargetCount 名区域内敌人造成一次伤害；跳伤之间互不去重，同一目标可被多跳累计命中。
 /// 命中后挂 SkillConfig.BuffId 指定的减益；在起始距离处播一次 AreaEffect 作为喷火视觉。
 /// </summary>
-public class SkillAidCastingFrontalFlaming : Skill
+public class SkillAidDamageCastingFrontal : Skill
 {
     /// <summary>默认跳伤间隔(秒)，未配置 SummonHitInterval 时使用</summary>
     private const float DefaultHitInterval = 0.5f;
@@ -18,7 +18,7 @@ public class SkillAidCastingFrontalFlaming : Skill
     /// <summary>喷火起始距离(米)，特效与伤害矩形均从该距离开始</summary>
     private const float FlamingStartDistance = 10f;
 
-    public SkillAidCastingFrontalFlaming(int id, Chess unit) : base(id, unit)
+    public SkillAidDamageCastingFrontal(int id, Chess unit) : base(id, unit)
     {
     }
 

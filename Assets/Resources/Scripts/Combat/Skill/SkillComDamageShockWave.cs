@@ -7,7 +7,7 @@ using UnityEngine;
 /// 配置了 BuffId 时额外给命中目标挂该 buff（如惊雷减速，比例取 Buff 短名对应键，如「缓」= slow），
 /// 未配置 BuffId 的技能不挂 buff。
 /// 配置了 Strength2 的 pushMin/pushMax 时，命中后沿"自身→目标"方向把目标随机推开 pushMin~pushMax 距离（如许褚·虎啸）。
-/// 多箭随机散射（太史慈·连珠）见 SkillAidShockWaveMulti。
+/// 多箭随机散射（太史慈·连珠）见 SkillAidDamageLineVolley。
 /// </summary>
 public class SkillComDamageShockWave : SkillComDamageSingle
 {

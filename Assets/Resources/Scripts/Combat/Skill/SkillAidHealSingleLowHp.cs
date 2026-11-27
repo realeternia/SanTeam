@@ -11,9 +11,9 @@ using UnityEngine;
 /// - 仅配置护盾/无治疗时，跳过满血目标且全满血不施放；带治疗时满血目标也可获得护甲等增益。
 /// 通过 Skill.CheckAidSkill 由 SkillManager 自动循环施放。
 /// </summary>
-public class SkillAidBuffLowHp : Skill
+public class SkillAidHealSingleLowHp : Skill
 {
-    public SkillAidBuffLowHp(int id, Chess unit) : base(id, unit)
+    public SkillAidHealSingleLowHp(int id, Chess unit) : base(id, unit)
     {
     }
 
@@ -26,7 +26,7 @@ public class SkillAidBuffLowHp : Skill
         var heal = GetSkillHeal();
         if (buffIds.Count == 0 && heal <= 0)
         {
-            GameLog.Error("SkillAidBuffLowHp: BuffId 与 HealStrength 均为空，技能无法生效 id=" + skillCfg.Id);
+            GameLog.Error("SkillAidHealSingleLowHp: BuffId 与 HealStrength 均为空，技能无法生效 id=" + skillCfg.Id);
             return false;
         }
 

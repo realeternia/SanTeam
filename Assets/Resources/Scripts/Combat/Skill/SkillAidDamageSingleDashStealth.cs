@@ -7,12 +7,12 @@ using UnityEngine;
 /// 每次释放同时给自己挂 SkillConfig.BuffId 指定的隐匿 Buff（"隐"，时长 BuffTime=5 秒）：
 /// 隐匿期间敌方索敌与单体技能锁定不到，且自身移动目的点改为"最远敌人身后 + 自身攻击射程"（见 Chess.ReplanMoveDest）。
 /// </summary>
-public class SkillAidRaidCamp : Skill
+public class SkillAidDamageSingleDashStealth : Skill
 {
     /// <summary>突进落点在目标身后的水平距离</summary>
     private const float DashOffset = 40f;
 
-    public SkillAidRaidCamp(int id, Chess unit) : base(id, unit)
+    public SkillAidDamageSingleDashStealth(int id, Chess unit) : base(id, unit)
     {
     }
 

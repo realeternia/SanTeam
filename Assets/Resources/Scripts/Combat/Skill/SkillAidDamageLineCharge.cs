@@ -8,14 +8,14 @@ using UnityEngine;
 /// 每段最多命中 TargetCount 名敌人、同一段内同一敌人只命中一次（跨段可被再冲一次），单人最多吃到两次伤害。
 /// 路径命中半径取 skillCfg.Area（Area=0 在全图语义下会命中全场，配置须非 0）。
 /// </summary>
-public class SkillAidCavalryStrike : Skill
+public class SkillAidDamageLineCharge : Skill
 {
     /// <summary>单段冲锋耗时（秒）</summary>
     private const float MoveDuration = 1f;
     /// <summary>路径采样步长（秒），与 RunCross 系列一致</summary>
     private const float StepTime = 0.025f;
 
-    public SkillAidCavalryStrike(int id, Chess unit) : base(id, unit)
+    public SkillAidDamageLineCharge(int id, Chess unit) : base(id, unit)
     {
     }
 

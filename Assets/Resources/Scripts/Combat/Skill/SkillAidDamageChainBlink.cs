@@ -10,14 +10,14 @@ using UnityEngine;
 /// 结束后停在最后目标附近。整段过程自身持续挂导弹特效（SelfEffect，走 EffectConfig.MissilePath 的导弹预制体），
 /// 瞬移时粒子在路径上留下拖尾残影。位移期间用 noMoveCount 锁住寻路/普攻，结束后 FindTarget 恢复。
 /// </summary>
-public class SkillAidFlashStrike : Skill
+public class SkillAidDamageChainBlink : Skill
 {
     /// <summary>相邻两次闪击的间隔（秒）</summary>
     private const float StrikeInterval = 0.5f;
     /// <summary>闪击落点相对目标中心的后退距离（防止与目标叠住）</summary>
     private const float BlinkBack = 10f;
 
-    public SkillAidFlashStrike(int id, Chess unit) : base(id, unit)
+    public SkillAidDamageChainBlink(int id, Chess unit) : base(id, unit)
     {
     }
 

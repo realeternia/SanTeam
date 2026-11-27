@@ -9,7 +9,7 @@ using UnityEngine;
 /// 再取其 Area 内距第一目标最远者为第二目标，取两者中点；仅有 1 个目标时，落点取在距该目标 SingleTargetDistance（&lt;10）的位置。
 /// 落地对 Area 范围内最多 TargetCount 个敌人（由近到远）造成 GetSkillDamage 伤害，并给自身挂「甲」Buff 提升 StrengthBuff1-armor 点护甲，持续 BuffTime 秒。
 /// </summary>
-public class SkillAidSkyFall : Skill
+public class SkillAidDamageAreaFall : Skill
 {
     /// <summary>下落起始高度（世界单位）</summary>
     private const float FallHeight = 25f;
@@ -18,7 +18,7 @@ public class SkillAidSkyFall : Skill
     /// <summary>单目标时的落点距离（要求 &lt;10 米）</summary>
     private const float SingleTargetDistance = 9f;
 
-    public SkillAidSkyFall(int id, Chess unit) : base(id, unit)
+    public SkillAidDamageAreaFall(int id, Chess unit) : base(id, unit)
     {
     }
 

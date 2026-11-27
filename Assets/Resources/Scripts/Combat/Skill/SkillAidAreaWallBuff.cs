@@ -2,18 +2,18 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// 杜预·冰山（ScriptName = "SkillAidIceberg"）：主动群伤技能——
+/// 杜预·冰山（ScriptName = "SkillAidAreaWallBuff"）：主动群伤技能——
 /// 以当前目标为基准点，沿「施法者→目标」方向的垂直方向横排召唤 SummonCount 座冰山（间距 IcebergSpacing），
 /// 每座冰山对周围 Area 内敌人各结算一次技能伤害，同一次施法内每个单位只结算一次；
 /// 命中目标额外附加 SkillConfig.BuffId（缓）指定的减速 Buff，持续 BuffTime 秒。
 /// 非持续施法：放完冰山后施法者可正常移动/普攻。
 /// </summary>
-public class SkillAidIceberg : SkillComDamageSingle
+public class SkillAidAreaWallBuff : SkillComDamageSingle
 {
     /// <summary>相邻冰山的横向间距（世界单位）</summary>
     private const float IcebergSpacing = 10f;
 
-    public SkillAidIceberg(int id, Chess unit) : base(id, unit)
+    public SkillAidAreaWallBuff(int id, Chess unit) : base(id, unit)
     {
     }
 

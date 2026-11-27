@@ -11,7 +11,7 @@ using UnityEngine;
 /// 每片火召唤一个火焰场（SummonTag=火）并播放火特效，周期性(skillCfg.SummonHitInterval)对落点周围敌人持续造成伤害。
 /// 非持续施法：放火后施法者可正常移动/普攻，火焰场按 SummonTime 独立持续跳伤。
 /// </summary>
-public class SkillAidCastingScorchedEarth : Skill
+public class SkillAidDamageAreaField : Skill
 {
     /// <summary>扇形左右开角（度）</summary>
     private const float HalfAngle = 30f;
@@ -20,7 +20,7 @@ public class SkillAidCastingScorchedEarth : Skill
 
     private List<Vector3> targetPosList;
 
-    public SkillAidCastingScorchedEarth(int id, Chess unit) : base(id, unit)
+    public SkillAidDamageAreaField(int id, Chess unit) : base(id, unit)
     {
     }
 

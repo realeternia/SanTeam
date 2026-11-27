@@ -5,17 +5,17 @@ using CommonConfig;
 using UnityEngine;
 
 /// <summary>
-/// 周瑜·火墙（ScriptName = "SkillAidFireWall"）：主动辅助技能——
+/// 周瑜·火墙（ScriptName = "SkillAidDamageAreaWall"）：主动辅助技能——
 /// 以当前目标为基准点，在目标位置及 owner→目标方向左右各 90° 处召唤火墙
 /// （数量由 SummonCount 决定：1=仅中心，&gt;1=左右各 10，&gt;3=左右各 20），
 /// 每个火墙每 SummonHitInterval 秒对周围 Area*1.5 内敌人结算一次技能伤害，持续 SummonTime 秒。
 /// 非持续施法：放下火墙后施法者可正常移动/普攻。
 /// </summary>
-public class SkillAidFireWall : Skill
+public class SkillAidDamageAreaWall : Skill
 {
     private List<Vector3> targetPosList;
 
-    public SkillAidFireWall(int id, Chess unit) : base(id, unit)
+    public SkillAidDamageAreaWall(int id, Chess unit) : base(id, unit)
     {
     }
 

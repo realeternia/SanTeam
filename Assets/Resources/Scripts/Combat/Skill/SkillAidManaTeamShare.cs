@@ -7,9 +7,9 @@ using UnityEngine;
 /// 每位英雄分得 总量 / 英雄数，按各自未满的蓝耗技能逐一充能（与名门共用 AddMp 入口）。
 /// MP 的清零由 Skill.CheckBurst 在发动瞬间完成，脚本通过 mpBeforeBurst 读取清零前的累积量。
 /// </summary>
-public class SkillAidManaShare : Skill
+public class SkillAidManaTeamShare : Skill
 {
-    public SkillAidManaShare(int id, Chess unit) : base(id, unit)
+    public SkillAidManaTeamShare(int id, Chess unit) : base(id, unit)
     {
     }
 

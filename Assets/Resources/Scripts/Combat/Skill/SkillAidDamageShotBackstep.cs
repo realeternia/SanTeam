@@ -7,7 +7,7 @@ using UnityEngine;
 /// 位移用 RetreatDuration 秒平滑播完（非瞬移，期间锁寻路/外部位移），
 /// 落地后再向原目标补射第二段（无视射程），第二段伤害为第一段的 SecondDamageRate。
 /// </summary>
-public class SkillAidBackstepShot : Skill
+public class SkillAidDamageShotBackstep : Skill
 {
     /// <summary>后撤距离(米)</summary>
     private const float RetreatDistance = 30f;
@@ -18,7 +18,7 @@ public class SkillAidBackstepShot : Skill
     /// <summary>第二段伤害相对第一段的比例</summary>
     private const float SecondDamageRate = 0.7f;
 
-    public SkillAidBackstepShot(int id, Chess unit) : base(id, unit)
+    public SkillAidDamageShotBackstep(int id, Chess unit) : base(id, unit)
     {
     }
 

@@ -6,9 +6,9 @@ using UnityEngine;
 /// 关羽·分兵：对目标造成一次魔法伤害，并以目标单位为对称中心，在本体的镜像位置召唤一个影分身
 /// （攻击/生命按 Strength2 比例 inheritRate 继承本体）。镜像点踩墙时回退到目标身后 Area 距离处。
 /// </summary>
-public class SkillAidShadowSplit : Skill
+public class SkillAidDamageSingleSummon : Skill
 {
-    public SkillAidShadowSplit(int id, Chess unit) : base(id, unit)
+    public SkillAidDamageSingleSummon(int id, Chess unit) : base(id, unit)
     {
     }
 

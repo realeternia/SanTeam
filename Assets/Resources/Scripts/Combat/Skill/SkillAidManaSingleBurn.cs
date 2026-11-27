@@ -7,9 +7,9 @@ using UnityEngine;
 /// 再把实际燃烧量 × 键 "mpShareRate"（默认 0.5）转移给 skillCfg.Range 半径内最近的一名友方，
 /// 该友方所有 MpCost&gt;0 的技能各加同量法力并各自裁剪到上限；身边无友方时转移给自己。
 /// </summary>
-public class SkillAidManaBurn : Skill
+public class SkillAidManaSingleBurn : Skill
 {
-    public SkillAidManaBurn(int id, Chess unit) : base(id, unit)
+    public SkillAidManaSingleBurn(int id, Chess unit) : base(id, unit)
     {
     }
 
@@ -49,7 +49,7 @@ public class SkillAidManaBurn : Skill
                 skill.AddMp(share);
         }
 
-        GameLog.Info("SkillAidManaBurn: 燃烧 " + target.chessName + " " + burned + " 点法力，转移 " + share + " 点给 " + receiver.chessName);
+        GameLog.Info("SkillAidManaSingleBurn: 燃烧 " + target.chessName + " " + burned + " 点法力，转移 " + share + " 点给 " + receiver.chessName);
         return true;
     }
 

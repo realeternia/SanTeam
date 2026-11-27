@@ -7,9 +7,9 @@ using UnityEngine;
 /// 然后给我方全体英雄（含施法者自己）挂 BuffId 指定的增益（"术"=法强提升，数值取 StrengthBuff1 的 "ap"），持续 BuffTime。
 /// 冷却长、耗蓝高，定位为决战型大招。
 /// </summary>
-public class SkillAidDominion : Skill
+public class SkillAidDamageAreaTeamBuff : Skill
 {
-    public SkillAidDominion(int id, Chess unit) : base(id, unit)
+    public SkillAidDamageAreaTeamBuff(int id, Chess unit) : base(id, unit)
     {
     }
 

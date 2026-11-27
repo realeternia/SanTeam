@@ -6,7 +6,7 @@ using UnityEngine;
 /// 首段 Buff 挂给目标、其余 Buff 挂给自身（BuffId="缓,愈,抗" → 减速给目标，回血与魔抗给自己），持续 BuffTime。
 /// 伤害结算与通用命中后处理（破盾/燃蓝/击退/苦肉/驱散）沿用 SkillComDamageSingle。
 /// </summary>
-public class SkillAidWhiteRobe : SkillComDamageSingle
+public class SkillAidDamageSingleDashBuff : SkillComDamageSingle
 {
     /// <summary>突进位移耗时(秒)</summary>
     private const float MoveDuration = 0.3f;
@@ -17,7 +17,7 @@ public class SkillAidWhiteRobe : SkillComDamageSingle
     /// <summary>位移途中禁止重复发动</summary>
     private bool moving;
 
-    public SkillAidWhiteRobe(int id, Chess unit) : base(id, unit)
+    public SkillAidDamageSingleDashBuff(int id, Chess unit) : base(id, unit)
     {
     }
 

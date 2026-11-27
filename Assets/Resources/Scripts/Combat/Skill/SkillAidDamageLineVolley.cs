@@ -1,18 +1,18 @@
 ﻿using UnityEngine;
 
 /// <summary>
-/// 太史慈·连珠专用（ScriptName = "SkillAidShockWaveMulti"）：朝目标方向一次射出多支 shockwave 箭，
+/// 太史慈·连珠专用（ScriptName = "SkillAidDamageLineVolley"）：朝目标方向一次射出多支 shockwave 箭，
 /// 箭数 = SummonCount ~ SummonCount+2（随机），开角 ±30°，第 1 支固定朝正中心。
 /// 每支箭的伤害/命中结算复用 Missile 的方向型流程（每人只结算一次，最多 TargetCount 名），不做击退。
 /// </summary>
-public class SkillAidShockWaveMulti : Skill
+public class SkillAidDamageLineVolley : Skill
 {
     /// <summary>箭矢最大偏转角（度），正负对称</summary>
     public const float SpreadHalfAngle = 30f;
     /// <summary>在 SummonCount 基础上随机追加的最大箭数（0 ~ 该值）</summary>
     public const int ExtraArrowMax = 2;
 
-    public SkillAidShockWaveMulti(int id, Chess unit) : base(id, unit)
+    public SkillAidDamageLineVolley(int id, Chess unit) : base(id, unit)
     {
     }
 

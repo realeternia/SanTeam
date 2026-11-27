@@ -7,7 +7,7 @@ using UnityEngine;
 /// 并施加「陷阵」BuffTime 秒；停留 BuffTime 秒后沿抛物线跳回起跳点。
 /// 两段跳跃统一走 Skill.JumpTo（跳跃期间 isJumping，击退/拖拽/换位等外部位移无法打断，动作必播完）。
 /// </summary>
-public class SkillAidJumpReturn : Skill
+public class SkillAidDamageSingleJump : Skill
 {
     /// <summary>跳跃峰值高度（世界单位）</summary>
     private const float JumpHeight = 18f;
@@ -16,7 +16,7 @@ public class SkillAidJumpReturn : Skill
     /// <summary>落点与目标的水平距离候选（依次尝试，被挡则收短，最后落到目标脚下）</summary>
     private static readonly float[] LandDists = { 12f, 6f, 0f };
 
-    public SkillAidJumpReturn(int id, Chess unit) : base(id, unit)
+    public SkillAidDamageSingleJump(int id, Chess unit) : base(id, unit)
     {
     }
 
@@ -61,7 +61,7 @@ public class SkillAidJumpReturn : Skill
         // 落地：先结算一次单体技能伤害，再施加陷阵
         var buffIds = GetSkillBuffIds();
         if (buffIds.Count == 0)
-            GameLog.Error($"SkillAidJumpReturn: 缺少陷阵Buff配置 BuffId={skillCfg.BuffId} 技能id={id}");
+            GameLog.Error($"SkillAidDamageSingleJump: 缺少陷阵Buff配置 BuffId={skillCfg.BuffId} 技能id={id}");
         var damage = GetSkillDamage();
         if (target != null && target.hp > 0)
         {

@@ -111,8 +111,8 @@ description: 《三国卡牌》(金铲铲式) SkillConfig 表的配置方法与�
 | 群体治疗（按缺口） | `ally;notFullHp` | `biggestHpGap` |
 | 单体伤害 | `enemy` | 空（沿用当前索敌目标） |
 
-- 单体类脚本（`SkillComDamageSingle`、`SkillComDamageShockWave*`、`SkillAidDualLaser` 等）统一走基类 `SelectSingleTarget(Range)`：未配 `SelectFirst` 时行为与原来一致（沿用 `owner.targetChess` 并校验射程）。
-- 不走筛选的类型：冲刺/直线路径扫掠（`SkillAidCavalryStrike`、`SkillBondAttackRunCrossPlus`）、全员光环/全体友军加成（`SkillComBuffAura`、`SkillBondFactionShield`、`SkillAidManaShare`、`SkillAidSoldier*` / `SkillBondInitSoldierBuff` 的小兵加成）、嘲讽强制、导弹逐帧探测。这些不是"选目标"，`SelectOnly`/`SelectFirst` 不参与逻辑。
+- 单体类脚本（`SkillComDamageSingle`、`SkillComDamageShockWave*`、`SkillAidDamageLineLaser` 等）统一走基类 `SelectSingleTarget(Range)`：未配 `SelectFirst` 时行为与原来一致（沿用 `owner.targetChess` 并校验射程）。
+- 不走筛选的类型：冲刺/直线路径扫掠（`SkillAidDamageLineCharge`、`SkillBondAttackRunCrossPlus`）、全员光环/全体友军加成（`SkillComBuffAura`、`SkillBondFactionShield`、`SkillAidManaTeamShare`、`SkillAidSoldier*` / `SkillBondInitSoldierBuff` 的小兵加成）、嘲讽强制、导弹逐帧探测。这些不是"选目标"，`SelectOnly`/`SelectFirst` 不参与逻辑。
 - 远程技能以自身为中心会全程打空（站位远离敌阵）→ 用目标中心；近战贴脸 AoE 用 `self`。
 - 已废弃词不要复用：同一标记在不同脚本里含义必须一致，新增标记前先全局 `Grep HasSkillFlag`。
 - **标记实现位置**：`TargetType` 标记与组件 `Strength2` 键只在 3 个体系基类里读取（见第八节表格），子类（`SkillComDamageArea` / `SkillComDamageShockWave` / `SkillComBuffArea` / `SkillComDamageTaunt` 等）只声明形态，不得再写 `HasSkillFlag` / `GetStr2`，保证同一组件在所有形态下行为一致（脚本自有形态参数如 `moveDist` 除外）。
@@ -259,7 +259,7 @@ description: 《三国卡牌》(金铲铲式) SkillConfig 表的配置方法与�
 - **保留列（9 列身份列）**：`Id Name Sname Version Descript Type Template Modules Lv`。
 - **展开规则（k-v 映射）**：模板先按 `Effect` 的绑定把 `Lv` 对应数值写入目标列/槽（伤害模板=`DamageStrength`、治疗模板=`HealStrength`，两者互斥清零）；随后 `Range`/`Area`/`TargetCount` 仅在模板值 >0 时覆盖（Range 默认 40、Area 默认小范围 20、TargetCount 群体 3/单体 1），`CD` 取模板，`MpCost` = 模板 `MpCost × 10`；再按**技能自己 `Modules`** 顺序展开每个组件的 `Effect`（列写入 / `Buff:短名:槽键` 追加 `BuffId`+`StrengthBuff1` / `TargetType:标记` / `TriggerCondition` / `Strength2:键`）。`BuffId`/`StrengthBuff1`/`Strength2`/`TargetType` 已手配的键不覆盖，只补缺失项。`BuffTime` 取模板与各组件提供值的最大值，再乘 `BuffTimeRate`（多个取最大值）；`BuffEffectRate` 对 `BuffConfig.BuffAttrDynamic` 的槽键数值乘算（手配键不参与，`BuffAttrConst` 不参与）。模板默认 `Modules` 只参与估值与推荐校验，**不注入任何效果**（当前所有模板 `Modules` 均为空，需要组件请配到技能行，不要放模板）。
 - **可被组件写入的列**：`EffectColumns` = `DamageStrength HealStrength CD MpCost StartMpRate AuraMpRate Range Area TargetCount Rate BuffTime BuffTimeRate BuffEffectRate SelectOnly SelectFirst TargetType TriggerCondition Strength2 Buff SummonCount SummonTime SummonHitInterval SummonSpeed SummonTag`。其中 `BuffTimeRate` 乘最终 `BuffTime`，`BuffEffectRate` 对 `BuffConfig.BuffAttrDynamic` 的键乘算（两者只参与展开，不落到技能表列）。目标筛选类组件（`3000~3999`）写 `SelectOnly:`/`SelectFirst:`，行为标记才写 `TargetType:`（如 `3090 施法者必含`→`TargetType:selfAlways`）。
-- **现状覆盖**：品质 1~4 英雄技能 152 个（Q1 26 / Q2 54 / Q3 47 / Q4 25），模板化 128 个（645 行 SkillBase），24 个特化不模板化。Q4 共 14 个专属脚本：曹操·SkillAidDominion、赵云·SkillAidFlashStrike、张飞·SkillAidSpinAttack、马超·SkillAidCavalryStrike、关羽·SkillAidShadowSplit、姜维·SkillAidDualLaser、郭嘉·SkillAidCastingLastStrategy、典韦·SkillAidSkyFall、甘宁·SkillAidRaidCamp、太史慈·SkillAidShockWaveMulti、周瑜·SkillAidFireWall、陆逊·SkillAidCastingScorchedEarth、吕布·SkillAidCastingDrain、邓艾·SkillAidJumpReturn。Q1~3 共 10 个：孙权·SkillAidFeint、张昭·SkillAidSoldierFortify、曹叡·SkillAidManaBurn、刘备·SkillAidManaShare、孙尚香·SkillAidBackstepShot、陈宫·SkillAidCastingFrontalFlaming、蒋琬·SkillComHealArea（手配群疗，Template 留空）、吕蒙·SkillAidWhiteRobe、司马炎/陆抗·SkillAidRangeSplit。
+- **现状覆盖**：品质 1~4 英雄技能 152 个（Q1 26 / Q2 54 / Q3 47 / Q4 25），模板化 128 个（645 行 SkillBase），24 个特化不模板化。Q4 共 14 个专属脚本：曹操·SkillAidDamageAreaTeamBuff、赵云·SkillAidDamageChainBlink、张飞·SkillAidSpinAttack、马超·SkillAidDamageLineCharge、关羽·SkillAidDamageSingleSummon、姜维·SkillAidDamageLineLaser、郭嘉·SkillAidDamageCastingLine、典韦·SkillAidDamageAreaFall、甘宁·SkillAidDamageSingleDashStealth、太史慈·SkillAidDamageLineVolley、周瑜·SkillAidDamageAreaWall、陆逊·SkillAidDamageAreaField、吕布·SkillAidDamageCastingDrain、邓艾·SkillAidDamageSingleJump。Q1~3 共 10 个：孙权·SkillAidSummonSingleClone、张昭·SkillAidSoldierFortify、曹叡·SkillAidManaSingleBurn、刘备·SkillAidManaTeamShare、孙尚香·SkillAidDamageShotBackstep、陈宫·SkillAidDamageCastingFrontal、蒋琬·SkillComHealArea（手配群疗，Template 留空）、吕蒙·SkillAidDamageSingleDashBuff、司马炎/陆抗·SkillAidBuffAreaRangeSplit。
 - **数值口径提醒**：模板 `Values` 是「标准态」主数值，与手配 `DamageStrength`/`HealStrength`（受品质、MP 系数、法术倍率影响）不是同一量级，直接覆盖会显著改变战斗数值；需要标定时应在烘焙阶段按品质/MP 系数缩放模板值，或回调模板 `Values`，不要逐行改 `SkillBaseConfig`（它由脚本重新生成）。
 
 ## 三、Id 段（当前实际占用）
@@ -322,14 +322,14 @@ description: 《三国卡牌》(金铲铲式) SkillConfig 表的配置方法与�
 | `SkillComDamageSingle` | 单体伤害（125 行，最常用） | **单体伤害体系基类**：`DamageStrength` + `BuffId`（空=纯伤害），固定流程「选人 → 发动判定 → 施法表现 → 伤害结算 → 命中后处理」，派生类只覆写钩子（`SelectTarget`/`CanCast`/`PlayCast`/`CalcDamage`/`ResolveHit`/`ApplyDamage`/`AfterDamage`）即可继承全部通用组件。体系内派生：`SkillComDamageArea`、`SkillComDamageShockWave`、`SkillComDamageJumpChain`、`SkillComDamageHitRegion`（各自覆写 `CheckAidSkill`，继承通用能力）。注意：一次施放只结算 1 段，多段必须另写派生脚本 |
 | `SkillComDamageArea` | 范围伤害 + 可选 Buff（60 行） | `SelectOnly=enemy`；`TargetType` 空=目标中心 / `self`=自身中心；`BuffId` 可 0~N 段（未配置即纯伤害） |
 | `SkillComBuffSingle` | 单体增益（90 行，缺省自身） | **单体增益体系基类**：`BuffId` 挂 1~N 个 Buff，数值放 `Strength2`/`StrengthBuff1` 由 Buff 读。目标由 `SelectOnly`/`SelectFirst` 在 `Area` 内选（最多 `TargetCount` 名），**留空则默认给自己**；所以既能当"自身强化"，也能配 `ally;hero` 给友军加 Buff。钩子：`CanStart`/`SelectBuffTargets`/`CanCast`/`PlayCast`/`ApplyBuffs`；体系内派生：`SkillComBuffArea`、`SkillComBuffAura`、`SkillComDamageTaunt`。**反伤也走这里**：`BuffId=反`、`StrengthBuff1=reflect:比例`、`BuffTime=持续时间`，由 `BuffReflect` 在 Buff 期间结算；连接授予的常驻反伤（如 `刺`）加 `TargetType=noStack`，避免 CD 0 时每帧重放 |
-| `SkillComBuffArea` | 群体增益（45 行） | `SelectOnly=ally;...` + `SelectFirst` 选人（见 2.3）；护盾类按统一护盾公式写 `Strength2[shield]`。施放中心分两种模板：`群体友方增益`（自身中心，Area 20）、`-目标小`（`TargetType:targetCenter`，Area 25）；要更大半径加 `中范围`/`大范围` 组件。近远分段（司马炎·一统 / 陆抗·西陵）走专属脚本 `SkillAidRangeSplit`，不再作为通用组件 |
+| `SkillComBuffArea` | 群体增益（45 行） | `SelectOnly=ally;...` + `SelectFirst` 选人（见 2.3）；护盾类按统一护盾公式写 `Strength2[shield]`。施放中心分两种模板：`群体友方增益`（自身中心，Area 20）、`-目标小`（`TargetType:targetCenter`，Area 25）；要更大半径加 `中范围`/`大范围` 组件。近远分段（司马炎·一统 / 陆抗·西陵）走专属脚本 `SkillAidBuffAreaRangeSplit`，不再作为通用组件 |
 | `SkillComBuffAura` | 光环（40 行） | 模板只有 `光环中`（半径 40、`TargetCount=0` 不限人数、评分 2），需要更大范围加 `中范围`/`大范围` 组件。每 1.4 秒对 `Area` 内按 `SelectOnly`/`SelectFirst` 选中的单位（可含敌方）挂 1.5 秒 `BuffId`（固定时长，`BuffTime` 列不参与）；`MpCost=0` 常开；`MpCost>0` 时 MP 满且 CD 就绪后通过施法开启（施法不清空 MP，MP 作为光环燃料），开启后每秒扣 `1×AuraMpRate` 点 MP（默认 20，组件 150~154 可调 15/20/25/30/40）、期间攻击/受击回蓝照常累计，MP<=0 自动关闭并移除 `SelfEffect`，再次开启需 MP 充满后重新施法 |
 | `SkillComHealArea` | 范围治疗（25 行） | `HealStrength` + `Area`；单目标结算走基类 `HealUnit`，`overflowToArmor` 等组件自动生效 |
 | `SkillComHealSingle` | 单体治疗（15 行） | **单体治疗体系基类**：只治 1 名友军（`Area` 内按 `SelectFirst`，典型 `lowestHp`），默认净化并挂 `BuffId`（支持多段/护盾），`HitEffect` 打在目标身上；钩子 `SelectTarget`/`CanCast`/`PlayCast`/`ResolveHeal`/`CleanseOnHeal`；体系内派生：`SkillComHealArea`、`SkillComHealAreaCasting`、`SkillComHealJumpChain` |
 | `SkillComDamageJumpChain` | 伤害弹射（5 行） | 敌方跳跃伤害链；每跳衰减读 `Strength2[jumpDecay]`（模板默认 0.85，组件可改 1/0.7/0.5），命中可带 `BuffId` 减益 |
 | `SkillComHealJumpChain` | 治疗弹射（5 行） | 友军跳跃治疗链；同样读 `Strength2[jumpDecay]`，固定选 `ally;hero;notFullHp + lowestHp` 语义 |
 | `SkillBondBacklineStrike` | 打后排（15 行） | `smart` 智能选后排 / 默认最远 |
-| `SkillAidBuffLowHp` / `SkillBondDefReduceDamageRate` | 低血触发（5 行各） | `TriggerCondition=hprate<50` + `Strength2[reduceRate]` |
+| `SkillAidHealSingleLowHp` / `SkillBondDefReduceDamageRate` | 低血触发（5 行各） | `TriggerCondition=hprate<50` + `Strength2[reduceRate]` |
 | `SkillDumb` | 占位（65 行） | 无战斗行为，仅用于职业/道具等纯展示行；**不要给它配伤害字段** |
 
 **组件语义只在体系基类结算（强制）**：`TargetType` 标记与 `Strength2` 键的读取一律写在 3 个体系基类里，派生类（含 `SkillComDamageShockWave` / `SkillComBuffArea` 等）不得再写 `HasSkillFlag` / `GetStr2`，否则同一组件在不同形态下表现不一致。当前归属：
@@ -338,7 +338,7 @@ description: 《三国卡牌》(金铲铲式) SkillConfig 表的配置方法与�
 | --- | --- |
 | `SkillComDamageSingle` | `self`（自身中心）/ `missile`（飞弹表现+飞行速度取 SummonSpeed）/ `highHp`·`randomAmp`·`isolatedAmp`·`shieldedAmp`·`fullHp`·`castStack`（增伤修正）/ `execute`·`shieldBonus`·`missingHp`·`vsJob`·`soldierDamage`·`critRateBonus`（伤害修正）/ `antiShield`·`mpBurn`·`pushMin/pushMax`·`selfHurt`·`selfBuff`·`dispel`（命中后处理）/ 命中特效 |
 | `SkillComHealSingle` | `overflowToArmor`（溢出转护甲）/ 驱散负面 / 护盾值写入 / 多段 `BuffId` / 命中特效，统一入口 `HealUnit(unit, heal, withBuffs)` |
-| `SkillComBuffSingle` | `noStack` / `permanent` / `selfAlways` / `noDedupe` / `targetCenter` / 护盾值写入；近远分段由专属脚本 `SkillAidRangeSplit` 实现 |
+| `SkillComBuffSingle` | `noStack` / `permanent` / `selfAlways` / `noDedupe` / `targetCenter` / 护盾值写入；近远分段由专属脚本 `SkillAidBuffAreaRangeSplit` 实现 |
 
 新增组件时：先在对应体系基类实现语义，再在组件表登记 `Effect`（`TargetType:xxx` 或 `Strength2:key=...`），派生类只需声明形态（单体/范围/弹射等）。
 

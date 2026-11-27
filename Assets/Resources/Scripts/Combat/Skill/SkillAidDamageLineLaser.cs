@@ -2,16 +2,16 @@
 using UnityEngine;
 
 /// <summary>
-/// 姜维·流光（车，ScriptName = "SkillAidDualLaser"）：向正前方及左右各 45° 共 3 道激光，
+/// 姜维·流光（车，ScriptName = "SkillAidDamageLineLaser"）：向正前方及左右各 45° 共 3 道激光，
 /// 每道复用惊雷的方向型导弹流程独立结算（各自最多命中原有 TargetCount 个目标，互不去重，
 /// 同一目标被多道命中时伤害叠加），命中附加效果走基类 OnMissileHit（未配置 BuffId 时不挂 buff）。
 /// </summary>
-public class SkillAidDualLaser : SkillComDamageShockWave
+public class SkillAidDamageLineLaser : SkillComDamageShockWave
 {
     /// <summary>左右两道激光相对正前方的偏转角（度）</summary>
     private const float LaserSpreadAngle = 25f;
 
-    public SkillAidDualLaser(int id, Chess unit) : base(id, unit)
+    public SkillAidDamageLineLaser(int id, Chess unit) : base(id, unit)
     {
     }
 
@@ -43,7 +43,7 @@ public class SkillAidDualLaser : SkillComDamageShockWave
             WorldManager.Instance.CreateSpellMissile(owner, startPos + dir * skillCfg.Range, GetSummonTime(), skillCfg.SummonSpeed, skillCfg.Area, skillCfg.Id, damage, skillCfg.HitEffect, null, OnMissileHit, effectTint);
         }
 
-        GameLog.Debug("SkillAidDualLaser id=" + id.ToString() + " damage=" + damage.ToString());
+        GameLog.Debug("SkillAidDamageLineLaser id=" + id.ToString() + " damage=" + damage.ToString());
 
         return true;
     }

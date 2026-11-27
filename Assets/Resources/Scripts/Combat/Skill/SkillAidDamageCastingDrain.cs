@@ -9,7 +9,7 @@ using UnityEngine;
 /// 同时吸取目标生命（造成 GetSkillDamage 伤害）并把等量生命回复自身。
 /// 起手位移用 noMoveCount 锁住寻路，引导期间自身处于引导状态(castingSkillId>0)，无法移动/普攻，被晕眩/死亡打断；目标死亡则提前结束。
 /// </summary>
-public class SkillAidCastingDrain : Skill
+public class SkillAidDamageCastingDrain : Skill
 {
     /// <summary>起飞阶段耗时（秒）</summary>
     private const float FlyUpDuration = 1f;
@@ -20,7 +20,7 @@ public class SkillAidCastingDrain : Skill
     /// <summary>落点与目标的水平距离（落在目标身前）</summary>
     private const float LandDistance = 15f;
 
-    public SkillAidCastingDrain(int id, Chess unit) : base(id, unit)
+    public SkillAidDamageCastingDrain(int id, Chess unit) : base(id, unit)
     {
     }
 
@@ -112,7 +112,7 @@ public class SkillAidCastingDrain : Skill
     {
         var stunCfg = BuffConfig.GetConfigByNameS(skillCfg.BuffId);
         if (stunCfg == null)
-            GameLog.Error("SkillAidCastingDrain: 未找到眩晕Buff短名：" + skillCfg.BuffId);
+            GameLog.Error("SkillAidDamageCastingDrain: 未找到眩晕Buff短名：" + skillCfg.BuffId);
 
         var endTime = Time.time + Mathf.Max(0.1f, skillCfg.SummonTime);
         while (Time.time < endTime)

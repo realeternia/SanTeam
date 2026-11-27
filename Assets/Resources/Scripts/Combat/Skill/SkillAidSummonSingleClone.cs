@@ -7,9 +7,9 @@ using UnityEngine;
 /// 幻影在施法者朝最近敌人的方向、距离 Area 处生成（佯攻站位，踩墙则回退到施法者位置），
 /// 攻击/生命按 Strength2 的 "inheritRate" 继承被复制武将。
 /// </summary>
-public class SkillAidFeint : Skill
+public class SkillAidSummonSingleClone : Skill
 {
-    public SkillAidFeint(int id, Chess unit) : base(id, unit)
+    public SkillAidSummonSingleClone(int id, Chess unit) : base(id, unit)
     {
     }
 
