@@ -85,7 +85,6 @@
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffStackBuf.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillBondHitBuff.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidDamageAreaTeamBuff.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidBuffAreaRangeSplit.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidDamageSingleDashBuff.cs" />
     <Compile Include="Assets\Resources\Scripts\WorldManager.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidHealSingleLowHp.cs" />

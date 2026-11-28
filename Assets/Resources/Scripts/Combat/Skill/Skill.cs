@@ -272,7 +272,7 @@ public class Skill
 
     /// <summary>
     /// 伤害类组件修正：execute(execHp/execRate)、shieldBonus、missingHp、highHp、vsJob、soldierDamage、critRateBonus、
-    /// randomAmp、isolatedAmp、shieldedAmp、fullHp、castStack。
+    /// randomAmp、distanceAmp、isolatedAmp、shieldedAmp、fullHp、castStack。
     /// 未配置的标记与键均为 no-op，可在任意单体/范围伤害结算前直接调用。
     /// </summary>
     protected int ApplyDamageModifiers(int dmg, Chess target)
@@ -321,6 +321,19 @@ public class Skill
             dmg = Math.Max(1, (int)(dmg * amp));
             if (amp > 1f)
                 WorldManager.Instance.AddBattleText($"增伤{Mathf.RoundToInt(amp * 100f)}%", target.transform.position, new Vector2(0, 40), SysColor.BattleText.AmpUp, 3);
+        }
+        // 距离增伤：按施法者到目标的距离线性提升倍率（distanceAmpMin → distanceAmpMax）
+        if (HasSkillFlag("distanceAmp"))
+        {
+            // 跨度取技能射程（含「射程中/大」组件加成），弹道在施法瞬间结算
+            var span = Mathf.Max(1f, skillCfg.Range > 0f ? skillCfg.Range : 40f);
+            var dist = Vector3.Distance(owner.transform.position, target.transform.position);
+            var rate = Mathf.Clamp01(dist / span);
+            var amp = Mathf.Lerp(GetStr2("distanceAmpMin", 1f), GetStr2("distanceAmpMax", 2f), rate);
+            dmg = Math.Max(1, (int)(dmg * amp));
+            if (amp > 1f)
+                WorldManager.Instance.AddBattleText($"距离增伤{Mathf.RoundToInt(amp * 100f)}%", target.transform.position,
+                    new Vector2(0, 40), SysColor.BattleText.AmpUp, 3);
         }
         // 孤立增伤：目标周围 isolatedRange 格内没有其他敌方英雄
         if (HasSkillFlag("isolatedAmp"))

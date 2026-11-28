@@ -229,6 +229,7 @@ namespace CommonConfig
             config[4110] = new SkillTemplateComponentConfig(4110, "满血增伤", "增伤", null, "TargetType:fullHp;Strength2:fullHpRate=0.3", 2, 2f, "施法者满血时，伤害 ×(1+fullHpRate)", "按战斗前中期满血窗口估值", false);
             config[4120] = new SkillTemplateComponentConfig(4120, "逐次施法增伤", "增伤", null, "TargetType:castStack;Strength2:castStackRate=0.15;Strength2:castStackMax=2", 2, 2.3f, "本场第 2 次施放起伤害逐次提升：每次 +castStackRate，最多叠 castStackMax 层", "按一场战斗的预期施放次数与平均层数估值", false);
             config[4130] = new SkillTemplateComponentConfig(4130, "中心双倍", "增伤", null, "TargetType:centerDouble;Strength2:centerRate=2", 2, 3f, "范围伤害时，锁定的主目标承受 centerRate 倍伤害，其余目标正常", "按主目标承伤占比与倍率折算额外伤害", false);
+            config[4140] = new SkillTemplateComponentConfig(4140, "距离增伤", "增伤", null, "TargetType:distanceAmp;Strength2:distanceAmpMin=1;Strength2:distanceAmpMax=2", 2, 3f, "伤害倍率随施法者到目标的距离线性提升：distanceAmpMin~distanceAmpMax，跨度为技能射程（含射程组件加成）", "远距离索敌技能近似稳定吃满，按中高档估值", false);
             config[5000] = new SkillTemplateComponentConfig(5000, "受击·仅物理", "目标筛选", new string[]{"Defend"}, "Strength2:onlyPhys=1", 2, -1f, "仅对物理伤害（普攻/物理技能）生效；不配受击类型组件时物理+魔法都算", "限制一半伤害来源，按覆盖率折价", false);
             config[5010] = new SkillTemplateComponentConfig(5010, "受击·仅魔法", "目标筛选", new string[]{"Defend"}, "Strength2:onlyMagic=1", 2, -1f, "仅对魔法伤害（法术技能）生效；不配受击类型组件时物理+魔法都算", "限制一半伤害来源，按覆盖率折价", false);
             config[5020] = new SkillTemplateComponentConfig(5020, "防御减免·40%", "数值", new string[]{"Defend"}, "Strength2:reduce=0.4", 1, 1.5f, "受伤前减免比例调整为 15%（模板基准 25%）", "负向项：按减免比例下降折算", false);
@@ -260,6 +261,7 @@ namespace CommonConfig
             config[9081] = new SkillTemplateComponentConfig(9081, "自损", "特殊机制", new string[]{"单体伤害大","单体伤害中","单体伤害小"}, "TargetType:selfHurt;Strength2:selfHurt=0.2", 1, -1.5f, "施放时消耗自身生命（selfHurt），属于代价项", "负向项，抵减技能总价值", false);
             config[9082] = new SkillTemplateComponentConfig(9082, "燃烧法力", "特殊机制", null, "TargetType:mpBurn;Strength2:mpBurn=20", 2, 2f, "燃烧目标法力（mpBurn），压制技能循环", "按削弱的法力与技能频率估值", false);
             config[9083] = new SkillTemplateComponentConfig(9083, "法力转移", "特殊机制", new string[]{"Damage"}, "TargetType:mpTransfer;Strength2:mpTransferRange=40", 3, 4f, "命中后按 mpBurn 燃烧目标法力，实燃量×mpShareRate（默认1）转给 mpTransferRange 内法力最低、最近的1名友军；无友军只燃不转", "按燃蓝量与转移收益估值，人工评审", false);
+            config[9084] = new SkillTemplateComponentConfig(9084, "近远分档", "特殊机制", new string[]{"Buff"}, "TargetType:rangeSplit", 1, .5f, "按目标攻击距离分流：近战取 BuffId 第1段，远程取第2段（BuffId/StrengthBuff1 逗号分列）", "结构性开关，本身不增值", false);
             config[9190] = new SkillTemplateComponentConfig(9190, "持续场移动", "特殊机制", new string[]{"持续伤害大","持续伤害中","持续伤害小"}, "Strength2:moveDist=40", 2, 1.5f, "持续伤害场沿方向移动（moveDist）", "特殊机制，人工评审", true);
 
             RebuildIndex();

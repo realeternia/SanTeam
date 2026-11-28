@@ -19,6 +19,7 @@ using UnityEngine;
 /// · noDedupe           = 不按首段 Buff 去重（司马炎 / 陆抗 / 张梁 / 周仓 / 娄圭 / 步骘 / 阮籍 / 甄宓）
 /// · targetCenter       = 以选中的首个友军目标为中心，再在 Area 内扩散（缺省以自身为中心）
 /// · mpRestore          = 立刻回蓝（Strength2 的 mpRestore &gt; 0）：给每个目标直接加 MP，不算 Buff、不吃 mpRegen
+/// · rangeSplit         = 近远分档：近战取 BuffId 第1段、远程取第2段（BuffId/StrengthBuff1 逗号分列，不足两段不生效）
 /// 护盾类 Buff 统一按护盾公式写入护盾值。
 ///
 /// 增益体系派生：SkillComBuffArea（群体增益）、SkillComBuffAura（光环）、SkillComDamageTaunt（嘲讽）。
@@ -168,8 +169,18 @@ public class SkillComBuffSingle : Skill
     {
         foreach (var unit in targets)
         {
-            foreach (var buffId in buffIds)
+            // 「近远分档」：近战取第 1 段 Buff、远程取第 2 段（BuffId / StrengthBuff1 逗号分列）
+            var start = 0;
+            var count = buffIds.Count;
+            if (HasSkillFlag("rangeSplit") && buffIds.Count >= 2)
             {
+                start = unit.attackRange < CombatConst.MeleeRange ? 0 : 1;
+                count = 1;
+            }
+
+            for (var i = start; i < start + count; i++)
+            {
+                var buffId = buffIds[i];
                 // 单体友方增益：目标已带同一 Buff 时只刷新时长，避免共存类 Buff 叠层
                 // （群体增益仍走 AddBuff + 首段去重，保持原有群刷语义）
                 var exist = SingleAllyBuff ? unit.GetBuff(buffId) : null;
