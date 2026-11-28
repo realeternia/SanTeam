@@ -204,6 +204,7 @@ namespace CommonConfig
             config[300108] = new BuffConfig(300108, "兼资", "兼", "攻击叠层：每层提升/strength攻击、/strength2法术强度，持续攻击刷新，停手后层数清零", true, false, false, true, true, 4, "BuffStackBuf", "atk,ap", "", "", "", "RisingArrowGreen", "", "");
             config[300109] = new BuffConfig(300109, "威震", "震", "携带者普攻按概率眩晕目标，且普攻转为真实伤害", true, false, false, false, false, 4, "BuffVengefulStance", "", "stunChance", "", "", "RisingArrowGreen", "", "");
             config[300110] = new BuffConfig(300110, "焰衣", "焰", "每秒对周围敌人造成伤害", true, false, false, false, false, 4, "BuffFireCloak", "", "damageShare", "", "", "Par_FireFieldRed", "", "");
+            config[300111] = new BuffConfig(300111, "雷衣", "雷", "雷衣：每秒对周围敌人造成雷击伤害", true, false, false, false, false, 4, "BuffFireCloak", "", "damageShare", "", "", "Par_LargeMagicCircle", "", "");
             config[301001] = new BuffConfig(301001, "眩晕", "乱", "眩晕，无法行动", false, true, true, false, false, 3, "BuffNoAction", "", "", "", "", "StunnedCirclingStarsSimple", "", "");
             config[301003] = new BuffConfig(301003, "增伤", "伤", "受到的伤害按比例增加", false, true, false, true, true, 1, "BuffDamagedAddRate", "damagedUp", "", "", "", "StunnedDamageUp", "", "");
             config[301004] = new BuffConfig(301004, "减攻", "慑", "降低目标攻击力", false, true, false, true, true, 1, "BuffAtkDown", "atkDown", "", "", "", "Misses", "", "");

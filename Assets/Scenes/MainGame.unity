@@ -2996,16 +2996,16 @@ MonoBehaviour:
   scenarioId: 1
   pendingNewGameSave: 0
   debugHeroesSide1:
-  - heroId: 101016
+  - heroId: 101004
     level: 1
     buffId: 0
     buffTime: 10
-  - heroId: 100023
+  - heroId: 100013
     level: 1
     buffId: 0
     buffTime: 10
   debugHeroesSide2:
-  - heroId: 105015
+  - heroId: 105005
     level: 1
     buffId: 0
     buffTime: 10
