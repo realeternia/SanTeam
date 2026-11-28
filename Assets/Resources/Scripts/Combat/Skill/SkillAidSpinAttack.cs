@@ -5,7 +5,7 @@ using UnityEngine;
 
 /// <summary>
 /// 张飞·旋风斩（主动）：锁定射程内一名敌人后施放，对自身周围最多 TargetCount 个敌人造成
-/// key "splashRate" × 自身攻击的伤害，并对被命中的敌人附加流血
+/// GetSkillDamage()（DamageStrength）伤害，并对被命中的敌人附加流血
 /// （Buff 短名由 skillCfg.BuffId 配置），每秒伤害 = 本次伤害 × key "dot"，持续 BuffTime 秒。
 /// </summary>
 public class SkillAidSpinAttack : Skill
@@ -29,7 +29,7 @@ public class SkillAidSpinAttack : Skill
         var unitsInRange = SelectTargets(owner.transform.position, skillCfg.Area, false, skillCfg.TargetCount);
         foreach (var unit in unitsInRange)
         {
-            var spinDamage = ApplyDamageModifiers((int)(owner.atk * GetStr2("splashRate")), unit);
+            var spinDamage = ApplyDamageModifiers(GetSkillDamage(), unit);
             unit.OnSkillDamaged(owner, skillId, spinDamage);
             if (!string.IsNullOrEmpty(skillCfg.HitEffect))
                 PlaySkillEffect(unit, skillCfg.HitEffect);

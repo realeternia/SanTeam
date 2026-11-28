@@ -58,8 +58,8 @@ public class SkillAidDamageCastingFrontal : Skill
         var interval = skillCfg.SummonHitInterval > 0f ? skillCfg.SummonHitInterval : DefaultHitInterval;
         var duration = Mathf.Max(0.1f, skillCfg.BuffTime);
         var ticks = Mathf.Max(1, Mathf.FloorToInt(duration / interval));
-        // 每跳伤害 = 配置的 DamageStrength（每跳独立结算，可对同一目标累计多跳）
-        var perTickDamage = Mathf.Max(1, GetSkillDamage());
+        // DamageStrength 为整轮总伤害，按跳数均分（与火墙/火焰场一致）
+        var perTickDamage = GetTickDamage(ticks);
         var halfWidth = skillCfg.Area * 0.5f;
         var rightDir = Vector3.Cross(Vector3.up, forwardDir).normalized;
         var buffIds = GetSkillBuffIds();
@@ -79,9 +79,12 @@ public class SkillAidDamageCastingFrontal : Skill
 
             foreach (var unit in hitUnits)
             {
-                unit.OnSkillDamaged(owner, skillId, perTickDamage);
-                if (!string.IsNullOrEmpty(skillCfg.HitEffect))
-                    PlaySkillEffect(unit, skillCfg.HitEffect);
+                if (perTickDamage > 0)
+                {
+                    unit.OnSkillDamaged(owner, skillId, perTickDamage);
+                    if (!string.IsNullOrEmpty(skillCfg.HitEffect))
+                        PlaySkillEffect(unit, skillCfg.HitEffect);
+                }
                 // 减益：每跳刷新一次，引导结束后仍按 BuffTime 计时
                 foreach (var buffId in buffIds)
                     BuffManager.AddBuff(unit, owner, id, buffId, skillCfg.BuffTime);
