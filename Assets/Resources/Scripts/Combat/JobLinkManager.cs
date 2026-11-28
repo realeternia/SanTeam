@@ -89,7 +89,7 @@ public static class JobLinkManager
                     foreach (var bonus in linkTeamBonuses)
                         ApplyAttr(unit, bonus.Attr, bonus.Value);
                 }
-                if (!unit.isHero)
+                if (!unit.isHero && !unit.isDummy)
                 {
                     foreach (var bonus in linkSelfBonuses)
                         if (bonus.Attr == "soldierAtk" || bonus.Attr == "soldierHp")
@@ -104,7 +104,8 @@ public static class JobLinkManager
         // 结算后复位系数并折算进 atk，伤害计算时攻击基准统一为 atk，不再乘算
         foreach (var unit in allMySideUnits)
         {
-            if (unit.isHero)
+            // 木桩是固定血量靶子，不吃职业羁绊的士兵生命/攻击系数
+            if (unit.isHero || unit.isDummy)
                 continue;
             var targetMaxHp = (int)(unit.soldierBaseMaxHp * unit.soldierHpRate);
             unit.hp = targetMaxHp;

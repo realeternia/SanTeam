@@ -37,6 +37,8 @@ public class Chess : MonoBehaviour
     public int level = 1;
     public bool isShadow;
     public bool isFakeHero;
+    /// <summary>木桩标记：调试阵容用的固定靶，不移动、不攻击、不被强制位移</summary>
+    public bool isDummy;
     public float dodgeRate; //闪避
     public float critRate; //暴击
     public float critDamageMulti = 0.8f; //暴击伤害倍率
@@ -634,6 +636,10 @@ public class Chess : MonoBehaviour
 
         // 空中位移（跳跃/俯冲）期间位置由技能协程接管，屏蔽寻路、普攻与叛逃回退
         if (isJumping)
+            return;
+
+        // 木桩：调试用固定靶，不索敌、不移动也不攻击
+        if (isDummy)
             return;
 
         // 叛逃：不受控制，持续朝初始位置后退（不索敌/不攻击）

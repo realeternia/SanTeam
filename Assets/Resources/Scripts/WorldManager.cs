@@ -616,18 +616,25 @@ public class WorldManager : MonoBehaviour
             var center1 = mapInfo.SideCenters != null && mapInfo.SideCenters.Length > 0 ? mapInfo.SideCenters[0] : null;
             var center2 = mapInfo.SideCenters != null && mapInfo.SideCenters.Length > 1 ? mapInfo.SideCenters[1] : null;
 
-            SpawnDebugHeroes(GameManager.Instance.GetPlayer(0), center1, GameManager.Instance.debugHeroesSide1, 1);
-            SpawnDebugHeroes(GameManager.Instance.GetPlayer(1), center2, GameManager.Instance.debugHeroesSide2, 2);
+            var p1 = GameManager.Instance.GetPlayer(0);
+            var p2 = GameManager.Instance.GetPlayer(1);
+            // 士兵与英雄共用同一侧占位集合，避免自动布阵时叠到同一格
+            var occupied1 = new HashSet<int>();
+            var occupied2 = new HashSet<int>();
+            SpawnDebugSoldiers(p1, center1, GameManager.Instance.debugSoldiersSide1, 1, occupied1);
+            SpawnDebugHeroes(p1, center1, GameManager.Instance.debugHeroesSide1, 1, occupied1);
+            SpawnDebugSoldiers(p2, center2, GameManager.Instance.debugSoldiersSide2, 2, occupied2);
+            SpawnDebugHeroes(p2, center2, GameManager.Instance.debugHeroesSide2, 2, occupied2);
             // 调试阵容同样结算工·机巧召唤：按本侧上阵"工"职业英雄数刷召唤兽（与非调试分支一致）
-            SpawnGongSummonForSide(GameManager.Instance.GetPlayer(0), center1, 1);
-            SpawnGongSummonForSide(GameManager.Instance.GetPlayer(1), center2, 2);
+            SpawnGongSummonForSide(p1, center1, 1);
+            SpawnGongSummonForSide(p2, center2, 2);
         }
 
     }
 
     // 调试阵容：按近战/远程分前后排摆入中间英雄格(HeroCells)——近战从顶排往下填(前排)，远程从底排往上填(后排)；
     // 超出9格的武将再按布阵格顺序补空位。等级取配置值(1~MaxHeroCardLevel)
-    private void SpawnDebugHeroes(PlayerInfo p, Transform center, List<GameManager.DebugHeroEntry> heroes, int side)
+    private void SpawnDebugHeroes(PlayerInfo p, Transform center, List<GameManager.DebugHeroEntry> heroes, int side, HashSet<int> occupied)
     {
         if (center == null || heroes == null)
             return;
@@ -651,13 +658,15 @@ public class WorldManager : MonoBehaviour
         }
 
         var heroCells = GameConst.HeroCells;
-        var occupied = new HashSet<int>();
-        // 近战：HeroCells 顶排往下填(前排)
+        // 近战：HeroCells 顶排往下填(前排)，已被士兵占用的格跳过
         int mi = 0;
-        for (int ci = 0; ci < heroCells.Length && mi < melee.Count; ci++, mi++)
+        for (int ci = 0; ci < heroCells.Length && mi < melee.Count; ci++)
         {
+            if (occupied.Contains(heroCells[ci]))
+                continue;
             SpawnDebugHeroUnit(p, center, heroCells[ci], melee[mi], side);
             occupied.Add(heroCells[ci]);
+            mi++;
         }
         // 远程：HeroCells 底排往上填(后排)
         int ri = 0;
@@ -687,6 +696,77 @@ public class WorldManager : MonoBehaviour
         // 调试开局Buff：先记录待挂载条目，等 BattleBegin 全部技能结算后再施加（见 ApplyDebugBuffs）
         if (chess != null && hero.buffId > 0)
             debugBuffTargets.Add(new Tuple<Chess, GameManager.DebugHeroEntry>(chess, hero));
+    }
+
+    // 调试阵容：士兵按射程自动摆入前后排空格（近战前排 row0、远程后排 row4，行内从左到右；
+    // 该行排满后依次找非英雄格、任意空格），与英雄共用 occupied 避免叠格
+    private void SpawnDebugSoldiers(PlayerInfo p, Transform center, List<GameManager.DebugSoldierEntry> soldiers, int side, HashSet<int> occupied)
+    {
+        if (center == null || soldiers == null)
+            return;
+        foreach (var soldier in soldiers)
+        {
+            if (soldier == null)
+                continue;
+            var cfg = SoldierConfig.GetConfig(soldier.soldierId);
+            if (cfg == null)
+            {
+                GameLog.Error($"调试阵容非法士兵ID: {soldier.soldierId}(side{side})");
+                continue;
+            }
+            bool ranged = cfg.Range >= CombatConst.MeleeRange;
+            int row = ranged ? GameConst.SoldierRangedRow : GameConst.SoldierMeleeRow;
+            int pos = PickDebugFormationPos(occupied, row);
+            if (pos < 0)
+            {
+                GameLog.Warn($"调试阵容：side{side} 布阵格已满，士兵 {cfg.Name}({soldier.soldierId}) 未生成");
+                continue;
+            }
+            occupied.Add(pos);
+            SpawnDebugSoldierUnit(p, center, pos, soldier, side);
+        }
+    }
+
+    // 生成一个调试士兵到指定布阵格；木桩标记为固定靶（血量/攻防全部取自 SoldierConfig）
+    private void SpawnDebugSoldierUnit(PlayerInfo p, Transform center, int pos, GameManager.DebugSoldierEntry soldier, int side)
+    {
+        var chess = SpawnUnitsForRegion(p, soldier.soldierId, pos, GetFormationCellPos(center, pos), side, p != null ? p.imgPath : "");
+        if (chess == null)
+            return;
+        if (soldier.soldierId == CombatConst.DummySoldierId)
+            chess.isDummy = true;
+    }
+
+    // 为调试士兵挑布阵空格：优先指定行，其次非英雄格，最后任意空格；全满返回 -1
+    private int PickDebugFormationPos(HashSet<int> occupied, int preferredRow)
+    {
+        var size = GameConst.FormationGridSize;
+        for (int col = 0; col < size; col++)
+        {
+            int pos = preferredRow * size + col;
+            if (!occupied.Contains(pos))
+                return pos;
+        }
+        for (int pos = 0; pos < GameConst.FormationCellCount; pos++)
+        {
+            if (!occupied.Contains(pos) && !IsHeroCell(pos))
+                return pos;
+        }
+        for (int pos = 0; pos < GameConst.FormationCellCount; pos++)
+        {
+            if (!occupied.Contains(pos))
+                return pos;
+        }
+        return -1;
+    }
+
+    private static bool IsHeroCell(int pos)
+    {
+        var cells = GameConst.HeroCells;
+        for (int i = 0; i < cells.Length; i++)
+            if (cells[i] == pos)
+                return true;
+        return false;
     }
 
     // 计算布阵图中第pos格(0~24)的世界坐标：row=pos/5 从上到下，col=pos%5 从左到右
@@ -1286,6 +1366,9 @@ public class WorldManager : MonoBehaviour
 
     public bool MoveTo(Chess unit, Vector3 targetPosition, bool isForce = false)
     {
+        // 木桩固定不动：忽略技能的强制位移/拖拽
+        if (unit != null && unit.isDummy)
+            return false;
         // 单位移动已改为转向制(短程寻路+互斥力)，不再锁格子；技能强制位移直接落位
         // 落点高度统一贴回单位自身地面：落点若取自空中单位(跳跃/俯冲/引导起手)的位置，
         // 会把飞行高度一并复制过来，而移动/间距逻辑只改 x/z，单位会永久悬空在地面上方

@@ -208,6 +208,7 @@ namespace CommonConfig
             config[590003] = new SoldierConfig(590003, "猪怪", 1, 9f, 55, 1400, 0f, 0f, 10, 40, 25, 6, 12, 0, 0f, false, "", "UnitBing", "SwordHitYellowCritical", true, "Textures/UnitPic/Boar");
             config[590004] = new SoldierConfig(590004, "蛇怪", 1, 6f, 42, 520, 0f, 0f, 14, 6, 8, 9, 40, 16, 1.5f, false, "蛇毒", "UnitBing2", "BulletExplosionGreen", true, "Textures/UnitPic/Snake");
             config[590005] = new SoldierConfig(590005, "老虎怪", 1, 10f, 95, 2400, 0f, 0f, 10, 60, 40, 7, 12, 0, 0f, false, "", "UnitBing", "SwordHitYellowCritical", true, "Textures/UnitPic/Tiger");
+            config[590099] = new SoldierConfig(590099, "木桩", 1, 9f, 0, 100000, 0f, 0f, 15, 0, 0, 0, 0, 0, 0f, false, "", "UnitBing", "", false, "Textures/UnitPic/MuNiuLiMa");
 
             RebuildIndex();
 

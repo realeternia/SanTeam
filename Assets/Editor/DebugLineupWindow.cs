@@ -8,12 +8,13 @@ using UnityEngine.SceneManagement;
 
 /// <summary>
 /// 调试阵容配置窗口（菜单：Tools/调试阵容配置窗口）。
-/// 在窗口里配置当前场景 GameManager 的左侧(1号位)/右侧(2号位)上阵武将：
-/// 任一方填入武将即视为调试开局，启动游戏后跳过选牌/商店流程直接开战（见 WorldManager.SpawnDebugHeroes）；
+/// 在窗口里配置当前场景 GameManager 的左侧(1号位)/右侧(2号位)上阵武将、士兵：
+/// 任一方填入武将或士兵即视为调试开局，启动游戏后跳过选牌/商店流程直接开战（见 WorldManager.SpawnDebugHeroes）；
 /// 两方留空则走正常对局流程。点「开始战斗」会先保存场景再进入 Play。
 /// 武将按各自配置的品质标记（阵营色块 + 品质色块 + 品质文本），下拉菜单按阵营分组、组内按品质倒排。
 /// 武将按近战/远程分前后排摆入中间英雄格（近战顶排=前排、远程底排=后排），等级取各自配置值(1~5级)。
 /// 每名武将可在同行末尾另配 1 个开局Buff（BuffConfig 全表下拉 + 时长，默认10秒），进战斗后自动挂载。
+/// 士兵按射程自动摆入前排(row0)/后排(row4)空格，可选小兵/召唤物/怪物；其中「木桩」不移动、不攻击，血量等数值在 SoldierConfig 的 590099 行配置。
 /// 英雄列表与下拉菜单同时显示职业；「羁绊起效」区可分别开关职业连锁 / 国家护盾 / 好友连锁（默认全部生效）。
 /// 「随机阵容」可一键为两侧各生成 3 近战 + 3 远程，共 12 名互不重复的 1 级武将。
 /// </summary>
@@ -23,6 +24,8 @@ public class DebugLineupWindow : EditorWindow
     private const string GameScenePath = "Assets/Scenes/MainGame.unity";
     private const string PropSide1 = "debugHeroesSide1";
     private const string PropSide2 = "debugHeroesSide2";
+    private const string PropSoldiers1 = "debugSoldiersSide1";
+    private const string PropSoldiers2 = "debugSoldiersSide2";
     private const string PropFullMp = "debugFullMp";
     private const string PropJobLink = "debugJobLink";
     private const string PropFactionShield = "debugFactionShield";
@@ -52,8 +55,16 @@ public class DebugLineupWindow : EditorWindow
         public string Label;
     }
 
+    private class SoldierItem
+    {
+        public int Id;
+        public string Name;
+        public string Category; // 小兵 / 召唤物 / 怪物 / 木桩
+    }
+
     private static List<HeroItem> heroes;
     private static List<BuffItem> buffs;
+    private static List<SoldierItem> soldiers;
 
     private GUIStyle titleStyle;
     private GUIStyle hintStyle;
@@ -205,6 +216,65 @@ public class DebugLineupWindow : EditorWindow
         menu.ShowAsContext();
     }
 
+    // 士兵下拉数据源：排除法术场/影分身等纯技能载体，木桩单独归类
+    private static List<SoldierItem> GetSoldiers()
+    {
+        ConfigManager.Init();
+
+        if (soldiers != null)
+            return soldiers;
+
+        soldiers = new List<SoldierItem>();
+        foreach (var cfg in SoldierConfig.ConfigList)
+        {
+            if (cfg == null || cfg.Id <= 0 || cfg.IsShadow)
+                continue;
+            // 501xxx 为法术场/影分身等技能载体，不作为可上阵兵种
+            if (cfg.Id >= 501000 && cfg.Id < 502000)
+                continue;
+            string category;
+            if (cfg.Id == CombatConst.DummySoldierId)
+                category = "木桩";
+            else if (cfg.Id >= 590000)
+                category = "怪物";
+            else if (cfg.Id >= 502000)
+                category = "召唤物";
+            else
+                category = "小兵";
+            soldiers.Add(new SoldierItem { Id = cfg.Id, Name = cfg.Name, Category = category });
+        }
+        soldiers.Sort((a, b) => a.Id.CompareTo(b.Id));
+        return soldiers;
+    }
+
+    private static SoldierItem GetSoldier(int soldierId)
+    {
+        foreach (var s in GetSoldiers())
+            if (s.Id == soldierId)
+                return s;
+        return null;
+    }
+
+    private static string SoldierLabel(int soldierId)
+    {
+        var s = GetSoldier(soldierId);
+        if (s != null)
+            return string.Format("{0}·{1} ({2})", s.Category, s.Name, soldierId);
+        return soldierId > 0 ? ("未知士兵 (" + soldierId + ")") : "（未选择）";
+    }
+
+    // 弹出按类别分组的士兵菜单（GenericMenu 的 "/" 路径自动形成子菜单）
+    private static void ShowSoldierMenu(System.Action<int> onPick)
+    {
+        var menu = new GenericMenu();
+        foreach (var s in GetSoldiers())
+        {
+            int id = s.Id;
+            menu.AddItem(new GUIContent(string.Format("{0}/{1} ({2})", s.Category, s.Name, id)), false, () => onPick(id));
+        }
+        menu.ShowAsContext();
+    }
+
     private void OnGUI()
     {
         InitStyles();
@@ -229,9 +299,9 @@ public class DebugLineupWindow : EditorWindow
 
         so.Update();
         scrollPos = EditorGUILayout.BeginScrollView(scrollPos);
-        DrawHeroList("左侧（1号位）", PropSide1, Side1Accent);
+        DrawHeroList("左侧（1号位）", PropSide1, PropSoldiers1, Side1Accent);
         GUILayout.Space(4);
-        DrawHeroList("右侧（2号位）", PropSide2, Side2Accent);
+        DrawHeroList("右侧（2号位）", PropSide2, PropSoldiers2, Side2Accent);
         GUILayout.Space(4);
         DrawOptions();
         so.ApplyModifiedProperties();
@@ -240,7 +310,7 @@ public class DebugLineupWindow : EditorWindow
         DrawLineupWarning();
 
         GUILayout.Space(4);
-        GUILayout.Label("任一方填入武将即视为调试开局；两方留空则走正常对局流程。武将按各自设置的等级(1~5级)生成，按顺序摆入布阵格。每名武将可在同行末尾挂 1 个开局Buff，进战斗后自动挂载（时长默认10秒）。配置写入当前场景，点「开始战斗」时自动保存场景。", hintStyle);
+        GUILayout.Label("任一方填入武将或士兵即视为调试开局；两方留空则走正常对局流程。武将按各自设置的等级(1~5级)生成，按顺序摆入布阵格；士兵按射程自动摆入前排(row0)/后排(row4)空格。每名武将可在同行末尾挂 1 个开局Buff，进战斗后自动挂载（时长默认10秒）。士兵可选「木桩」（不移动、不攻击，血量在 SoldierConfig 590099 行配置），放到敌方侧即可当 DPS 靶子。配置写入当前场景，点「开始战斗」时自动保存场景。", hintStyle);
 
         GUILayout.Space(6);
         GUILayout.BeginHorizontal();
@@ -269,7 +339,9 @@ public class DebugLineupWindow : EditorWindow
         string state = gm == null
             ? "未找到 GameManager"
             : (gm.HasDebugLineup()
-                ? string.Format("已配置：甲 {0} 名 / 乙 {1} 名", gm.debugHeroesSide1.Count, gm.debugHeroesSide2.Count)
+                ? string.Format("已配置：甲 {0} 英雄 + {1} 士兵 / 乙 {2} 英雄 + {3} 士兵",
+                    gm.debugHeroesSide1.Count, gm.debugSoldiersSide1.Count,
+                    gm.debugHeroesSide2.Count, gm.debugSoldiersSide2.Count)
                 : "未配置（启动走正常对局流程）");
         GUILayout.Label("场景：" + SceneManager.GetActiveScene().name + "    " + state, hintStyle);
         GUILayout.Space(2);
@@ -304,7 +376,7 @@ public class DebugLineupWindow : EditorWindow
         GUILayout.Label("勾选后调试战斗开局所有技能即为满MP（默认勾选）。三项羁绊开关默认全部起效，取消勾选可在调试战斗中单独关闭对应机制做对比验证。", hintStyle);
     }
 
-    private void DrawHeroList(string title, string propName, Color accent)
+    private void DrawHeroList(string title, string propName, string soldierPropName, Color accent)
     {
         SerializedProperty listProp = so.FindProperty(propName);
         if (listProp == null)
@@ -399,7 +471,74 @@ public class DebugLineupWindow : EditorWindow
             });
         }
 
+        DrawSoldierSection(soldierPropName, accent);
+
         EditorGUILayout.EndVertical();
+    }
+
+    // 士兵列表：兵种下拉（小兵/召唤物/怪物/木桩），数值全部取自 SoldierConfig；删改与武将列表一致
+    private void DrawSoldierSection(string propName, Color accent)
+    {
+        SerializedProperty listProp = so.FindProperty(propName);
+        if (listProp == null)
+        {
+            GameLog.Error($"DebugLineupWindow 未找到字段 {propName}");
+            return;
+        }
+
+        GUILayout.Space(4);
+        Rect titleRect = GUILayoutUtility.GetRect(0, 18);
+        EditorGUI.DrawRect(new Rect(titleRect.x, titleRect.y, 3, titleRect.height), accent);
+        GUI.Label(new Rect(titleRect.x + 8, titleRect.y, titleRect.width - 8, titleRect.height),
+            string.Format("士兵   共 {0} 个", listProp.arraySize), titleStyle);
+
+        for (int i = 0; i < listProp.arraySize; i++)
+        {
+            SerializedProperty elem = listProp.GetArrayElementAtIndex(i);
+            SerializedProperty soldierIdProp = elem.FindPropertyRelative("soldierId");
+            EditorGUILayout.BeginHorizontal();
+            if (GUILayout.Button(SoldierLabel(soldierIdProp.intValue), EditorStyles.popup))
+            {
+                int index = i;
+                ShowSoldierMenu(id =>
+                {
+                    if (so == null)
+                        return;
+                    var p = so.FindProperty(propName);
+                    if (p == null || index >= p.arraySize)
+                        return;
+                    p.GetArrayElementAtIndex(index).FindPropertyRelative("soldierId").intValue = id;
+                    so.ApplyModifiedProperties();
+                    MarkSceneDirty();
+                });
+            }
+            if (GUILayout.Button("×", GUILayout.Width(22)))
+            {
+                EditorGUILayout.EndHorizontal();
+                RemoveElement(listProp, i);
+                so.ApplyModifiedProperties();
+                MarkSceneDirty();
+                break;
+            }
+            EditorGUILayout.EndHorizontal();
+        }
+
+        if (GUILayout.Button("＋ 添加士兵", GUILayout.Height(20)))
+        {
+            ShowSoldierMenu(id =>
+            {
+                if (so == null)
+                    return;
+                var p = so.FindProperty(propName);
+                if (p == null)
+                    return;
+                int n = p.arraySize;
+                p.InsertArrayElementAtIndex(n);
+                p.GetArrayElementAtIndex(n).FindPropertyRelative("soldierId").intValue = id;
+                so.ApplyModifiedProperties();
+                MarkSceneDirty();
+            });
+        }
     }
 
     // 阵营色块（颜色统一取自 SysColor）
@@ -447,15 +586,17 @@ public class DebugLineupWindow : EditorWindow
         menu.ShowAsContext();
     }
 
-    // 超出布阵格数量的武将不会被生成，提前提示
+    // 超出布阵格数量的单位（英雄+士兵）不会被生成，提前提示
     private void DrawLineupWarning()
     {
         if (gm == null)
             return;
-        int over = Mathf.Max(gm.debugHeroesSide1.Count, gm.debugHeroesSide2.Count) - GameConst.FormationCellCount;
+        int side1 = gm.debugHeroesSide1.Count + gm.debugSoldiersSide1.Count;
+        int side2 = gm.debugHeroesSide2.Count + gm.debugSoldiersSide2.Count;
+        int over = Mathf.Max(side1, side2) - GameConst.FormationCellCount;
         if (over > 0)
             EditorGUILayout.HelpBox(
-                "布阵格只有 " + GameConst.FormationCellCount + " 格，超出的 " + over + " 名武将不会生成。",
+                "布阵格只有 " + GameConst.FormationCellCount + " 格，超出的 " + over + " 个单位不会生成。",
                 MessageType.Warning);
     }
 
@@ -484,8 +625,12 @@ public class DebugLineupWindow : EditorWindow
             return;
         var p1 = so.FindProperty(PropSide1);
         var p2 = so.FindProperty(PropSide2);
+        var s1 = so.FindProperty(PropSoldiers1);
+        var s2 = so.FindProperty(PropSoldiers2);
         if (p1 != null) p1.ClearArray();
         if (p2 != null) p2.ClearArray();
+        if (s1 != null) s1.ClearArray();
+        if (s2 != null) s2.ClearArray();
         so.ApplyModifiedProperties();
         MarkSceneDirty();
     }
@@ -570,7 +715,7 @@ public class DebugLineupWindow : EditorWindow
         }
         if (!gm.HasDebugLineup())
         {
-            GameLog.Warn("调试阵容：左右两侧都没有武将，无法进入调试战斗");
+            GameLog.Warn("调试阵容：左右两侧都没有武将或士兵，无法进入调试战斗");
             return;
         }
 
@@ -578,7 +723,9 @@ public class DebugLineupWindow : EditorWindow
         var scene = gm.gameObject.scene;
         if (scene.IsValid() && !string.IsNullOrEmpty(scene.path))
             EditorSceneManager.SaveScene(scene);
-        GameLog.Info("调试阵容：进入战斗（甲 " + gm.debugHeroesSide1.Count + " 名 / 乙 " + gm.debugHeroesSide2.Count + " 名）");
+        GameLog.Info(string.Format("调试阵容：进入战斗（甲 {0} 英雄 + {1} 士兵 / 乙 {2} 英雄 + {3} 士兵）",
+            gm.debugHeroesSide1.Count, gm.debugSoldiersSide1.Count,
+            gm.debugHeroesSide2.Count, gm.debugSoldiersSide2.Count));
         EditorApplication.EnterPlaymode();
     }
 }

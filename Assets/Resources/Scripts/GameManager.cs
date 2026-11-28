@@ -91,20 +91,31 @@ public class GameManager : MonoBehaviour
         public float buffTime = 10f;  // Buff持续时长（秒，默认10）
     }
 
+    // 调试阵容士兵条目：兵种ID（SoldierConfig.Id；木桩=CombatConst.DummySoldierId，血量等数值走配表）
+    [System.Serializable]
+    public class DebugSoldierEntry
+    {
+        public int soldierId;
+    }
+
     // 调试阵容：配置任一方武将后，进入游戏直接开战（跳过选牌/商店流程），列表留空则走正常对局流程。
     // 仅用于开发调试，通过菜单 Tools/调试阵容配置窗口 配置（见 Assets/Editor/DebugLineupWindow.cs），配置后可一键进入战斗。
     [HideInInspector] public List<DebugHeroEntry> debugHeroesSide1 = new List<DebugHeroEntry>(); // 左侧(1号位)武将，按近战/远程分前后排摆入中间英雄格
     [HideInInspector] public List<DebugHeroEntry> debugHeroesSide2 = new List<DebugHeroEntry>(); // 右侧(2号位)武将，按近战/远程分前后排摆入中间英雄格
+    [HideInInspector] public List<DebugSoldierEntry> debugSoldiersSide1 = new List<DebugSoldierEntry>(); // 左侧(1号位)士兵，按射程自动摆入前后排空格
+    [HideInInspector] public List<DebugSoldierEntry> debugSoldiersSide2 = new List<DebugSoldierEntry>(); // 右侧(2号位)士兵，按射程自动摆入前后排空格
     [HideInInspector] public bool debugFullMp = true; // 调试阵容：开战时所有技能MP直接拉满（默认勾选）
     [HideInInspector] public bool debugJobLink = true; // 调试阵容：开战时是否结算职业连锁（兵种羁绊）
     [HideInInspector] public bool debugFactionShield = true; // 调试阵容：开战时是否结算国家护盾（同阵营羁绊）
     [HideInInspector] public bool debugFriendLine = true; // 调试阵容：开战时是否结算好友连锁（好友羁绊）
 
-    /// <summary>是否配置了调试阵容（任一方填入武将即视为调试开局）</summary>
+    /// <summary>是否配置了调试阵容（任一方填入武将或士兵即视为调试开局）</summary>
     public bool HasDebugLineup()
     {
         return (debugHeroesSide1 != null && debugHeroesSide1.Count > 0)
-            || (debugHeroesSide2 != null && debugHeroesSide2.Count > 0);
+            || (debugHeroesSide2 != null && debugHeroesSide2.Count > 0)
+            || (debugSoldiersSide1 != null && debugSoldiersSide1.Count > 0)
+            || (debugSoldiersSide2 != null && debugSoldiersSide2.Count > 0);
     }
 
     private void Awake()

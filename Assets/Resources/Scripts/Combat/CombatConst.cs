@@ -145,6 +145,10 @@ public static class CombatConst
     /// <summary>影子(501002)：分兵/影技能召唤的分身</summary>
     public const int SoldierShadow = 501002;
 
+    // ---- 调试用木桩 ----
+    /// <summary>木桩怪(590099)：调试阵容用的固定靶，血量/攻防走 SoldierConfig，不移动也不攻击（见 Chess.isDummy）</summary>
+    public const int DummySoldierId = 590099;
+
     // ---- 卡牌属性成长 ----
     /// <summary>星级成长倍率：每升1星 ×本值（乘方式，Lv1=×1.0、Lv2=×1.55、Lv3=×1.55²…），作用于 Atk/Ap/Hp</summary>
     public const float StarGrowthPerStar = 1.55f;
