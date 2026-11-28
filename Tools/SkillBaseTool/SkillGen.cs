@@ -684,7 +684,11 @@ namespace SkillBaseTool
                 store = dataStore;
                 buffIds = SplitList(B[Col.BuffId], ',');
                 buffSegs = SplitList(B[Col.StrengthBuff1], ',');
-                tags = SplitList(B[Col.TargetType], ',');
+                tags = CfgUtil.Unquote(B[Col.TargetType])
+                    .Split(new[] { ',', ';', '，', '；', '|' }, StringSplitOptions.RemoveEmptyEntries)
+                    .Select(x => x.Trim())
+                    .Where(x => x.Length > 0)
+                    .ToList();
                 selectOnly = SplitList(B[Col.SelectOnly], ';');
                 selectFirst = SplitList(B[Col.SelectFirst], ';');
                 triggers = SplitList(B[Col.TriggerCondition], ';');
@@ -878,7 +882,7 @@ namespace SkillBaseTool
                 B[Col.BuffId] = CfgUtil.Quote(string.Join(",", buffIds));
                 B[Col.StrengthBuff1] = CfgUtil.Quote(string.Join(",", buffSegs));
                 if (tagsChanged)
-                    B[Col.TargetType] = CfgUtil.Quote(string.Join(",", tags));
+                    B[Col.TargetType] = CfgUtil.Quote(string.Join(",", tags.Distinct()));
                 if (selectOnlyChanged)
                     B[Col.SelectOnly] = CfgUtil.Quote(string.Join(";", selectOnly));
                 if (selectFirstChanged)

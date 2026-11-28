@@ -18,6 +18,8 @@ namespace SkillBaseTool
         private int editColumn = -1;
         private int templateColumn = -1;
         private int moduleColumn = -1;
+        /// <summary>顶部搜索框：按技能/英雄/ID/脚本/模板/组件/状态模糊过滤。</summary>
+        private TextBox txtSearch;
         /// <summary>列索引 → 允许显示的单元格文本；不存在表示该列不过滤。</summary>
         private readonly Dictionary<int, HashSet<string>> columnFilters = new Dictionary<int, HashSet<string>>();
         /// <summary>各列原始表头（不含筛选标记），用于恢复。</summary>
@@ -56,14 +58,33 @@ namespace SkillBaseTool
             btnApply.Click += (s, e) => ApplyStaged();
             var tip = new Label
             {
-                Text = "生成/编辑只把与 SkillConfig 有差异的行写入 SkillBaseConfig（待应用）；「④ 应用」才把效果列写入 SkillConfig、Version 末位+1，然后清空 SkillBaseConfig\n点击任意列头可按该列值筛选，再次点击可修改或清除",
+                Text = "生成/编辑只把与 SkillConfig 有差异的行写入 SkillBaseConfig（待应用）；「④ 应用」才把效果列写入 SkillConfig、Version 末位+1，然后清空 SkillBaseConfig\n点击任意列头可按该列值筛选，再次点击可修改或清除；顶部搜索框按技能/英雄/ID/脚本/模板/组件模糊过滤",
                 Font = Theme.Small,
                 ForeColor = Theme.Faint,
                 AutoSize = true,
-                Location = new Point(552, 12),
+                Location = new Point(552, 8),
             };
 
-            top.Controls.AddRange(new Control[] { lblStats, btnAuto, btnGen, btnCheck, btnApply, tip });
+            var lblSearch = new Label
+            {
+                Text = "搜索",
+                Font = Theme.Base,
+                ForeColor = Theme.Muted,
+                AutoSize = true,
+                Location = new Point(552, 50),
+            };
+            txtSearch = new TextBox
+            {
+                Location = new Point(596, 46),
+                Size = new Size(220, 26),
+                Font = Theme.Base,
+                BackColor = Theme.Card2,
+                ForeColor = Theme.Text,
+                BorderStyle = BorderStyle.FixedSingle,
+            };
+            txtSearch.TextChanged += (s, e) => RefreshGrid();
+
+            top.Controls.AddRange(new Control[] { lblStats, btnAuto, btnGen, btnCheck, btnApply, tip, lblSearch, txtSearch });
 
             grid = new DataGridView { Dock = DockStyle.Fill, Margin = new Padding(0) };
             Theme.StyleGrid(grid);
@@ -237,6 +258,7 @@ namespace SkillBaseTool
                 .ToList();
             int templated = 0;
             int shown = 0;
+            string keyword = txtSearch != null ? txtSearch.Text.Trim() : "";
             foreach (var s in skills)
             {
                 string status = StatusOf(s);
@@ -248,7 +270,7 @@ namespace SkillBaseTool
                     s.Display, s.Job, "Q" + s.Quality, price.ToString("0.##"), s.Type, s.ScriptName,
                     s.TemplateName, string.Join("、", s.Modules), status,
                 };
-                if (!PassFilters(cells))
+                if (!PassSearch(s, status, keyword) || !PassFilters(cells))
                     continue;
                 int idx = grid.Rows.Add(cells[0], cells[1], cells[2], cells[3], cells[4], cells[5],
                     cells[6], cells[7], cells[8], "编辑");
@@ -280,7 +302,7 @@ namespace SkillBaseTool
             if (keepId != 0)
                 SelectSkill(keepId);
             lblStats.Text = string.Format("品质 1~4 英雄技能 {0} 个{1}：已模板化 {2}，待应用行 {3}",
-                skills.Count, columnFilters.Count > 0 ? "（筛选显示 " + shown + "）" : "", templated, store.BaseRows.Count);
+                skills.Count, (keyword.Length > 0 || columnFilters.Count > 0) ? "（筛选显示 " + shown + "）" : "", templated, store.BaseRows.Count);
         }
 
         /// <summary>按技能 Id 选中对应行并滚动到可见位置；未找到（例如被筛选隐藏）时保持默认。</summary>
@@ -323,6 +345,23 @@ namespace SkillBaseTool
                 case 8: return StatusOf(s);
                 default: return null;
             }
+        }
+
+        /// <summary>顶部搜索：技能名/英雄名/技能 Id/职业/类型/脚本/模板/组件/状态，任一命中即保留（不区分大小写）。</summary>
+        private bool PassSearch(SkillRow s, string status, string keyword)
+        {
+            if (string.IsNullOrEmpty(keyword))
+                return true;
+            string text = string.Join("|",
+                s.Id.ToString(),
+                s.Display ?? "",
+                s.Job ?? "",
+                s.Type ?? "",
+                s.ScriptName ?? "",
+                s.TemplateName ?? "",
+                status ?? "",
+                s.Modules == null ? "" : string.Join("、", s.Modules));
+            return text.IndexOf(keyword, StringComparison.OrdinalIgnoreCase) >= 0;
         }
 
         private bool PassFilters(string[] cells)

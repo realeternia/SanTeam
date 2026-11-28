@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 /// <summary>
 /// 通用"范围伤害 + 可选 Buff"技能（ScriptName = "SkillComDamageArea"）：
@@ -6,6 +7,7 @@
 /// 造成技能伤害；每个目标再按 SkillConfig.BuffId 挂 Buff（英文/中文逗号或分号分隔可配多个，未配置则纯伤害），时长 BuffTime。
 /// 范围特效播在中心点、命中特效播在每个受击目标身上。
 /// · centerDouble = 锁定目标（首个目标）承受 centerRate 倍伤害（袁绍·名门），其余目标正常伤害。
+/// · selfDash/selfJump = 先冲/跳到中心点再播特效结算（典韦·天降恶来）；selfBuff = BuffId 改挂给自身。
 ///
 /// 中心点由基类 SelectTarget 决定：配 TargetType:self 时以自身为中心（近战贴脸 AoE，不做射程校验，
 /// 如张绣·枪出如龙 / 魏延·奇袭 / 刘晔·卸甲）；缺省以锁定目标为中心（远程需在 Range 射程内，
@@ -21,6 +23,9 @@ public class SkillComDamageArea : SkillComDamageSingle
 
     public override bool CheckAidSkill()
     {
+        if (moving)
+            return false;
+
         // 中心目标：self 标记时以自身为中心，否则按射程锁定目标（均由基类 SelectTarget 判定）
         var target = SelectTarget();
         if (target == null)
@@ -40,21 +45,42 @@ public class SkillComDamageArea : SkillComDamageSingle
             return false;
 
         PlayCast(target);
-        PlayAreaEffect(center);
 
+        // 移动类组件：先冲/跳到落点，再播范围特效并结算（典韦·天降恶来）
+        if (BeginMove(center, () =>
+            {
+                PlayAreaEffect(center);
+                ApplyAreaDamage(target, units);
+            }))
+            return true;
+
+        PlayAreaEffect(center);
+        ApplyAreaDamage(target, units);
+        return true;
+    }
+
+    /// <summary>范围伤害 + Buff：Buff 默认逐个挂给命中目标；selfBuff 时改为挂给自身（典韦·天降恶来的护甲）。</summary>
+    private void ApplyAreaDamage(Chess target, List<Chess> units)
+    {
         // Buff 由 SkillConfig.BuffId 短名指定（如"缓"=减速、"叛"=叛逃），支持多个（如"慑,疫"）
         var buffIds = GetSkillBuffIds();
         var baseDamage = GetSkillDamage();
+        var toSelf = BuffsToSelf;
         foreach (var u in units)
         {
             // 主目标双倍由伤害基类统一处理（centerDouble / centerRate）
             var dmg = ResolveDamage(u, ApplyCenterDouble(baseDamage, u == target));
             // 导弹型：Buff 归属已延后到飞弹命中回调，施法瞬间不再挂
-            if (IsMissileDeferred(dmg))
+            if (IsMissileDeferred(dmg) || toSelf)
                 continue;
             foreach (var buffId in buffIds)
                 ApplyBuffToUnit(u, buffId);
         }
-        return true;
+
+        if (toSelf)
+        {
+            foreach (var buffId in buffIds)
+                ApplyBuffToUnit(owner, buffId);
+        }
     }
 }

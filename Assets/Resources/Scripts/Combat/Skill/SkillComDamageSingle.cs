@@ -27,6 +27,7 @@ using UnityEngine;
 /// · execute / shieldBonus / missingHp / highHp / vsJob / soldierDamage / critRateBonus / distanceAmp（ApplyDamageModifiers）
 /// · antiShield / mpBurn / mpTransfer / 击退 pushMin~pushMax / 拖回出生点 pullToSpawn / selfHurt / selfBuff / dispel（AfterDamage）
 /// · hitCount / hitInterval = 多段攻击：第1段立即结算，第2段起每隔 hitInterval 秒追加命中（默认1段、间隔0.3秒）
+/// · selfDash / selfJump / selfBackstep = 先冲到目标身前/跳到落点再结算，或命中后退（组件 9042~9044）；移动中禁止重复发动
 /// 伤害体系派生（各自覆写 CheckAidSkill，自动继承上述全部组件能力）：
 /// · SkillComDamageArea        范围伤害 + 可选 Buff（目标中心 / self 自身中心）
 /// · SkillComDamageShockWave   冲击波（导弹沿路径命中）
@@ -38,6 +39,21 @@ public class SkillComDamageSingle : Skill
 {
     /// <summary>多段攻击未配置 hitInterval 时的默认间隔（秒）</summary>
     private const float DefaultHitInterval = 0.3f;
+
+    /// <summary>移动类组件（selfDash/selfJump）进行中，禁止重复发动</summary>
+    protected bool moving;
+
+    /// <summary>是否配置了位移类组件（冲锋/跳跃）</summary>
+    protected bool HasMoveComponent
+    {
+        get { return HasSkillFlag("selfDash") || HasSkillFlag("selfJump"); }
+    }
+
+    /// <summary>Buff 是否挂给自身（selfBuff 组件）</summary>
+    protected bool BuffsToSelf
+    {
+        get { return HasSkillFlag("selfBuff"); }
+    }
 
     public SkillComDamageSingle(int id, Chess unit) : base(id, unit)
     {
@@ -51,6 +67,9 @@ public class SkillComDamageSingle : Skill
 
     public override bool CheckAidSkill()
     {
+        if (moving)
+            return false;
+
         var target = SelectTarget();
         if (target == null)
             return false;
@@ -58,13 +77,115 @@ public class SkillComDamageSingle : Skill
             return false;
 
         PlayCast(target);
+
+        // 移动类组件：先位移到目标身前/落点，再结算伤害（吕蒙·白衣袭 / 典韦·天降恶来）
+        if (BeginMove(CalcApproachPos(target), () =>
+            {
+                if (target != null && target.hp > 0)
+                    ResolveHit(target);
+            }))
+            return true;
+
         ResolveHit(target);
+
+        // 后退组件：命中后远离目标（孙尚香·纵舞）
+        if (HasSkillFlag("selfBackstep"))
+            owner.StartCoroutine(Backstep(target));
 
         // 多段攻击：hitCount>1 时按 hitInterval 秒间隔追加命中（默认1段，保持原有单体技能行为）
         var hitCount = Mathf.Max(1, (int)GetStr2("hitCount", 1f));
         if (hitCount > 1)
             owner.StartCoroutine(ExtraHits(target, hitCount, Mathf.Max(0f, GetStr2("hitInterval", DefaultHitInterval))));
         return true;
+    }
+
+    /// <summary>位移到 dest 后回调 onArrive；未配位移组件返回 false（由调用方走原地结算）。</summary>
+    protected bool BeginMove(Vector3 dest, Action onArrive)
+    {
+        if (!HasMoveComponent)
+            return false;
+
+        moving = true;
+        owner.StartCoroutine(MoveThen(dest, HasSkillFlag("selfJump"), onArrive));
+        return true;
+    }
+
+    private IEnumerator MoveThen(Vector3 dest, bool useJump, Action onArrive)
+    {
+        var move = MoveToPoint(dest, useJump);
+        while (move.MoveNext())
+            yield return move.Current;
+
+        moving = false;
+        if (owner == null || owner.hp <= 0)
+            yield break;
+        if (onArrive != null)
+            onArrive();
+    }
+
+    /// <summary>后退：沿「目标→自身」方向远离 backstepDist，耗时 backstepTime（平滑，期间锁寻路）。</summary>
+    private IEnumerator Backstep(Chess target)
+    {
+        var start = owner.transform.position;
+        var dir = target != null ? start - target.transform.position : -owner.transform.forward;
+        dir.y = 0f;
+        if (dir.sqrMagnitude < 0.0001f)
+            dir = -owner.transform.forward;
+        dir.Normalize();
+        var dest = start + dir * GetStr2("backstepDist", 30f);
+        dest.y = start.y;
+
+        var move = MoveToPoint(dest, false, GetStr2("backstepTime", 0.3f));
+        while (move.MoveNext())
+            yield return move.Current;
+    }
+
+    /// <summary>落点：目标身前（沿目标→自身方向外推），stop 取 dashStop/jumpStop，0 表示落在目标脚下。</summary>
+    private Vector3 CalcApproachPos(Chess target)
+    {
+        var start = owner.transform.position;
+        if (target == null)
+            return start;
+
+        var dir = start - target.transform.position;
+        dir.y = 0f;
+        if (dir.sqrMagnitude < 0.0001f)
+            dir = -owner.transform.forward;
+        dir.Normalize();
+
+        var stop = HasSkillFlag("selfJump") ? GetStr2("jumpStop") : GetStr2("dashStop", 10f);
+        var pos = target.transform.position + dir * Mathf.Max(0f, stop);
+        pos.y = start.y;
+        return pos;
+    }
+
+    /// <summary>
+    /// 通用位移：useJump=true 走抛物线（JumpTo，自带空中状态），否则按 duration 线性 AirMove；
+    /// 两种都锁寻路、不可被外部位移打断，调用方须手动逐段推进。
+    /// </summary>
+    protected IEnumerator MoveToPoint(Vector3 dest, bool useJump, float duration = -1f)
+    {
+        if (useJump)
+        {
+            var jump = JumpTo(dest, GetStr2("jumpHeight", 25f), GetStr2("jumpTime", 0.55f));
+            while (jump.MoveNext())
+                yield return jump.Current;
+            yield break;
+        }
+
+        var start = owner.transform.position;
+        BeginAirMove();
+        try
+        {
+            var time = duration > 0f ? duration : GetStr2("dashTime", 0.3f);
+            var move = AirMove(time, t => Vector3.Lerp(start, dest, t));
+            while (move.MoveNext())
+                yield return move.Current;
+        }
+        finally
+        {
+            EndAirMove();
+        }
     }
 
     /// <summary>多段攻击：第2段起每隔 interval 秒再次结算 ResolveHit；目标死亡时重新索敌。</summary>

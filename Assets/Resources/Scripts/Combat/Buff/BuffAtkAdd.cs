@@ -2,7 +2,7 @@ using System;
 
 /// <summary>
 /// 攻击力提升（短名"攻"）：按技能 StrengthBuff1 语义 key "atk" 数值提升自身攻击力，移除时还原。
-/// 用于洛神（甄宓）给友军加攻击力。
+/// 用于惊鸿（甄宓）给友军加攻击力。
 /// </summary>
 public class BuffAtkAdd : Buff
 {

@@ -85,7 +85,6 @@
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffStackBuf.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillBondHitBuff.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidDamageAreaTeamBuff.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidDamageSingleDashBuff.cs" />
     <Compile Include="Assets\Resources\Scripts\WorldManager.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidHealSingleLowHp.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillBondBuffLowHp.cs" />
@@ -243,7 +242,6 @@
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillComDamageArea.cs" />
     <Compile Include="Assets\Resources\Scripts\Configs\PlayerLevelConfig_s.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillBondAttackSpeedAttack.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidDamageShotBackstep.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillBondInitDecayDef.cs" />
     <Compile Include="Assets\Resources\Scripts\Configs\ItemCombineConfig_s.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffHealDown.cs" />
@@ -278,7 +276,6 @@
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillBondSelfShield.cs" />
     <Compile Include="Assets\Resources\Scripts\Shop\SharedShopMode.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidDamageAreaField.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidDamageAreaFall.cs" />
     <Compile Include="Assets\DOTween\Modules\DOTweenModuleEPOOutline.cs" />
     <Compile Include="Assets\Resources\Scripts\Tools\BGMPlayer.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\LikeHeroPanelControl.cs" />

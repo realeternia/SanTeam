@@ -541,7 +541,7 @@ public class Skill
         owner.OnHpChanged();
     }
 
-    /// <summary>Buff 归属：selfBuff=全部挂自身；缺省全部挂目标。特化技能可覆写自定义归属（如白衣渡江首段挂目标、其余挂自身）。</summary>
+    /// <summary>Buff 归属：selfBuff=全部挂自身；缺省全部挂目标。特化技能可覆写自定义归属（如白衣袭首段挂目标、其余挂自身）。</summary>
     protected virtual void ApplySkillBuffs(Chess target)
     {
         var buffIds = GetSkillBuffIds();
