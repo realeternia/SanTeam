@@ -233,6 +233,7 @@ namespace CommonConfig
             config[5030] = new SkillTemplateComponentConfig(5030, "防御减免·60%", "数值", new string[]{"Defend"}, "Strength2:reduce=0.6", 2, 3f, "受伤前减免比例提升到 35%", "正向项：按减免比例提升折算", false);
             config[5040] = new SkillTemplateComponentConfig(5040, "反伤比例·30%", "数值", new string[]{"Defend"}, "Strength2:reflect=0.3", 2, 2f, "额外附带 15% 反伤（按减免后伤害反弹给攻击者）", "正向项：按反伤比例折算", false);
             config[5050] = new SkillTemplateComponentConfig(5050, "反伤比例·60%", "数值", new string[]{"Defend"}, "Strength2:reflect=0.6", 3, 4f, "额外附带 35% 反伤（按减免后伤害反弹给攻击者）", "正向项：按反伤比例折算", false);
+            config[5060] = new SkillTemplateComponentConfig(5060, "防御减免·逐级", "数值", new string[]{"Defend"}, "Strength2:reduce=0.4,0.45,0.5,0.55,0.6", 2, 3f, "受伤前减免比例按等级成长：Lv1~5 依次为 40%/45%/50%/55%/60%", "正向项：按各级减免比例提升折算", false);
             config[8000] = new SkillTemplateComponentConfig(8000, "士兵士气", "士兵", null, "TargetType:morale;BuffTime=999", 2, 1.5f, "施放后为我方全体小兵各叠一层士兵士气（每层+5攻击、+5护甲，战斗内近似永久）", "按覆盖士兵数与每层攻击/护甲折算", false);
             config[8010] = new SkillTemplateComponentConfig(8010, "士兵增伤", "士兵", null, "Strength2:soldierDamage=0.02,0.025,0.03,0.035,0.04", 2, 2f, "伤害随我方存活士兵数提升：伤害 × (1 + 士兵数 × soldierDamage)", "按平均存活士兵数与每兵增伤折算期望收益", false);
             config[8020] = new SkillTemplateComponentConfig(8020, "士兵回蓝", "士兵", null, "Strength2:soldierMpRestore=0.1,0.15,0.2,0.25,0.3", 2, 1.5f, "施放成功后按我方存活士兵数直接回复 MP：每名士兵 0.1~0.3 点，单次最多回复 3 点", "按平均存活士兵数与每兵回蓝折算 MP 收益", false);
