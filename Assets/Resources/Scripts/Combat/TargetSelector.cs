@@ -18,10 +18,11 @@ using UnityEngine;
 ///
 /// SelectFirst —— 优先级链，用 ";" 分隔，按顺序逐条比较，前一条分出胜负即返回，平手看下一条：
 ///   lowestHp / highestHp / highestArmor / lowestArmor / highestAp / highestAtk /
-///   highestMagicRes / lowestMagicRes / highestMp / biggestHpGap /
+///   highestMagicRes / lowestMagicRes / highestMp / lowestMp / biggestHpGap /
 ///   nearest / farthest / rangedFirst / meleeFirst / heroFirst / nearestToEnemy / random
 ///   （nearest / farthest 以本次搜索的中心点为基准，而非施法者位置）
 ///   biggestHpGap = 生命缺口（maxHp-hp）最大优先；highestMp = 带蓝耗技能的法力总和最高优先；
+///   lowestMp = 带蓝耗技能的法力总和最低优先（法力转移找"最缺蓝"的友军）；
 ///   nearestToEnemy = 该单位到其最近敌人的距离最近优先（衡量"站位最靠前"）
 ///
 /// 目标数：limit&lt;=0 表示全选；limit&gt;0 时有 SelectFirst 按优先级降序取前 limit，未配 SelectFirst 则随机取 limit。
@@ -215,6 +216,7 @@ public static class TargetSelector
             case "highestMagicRes": return b.magicRes.CompareTo(a.magicRes);
             case "lowestMagicRes": return a.magicRes.CompareTo(b.magicRes);
             case "highestMp": return TotalMp(b).CompareTo(TotalMp(a));
+            case "lowestMp": return TotalMp(a).CompareTo(TotalMp(b));
             case "biggestHpGap": return (b.maxHp - b.hp).CompareTo(a.maxHp - a.hp);
             case "nearest": return Distance(center, a).CompareTo(Distance(center, b));
             case "farthest": return Distance(center, b).CompareTo(Distance(center, a));

@@ -255,9 +255,11 @@ namespace CommonConfig
             config[9040] = new SkillTemplateComponentConfig(9040, "治疗诅咒", "特殊机制", new string[]{"Heal"}, "TargetType:curseNearest;Strength2:curseRange=60", 2, 2.5f, "治疗时把 BuffId 挂给被治疗目标周围 curseRange 内最近的 TargetCount 名敌人", "按可覆盖敌人数与 debuff 强度估值，人工评审", true);
             config[9041] = new SkillTemplateComponentConfig(9041, "链接双方", "特殊机制", new string[]{"Heal"}, "TargetType:linkBoth", 2, 1.5f, "治疗目标后，把 BuffId 同时挂给目标与施法者自身（双方生命链接）", "按链接双方的自损/分摊收益估值，人工评审", true);
             config[9050] = new SkillTemplateComponentConfig(9050, "永久成长攻速", "特殊机制", null, "TargetType:permanent;Strength2:selfAtkSpeed=0.08,0.1,0.12,0.14,0.17", 3, 3.5f, "每次施放永久提升自身攻击速度（selfAtkSpeed）", "特殊机制，人工评审", true);
+            config[9060] = new SkillTemplateComponentConfig(9060, "立刻回蓝", "特殊机制", new string[]{"Buff"}, "Strength2:mpRestore=3", 4, 6f, "施放后为每个目标立即回复 3 点法力（直接加 MP，不挂 Buff、不吃 mpRegen 加成）", "按回复法力折算技能循环收益", false);
             config[9070] = new SkillTemplateComponentConfig(9070, "弹道", "特殊机制", new string[]{"单体伤害大","单体伤害中","单体伤害小","群体伤害近距离大","群体伤害近距离中","群体伤害近距离小","群体伤害自身中心大","群体伤害自身中心中","群体伤害自身中心小"}, "TargetType:missile;SummonSpeed=20", 1, 0.5f, "以飞弹逐个结算，飞弹特效取技能 HitEffect，飞行速度取 SummonSpeed（为0时用单位导弹速度，最低14）", "形态组件，不计分", false);
             config[9081] = new SkillTemplateComponentConfig(9081, "自损", "特殊机制", new string[]{"单体伤害大","单体伤害中","单体伤害小"}, "TargetType:selfHurt;Strength2:selfHurt=0.2", 1, -1.5f, "施放时消耗自身生命（selfHurt），属于代价项", "负向项，抵减技能总价值", false);
             config[9082] = new SkillTemplateComponentConfig(9082, "燃烧法力", "特殊机制", null, "TargetType:mpBurn;Strength2:mpBurn=20", 2, 2f, "燃烧目标法力（mpBurn），压制技能循环", "按削弱的法力与技能频率估值", false);
+            config[9083] = new SkillTemplateComponentConfig(9083, "法力转移", "特殊机制", new string[]{"Damage"}, "TargetType:mpTransfer;Strength2:mpTransferRange=40", 3, 4f, "命中后按 mpBurn 燃烧目标法力，实燃量×mpShareRate（默认1）转给 mpTransferRange 内法力最低、最近的1名友军；无友军只燃不转", "按燃蓝量与转移收益估值，人工评审", false);
             config[9190] = new SkillTemplateComponentConfig(9190, "持续场移动", "特殊机制", new string[]{"持续伤害大","持续伤害中","持续伤害小"}, "Strength2:moveDist=40", 2, 1.5f, "持续伤害场沿方向移动（moveDist）", "特殊机制，人工评审", true);
 
             RebuildIndex();

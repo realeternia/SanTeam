@@ -11,7 +11,7 @@ using UnityEngine;
 /// · 伤害修正 ApplyDamageModifiers：execute(execHp/execRate)、shieldBonus、missingHp、vsJob、soldierDamage、critRateBonus
 /// · 概率翻倍 TryDoubleDamage：doubleChance/doubleRate
 /// · 破盾追加 ApplyAntiShieldBonus：antiShield/antiShieldRate
-/// · 命中效果 ApplyMpBurn / ApplyDispel：mpBurn、dispel
+/// · 命中效果 ApplyMpBurn / ApplyMpTransfer / ApplyDispel：mpBurn、mpTransfer、dispel
 /// · 击退 PushTargetBack：pushMin/pushMax
 /// · 苦肉反噬 HurtSelfByDamage：selfHurt
 /// · Buff 归属 ApplySkillBuffs / ApplyBuffToUnit：selfBuff，护盾类自动写护盾值（特化技能可覆写归属）
@@ -435,6 +435,45 @@ public class Skill
     {
         if (HasSkillFlag("mpBurn"))
             BurnMpToTarget(target, GetStr2("mpBurn"));
+    }
+
+    /// <summary>
+    /// 命中法力转移（组件「法力转移」）：按 mpBurn 燃烧目标法力，实燃量 × mpShareRate（默认 1）
+    /// 转给 mpTransferRange 内“法力最低、最近”的一名友军（不含施法者）；范围内无友军时只燃不转。
+    /// 配置 mpTransfer 标记时由本方法统一处理，不再走 ApplyMpBurn，避免重复燃烧。
+    /// </summary>
+    protected int ApplyMpTransfer(Chess target)
+    {
+        if (target == null || !HasSkillFlag("mpTransfer"))
+            return 0;
+
+        var burned = BurnMpToTarget(target, GetStr2("mpBurn"));
+        if (burned <= 0)
+            return 0;
+
+        var share = Mathf.RoundToInt(burned * GetStr2("mpShareRate", 1f));
+        if (share <= 0)
+            return burned;
+
+        var range = GetStr2("mpTransferRange", skillCfg.Area > 0f ? skillCfg.Area : skillCfg.Range);
+        var receiver = SelectTargetsWithRules(owner.transform.position, range, true, 1,
+            "ally;notSelf;inFight", "lowestMp;nearest");
+        if (receiver.Count == 0)
+        {
+            GameLog.Debug($"法力转移：{target.name} 燃蓝 {burned} 点，范围内无友军，只燃不转 技能id={id}");
+            return burned;
+        }
+
+        var ally = receiver[0];
+        foreach (var s in ally.skills)
+        {
+            if (s.skillCfg == null || s.skillCfg.MpCost <= 0 || s.IsMpFull())
+                continue;
+            s.AddMp(share);
+        }
+
+        GameLog.Debug($"法力转移：{target.name} 燃蓝 {burned} 点，转给 {ally.name} {share} 点 技能id={id}");
+        return burned;
     }
 
     /// <summary>命中驱散：dispel 标记时驱散目标正面 Buff。</summary>

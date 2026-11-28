@@ -194,7 +194,6 @@
     <Compile Include="Assets\Resources\Scripts\Combat\FatigueManager.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillEquipInitShieldValue.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillComHealAreaCasting.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidManaSingleBurn.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffLock.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidDamageAreaWall.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidAreaWallBuff.cs" />
@@ -283,7 +282,6 @@
     <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidDamageAreaFall.cs" />
     <Compile Include="Assets\DOTween\Modules\DOTweenModuleEPOOutline.cs" />
     <Compile Include="Assets\Resources\Scripts\Tools\BGMPlayer.cs" />
-    <Compile Include="Assets\Resources\Scripts\Combat\Skill\SkillAidManaTeamShare.cs" />
     <Compile Include="Assets\Resources\Scripts\UIs\LikeHeroPanelControl.cs" />
     <Compile Include="Assets\Resources\Scripts\Effect\GlowBeamController.cs" />
     <Compile Include="Assets\Resources\Scripts\Combat\Buff\BuffDefStack.cs" />

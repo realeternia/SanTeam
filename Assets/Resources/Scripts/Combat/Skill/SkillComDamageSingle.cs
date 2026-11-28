@@ -25,7 +25,7 @@ using UnityEngine;
 /// · missile     = 以飞弹逐个结算（ApplyDamage）；飞弹特效取 HitEffect，飞行速度取 SummonSpeed（0 时用单位导弹速度），
 ///                 破盾/燃蓝/击退/驱散与 Buff 归属统一延后到飞弹命中回调，避免飞弹未落地就生效
 /// · execute / shieldBonus / missingHp / highHp / vsJob / soldierDamage / critRateBonus（ApplyDamageModifiers）
-/// · antiShield / mpBurn / 击退 pushMin~pushMax / 拖回出生点 pullToSpawn / selfHurt / selfBuff / dispel（AfterDamage）
+/// · antiShield / mpBurn / mpTransfer / 击退 pushMin~pushMax / 拖回出生点 pullToSpawn / selfHurt / selfBuff / dispel（AfterDamage）
 /// · hitCount / hitInterval = 多段攻击：第1段立即结算，第2段起每隔 hitInterval 秒追加命中（默认1段、间隔0.3秒）
 /// 伤害体系派生（各自覆写 CheckAidSkill，自动继承上述全部组件能力）：
 /// · SkillComDamageArea        范围伤害 + 可选 Buff（目标中心 / self 自身中心）
@@ -183,7 +183,11 @@ public class SkillComDamageSingle : Skill
     private void ApplyHitFollowUps(Chess target, int baseDamage)
     {
         ApplyAntiShieldBonus(target, baseDamage);
-        ApplyMpBurn(target);
+        // 法力转移（mpTransfer）自带燃蓝并转给友军，避免再走 ApplyMpBurn 重复燃烧
+        if (HasSkillFlag("mpTransfer"))
+            ApplyMpTransfer(target);
+        else
+            ApplyMpBurn(target);
         PushTargetBack(target);
         ApplyDispel(target);
     }

@@ -18,6 +18,7 @@ using UnityEngine;
 /// · selfAlways         = 施法者必定获得（李典·御阵 / 周仓）
 /// · noDedupe           = 不按首段 Buff 去重（司马炎 / 陆抗 / 张梁 / 周仓 / 娄圭 / 步骘 / 阮籍 / 甄宓）
 /// · targetCenter       = 以选中的首个友军目标为中心，再在 Area 内扩散（缺省以自身为中心）
+/// · mpRestore          = 立刻回蓝（Strength2 的 mpRestore &gt; 0）：给每个目标直接加 MP，不算 Buff、不吃 mpRegen
 /// 护盾类 Buff 统一按护盾公式写入护盾值。
 ///
 /// 增益体系派生：SkillComBuffArea（群体增益）、SkillComBuffAura（光环）、SkillComDamageTaunt（嘲讽）。
@@ -100,8 +101,10 @@ public class SkillComBuffSingle : Skill
 
         var selfAlways = HasSkillFlag("selfAlways");
         var noDedupe = HasSkillFlag("noDedupe");
-        // 去重：非 noDedupe 时排除已带首段 Buff 的单位
-        Func<Chess, bool> dedupeFilter = (noDedupe || buffIds.Count == 0) ? null : x => !x.HasBuff(buffIds[0]);
+        // 去重：非 noDedupe 时排除已带首段 Buff 的单位；
+        // 「立刻回蓝」需要每轮都选中目标，不能因目标已带首段 Buff 被跳过，因此同样绕过去重
+        Func<Chess, bool> dedupeFilter = (noDedupe || HasMpRestore || buffIds.Count == 0)
+            ? null : x => !x.HasBuff(buffIds[0]);
         // selfAlways：选人时排除施法者，最后再把他补进结果
         var exclude = selfAlways ? owner : null;
 
@@ -154,7 +157,13 @@ public class SkillComBuffSingle : Skill
         get { return !GroupBuff && !string.IsNullOrEmpty(skillCfg.SelectOnly); }
     }
 
-    /// <summary>施加效果：逐目标挂 Buff，并结算命中特效。</summary>
+    /// <summary>是否配置「立刻回蓝」组件（Strength2 的 mpRestore &gt; 0）。</summary>
+    protected bool HasMpRestore
+    {
+        get { return GetStr2("mpRestore") > 0f; }
+    }
+
+    /// <summary>施加效果：逐目标挂 Buff、结算立刻回蓝，并结算命中特效。</summary>
     protected virtual void ApplyBuffs(List<Chess> targets, List<int> buffIds)
     {
         foreach (var unit in targets)
@@ -169,11 +178,52 @@ public class SkillComBuffSingle : Skill
                     exist.SetTime(skillCfg.BuffTime);
                     continue;
                 }
+
+                // 「立刻回蓝」绕过了群体首段去重：已有的共存类 Buff 只刷新时长，避免重复叠层
+                if (HasMpRestore)
+                {
+                    var coexist = unit.GetBuff(buffId);
+                    if (coexist != null && coexist.buffCfg != null
+                        && coexist.buffCfg.StackMode == CombatConst.BuffStackCoexist)
+                    {
+                        coexist.SetTime(skillCfg.BuffTime);
+                        continue;
+                    }
+                }
+
                 ApplyBuffToUnit(unit, buffId);
             }
+
+            RestoreMpToTarget(unit);
 
             if (!string.IsNullOrEmpty(skillCfg.HitEffect))
                 PlaySkillEffect(unit, skillCfg.HitEffect);
         }
+    }
+
+    /// <summary>
+    /// 立刻回蓝（组件「立刻回蓝」）：按 Strength2[mpRestore] 给目标身上所有 MpCost&gt;0 且未满的技能直接加 MP。
+    /// 不挂 Buff、不吃 mpRegen 百分比加成（与旧「仁德分蓝」共用 Skill.AddMp 入口）；未配置该键时为 no-op。
+    /// </summary>
+    protected void RestoreMpToTarget(Chess target)
+    {
+        if (target == null || target.hp <= 0)
+            return;
+
+        var restore = GetStr2("mpRestore");
+        if (restore <= 0f)
+            return;
+
+        var given = false;
+        foreach (var s in target.skills)
+        {
+            if (s.skillCfg == null || s.skillCfg.MpCost <= 0 || s.IsMpFull())
+                continue;
+            s.AddMp(restore);
+            given = true;
+        }
+
+        if (given)
+            GameLog.Debug($"立刻回蓝：{target.name} 回复 {restore:0.##} 点 MP 技能id={id}");
     }
 }
