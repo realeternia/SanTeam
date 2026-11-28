@@ -19,6 +19,8 @@ public class Missile : MonoBehaviour
 
     public int skillId;
     public int skillDamage;
+    /// <summary>命中结算时传给 OnSkillDamaged 的伤害标签（空=普通伤害；折射飞弹传 Refract 标记为派生伤害）</summary>
+    public string hurtTag = "";
     /// <summary>每目标伤害倍率回调（可空）：命中单个目标时按该目标计算伤害系数，用于"对特定目标伤害翻倍"类技能（如飞斧对带盾目标）</summary>
     public Func<Chess, float> perTargetDamageMulti;
 
@@ -251,7 +253,7 @@ public class Missile : MonoBehaviour
             var damage = perTargetDamageMulti != null
                 ? Mathf.Max(1, (int)(skillDamage * perTargetDamageMulti(target)))
                 : skillDamage;
-            target.OnSkillDamaged(owner, skillId, damage);
+            target.OnSkillDamaged(owner, skillId, damage, false, hurtTag);
             EffectManager.PlaySkillEffect(target, hitEffectName, 1.3f, heroTint);
             // 命中附加效果（如惊雷减速）：目标仍存活时回调
             if (perTargetOnHit != null && target != null && target.hp > 0)

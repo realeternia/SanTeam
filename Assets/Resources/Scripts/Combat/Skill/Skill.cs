@@ -576,6 +576,87 @@ public class Skill
         return candidates[0];
     }
 
+    // ---- 技能折射（组件：主伤害落地后按比例扩散到额外目标） ----
+
+    /// <summary>本次施放是否已经折射过（CheckBurst 成功时重置，保证一次施放只折射一次）</summary>
+    private bool refractUsed;
+
+    /// <summary>多个折射目标之间的结算间隔（秒），避免视觉上同时爆开</summary>
+    private const float RefractHitInterval = 0.12f;
+
+    /// <summary>
+    /// 技能折射：以 center 为中心、按 refractRadius 选 refractCount 个目标（排除主目标），
+    /// 各造成 GetSkillDamage 原始值 × (refractRate + refractAmp) 的派生伤害（Refract 标签，不再二次派生）。
+    /// 每次施放最多触发一次。
+    /// </summary>
+    protected int TryRefract(Chess mainTarget, Vector3 center, int baseDamage)
+    {
+        var rate = GetStr2("refractRate");
+        if (rate <= 0f || baseDamage <= 0 || refractUsed)
+            return 0;
+
+        var radius = GetStr2("refractRadius", CombatConst.DefaultRefractRadius);
+        var rawCount = (int)GetStr2("refractCount", 1f);
+        var only = GetStrKey("refractSelectOnly");
+        if (string.IsNullOrEmpty(only))
+            only = "enemy";
+        only = only.Replace('|', ';');
+
+        var targets = TargetSelector.Select(owner, center, radius, false, only, "", rawCount, mainTarget);
+        if (targets.Count == 0)
+            return 0;
+
+        refractUsed = true;
+        var ratio = Mathf.Min(1f, rate + GetStr2("refractAmp"));
+        var dmg = Mathf.Max(1, Mathf.RoundToInt(baseDamage * ratio));
+
+        var valid = new List<Chess>();
+        foreach (var unit in targets)
+        {
+            if (unit != null && unit.hp > 0)
+                valid.Add(unit);
+        }
+        if (valid.Count == 0)
+            return 0;
+
+        if (HasSkillFlag("refractMissile"))
+        {
+            // 折射飞弹：以主目标位置为起点，按 refractSpeed 飞向每个折射目标，命中时带 Refract 标签结算
+            var speed = GetStr2("refractSpeed", CombatConst.DefaultRefractMissileSpeed);
+            foreach (var unit in valid)
+                WorldManager.Instance.CreateSpellMissile(owner, unit, center, id, dmg, skillCfg.HitEffect, speed,
+                    null, effectTint, CombatConst.RefractHurtTag);
+        }
+        else if (valid.Count == 1)
+            ApplyRefractHit(valid[0], dmg);
+        else
+            owner.StartCoroutine(RefractHitsSequential(valid, dmg));
+
+        GameLog.Debug($"折射：{owner.name} 技能id={id} 目标数={valid.Count} 单次伤害={dmg}");
+        return valid.Count;
+    }
+
+    /// <summary>多个折射目标按 RefractHitInterval 依次结算，避免同一帧全部弹出。</summary>
+    private IEnumerator RefractHitsSequential(List<Chess> targets, int dmg)
+    {
+        for (var i = 0; i < targets.Count; i++)
+        {
+            if (i > 0)
+                yield return new WaitForSeconds(RefractHitInterval);
+            ApplyRefractHit(targets[i], dmg);
+        }
+    }
+
+    /// <summary>对单个折射目标结算派生伤害并播放命中特效。</summary>
+    private void ApplyRefractHit(Chess unit, int dmg)
+    {
+        if (unit == null || unit.hp <= 0)
+            return;
+        unit.OnSkillDamaged(owner, id, dmg, false, CombatConst.RefractHurtTag);
+        if (!string.IsNullOrEmpty(skillCfg.HitEffect))
+            PlaySkillEffect(unit, skillCfg.HitEffect);
+    }
+
     /// <summary>
     /// 判断 SkillConfig.TargetType 是否包含指定行为标记。
     /// TargetType 原本是“选取点”单选字段，现向后兼容地扩展为标记列表：
@@ -706,6 +787,7 @@ public class Skill
         GameLog.Debug("CheckBurst isBurst=" + isBurst.ToString() + " skillId=" + id.ToString());
         if(isBurst)
         {
+            refractUsed = false; // 新一次施放：允许折射一次
             UpdateCD();
             mpBeforeBurst = mp; // 记录发动前累积量，供"转移全部法力"类技能读取
             mp = Mathf.Max(0f, mp - skillCfg.MpCost); // 每次发动扣除 1×MpCost，剩余MP可留到下一次（MpLimit>0 时）

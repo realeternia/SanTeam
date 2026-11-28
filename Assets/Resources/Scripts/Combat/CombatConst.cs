@@ -45,6 +45,12 @@ public static class CombatConst
     /// <summary>士兵回蓝单次回复上限（点）：组件只写 Strength2.soldierMpRestore，上限由运行时常量约束</summary>
     public const float SoldierMpRestoreMax = 3f;
 
+    // ---- 技能折射 ----
+    /// <summary>折射默认搜索半径（未配置 refractRadius 时使用，0 表示全图）</summary>
+    public const float DefaultRefractRadius = 40f;
+    /// <summary>折射飞弹默认速度（未配置 refractSpeed 时使用）</summary>
+    public const float DefaultRefractMissileSpeed = 20f;
+
     // ---- 伤害标签(SkillConfig.HurtTag) ----
     /// <summary>AntiShield：绕过护盾直接打血（破盾类技能，BuffShield 判定该标签不吸收）</summary>
     public const string AntiShieldHurtTag = "AntiShield";
@@ -52,14 +58,17 @@ public static class CombatConst
     public const string LockChainHurtTag = "LockChain";
     /// <summary>Reflect：反伤(物理/魔法反弹)产生的伤害标签，避免双方反伤互相递归</summary>
     public const string ReflectHurtTag = "Reflect";
+    /// <summary>Refract：技能折射追加的伤害标签，派生伤害不再二次折射/回蓝/触发连锁</summary>
+    public const string RefractHurtTag = "Refract";
 
     /// <summary>
-    /// 是否派生伤害：连锁(LockChain)/破盾(AntiShield)/反伤(Reflect)这类由其他伤害二次派生的伤害。
-    /// 派生伤害不得再生出派生伤害（连锁/生命链接/破盾/反伤），否则机制会互相触发形成无限递归
+    /// 是否派生伤害：连锁(LockChain)/破盾(AntiShield)/反伤(Reflect)/折射(Refract)这类由其他伤害二次派生的伤害。
+    /// 派生伤害不得再生出派生伤害（连锁/生命链接/破盾/反伤/折射），否则机制会互相触发形成无限递归
     /// </summary>
     public static bool IsDerivedHurtTag(string hurtTag)
     {
-        return hurtTag == LockChainHurtTag || hurtTag == AntiShieldHurtTag || hurtTag == ReflectHurtTag;
+        return hurtTag == LockChainHurtTag || hurtTag == AntiShieldHurtTag || hurtTag == ReflectHurtTag
+            || hurtTag == RefractHurtTag;
     }
 
     // ---- 跳跃链(SkillComDamageJumpChain) ----

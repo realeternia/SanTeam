@@ -251,6 +251,16 @@ namespace CommonConfig
             config[4130] = new SkillTemplateComponentConfig(4130, "中心双倍", "增伤", null, "TargetType:centerDouble;Strength2:centerRate=2", 2, 3f, "范围伤害时，锁定的主目标承受 centerRate 倍伤害，其余目标正常", "按主目标承伤占比与倍率折算额外伤害", false);
             config[9040] = new SkillTemplateComponentConfig(9040, "治疗诅咒", "特殊机制", new string[]{"Heal"}, "TargetType:curseNearest;Strength2:curseRange=60", 2, 2.5f, "治疗时把 BuffId 挂给被治疗目标周围 curseRange 内最近的 TargetCount 名敌人", "按可覆盖敌人数与 debuff 强度估值，人工评审", true);
             config[9041] = new SkillTemplateComponentConfig(9041, "链接双方", "特殊机制", new string[]{"Heal"}, "TargetType:linkBoth", 2, 1.5f, "治疗目标后，把 BuffId 同时挂给目标与施法者自身（双方生命链接）", "按链接双方的自损/分摊收益估值，人工评审", true);
+            // ---- 6000 段：伤害组·技能折射（主伤害落地后按比例扩散到额外目标） ----
+            config[6000] = new SkillTemplateComponentConfig(6000, "折射·弹射", "伤害组", new string[]{"单体伤害大","单体伤害中","单体伤害小"}, "Strength2:refractRate=0.3;Strength2:refractRadius=40;Strength2:refractCount=1", 2, 3f, "主伤害落地后，以主目标为中心 40 范围内随机折射 1 名敌人，造成 30% 伤害", "按额外目标数与折射比例折算总输出，人工评审", true);
+            config[6001] = new SkillTemplateComponentConfig(6001, "折射·三连", "伤害组", new string[]{"单体伤害大","单体伤害中","单体伤害小"}, "Strength2:refractRate=0.3;Strength2:refractRadius=60;Strength2:refractCount=3", 3, 4.5f, "主伤害落地后，向周围 60 范围内折射最多 3 名敌人，各造成 30% 伤害", "按额外目标数（3 人）与折射比例折算，人工评审", true);
+            config[6010] = new SkillTemplateComponentConfig(6010, "折射·范围小", "伤害组", new string[]{"单体伤害大","单体伤害中","单体伤害小"}, "Strength2:refractRate=0.3;Strength2:refractRadius=20;Strength2:refractCount=3", 3, 4f, "主伤害落地后，以主目标为中心 20 范围内最多 3 名敌人各受 30% 伤害", "按覆盖人数与折射比例折算，人工评审", true);
+            config[6011] = new SkillTemplateComponentConfig(6011, "折射·范围中", "伤害组", new string[]{"单体伤害大","单体伤害中","单体伤害小"}, "Strength2:refractRate=0.3;Strength2:refractRadius=35;Strength2:refractCount=3", 3, 5f, "同折射·范围小，半径 35（覆盖更多目标）", "按覆盖人数与折射比例折算，人工评审", true);
+            config[6012] = new SkillTemplateComponentConfig(6012, "折射·范围大", "伤害组", new string[]{"单体伤害大","单体伤害中","单体伤害小"}, "Strength2:refractRate=0.3;Strength2:refractRadius=50;Strength2:refractCount=3", 4, 6f, "同折射·范围小，半径 50（大范围扩散）", "按覆盖人数与折射比例折算，人工评审", true);
+            config[6090] = new SkillTemplateComponentConfig(6090, "折射飞弹", "伤害组", new string[]{"单体伤害大","单体伤害中","单体伤害小"}, "TargetType:refractMissile;Strength2:refractSpeed=20", 1, 0.5f, "折射改为飞弹表现：以主目标位置为起点逐个飞向折射目标，速度取 refractSpeed（默认 20），命中结算派生伤害", "形态组件，不计分", false);
+            config[6100] = new SkillTemplateComponentConfig(6100, "折射增幅·小", "伤害组", new string[]{"单体伤害大","单体伤害中","单体伤害小"}, "Strength2:refractAmp=0.15", 1, 1.5f, "折射比例 +15%（与折射比例加算，如 30% → 45%）", "正向项：按折射目标数与增量折算", true);
+            config[6101] = new SkillTemplateComponentConfig(6101, "折射增幅·中", "伤害组", new string[]{"单体伤害大","单体伤害中","单体伤害小"}, "Strength2:refractAmp=0.3", 2, 3f, "折射比例 +30%（与折射比例加算，如 30% → 60%）", "正向项：按折射目标数与增量折算", true);
+            config[6102] = new SkillTemplateComponentConfig(6102, "折射增幅·逐级", "伤害组", new string[]{"单体伤害大","单体伤害中","单体伤害小"}, "Strength2:refractAmp=0,0.05,0.1,0.15,0.2", 2, 2f, "折射比例随等级递增：Lv1~5 依次 +0%/+5%/+10%/+15%/+20%（加算）", "正向项：按各级增量与目标数折算", true);
 
             RebuildIndex();
 

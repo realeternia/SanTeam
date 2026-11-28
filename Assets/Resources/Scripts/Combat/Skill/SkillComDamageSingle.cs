@@ -193,12 +193,17 @@ public class SkillComDamageSingle : Skill
     {
         ApplyHitFollowUps(target, baseDamage);
         ApplySkillBuffs(target);
+        // 导弹型主伤害落地后再折射（同一次施放只折射一次）
+        TryRefract(target, target.transform.position, GetSkillDamage());
     }
 
     /// <summary>伤害结算主流程：统一伤害路径 + 命中后的自伤与 Buff 归属。</summary>
     protected virtual void ResolveHit(Chess target)
     {
         var dmg = ResolveDamage(target, GetSkillDamage());
+        // 直伤：主伤害落地后触发折射（导弹型延后到命中回调）
+        if (!IsMissileDeferred(dmg))
+            TryRefract(target, target.transform.position, GetSkillDamage());
         AfterDamage(target, dmg);
     }
 
